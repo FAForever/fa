@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSC9002/XSC9002_script.lua
-#**  Author   :  Greg Kohne
-#**  Summary  :  Jamming Crystal
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSC9002/XSC9002_script.lua
+--**  Author   :  Greg Kohne
+--**  Summary  :  Jamming Crystal
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystalAmbient
 
@@ -13,10 +13,10 @@ local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystal
 XSC9002 = Class(SStructureUnit) {
 
     OnCreate = function(self, builder, layer)
-        --#SEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
+        ----SEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         ----self.Trash:Add(CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + Random(0, 20)))
 
-        --#Place emitters on certain light bones on the mesh.
+        ----Place emitters on certain light bones on the mesh.
         for k, v in SSJammerCrystalAmbient do
             CreateAttachedEmitter(self, 'XSC9002', self:GetArmy(), v)
         end
@@ -24,7 +24,7 @@ XSC9002 = Class(SStructureUnit) {
         self:ForkThread(self.LandBlipThread)
         self:ForkThread(self.AirBlipThread)
 
-        # Make unit uncapturable
+        -- Make unit uncapturable
         self:SetCapturable(false)
 
         SStructureUnit.OnCreate(self)
@@ -43,7 +43,7 @@ XSC9002 = Class(SStructureUnit) {
             self.landChildUnit:Destroy()
             self.landChildUnit = nil
 
-            #WaitSeconds(Random(2,7))
+            --WaitSeconds(Random(2,7))
         end
     end,
 
@@ -65,7 +65,7 @@ XSC9002 = Class(SStructureUnit) {
             self.airChildUnit:Destroy()
             self.airChildUnit = nil
 
-            #WaitSeconds(Random(2,7))
+            --WaitSeconds(Random(2,7))
         end
     end,
 

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAS0401/UAS0401_script.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  Aeon Experimental Sub
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAS0401/UAS0401_script.lua
+--**  Author(s):  John Comes
+--**
+--**  Summary  :  Aeon Experimental Sub
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
@@ -130,7 +130,7 @@ UAS0401 = Class(ASeaUnit) {
 				WaitSeconds(0.1)
 				-- LOG("Sinker: ", repr(self:GetPosition()))
 			end
-			#CreateScaledBoom(self, overkillRatio, watchBone)
+			--CreateScaledBoom(self, overkillRatio, watchBone)
 			self:CreateWreckage(overkillRatio, instigator)
 			self:Destroy()
 		end)

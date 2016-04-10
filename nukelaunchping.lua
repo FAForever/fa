@@ -21,17 +21,17 @@ function DoNukePing(NukeLaunchData)
     end
     local army = NukeLaunchData.army
     
-    #Check ping table do determine if this is another ping near the same place at the same time
+    --Check ping table do determine if this is another ping near the same place at the same time
     local pingTime = GetGameTimeSeconds()
     local pingOkFlag = false
     if lastPingData[army] then
-    	#if data has been set, check it...
+    	--if data has been set, check it...
     	if VDist3(lastPingData[army].loc, position) > redundantPingCheckDistance or lastPingData[army].tm < pingTime - redundantPingCheckTime then
     		pingOkFlag = true
     		lastPingData[army] = {loc = position, tm = pingTime}
     	end
     else
-    	#if no data has been set for this army, set some
+    	--if no data has been set for this army, set some
     	lastPingData[army] = {loc = position, tm = pingTime}
     	pingOkFlag = true
     end

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFInainoStrategicMissile02/SIFInainoStrategicMissile02_script.lua
-#**  Author(s):  Gordon Duclos, Matt Vainio
-#**
-#**  Summary  :  Inaino Strategic Missile Projectile script, XSS0302
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFInainoStrategicMissile02/SIFInainoStrategicMissile02_script.lua
+--**  Author(s):  Gordon Duclos, Matt Vainio
+--**
+--**  Summary  :  Inaino Strategic Missile Projectile script, XSS0302
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
 
 SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
@@ -47,7 +47,7 @@ SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
-            # Play the explosion sound
+            -- Play the explosion sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Explosion then
                 self:PlaySound(myBlueprint.Audio.Explosion)
@@ -100,18 +100,18 @@ SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
 
     SetTurnRateByDist = function(self) 
         local dist = self:GetDistanceToTarget()
-        #Get the nuke as close to 90 deg as possible
+        --Get the nuke as close to 90 deg as possible
         if dist > 150 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             self:SetTurnRate(0)
         elseif dist > 75 and dist <= 150 then
-						# Increase check intervals
+						-- Increase check intervals
             self.WaitTime = 0.3
         elseif dist > 32 and dist <= 75 then
-						# Further increase check intervals
+						-- Further increase check intervals
             self.WaitTime = 0.1
         elseif dist < 32 then
-						# Turn the missile down
+						-- Turn the missile down
             self:SetTurnRate(80)
         end
     end,

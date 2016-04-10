@@ -1,6 +1,6 @@
-#
-# Terran CDR Nuke
-#
+--
+-- Terran CDR Nuke
+--
 local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
 
 TIFMissileNukeCDR = Class(TIFMissileNuke) {
@@ -22,7 +22,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
     
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
-            # Play the explosion sound
+            -- Play the explosion sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Explosion then
                 self:PlaySound(myBlueprint.Audio.Explosion)
@@ -41,29 +41,29 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         end
     end,
 
-#    MovementThread = function(self)
-#        local army = self:GetArmy()
-#        local target = self:GetTrackingTarget()
-#        local launcher = self:GetLauncher()
-#        self:TrackTarget(false)
-#        self.CreateEffects( self, self.InitialEffects, army, 1 )        
-#        WaitSeconds(3)
-#        self.CreateEffects( self, self.LaunchEffects, army, 1 )
-#        self.CreateEffects( self, self.ThrustEffects, army, 1 )   
-#        self:SetCollision(true)
-#        WaitSeconds(3)
-#        self:SetTurnRate(5)
-#        WaitSeconds(6)
-#        self:TrackTarget(true)
-#        self:SetDestroyOnWater(true)
-#        self:SetTurnRate(25)
-#        WaitSeconds(3.5)
-#        self:SetBallisticAcceleration(10)
-#        while not self:BeenDestroyed() do
-#            self:SetTurnRateByDist()
-#            WaitSeconds(0.5)
-#        end
-#    end,
+--    MovementThread = function(self)
+--        local army = self:GetArmy()
+--        local target = self:GetTrackingTarget()
+--        local launcher = self:GetLauncher()
+--        self:TrackTarget(false)
+--        self.CreateEffects( self, self.InitialEffects, army, 1 )        
+--        WaitSeconds(3)
+--        self.CreateEffects( self, self.LaunchEffects, army, 1 )
+--        self.CreateEffects( self, self.ThrustEffects, army, 1 )   
+--        self:SetCollision(true)
+--        WaitSeconds(3)
+--        self:SetTurnRate(5)
+--        WaitSeconds(6)
+--        self:TrackTarget(true)
+--        self:SetDestroyOnWater(true)
+--        self:SetTurnRate(25)
+--        WaitSeconds(3.5)
+--        self:SetBallisticAcceleration(10)
+--        while not self:BeenDestroyed() do
+--            self:SetTurnRateByDist()
+--            WaitSeconds(0.5)
+--        end
+--    end,
 
      MovementThread = function(self)   
         local army = self:GetArmy()
@@ -84,20 +84,20 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
-			# Increase check intervals
+			-- Increase check intervals
 			self:SetTurnRate(30)
 			WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
-		    # Further increase check intervals
+		    -- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(75)
 		elseif dist > 0 and dist <= 43 then
-			# Further increase check intervals            
+			-- Further increase check intervals            
             self:SetTurnRate(200)   
             KillThread(self.MoveThread)         
         end

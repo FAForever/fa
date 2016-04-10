@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEA0001/UEA0001_script.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  UEF CDR Pod Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEA0001/UEA0001_script.lua
+--**  Author(s):  John Comes
+--**
+--**  Summary  :  UEF CDR Pod Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 

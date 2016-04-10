@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/buffdefinition.lua
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sim/buffdefinition.lua
+--**
+--**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 import('/lua/sim/AdjacencyBuffs.lua')
-import('/lua/sim/CheatBuffs.lua') # Buffs for AI Cheating
+import('/lua/sim/CheatBuffs.lua') -- Buffs for AI Cheating
 
 
 ------------------------------------------------------------------

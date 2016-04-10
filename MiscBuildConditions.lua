@@ -1,47 +1,47 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/MiscBuildConditions.lua
-#**  Author(s): Dru Staltman, John Comes
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/MiscBuildConditions.lua
+--**  Author(s): Dru Staltman, John Comes
+--**
+--**  Summary  : Generic AI Platoon Build Conditions
+--**             Build conditions always return true or false
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Utils = import('/lua/utilities.lua')
 
 --------------------------------------------------------------------------------------------------------------
-# function: True = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-#
+-- function: True = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function True(aiBrain)
     return true
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: False = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-#
+-- function: False = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function False(aiBrain)
     return false
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: RandomNumber = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int      higherThan      = 0                 doc = "docs for param1"
-# parameter 2: int      lowerThan       = 0                 doc = "param2 docs"
-# parameter 3: int      minNumber       = 0                 doc = "param2 docs"
-# parameter 4: int      maxNumber       = 0                 doc = "param2 docs"
-#
+-- function: RandomNumber = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int      higherThan      = 0                 doc = "docs for param1"
+-- parameter 2: int      lowerThan       = 0                 doc = "param2 docs"
+-- parameter 3: int      minNumber       = 0                 doc = "param2 docs"
+-- parameter 4: int      maxNumber       = 0                 doc = "param2 docs"
+--
 --------------------------------------------------------------------------------------------------------------
 function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
     local num = Random( minNumber, maxNumber)
@@ -52,11 +52,11 @@ function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: IsAIBrainLayerPref = BuildCondition doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: string   layerPref       = "Land"            doc = "docs for param1"
-#
+-- function: IsAIBrainLayerPref = BuildCondition doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: string   layerPref       = "Land"            doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function IsAIBrainLayerPref(aiBrain, layerPref)
     if layerPref == aiBrain:AIGetLayerPreference() then
@@ -66,11 +66,11 @@ function IsAIBrainLayerPref(aiBrain, layerPref)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MissionNumber = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: MissionNumber = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function MissionNumber(aiBrain, num)
     if ScenarioInfo.MissionNumber and num == ScenarioInfo.MissionNumber then
@@ -81,11 +81,11 @@ function MissionNumber(aiBrain, num)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MissionNumberGreaterOrEqual = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: MissionNumberGreaterOrEqual = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function MissionNumberGreaterOrEqual(aiBrain, num)
     if ScenarioInfo.MissionNumber and num <= ScenarioInfo.MissionNumber then
@@ -96,11 +96,11 @@ function MissionNumberGreaterOrEqual(aiBrain, num)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MissionNumberLessOrEqual = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: MissionNumberLessOrEqual = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function MissionNumberLessOrEqual(aiBrain, num)
     if ScenarioInfo.MissionNumber and num >= ScenarioInfo.MissionNumber then
@@ -111,11 +111,11 @@ function MissionNumberLessOrEqual(aiBrain, num)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: CheckScenarioInfoVarTable = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: string   varName         = "VarName"         doc = "docs for param1"
-#
+-- function: CheckScenarioInfoVarTable = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: string   varName         = "VarName"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function CheckScenarioInfoVarTable(aiBrain, varName)
     if ScenarioInfo.VarTable then
@@ -128,11 +128,11 @@ function CheckScenarioInfoVarTable(aiBrain, varName)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: CheckScenarioInfoVarTableFalse = BuildCondition doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: string   varName         = "VarName"         doc = "docs for param1"
-#
+-- function: CheckScenarioInfoVarTableFalse = BuildCondition doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: string   varName         = "VarName"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function CheckScenarioInfoVarTableFalse(aiBrain, varName)
     if ScenarioInfo.VarTable then
@@ -145,11 +145,11 @@ function CheckScenarioInfoVarTableFalse(aiBrain, varName)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: DifficultyEqual = BuildCondition    doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
-#
+-- function: DifficultyEqual = BuildCondition    doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function DifficultyEqual(aiBrain, diffLevel)
     if not ScenarioInfo.Options.Difficulty then
@@ -163,11 +163,11 @@ function DifficultyEqual(aiBrain, diffLevel)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: DifficultyGreaterOrEqual = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
-#
+-- function: DifficultyGreaterOrEqual = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
     if not ScenarioInfo.Options.Difficulty then
@@ -181,11 +181,11 @@ function DifficultyGreaterOrEqual(aiBrain, diffLevel)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: DifficultyLessOrEqual = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
-#
+-- function: DifficultyLessOrEqual = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  diffLevel         = "1"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function DifficultyLessOrEqual(aiBrain, diffLevel)
     if not ScenarioInfo.Options.Difficulty then
@@ -199,11 +199,11 @@ function DifficultyLessOrEqual(aiBrain, diffLevel)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MarkerChainExists = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string  aiBrain         = "default_brain"
-# parameter 1: string  chainName       = "CHAIN_NAME"         doc = "docs for param1"
-#
+-- function: MarkerChainExists = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string  aiBrain         = "default_brain"
+-- parameter 1: string  chainName       = "CHAIN_NAME"         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function MarkerChainExists(aiBrain, chainName)
     local chain = Scenario.Chains[chainName]
@@ -215,16 +215,16 @@ function MarkerChainExists(aiBrain, chainName)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: FactionIndex = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-# parameter 1: int factionNum = "1"
-# parameter 2: int otherFactionNum = "0"
-#
+-- function: FactionIndex = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+-- parameter 1: int factionNum = "1"
+-- parameter 2: int otherFactionNum = "0"
+--
 --------------------------------------------------------------------------------------------------------------
 function FactionIndex(aiBrain, factionNum, otherFactionNum, thirdFacNum)
     local facIndex = aiBrain:GetFactionIndex()
-    #LOG('*AI DEBUG: ARMY 2: Getting Faction Index = ', facIndex, ' while factionNum = ', factionNum, ' and otherFactionNum = ', otherFactionNum)
+    --LOG('*AI DEBUG: ARMY 2: Getting Faction Index = ', facIndex, ' while factionNum = ', factionNum, ' and otherFactionNum = ', otherFactionNum)
     if thirdFacNum and thirdFacNum ~= 0 then
         if thirdFacNum == facIndex or otherFactionNum == facIndex or factionNum == facIndex then
             return true
@@ -245,22 +245,22 @@ function FactionIndex(aiBrain, factionNum, otherFactionNum, thirdFacNum)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: ReclaimablesInArea = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-# parameter 1: string   locType     = "MAIN"
-#
+-- function: ReclaimablesInArea = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+-- parameter 1: string   locType     = "MAIN"
+--
 --------------------------------------------------------------------------------------------------------------
 function ReclaimablesInArea(aiBrain, locType)
-	#DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
+	--DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
     if aiBrain:GetEconomyStoredRatio('MASS') > .7 then
         return false
     end
     
-	#DUNCAN - who cares about energy for reclaming?
-    #if aiBrain:GetEconomyStoredRatio('ENERGY') > .9 then
-    #    return false
-    #end
+	--DUNCAN - who cares about energy for reclaming?
+    --if aiBrain:GetEconomyStoredRatio('ENERGY') > .9 then
+    --    return false
+    --end
     
     local ents = AIUtils.AIGetReclaimablesAroundLocation( aiBrain, locType )
     if ents and table.getn(ents) > 0 then
@@ -271,11 +271,11 @@ function ReclaimablesInArea(aiBrain, locType)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: CheckAvailableGates = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-# parameter 1: string   locType     = "MAIN"
-#
+-- function: CheckAvailableGates = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+-- parameter 1: string   locType     = "MAIN"
+--
 --------------------------------------------------------------------------------------------------------------
 function CheckAvailableGates( aiBrain, locType )
     local pos, rad
@@ -310,11 +310,11 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
-# function: GreaterThanMapWaterRatio = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: GreaterThanMapWaterRatio = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanMapWaterRatio(aiBrain, num)
     local ratio = aiBrain:GetMapWaterRatio()
@@ -335,10 +335,10 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
-# function: ArmyNeedsTransports = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-#
+-- function: ArmyNeedsTransports = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function ArmyNeedsTransports(aiBrain)
     if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0  then
@@ -348,11 +348,11 @@ function ArmyNeedsTransports(aiBrain)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: TransportNeedGreater = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: TransportNeedGreater = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function TransportNeedGreater(aiBrain, number)
     if aiBrain and aiBrain.NeedsTransports and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports > number then
@@ -362,10 +362,10 @@ function TransportNeedGreater(aiBrain, number)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: ArmyWantsTransports = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-#
+-- function: ArmyWantsTransports = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function ArmyWantsTransports(aiBrain)
     if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.WantTransports then
@@ -375,10 +375,10 @@ function ArmyWantsTransports(aiBrain)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: CDRRunningAway = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-#
+-- function: CDRRunningAway = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function CDRRunningAway(aiBrain)
     local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
@@ -392,11 +392,11 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
-# function: GreaterThanGameTime = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: GreaterThanGameTime = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
@@ -409,21 +409,21 @@ function GreaterThanGameTime(aiBrain, num)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: LessThanGameTime = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: LessThanGameTime = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function LessThanGameTime(aiBrain, num)
     return ( not GreaterThanGameTime( aiBrain, num ) )
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: PreBuiltBase = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-#
+-- function: PreBuiltBase = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function PreBuiltBase(aiBrain)
     if aiBrain.PreBuilt then
@@ -434,10 +434,10 @@ function PreBuiltBase(aiBrain)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: NotPreBuilt = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-#
+-- function: NotPreBuilt = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+--
 --------------------------------------------------------------------------------------------------------------
 function NotPreBuilt(aiBrain)
     if not aiBrain.PreBuilt then
@@ -447,7 +447,7 @@ function NotPreBuilt(aiBrain)
     end
 end
 
-#DUNCAN - added to check the map.
+--DUNCAN - added to check the map.
 function MapCheck(aiBrain, mapname, check) 
 	if (ScenarioInfo.name == mapname) == check then
 		return true
@@ -455,7 +455,7 @@ function MapCheck(aiBrain, mapname, check)
 	return false
 end 
 
-#DUNCAN - added to check for islands
+--DUNCAN - added to check for islands
 function IsIsland(aiBrain, check) 
 		
 	if not aiBrain.islandCheck then 
@@ -477,38 +477,38 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
-# function: MapGreaterThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  sizeX           = "sizeX"
-# parameter 2: integer  sizeZ           = "sizeZ"
-#
+-- function: MapGreaterThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  sizeX           = "sizeX"
+-- parameter 2: integer  sizeZ           = "sizeZ"
+--
 --------------------------------------------------------------------------------------------------------------
 function MapGreaterThan(aiBrain, sizeX, sizeZ)	
 	local mapSizeX, mapSizeZ = GetMapSize()
 	if mapSizeX > sizeX or mapSizeZ > sizeZ then
-		#LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+		--LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 		return true
 	end
-	#LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+	--LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 	return false
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MapLessThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  sizeX           = "sizeX"
-# parameter 2: integer  sizeZ           = "sizeZ"
-#
+-- function: MapLessThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  sizeX           = "sizeX"
+-- parameter 2: integer  sizeZ           = "sizeZ"
+--
 --------------------------------------------------------------------------------------------------------------
 function MapLessThan(aiBrain, sizeX, sizeZ)	
 	local mapSizeX, mapSizeZ = GetMapSize()	
 	if mapSizeX < sizeX and mapSizeZ < sizeZ then
-		#LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+		--LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 		return true
 	end
-	#LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+	--LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 	return false
 end
 

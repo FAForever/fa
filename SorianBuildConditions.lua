@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/SorianBuildConditions.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/SorianBuildConditions.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Generic AI Platoon Build Conditions
+--**             Build conditions always return true or false
+--**
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -16,11 +16,11 @@ local MABC = import('/lua/editor/MarkerBuildConditions.lua')
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 
 --------------------------------------------------------------------------------------------------------------
-# function: IsBadMap = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 2: bool     bool            = true = is a bad map, false = is not a bad map
-#
+-- function: IsBadMap = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 2: bool     bool            = true = is a bad map, false = is not a bad map
+--
 --------------------------------------------------------------------------------------------------------------
 
 function IsBadMap(aiBrain, bool)
@@ -46,11 +46,11 @@ function CategoriesNotRestricted(aiBrain, resTable)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: IsWaterMap = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 2: bool     bool            = true = is a water map, false = is not a water map
-#
+-- function: IsWaterMap = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 2: bool     bool            = true = is a water map, false = is not a water map
+--
 --------------------------------------------------------------------------------------------------------------
 
 function IsWaterMap(aiBrain, bool)
@@ -65,11 +65,11 @@ function IsWaterMap(aiBrain, bool)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: IsIslandMap = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 2: bool     bool            = true = is a island map, false = is not a island map
-#
+-- function: IsIslandMap = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 2: bool     bool            = true = is a island map, false = is not a island map
+--
 --------------------------------------------------------------------------------------------------------------
 
 function IsIslandMap(aiBrain, bool)
@@ -94,12 +94,12 @@ function IsIslandMap(aiBrain, bool)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: AIType = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: string   aitype          = "AI Personality"
-# parameter 2: bool     bool            = true = aitype matches, false = aitype does not match
-#
+-- function: AIType = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: string   aitype          = "AI Personality"
+-- parameter 2: bool     bool            = true = aitype matches, false = aitype does not match
+--
 --------------------------------------------------------------------------------------------------------------
 
 function AIType(aiBrain, aitype, bool)
@@ -133,11 +133,11 @@ function MarkerLessThan(aiBrain, locationType, markerTypes, distance, checkForBa
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: GreaterThanGameTime = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: GreaterThanGameTime = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
@@ -153,22 +153,22 @@ function GreaterThanGameTime(aiBrain, num)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: LessThanGameTime = BuildCondition  doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: int  num             = 1         doc = "docs for param1"
-#
+-- function: LessThanGameTime = BuildCondition  doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: int  num             = 1         doc = "docs for param1"
+--
 --------------------------------------------------------------------------------------------------------------
 function LessThanGameTime(aiBrain, num)
     return ( not GreaterThanGameTime( aiBrain, num ) )
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: EnemiesLessThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  num             = "Number of enemies"
-#
+-- function: EnemiesLessThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  num             = "Number of enemies"
+--
 --------------------------------------------------------------------------------------------------------------
 function EnemyToAllyRatioLessOrEqual(aiBrain, num)	
 	local enemies = 0
@@ -195,11 +195,11 @@ function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, thre
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: ReclaimablesInArea = BuildCondition   doc = "Please work function docs."
-#
-# parameter 0: string   aiBrain     = "default_brain"
-# parameter 1: string   locType     = "MAIN"
-#
+-- function: ReclaimablesInArea = BuildCondition   doc = "Please work function docs."
+--
+-- parameter 0: string   aiBrain     = "default_brain"
+-- parameter 1: string   locType     = "MAIN"
+--
 --------------------------------------------------------------------------------------------------------------
 function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
     if aiBrain:GetEconomyStoredRatio('MASS') > .5 and aiBrain:GetEconomyStoredRatio('ENERGY') > .5 then
@@ -222,11 +222,11 @@ function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: ClosestEnemyLessThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  distance        = "distance"
-#
+-- function: ClosestEnemyLessThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  distance        = "distance"
+--
 --------------------------------------------------------------------------------------------------------------
 function ClosestEnemyLessThan(aiBrain, distance)
 	local startX, startZ = aiBrain:GetArmyStartPos()
@@ -254,11 +254,11 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
     for k,v in Structures do
         if not v.Dead and v:GetHealthPercent() < .8 then
-		#LOG('*AI DEBUG: DamagedStructuresInArea return true')
+		--LOG('*AI DEBUG: DamagedStructuresInArea return true')
 			return true
         end
     end
-	#LOG('*AI DEBUG: DamagedStructuresInArea return false')
+	--LOG('*AI DEBUG: DamagedStructuresInArea return false')
     return false
 end
 
@@ -300,51 +300,51 @@ function NoMarkerLessThanDistance(aiBrain, markerType, distance, threatMin, thre
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MapGreaterThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  sizeX           = "sizeX"
-# parameter 2: integer  sizeZ           = "sizeZ"
-#
+-- function: MapGreaterThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  sizeX           = "sizeX"
+-- parameter 2: integer  sizeZ           = "sizeZ"
+--
 --------------------------------------------------------------------------------------------------------------
 function MapGreaterThan(aiBrain, sizeX, sizeZ)	
 	local mapSizeX, mapSizeZ = GetMapSize()
 	if mapSizeX > sizeX or mapSizeZ > sizeZ then
-		#LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+		--LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 		return true
 	end
-	#LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+	--LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 	return false
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: MapLessThan = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  sizeX           = "sizeX"
-# parameter 2: integer  sizeZ           = "sizeZ"
-#
+-- function: MapLessThan = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  sizeX           = "sizeX"
+-- parameter 2: integer  sizeZ           = "sizeZ"
+--
 --------------------------------------------------------------------------------------------------------------
 function MapLessThan(aiBrain, sizeX, sizeZ)	
 	local mapSizeX, mapSizeZ = GetMapSize()	
 	if mapSizeX < sizeX and mapSizeZ < sizeZ then
-		#LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+		--LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 		return true
 	end
-	#LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+	--LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
 	return false
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: PoolThreatGreaterThanEnemyBase = BuildCondition
-#
-# parameter 0: string   aiBrain        = "default_brain"
-# parameter 1: string	  locationType   = "loactionType"
-# parameter 2: string   ucat            = "Unit Category"
-# parameter 3: string   ttype           = "Enemy Threat Type"
-# parameter 4: string   uttype          = "Unit Threat Type"
-# parameter 5: integer divideby        = "Divide Unit Threat by"
-#
+-- function: PoolThreatGreaterThanEnemyBase = BuildCondition
+--
+-- parameter 0: string   aiBrain        = "default_brain"
+-- parameter 1: string	  locationType   = "loactionType"
+-- parameter 2: string   ucat            = "Unit Category"
+-- parameter 3: string   ttype           = "Enemy Threat Type"
+-- parameter 4: string   uttype          = "Unit Threat Type"
+-- parameter 5: integer divideby        = "Divide Unit Threat by"
+--
 --------------------------------------------------------------------------------------------------------------
 function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, uttype, divideby)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
@@ -373,12 +373,12 @@ function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, utty
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: LessThanThreatAtEnemyBase = BuildCondition
-#
-# parameter 0: string   aiBrain        = "default_brain"
-# parameter 3: string   ttype          = "Enemy Threat Type"
-# parameter 5: integer number         = "Threat Amount"
-#
+-- function: LessThanThreatAtEnemyBase = BuildCondition
+--
+-- parameter 0: string   aiBrain        = "default_brain"
+-- parameter 3: string   ttype          = "Enemy Threat Type"
+-- parameter 5: integer number         = "Threat Amount"
+--
 --------------------------------------------------------------------------------------------------------------
 function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
 	if aiBrain:GetCurrentEnemy() then
@@ -402,13 +402,13 @@ function GreaterThanThreatAtEnemyBase(aiBrain, ttype, number)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: GreaterThanEnemyUnitsAroundBase = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  numUnits        = "Number of Units"
-# parameter 2: integer  radius          = "radius"
-# parameter 3: integer  unitCat         = "Unit Category"
-#
+-- function: GreaterThanEnemyUnitsAroundBase = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  numUnits        = "Number of Units"
+-- parameter 2: integer  radius          = "radius"
+-- parameter 3: integer  unitCat         = "Unit Category"
+--
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCat, radius)
 	local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
@@ -426,12 +426,12 @@ function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCa
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: UnfinishedUnits = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  radius          = "radius"
-# parameter 2: string   category        = "Unit category"
-#
+-- function: UnfinishedUnits = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  radius          = "radius"
+-- parameter 2: string   category        = "Unit category"
+--
 --------------------------------------------------------------------------------------------------------------
 function UnfinishedUnits(aiBrain, locationType, category)	
 	local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -449,11 +449,11 @@ function UnfinishedUnits(aiBrain, locationType, category)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: ShieldDamaged = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: integer  radius          = "radius"
-#
+-- function: ShieldDamaged = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: integer  radius          = "radius"
+--
 --------------------------------------------------------------------------------------------------------------
 function ShieldDamaged(aiBrain, locationType)	
 	local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -563,11 +563,11 @@ function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, location
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: CmdrHasUpgrade = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 1: string   upgrade         = "upgrade"
-#
+-- function: CmdrHasUpgrade = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 1: string   upgrade         = "upgrade"
+--
 --------------------------------------------------------------------------------------------------------------
 function CmdrHasUpgrade(aiBrain, upgrade, has)
     local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
@@ -669,11 +669,11 @@ function TargetHasGreaterThanUnitsWithCategory(aiBrain, numReq, category)
 end
 
 --------------------------------------------------------------------------------------------------------------
-# function: EnemyInT3ArtilleryRange = BuildCondition
-#
-# parameter 0: string   aiBrain         = "default_brain"
-# parameter 0: boolean  inrange         = "true = in range, false = not in range"
-#
+-- function: EnemyInT3ArtilleryRange = BuildCondition
+--
+-- parameter 0: string   aiBrain         = "default_brain"
+-- parameter 0: boolean  inrange         = "true = in range, false = not in range"
+--
 --------------------------------------------------------------------------------------------------------------
 function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)	
 	local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
@@ -712,7 +712,7 @@ function AIOutnumbered(aiBrain, bool)
 	local buildmult = tonumber(ScenarioInfo.Options.BuildMult) or 2
 	local cheatAdjustment = (cheatmult + buildmult) * .75
 	local myTeam = ScenarioInfo.ArmySetup[aiBrain.Name].Team
-	#LOG('*AI DEBUG: '..aiBrain.Nickname..' I am on team '..myTeam)
+	--LOG('*AI DEBUG: '..aiBrain.Nickname..' I am on team '..myTeam)
 	local largestEnemyTeam = false
 	local teams = {0,0,0,0}
 	
@@ -726,7 +726,7 @@ function AIOutnumbered(aiBrain, bool)
 	for k,v in ArmyBrains do
         if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
 			local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
-			#LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
+			--LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
 			cheatAI = string.find( v.Nickname, 'AIx:')
 			if cheatAI then
 				teams[armyTeam] = teams[armyTeam] + (1 * cheatAdjustment)
@@ -741,7 +741,7 @@ function AIOutnumbered(aiBrain, bool)
 		end
 	end
 	
-	#LOG('*AI DEBUG: '..v.Nickname..' Larget enemy team is '..z..' strength')
+	--LOG('*AI DEBUG: '..v.Nickname..' Larget enemy team is '..z..' strength')
 	
 	if largestEnemyTeam == 0 then
 		return false

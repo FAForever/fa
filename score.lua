@@ -497,7 +497,7 @@ function SetUnitText(current, cap)
 end
 
 function ToggleScoreControl(state)
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

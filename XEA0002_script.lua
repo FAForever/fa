@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XEA0002/XEA0002_script.lua
-#**  Author(s):  Drew Staltman, Gordon Duclos
-#**
-#**  Summary  :  UEF Defense Satelite Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XEA0002/XEA0002_script.lua
+--**  Author(s):  Drew Staltman, Gordon Duclos
+--**
+--**  Summary  :  UEF Defense Satelite Script
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TOrbitalDeathLaserBeamWeapon = import('/lua/terranweapons.lua').TOrbitalDeathLaserBeamWeapon
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker

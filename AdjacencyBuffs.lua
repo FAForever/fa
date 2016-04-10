@@ -1,9 +1,9 @@
-﻿#****************************************************************************
-#**
-#**  File     :  /lua/sim/AdjacencyBuffs.lua
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+﻿--****************************************************************************
+--**
+--**  File     :  /lua/sim/AdjacencyBuffs.lua
+--**
+--**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')
 
@@ -332,7 +332,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.04,#-0.025
+            Add = -0.04,---0.025
             Mult = 1.0,
         },
     },
@@ -768,7 +768,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,---0.05
             Mult = 1.0,
         },
     },
@@ -786,7 +786,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,---0.05
             Mult = 1.0,
         },
     },
@@ -804,7 +804,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,---0.05
             Mult = 1.0,
         },
     },
@@ -822,7 +822,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,---0.05
             Mult = 1.0,
         },
     },
@@ -840,7 +840,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,---0.05
             Mult = 1.0,
         },
     },
@@ -1176,7 +1176,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,---0.075
             Mult = 1.0,
         },
     },
@@ -1194,7 +1194,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,---0.075
             Mult = 1.0,
         },
     },
@@ -1212,7 +1212,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,---0.075
             Mult = 1.0,
         },
     },
@@ -1230,7 +1230,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,---0.075
             Mult = 1.0,
         },
     },
@@ -1248,7 +1248,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,---0.075
             Mult = 1.0,
         },
     },
@@ -1339,7 +1339,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075, #-0.025
+            Add = -0.075, ---0.025
             Mult = 1.0,
         },
     },
@@ -1357,7 +1357,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075, #-0.02
+            Add = -0.075, ---0.02
             Mult = 1.0,
         },
     },
@@ -1449,7 +1449,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.1,#-0.0375
+            Add = -0.1,---0.0375
             Mult = 1.0,
         },
     },
@@ -1467,7 +1467,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.1,#-0.03
+            Add = -0.1,---0.03
             Mult = 1.0,
         },
     },
@@ -1559,7 +1559,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.125, #-0.05
+            Add = -0.125, ---0.05
             Mult = 1.0,
         },
     },
@@ -1577,7 +1577,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.125,#-0.04
+            Add = -0.125,---0.04
             Mult = 1.0,
         },
     },
@@ -1669,7 +1669,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0125 ,#-0.00625
+            Add = -0.0125 ,---0.00625
             Mult = 1.0,
         },
     },
@@ -1687,7 +1687,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0075,#-0.005
+            Add = -0.0075,---0.005
             Mult = 1.0,
         },
     },
@@ -1778,7 +1778,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.2,#-0.075
+            Add = -0.2,---0.075
             Mult = 1.0,
         },
     },
@@ -1796,7 +1796,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0225,#-0.075
+            Add = -0.0225,---0.075
             Mult = 1.0,
         },
     },

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0401/UAL0401_script.lua
-#**  Author(s):  John Comes, Gordon Duclos
-#**
-#**  Summary  :  Aeon Galactic Colossus Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAL0401/UAL0401_script.lua
+--**  Author(s):  John Comes, Gordon Duclos
+--**
+--**  Summary  :  Aeon Galactic Colossus Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local WeaponsFile = import ('/lua/aeonweapons.lua')
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
@@ -70,10 +70,10 @@ UAL0401 = Class(AWalkingLandUnit) {
         self:DestroyAllDamageEffects()
         self:CreateWreckage( overkillRatio )
 
-        # CURRENTLY DISABLED UNTIL DESTRUCTION
-        # Create destruction debris out of the mesh, currently these projectiles look like crap,
-        # since projectile rotation and terrain collision doesn't work that great. These are left in
-        # hopes that this will look better in the future.. =)
+        -- CURRENTLY DISABLED UNTIL DESTRUCTION
+        -- Create destruction debris out of the mesh, currently these projectiles look like crap,
+        -- since projectile rotation and terrain collision doesn't work that great. These are left in
+        -- hopes that this will look better in the future.. =)
         if( self.ShowUnitDestructionDebris and overkillRatio ) then
             if overkillRatio <= 1 then
                 self.CreateUnitDestructionDebris( self, true, true, false )
@@ -81,7 +81,7 @@ UAL0401 = Class(AWalkingLandUnit) {
                 self.CreateUnitDestructionDebris( self, true, true, false )
             elseif overkillRatio <= 3 then
                 self.CreateUnitDestructionDebris( self, true, true, true )
-            else #VAPORIZED
+            else --VAPORIZED
                 self.CreateUnitDestructionDebris( self, true, true, true )
             end
         end

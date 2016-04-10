@@ -1,11 +1,11 @@
-﻿#****************************************************************************
-#**  File     :  lua/modules/ui/game/taunt.lua
-#**  Author(s):  Chris blackwell
-#**
-#**  Summary  :  Taunt system
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+﻿--****************************************************************************
+--**  File     :  lua/modules/ui/game/taunt.lua
+--**  Author(s):  Chris blackwell
+--**
+--**  Summary  :  Taunt system
+--**
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Prefs = import('/lua/user/prefs.lua')
 local AIChatS = import('/lua/AIChatSorian.lua')
 

@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  Author(s):  Mikko Tyster
-#**
-#**  Summary  :  Cybran T3 Mobile AA
-#**
-#**  Copyright © 2008 Blade Braver!
-#****************************************************************************
+--****************************************************************************
+--**
+--**  Author(s):  Mikko Tyster
+--**
+--**  Summary  :  Cybran T3 Mobile AA
+--**
+--**  Copyright © 2008 Blade Braver!
+--****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')

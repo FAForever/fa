@@ -1,11 +1,11 @@
 ﻿--****************************************************************************
-#**  File     :  lua/modules/ui/help/unitdescriptions.lua
-#**  Author(s):  Ted Snook
-#**
-#**  Summary  :  Strings and images for the unit rollover System
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--**  File     :  lua/modules/ui/help/unitdescriptions.lua
+--**  Author(s):  Ted Snook
+--**
+--**  Summary  :  Strings and images for the unit rollover System
+--**
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
  
 Description = {
 --UEF Units
@@ -160,7 +160,7 @@ Description = {
    ['ueb0303'] = "<LOC Unit_Description_0087> Constructs Tech 3 naval units. Highest tech level available.",
    
    
-   #Buildings
+   --Buildings
    
    ['ueb1101'] = "<LOC Unit_Description_0088> Generates Energy. Construct next to other structures for adjacency bonus.",
    ['ueb1102'] = "<LOC Unit_Description_0089> Generates Energy. Must be constructed on hydrocarbon deposits. Construct structures next to Hydrocarbon power plant for adjacency bonus.",
@@ -190,7 +190,7 @@ Description = {
    --CYBRAN UNITS
    
    
-   #Commanders  
+   --Commanders  
    
    ['url0001'] = "<LOC Unit_Description_0304> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",   
    ['url0001-ras'] = "<LOC Unit_Description_0106> Increases ACU's resource generation.",
@@ -353,7 +353,7 @@ Description = {
    --AEON UNITS
    
    
-   #Commanders  
+   --Commanders  
    
    ['ual0001'] = "<LOC Unit_Description_0305> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
    ['ual0001-aes'] = "<LOC Unit_Description_0156> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
@@ -627,7 +627,7 @@ Description = {
 	['xsb3104'] = "<LOC Unit_Description_0416> High-end intelligence system. Provides maximum radar and sonar coverage. Counters enemy intelligence systems.",
            
 
-   # Patch Units
+   -- Patch Units
    ['dea0202'] = "<LOC Unit_Description_0417> Combination fighter/bomber designed to engage both land and aerial units. Armed with linked AA railguns and heavy napalm carpet bombs.",
    ['dra0202'] = "<LOC Unit_Description_0418> Combination fighter/bomber designed to engage both land and aerial units. Armed with Nano Dart launcher and separate missile launcher.",
    ['daa0206'] = "<LOC Unit_Description_0419> The volatile and destructive nature of the Mercy's weapon system forced Aeon scientists to create a simple, expendable delivery system. As a result, the payload is attached to what is little more than a guided missile.",

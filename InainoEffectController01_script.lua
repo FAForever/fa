@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  \data\effects\Entities\InainoEffectController01\InainoBombEffectController01_script.lua
-#**  Author(s):  Gordon Duclos, Matt Vainio
-#**
-#**  Summary  :  Inaino Bomb effect controller script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  \data\effects\Entities\InainoEffectController01\InainoBombEffectController01_script.lua
+--**  Author(s):  Gordon Duclos, Matt Vainio
+--**
+--**  Summary  :  Inaino Bomb effect controller script
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local RandomInt = import('/lua/utilities.lua').GetRandomInt
@@ -28,8 +28,8 @@ InainoEffectController01 = Class(NullShell) {
     NukeInnerRingTicks = 0,
     NukeInnerRingTotalTime = 0,
         
-    # NOTE: This script has been modified to REQUIRE that data is passed in!  The nuke won't explode until this happens!
-    #OnCreate = function(self)  
+    -- NOTE: This script has been modified to REQUIRE that data is passed in!  The nuke won't explode until this happens!
+    --OnCreate = function(self)  
     
     PassData = function(self, Data)
         if Data.NukeOuterRingDamage then self.NukeOuterRingDamage = Data.NukeOuterRingDamage end
@@ -41,7 +41,7 @@ InainoEffectController01 = Class(NullShell) {
         if Data.NukeInnerRingTicks then self.NukeInnerRingTicks = Data.NukeInnerRingTicks end
         if Data.NukeInnerRingTotalTime then self.NukeInnerRingTotalTime = Data.NukeInnerRingTotalTime end
   
-        # Create Damage Threads
+        -- Create Damage Threads
         self:ForkThread(self.InnerRingDamage)
         self:ForkThread(self.OuterRingDamage)
         
@@ -72,22 +72,22 @@ InainoEffectController01 = Class(NullShell) {
         ----Create a light for this thing's flash.
         CreateLightParticle(self, -1, self:GetArmy(), 160, 14, 'flare_lens_add_03', 'ramp_white_07' )
         
-        # Create our decals
+        -- Create our decals
         CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())          
 
-		# Create explosion effects
+		-- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
         
-        --#self:CreatePlumes()
+        ----self:CreatePlumes()
         
-        --#self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
+        ----self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
         self:ShakeCamera( 55, 10, 0, 2.5 )        
 
 		WaitSeconds(0.3)
         
-        # Create upward moving smoke plume
+        -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp', 0, 3, 0, 0, 0, 0)
         plume:SetLifetime(5.35)
         plume:SetVelocity(10.0)
@@ -95,7 +95,7 @@ InainoEffectController01 = Class(NullShell) {
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
         
-        # Create explosion dust ring
+        -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 16        
         local horizontal_angle = (2*math.pi) / num_projectiles
@@ -118,7 +118,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
     
     CreateGroundFingers = function(self)  
-        # outward rushing fingers that spawn the upward fingers
+        -- outward rushing fingers that spawn the upward fingers
         local num_projectiles = 5        
         local horizontal_angle = (2*math.pi) / num_projectiles
         local xVec, zVec  
@@ -137,7 +137,7 @@ InainoEffectController01 = Class(NullShell) {
     
     CreateInitialFingers = function(self)
 		WaitSeconds(1.75)
-        # upward rising fingers that join to form explosion
+        -- upward rising fingers that join to form explosion
         local num_projectiles = 5        
         local horizontal_angle = (2*math.pi) / num_projectiles
         local xVec, zVec 
@@ -156,7 +156,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
     
     CreatePlumes = function(self)
-        # Create fireball plumes to accentuate the explosive detonation
+        -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 7        
         local horizontal_angle = (2*math.pi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )  
@@ -185,12 +185,12 @@ InainoEffectController01 = Class(NullShell) {
         else
             local ringWidth = ( self.NukeOuterRingRadius / self.NukeOuterRingTicks )
             local tickLength = ( self.NukeOuterRingTotalTime / self.NukeOuterRingTicks )
-            # Since we're not allowed to have an inner radius of 0 in the DamageRing function,
-            # I'm manually executing the first tick of damage with a DamageArea function.
+            -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
+            -- I'm manually executing the first tick of damage with a DamageArea function.
             DamageArea(self:GetLauncher(), myPos, ringWidth, self.NukeOuterRingDamage, 'Normal', true, true)
             WaitSeconds(tickLength)
             for i = 2, self.NukeOuterRingTicks do
-                #print('Damage Ring: MaxRadius:' .. 2*i)
+                --print('Damage Ring: MaxRadius:' .. 2*i)
                 DamageRing(self:GetLauncher(), myPos, ringWidth * (i - 1), ringWidth * i, self.NukeOuterRingDamage, self.DamageData.DamageType, true, true)
                 WaitSeconds(tickLength)
             end
@@ -204,12 +204,12 @@ InainoEffectController01 = Class(NullShell) {
         else
             local ringWidth = ( self.NukeInnerRingRadius / self.NukeInnerRingTicks )
             local tickLength = ( self.NukeInnerRingTotalTime / self.NukeInnerRingTicks )
-            # Since we're not allowed to have an inner radius of 0 in the DamageRing function,
-            # I'm manually executing the first tick of damage with a DamageArea function.
+            -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
+            -- I'm manually executing the first tick of damage with a DamageArea function.
             DamageArea(self:GetLauncher(), myPos, ringWidth, self.NukeInnerRingDamage, 'Normal', true, true)
             WaitSeconds(tickLength)
             for i = 2, self.NukeInnerRingTicks do
-                #LOG('Damage Ring: MaxRadius:' .. ringWidth * i)
+                --LOG('Damage Ring: MaxRadius:' .. ringWidth * i)
                 DamageRing(self:GetLauncher(), myPos, ringWidth * (i - 1), ringWidth * i, self.NukeInnerRingDamage, self.DamageData.DamageType, true, true)
                 WaitSeconds(tickLength)
             end
