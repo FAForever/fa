@@ -21,7 +21,7 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-		'EngineerFactoryConstruction Balance',
+        'EngineerFactoryConstruction Balance',
         
         -- Engineer Support buildings
         'EngineeringSupportBuilder',
@@ -39,9 +39,9 @@ BaseBuilderTemplate {
         'Land Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Gun improvements',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
+        'ACUUpgrades - Gun improvements',
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
         
         -- ACU Defense
         'T1ACUDefenses',
@@ -53,21 +53,21 @@ BaseBuilderTemplate {
         -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-		--'EngineerFirebaseBuilders',
+        --'EngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
         --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-		
+        
         'T2MissileDefenses',
-		'T2ArtilleryFormBuilders',
+        'T2ArtilleryFormBuilders',
         
         --'T1DefensivePoints',
         --'T2DefensivePoints',
         --'T3DefensivePoints',
-		
-		'T2Shields',
+        
+        'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
         
@@ -114,14 +114,14 @@ BaseBuilderTemplate {
         -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		-- ==== ARTILLERY BUILDERS ==== --
+        
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
+        'T3ArtilleryFormBuilders',
         
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+        
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         -- ==== EXPERIMENTALS ==== --
@@ -130,11 +130,11 @@ BaseBuilderTemplate {
         
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -153,14 +153,14 @@ BaseBuilderTemplate {
     },
     BaseSettings = {
         EngineerCount = {
-			--DUNCAN - was 15, 10, 10, 1
+            --DUNCAN - was 15, 10, 10, 1
             Tech1 = 25,
             Tech2 = 10,
             Tech3 = 25,
             SCU = 1,
         },
         FactoryCount = {
-			--DUNCAN - Factory number tweaks, was 5, 1, 0, 1
+            --DUNCAN - Factory number tweaks, was 5, 1, 0, 1
             Land = 8,
             Air = 2,
             Sea = 0,
@@ -185,6 +185,6 @@ BaseBuilderTemplate {
             return 1000, 'setons'
         end
         
-		return 0, 'setons'
+        return 0, 'setons'
     end,
 }

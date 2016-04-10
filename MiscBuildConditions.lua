@@ -252,12 +252,12 @@ end
 --
 --------------------------------------------------------------------------------------------------------------
 function ReclaimablesInArea(aiBrain, locType)
-	--DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
+    --DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
     if aiBrain:GetEconomyStoredRatio('MASS') > .7 then
         return false
     end
     
-	--DUNCAN - who cares about energy for reclaming?
+    --DUNCAN - who cares about energy for reclaming?
     --if aiBrain:GetEconomyStoredRatio('ENERGY') > .9 then
     --    return false
     --end
@@ -449,30 +449,30 @@ end
 
 --DUNCAN - added to check the map.
 function MapCheck(aiBrain, mapname, check) 
-	if (ScenarioInfo.name == mapname) == check then
-		return true
-	end
-	return false
+    if (ScenarioInfo.name == mapname) == check then
+        return true
+    end
+    return false
 end 
 
 --DUNCAN - added to check for islands
 function IsIsland(aiBrain, check) 
-		
-	if not aiBrain.islandCheck then 
-		local startX, startZ = aiBrain:GetArmyStartPos()
-		aiBrain.isIsland = false
-		aiBrain.islandMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
-		aiBrain.islandCheck = true
-		if aiBrain.islandMarker then
-			aiBrain.isIsland = true
-		end
-	end
+        
+    if not aiBrain.islandCheck then 
+        local startX, startZ = aiBrain:GetArmyStartPos()
+        aiBrain.isIsland = false
+        aiBrain.islandMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        aiBrain.islandCheck = true
+        if aiBrain.islandMarker then
+            aiBrain.isIsland = true
+        end
+    end
 
-	if check == aiBrain.isIsland then
-		return true
-	else
-		return false
-	end
+    if check == aiBrain.isIsland then
+        return true
+    else
+        return false
+    end
 end
 
 
@@ -484,14 +484,14 @@ end
 -- parameter 2: integer  sizeZ           = "sizeZ"
 --
 --------------------------------------------------------------------------------------------------------------
-function MapGreaterThan(aiBrain, sizeX, sizeZ)	
-	local mapSizeX, mapSizeZ = GetMapSize()
-	if mapSizeX > sizeX or mapSizeZ > sizeZ then
-		--LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-		return true
-	end
-	--LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-	return false
+function MapGreaterThan(aiBrain, sizeX, sizeZ)    
+    local mapSizeX, mapSizeZ = GetMapSize()
+    if mapSizeX > sizeX or mapSizeZ > sizeZ then
+        --LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+        return true
+    end
+    --LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+    return false
 end
 
 --------------------------------------------------------------------------------------------------------------
@@ -502,14 +502,14 @@ end
 -- parameter 2: integer  sizeZ           = "sizeZ"
 --
 --------------------------------------------------------------------------------------------------------------
-function MapLessThan(aiBrain, sizeX, sizeZ)	
-	local mapSizeX, mapSizeZ = GetMapSize()	
-	if mapSizeX < sizeX and mapSizeZ < sizeZ then
-		--LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-		return true
-	end
-	--LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-	return false
+function MapLessThan(aiBrain, sizeX, sizeZ)    
+    local mapSizeX, mapSizeZ = GetMapSize()    
+    if mapSizeX < sizeX and mapSizeZ < sizeZ then
+        --LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+        return true
+    end
+    --LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+    return false
 end
 
 

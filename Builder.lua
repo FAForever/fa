@@ -46,7 +46,7 @@ Builder = Class {
     GetPriority = function(self)
         return self.Priority
     end,
-	
+    
     GetActivePriority = function(self)
         if Builders[self.BuilderName].ActivePriority then
             return Builders[self.BuilderName].ActivePriority
@@ -57,9 +57,9 @@ Builder = Class {
     SetPriority = function(self, val, temporary, setbystrat)
         if temporary then
             self.OldPriority = self.Priority
-			if setbystrat then
-				self.SetByStrat = true
-			end
+            if setbystrat then
+                self.SetByStrat = true
+            end
         end
         if val != self.Priority then
             self.PriorityAltered = true
@@ -69,7 +69,7 @@ Builder = Class {
     
     ResetPriority = function(self)
         self.Priority = self.OldPriority
-		self.SetByStrat = false
+        self.SetByStrat = false
         self.OldPriority = nil
     end,
     
@@ -322,7 +322,7 @@ PlatoonBuilder = Class(Builder) {
                 local destroyedCallback = function(brain,platoon)
                     if platoon.BuilderHandle then
                         --platoon.BuilderHandle:RemoveHandle(platoon)
-						self:ForkThread( self.DelayRemove, self, platoon )
+                        self:ForkThread( self.DelayRemove, self, platoon )
                     end
                 end
                 platoon:AddDestroyCallback(destroyedCallback)
@@ -330,11 +330,11 @@ PlatoonBuilder = Class(Builder) {
             end
         end
     end,
-	
-	DelayRemove = function(self,platoon)
-		WaitSeconds(1)
-		platoon.BuilderHandle:RemoveHandle(platoon)
-	end,
+    
+    DelayRemove = function(self,platoon)
+        WaitSeconds(1)
+        platoon.BuilderHandle:RemoveHandle(platoon)
+    end,
     
     RemoveHandle = function(self,platoon)
         self.InstanceCount[platoon.InstanceNumber].Status = 'Available'

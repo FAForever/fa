@@ -53,15 +53,15 @@ SeraphimNukeEffectController01 = Class(NullShell) {
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
     
-		-- Create Damage Threads only if damage is being delivered (prevents DamageArea script error for passing in 0 value)
-		if (self.NukeInnerRingDamage ~= 0) then
-			self:ForkThread(self.InnerRingDamage)
-		end
+        -- Create Damage Threads only if damage is being delivered (prevents DamageArea script error for passing in 0 value)
+        if (self.NukeInnerRingDamage ~= 0) then
+            self:ForkThread(self.InnerRingDamage)
+        end
         if (self.NukeOuterRingDamage ~= 0) then
-			self:ForkThread(self.OuterRingDamage)
-		end
+            self:ForkThread(self.OuterRingDamage)
+        end
 
-		-- Create thread that spawns and controls effects
+        -- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
         self:ForkThread(self.CreateEffectInnerPlasma)
         self:ForkThread(self.CreateEffectElectricity)
@@ -105,7 +105,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         end
     end,
     
-	-- Create inner explosion plasma
+    -- Create inner explosion plasma
     CreateEffectInnerPlasma = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 12        
@@ -115,7 +115,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-		WaitSeconds( 3.5 )
+        WaitSeconds( 3.5 )
         for i = 0, (num_projectiles -1) do            
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -127,9 +127,9 @@ SeraphimNukeEffectController01 = Class(NullShell) {
             proj:SetVelocity(7.0)
             proj:SetAcceleration(-0.35)            
         end
-	end,
-	
-	-- Create random wavy electricity lines
+    end,
+    
+    -- Create random wavy electricity lines
     CreateEffectElectricity = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 7        
@@ -139,7 +139,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 0.0
         local px, pz
 
-		WaitSeconds( 3.5 )
+        WaitSeconds( 3.5 )
         for i = 0, (num_projectiles -1) do            
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -151,7 +151,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
             proj:SetVelocity(RandomFloat( 11, 20 ))
             proj:SetAcceleration(-0.35)            
         end
-	end,       
+    end,       
 
     EffectThread = function(self)
         local army = self:GetArmy()
@@ -167,11 +167,11 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         WaitSeconds( 0.3 )
         CreateLightParticle(self, -1, army, 80, 36, 'glow_02', 'ramp_blue_16')
         
-		-- Create explosion effects
+        -- Create explosion effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileHit01 do
             emit = CreateEmitterAtEntity(self,army,v)
-        end	
-        	
+        end    
+            
         WaitSeconds( 3.0 )
         CreateLightParticle(self, -1, army, 160, 6, 'glow_02', 'ramp_blue_16')
         WaitSeconds( 0.1 )       

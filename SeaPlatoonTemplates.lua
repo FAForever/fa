@@ -27,7 +27,7 @@ PlatoonTemplate {
 PlatoonTemplate {
     Name = 'T4ExperimentalSea',
     Plan = 'NavalForceAI',
-	GlobalSquads = {
+    GlobalSquads = {
         { categories.NAVAL * categories.EXPERIMENTAL * categories.MOBILE, 1, 1, 'attack', 'none' },
     },
 }

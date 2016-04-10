@@ -19,9 +19,9 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 ---- PlatoonData -
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PlatoonAttackClosestUnit = AddFunction	doc = "Please work function docs."
+-- function: PlatoonAttackClosestUnit = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PlatoonAttackClosestUnit(platoon)
@@ -99,9 +99,9 @@ end
 ----     Target - Handle to Unit used in orders that require a target (OPTIONAL)
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PlatoonAssignOrders = AddFunction	doc = "Please work function docs."
+-- function: PlatoonAssignOrders = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PlatoonAssignOrders(platoon)
@@ -120,9 +120,9 @@ end
 ---- PlatoonData -
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PlatoonAttackHighestThreat = AddFunction	doc = "Please work function docs."
+-- function: PlatoonAttackHighestThreat = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PlatoonAttackHighestThreat(platoon)
@@ -151,9 +151,9 @@ end
 ----     Location - (REQUIRED) location on the map to attack move to
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PlatoonAttackLocation = AddFunction	doc = "Please work function docs."
+-- function: PlatoonAttackLocation = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PlatoonAttackLocation(platoon)
@@ -190,9 +190,9 @@ end
 ----     High - true will attack highest threats first, false lowest - defaults to false/lowest
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PlatoonAttackLocationList = AddFunction	doc = "Please work function docs."
+-- function: PlatoonAttackLocationList = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PlatoonAttackLocationList(platoon)
@@ -248,9 +248,9 @@ end
 ----     TransportMoveLocation - Location to move transport to before assigning to transport pool
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: TransportPool = AddFunction	doc = "Please work function docs."
+-- function: TransportPool = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function TransportPool(platoon)
@@ -302,9 +302,9 @@ end
 ----     RandomPatrol - Bool if you want the patrol things to be random rather than in order
 --------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: LandAssaultWithTransports = AddFunction	doc = "Please work function docs."
+-- function: LandAssaultWithTransports = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function LandAssaultWithTransports(platoon)
@@ -466,9 +466,9 @@ end
 ----
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: MoveToThread = AddFunction	doc = "Please work function docs."
+-- function: MoveToThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function MoveToThread(platoon)
@@ -516,9 +516,9 @@ end
 ----
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PatrolThread = AddFunction	doc = "Please work function docs."
+-- function: PatrolThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PatrolThread(platoon)
@@ -556,9 +556,9 @@ end
 ----
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: RandomPatrolThread = AddFunction	doc = "Please work function docs."
+-- function: RandomPatrolThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function RandomPatrolThread(platoon)
@@ -598,9 +598,9 @@ end
 ----
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: RandomDefensePatrolThread = AddFunction	doc = "Please work function docs."
+-- function: RandomDefensePatrolThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function RandomDefensePatrolThread(platoon)
@@ -628,9 +628,9 @@ end
 ----
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: PatrolChainPickerThread = AddFunction	doc = "Please work function docs."
+-- function: PatrolChainPickerThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function PatrolChainPickerThread(platoon)
@@ -650,9 +650,9 @@ function PatrolChainPickerThread(platoon)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: EngineersBuildPlatoon = AddFunction	doc = "Please work function docs."
+-- function: EngineersBuildPlatoon = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function EngineersBuildPlatoon(platoon)
@@ -821,9 +821,9 @@ end
 ----    -- CategoryList : The categories we are going to find and attack
 ------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: CategoryHunterPlatoonAI = AddFunction	doc = "Please work function docs."
+-- function: CategoryHunterPlatoonAI = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function CategoryHunterPlatoonAI(platoon)
@@ -924,9 +924,9 @@ end
 ----         patrol using PatrolRoute, platoon can disband if given a patrol and is not maintaining a base
 ------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
--- function: StartBaseEngineerThread = AddFunction	doc = "Please work function docs."
+-- function: StartBaseEngineerThread = AddFunction    doc = "Please work function docs."
 --
--- parameter 0: string	platoon         = "default_platoon"
+-- parameter 0: string    platoon         = "default_platoon"
 --
 --------------------------------------------------------------------------------------------------------------
 function StartBaseEngineerThread(platoon)
@@ -2121,7 +2121,7 @@ function PlatoonChooseLowestNonNegative( aiBrain, locationList, ringSize, locati
 
     for k, v in locationList do
         currThreat = aiBrain:GetThreatAtPosition( v, ringSize, true )
-		WaitSeconds(0.1)
+        WaitSeconds(0.1)
         if not location or location ~= v then
             if (currThreat < bestThreat and currThreat > 0) or not locationSet then
                 locationSet = true
@@ -2149,7 +2149,7 @@ function PlatoonChooseLowest(aiBrain, locationList, ringSize, location)
 
     for k, v in locationList do
         currThreat = aiBrain:GetThreatAtPosition(v, ringSize, true)
-		WaitSeconds(0.1)
+        WaitSeconds(0.1)
         if not location or location ~= v then
             if (currThreat < bestThreat ) or not locationSet then
                 locationSet = true
@@ -2176,7 +2176,7 @@ function PlatoonChooseHighest( aiBrain, locationList, ringSize, location )
 
     for k, v in locationList do
         currThreat = aiBrain:GetThreatAtPosition( v, ringSize, true )
-		WaitSeconds(0.1)
+        WaitSeconds(0.1)
         if(currThreat > highestThreat) and (not location or location ~= v) then
             highestThreat = currThreat
             bestLocation = v
@@ -2194,7 +2194,7 @@ function PlatoonChooseRandomNonNegative( aiBrain, locationList, ringSize )
     local landingList = {}
     for k, v in locationList do
         if aiBrain:GetThreatAtPosition( v, ringSize, true ) > 0 then
-			WaitSeconds(0.1)
+            WaitSeconds(0.1)
             table.insert(landingList, v)
         end
     end

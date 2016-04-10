@@ -25,8 +25,8 @@ BaseBuilderTemplate {
 
         -- Extractor building        
         'EngineerMassBuildersLowerPri',
-		
-		-- ==== UNIT CAP BUILDERS ==== --
+        
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
         

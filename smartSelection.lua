@@ -31,9 +31,9 @@ function setSelection(expression)
   local units = GetSelectedUnits()
   
   for k,v in expression.negatives do
-	if units ~= nil then
-		units = EntityCategoryFilterOut(categories[v], units)
-	end
+    if units ~= nil then
+        units = EntityCategoryFilterOut(categories[v], units)
+    end
   end
 
   SelectUnits(units)

@@ -21,7 +21,7 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-		'EngineerFactoryConstruction Balance',
+        'EngineerFactoryConstruction Balance',
         
         -- Engineer Support buildings
         'EngineeringSupportBuilder',
@@ -39,8 +39,8 @@ BaseBuilderTemplate {
         'Balanced Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
         
         -- ACU Defense
         'T1ACUDefenses',
@@ -52,21 +52,21 @@ BaseBuilderTemplate {
         -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-		'EngineerFirebaseBuilders',
+        'EngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
         --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-		
+        
         'T2MissileDefenses',
-		'T2ArtilleryFormBuilders',
+        'T2ArtilleryFormBuilders',
         
         --'T1DefensivePoints',
         --'T2DefensivePoints',
         --'T3DefensivePoints',
-		
-		'T2Shields',
+        
+        'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
         
@@ -113,14 +113,14 @@ BaseBuilderTemplate {
         -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		-- ==== ARTILLERY BUILDERS ==== --
+        
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
+        'T3ArtilleryFormBuilders',
         
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+        
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         -- ==== EXPERIMENTALS ==== --
@@ -129,11 +129,11 @@ BaseBuilderTemplate {
         
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -158,7 +158,7 @@ BaseBuilderTemplate {
             SCU = 3,
         },
         FactoryCount = {
-			--DUNCAN - Factory number tweaks, was 6, 4, 0, 1
+            --DUNCAN - Factory number tweaks, was 6, 4, 0, 1
             Land = 7,
             Air = 4,
             Sea = 0,
@@ -177,12 +177,12 @@ BaseBuilderTemplate {
         local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         local mapSizeX, mapSizeZ = GetMapSize()
         local isIsland = false
-				
-		if not per then 
+                
+        if not per then 
             return 1, 'rushbalanced'
         end
-		
-		if per == 'rushland' and mapSizeX > 512 and mapSizeZ > 512 then
+        
+        if per == 'rushland' and mapSizeX > 512 and mapSizeZ > 512 then
             return 1000, 'rushland'
         end
         
@@ -209,7 +209,7 @@ BaseBuilderTemplate {
         if isIsland then
             return Random(25, 50), 'rushbalanced'
 
-		--DUNCAN - Dont use balanced on small 5km maps
+        --DUNCAN - Dont use balanced on small 5km maps
         elseif mapSizeX > 256 and mapSizeZ > 256 and mapSizeX <= 512 and mapSizeZ <= 512 then
             return Random(75, 100), 'rushbalanced'
 

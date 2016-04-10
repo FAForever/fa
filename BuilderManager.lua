@@ -128,8 +128,8 @@ BuilderManager = Class {
         end
         return false
     end,
-	
-	GetActivePriority = function(self, builderName)
+    
+    GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
                 if builder:GetBuilderName() == builderName then
@@ -150,7 +150,7 @@ BuilderManager = Class {
             end
         end
     end,
-	
+    
     ResetBuilderPriority = function(self,builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -229,7 +229,7 @@ BuilderManager = Class {
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
-			if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and ( not found or v:GetPriority() == found ) and v:GetBuilderStatus() then
+            if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and ( not found or v:GetPriority() == found ) and v:GetBuilderStatus() then
                 found = v:GetPriority()
                 table.insert( possibleBuilders, k )
             elseif found and v:GetPriority() < found then

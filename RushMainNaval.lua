@@ -36,8 +36,8 @@ BaseBuilderTemplate {
         'Naval Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Shields',
-		
+        'ACUUpgrades - Shields',
+        
         -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
@@ -57,7 +57,7 @@ BaseBuilderTemplate {
         'NavalExpansionBuilders HighPri',
         
         -- ==== LAND UNIT BUILDERS ==== --
-		'T2LandFactoryAmphibiousBuilders', --DUNCAN - added
+        'T2LandFactoryAmphibiousBuilders', --DUNCAN - added
         'T3LandFactoryBuilders',
         
         'FrequentLandAttackFormBuilders',
@@ -94,16 +94,16 @@ BaseBuilderTemplate {
         'BaseGuardAirFormBuilders', --DUNCAN - was 'BaseGuardAirFormBuildersNaval'
 
         -- ==== EXPERIMENTALS ==== --
-		'MobileLandExperimentalEngineers',
-		'MobileLandExperimentalForm',
-		
-		'MobileAirExperimentalEngineers',
+        'MobileLandExperimentalEngineers',
+        'MobileLandExperimentalForm',
+        
+        'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -142,23 +142,23 @@ BaseBuilderTemplate {
     FirstBaseFunction = function(aiBrain)
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()
-		
-		local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
+        
+        local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not per then
             return 1, 'rushnaval'
         end
-		if per == 'rushnaval' then
+        if per == 'rushnaval' then
             return 1000, 'rushnaval'
         end
-		
-		--DUNCAN - Add island check
-		local isIsland = false
+        
+        --DUNCAN - Add island check
+        local isIsland = false
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end
-		
-		local navalMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
+        
+        local navalMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
         local navalExclude = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Exclude', startX, startZ)
         if not navalMarker or aiBrain:GetMapWaterRatio() < .5 or navalExclude then
             return 0, 'rushnaval'
@@ -169,11 +169,11 @@ BaseBuilderTemplate {
         elseif per != 'rush'and per != 'adaptive' and per != '' then
             return 1, 'rushnaval'
         end
-		
-		--DUNCAN - dont use this AI on setons
-		if ScenarioInfo.name =='Seton\'s Clutch' then
-			return 1, 'rushnaval'
-		end
+        
+        --DUNCAN - dont use this AI on setons
+        if ScenarioInfo.name =='Seton\'s Clutch' then
+            return 1, 'rushnaval'
+        end
 
 
         --if true then
@@ -185,11 +185,11 @@ BaseBuilderTemplate {
             return 10, 'rushnaval'
 
         --If we're playing on a 512 map, possibly go rush naval
-		--DUNCAN - Only go naval if islands
+        --DUNCAN - Only go naval if islands
         elseif isIsland and mapSizeX > 500 and mapSizeZ > 500 and mapSizeX < 1000 and mapSizeZ < 1000 then
             return Random(80, 100), 'rushnaval'
         
-		--If we're playing on a 1024 or bigger, rushing naval might work
+        --If we're playing on a 1024 or bigger, rushing naval might work
         elseif mapSizeX > 1000 and mapSizeZ > 1000 then
             return Random(80,100), 'rushnaval'
         end

@@ -13,7 +13,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 
 DALK003 = Class(AWalkingLandUnit) {    
     Weapons = {
-		Missile = Class(AAAZealotMissileWeapon) {},
+        Missile = Class(AAAZealotMissileWeapon) {},
     },
     
 }

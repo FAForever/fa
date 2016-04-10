@@ -125,16 +125,16 @@ function CreateProfileButton(parent, exitBehavior, enterBehavior)
     SetNameToCurrentProfile()
 
     profileButton.OnClick = function(self)
-       	if enterBehavior then
-    		enterBehavior()
-		end    
+           if enterBehavior then
+            enterBehavior()
+        end    
         if not profileDlg then
             profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-               	SetNameToCurrentProfile()
-               	profileDlg = nil
-               	if exitBehavior then
-               	    exitBehavior()
-               	end
+                   SetNameToCurrentProfile()
+                   profileDlg = nil
+                   if exitBehavior then
+                       exitBehavior()
+                   end
             end)
         end
     end

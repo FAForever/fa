@@ -38,24 +38,24 @@ BaseBuilderTemplate {
         'SorianT1SeaFactoryBuilders',
         'SorianT2SeaFactoryBuilders',
         'SorianT3SeaFactoryBuilders',
-		
-		'SorianT2SeaStrikeForceBuilders',
-		
-		'SorianSeaHunterFormBuilders',
+        
+        'SorianT2SeaStrikeForceBuilders',
+        
+        'SorianSeaHunterFormBuilders',
         'SorianFrequentSeaAttackFormBuilders',
         'SorianMassHunterSeaFormBuilders',
-		
-		-- ===== STRATEGIES ====== --
-		
-		'SorianParagonStrategyExp',
-		
-		-- == STRATEGY PLATOONS == --
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
+        
+        -- ===== STRATEGIES ====== --
+        
+        'SorianParagonStrategyExp',
+        
+        -- == STRATEGY PLATOONS == --
+        
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
         
         -- ==== NAVAL EXPANSION ==== --
         'SorianNavalExpansionBuilders',
-		
+        
         -- ==== EXPERIMENTALS ==== --
         --'SorianMobileNavalExperimentalEngineers',
         --'SorianMobileNavalExperimentalForm',

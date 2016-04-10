@@ -39,10 +39,10 @@ BrainConditionsMonitor = Class {
         end
         self.Brain = brain
     end,
-	
+    
     Destroy = function(self)
-		KillThread(self.ConditionMonitor)
-		self.Active = false
+        KillThread(self.ConditionMonitor)
+        self.Active = false
         self.Trash:Destroy()
     end,
 
@@ -110,7 +110,7 @@ BrainConditionsMonitor = Class {
         local newCondition
         if cFilename == '/lua/editor/InstantBuildConditions.lua' 
             or cFilename == '/lua/editor/UnitCountBuildConditions.lua' or cFilename == '/lua/editor/EconomyBuildConditions.lua' 
-			or cFilename == '/lua/editor/SorianInstantBuildConditions.lua' then
+            or cFilename == '/lua/editor/SorianInstantBuildConditions.lua' then
             newCondition = InstantImportCondition()
         else
             newCondition = ImportCondition()
@@ -163,17 +163,17 @@ BrainConditionsMonitor = Class {
     ConditionMonitorThread = function(self)
         while true do
             local checks = 0
-			local numResults = 0
+            local numResults = 0
             local numChecks = table.getn(self.ResultTable)
             local numPerTick = math.ceil( numChecks / ( self.ThreadWaitDuration * 10 ) )
             
             for k,v in self.ResultTable do
-				if not v:LocationExists() then
-					--Don't remove the condition, just skip over.
-					--If the base gets rebuilt the AI will use the old keyed conditions.
-					continue
-				end
-				numResults = numResults + 1
+                if not v:LocationExists() then
+                    --Don't remove the condition, just skip over.
+                    --If the base gets rebuilt the AI will use the old keyed conditions.
+                    continue
+                end
+                numResults = numResults + 1
                 v:CheckCondition()
                 
                 -- Load balance per tick here
@@ -183,7 +183,7 @@ BrainConditionsMonitor = Class {
                     checks = 0
                 end
             end
-			--LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
+            --LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
             WaitTicks(1)
         end
     end,
@@ -263,23 +263,23 @@ ImportCondition = Class(Condition) {
         end
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionData do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+    
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionData do
+            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }
 
 InstantImportCondition = Class(Condition) {
@@ -312,23 +312,23 @@ InstantImportCondition = Class(Condition) {
         end
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionData do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+    
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionData do
+            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }
 
 FunctionCondition = Class(Condition) {
@@ -342,21 +342,21 @@ FunctionCondition = Class(Condition) {
         self.Status = self.FunctionHandle( self.Brain, unpack(self.FunctionParameters) )
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionParameters do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+    
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionParameters do
+            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }

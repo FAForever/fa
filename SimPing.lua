@@ -54,9 +54,9 @@ function SpawnPing(data)
         for num,brain in ArmyBrains do
             if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
                 ArmyBrains[num]:DoPingCallbacks( data )
-				if not SUtils.IsAIArmy(data.Owner + 1) then
-					ArmyBrains[num]:DoAIPing( data )
-				end
+                if not SUtils.IsAIArmy(data.Owner + 1) then
+                    ArmyBrains[num]:DoAIPing( data )
+                end
             end
         end
 
@@ -65,7 +65,7 @@ function SpawnPing(data)
 end
 
 function SpawnSpecialPing(data)
-	--This function is used to generate automatic nuke pings    
+    --This function is used to generate automatic nuke pings    
     local Entity = import('/lua/sim/Entity.lua').Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
@@ -89,9 +89,9 @@ function SpawnSpecialPing(data)
     for num,brain in ArmyBrains do
         if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
             ArmyBrains[num]:DoPingCallbacks( data )
-			if not SUtils.IsAIArmy(data.Owner + 1) then
-				ArmyBrains[num]:DoAIPing( data )
-			end
+            if not SUtils.IsAIArmy(data.Owner + 1) then
+                ArmyBrains[num]:DoAIPing( data )
+            end
         end
     end    
 end

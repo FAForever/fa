@@ -163,38 +163,38 @@ function OnCommandIssued(command)
             end
         end
     elseif command.CommandType == 'BuildMobile' then
-		AddCommandFeedbackBlip({
-			Position = command.Target.Position, 
-			BlueprintID = command.Blueprint,			
-			TextureName = '/meshes/game/flag02d_albedo.dds',
-			ShaderName = 'CommandFeedback',
-			UniformScale = 1,
-		}, 0.7)
+        AddCommandFeedbackBlip({
+            Position = command.Target.Position, 
+            BlueprintID = command.Blueprint,            
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 1,
+        }, 0.7)
     elseif command.CommandType == 'Repair' then
         local target = command.Target
         if target.Type == 'Entity' then -- repair wreck to rebuild
             local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
         end
-	else	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/flag02d_lod0.scm',
-				TextureName = '/meshes/game/flag02d_albedo.dds',
-				ShaderName = 'CommandFeedback',
-				UniformScale = 0.5,
-			}, 0.7)		
-			
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/crosshair02d_lod0.scm',
-				TextureName = '/meshes/game/crosshair02d_albedo.dds',
-				ShaderName = 'CommandFeedback2',
-				UniformScale = 0.5,
-			}, 0.75)		
-		end		
-	end
+    else    
+        if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position, 
+                MeshName = '/meshes/game/flag02d_lod0.scm',
+                TextureName = '/meshes/game/flag02d_albedo.dds',
+                ShaderName = 'CommandFeedback',
+                UniformScale = 0.5,
+            }, 0.7)        
+            
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position, 
+                MeshName = '/meshes/game/crosshair02d_lod0.scm',
+                TextureName = '/meshes/game/crosshair02d_albedo.dds',
+                ShaderName = 'CommandFeedback2',
+                UniformScale = 0.5,
+            }, 0.75)        
+        end        
+    end
 
-	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end

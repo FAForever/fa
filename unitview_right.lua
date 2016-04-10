@@ -69,7 +69,7 @@ function SetLayout()
         UIUtil.UIFile('/game/unit_view_icons/mass.dds'),
         UIUtil.UIFile('/game/unit_view_icons/energy.dds'),
         UIUtil.UIFile('/game/unit_view_icons/kills.dds'),
-		UIUtil.UIFile('/game/unit_view_icons/kills.dds'),
+        UIUtil.UIFile('/game/unit_view_icons/kills.dds'),
         UIUtil.UIFile('/game/unit_view_icons/missiles.dds'),
         UIUtil.UIFile('/game/unit_view_icons/shield.dds'),
         UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),

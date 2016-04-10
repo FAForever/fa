@@ -58,7 +58,7 @@ PlatoonTemplate {
     Name = 'GhettoMarines',
     Plan = 'GhettoAI', 
     GlobalSquads = {
-		--DUNCAN - the REPAIR is to remove the mantis. Added in Selen too.
+        --DUNCAN - the REPAIR is to remove the mantis. Added in Selen too.
         { categories.MOBILE * categories.LAND * categories.TECH1 * categories.BOT - categories.REPAIR + (categories.SERAPHIM * categories.SCOUT), 6, 6, 'Attack', 'none' }
     },
 }
@@ -81,7 +81,7 @@ PlatoonTemplate {
     Name = 'StartLocationAttack',
     Plan = 'GuardMarker',
     GlobalSquads = {
-		--DUNCAN - was 15 to 25
+        --DUNCAN - was 15 to 25
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' },
         { categories.ENGINEER, 1, 1, 'Attack', 'none' },
     },
@@ -114,7 +114,7 @@ PlatoonTemplate {
     --Plan = 'AttackForceAI',    
     Plan = 'GuardMarker',    
     GlobalSquads = {
-		--DUNCAN - removed bot as mantis is a bot?
+        --DUNCAN - removed bot as mantis is a bot?
         { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
@@ -125,7 +125,7 @@ PlatoonTemplate {
     --Plan = 'AttackForceAI',    
     Plan = 'GuardMarker',    
     GlobalSquads = {
-		--DUNCAN - removed bot as mantis is a bot?
+        --DUNCAN - removed bot as mantis is a bot?
         { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 25, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
@@ -154,7 +154,7 @@ PlatoonTemplate {
     Name = 'T4ExperimentalLand',
     Plan = 'ExperimentalAIHub',   
     GlobalSquads = {
-		--DUNCAN - removed the sera lightning unit
+        --DUNCAN - removed the sera lightning unit
         { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.INSIGNIFICANTUNIT, 1, 1, 'attack', 'none' }
     },
 }
@@ -162,7 +162,7 @@ PlatoonTemplate {
     Name = 'T4ExperimentalLandGroup',
     Plan = 'ExperimentalAIHub',   
     GlobalSquads = {
-		--DUNCAN - removed the sera lightning unit
+        --DUNCAN - removed the sera lightning unit
         { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.INSIGNIFICANTUNIT, 2, 3, 'attack', 'none' }
     },
 }
@@ -171,7 +171,7 @@ PlatoonTemplate {
     Name = 'T1EngineerGuard',
     Plan = 'None',
     GlobalSquads = {
-		--DUNCAN - was 1 to 3
+        --DUNCAN - was 1 to 3
         { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 3, 5, 'guard', 'None' } 
     },
 }

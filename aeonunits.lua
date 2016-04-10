@@ -161,7 +161,7 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag )
         unitBeingBuilt.Trash:Add( thread )    
-    end,	
+    end,    
 }
 
 

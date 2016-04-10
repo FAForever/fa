@@ -31,7 +31,7 @@ BaseBuilderTemplate {
         'EngineerEnergyBuildersExpansions',
         
         -- ==== EXPANSION ==== --
-		--DUNCAN - expansions dont build more expansions!
+        --DUNCAN - expansions dont build more expansions!
         --'EngineerExpansionBuildersFull',
         --'EngineerExpansionBuildersSmall',
         
@@ -63,8 +63,8 @@ BaseBuilderTemplate {
         'T1ReactionDF',
         'T2ReactionDF',
         'T3ReactionDF',
-		
-		-- ==== UNIT CAP BUILDERS ==== --
+        
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 

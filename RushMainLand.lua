@@ -39,9 +39,9 @@ BaseBuilderTemplate {
         'Land Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Gun improvements',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
+        'ACUUpgrades - Gun improvements',
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
         
         -- ACU Defense
         'T1ACUDefenses',
@@ -53,21 +53,21 @@ BaseBuilderTemplate {
         -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-		--'EngineerFirebaseBuilders',
+        --'EngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
         --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-		
+        
         'T2MissileDefenses',
-		'T2ArtilleryFormBuilders',
+        'T2ArtilleryFormBuilders',
         
         --'T1DefensivePoints',
         --'T2DefensivePoints',
         --'T3DefensivePoints',
-		
-		'T2Shields',
+        
+        'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
         
@@ -114,14 +114,14 @@ BaseBuilderTemplate {
         -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		-- ==== ARTILLERY BUILDERS ==== --
+        
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
+        'T3ArtilleryFormBuilders',
         
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+        
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         -- ==== EXPERIMENTALS ==== --
@@ -130,11 +130,11 @@ BaseBuilderTemplate {
         
         --'MobileAirExperimentalEngineers',
         --'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -156,7 +156,7 @@ BaseBuilderTemplate {
             SCU = 1,
         },
         FactoryCount = {
-			--DUNCAN - Factory number tweaks, was 5, 1, 0, 1
+            --DUNCAN - Factory number tweaks, was 5, 1, 0, 1
             Land = 7,
             Air = 3,
             Sea = 0,
@@ -189,8 +189,8 @@ BaseBuilderTemplate {
         if not per then
             return 1, 'rushland'
         end
-		
-		if per == 'rushland' and mapSizeX <= 512 and mapSizeZ <= 512 then
+        
+        if per == 'rushland' and mapSizeX <= 512 and mapSizeZ <= 512 then
             return 1000, 'rushland'
         end
         
@@ -200,11 +200,11 @@ BaseBuilderTemplate {
             return 1, 'rushland'
         end
         
-		--DUNCAN - if this is islands then dont use land rush
-		if isIsland then
-			return  1, 'rushland'
-		
-		--DUNCAN - use this on 5km maps
+        --DUNCAN - if this is islands then dont use land rush
+        if isIsland then
+            return  1, 'rushland'
+        
+        --DUNCAN - use this on 5km maps
         elseif mapSizeX <= 256 and mapSizeZ <= 256 and not isIsland then
             return 100, 'rushland'
 

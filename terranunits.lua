@@ -215,9 +215,9 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
     -- This causes them both to be shown while it upgrades, this over-riden function can be removed
     -- once it is.
     StartBeingBuiltEffects = function(self, builder, layer)
-		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
-			self:HideBone(0, true)        
+            self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end
     end,    
@@ -241,9 +241,9 @@ TMassStorageUnit = Class(MassStorageUnit) {
 TMobileFactoryUnit = Class(LandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
-		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
-			self:HideBone(0, true)        
+            self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end
     end,   
@@ -333,10 +333,10 @@ TShieldLandUnit = Class(ShieldLandUnit) {}
 --------------------------------------------------------------
 TShieldStructureUnit = Class(ShieldStructureUnit) {
     StartBeingBuiltEffects = function(self,builder,layer)
-    	self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if builder and EntityCategoryContains(categories.MOBILE, builder) then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag )	)	
+            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag )    )    
         end
     end,
 }

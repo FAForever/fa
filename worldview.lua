@@ -18,11 +18,11 @@ local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 WorldViewParams = {
-	ui_SelectTolerance = 7.0,
-	ui_DisableCursorFixing = false,
-	ui_ExtractSnapTolerance = 4.0,
-	ui_MinExtractSnapPixels = 10,
-	ui_MaxExtractSnapPixels = 1000,
+    ui_SelectTolerance = 7.0,
+    ui_DisableCursorFixing = false,
+    ui_ExtractSnapTolerance = 4.0,
+    ui_MinExtractSnapPixels = 10,
+    ui_MaxExtractSnapPixels = 1000,
 }
 
 local CommandDecals = {}
@@ -311,8 +311,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                     end
                 end)
             end
-		end
-		
+        end
+        
         if not self:IsHidden() and pingData.Location then
             local coords = self:Project(Vector(pingData.Location[1], pingData.Location[2], pingData.Location[3]))
             if not pingData.Renew then

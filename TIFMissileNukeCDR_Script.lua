@@ -28,7 +28,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
                 self:PlaySound(myBlueprint.Audio.Explosion)
             end
            
-			nukeProjectile = self:CreateProjectile('/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
+            nukeProjectile = self:CreateProjectile('/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
             nukeProjectile:PassDamageData(self.DamageData)
             nukeProjectile:PassData(self.Data)
         end
@@ -88,16 +88,16 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
-			-- Increase check intervals
-			self:SetTurnRate(30)
-			WaitSeconds(1.5)
+            -- Increase check intervals
+            self:SetTurnRate(30)
+            WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
-		    -- Further increase check intervals
+            -- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(75)
-		elseif dist > 0 and dist <= 43 then
-			-- Further increase check intervals            
+        elseif dist > 0 and dist <= 43 then
+            -- Further increase check intervals            
             self:SetTurnRate(200)   
             KillThread(self.MoveThread)         
         end

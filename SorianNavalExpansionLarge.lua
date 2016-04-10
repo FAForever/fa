@@ -15,7 +15,7 @@ BaseBuilderTemplate {
         -- Factory upgrades
         'SorianT1NavalUpgradeBuilders',
         'SorianT2NavalUpgradeBuilders',
-		
+        
         -- Pass engineers to main as needed
         --'Engineer Transfers',
         
@@ -41,24 +41,24 @@ BaseBuilderTemplate {
         'SorianT1SeaFactoryBuilders',
         'SorianT2SeaFactoryBuilders',
         'SorianT3SeaFactoryBuilders',
-		
-		'SorianT2SeaStrikeForceBuilders',
-		
-		'SorianSeaHunterFormBuilders',
+        
+        'SorianT2SeaStrikeForceBuilders',
+        
+        'SorianSeaHunterFormBuilders',
         'SorianBigSeaAttackFormBuilders',
         'SorianMassHunterSeaFormBuilders',
-		
-		-- ===== STRATEGIES ====== --
-		
-		'SorianParagonStrategyExp',
-		
-		-- == STRATEGY PLATOONS == --
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
+        
+        -- ===== STRATEGIES ====== --
+        
+        'SorianParagonStrategyExp',
+        
+        -- == STRATEGY PLATOONS == --
+        
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
         
         -- ==== NAVAL EXPANSION ==== --
         'SorianNavalExpansionBuildersFast',
-		
+        
         -- ==== EXPERIMENTALS ==== --
         --'SorianMobileNavalExperimentalEngineers',
         --'SorianMobileNavalExperimentalForm',
@@ -90,8 +90,8 @@ BaseBuilderTemplate {
         if markerType != 'Naval Area' then
             return 0
         end
-		
-		local isIsland = false
+        
+        local isIsland = false
         local startX, startZ = aiBrain:GetArmyStartPos()
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
@@ -99,12 +99,12 @@ BaseBuilderTemplate {
         end
         
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-		local base = ScenarioInfo.ArmySetup[aiBrain.Name].AIBase
-		
-		if personality == 'sorianadaptive' and base == 'SorianMainWater' then
-			return 250
-		end
-		
+        local base = ScenarioInfo.ArmySetup[aiBrain.Name].AIBase
+        
+        if personality == 'sorianadaptive' and base == 'SorianMainWater' then
+            return 250
+        end
+        
         if personality == 'sorianwater' then
             return 200
         end

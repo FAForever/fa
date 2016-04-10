@@ -57,7 +57,7 @@ function CreateUI()
     -- this should be shown if there are no profiles
     if not GetPreference("profile.current") then
         profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-           	CreateUI()
+               CreateUI()
         end)
         return
     end
@@ -477,9 +477,9 @@ function CreateUI()
             MenuHide(function()
                 if not profileDlg then
                     profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-                       	SetNameToCurrentProfile()
-                       	profileDlg = nil
-                       	MenuShow()
+                           SetNameToCurrentProfile()
+                           profileDlg = nil
+                           MenuShow()
                     end)
                 end
             end)

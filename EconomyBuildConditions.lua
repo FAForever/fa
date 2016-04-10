@@ -14,11 +14,11 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local BuildingTemplates = import('/lua/BuildingTemplates.lua')
 
 --------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEconStorageRatio = BuildCondition	doc = "Please work function docs."
+-- function: GreaterThanEconStorageRatio = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"		
--- parameter 1: float	mStorageRatio	= 0.0				doc = "docs for param1"
--- parameter 2: float	eStorageRatio	= 0.0				doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"        
+-- parameter 1: float    mStorageRatio    = 0.0                doc = "docs for param1"
+-- parameter 2: float    eStorageRatio    = 0.0                doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
@@ -30,11 +30,11 @@ function GreaterThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEconStorageMax = BuildCondition	doc = "Please work function docs."
+-- function: GreaterThanEconStorageMax = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain         = "default_brain"		
--- parameter 1: int	mStorage        = 0				doc = "docs for param1"
--- parameter 2: int	eStorage	= 0				doc = "param2 docs"
+-- parameter 0: string    aiBrain         = "default_brain"        
+-- parameter 1: int    mStorage        = 0                doc = "docs for param1"
+-- parameter 2: int    eStorage    = 0                doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconStorageMax(aiBrain, mStorage, eStorage)
@@ -46,11 +46,11 @@ function GreaterThanEconStorageMax(aiBrain, mStorage, eStorage)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEconStorageCurrent = BuildCondition	doc = "Please work function docs."
+-- function: GreaterThanEconStorageCurrent = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"		doc = "docs for param1"
--- parameter 1: integer	mStorage	= 0					doc = "docs for param1"
--- parameter 2: integer	eStorage	= 0					doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"        doc = "docs for param1"
+-- parameter 1: integer    mStorage    = 0                    doc = "docs for param1"
+-- parameter 2: integer    eStorage    = 0                    doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconStorageCurrent(aiBrain, mStorage, eStorage)
@@ -62,11 +62,11 @@ function GreaterThanEconStorageCurrent(aiBrain, mStorage, eStorage)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessThanEconTrend = BuildCondition	doc = "Please work function docs."
+-- function: LessThanEconTrend = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"			doc = "docs for param1"	
--- parameter 1: integer	mTrend	        = 0				doc = "docs for param1"
--- parameter 2: integer	eTrend	        = 0      			doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"            doc = "docs for param1"    
+-- parameter 1: integer    mTrend            = 0                doc = "docs for param1"
+-- parameter 2: integer    eTrend            = 0                  doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function LessThanEconTrend(aiBrain, mTrend, eTrend)
@@ -79,11 +79,11 @@ function LessThanEconTrend(aiBrain, mTrend, eTrend)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessThanEconStorageRatio = BuildCondition	doc = "Please work function docs."
+-- function: LessThanEconStorageRatio = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		     = "default_brain"				doc = "docs for param1"
--- parameter 1: integer	mStorageRatio        = 0					doc = "docs for param1"
--- parameter 2: integer	eStorageRatio	     = 0					doc = "param2 docs"
+-- parameter 0: string    aiBrain             = "default_brain"                doc = "docs for param1"
+-- parameter 1: integer    mStorageRatio        = 0                    doc = "docs for param1"
+-- parameter 2: integer    eStorageRatio         = 0                    doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function LessThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
@@ -95,11 +95,11 @@ function LessThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessEconStorageMax = BuildCondition	doc = "Please work function docs."
+-- function: LessEconStorageMax = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string       aiBrain	    = "default_brain"				doc = "docs for param1"
--- parameter 1: integer      mStorage    = 0					doc = "docs for param1"
--- parameter 2: integer      eStorage    = 0					doc = "param2 docs"
+-- parameter 0: string       aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: integer      mStorage    = 0                    doc = "docs for param1"
+-- parameter 2: integer      eStorage    = 0                    doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function LessEconStorageMax(aiBrain, mStorage, eStorage)
@@ -111,11 +111,11 @@ function LessEconStorageMax(aiBrain, mStorage, eStorage)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessEconStorageCurrent = BuildCondition	doc = "Please work function docs."
+-- function: LessEconStorageCurrent = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string       aiBrain         = "default_brain"				doc = "docs for param1"
--- parameter 1: integer      mStorage	= 0					doc = "docs for param1"
--- parameter 2: integer      eStorage	= 0					doc = "param2 docs"
+-- parameter 0: string       aiBrain         = "default_brain"                doc = "docs for param1"
+-- parameter 1: integer      mStorage    = 0                    doc = "docs for param1"
+-- parameter 2: integer      eStorage    = 0                    doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function LessEconStorageCurrent(aiBrain, mStorage, eStorage)
@@ -128,11 +128,11 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEconTrend = BuildCondition	doc = "Please work function docs."
+-- function: GreaterThanEconTrend = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"				doc = "docs for param1"
--- parameter 1: int	MassTrend	= 1             doc = "docs for param1"
--- parameter 2: int	EnergyTrend	= 1             doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: int    MassTrend    = 1             doc = "docs for param1"
+-- parameter 2: int    EnergyTrend    = 1             doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
@@ -144,18 +144,18 @@ function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEconIncome = BuildCondition	doc = "Please work function docs."
+-- function: GreaterThanEconIncome = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"				doc = "docs for param1"
--- parameter 1: int	MassIncome	= 0.1             doc = "docs for param1"
--- parameter 2: int	EnergyIncome	= 1             doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: int    MassIncome    = 0.1             doc = "docs for param1"
+-- parameter 2: int    EnergyIncome    = 1             doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return true
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return true
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassIncome >= MassIncome and econ.EnergyIncome >= EnergyIncome) then
         return true
@@ -165,18 +165,18 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessThanEconIncome = BuildCondition	doc = "Please work function docs."
+-- function: LessThanEconIncome = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"				doc = "docs for param1"
--- parameter 1: int	MassIncome	= 0.1             doc = "docs for param1"
--- parameter 2: int	EnergyIncome	= 1             doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: int    MassIncome    = 0.1             doc = "docs for param1"
+-- parameter 2: int    EnergyIncome    = 1             doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return false
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return false
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassIncome < MassIncome and econ.EnergyIncome < EnergyIncome) then
         return true
@@ -188,18 +188,18 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessThanEconEfficiency = BuildCondition	doc = "Please work function docs."
+-- function: LessThanEconEfficiency = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"				doc = "docs for param1"
--- parameter 1: int	MassEfficiency	= 1             doc = "docs for param1"
--- parameter 2: int	EnergyEfficiency	= 1             doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: int    MassEfficiency    = 1             doc = "docs for param1"
+-- parameter 2: int    EnergyEfficiency    = 1             doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return true
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return true
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassEfficiency >= MassEfficiency and econ.EnergyEfficiency >= EnergyEfficiency) then
         return true
@@ -208,10 +208,10 @@ function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return false
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return false
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassEfficiency <= MassEfficiency and econ.EnergyEfficiency <= EnergyEfficiency) then
         return true
@@ -220,18 +220,18 @@ function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- function: LessThanEconEfficiencyOverTime = BuildCondition	doc = "Please work function docs."
+-- function: LessThanEconEfficiencyOverTime = BuildCondition    doc = "Please work function docs."
 -- 
--- parameter 0: string	aiBrain		= "default_brain"				doc = "docs for param1"
--- parameter 1: int	MassEfficiency	= 1             doc = "docs for param1"
--- parameter 2: int	EnergyEfficiency	= 1             doc = "param2 docs"
+-- parameter 0: string    aiBrain        = "default_brain"                doc = "docs for param1"
+-- parameter 1: int    MassEfficiency    = 1             doc = "docs for param1"
+-- parameter 2: int    EnergyEfficiency    = 1             doc = "param2 docs"
 --
 --------------------------------------------------------------------------------------------------------------
 function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return true
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return true
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassEfficiencyOverTime >= MassEfficiency and econ.EnergyEfficiencyOverTime >= EnergyEfficiency) then
         return true
@@ -240,10 +240,10 @@ function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEffici
 end
 
 function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-	if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
-		--LOG('*AI DEBUG: Found Paragon')
-		return false
-	end
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+        --LOG('*AI DEBUG: Found Paragon')
+        return false
+    end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     if (econ.MassEfficiencyOverTime <= MassEfficiency and econ.EnergyEfficiencyOverTime <= EnergyEfficiency) then
         return true
@@ -338,7 +338,7 @@ end
 
 function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
-	local total = 0
+    local total = 0
     if type(category) == 'string' then
         category = ParseEntityCategory(category)
     end
@@ -347,16 +347,16 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     else
         numUnits = aiBrain:GetListOfUnits(category, true)
     end
-	for k,v in numUnits do
-		if v:GetFractionComplete() == 1 then
-			total = total + 1
-			if total > numReq then
-				return true
-			end
-		end
-	end
-	if total > numReq then
-		return true
-	end
+    for k,v in numUnits do
+        if v:GetFractionComplete() == 1 then
+            total = total + 1
+            if total > numReq then
+                return true
+            end
+        end
+    end
+    if total > numReq then
+        return true
+    end
     return false
 end

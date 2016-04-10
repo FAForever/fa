@@ -101,11 +101,11 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         -- Overcharge
         elseif enh == 'Overcharge' then
-      	    self:AddCommandCap('RULEUCC_Overcharge')
-      	    self:SetWeaponEnabledByLabel('OverCharge', true)
+              self:AddCommandCap('RULEUCC_Overcharge')
+              self:SetWeaponEnabledByLabel('OverCharge', true)
         elseif enh == 'OverchargeRemove' then
-      	    self:RemoveCommandCap('RULEUCC_Overcharge')
-      	    self:SetWeaponEnabledByLabel('OverCharge', false)
+              self:RemoveCommandCap('RULEUCC_Overcharge')
+              self:SetWeaponEnabledByLabel('OverCharge', false)
         -- Engineering Throughput Upgrade
         elseif enh =='EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then
@@ -153,7 +153,7 @@ XSL0301 = Class(CommandUnit) {
                 Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
             end
             Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
-      	elseif enh == 'DamageStabilizationRemove' then
+          elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
             end

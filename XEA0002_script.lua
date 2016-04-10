@@ -57,9 +57,9 @@ XEA0002 = Class(TAirUnit) {
     
     --Make this unit invulnerable - Not any more! (IceDreamer)
     OnDamage = function(self, instigator, amount, vector, damageType)
-		if EntityCategoryContains(categories.NUKE, instigator) then
-			self:Destroy()
-		end
+        if EntityCategoryContains(categories.NUKE, instigator) then
+            self:Destroy()
+        end
     end,
 }
 TypeClass = XEA0002

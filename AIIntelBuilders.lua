@@ -189,7 +189,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 930,
         BuilderConditions = {
-			--DUNCAN - commented out
+            --DUNCAN - commented out
             --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, ( categories.RADAR + categories.OMNI ) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncome',  { 0.5, 15 } },
@@ -261,8 +261,8 @@ BuilderGroup {
             { EBC, 'GreaterThanEconIncome',  { 2, 100 }},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-			--DUNCAN - added
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
         },
         BuilderType = 'Any',
         FormDebugFunction = function()
@@ -278,8 +278,8 @@ BuilderGroup {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.OMNI * categories.STRUCTURE, 'RADAR STRUCTURE' } },
-			--DUNCAN - added
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
         },
         BuilderType = 'Any',
     },

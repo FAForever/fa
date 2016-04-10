@@ -18,23 +18,23 @@ XRL0302 = Class(CWalkingLandUnit) {
         DeathWeapon = Class(CMobileKamikazeBombDeathWeapon) {},
         
         Suicide = Class(CMobileKamikazeBombWeapon) {   
-			OnFire = function(self)		
-				self.unit:SetDeathWeaponEnabled(false)
-				CMobileKamikazeBombWeapon.OnFire(self)
-			end,
+            OnFire = function(self)        
+                self.unit:SetDeathWeaponEnabled(false)
+                CMobileKamikazeBombWeapon.OnFire(self)
+            end,
         },
     },
 
-	OnProductionPaused = function(self)
+    OnProductionPaused = function(self)
         local wep = self:GetWeapon(1)
         wep.OnFire(wep)
     end,
-	
-	OnKilled = function(self, instigator, type, overkillRatio)
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-		if not instigator and self.DeathWeaponEnabled != false then
-			self:GetWeaponByLabel('Suicide'):FireWeapon()
-		end
+        if not instigator and self.DeathWeaponEnabled != false then
+            self:GetWeaponByLabel('Suicide'):FireWeapon()
+        end
     end,
 
     OnLayerChange = function(self, new, old)

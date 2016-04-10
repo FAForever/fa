@@ -142,7 +142,7 @@ UAL0001 = Class(ACUUnit) {
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             
-	    if not Buffs['AeonACUT2BuildRate'] then
+        if not Buffs['AeonACUT2BuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonACUT2BuildRate',
                     DisplayName = 'AeonACUT2BuildRate',
@@ -166,8 +166,8 @@ UAL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -175,9 +175,9 @@ UAL0001 = Class(ACUUnit) {
             self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'AeonACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonACUT2BuildRate' )
-	     end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+         end
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         -- T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -208,8 +208,8 @@ UAL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -217,9 +217,9 @@ UAL0001 = Class(ACUUnit) {
             self:AddBuildRestriction( categories.AEON * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'AeonACUT3BuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonACUT3BuildRate' )
-	     end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+         end
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         -- Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')

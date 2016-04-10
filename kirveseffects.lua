@@ -19,7 +19,7 @@ OrbGlowEffect = {
 }
 
 SExperimentalUnstablePhasonLaserMuzzle01 = {
-	EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp',
+    EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp',
     EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp', 
 }
 

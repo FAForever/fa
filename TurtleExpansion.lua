@@ -39,7 +39,7 @@ BaseBuilderTemplate {
         
         -- ==== EXPANSION ==== --
         --DUNCAN - expansions dont build expansions!
-		--'EngineerExpansionBuildersFull',
+        --'EngineerExpansionBuildersFull',
         --'EngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
@@ -70,8 +70,8 @@ BaseBuilderTemplate {
         
         -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
-		
-		-- ==== UNIT CAP BUILDERS ==== --
+        
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
         

@@ -22,9 +22,9 @@ BaseBuilderTemplate {
         'SorianT3EngineerBuilders',
         'SorianEngineerFactoryConstruction',
         'SorianEngineerFactoryConstruction Balance',
-		
-		-- SCU Upgrades
-		'SorianSCUUpgrades',
+        
+        -- SCU Upgrades
+        'SorianSCUUpgrades',
         
         -- Build Mass low pri at this base
         'SorianEngineerMassBuildersLowerPri',
@@ -41,18 +41,18 @@ BaseBuilderTemplate {
         'SorianT2LightDefenses',
         'SorianT3LightDefenses',
 
-		'SorianT2ArtilleryFormBuilders',
-		'SorianT3ArtilleryFormBuilders',
-		'SorianT4ArtilleryFormBuilders',
+        'SorianT2ArtilleryFormBuilders',
+        'SorianT3ArtilleryFormBuilders',
+        'SorianT4ArtilleryFormBuilders',
         'SorianT3NukeDefensesExp',
         'SorianT3NukeDefenseBehaviors',
-		'SorianT2ShieldsExpansion',
-		'SorianShieldUpgrades',
-		'SorianAirStagingExpansion',
-		'SorianT3ShieldsExpansion',
-		'SorianT2MissileDefenses',
-		
-		'SorianMassAdjacencyDefenses',
+        'SorianT2ShieldsExpansion',
+        'SorianShieldUpgrades',
+        'SorianAirStagingExpansion',
+        'SorianT3ShieldsExpansion',
+        'SorianT2MissileDefenses',
+        
+        'SorianMassAdjacencyDefenses',
         
         -- ==== NAVAL EXPANSION ==== --
         'SorianNavalExpansionBuilders',
@@ -64,7 +64,7 @@ BaseBuilderTemplate {
         'SorianFrequentLandAttackFormBuilders',
         'SorianMassHunterLandFormBuilders',
         'SorianMiscLandFormBuilders',
-		'SorianUnitCapLandAttackFormBuilders',
+        'SorianUnitCapLandAttackFormBuilders',
         
         'SorianT1ReactionDF',
         'SorianT2ReactionDF',
@@ -77,26 +77,26 @@ BaseBuilderTemplate {
         'SorianFrequentAirAttackFormBuilders',
         'SorianMassHunterAirFormBuilders',
         
-		'SorianUnitCapAirAttackFormBuilders',
+        'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
         
         --'SorianTransportFactoryBuilders',
-		
-		'SorianExpResponseFormBuilders',
+        
+        'SorianExpResponseFormBuilders',
         
         'SorianT1AntiAirBuilders',
         'SorianT2AntiAirBuilders',
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
-		
-		-- ===== STRATEGIES ====== --
-		
-		'SorianParagonStrategyExp',
-		'SorianWaterMapLowLand',
-		
-		-- == STRATEGY PLATOONS == --
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
+        
+        -- ===== STRATEGIES ====== --
+        
+        'SorianParagonStrategyExp',
+        'SorianWaterMapLowLand',
+        
+        -- == STRATEGY PLATOONS == --
+        
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
 
         -- ==== EXPERIMENTALS ==== --
         'SorianMobileLandExperimentalEngineers',
@@ -104,7 +104,7 @@ BaseBuilderTemplate {
         
         'SorianMobileAirExperimentalEngineers',
         'SorianMobileAirExperimentalForm',
-		
+        
         -- ==== ARTILLERY BUILDERS ==== --
         'SorianT3ArtilleryGroupExp',
     },
@@ -148,7 +148,7 @@ BaseBuilderTemplate {
         if not (personality == 'sorian' or personality == 'sorianadaptive') then
             return 0
         end
-		
+        
         local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
         if not distance or distance > 1000 then

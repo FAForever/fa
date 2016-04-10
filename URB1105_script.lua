@@ -27,14 +27,14 @@ URB1105 = Class(CEnergyStorageUnit) {
 
         local sliderManip = CreateStorageManip(self, 'Lift', 'ENERGY', 0, 0, 0, 0, .8, 0)
     end,
-	
-	OnKilled = function(self, instigator, type, overkillRatio)
-			if not instigator then 
-				self.DeathWeaponEnabled = false
-			end
-		CEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
-	
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
+            if not instigator then 
+                self.DeathWeaponEnabled = false
+            end
+        CEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+    
 }
 
 TypeClass = URB1105

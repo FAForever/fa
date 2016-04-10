@@ -697,8 +697,8 @@ end
 -- instead to incrementaly update things.
 function SetSlotInfo(slotNum, playerInfo)
     -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
-	if GUI.connectdialog then
-		GUI.connectdialog:Close()
+    if GUI.connectdialog then
+        GUI.connectdialog:Close()
         GUI.connectdialog = nil
 
         -- Changelog, if necessary.
@@ -4432,22 +4432,22 @@ function ShowLobbyOptionsDialog()
         Prefs.SetToCurrentProfile("LobbyBackground", index)
         RefreshLobbyBackground()
     end
-	--
-	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
-	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
+    --
+    local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
+    local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 136)
 
-	local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
-	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
+    slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
         GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
-	end
-	--
+    end
+    --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
@@ -4484,10 +4484,10 @@ function ShowLobbyOptionsDialog()
     --
     local WindowedLobby = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
     cbox_WindowedLobby:SetCheck(WindowedLobby == 'true', true)
-	if defaultMode == 'windowed' then
-		-- Already set Windowed in Game
-		cbox_WindowedLobby:Disable()
-	end
+    if defaultMode == 'windowed' then
+        -- Already set Windowed in Game
+        cbox_WindowedLobby:Disable()
+    end
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
@@ -4702,7 +4702,7 @@ function CreateHelpWindow()
 
     -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-	LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
+    LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
     OkButton.OnClick = function(self)
         helpWindow:Close()
@@ -4825,16 +4825,16 @@ end
 
 -- Changelog dialog
 function Need_Changelog()
-	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-	local result = false
-	for i, d in Changelog do
-		if Last_Changelog_Version < d.version then
-			result = true
-			break
-		end
-	end
-	return result
+    local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
+    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+    local result = false
+    for i, d in Changelog do
+        if Last_Changelog_Version < d.version then
+            result = true
+            break
+        end
+    end
+    return result
 end
 
 function GUI_Changelog()
@@ -4860,25 +4860,25 @@ function GUI_Changelog()
     InfoList.Width:Set(498)
     InfoList.Height:Set(360)
     LayoutHelpers.AtLeftIn(InfoList, dialogContent, 10)
-	LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
+    LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
-	InfoList.OnClick = function(self) end
-	-- See only new Changelog by version
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-	for i, d in Changelog.changelog do
-		if Last_Changelog_Version < d.version then
-			InfoList:AddItem(d.name)
-			for k, v in d.description do
-				InfoList:AddItem(v)
-			end
-			InfoList:AddItem('')
-		end
-	end
+    InfoList.OnClick = function(self) end
+    -- See only new Changelog by version
+    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+    for i, d in Changelog.changelog do
+        if Last_Changelog_Version < d.version then
+            InfoList:AddItem(d.name)
+            for k, v in d.description do
+                InfoList:AddItem(v)
+            end
+            InfoList:AddItem('')
+        end
+    end
 
     -- OK button --
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
+    LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
     OkButton.OnClick = function()
         changelogPopup:Close()

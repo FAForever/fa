@@ -41,18 +41,18 @@ XSL0305 = Class(SLandUnit) {
             self:SetWeaponEnabledByLabel('MainGun', false)
             self:GetWeaponManipulatorByLabel('SniperGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('MainGun'):GetHeadingPitch() )
         end
-		
-		
-		----This is to add a visual que that the sniper is in sniper mode
-		if not self.ShieldEffectsBag then
+        
+        
+        ----This is to add a visual que that the sniper is in sniper mode
+        if not self.ShieldEffectsBag then
             self.ShieldEffectsBag = {}
         end
         self.ShieldEffectsBag = {}
 
-		table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' ) )
-		--CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' ) 
-		----end added visual que
-		
+        table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' ) )
+        --CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' ) 
+        ----end added visual que
+        
     end,
 
     OnScriptBitClear = function(self, bit)
@@ -65,16 +65,16 @@ XSL0305 = Class(SLandUnit) {
             self:SetWeaponEnabledByLabel('SniperGun', false)
             self:SetWeaponEnabledByLabel('MainGun', true)
             self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch() )
-			--this is to remove the effect generated in sniper mode
-			--table.remove( self.ShieldEffectsBag )
-			--EffectUtil.CleanupEffectBag(self,'ShieldEffectsBag')
-			if self.ShieldEffectsBag then
+            --this is to remove the effect generated in sniper mode
+            --table.remove( self.ShieldEffectsBag )
+            --EffectUtil.CleanupEffectBag(self,'ShieldEffectsBag')
+            if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
                     v:Destroy()
                 end
-		        self.ShieldEffectsBag = {}
-		    end
-			self.ShieldEffectsBag = nil
+                self.ShieldEffectsBag = {}
+            end
+            self.ShieldEffectsBag = nil
         end
     end,
 }

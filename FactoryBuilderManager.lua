@@ -29,7 +29,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.Location = location
         self.Radius = radius
         self.LocationType = lType
-		self.RallyPoint = false
+        self.RallyPoint = false
         
         self.FactoryList = {}
         
@@ -39,47 +39,47 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.PlatoonListEmpty = true
         
         self.UseCenterPoint = useCenterPoint or false
-		self:ForkThread( self.RallyPointMonitor)
+        self:ForkThread( self.RallyPointMonitor)
     end,
-	
-	RallyPointMonitor = function(self)
-		while true do
-			if self.LocationActive and self.RallyPoint then
-				-- LOG('*AI DEBUG: Checking Active Rally Point')
-				local newRally = false
-				local bestDist = 99999
-				local rallyheight = GetTerrainHeight( self.RallyPoint[1], self.RallyPoint[3] )
-				if self.Brain:GetNumUnitsAroundPoint( categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
-					-- LOG('*AI DEBUG: Searching for a new Rally Point Location')
-					for x = -30, 30, 5 do
-						for z = -30, 30, 5 do
-							local height = GetTerrainHeight( self.RallyPoint[1] + x, self.RallyPoint[3] + z )
-							if GetSurfaceHeight( self.RallyPoint[1] + x, self.RallyPoint[3] + z ) > height or rallyheight > height + 10 or rallyheight < height - 10 then
-								continue
-							end
-							local tempPos = { self.RallyPoint[1] + x, height, self.RallyPoint[3] + z }
-							if self.Brain:GetNumUnitsAroundPoint( categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
-								continue
-							end
-							if not newRally or VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3]) < bestDist then
-								newRally = tempPos
-								bestDist = VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3])
-							end
-						end
-					end
-					if newRally then
-						self.RallyPoint = newRally
-						-- LOG('*AI DEBUG: Setting a new Rally Point Location')
-						for k,v in self.FactoryList do
-							IssueClearFactoryCommands( {v} )
-							IssueFactoryRallyPoint({v}, self.RallyPoint)
-						end
-					end
-				end
-			end
-			WaitSeconds(300)
-		end
-	end,
+    
+    RallyPointMonitor = function(self)
+        while true do
+            if self.LocationActive and self.RallyPoint then
+                -- LOG('*AI DEBUG: Checking Active Rally Point')
+                local newRally = false
+                local bestDist = 99999
+                local rallyheight = GetTerrainHeight( self.RallyPoint[1], self.RallyPoint[3] )
+                if self.Brain:GetNumUnitsAroundPoint( categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
+                    -- LOG('*AI DEBUG: Searching for a new Rally Point Location')
+                    for x = -30, 30, 5 do
+                        for z = -30, 30, 5 do
+                            local height = GetTerrainHeight( self.RallyPoint[1] + x, self.RallyPoint[3] + z )
+                            if GetSurfaceHeight( self.RallyPoint[1] + x, self.RallyPoint[3] + z ) > height or rallyheight > height + 10 or rallyheight < height - 10 then
+                                continue
+                            end
+                            local tempPos = { self.RallyPoint[1] + x, height, self.RallyPoint[3] + z }
+                            if self.Brain:GetNumUnitsAroundPoint( categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
+                                continue
+                            end
+                            if not newRally or VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3]) < bestDist then
+                                newRally = tempPos
+                                bestDist = VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3])
+                            end
+                        end
+                    end
+                    if newRally then
+                        self.RallyPoint = newRally
+                        -- LOG('*AI DEBUG: Setting a new Rally Point Location')
+                        for k,v in self.FactoryList do
+                            IssueClearFactoryCommands( {v} )
+                            IssueFactoryRallyPoint({v}, self.RallyPoint)
+                        end
+                    end
+                end
+            end
+            WaitSeconds(300)
+        end
+    end,
 
     AddBuilder = function(self, builderData, locationType)
         local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
@@ -164,30 +164,30 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
     
     AddFactory = function(self,unit)
-		if not self:FactoryAlreadyExists(unit) then
-			table.insert(self.FactoryList, unit)
-			unit.DesiresAssist = true
-			if EntityCategoryContains( categories.LAND, unit ) then
-				self:SetupNewFactory(unit, 'Land')
-			elseif EntityCategoryContains( categories.AIR, unit ) then
-				self:SetupNewFactory(unit, 'Air')
-			elseif EntityCategoryContains( categories.NAVAL, unit ) then
-				self:SetupNewFactory(unit, 'Sea')
-			else
-				self:SetupNewFactory(unit, 'Gate')
-			end
-			self.LocationActive = true
-		end
+        if not self:FactoryAlreadyExists(unit) then
+            table.insert(self.FactoryList, unit)
+            unit.DesiresAssist = true
+            if EntityCategoryContains( categories.LAND, unit ) then
+                self:SetupNewFactory(unit, 'Land')
+            elseif EntityCategoryContains( categories.AIR, unit ) then
+                self:SetupNewFactory(unit, 'Air')
+            elseif EntityCategoryContains( categories.NAVAL, unit ) then
+                self:SetupNewFactory(unit, 'Sea')
+            else
+                self:SetupNewFactory(unit, 'Gate')
+            end
+            self.LocationActive = true
+        end
     end,
-	
-	FactoryAlreadyExists = function(self, factory)
-		for k,v in self.FactoryList do
+    
+    FactoryAlreadyExists = function(self, factory)
+        for k,v in self.FactoryList do
             if v == factory then
                 return true
             end
         end
-		return false
-	end,
+        return false
+    end,
     
     SetupNewFactory = function(self,unit,bType)
         self:SetupFactoryCallbacks({unit}, bType)
@@ -204,17 +204,17 @@ FactoryBuilderManager = Class(BuilderManager) {
                                             self:FactoryDestroyed(v)
                                         end
                 import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v )
-										
+                                        
                 local factoryNewlyCaptured = function(unit, captor)
-											local aiBrain = captor:GetAIBrain()
-											-- LOG('*AI DEBUG: FACTORY: I was Captured by '..aiBrain.Nickname..'!')
-											if aiBrain.BuilderManagers then
-												local facManager = aiBrain.BuilderManagers[captor.BuilderManagerData.LocationType].FactoryManager
-												if facManager then
-													facManager:AddFactory(unit)
-												end
-											end
-										end
+                                            local aiBrain = captor:GetAIBrain()
+                                            -- LOG('*AI DEBUG: FACTORY: I was Captured by '..aiBrain.Nickname..'!')
+                                            if aiBrain.BuilderManagers then
+                                                local facManager = aiBrain.BuilderManagers[captor.BuilderManagerData.LocationType].FactoryManager
+                                                if facManager then
+                                                    facManager:AddFactory(unit)
+                                                end
+                                            end
+                                        end
                 import('/lua/ScenarioTriggers.lua').CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v )
                 
                 local factoryWorkStart = function(factory, unitBeingBuilt)
@@ -286,20 +286,20 @@ FactoryBuilderManager = Class(BuilderManager) {
             return 'Cybran'
         elseif EntityCategoryContains( categories.SERAPHIM, factory ) then
             return 'Seraphim'
-		elseif self.Brain.CustomFactions then
-			return self:UnitFromCustomFaction( factory )
+        elseif self.Brain.CustomFactions then
+            return self:UnitFromCustomFaction( factory )
         end
         return false
     end,
-	
-	UnitFromCustomFaction = function(self, factory)
-		local customFactions = self.Brain.CustomFactions
-		for k,v in customFactions do
-			if EntityCategoryContains( v.customCat, factory ) then
-				return v.cat
-			end
-		end
-	end,
+    
+    UnitFromCustomFaction = function(self, factory)
+        local customFactions = self.Brain.CustomFactions
+        for k,v in customFactions do
+            if EntityCategoryContains( v.customCat, factory ) then
+                return v.cat
+            end
+        end
+    end,
     
     GetFactoryTemplate = function(self, templateName, factory)
         local templateData = PlatoonTemplates[templateName]
@@ -315,53 +315,53 @@ FactoryBuilderManager = Class(BuilderManager) {
         }
         
         local faction = self:GetFactoryFaction( factory )
-		local customData = self.Brain.CustomUnits[templateName]
+        local customData = self.Brain.CustomUnits[templateName]
         if faction and templateData.FactionSquads[faction] then
             for k,v in templateData.FactionSquads[faction] do
-				if customData and customData[faction] then
-					-- LOG('*AI DEBUG: Replacement unit found!')
-					local replacement = self:GetCustomReplacement(v, templateName, faction)
-					if replacement then
-						table.insert( template, replacement )
-					else
-						table.insert( template, v )
-					end
-				else
-					table.insert( template, v )
-				end
+                if customData and customData[faction] then
+                    -- LOG('*AI DEBUG: Replacement unit found!')
+                    local replacement = self:GetCustomReplacement(v, templateName, faction)
+                    if replacement then
+                        table.insert( template, replacement )
+                    else
+                        table.insert( template, v )
+                    end
+                else
+                    table.insert( template, v )
+                end
             end
-		elseif faction and customData and customData[faction] then
-			-- LOG('*AI DEBUG: New unit found!')
-			local replacement = self:GetCustomReplacement(templateData.FactionSquads[1], templateName, faction)
-			if replacement then
-				table.insert( template, replacement )
-			end
+        elseif faction and customData and customData[faction] then
+            -- LOG('*AI DEBUG: New unit found!')
+            local replacement = self:GetCustomReplacement(templateData.FactionSquads[1], templateName, faction)
+            if replacement then
+                table.insert( template, replacement )
+            end
         end
         return template
     end,
-	
-	GetCustomReplacement = function(self, template, templateName, faction)
-		local retTemplate = false
-		local templateData = self.Brain.CustomUnits[templateName]
-		if templateData and templateData[faction] then
-			-- LOG('*AI DEBUG: Replacement for '..templateName..' exists.')
-			local rand = Random(1,100)
-			local possibles = {}
-			for k,v in templateData[faction] do
-				if rand <= v[2] then
-					-- LOG('*AI DEBUG: Insert possibility.')
-					table.insert(possibles, v[1])
-				end
-			end
-			if table.getn(possibles) > 0 then
-				rand = Random(1,table.getn(possibles))
-				local customUnitID = possibles[rand]
-				-- LOG('*AI DEBUG: Replaced with '..customUnitID)
-				retTemplate = { customUnitID, template[2], template[3], template[4], template[5] }
-			end
-		end
-		return retTemplate
-	end,
+    
+    GetCustomReplacement = function(self, template, templateName, faction)
+        local retTemplate = false
+        local templateData = self.Brain.CustomUnits[templateName]
+        if templateData and templateData[faction] then
+            -- LOG('*AI DEBUG: Replacement for '..templateName..' exists.')
+            local rand = Random(1,100)
+            local possibles = {}
+            for k,v in templateData[faction] do
+                if rand <= v[2] then
+                    -- LOG('*AI DEBUG: Insert possibility.')
+                    table.insert(possibles, v[1])
+                end
+            end
+            if table.getn(possibles) > 0 then
+                rand = Random(1,table.getn(possibles))
+                local customUnitID = possibles[rand]
+                -- LOG('*AI DEBUG: Replaced with '..customUnitID)
+                retTemplate = { customUnitID, template[2], template[3], template[4], template[5] }
+            end
+        end
+        return retTemplate
+    end,
     
     AssignBuildOrder = function(self,factory,bType)
         -- Find a builder the factory can build
@@ -444,12 +444,12 @@ FactoryBuilderManager = Class(BuilderManager) {
     SetRallyPoint = function(self, factory)
         local position = factory:GetPosition()
         local rally = false
-		
-		if self.RallyPoint then
-			IssueClearFactoryCommands( {factory} )
-			IssueFactoryRallyPoint({factory}, self.RallyPoint)
-			return true
-		end
+        
+        if self.RallyPoint then
+            IssueClearFactoryCommands( {factory} )
+            IssueFactoryRallyPoint({factory}, self.RallyPoint)
+            return true
+        end
         
         local rallyType = 'Rally Point'
         if EntityCategoryContains( categories.NAVAL, factory ) then
@@ -477,13 +477,13 @@ FactoryBuilderManager = Class(BuilderManager) {
         -- Use factory location if no other rally or if rally point is far away
         if not rally or VDist2( rally[1], rally[3], position[1], position[3] ) > 75 then
             -- DUNCAN - added to try and vary the rally points.
-			position = AIUtils.RandomLocation(position[1],position[3])
-			rally = position
+            position = AIUtils.RandomLocation(position[1],position[3])
+            rally = position
         end
         
         IssueClearFactoryCommands( {factory} )
         IssueFactoryRallyPoint({factory}, rally)
-		self.RallyPoint = rally
+        self.RallyPoint = rally
         return true
     end,
 }

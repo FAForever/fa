@@ -23,7 +23,7 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
                 self:PlaySound(myBlueprint.Audio.Explosion)
             end
            
-			nukeProjectile = self:CreateProjectile('/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
+            nukeProjectile = self:CreateProjectile('/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
             nukeProjectile:PassDamageData(self.DamageData)
             nukeProjectile:PassData(self.Data)
         end
@@ -63,7 +63,7 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
         local launcher = self:GetLauncher()
         self.CreateEffects( self, self.InitialEffects, army, 1 )
         self:TrackTarget(false)
-        WaitSeconds(2.5)		-- Height
+        WaitSeconds(2.5)        -- Height
         self:SetCollision(true)
         self.CreateEffects( self, self.LaunchEffects, army, 1 )
         WaitSeconds(2.5)
@@ -72,7 +72,7 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
         self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)
         self:SetTurnRate(47.36)
-        WaitSeconds(2) 					-- Now set turn rate to zero so nuke flies straight
+        WaitSeconds(2)                     -- Now set turn rate to zero so nuke flies straight
         self:SetTurnRate(0)
         self:SetAcceleration(0.001)
         self.WaitTime = 0.5
@@ -89,13 +89,13 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
             --Freeze the turn rate as to prevent steep angles at long distance targets
             self:SetTurnRate(0)
         elseif dist > 75 and dist <= 150 then
-						-- Increase check intervals
+                        -- Increase check intervals
             self.WaitTime = 0.3
         elseif dist > 32 and dist <= 75 then
-						-- Further increase check intervals
+                        -- Further increase check intervals
             self.WaitTime = 0.1
         elseif dist < 32 then
-						-- Turn the missile down
+                        -- Turn the missile down
             self:SetTurnRate(50)
         end
     end,

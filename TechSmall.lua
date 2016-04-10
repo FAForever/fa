@@ -39,9 +39,9 @@ BaseBuilderTemplate {
         'Land Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Gun improvements',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
+        'ACUUpgrades - Gun improvements',
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
         
         -- ACU Defense
         'T1ACUDefenses',
@@ -113,14 +113,14 @@ BaseBuilderTemplate {
         -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		-- ==== ARTILLERY BUILDERS ==== --
+        
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
+        'T3ArtilleryFormBuilders',
         
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+        
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         -- ==== EXPERIMENTALS ==== --
@@ -129,11 +129,11 @@ BaseBuilderTemplate {
         
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -155,7 +155,7 @@ BaseBuilderTemplate {
             SCU = 4,
         },
         FactoryCount = {
-			--DUNCAN - Factory number tweaks, was 5, 1, 0, 1
+            --DUNCAN - Factory number tweaks, was 5, 1, 0, 1
             Land = 7,
             Air = 2,
             Sea = 0,
@@ -173,26 +173,26 @@ BaseBuilderTemplate {
     FirstBaseFunction = function(aiBrain)
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()
-		local isIsland = false
+        local isIsland = false
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end
-		
-		--If we're playing on an island map, do not use this plan
+        
+        --If we're playing on an island map, do not use this plan
         if isIsland then
             return 0, 'tech'
         end
-		
-		local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
+        
+        local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not per then return 1 end
         if per == 'random' then
             return Random(1, 100), 'tech'
         elseif per != 'tech' and per != 'adaptive' and per != '' then
             return 1, 'tech'
         end
-		
-		
+        
+        
         if mapSizeX < 500 and mapSizeZ < 500 then
             return 100, 'tech'
         elseif mapSizeX >= 512 and mapSizeZ >= 512 and mapSizeX < 1024 and mapSizeZ < 1024 then

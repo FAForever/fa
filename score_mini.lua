@@ -82,9 +82,9 @@ function SetLayout()
     controls.unitIcon.Height:Set(function() return controls.unitIcon.BitmapHeight() * .9 end)
     controls.unitIcon.Width:Set(function() return controls.unitIcon.BitmapWidth() * .9 end)
     if not SessionIsReplay() then
-		local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
-		avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
-	end
+        local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
+        avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
+    end
     
     LayoutArmyLines()
 end

@@ -23,13 +23,13 @@ StrategyManager = Class(BuilderManager) {
         self.Location = location
         self.Radius = radius
         self.LocationType = lType
-		
+        
         self.LastChange = 0
-		self.NextChange = 300
-		self.LastStrategy = false
-		self.OverallStrategy = false
-		self.OverallPriority = 0
-		
+        self.NextChange = 300
+        self.LastStrategy = false
+        self.OverallStrategy = false
+        self.OverallPriority = 0
+        
         self.UseCenterPoint = useCenterPoint or false
         
         self:AddBuilderType('Any')
@@ -49,55 +49,55 @@ StrategyManager = Class(BuilderManager) {
             self:AddBuilder(v)
         end
     end,
-	
-	ExecuteChanges = function(self, builder)
-		local turnOff = builder:GetRemoveBuilders()
-		local turnOn = builder:GetActivateBuilders()
-		for mname, manager in turnOff do
-			for _, bname in manager do
-				local Managers = self.Brain.BuilderManagers[self.LocationType]
-				Managers[mname]:SetBuilderPriority(bname, 0.1, true, true)
-			end
-		end
-		for mname, manager in turnOn do
-			for _, bname in manager do
-				local Managers = self.Brain.BuilderManagers[self.LocationType]
-				local newPriority = Managers[mname]:GetActivePriority(bname)
-				Managers[mname]:SetBuilderPriority(bname, newPriority)
-			end
-		end
-		builder:SetStrategyActive(true)
-	end,
-	
-	UndoChanges = function(self, builder)
-		local turnOn = builder:GetRemoveBuilders()
-		local turnOff = builder:GetActivateBuilders()
-		for mname, manager in turnOff do
-			for _, bname in manager do
-				local Managers = self.Brain.BuilderManagers[self.LocationType]
-				Managers[mname]:SetBuilderPriority(bname, 0)
-			end
-		end
-		for mname, manager in turnOn do
-			for _, bname in manager do
-				local Managers = self.Brain.BuilderManagers[self.LocationType]
-				Managers[mname]:ResetBuilderPriority(bname)
-			end
-		end
-		builder:SetStrategyActive(false)
-	end,
+    
+    ExecuteChanges = function(self, builder)
+        local turnOff = builder:GetRemoveBuilders()
+        local turnOn = builder:GetActivateBuilders()
+        for mname, manager in turnOff do
+            for _, bname in manager do
+                local Managers = self.Brain.BuilderManagers[self.LocationType]
+                Managers[mname]:SetBuilderPriority(bname, 0.1, true, true)
+            end
+        end
+        for mname, manager in turnOn do
+            for _, bname in manager do
+                local Managers = self.Brain.BuilderManagers[self.LocationType]
+                local newPriority = Managers[mname]:GetActivePriority(bname)
+                Managers[mname]:SetBuilderPriority(bname, newPriority)
+            end
+        end
+        builder:SetStrategyActive(true)
+    end,
+    
+    UndoChanges = function(self, builder)
+        local turnOn = builder:GetRemoveBuilders()
+        local turnOff = builder:GetActivateBuilders()
+        for mname, manager in turnOff do
+            for _, bname in manager do
+                local Managers = self.Brain.BuilderManagers[self.LocationType]
+                Managers[mname]:SetBuilderPriority(bname, 0)
+            end
+        end
+        for mname, manager in turnOn do
+            for _, bname in manager do
+                local Managers = self.Brain.BuilderManagers[self.LocationType]
+                Managers[mname]:ResetBuilderPriority(bname)
+            end
+        end
+        builder:SetStrategyActive(false)
+    end,
     
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
-		
-		if builder:GetPriority() >= 70 and builder:GetBuilderStatus() and not builder:IsStrategyActive() then
-			--LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
-			self:ExecuteChanges(builder)
-		elseif (builder:GetPriority() < 70 or not builder:GetBuilderStatus()) and builder:IsStrategyActive() then
-			--LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
-			self:UndoChanges(builder)
-		end
-	end,
+        
+        if builder:GetPriority() >= 70 and builder:GetBuilderStatus() and not builder:IsStrategyActive() then
+            --LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
+            self:ExecuteChanges(builder)
+        elseif (builder:GetPriority() < 70 or not builder:GetBuilderStatus()) and builder:IsStrategyActive() then
+            --LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
+            self:UndoChanges(builder)
+        end
+    end,
 }
 
 function CreateStrategyManager(brain, lType, location, radius, useCenterPoint)

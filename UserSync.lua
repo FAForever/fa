@@ -80,15 +80,15 @@ OnSync = function()
 
     if not table.empty(Sync.Score) then
         import('/lua/ui/game/score.lua').currentScores = Sync.Score
-		if not Sync.FullScoreSync then
-			import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
-		end
+        if not Sync.FullScoreSync then
+            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
+        end
     end
     
     if Sync.FullScoreSync then
-		if not table.empty(Sync.ScoreAccum) then
-			import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
-		end
+        if not table.empty(Sync.ScoreAccum) then
+            import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
+        end
     end
 
     for k,gameResult in Sync.GameResult do

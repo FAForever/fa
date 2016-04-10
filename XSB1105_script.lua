@@ -16,12 +16,12 @@ XSB1105 = Class(SEnergyStorageUnit) {
         self.Trash:Add(CreateStorageManip(self, 'B01', 'ENERGY', 0, 0, -0.7, 0, 0, 0))
     end,
 
-	OnKilled = function(self, instigator, type, overkillRatio)
-			if not instigator then 
-				self.DeathWeaponEnabled = false
-			end
-		SEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
+    OnKilled = function(self, instigator, type, overkillRatio)
+            if not instigator then 
+                self.DeathWeaponEnabled = false
+            end
+        SEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
 
 }
 

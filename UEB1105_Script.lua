@@ -16,13 +16,13 @@ UEB1105 = Class(TEnergyStorageUnit) {
         self.Trash:Add(CreateStorageManip(self, 'B01', 'ENERGY', 0, 0, -0.6, 0, 0, 0))
     end,
 
-	OnKilled = function(self, instigator, type, overkillRatio)
-			if not instigator then 
-				self.DeathWeaponEnabled = false
-			end
-		TEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
-	
+    OnKilled = function(self, instigator, type, overkillRatio)
+            if not instigator then 
+                self.DeathWeaponEnabled = false
+            end
+        TEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+    
 }
 
 TypeClass = UEB1105

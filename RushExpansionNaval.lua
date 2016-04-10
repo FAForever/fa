@@ -30,7 +30,7 @@ BaseBuilderTemplate {
         'Time Exempt Extractor Upgrades Expansion',
                         
         -- ==== EXPANSION ==== --
-		--DUNCAN - expansions dont build more expansions!
+        --DUNCAN - expansions dont build more expansions!
         --'EngineerExpansionBuildersFull - Naval', 
         
         -- ==== DEFENSES ==== --
@@ -43,7 +43,7 @@ BaseBuilderTemplate {
         
         -- ==== LAND UNIT BUILDERS ==== --
         'T2LandFactoryAmphibiousBuilders', --DUNCAN - added
-		'T3LandFactoryBuilders',
+        'T3LandFactoryBuilders',
         
         'FrequentLandAttackFormBuilders',
         'MassHunterLandFormBuilders',

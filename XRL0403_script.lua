@@ -89,8 +89,8 @@ XRL0403 = Class(CWalkingLandUnit) {
         end
     end,
 
-	OnLayerChange = function(self, new, old)
-		CWalkingLandUnit.OnLayerChange(self, new, old)
+    OnLayerChange = function(self, new, old)
+        CWalkingLandUnit.OnLayerChange(self, new, old)
 
         --LOG("Mega Layerchange from ", old, " to ", new)
 
@@ -103,13 +103,13 @@ XRL0403 = Class(CWalkingLandUnit) {
             -- Increase speed while in water
             self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
         end
-	end,
-	
+    end,
+    
     CreateDamageEffects = function(self, bone, army )
         for k, v in EffectTemplate.DamageFireSmoke01 do
             CreateAttachedEmitter( self, bone, army, v ):ScaleEmitter(1.5)
         end
-    end,	
+    end,    
 
     CreateDeathExplosionDustRing = function( self )
         local blanketSides = 18

@@ -15,8 +15,8 @@ BaseBuilderTemplate {
         -- Factory upgrades
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
-		'SorianEmergencyUpgradeBuilders',
-		'SorianMassFabPause',
+        'SorianEmergencyUpgradeBuilders',
+        'SorianMassFabPause',
         
         -- Engineer Builders
         'SorianEngineerFactoryBuilders',
@@ -25,9 +25,9 @@ BaseBuilderTemplate {
         'SorianT3EngineerBuilders',
         'SorianEngineerFactoryConstruction Air',
         'SorianEngineerFactoryConstruction',
-		
-		-- SCU Upgrades
-		'SorianSCUUpgrades',
+        
+        -- SCU Upgrades
+        'SorianSCUUpgrades',
         
         -- Engineer Support buildings
         'SorianEngineeringSupportBuilder',
@@ -56,29 +56,29 @@ BaseBuilderTemplate {
         -- ==== EXPANSION ==== --
         'SorianEngineerExpansionBuildersFull',
         'SorianEngineerExpansionBuildersSmall',
-		'SorianEngineerFirebaseBuilders',
+        'SorianEngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
-		'SorianT1BaseDefenses',
-		'SorianT2BaseDefenses',
-		'SorianT3BaseDefenses',
+        'SorianT1BaseDefenses',
+        'SorianT2BaseDefenses',
+        'SorianT3BaseDefenses',
 
-		'SorianT2PerimeterDefenses',
-		'SorianT3PerimeterDefenses',
-		
+        'SorianT2PerimeterDefenses',
+        'SorianT3PerimeterDefenses',
+        
         'SorianT1DefensivePoints',
         'SorianT2DefensivePoints',
         'SorianT3DefensivePoints',
-		
-		'SorianT2ArtilleryFormBuilders',
-		'SorianT3ArtilleryFormBuilders',
-		'SorianT4ArtilleryFormBuilders',
+        
+        'SorianT2ArtilleryFormBuilders',
+        'SorianT3ArtilleryFormBuilders',
+        'SorianT4ArtilleryFormBuilders',
         'SorianT2MissileDefenses',
         'SorianT3NukeDefenses',
         'SorianT3NukeDefenseBehaviors',
-		'SorianMiscDefensesEngineerBuilders',
-		
-		'SorianMassAdjacencyDefenses',
+        'SorianMiscDefensesEngineerBuilders',
+        
+        'SorianMassAdjacencyDefenses',
         
         -- ==== NAVAL EXPANSION ==== --
         'SorianNavalExpansionBuilders',
@@ -95,7 +95,7 @@ BaseBuilderTemplate {
         
         'SorianT1LandAA',
         'SorianT2LandAA',
-		'SorianT3LandResponseBuilders',
+        'SorianT3LandResponseBuilders',
 
         'SorianT1ReactionDF',
         'SorianT2ReactionDF',
@@ -104,7 +104,7 @@ BaseBuilderTemplate {
         'SorianT2Shields',
         'SorianShieldUpgrades',
         'SorianT3Shields',
-		'SorianEngineeringUpgrades',
+        'SorianEngineeringUpgrades',
 
         -- ==== AIR UNIT BUILDERS ==== --
         'SorianT1AirFactoryBuilders',
@@ -117,8 +117,8 @@ BaseBuilderTemplate {
         'SorianACUHunterAirFormBuilders',
         
         'SorianTransportFactoryBuilders - Air',
-		
-		'SorianExpResponseFormBuilders',
+        
+        'SorianExpResponseFormBuilders',
         
         'SorianT1AntiAirBuilders',
         'SorianT2AntiAirBuilders',
@@ -131,13 +131,13 @@ BaseBuilderTemplate {
         
         'SorianMobileAirExperimentalEngineers',
         'SorianMobileAirExperimentalForm',
-		
+        
         --'SorianMobileNavalExperimentalEngineers',
         --'SorianMobileNavalExperimentalForm',
-		
-		'SorianEconomicExperimentalEngineers',
-		'SorianMobileExperimentalEngineersGroup',
-		
+        
+        'SorianEconomicExperimentalEngineers',
+        'SorianMobileExperimentalEngineersGroup',
+        
         -- ==== ARTILLERY BUILDERS ==== --
         'SorianT3ArtilleryGroup',
         
@@ -148,44 +148,44 @@ BaseBuilderTemplate {
         
         'SorianSatelliteExperimentalEngineers',
         'SorianSatelliteExperimentalForm',
-		
-		-- ======== Strategies ======== --
-		'SorianHeavyAirStrategy',
-		'SorianBigAirGroup',
-		'SorianJesterRush',
-		'SorianNukeRush',
-		'SorianT3ArtyRush',
-		'SorianT2ACUSnipe',
-		'SorianT3FBRush',
-		'SorianTeamLevelAdjustment',
-		'SorianParagonStrategy',
-		'Sorian Tele SCU Strategy',
-		'SorianWaterMapLowLand',
-		'Sorian PD Creep Strategy',
-		'SorianStopNukes',
-		'SorianEnemyTurtle - In Range',
-		'SorianEnemyTurtle - Out of Range',
-		'Sorian Excess Mass Strategy',
-		
-		-- ===== Strategy Platoons ===== --
-		'SorianT1BomberHighPrio',
-		'SorianT2BomberHighPrio',
-		'SorianT3BomberHighPrio',
-		'SorianT3BomberSpecialHighPrio',
-		'SorianT1GunshipHighPrio',
-		'SorianT1DefensivePoints - High Prio',
-		'SorianT2DefensivePoints - High Prio',
-		
-		'SorianBomberLarge',
-		'SorianBomberBig',
-		'SorianGunShipLarge',
-		'SorianNukeBuildersHighPrio',
-		'SorianT3ArtyBuildersHighPrio',
-		'SorianT2FirebaseBuildersHighPrio',
-		'SorianT3FBBuildersHighPrio',
-		'Sorian Extractor Upgrades Strategy',
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
-		'SorianExcessMassBuilders',
+        
+        -- ======== Strategies ======== --
+        'SorianHeavyAirStrategy',
+        'SorianBigAirGroup',
+        'SorianJesterRush',
+        'SorianNukeRush',
+        'SorianT3ArtyRush',
+        'SorianT2ACUSnipe',
+        'SorianT3FBRush',
+        'SorianTeamLevelAdjustment',
+        'SorianParagonStrategy',
+        'Sorian Tele SCU Strategy',
+        'SorianWaterMapLowLand',
+        'Sorian PD Creep Strategy',
+        'SorianStopNukes',
+        'SorianEnemyTurtle - In Range',
+        'SorianEnemyTurtle - Out of Range',
+        'Sorian Excess Mass Strategy',
+        
+        -- ===== Strategy Platoons ===== --
+        'SorianT1BomberHighPrio',
+        'SorianT2BomberHighPrio',
+        'SorianT3BomberHighPrio',
+        'SorianT3BomberSpecialHighPrio',
+        'SorianT1GunshipHighPrio',
+        'SorianT1DefensivePoints - High Prio',
+        'SorianT2DefensivePoints - High Prio',
+        
+        'SorianBomberLarge',
+        'SorianBomberBig',
+        'SorianGunShipLarge',
+        'SorianNukeBuildersHighPrio',
+        'SorianT3ArtyBuildersHighPrio',
+        'SorianT2FirebaseBuildersHighPrio',
+        'SorianT3FBBuildersHighPrio',
+        'Sorian Extractor Upgrades Strategy',
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
+        'SorianExcessMassBuilders',
     },
     NonCheatBuilders = {
         'SorianAirScoutFactoryBuilders',

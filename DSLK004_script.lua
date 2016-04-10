@@ -225,7 +225,7 @@ DSLK004 = Class(SLandUnit) {
             FxBeamEndPointScale = 0.01,
         },
     },
-	
+    
     OnStopBeingBuilt = function(self,builder,layer)
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 

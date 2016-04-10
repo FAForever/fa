@@ -67,10 +67,10 @@ local function MakeLocalPlayerInfo(name)
     end
     
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""	
-	result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""	
-	result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
-	result.PL = math.floor(result.MEAN - 3 * result.DEV)
+    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""    
+    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""    
+    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
 end
@@ -163,14 +163,14 @@ local function CheckForLaunch()
     if playercount < requiredPlayers then
        return
     end
-	
-	local allRatings = {}
-	for k,v in gameInfo.PlayerOptions do
-		if v.Human and v.PL then
-			allRatings[v.PlayerName] = v.PL
-		end
-	end
-	gameInfo.GameOptions['Ratings'] = allRatings
+    
+    local allRatings = {}
+    for k,v in gameInfo.PlayerOptions do
+        if v.Human and v.PL then
+            allRatings[v.PlayerName] = v.PL
+        end
+    end
+    gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
@@ -363,9 +363,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-	
-	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+    
+    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
+    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
 
 
     lobbyComm:HostGame()

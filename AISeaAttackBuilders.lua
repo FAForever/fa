@@ -64,12 +64,12 @@ BuilderGroup {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
        },
     },
-	Builder {
+    Builder {
         BuilderName = 'T1 Sea Sub',
         PlatoonTemplate = 'T1SeaSub',
         Priority = 501,
         BuilderConditions = {
-			{ UCBC, 'HaveUnitRatio', { 0.4, categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE, '<=', categories.MOBILE * categories.NAVAL}},
+            { UCBC, 'HaveUnitRatio', { 0.4, categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE, '<=', categories.MOBILE * categories.NAVAL}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -90,7 +90,7 @@ BuilderGroup {
         PlatoonTemplate = 'T1SeaAntiAir',
         Priority = 500,
         BuilderConditions = {
-			--DUNCAN - commented out as need some anti all the time.
+            --DUNCAN - commented out as need some anti all the time.
             --{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -108,7 +108,7 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'CRUISER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'CRUISER'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }}, --DUNCAN - was 0.9
         },
@@ -130,8 +130,8 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
-			--{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'T1SUBMARINE'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
+            --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'T1SUBMARINE'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -142,8 +142,8 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'SHIELD NAVAL MOBILE' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -155,8 +155,8 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'COUNTERINTELLIGENCE NAVAL MOBILE' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -182,8 +182,8 @@ BuilderGroup {
         PlatoonTemplate = 'T3SeaNukeSub',
         Priority = 700,
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
-			{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.NUKE } }, --DUNCAN - added so it doesnt over build
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.NUKE } }, --DUNCAN - added so it doesnt over build
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -195,18 +195,18 @@ BuilderGroup {
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'T3SubKiller',
         PlatoonTemplate = 'T3SubKiller',
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -217,7 +217,7 @@ BuilderGroup {
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -234,7 +234,7 @@ BuilderGroup {
         InstanceCount = 10, --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
-			UseFormation = 'AttackFormation',
+            UseFormation = 'AttackFormation',
             ThreatWeights = {
                 IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
@@ -249,7 +249,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
-			{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, 'MOBILE NAVAL SUB' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, 'MOBILE NAVAL SUB' } },
             { SeaAttackCondition, { 'LocationType', 14 } }, 
         },
     },
@@ -260,7 +260,7 @@ BuilderGroup {
         InstanceCount = 10, --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
-			UseFormation = 'AttackFormation',
+            UseFormation = 'AttackFormation',
             ThreatWeights = {
                 IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
@@ -285,7 +285,7 @@ BuilderGroup {
         InstanceCount = 20,  --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
-			UseFormation = 'AttackFormation',
+            UseFormation = 'AttackFormation',
             ThreatWeights = {
                 IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
@@ -302,15 +302,15 @@ BuilderGroup {
             { SeaAttackCondition, { 'LocationType', 180 } }, --DUNCAN - was 180
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'Frequent Sea Attack T3 Nuke',
         PlatoonTemplate = 'SeaNuke',
-		PlatoonAddPlans = { 'NukeAI', },
+        PlatoonAddPlans = { 'NukeAI', },
         Priority = 1,
         InstanceCount = 20,
         BuilderType = 'Any',
         BuilderData = {
-			UseFormation = 'AttackFormation',
+            UseFormation = 'AttackFormation',
             ThreatWeights = {
                 IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
@@ -323,18 +323,18 @@ BuilderGroup {
                 FarThreatWeight = 1,            
             },
         },
-		BuilderConditions = {
+        BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'NAVAL NUKE' } },
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'Frequent Sea Attack T3 Nuke - Dont fire',
         PlatoonTemplate = 'SeaNuke',
         Priority = 1,
         InstanceCount = 20,
         BuilderType = 'Any',
         BuilderData = {
-			UseFormation = 'AttackFormation',
+            UseFormation = 'AttackFormation',
             ThreatWeights = {
                 IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
@@ -347,7 +347,7 @@ BuilderGroup {
                 FarThreatWeight = 1,            
             },
         },
-		BuilderConditions = {
+        BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'NAVAL NUKE' } },
         },
     },

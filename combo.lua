@@ -58,7 +58,7 @@ Combo = Class(Group) {
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
         self.mItemCue = itemCue or "UI_Tab_Click_01"
-		self.EnableColor = EnableColor or true
+        self.EnableColor = EnableColor or true
 
         bitmaps = bitmaps or defaultBitmaps
 
@@ -309,7 +309,7 @@ Combo = Class(Group) {
         local numItems = table.getn(textArray)
         local defaultItemIndex = defaultItemIndex or 1
         
-		self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
+        self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
 
         if self._scrollbar then
             self._scrollbar:Destroy()
@@ -319,18 +319,18 @@ Combo = Class(Group) {
         end
 
         local realDefFinded = false
-		for i, text in ipairs(textArray) do
+        for i, text in ipairs(textArray) do
             if realDefValue and i == realDefValue then
-				if i == defaultItemIndex then realDefFinded = true end
-				self._list:AddItem(LOC(text)..' (default)')
-			elseif i ~= realDefValue then
-				self._list:AddItem(LOC(text))
-			end
+                if i == defaultItemIndex then realDefFinded = true end
+                self._list:AddItem(LOC(text)..' (default)')
+            elseif i ~= realDefValue then
+                self._list:AddItem(LOC(text))
+            end
         end
-		
-		if self.EnableColor and realDefFinded then
-			self._text:SetColor('DBDBBA') -- Yellow
-		end
+        
+        if self.EnableColor and realDefFinded then
+            self._text:SetColor('DBDBBA') -- Yellow
+        end
 
         self:SetItem(defaultItemIndex)
     end,
@@ -339,7 +339,7 @@ Combo = Class(Group) {
         self._visibleItems:Set(0)
         self._list:DeleteAllItems()
         self._text:SetText("")
-		self._text:SetColor(UIUtil.fontColor) -- Gris
+        self._text:SetColor(UIUtil.fontColor) -- Gris
         if self._scrollbar then
             self._scrollbar:Destroy()
             self._scrollbar = nil
@@ -373,7 +373,7 @@ Combo = Class(Group) {
 
     -- overload to get clicks
     OnClick = function(self, index, text)
-		--if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
+        --if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
     end,
     
     OnEvent = function(self)

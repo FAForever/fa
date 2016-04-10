@@ -159,12 +159,12 @@ PlatoonFormManager = Class(BuilderManager) {
                 hndl.BuilderName = builder:GetBuilderName()
                 
                 hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
-				
-				for k,v in hndl:GetPlatoonUnits() do
-					if not v.PlatoonPlanName then
-						v.PlatoonHandle = hndl
-					end
-				end
+                
+                for k,v in hndl:GetPlatoonUnits() do
+                    if not v.PlatoonPlanName then
+                        v.PlatoonHandle = hndl
+                    end
+                end
                 
                 builder:StoreHandle(hndl)
             end

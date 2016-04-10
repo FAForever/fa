@@ -36,7 +36,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1500,  --DUNCAN - was 1000
         BuilderConditions = {
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, --DUNCAN - added 
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, --DUNCAN - added 
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -64,7 +64,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1500, --DUNCAN - was 1000
         BuilderConditions = {
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, --DUNCAN - added 
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, --DUNCAN - added 
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -464,8 +464,8 @@ BuilderGroup {
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, --DUNCAN - added
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, --DUNCAN - Added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, --DUNCAN - Added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'ENERGYPRODUCTION TECH3' }},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'GATE TECH3 STRUCTURE' }},
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Gate' } },

@@ -18,8 +18,8 @@ EmptyCollisionBeam = Class(CollisionBeam) {
 
 TargetingCollisionBeam = Class(EmptyCollisionBeam) {
     FxBeam = {
-		'/effects/emitters/targetting_beam_01_emit.bp'
-	},
+        '/effects/emitters/targetting_beam_01_emit.bp'
+    },
 }
 
 UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {

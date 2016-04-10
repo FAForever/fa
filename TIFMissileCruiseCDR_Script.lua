@@ -7,7 +7,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
 
-	FxAirUnitHitScale = 1.65,
+    FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
     FxNoneHitScale = 1.65,
     FxPropHitScale = 1.65,
@@ -45,16 +45,16 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 30 and dist <= 150 then
-			-- Increase check intervals
-			self:SetTurnRate(30)
-			WaitSeconds(1.5)
+            -- Increase check intervals
+            self:SetTurnRate(30)
+            WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 10 and dist <= 30 then
-			-- Further increase check intervals
+            -- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(50)
-		elseif dist > 0 and dist <= 10 then
-			-- Further increase check intervals            
+        elseif dist > 0 and dist <= 10 then
+            -- Further increase check intervals            
             self:SetTurnRate(100)   
             KillThread(self.MoveThread)         
         end

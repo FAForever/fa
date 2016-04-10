@@ -48,8 +48,8 @@ InainoEffectController01 = Class(NullShell) {
         local army = self:GetArmy()
         self:ForkThread(self.CreateInitialHit, army)
         self:ForkThread(self.CreateInitialBuildup, army)
-		self:ForkThread(self.CreateGroundFingers )
-		self:ForkThread(self.CreateInitialFingers )
+        self:ForkThread(self.CreateGroundFingers )
+        self:ForkThread(self.CreateInitialFingers )
         self:ForkThread(self.MainBlast, army)
     end,    
     
@@ -60,22 +60,22 @@ InainoEffectController01 = Class(NullShell) {
     end,
     
     CreateInitialBuildup = function( self, army )
-		WaitSeconds(2.0)
+        WaitSeconds(2.0)
         for k, v in EffectTemplate.SIFInainoHit02 do
             emit = CreateEmitterAtEntity(self,army,v)
         end      
     end,
     
     MainBlast = function( self, army )
-		WaitSeconds(5.00)
-		
+        WaitSeconds(5.00)
+        
         ----Create a light for this thing's flash.
         CreateLightParticle(self, -1, self:GetArmy(), 160, 14, 'flare_lens_add_03', 'ramp_white_07' )
         
         -- Create our decals
         CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())          
 
-		-- Create explosion effects
+        -- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
@@ -85,7 +85,7 @@ InainoEffectController01 = Class(NullShell) {
         ----self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
         self:ShakeCamera( 55, 10, 0, 2.5 )        
 
-		WaitSeconds(0.3)
+        WaitSeconds(0.3)
         
         -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp', 0, 3, 0, 0, 0, 0)
@@ -136,7 +136,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
     
     CreateInitialFingers = function(self)
-		WaitSeconds(1.75)
+        WaitSeconds(1.75)
         -- upward rising fingers that join to form explosion
         local num_projectiles = 5        
         local horizontal_angle = (2*math.pi) / num_projectiles

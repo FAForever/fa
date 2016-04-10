@@ -17,13 +17,13 @@ UAB1105 = Class(AEnergyStorageUnit) {
         self.Trash:Add(CreateStorageManip(self, 'Center_Pod', 'ENERGY', 0, 0, 0, 0, 0, .3))
     end,
 
-	OnKilled = function(self, instigator, type, overkillRatio)
-			if not instigator then 
-				self.DeathWeaponEnabled = false
-			end
-		AEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
-	
+    OnKilled = function(self, instigator, type, overkillRatio)
+            if not instigator then 
+                self.DeathWeaponEnabled = false
+            end
+        AEnergyStorageUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+    
 }
 
 TypeClass = UAB1105

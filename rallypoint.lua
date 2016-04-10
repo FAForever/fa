@@ -26,9 +26,9 @@ local function AddRallyPoint(unit)
     table.insert(meshes, mesh)
     mesh:SetMesh({
         MeshName = rallyMeshes[commandOfInterest.type][1] or commandMeshResources[commandOfInterest.type][1],
-	    TextureName = rallyMeshes[commandOfInterest.type][2] or commandMeshResources[commandOfInterest.type][2],
-	    ShaderName = 'RallyPoint',
-	    UniformScale = 0.10
+        TextureName = rallyMeshes[commandOfInterest.type][2] or commandMeshResources[commandOfInterest.type][2],
+        ShaderName = 'RallyPoint',
+        UniformScale = 0.10
     })
     mesh:SetLifetimeParameter(10)
     mesh:SetStance(commandOfInterest.position)

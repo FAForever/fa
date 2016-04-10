@@ -23,28 +23,28 @@ BaseBuilderTemplate {
         'SorianT3EngineerBuilders',
         'SorianEngineerFactoryConstruction',
         'SorianLandInitialFactoryConstruction',
-		
-		-- SCU Upgrades
-		'SorianSCUUpgrades',
+        
+        -- SCU Upgrades
+        'SorianSCUUpgrades',
 
         -- Extractor building        
         'SorianEngineerMassBuildersLowerPri - Rush',
-		
+        
         -- Build some power, but not much
         'SorianEngineerEnergyBuildersExpansions',
-		
+        
         -- ==== DEFENSES ==== --
         'SorianT1LightDefenses',
         'SorianT2LightDefenses',
         'SorianT3LightDefenses',
-		
-		'SorianT2ArtilleryFormBuilders',
-		--'SorianT3ArtilleryFormBuilders',
-		--'SorianT4ArtilleryFormBuilders',
-		'SorianAirStagingExpansion',
-		'SorianT2MissileDefenses',
-		
-		'SorianMassAdjacencyDefenses',
+        
+        'SorianT2ArtilleryFormBuilders',
+        --'SorianT3ArtilleryFormBuilders',
+        --'SorianT4ArtilleryFormBuilders',
+        'SorianAirStagingExpansion',
+        'SorianT2MissileDefenses',
+        
+        'SorianMassAdjacencyDefenses',
         
         -- ==== LAND UNIT BUILDERS ==== --
         'SorianT1LandFactoryBuilders',
@@ -53,7 +53,7 @@ BaseBuilderTemplate {
         'SorianFrequentLandAttackFormBuilders',
         'SorianMassHunterLandFormBuilders',
         'SorianMiscLandFormBuilders',
-		'SorianUnitCapLandAttackFormBuilders',
+        'SorianUnitCapLandAttackFormBuilders',
         
         'SorianT1ReactionDF',
         'SorianT2ReactionDF',
@@ -66,26 +66,26 @@ BaseBuilderTemplate {
         'SorianFrequentAirAttackFormBuilders',
         'SorianMassHunterAirFormBuilders',
         
-		'SorianUnitCapAirAttackFormBuilders',
+        'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
         
         --'SorianTransportFactoryBuilders',
-		
-		'SorianExpResponseFormBuilders',
+        
+        'SorianExpResponseFormBuilders',
         
         'SorianT1AntiAirBuilders',
         'SorianT2AntiAirBuilders',
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
-		
-		-- ===== STRATEGIES ====== --
-		
-		'SorianParagonStrategyExp',
-		'SorianWaterMapLowLand',
-		
-		-- == STRATEGY PLATOONS == --
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
+        
+        -- ===== STRATEGIES ====== --
+        
+        'SorianParagonStrategyExp',
+        'SorianWaterMapLowLand',
+        
+        -- == STRATEGY PLATOONS == --
+        
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
     },
     NonCheatBuilders = {        
         'SorianLandScoutFactoryBuilders',
@@ -136,7 +136,7 @@ BaseBuilderTemplate {
         else -- within 250
             return 250
         end
-		
+        
         return 0
     end,
 }

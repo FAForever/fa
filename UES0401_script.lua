@@ -31,10 +31,10 @@ UES0401 = Class(TSeaUnit) {
         MissileRack03 = Class(TSAMLauncher) {},
         MissileRack04 = Class(TSAMLauncher) {},
     },
-	
-	OnKilled = function(self, instigator, type, overkillRatio)
-		TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
+        TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
 
     OnCreate = function(self)
         TSeaUnit.OnCreate(self)
@@ -53,9 +53,9 @@ UES0401 = Class(TSeaUnit) {
 
 
     StartBeingBuiltEffects = function(self, builder, layer)
-		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
-			self:HideBone(0, true)        
+            self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end
     end,  

@@ -30,8 +30,8 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 CDFBrackmanHackPegProjectile01 = Class(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegPodTrails,
-	PolyTrailOffset = {0,0}, 
-	
+    PolyTrailOffset = {0,0}, 
+    
     FxTrails = {},
     FxImpactUnit = {},
     FxImpactProp = {},
@@ -46,8 +46,8 @@ CDFBrackmanHackPegProjectile01 = Class(MultiPolyTrailProjectile) {
 CDFBrackmanHackPegProjectile02 = Class(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegTrails,
-	PolyTrailOffset = {0,0}, 
-	
+    PolyTrailOffset = {0,0}, 
+    
     FxTrails = {},
     FxImpactUnit = {},
     FxImpactProp = {},
@@ -152,7 +152,7 @@ CAADissidentProjectile = Class(SinglePolyTrailProjectile) {
 --------------------------------------------------------------------------
 CAAElectronBurstCloudProjectile = Class(SinglePolyTrailProjectile) {
 
-	PolyTrail = '/effects/emitters/default_polytrail_02_emit.bp',
+    PolyTrail = '/effects/emitters/default_polytrail_02_emit.bp',
     
     -- Hit Effects
     FxImpactLand = {},
@@ -229,8 +229,8 @@ CArtilleryProjectile = Class(EmitterProjectile) {
 
 CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxTrails = {},
-	FxImpactTrajectoryAligned = false,  
-	PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
+    FxImpactTrajectoryAligned = false,  
+    PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
 
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CProtonArtilleryHit01,
@@ -304,13 +304,13 @@ CDFTrackerProjectile = Class(SingleCompositeEmitterProjectile) {
 --------------------------------------------------------------------------
 CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
-		'/effects/emitters/disintegrator_polytrail_04_emit.bp',
-		'/effects/emitters/disintegrator_polytrail_05_emit.bp',
-		'/effects/emitters/default_polytrail_03_emit.bp',
-	},
-	PolyTrailOffset = {0,0,0},  
-	FxTrails = EffectTemplate.CDisintegratorFxTrails01,  
-	
+        '/effects/emitters/disintegrator_polytrail_04_emit.bp',
+        '/effects/emitters/disintegrator_polytrail_05_emit.bp',
+        '/effects/emitters/default_polytrail_03_emit.bp',
+    },
+    PolyTrailOffset = {0,0,0},  
+    FxTrails = EffectTemplate.CDisintegratorFxTrails01,  
+    
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
@@ -319,15 +319,15 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
---	adjusments for URA0104 to tone down effect
+--    adjusments for URA0104 to tone down effect
 CDisintegratorLaserProjectile02 = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
-		'/effects/emitters/disintegrator_polytrail_04_emit.bp',
-		'/effects/emitters/disintegrator_polytrail_05_emit.bp',
-		'/effects/emitters/default_polytrail_03_emit.bp',
-	},
-	PolyTrailOffset = {0,0,0},  
-	
+        '/effects/emitters/disintegrator_polytrail_04_emit.bp',
+        '/effects/emitters/disintegrator_polytrail_05_emit.bp',
+        '/effects/emitters/default_polytrail_03_emit.bp',
+    },
+    PolyTrailOffset = {0,0,0},  
+    
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
@@ -342,10 +342,10 @@ CDisintegratorLaserProjectile02 = Class(MultiPolyTrailProjectile) {
 CElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
 
     PolyTrails = {
-		'/effects/emitters/electron_bolter_trail_02_emit.bp',
-		'/effects/emitters/default_polytrail_01_emit.bp',
-	},
-	PolyTrailOffset = {0,0},  
+        '/effects/emitters/electron_bolter_trail_02_emit.bp',
+        '/effects/emitters/default_polytrail_01_emit.bp',
+    },
+    PolyTrailOffset = {0,0},  
     FxTrails = {'/effects/emitters/electron_bolter_munition_01_emit.bp',},
 
     -- Hit Effects
@@ -357,10 +357,10 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
 CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
 
     PolyTrails = {
-		'/effects/emitters/electron_bolter_trail_01_emit.bp',
-		'/effects/emitters/default_polytrail_05_emit.bp',
-	},
-	PolyTrailOffset = {0,0},  
+        '/effects/emitters/electron_bolter_trail_01_emit.bp',
+        '/effects/emitters/default_polytrail_05_emit.bp',
+    },
+    PolyTrailOffset = {0,0},  
     FxTrails = {'/effects/emitters/electron_bolter_munition_02_emit.bp',},
 
     -- Hit Effects
@@ -458,7 +458,7 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
 --------------------------------------------------------------------------
 CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxTrails = {},
-	PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',    
+    PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',    
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
     FxImpactUnit = EffectTemplate.CMissileHit02,
     FxImpactProp = EffectTemplate.CMissileHit02,
@@ -471,7 +471,7 @@ CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) {
 --------------------------------------------------------------------------
 CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxTrails = {},
-	PolyTrail = EffectTemplate.CCorsairMissilePolyTrail01,    
+    PolyTrail = EffectTemplate.CCorsairMissilePolyTrail01,    
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
     FxImpactUnit = EffectTemplate.CCorsairMissileUnitHit01,
     FxImpactProp = EffectTemplate.CCorsairMissileHit01,
@@ -485,9 +485,9 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
 CLaserLaserProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
         '/effects/emitters/cybran_laser_trail_01_emit.bp',
-		'/effects/emitters/default_polytrail_02_emit.bp',
-	},
-	PolyTrailOffset = {0,0}, 
+        '/effects/emitters/default_polytrail_02_emit.bp',
+    },
+    PolyTrailOffset = {0,0}, 
 
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
@@ -499,10 +499,10 @@ CLaserLaserProjectile = Class(MultiPolyTrailProjectile) {
 CHeavyLaserProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
         '/effects/emitters/cybran_laser_trail_02_emit.bp',
-		'/effects/emitters/default_polytrail_03_emit.bp',
-	},
-	PolyTrailOffset = {0,0}, 
-	
+        '/effects/emitters/default_polytrail_03_emit.bp',
+    },
+    PolyTrailOffset = {0,0}, 
+    
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
     FxImpactProp = EffectTemplate.CLaserHitUnit01,
@@ -514,9 +514,9 @@ CHeavyLaserProjectile2 = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
         '/effects/emitters/hrailgunsd_polytrail_01_emit.bp',
                 '/effects/emitters/default_polytrail_02_emit.bp',
-	},
-	PolyTrailOffset = {0,0}, 
-	
+    },
+    PolyTrailOffset = {0,0}, 
+    
     -- Hit Effects
     FxUnitHitScale = 0.15,
     FxLandHitScale = 0.15,
@@ -703,11 +703,11 @@ CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
     end,
     
     OnExitWater = function(self)
-		EmitterProjectile.OnExitWater(self)
-		local army = self:GetArmy()
-		for k, v in self.FxExitWaterEmitter do
-			CreateEmitterAtBone(self,-2,army,v)
-		end
+        EmitterProjectile.OnExitWater(self)
+        local army = self:GetArmy()
+        for k, v in self.FxExitWaterEmitter do
+            CreateEmitterAtBone(self,-2,army,v)
+        end
     end,
 }
 
@@ -755,11 +755,11 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
     end,
     
     OnExitWater = function(self)
-		EmitterProjectile.OnExitWater(self)
-		local army = self:GetArmy()
-		for k, v in self.FxExitWaterEmitter do
-			CreateEmitterAtBone(self,-2,army,v)
-		end
+        EmitterProjectile.OnExitWater(self)
+        local army = self:GetArmy()
+        for k, v in self.FxExitWaterEmitter do
+            CreateEmitterAtBone(self,-2,army,v)
+        end
     end,
 }
 
@@ -768,10 +768,10 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
 --------------------------------------------------------------------------
 CShellAAAutoCannonProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
-		'/effects/emitters/auto_cannon_trail_01_emit.bp',
-		'/effects/emitters/default_polytrail_03_emit.bp',
-	},
-	PolyTrailOffset = {0,0},
+        '/effects/emitters/auto_cannon_trail_01_emit.bp',
+        '/effects/emitters/default_polytrail_03_emit.bp',
+    },
+    PolyTrailOffset = {0,0},
 
     -- Hit Effects
     FxImpactUnit = {'/effects/emitters/auto_cannon_hit_flash_01_emit.bp', },
@@ -859,9 +859,9 @@ CTorpedoSubProjectile = Class(EmitterProjectile) {
 CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxInitial = {},
     FxTrails = {
-		'/effects/emitters/anti_torpedo_flare_01_emit.bp',
-		'/effects/emitters/anti_torpedo_flare_02_emit.bp',
-	},
+        '/effects/emitters/anti_torpedo_flare_01_emit.bp',
+        '/effects/emitters/anti_torpedo_flare_02_emit.bp',
+    },
 
     -- Hit Effects
     FxImpactLand = {},
@@ -876,11 +876,11 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
         if inWater then
-			local army = self:GetArmy()
-			for i in self.FxTrails do
-				CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
-			end
-		end
+            local army = self:GetArmy()
+            for i in self.FxTrails do
+                CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+            end
+        end
         
         self:TrackTarget(false)
     end,
@@ -920,11 +920,11 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 
 CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
-		'/effects/emitters/disintegrator_polytrail_02_emit.bp',
-		'/effects/emitters/disintegrator_polytrail_03_emit.bp',
-		'/effects/emitters/default_polytrail_03_emit.bp',
-	},
-	PolyTrailOffset = {0,0,0},    
+        '/effects/emitters/disintegrator_polytrail_02_emit.bp',
+        '/effects/emitters/disintegrator_polytrail_03_emit.bp',
+        '/effects/emitters/default_polytrail_03_emit.bp',
+    },
+    PolyTrailOffset = {0,0,0},    
 
     -- Hit Effects
     FxImpactUnit = EffectTemplate.CHvyDisintegratorHitUnit01,

@@ -19,11 +19,11 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     },
     
     FxSplit = {
-		'/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_01_emit.bp',
-		'/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_02_emit.bp',
-		'/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_03_emit.bp',
-		'/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_04_emit.bp',
-		'/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_05_emit.bp',
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_01_emit.bp',
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_02_emit.bp',
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_03_emit.bp',
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_04_emit.bp',
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_05_emit.bp',
     },
     
     OnEnterWater = function(self)
@@ -33,7 +33,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
 
         for i in self.FxEnterWaterEmitter do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
-        end	
+        end    
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
         self:SetCollideSurface(false)
@@ -68,7 +68,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
         local DividedDamageData = self.DamageData
         DividedDamageData.DamageAmount = DividedDamageData.DamageAmount / numProjectiles
         
-		local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
+        local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
 
         -- Split effects
         for k, v in FxFragEffect do

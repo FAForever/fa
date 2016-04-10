@@ -31,7 +31,7 @@ BaseBuilderTemplate {
         'EngineerMassBuildersLowerPri',
         
         -- ==== EXPANSION ==== --
-		--DUNCAN - expansions dont build more expansions!
+        --DUNCAN - expansions dont build more expansions!
         --'EngineerExpansionBuildersFull',
         --'EngineerExpansionBuildersSmall',
         

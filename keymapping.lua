@@ -2,16 +2,16 @@ local Prefs = import('/lua/user/prefs.lua')
 
 local lockZoomEnable = false
 function lockZoom()
-	if lockZoomEnable then
-			local options = Prefs.GetFromCurrentProfile('options')
-			value = options.wheel_sensitivity
-			ConExecute("cam_ZoomAmount " .. tostring(value / 100))
-			
-			lockZoomEnable = false
-	else
-			ConExecute("cam_ZoomAmount 0")
-			lockZoomEnable = true
-	end
+    if lockZoomEnable then
+            local options = Prefs.GetFromCurrentProfile('options')
+            value = options.wheel_sensitivity
+            ConExecute("cam_ZoomAmount " .. tostring(value / 100))
+            
+            lockZoomEnable = false
+    else
+            ConExecute("cam_ZoomAmount 0")
+            lockZoomEnable = true
+    end
 
 
 end

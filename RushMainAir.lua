@@ -21,7 +21,7 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-		'EngineerFactoryConstructionAirHigherPriority',
+        'EngineerFactoryConstructionAirHigherPriority',
         
         -- Engineer Support buildings
         'EngineeringSupportBuilder',
@@ -39,8 +39,8 @@ BaseBuilderTemplate {
         'Air Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
         
         -- ACU Defense
         'T1ACUDefenses',
@@ -52,21 +52,21 @@ BaseBuilderTemplate {
         -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-		'EngineerFirebaseBuilders',
+        'EngineerFirebaseBuilders',
         
         -- ==== DEFENSES ==== --
         --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-		
+        
         'T2MissileDefenses',
-		--'T2ArtilleryFormBuilders',
+        --'T2ArtilleryFormBuilders',
         
         --'T1DefensivePoints',
         --'T2DefensivePoints',
         --'T3DefensivePoints',
-		
-		'T2Shields',
+        
+        'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
         
@@ -113,14 +113,14 @@ BaseBuilderTemplate {
         -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		-- ==== ARTILLERY BUILDERS ==== --
+        
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
+        'T3ArtilleryFormBuilders',
         
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+        
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         -- ==== EXPERIMENTALS ==== --
@@ -129,11 +129,11 @@ BaseBuilderTemplate {
         
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+        
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+        
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
@@ -155,7 +155,7 @@ BaseBuilderTemplate {
             SCU = 1,
         },
         FactoryCount = {
-			--DUNCAN - was 2, 10, 0, 1
+            --DUNCAN - was 2, 10, 0, 1
             Land = 1,
             Air = 8,
             Sea = 0,
@@ -175,15 +175,15 @@ BaseBuilderTemplate {
         if not per then 
             return 1, 'rushair'
         end
-		
-		if per == 'rushair' then
+        
+        if per == 'rushair' then
             return 1000, 'rushair'
         end
-		
-		--DUNCAN - dont use this AI on setons
-		if ScenarioInfo.name =='Seton\'s Clutch' then
-			return 1, 'rushair'
-		end
+        
+        --DUNCAN - dont use this AI on setons
+        if ScenarioInfo.name =='Seton\'s Clutch' then
+            return 1, 'rushair'
+        end
         
         if per == 'random' then
             return Random(1,100), 'rushair'
@@ -198,9 +198,9 @@ BaseBuilderTemplate {
 
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()
-		
-		--DUNCAN - Add island check
-		local isIsland = false
+        
+        --DUNCAN - Add island check
+        local isIsland = false
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
@@ -214,7 +214,7 @@ BaseBuilderTemplate {
 
         elseif mapSizeX <= 1024 and mapSizeZ < 1024 then
             return Random(70, 100), 'rushair'
-		
+        
         else
             return Random(80, 100), 'rushair'
         end
