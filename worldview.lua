@@ -149,7 +149,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.bMouseIn = true
             if self.Cursor then
-                if (self.LastCursor == nil) or (self.Cursor[1] != self.LastCursor[1]) then
+                if (self.LastCursor == nil) or (self.Cursor[1] ~= self.LastCursor[1]) then
                     self.LastCursor = self.Cursor
                     GetCursor():SetTexture(unpack(self.Cursor))
                 end
@@ -262,7 +262,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
     OnCommandDragBegin = function(self)
         local dragCommandCursor = {UIUtil.GetCursor("DRAGCOMMAND")}
-        if (self.Cursor == nil) or (self.Cursor[1] != dragCommandCursor[1]) then
+        if (self.Cursor == nil) or (self.Cursor[1] ~= dragCommandCursor[1]) then
             self.Cursor = dragCommandCursor
             self:ApplyCursor()
         end
@@ -415,7 +415,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                                         data.Location = UnProject(self, Vector2(dragself.x, dragself.y))
                                         for _, v in data.Location do
                                             local var = v
-                                            if var != v then
+                                            if var ~= v then
                                                 PingGroup.NewPosition = false
                                                 return
                                             end
@@ -612,11 +612,11 @@ WorldView = Class(moho.UIWorldView, Control) {
                 LayoutHelpers.ResetBottom(arrow.Glow)
                 LayoutHelpers.ResetBottom(arrow)
             end
-            if horzStr != '' or vertStr != '' then
+            if horzStr ~= '' or vertStr ~= '' then
                 if arrow:IsHidden() then
                     arrow:Show()
                 end
-                if arrow.State != vertStr..horzStr then
+                if arrow.State ~= vertStr..horzStr then
                     arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'))
                     arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'),
                     UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_down.dds'),
@@ -629,7 +629,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 end
             else
                 if stayOnScreen then
-                    if arrow.State != 't' then
+                    if arrow.State ~= 't' then
                         arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'))
                         arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'),
                         UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_down.dds'),
@@ -657,10 +657,10 @@ WorldView = Class(moho.UIWorldView, Control) {
         self._order = order or 5
         self._registered = true
         WorldViewMgr.RegisterWorldView(self)
-        if Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode") != nil then
+        if Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode") ~= nil then
             self:SetCartographic(Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode"))
         end
-        if Prefs.GetFromCurrentProfile(cameraName.."_resource_icons") != nil then
+        if Prefs.GetFromCurrentProfile(cameraName.."_resource_icons") ~= nil then
             self:EnableResourceRendering(Prefs.GetFromCurrentProfile(cameraName.."_resource_icons"))
         end
         if GetCamera(self._cameraName) then

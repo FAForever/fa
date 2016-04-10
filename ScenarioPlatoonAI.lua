@@ -851,7 +851,7 @@ function CategoryHunterPlatoonAI(platoon)
                     end
                 end
                 -- If the target has changed, attack new target
-                if newTarget != target then
+                if newTarget ~= target then
                     platoon:Stop()
                     platoon:AttackTarget( newTarget )
                 end

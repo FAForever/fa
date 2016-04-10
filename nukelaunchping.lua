@@ -15,7 +15,7 @@ function DoNukePing(NukeLaunchData)
     local position = NukeLaunchData.location
     for _, v in position do
         local var = v
-        if var != v then
+        if var ~= v then
             return
         end
     end

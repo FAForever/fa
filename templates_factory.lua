@@ -21,7 +21,7 @@ end
 
 function GetInitialIcon(buildQueue)
     for _, entry in buildQueue do
-        if type(entry) != 'table' then continue end
+        if type(entry) ~= 'table' then continue end
         if DiskGetFileInfo('/textures/ui/common/icons/units/'..entry.id..'_icon.dds') then
             return entry.id
         else

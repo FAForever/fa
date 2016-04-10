@@ -95,7 +95,7 @@ function SetUserKeyMapping(key, oldKey, action)
         newDebugMap = import('defaultKeyMap.lua').debugKeyMap
     end
 
-    if oldKey != nil then
+    if oldKey ~= nil then
         if IsKeyInMap(oldKey, newDebugMap) then
             newDebugMap[oldKey] = nil
         elseif IsKeyInMap(oldKey, newUserMap) then
@@ -141,7 +141,7 @@ function GetKeyActions(includeDebugKeys)
 
 
     local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
-    if userActions != nil then
+    if userActions ~= nil then
         for k,v in userActions do
             ret[k] = v
         end
@@ -262,7 +262,7 @@ function KeyCategory(key, map, actions)
     for keyCombo, action in map do
         local curKeyCombo = NormalizeKey(keyCombo)
         if table.equal(curKeyCombo, compKeyCombo) then
-            if actions[action] != nil then
+            if actions[action] ~= nil then
                 if actions[action].category then
                     return actions[action].category
                 else 

@@ -110,7 +110,7 @@ PlatoonFormManager = Class(BuilderManager) {
             local radius = self.Radius
             if builder:GetFormRadius() then radius = builder:GetFormRadius() end
             if not template or not self.Location or not radius then
-                if type(template) != 'table' or type(template[1]) != 'string' or type(template[2]) != 'string' then
+                if type(template) ~= 'table' or type(template[1]) ~= 'string' or type(template[2]) ~= 'string' then
                     WARN('*Platoon Form: Could not find template named: ' .. builder:GetPlatoonTemplate())
                     return
                 end

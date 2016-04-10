@@ -71,7 +71,7 @@ end
 local function mount_contents(dir, mountpoint)
     LOG('checking ' .. dir)
     for _,entry in io.dir(dir .. '\\*') do
-        if entry != '.' and entry != '..' then
+        if entry ~= '.' and entry ~= '..' then
             local mp = string.lower(entry)
             local safe = true
             for i, black in blacklist do
@@ -92,7 +92,7 @@ local function mount_dir_with_whitelist(dir, glob, mountpoint)
     sorted = {}
     LOG('checking ' .. dir .. glob)
     for _,entry in io.dir(dir .. glob) do
-        if entry != '.' and entry != '..' then
+        if entry ~= '.' and entry ~= '..' then
             local mp = string.lower(entry)
             local notsafe = true
             for i, white in whitelist do
@@ -113,7 +113,7 @@ local function mount_dir_with_blacklist(dir, glob, mountpoint)
     sorted = {}
     LOG('checking ' .. dir .. glob)
     for _,entry in io.dir(dir .. glob) do
-        if entry != '.' and entry != '..' then
+        if entry ~= '.' and entry ~= '..' then
             local mp = string.lower(entry)
             local safe = true
             for i, black in blacklist do

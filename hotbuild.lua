@@ -162,7 +162,7 @@ function addModifiers()
   local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
     for key, action in currentKeyMap do
       if action["category"] == "hotbuilding" then
-        if key != nil then
+        if key ~= nil then
             if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
                 modifiersKeys["Shift-" .. key] = action
             else
@@ -310,7 +310,7 @@ function buildActionTemplate(modifier)
   local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
   --Allow all races to build other races templates
   local currentFaction = selection[1]:GetBlueprint().General.FactionName
-  if options.gui_all_race_templates != 0 and currentFaction then
+  if options.gui_all_race_templates ~= 0 and currentFaction then
     local function ConvertID(BPID)
       local prefixes = {
         ["AEON"]     = {"uab", "xab", "dab",},
@@ -426,7 +426,7 @@ function buildActionTemplate(modifier)
   CommandMode.StartCommandMode("build", {name = cmd})
   SetActiveBuildTemplate(template.templateData)
 
-  if options.gui_template_rotator != 0 then
+  if options.gui_template_rotator ~= 0 then
     -- rotating templates
     local worldview = import('/lua/ui/game/worldview.lua').viewLeft
     local oldHandleEvent = worldview.HandleEvent

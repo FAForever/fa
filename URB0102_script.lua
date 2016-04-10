@@ -37,7 +37,7 @@ URB0102 = Class(CAirFactoryUnit) {
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)

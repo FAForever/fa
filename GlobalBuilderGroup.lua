@@ -47,7 +47,7 @@ BuilderGroupDefMeta.__call = function(...)
         return
     end
     
-    if arg[2].BuildersType != 'EngineerBuilder' and arg[2].BuildersType != 'FactoryBuilder' and arg[2].BuildersType != 'PlatoonFormBuilder' and arg[2].BuildersType != 'StrategyBuilder' then
+    if arg[2].BuildersType ~= 'EngineerBuilder' and arg[2].BuildersType ~= 'FactoryBuilder' and arg[2].BuildersType ~= 'PlatoonFormBuilder' and arg[2].BuildersType ~= 'StrategyBuilder' then
         WARN('Invalid BuildersType for BuilderGroup definition - BuilderGroupName = ' .. arg[2].BuilderGroupName)
         return
     end

@@ -54,7 +54,7 @@ UES0401 = Class(TSeaUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
+        if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
             self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end

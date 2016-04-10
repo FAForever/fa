@@ -16,7 +16,7 @@ Flare = Class(Entity) {
     OnCollisionCheck = function(self,other)
         myArmy = self:GetArmy()
         otherArmy = other:GetArmy()
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
+        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and myArmy ~= otherArmy and IsAlly(myArmy, otherArmy) == false then
             other:SetNewTarget(self.Owner)
         end
         return false
@@ -38,7 +38,7 @@ DepthCharge = Class(Entity) {
     OnCollisionCheck = function(self,other)
         myArmy = self:GetArmy()
         otherArmy = other:GetArmy()
-        if EntityCategoryContains(categories.TORPEDO, other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
+        if EntityCategoryContains(categories.TORPEDO, other) and myArmy ~= otherArmy and IsAlly(myArmy, otherArmy) == false then
             other:SetNewTarget(self.Owner)
         end
         return false

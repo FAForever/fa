@@ -32,7 +32,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-        if not instigator and self.DeathWeaponEnabled != false then
+        if not instigator and self.DeathWeaponEnabled ~= false then
             self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
     end,
