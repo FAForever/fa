@@ -18,7 +18,7 @@ function RandomIter(someSet)
     end
 end
 
---- safecall(msg, fn, ...) calls the given function with the given args, and 
+--- safecall(msg, fn, ...) calls the given function with the given args, and
 --- catches any error and logs a warning including the given message.
 --- Returns nil if the function failed, otherwise returns the function's result.
 function safecall(msg, fn, ...)
@@ -33,7 +33,7 @@ end
 
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)
-    if not t then return end -- prevents looping over nil table 
+    if not t then return end -- prevents looping over nil table
     local r = {}
     for k,v in t do
         r[k] = v
@@ -44,7 +44,7 @@ end
 --- table.contains(t,val) returns the key for val if it is in t.
 --- Otherwise, return nil
 function table.find(t,val)
-    if not t then return end -- prevents looping over nil table 
+    if not t then return end -- prevents looping over nil table
     for k,v in t do
         if v == val then
             return k
@@ -56,7 +56,7 @@ end
 --- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
 function table.subset(t1,t2)
     if not t1 and not t2 then return true end  -- nothing is in nothing
-    if not t1 then return true end  -- nothing is in something 
+    if not t1 then return true end  -- nothing is in something
     if not t2 then return false end -- something is not in nothing
     for k,v in t1 do
         if t2[k] ~= v then return false end
@@ -156,7 +156,7 @@ function table.subtract(t1, t2)
 end
 
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
---- are expected to be numerically keyed (existing keys are discarded). 
+--- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
 function table.cat(t1, t2)
     -- handling nil tables before lopping
@@ -174,7 +174,7 @@ function table.cat(t1, t2)
     return r
 end
 
---- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. 
+--- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs.
 --- Slightly more overhead, but can constructively concat *all* the things)
 function table.concatenate(...)
     local ret = {}
@@ -191,7 +191,7 @@ function table.concatenate(...)
 end
 
 --- Destructively concatenate two tables. (numerical keys only)
---- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, 
+--- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed,
 --- but this avoids the need to copy the values in t1, saving some time.
 function table.destructiveCat(t1, t2)
     for k, v in t2 do
@@ -257,8 +257,8 @@ end
 function table.concatkeys(t, sep)
     sep = sep or ", "
     local tt = table.keys(t)
-    return table.concat(tt,sep) 
-end 
+    return table.concat(tt,sep)
+end
 
 --- Iterates over a table in key-sorted order:
 ---   for k,v in sortedpairs(t) do
@@ -279,12 +279,12 @@ end
 
 --- Returns actual size of a table, including string keys
 function table.getsize(t)
-    -- handling nil table like empty tables so that no need to check 
+    -- handling nil table like empty tables so that no need to check
     -- for nil table and then size of table:
-    -- if t and table.getsize(t) > 0 then 
-    -- do some thing 
-    -- end 
-    if type(t) ~= 'table' then return 0 end 
+    -- if t and table.getsize(t) > 0 then
+    -- do some thing
+    -- end
+    if type(t) ~= 'table' then return 0 end
     local size = 0
     for k, v in t do
         size = size + 1
@@ -319,8 +319,8 @@ end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
 --- it is useful for preparing hash table before sorting its values
---- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
----                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
+--- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } =>
+---                {   [1] = 'one',   [2] = 'two',   [3] = 'three' }
 function table.indexize(t)
     local indexized = {}
     for k, v in t do
@@ -341,7 +341,7 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
-    return table.getsize(t) == 0 
+    return table.getsize(t) == 0
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -365,7 +365,7 @@ function printField(k, v, tblName, printer)
     if "table" == type(k) then
         table.print(k, tblName .. " ", printer)
     else
-        tblName = tblName .. '' .. tostring(k)  
+        tblName = tblName .. '' .. tostring(k)
     end
     if "string" == type(v) then
         printer(tblName .. " = " .. "\"" .. v .. "\"")
@@ -406,7 +406,7 @@ end
 --- Filter a table using a function.
 --- @param t Table to filter
 --- @param filterFunc Decision function to use to filter the table.
---- @return A new table containing every mapping from t for which filterFunc 
+--- @return A new table containing every mapping from t for which filterFunc
 --- returns `true` when passed the value.
 function table.filter(t, filterFunc)
     local newTable = {}
@@ -457,29 +457,29 @@ function StringStartsWith(stringToMatch, valueToSeek)
     return string.sub(stringToMatch, 1, valueToSeek:len()) == valueToSeek
 end
 
---- Extracts a string between two specified strings  
+--- Extracts a string between two specified strings
 --- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
 function StringExtract(str, str1, str2, fromEnd)
     local pattern = str1 .. '(.*)' .. str2
     if fromEnd then pattern = '.*' .. pattern end
     local i, ii, m = string.find(str, pattern)
-    return m 
+    return m
 end
 
 --- Adds comma as thousands separator in specified value
 --- e.g. StringComma(10000) --> 10,000
 function StringComma(value)
     local str = value or 0
-    while true do  
+    while true do
       str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end
-    end 
+    end
     return str
 end
 
---- Prepends a string with specified symbol or one space 
+--- Prepends a string with specified symbol or one space
 function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
@@ -493,16 +493,16 @@ end
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
-    
-    if type(itemA) == "string" or 
+
+    if type(itemA) == "string" or
        type(itemB) == "string" then
         if string.lower(itemA) == string.lower(itemB) then
             return 0
         else
             -- sort string using alpha order
-            return string.lower(itemA) < string.lower(itemB) 
+            return string.lower(itemA) < string.lower(itemB)
         end
-    else 
+    else
        if math.abs(itemA - itemB) < 0.0001 then
             return 0
        else
@@ -512,7 +512,7 @@ function Sort(itemA, itemB)
     end
 end
 
--- Rounds a number to specified double precision 
+-- Rounds a number to specified double precision
 function math.round(num, idp)
     if not idp then
         return math.floor(num+.5)
@@ -529,15 +529,15 @@ end
 local timeStart = nil
 --- Starts timer to check how long a process is taking, useful for optimization
 function TimerStart()
-    timeStart = CurrentTime() 
+    timeStart = CurrentTime()
 end
 
 --- Stops timer and returns how much time a process took from calling TimerStart()
 function TimerStop()
     local timeStop = 0
-    if timeStart then 
-       timeStop  = CurrentTime() - timeStart 
+    if timeStart then
+       timeStop  = CurrentTime() - timeStart
        timeStart = CurrentTime() -- reset time start
-    end 
+    end
     return string.format("%0.3f seconds", timeStop)
 end

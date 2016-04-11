@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  : The base weapon class for all weapons in the game.
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -256,7 +256,7 @@ Weapon = Class(moho.weapon_methods) {
         if not bp.Audio[sound] then return end
         self:PlaySound(bp.Audio[sound])
     end,
-    
+
     PlayWeaponAmbientSound = function(self, sound)
         local bp = self:GetBlueprint()
         if not bp.Audio[sound] then return end
@@ -271,7 +271,7 @@ Weapon = Class(moho.weapon_methods) {
         end
         self.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
     end,
-    
+
     StopWeaponAmbientSound = function(self, sound)
         if not self.AmbientSounds then return end
         if not self.AmbientSounds[sound] then return end
@@ -282,34 +282,32 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnEnableWeapon = function(self)
-        
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-
     end,
 
     GetDamageTable = function(self)
-        local weaponBlueprint = self:GetBlueprint()
+        local bp = self:GetBlueprint()
         local damageTable = {}
-        damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
-        damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
-        damageTable.DamageAmount = weaponBlueprint.Damage + (self.DamageMod or 0)
-        damageTable.DamageType = weaponBlueprint.DamageType
-        damageTable.DamageFriendly = weaponBlueprint.DamageFriendly
+        damageTable.InitialDamageAmount = bp.InitialDamage or 0
+        damageTable.DamageRadius = bp.DamageRadius + (self.DamageRadiusMod or 0)
+        damageTable.DamageAmount = bp.Damage + (self.DamageMod or 0)
+        damageTable.DamageType = bp.DamageType
+        damageTable.DamageFriendly = bp.DamageFriendly
         if damageTable.DamageFriendly == nil then
             damageTable.DamageFriendly = true
         end
-        damageTable.CollideFriendly = weaponBlueprint.CollideFriendly or false
-        damageTable.DoTTime = weaponBlueprint.DoTTime
-        damageTable.DoTPulses = weaponBlueprint.DoTPulses
-        damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
-        damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
-        damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
+        damageTable.CollideFriendly = bp.CollideFriendly or false
+        damageTable.DoTTime = bp.DoTTime
+        damageTable.DoTPulses = bp.DoTPulses
+        damageTable.MetaImpactAmount = bp.MetaImpactAmount
+        damageTable.MetaImpactRadius = bp.MetaImpactRadius
+        damageTable.ArtilleryShieldBlocks = bp.ArtilleryShieldBlocks
         -- Add buff
         damageTable.Buffs = {}
-        if weaponBlueprint.Buffs ~= nil then
-            for k, v in weaponBlueprint.Buffs do
+        if bp.Buffs ~= nil then
+            for k, v in bp.Buffs do
                 if not self.DisabledBuffs[v.BuffType] then
                     damageTable.Buffs[k] = v
                 end
@@ -421,11 +419,11 @@ Weapon = Class(moho.weapon_methods) {
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
     end,
-    
+
     AddDamageRadiusMod = function(self, dmgRadMod)
         self.DamageRadiusMod = self.DamageRadiusMod + (dmgRadMod or 0)
     end,
-    
+
     DoOnFireBuffs = function(self)
         local data = self:GetBlueprint()
         if data.Buffs then
@@ -442,19 +440,19 @@ Weapon = Class(moho.weapon_methods) {
             self.DisabledBuffs[buffname] = true
         else
             -- Error
-            error('ERROR: DisableBuff in weapon.lua does not have a buffname') 
+            error('ERROR: DisableBuff in weapon.lua does not have a buffname')
         end
     end,
-    
+
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
         else
-            -- Error 
-            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname') 
+            -- Error
+            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname')
         end
     end,
-    
+
     -- Method to mark weapon when parent unit gets loaded on to a transport unit
     SetOnTransport = function(self, transportstate)
         self.onTransport = transportstate
@@ -471,15 +469,15 @@ Weapon = Class(moho.weapon_methods) {
                 self:SetWeaponEnabled(true)
                 self.WeaponDisabledOnTransport = false
             end
-        end        
+        end
     end,
 
     -- Method to retreive onTransport information. True if the parent unit has been loaded on to a transport unit
     GetOnTransport = function(self)
         return self.onTransport
     end,
-    
-    -- This is the function to set a weapon enabled. 
+
+    -- This is the function to set a weapon enabled.
     -- If the weapon is enhabled by an enhancement, this will check to see if the unit has the enhancement before
     -- allowing it to try to be enabled or disabled.
     SetWeaponEnabled = function(self, enable)

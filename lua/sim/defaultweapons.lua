@@ -11,7 +11,6 @@ local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleratio
 
 -- Most weapons derive from this class, including beam weapons later in this file
 DefaultProjectileWeapon = Class(Weapon) {
-
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
     FxChargeMuzzleFlash = {},
@@ -1253,13 +1252,13 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local bp = self:GetBlueprint()
         local proj = self.unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         proj:ForkThread(proj.EffectThread)
-        
+
         -- Play the explosion sound
         local projBp = proj:GetBlueprint()
         if projBp.Audio.NukeExplosion then
             self:PlaySound(projBp.Audio.NukeExplosion)
         end
-        
+
         proj.InnerRing = NukeDamage()
         proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
         proj.OuterRing = NukeDamage()
@@ -1271,7 +1270,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local brain = launcher:GetAIBrain()
         proj.InnerRing:DoNukeDamage(launcher, pos, brain, army)
         proj.OuterRing:DoNukeDamage(launcher, pos, brain, army)
-        
+
         -- Stop it calling DoDamage any time in the future.
         proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
     end,
