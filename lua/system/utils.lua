@@ -505,6 +505,20 @@ function StringSplitCamel(str)
    return (str:gsub("[A-Z]", StringPrepend):gsub("^.", string.upper))
 end
 
+--- Reverses order of letters for specified string
+--- e.g. StringCapitalize('abc123') --> 321cba
+function StringReverse(str)
+    local tbl =  {}
+    str:gsub(".",function(c) table.insert(tbl,c) end)  
+    tbl = table.reverse(tbl)
+    return table.concat(tbl) 
+end
+--- Capitalizes each word in specified string 
+--- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
+function StringCapitalize(str)
+    return string.gsub(" "..str, "%W%l", string.upper):sub(2) 
+end
+
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
