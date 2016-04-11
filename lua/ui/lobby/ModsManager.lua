@@ -13,11 +13,12 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local Prefs = import('/lua/user/prefs.lua')
 -- this version of Checkbox allows scaling of checkboxes
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox 
+local Checkbox = import('/lua/maui/checkbox.lua').Checkbox  
+local ToggleButton = import('/lua/ui/controls/togglebutton.lua').ToggleButton
 local RestrictedData = import('/lua/ui/lobby/UnitsRestrictions.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-local ModBlacklist = import('/etc/faf/blacklist.lua').Blacklist
+local ModsBlacklist = import('/etc/faf/blacklist.lua').Blacklist
 local SetUtils = import('/lua/system/setutils.lua')
 local GUIOpen = false
 local IsHost = false
@@ -44,13 +45,32 @@ local modsDialog
 
 local callback
 
--- The availableMods map from lobby.lua.
-local modsAvailable
-
--- The set of active mods (maps uids to true)
-local activeMods
-local allMods
-
+local mods = {
+    -- lookup table with uid of mods that are selectable 
+    selectable = {},
+    -- lookup table with uid of mods that are activated
+    activated = {}, 
+    -- mods that are disabled by the mod_info flag
+    disabled = {},
+    -- mods that are disabled by the FAF blacklist
+    blacklisted = {},
+    -- mods that are disabled because not everyone has them
+    missingByOthers = {},
+    -- mods that are disabled because dependencies are not installed
+    missingDependencies = {},
+    -- mods that change sim/game 
+    sim = {
+        active = {},
+        inactive = {}
+    },
+    -- mods that change UI
+    ui = {
+        active = {},
+        inactive = {}
+    },
+    -- mods that are available to all players (passed from lobby.lua)
+    availableToAll = {},
+} 
 -- Maps uids to the output of Mods.GetDependencies(uid)
 local modDependencyMap = {}
 
@@ -64,18 +84,16 @@ function UpdateClientModStatus(mod_selec)
     end
 end
 
---- Returns true iff every peer in the game reports having a mod with the given id installed.
-local function EveryoneHasMod(modId)
+-- Returns true iff every peer in the game reports having a mod with the given id installed.
+local function EveryoneHasMod(modID)
     if not IsHost then
         return true
     end
-
-    for peerId, peerMods in modsAvailable do
-        if not peerMods[modId] then
+    for _, peerMods in mods.availableToAll do
+        if not peerMods[modID] then
             return false
         end
     end
-
     return true
 end
 
@@ -84,10 +102,10 @@ local modsTags = {
  GAME     =  { key = 'GAME', name = 'GAME MODS', filtered = false, color = 'FFDE4521', }, -- #FFDE4521 game mod
  UNITS    =  { key = 'UNITS', name = 'UNITS',    filtered = false, color = 'FFDED621', }, -- #FFDED621 units mod  
  DISABLED =  { key = 'DISABLED', name = 'DISABLED', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
- LOCAL =  { key = 'LOCAL', name = 'LOCAL', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
+ LOCAL    =  { key = 'LOCAL', name = 'LOCAL', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
 }
  
---- Create the dialog for Mod Manager
+-- Create the dialog for Mod Manager
 -- @param parent UI control to create the dialog within.
 -- @param IsHost Is the user opening the control the host (and hence able to edit?)
 -- @param availableMods Present only if user is host. The availableMods map from lobby.lua.
@@ -95,7 +113,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     IsHost = availableMods ~= nil
     callback = saveBehaviour
 
-    modsAvailable = availableMods
+    mods.availableToAll = availableMods
 
     dialogContent = Group(parent)
     dialogContent.Width:Set(dialogWidth)
@@ -122,9 +140,10 @@ function CreateDialog(parent, availableMods, saveBehaviour)
         
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
+    SaveButton:UseAlphaHitTest(true)
     LayoutHelpers.AtLeftIn(SaveButton, dialogContent, -2)
-    LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
-     
+    LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
+
     controlList = {}
     
     modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- 1
@@ -135,9 +154,9 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     
     LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2) 
     scrollGroup.Top:Set(function() return subtitle.Bottom() + 5 end)
-    scrollGroup.Bottom:Set(function() return SaveButton.Top() - 20 end)
+    scrollGroup.Bottom:Set(function() return SaveButton.Top() - 10 end)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
-    -- top, bottom
+
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, -10, 10)
     scrollGroup.top = 1
     
@@ -167,16 +186,13 @@ function CreateDialog(parent, availableMods, saveBehaviour)
         for index, control in ipairs(controlList) do
             if control.filtered then
                 control:Hide()
-            --elseif index < top or index >= bottom then
             elseif visibleIndex < top or visibleIndex >= bottom then
                 control:Hide()
                 visibleIndex = visibleIndex + 1
             else
                 control:Show()
                 control.Left:Set(self.Left)
-                --local vIndex = index
                 local i = visibleIndex
-                --lIndex = index or 1
                 local c = control
                 control.Top:Set(function() return self.Top() + ((i - top) * c.Height()) end)
                 visibleIndex = visibleIndex + 1
@@ -188,21 +204,21 @@ function CreateDialog(parent, availableMods, saveBehaviour)
         modsDialog:Close()
         GUIOpen = false
         if callback then
-            local activeUIMods = SetUtils.PredicateFilter(activeMods,
+            mods.ui.active = SetUtils.PredicateFilter(mods.activated,
                 function(uid)
-                    return allMods[uid].ui_only
+                    return mods.selectable[uid].ui_only
                 end
             )
-            local activeSimMods = SetUtils.Subtract(activeMods, activeUIMods)
-            table.print(activeSimMods, 'activeSimMods')
-            table.print(activeUIMods, 'activeUIMods')
+            mods.sim.active = SetUtils.Subtract(mods.activated, mods.ui.active)
+            table.print(mods.sim.active, 'mods.sim.active')
+            table.print(mods.ui.active, 'mods.ui.active')
 
-            callback(activeSimMods, activeUIMods)
+            callback(mods.sim.active, mods.ui.active)
         else
-            import('/lua/mods.lua').SetSelectedMods(activeMods)
+            import('/lua/mods.lua').SetSelectedMods(mods.activated)
         end
 
-        return activeMods
+        return mods.activated
     end
 
     RefreshModsList()
@@ -220,41 +236,29 @@ function CreateDialog(parent, availableMods, saveBehaviour)
         return false
     end
 
-    local position = 10 
+    local position = 5 
     local filterGameMods = CreateModsFilter(dialogContent, modsTags.GAME)
     Tooltip.AddControlTooltip(filterGameMods, { 
         text = 'Filter Game Mods', 
         body = 'Toggle visibility of all game mods in above list of mods.' } )
-
     LayoutHelpers.AtRightIn(filterGameMods, dialogContent,position)
-    LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 20)
-    --filterGameMods.OnCheck = function(self, checked)
-    --  local tag = modsTags[self.tag]
-    --  local color = checked and self.selectedColor or self.unselectedColor
-    --  self.bg:SetSolidColor(color)
-    --  tag.filtered = checked
-    --  FilterMods()
-    --end    
-    position = position + 85
+    LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 10)
+    
+    position = position + 110
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
         text = 'Filter UI Mods', 
         body = 'Toggle visibility of all UI mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterUIMods, dialogContent, position)
-    LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 20)
+    LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 10)
     
-    position = position + 85
+    position = position + 110
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
         text = 'Filter Disabled Mods', 
         body = 'Toggle visibility of all disabled mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterDisabledMods, dialogContent, position)
-    LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 20)
-         
-    --position = position + 85
-    --local filterUNITS = CreateModsFilter(dialogContent, modsTags.UNITS)
-    --LayoutHelpers.AtRightIn(filterUNITS, dialogContent, position)
-    --LayoutHelpers.AtBottomIn(filterUNITS, dialogContent, 20)
+    LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 10)
      
     GUIOpen = true
 
@@ -262,7 +266,6 @@ function CreateDialog(parent, availableMods, saveBehaviour)
 end
 
 function FilterMods()
-    --LOG('ModsManager filtering mods...')
     for i, control in ipairs(controlList) do
         local filtered = true
         for name, tag in modsTags do 
@@ -277,55 +280,52 @@ function FilterMods()
 end 
 
 function CreateModsFilter(parent, tag)
- 
-    local checkbox = Checkbox(parent,
-    UIUtil.SkinnableFile('/MODS/blank.dds'),
-    UIUtil.SkinnableFile('/MODS/single.dds'),
-    UIUtil.SkinnableFile('/MODS/single.dds'),
-    UIUtil.SkinnableFile('/MODS/double.dds'),
-    UIUtil.SkinnableFile('/MODS/disabled.dds'),
-    UIUtil.SkinnableFile('/MODS/disabled.dds'),
-        'UI_Tab_Click_01', 'UI_Tab_Rollover_01') 
 
-    checkbox.tag = tag.key
-    checkbox.selectedColor  = tag.color  --#317E807E,FF363636
-    checkbox.unselectedColor = '317E807E' 
-    checkbox.border = Bitmap(checkbox)
-    LayoutHelpers.AtVerticalCenterIn(checkbox.border, checkbox)
-    LayoutHelpers.AtHorizontalCenterIn(checkbox.border, checkbox)
-    checkbox.bg = Bitmap(checkbox)
-    LayoutHelpers.AtVerticalCenterIn(checkbox.bg, checkbox)
-    LayoutHelpers.AtHorizontalCenterIn(checkbox.bg, checkbox)
-     
-    checkbox.label = UIUtil.CreateText(checkbox, tag.name, 12, 'Arial Bold')
-    checkbox.label:SetColor('FFB4B6B4') --#FFB4B6B4
-    LayoutHelpers.AtVerticalCenterIn(checkbox.label, checkbox)
-    LayoutHelpers.AtHorizontalCenterIn(checkbox.label, checkbox)
-
-    local height = checkbox.label.Height() + 15  -- function() return label.Height() + 5 end
-    local width = 80
-     
-    checkbox.Height:Set(height)
-    checkbox.Width:Set(width) 
-    checkbox:SetCheck(true, false)
-    checkbox.OnCheck = function(self, checked)
-        local color = self.unselectedColor
-        local modTag = modsTags[self.tag]
-        if modTag then
-           modTag.filtered = not checked
-           color = checked and modTag.color or color 
+    local states = {
+        normal   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
+        active   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
+        over     = UIUtil.SkinnableFile('/BUTTON/medium/_btn_over.dds'),
+        disabled = UIUtil.SkinnableFile('/BUTTON/medium/_btn_dis.dds'), 
+    }
+    local filterToggle = UIUtil.CreateButton(parent,
+            states.active,
+            states.active,
+            states.highlight,
+            states.disabled,
+            tag.name,
+            11)
+        
+    local height = filterToggle.label.Height() + 30
+    local width = 130
+    filterToggle.tag = tag.key
+    filterToggle.checked = true
+    filterToggle.Height:Set(height)
+    filterToggle.Width:Set(width) 
+    filterToggle.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then 
+            if not self.checked then
+                self.checked = true
+                self:SetTexture(states.active)
+            else  
+                self.checked = false
+                self:SetTexture(states.normal)
+            end
+            local modTag = modsTags[self.tag]
+            if modTag then
+               modTag.filtered = not self.checked 
+            end
+            FilterMods()
+            return true 
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter') 
+            return true 
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit') 
+            return true  
         end
-        --self.bg:SetSolidColor(color)
-        FilterMods()
-    end 
-
-    checkbox.border.Width:Set(width) 
-    checkbox.border.Height:Set(height)
-
-    checkbox.bg.Width:Set(width - 2) 
-    checkbox.bg.Height:Set(height - 2)
-
-    return checkbox 
+    end
+    filterToggle:UseAlphaHitTest(true)
+    return filterToggle 
 end
     
 local function UpdateModsCounters()
@@ -334,26 +334,26 @@ end
 
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 
-local function GetModUnits(mod)
+function GetModUnits(mod)
     local searchMods =  {}
     searchMods[mod.uid] = mod 
     return GetModsUnits(searchMods) 
 end
 
-local function GetModsUnits(searchMods) 
+function GetModsUnits(searchMods) 
     local bps = UnitsAnalyzer.GetBlueprints(searchMods, true)
     bps = table.merged(bps.Units, bps.Enhancements)
     return bps
 end
 
-local function GetModsFiles(mod, pattern)
+function GetModsFiles(mod, pattern)
     local units = '*_unit.bp'
-     
     for k,file in DiskFindFiles(mod.location, pattern) do
         BlueprintLoaderUpdateProgress()
         safecall("loading mod blueprint "..file, doscript, file)
     end
 end
+-- Gets a name and actual version for specified mod
 function GetModNameVersion(mod)
     local name = mod.name
     -- remove old mod version from mod name 
@@ -361,27 +361,84 @@ function GetModNameVersion(mod)
     name = name:gsub("%]", "")
     name = name:gsub(" V", " ")
     name = name:gsub(" v", " ")
+    name = name:gsub(" %(V", " ")
+    name = name:gsub(" %(v", " ")
+    name = name:gsub("%d%)", "")
+    name = name:gsub(" %d%_%d%_%d", "")
     name = name:gsub(" %d%.%d%d%d", "")
     name = name:gsub(" %d%.%d%d", "")
     name = name:gsub(" %d%.%d", "")
+    name = name:gsub(" %d%.", "")
     name = name:gsub(" %d", "") 
     -- cleanup name 
     name = name:gsub(" %(%)", "")
-    name = name:gsub(" %)", ")")
+    name = name:gsub("%)", "")
     name = name:gsub(" %-", " ")
     name = name:gsub("%- ", "")
+    name = name:gsub("%-", " ", 1)
     name = name:gsub("%_", " ")
+    name = name:gsub(" %(", " - ")
+    name = StringCapitalize(name)
 
-    if type(mod.version) == 'number' then
+    if not mod.version then 
+        name = name .. ' ---- (v1.0)'
+    elseif type(mod.version) == 'number' then
         local ver = string.format("v%01.2f", mod.version)
         ver = ver:gsub("%.*0$", "")
         -- append actual mod version to mod name
-        name = name .. ' --- (' .. ver .. ')'
-    end
-
+        name = name .. ' ---- (' .. ver .. ')'
+    elseif type(mod.version) == 'string' then 
+        local ver = mod.version
+        -- correct mod version (e.g. 1.1.1 --> 1.11) 
+        if string.find(ver, "%d%.%d%.%d") then
+            ver = StringReverse(ver)
+            ver = ver:gsub("%.", "", 1)
+            ver = StringReverse(ver)
+        elseif not string.find(ver, "%.") then
+            ver = ver .. '.0' 
+        end 
+        name = name .. ' ---- (v' .. ver .. ')'
+    end 
     return name
 end
---- Initialize the mod list UI.
+
+local posCounter = 1
+-- Append the given list of mods to the UI, applying the given label and activeness state to each.
+function AppendMods(modlist, active, enabled, labelParam, labelSet)
+    for k, mod in modlist do
+        
+        local label = labelParam or LOC(labelSet[k])
+        local entry = CreateListElement(scrollGroup, mod, posCounter)
+        --LOG('MOD  AppendMod '  .. tostring(label) .. '  ' .. mod.name)
+        if not enabled then
+            entry.bg:Disable()
+        end
+
+        entry.bg:SetCheck(active, true)
+
+        if label then
+            entry.type:SetText(label)
+        end
+        posCounter = posCounter + 1
+    end
+end
+-- Update mods in specified table with info about units that mods adds to the game
+function UpdateMods(modsList)
+    local units = GetModsUnits(modsList)
+    for uid, mod in modsList do
+        --mod.units = GetModsUnits(mod)
+        for id, bp in units do 
+            if bp.Mod.uid == uid then
+                mod.units[id] = bp
+            end
+        end
+        if table.getsize(mod.units) > 0 then
+            mod.tags['UNITS'] = true
+        end
+    end
+end
+
+-- Refreshes the mod list UI.
 function RefreshModsList()
     if controlList then
         for k, v in controlList do
@@ -392,28 +449,25 @@ function RefreshModsList()
     controlList = {}
     controlMap = {}
 
-    allMods = Mods.AllSelectableMods()
-    activeMods = Mods.GetSelectedMods()
+    mods.selectable = Mods.AllSelectableMods()
+    mods.activated = Mods.GetSelectedMods()
     
-    local activeSimMods = {}
-    local activeUIMods = {}
-    local inactiveSimMods = {}
-    local inactiveUIMods = {}
-
-    -- Mods that are disabled by the mod_info flag
-    local disabledMods = {}
-
-    -- Mods that are disabled because not everyone has them
-    local notInstalledMods = {}
-
-    -- Mods that are disabled because dependencies are not installed
-    local missingDepsMods = {}
-
-    -- Mods that are disabled by the FAF blacklist
-    local blacklistedMods = {}
+    -- reset state of mods
+    mods.sim.active = {}
+    mods.sim.inactive = {}
+    mods.ui.active = {}
+    mods.ui.inactive = {}
+    -- mods that are disabled by the mod_info flag
+    mods.disabled = {}
+    -- mods that are disabled because not everyone has them
+    mods.missingByOthers = {}
+    -- mods that are disabled because dependencies are not installed
+    mods.missingDependencies = {}
+    -- mods that are disabled by the FAF blacklist
+    mods.blacklisted = {}
 
     -- Construct various filtered lists of mods. We then concatenate these to form the list.
-    for uid, mod in allMods do
+    for uid, mod in mods.selectable do
         mod.tags = {}
         mod.units = {}
 
@@ -425,28 +479,28 @@ function RefreshModsList()
         --end
         mod.title = GetModNameVersion(mod)
 
-        if ModBlacklist[uid] then
+        if ModsBlacklist[uid] then
             -- value is a message explaining why it's blacklisted
             mod.tags['DISABLED'] = true
-            blacklistedMods[uid] = mod
+            mods.blacklisted[uid] = mod
         elseif mod.enabled == false then
             mod.tags['DISABLED'] = true
-            disabledMods[uid] = mod
+            mods.disabled[uid] = mod
         else
             -- check for the dependencies of mods are installed
             local dependencies = Mods.GetDependencies(uid)
             modDependencyMap[uid] = dependencies
             if dependencies.missing then
                 mod.tags['DISABLED'] = true
-                missingDepsMods[uid] = mod
+                mods.missingDependencies[uid] = mod
             elseif dependencies.requires then
                 -- Construct backward-dependency map for this mod (so we can disable this one if
                 -- someone turns off something we depend on)
                 for k, v in dependencies.requires do
                     -- Dependency on a blacklisted mod?
-                    if ModBlacklist[k] then
+                    if ModsBlacklist[k] then
                         mod.tags['DISABLED'] = true
-                        missingDepsMods[uid] = mod
+                        mods.missingDependencies[uid] = mod
                     end
 
                     if not modBackwardDependencyMap[k] then
@@ -461,24 +515,24 @@ function RefreshModsList()
                 -- Is this a UI mod that depends on a sim mod that is turned off?
                 if not IsHost and dependencies.requires then
                     for innerUid, innerMod in dependencies.requires do
-                        if not innerMod.ui_only and not activeSimMods[innerUid] then
+                        if not innerMod.ui_only and not mods.sim.active[innerUid] then
                             mod.tags['DISABLED'] = true
-                            missingDepsMods[uid] = mod
+                            mods.missingDependencies[uid] = mod
                             break
                         end
                     end
                 end
 
-                if missingDepsMods[uid] then
+                if mods.missingDependencies[uid] then
                     mod.type = 'X'
                 else
                     mod.type = 'UI'
                     mod.tags['UI'] = true
-
-                    if activeMods[uid] then
-                        activeUIMods[uid] = mod
+                    
+                    if mods.activated[uid] then
+                        mods.ui.active[uid] = mod
                     else
-                        inactiveUIMods[uid] = mod
+                        mods.ui.inactive[uid] = mod
                     end
                 end
             else
@@ -488,22 +542,22 @@ function RefreshModsList()
                 if not EveryoneHasMod(uid) then
                     mod.type = 'X'
                     mod.tags['DISABLED'] = true
-                    notInstalledMods[uid] = mod
-                elseif activeMods[uid] then
+                    mods.missingByOthers[uid] = mod
+                elseif mods.activated[uid] then
                     mod.type = 'GAME'
                     --mod.units = GetModsUnits(mod)
                     --if table.getsize(mod.units) > 0 then
                     --    mod.tags['UNITS'] = true
                     --end
-                    activeSimMods[uid] = mod
+                    mods.sim.active[uid] = mod
                 -- exclude sim mods that are missing dependency   
-                elseif not missingDepsMods[uid] then
+                elseif not mods.missingDependencies[uid] then
                     mod.type = 'GAME'
                     --mod.units = GetModsUnits(mod)
                     --if table.getsize(mod.units) > 0 then
                     --    mod.tags['UNITS'] = true
                     --end
-                    inactiveSimMods[uid] = mod
+                    mods.sim.inactive[uid] = mod
                 end
             end
         end
@@ -518,7 +572,6 @@ function RefreshModsList()
                     if not modDependencyMap[conflicter].conflicts then
                         modDependencyMap[conflicter].conflicts = {}
                     end
-
                     if not modDependencyMap[conflicter].conflicts[uid] then
                         WARN("A mod defines a non-commutative conflict set!")
                         WARN("Adding conflict from "..conflicter.." to " .. uid)
@@ -528,66 +581,29 @@ function RefreshModsList()
             end
         end
     end
-
-    local posCounter = 1
-    --- Append the given list of mods to the UI, applying the given label and activeness state to
-    -- each.
-    local function AppendMods(modlist, active, enabled, labelParam, labelSet)
-        for k, mod in modlist do
-            
-            local label = labelParam or LOC(labelSet[k])
-            local entry = CreateListElement(scrollGroup, mod, posCounter)
-            --LOG('MOD  AppendMod '  .. tostring(label) .. '  ' .. mod.name)
-            if not enabled then
-                entry.bg:Disable()
-            end
-
-            entry.bg:SetCheck(active, true)
-
-            if label then
-                entry.type:SetText(label)
-            end
-            posCounter = posCounter + 1
-        end
-    end
-
-    local function UpdateMods(modsList)
-        local units = GetModsUnits(modsList)
-        for uid, mod in modsList do
-            --mod.units = GetModsUnits(mod)
-            for id, bp in units do 
-                if bp.Mod.uid == uid then
-                    mod.units[id] = bp
-                end
-            end
-            if table.getsize(mod.units) > 0 then
-                mod.tags['UNITS'] = true
-            end
-        end
-    end
-    --UpdateMods(activeSimMods)
+    --UpdateMods(mods.sim.active)
     
     -- Create entries for the list of interesting mods.
-    --LOG('MOD  AppendMods --------------activeSimMods')
-    AppendMods(activeSimMods, true, true)
-    AppendMods(activeUIMods, true, true)
+    --LOG('MOD  AppendMods --------------mods.sim.active')
+    AppendMods(mods.sim.active, true, true)
+    AppendMods(mods.ui.active, true, true)
     if IsHost then
-        --UpdateMods(inactiveSimMods)
-        AppendMods(inactiveSimMods, false, true)
+        --UpdateMods(mods.sim.inactive)
+        AppendMods(mods.sim.inactive, false, true)
     end
-    --LOG('MOD  AppendMods --------------inactiveUIMods')
-    AppendMods(inactiveUIMods, false, true)
-    --LOG('MOD  AppendMods --------------disabledMods')
-    AppendMods(disabledMods, false, false)
-    --LOG('MOD  AppendMods --------------notInstalledMods')
-    AppendMods(notInstalledMods, false, false, LOC('<LOC uimod_0019>Players missing mod'))
-    --LOG('MOD  AppendMods --------------missingDepsMods')
-    AppendMods(missingDepsMods, false, false, LOC('<LOC uimod_0020>Missing dependency'))
-    --LOG('MOD  AppendMods --------------blacklistedMods')
-    AppendMods(blacklistedMods, false, false, nil, ModBlacklist)
+    --LOG('MOD  AppendMods --------------mods.ui.inactive')
+    AppendMods(mods.ui.inactive, false, true)
+    --LOG('MOD  AppendMods --------------mods.disabled')
+    AppendMods(mods.disabled, false, false)
+    --LOG('MOD  AppendMods --------------mods.missingByOthers')
+    AppendMods(mods.missingByOthers, false, false, LOC('<LOC uimod_0019>Players missing mod'))
+    --LOG('MOD  AppendMods --------------mods.missingDependencies')
+    AppendMods(mods.missingDependencies, false, false, LOC('<LOC uimod_0020>Missing dependency'))
+    --LOG('MOD  AppendMods --------------mods.blacklisted')
+    AppendMods(mods.blacklisted, false, false, nil, ModsBlacklist)
 
-    numEnabledUIMods = table.getsize(activeUIMods)
-    numEnabledSimMods = table.getsize(activeSimMods)
+    numEnabledUIMods = table.getsize(mods.ui.active)
+    numEnabledSimMods = table.getsize(mods.sim.active)
 
     UpdateModsCounters()
 
@@ -597,12 +613,12 @@ function RefreshModsList()
     scrollGroup:CalcVisible()
 end
 
---- Activate the mod with the given uid
+-- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
 -- @param visited The set of mods visited during this recursive set of calls (used to break cycles)
 function ActivateMod(uid, isRecursing, visited)
-    if activeMods[uid] then
+    if mods.activated[uid] then
         return
     end
 
@@ -624,12 +640,11 @@ function ActivateMod(uid, isRecursing, visited)
             WARN("Activating "..uid)
             local activatedConflictingMods = {}
             for uid, _ in deps.conflicts do
-                if activeMods[uid] then
+                if mods.activated[uid] then
                     WARN(uid .. " EEK!")
                     table.insert(activatedConflictingMods, uid)
                 end
             end
-
             -- Closure copy
             local thisUID = uid
             local doEnable = function()
@@ -638,7 +653,6 @@ function ActivateMod(uid, isRecursing, visited)
                     ActivateMod(thisUID, true, visited)
                 end
             end
-
             -- Prompt the user, and if they approve, turn off all conflicting mods.
             if table.getn(activatedConflictingMods) > 0 then
                 if isRecursing then
@@ -655,7 +669,6 @@ function ActivateMod(uid, isRecursing, visited)
                 return
             end
         end
-
         -- Activate any dependencies. We guaranteed that these all exist earlier on.
         if deps.requires then
             for uid, _ in deps.requires do
@@ -663,21 +676,20 @@ function ActivateMod(uid, isRecursing, visited)
             end
         end
     end
-    activeMods[uid] = true
+    mods.activated[uid] = true
     controlMap[uid].bg:SetCheck(true, true)
 
-    if allMods[uid].ui_only then
+    if mods.selectable[uid].ui_only then
         numEnabledUIMods = numEnabledUIMods + 1
     else
         numEnabledSimMods = numEnabledSimMods + 1
     end
 
     UpdateModsCounters()
-
 end
 
 function DeactivateMod(uid, visited)
-    if not activeMods[uid] then
+    if not mods.activated[uid] then
         return
     end
 
@@ -689,7 +701,6 @@ function DeactivateMod(uid, visited)
 
     -- Check for backward dependencies: do other mods require this one? If so, we should disable
     -- those mods, as well.
-
     local victims = modBackwardDependencyMap[uid]
     if victims then
         for k, v in victims do
@@ -697,10 +708,10 @@ function DeactivateMod(uid, visited)
         end
     end
 
-    activeMods[uid] = nil
+    mods.activated[uid] = nil
     controlMap[uid].bg:SetCheck(false, true)
 
-    if allMods[uid].ui_only then
+    if mods.selectable[uid].ui_only then
         numEnabledUIMods = numEnabledUIMods - 1
     else
         numEnabledSimMods = numEnabledSimMods - 1
@@ -712,11 +723,11 @@ function SortMods()
     table.sort(controlList, function(a,b)
         -- sort mods by active state, then by type and finally by name
         local uid = a.modInfo.uid
-        if activeMods[a.modInfo.uid] and 
-           not activeMods[b.modInfo.uid] then 
+        if mods.activated[a.modInfo.uid] and 
+           not mods.activated[b.modInfo.uid] then 
            return true  
-        elseif not activeMods[a.modInfo.uid] and 
-           activeMods[b.modInfo.uid] then 
+        elseif not mods.activated[a.modInfo.uid] and 
+           mods.activated[b.modInfo.uid] then 
            return false 
         else
             if a.modInfo.type == b.modInfo.type then 
@@ -735,9 +746,9 @@ end
 function CreateListElement(parent, modInfo, Pos)
     local group = Group(parent)
     -- changed fixed-size checkboxes to scalable checkboxes
-
     group.filtered = false
-
+    group.pos = Pos
+    group.modInfo = modInfo
     group.bg = Checkbox(group,
         UIUtil.SkinnableFile('/MODS/blank.dds'),
         UIUtil.SkinnableFile('/MODS/single.dds'),
@@ -752,10 +763,6 @@ function CreateListElement(parent, modInfo, Pos)
     group.Height:Set(modIconSize + 20)
     group.Width:Set(dialogWidth - 20)  
     LayoutHelpers.AtLeftTopIn(group, parent, 2, group.Height()*(Pos-1))
-   
-    group.pos = Pos
-    group.modInfo = modInfo
-
     LayoutHelpers.FillParent(group.bg, group)
 
     group.icon = Bitmap(group, modInfo.icon)
@@ -796,7 +803,7 @@ function CreateListElement(parent, modInfo, Pos)
         local uid = modInfo.uid
         group.bg.OnCheck = function(self, checked)
             if checked then
-                table.print(allMods[uid], 'active mod')
+                table.print(mods.selectable[uid], 'active mod')
                 ActivateMod(uid)
             else
                 DeactivateMod(uid)
