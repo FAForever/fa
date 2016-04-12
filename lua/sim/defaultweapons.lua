@@ -1243,7 +1243,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
-local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 DeathNukeWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
@@ -1251,6 +1250,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
     Fire = function(self)
         local bp = self:GetBlueprint()
         local proj = self.unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        proj:PassDamageData(self:GetDamageTable())
         proj:ForkThread(proj.EffectThread)
 
         -- Play the explosion sound
@@ -1259,20 +1259,8 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
             self:PlaySound(projBp.Audio.NukeExplosion)
         end
 
-        proj.InnerRing = NukeDamage()
-        proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
-        proj.OuterRing = NukeDamage()
-        proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
-
-        local launcher = self.unit
-        local pos = proj:GetPosition()
-        local army = launcher:GetArmy()
-        local brain = launcher:GetAIBrain()
-        proj.InnerRing:DoNukeDamage(launcher, pos, brain, army)
-        proj.OuterRing:DoNukeDamage(launcher, pos, brain, army)
-
-        -- Stop it calling DoDamage any time in the future.
-        proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
+        proj:DoDamage(self.unit or proj, proj.DamageData)
+        proj:Destroy()
     end,
 }
 

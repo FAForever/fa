@@ -9,8 +9,6 @@
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
-local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
-local Set = import('/lua/system/setutils.lua')
 
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
@@ -311,8 +309,16 @@ Weapon = Class(moho.weapon_methods) {
                 if not self.DisabledBuffs[v.BuffType] then
                     damageTable.Buffs[k] = v
                 end
-                
-            end   
+
+            end
+        end
+
+        if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
+            bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
+            damageTable.Nuke = {
+                {damage=bp.NukeInnerRingDamage, radius=bp.NukeInnerRingRadius, ticks=bp.NukeInnerRingTicks, duration=bp.NukeInnerRingTotalTime},
+                {damage=bp.NukeOuterRingDamage, radius=bp.NukeOuterRingRadius, ticks=bp.NukeOuterRingTicks, duration=bp.NukeOuterRingTotalTime}
+            }
         end
 
         return damageTable
@@ -324,20 +330,6 @@ Weapon = Class(moho.weapon_methods) {
 
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
-            local bp = self:GetBlueprint()
-
-            if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
-                bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
-                proj.InnerRing = NukeDamage()
-                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
-                proj.OuterRing = NukeDamage()
-                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
-                
-                -- Need to store these three for later, in case the missile lands after the launcher dies
-                proj.Launcher = self.unit
-                proj.Army = self.unit:GetArmy()
-                proj.Brain = self.unit:GetAIBrain()
-            end
         end
         return proj
     end,

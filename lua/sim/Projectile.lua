@@ -12,11 +12,9 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
-local Damage = import('/lua/sim/Damage.lua')
+local DamageFunc = import('/lua/sim/Damage.lua')
 
 Projectile = Class(moho.projectile_methods, Entity) {
-
-
     -- Brute51 - Added support for initialdamage AND changed lower case d in damageData to uppercase for consistency sake (I spent many hours on these kinds of issues...)
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
@@ -30,8 +28,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
-
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
+
+        if DamageData.Nuke then
+            self.DamageData.Nuke = DamageData.Nuke
+        end
     end,
 
     DoDamage = function(self, instigator, DamageData, targetEntity)
@@ -80,10 +81,13 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 end
             end
         end
-        if self.InnerRing and self.OuterRing then
-            local pos = self:GetPosition()
-            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
-            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
+        if self.DamageData.Nuke then
+            for _, params in self.DamageData.Nuke do
+                params.pos = self:GetPosition()
+                params.instigator = instigator
+                params.type = DamageData.DamageType
+                DamageFunc.Area(params)
+            end
         end
     end,
 
