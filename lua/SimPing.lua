@@ -77,11 +77,11 @@ function SpawnSpecialPing(data)
     ping:SetVizToNeutrals('Never')
     ping:SetMesh('/meshes/game/ping_'..data.Mesh)
     local animThread = ForkThread(AnimatePingMesh, ping)
-    ForkThread(function() 
+    ForkThread(function()
         WaitSeconds(data.Lifetime)
         KillThread(animThread)
         ping:Destroy()
-    end)        
+    end)
 
     SendData(data)
 
@@ -93,7 +93,7 @@ function SpawnSpecialPing(data)
 				ArmyBrains[num]:DoAIPing( data )
 			end
         end
-    end    
+    end
 end
 
 function GetPingID(owner)
@@ -142,7 +142,7 @@ end
 
 function UpdateMarker(data)
     if PingMarkers[data.Owner][data.ID] or data.Action == 'renew' then
-        if data.Action == 'delete' then 
+        if data.Action == 'delete' then
             PingMarkers[data.Owner][data.ID] = nil
         elseif data.Action == 'move' then
             PingMarkers[data.Owner][data.ID].Location = data.Location
