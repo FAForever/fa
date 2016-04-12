@@ -1,6 +1,5 @@
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
-local PingLocked = false
 local PingMarkers = {}
 MaxPingMarkers = 15
 --On first ping, send data to the user layer telling it the maximum allowable markers per army
@@ -18,49 +17,44 @@ function AnimatePingMesh(entity)
 end
 
 function SpawnPing(data)
-    if not PingLocked then
-        if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
-            return
-        elseif data.Marker and not PingMarkers[data.Owner] then
-            PingMarkers[data.Owner] = {}
+    if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
+        return
+    elseif data.Marker and not PingMarkers[data.Owner] then
+        PingMarkers[data.Owner] = {}
+    end
+
+    if data.Marker and GetPingID(data.Owner) then
+        data.ID = GetPingID(data.Owner)
+        PingMarkers[data.Owner][data.ID] = data
+    else
+        local Entity = import('/lua/sim/Entity.lua').Entity
+        data.Location[2] = data.Location[2]+2
+        local pingSpec = {Owner = data.Owner, Location = data.Location}
+        local ping = Entity(pingSpec)
+        Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
+        ping:SetVizToFocusPlayer('Always')
+        ping:SetVizToEnemies('Never')
+        ping:SetVizToAllies('Always')
+        ping:SetVizToNeutrals('Never')
+        ping:SetMesh('/meshes/game/ping_'..data.Mesh)
+        local animThread = ForkThread(AnimatePingMesh, ping)
+        ForkThread(function()
+            WaitSeconds(data.Lifetime)
+            KillThread(animThread)
+            ping:Destroy()
+        end)
+    end
+
+    SendData(data)
+
+    -- Callbacks to allied brains
+    for num,brain in ArmyBrains do
+        if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
+            ArmyBrains[num]:DoPingCallbacks( data )
+			if not SUtils.IsAIArmy(data.Owner + 1) then
+				ArmyBrains[num]:DoAIPing( data )
+			end
         end
-        PingLocked = true
-
-        if data.Marker and GetPingID(data.Owner) then
-            data.ID = GetPingID(data.Owner)
-            PingMarkers[data.Owner][data.ID] = data
-        else
-            local Entity = import('/lua/sim/Entity.lua').Entity
-            data.Location[2] = data.Location[2]+2
-            local pingSpec = {Owner = data.Owner, Location = data.Location}
-            local ping = Entity(pingSpec)
-            Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
-            ping:SetVizToFocusPlayer('Always')
-            ping:SetVizToEnemies('Never')
-            ping:SetVizToAllies('Always')
-            ping:SetVizToNeutrals('Never')
-            ping:SetMesh('/meshes/game/ping_'..data.Mesh)
-            local animThread = ForkThread(AnimatePingMesh, ping)
-            ForkThread(function() 
-                WaitSeconds(data.Lifetime)
-                KillThread(animThread)
-                ping:Destroy()
-            end)
-        end
-
-        SendData(data)
-
-        -- Callbacks to allied brains
-        for num,brain in ArmyBrains do
-            if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
-                ArmyBrains[num]:DoPingCallbacks( data )
-				if not SUtils.IsAIArmy(data.Owner + 1) then
-					ArmyBrains[num]:DoAIPing( data )
-				end
-            end
-        end
-
-        ForkThread(function() WaitSeconds(1) PingLocked = false end)
     end
 end
 
