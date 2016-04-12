@@ -184,7 +184,12 @@ function BuildPlayerLines()
                 entry.giveUnitBtn.OnClick = function(self, modifiers)
                     UIUtil.QuickDialog(GetFrame(0), LOCF("<LOC unitxfer_0000>Give Selected Units to %s?", entry.Data.nickname),
                         '<LOC _Yes>', function()
-                            SimCallback({Func="GiveUnitsToPlayer", Args={ From=GetFocusArmy(), To=entry.Data.armyIndex},} , true)
+                            local to = entry.Data.armyIndex
+                            if IsKeyDown('Shift') then
+                                IssueCommand("UNITCOMMAND_Script", {TaskName='GiveTask', To=to}, false)
+                            else
+                                SimCallback({Func="GiveUnitsToPlayer", Args={ From=GetFocusArmy(), To=to},} , true)
+                            end
                         end,
                         '<LOC _No>', nil, nil, nil, nil, {worldCover = false, enterButton = 1, escapeButton = 2})
                 end

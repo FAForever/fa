@@ -41,6 +41,7 @@ Patch 3652 (pending)
 - In Units Manager, improved description of preset restrictions
 - In Mods Manager, added filters for UI/Game/Disabled mods 
 - In Mods Manager, improved sorting mods by their activation status and names  
+- Hold down shift when gifting units to delay the actual transfer until the units finish their current orders. A ping will automatically be spawned
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
