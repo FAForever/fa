@@ -12,6 +12,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
+local Damage = import('/lua/sim/Damage.lua')
 
 Projectile = Class(moho.projectile_methods, Entity) {
 
@@ -35,6 +36,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
     DoDamage = function(self, instigator, DamageData, targetEntity)
         local damage = DamageData.DamageAmount
+        instigator = instigator or self
+
         if damage and damage > 0 then
             local radius = DamageData.DamageRadius
             if radius and radius > 0 then
@@ -300,7 +303,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
 		end
         return true
     end,
-
     -- create some cool explosions when we get destroyed
     --
     OnImpact = function(self, targetType, targetEntity)
@@ -308,11 +310,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = self:GetLauncher()
-        if instigator == nil then
-            instigator = self
-        end
-
+        local instigator = self:GetLauncher() or self
         local damageData = self.DamageData
 
         -- Do Damage
