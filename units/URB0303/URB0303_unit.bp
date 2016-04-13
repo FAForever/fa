@@ -57,7 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
@@ -143,7 +143,7 @@ UnitBlueprint {
         BuildCostMass = 7120,
         BuildRate = 120,
         BuildTime = 9200,
-	DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'urb0303',
         },
@@ -154,7 +154,8 @@ UnitBlueprint {
         },
         InitialRallyX = 0,
         InitialRallyZ = 10,
-        StorageEnergy = 0,        StorageMass = 320,
+        StorageEnergy = 0,
+        StorageMass = 320,
     },
     Footprint = {
         MinWaterDepth = 1.5,
@@ -242,7 +243,7 @@ UnitBlueprint {
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3,
     SizeZ = 10,
     StrategicIconName = 'icon_factoryhq3_naval',
     StrategicIconSortPriority = 210,

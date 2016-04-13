@@ -57,7 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
@@ -146,7 +146,7 @@ UnitBlueprint {
         BuildCostMass = 1670,
         BuildRate = 60,
         BuildTime = 2400,
-	DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'urb0203',
         },
@@ -245,7 +245,7 @@ UnitBlueprint {
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3,
     SizeZ = 10,
     StrategicIconName = 'icon_factoryhq2_naval',
     StrategicIconSortPriority = 215,
