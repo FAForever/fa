@@ -666,6 +666,7 @@ FactoryUnit = Class(StructureUnit) {
     OnPaused = function(self)
         --When factory is paused take some action
         self:StopUnitAmbientSound( 'ConstructLoop' )
+        self:StopArmsMoving()
         StructureUnit.OnPaused(self)
     end,
 
@@ -673,6 +674,10 @@ FactoryUnit = Class(StructureUnit) {
         if self.BuildingUnit then
             self:PlayUnitAmbientSound( 'ConstructLoop' )
         end
+        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
+            self:StartArmsMoving()
+        end
+
         StructureUnit.OnUnpaused(self)
     end,
 
@@ -751,11 +756,13 @@ FactoryUnit = Class(StructureUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order )
         self:ChangeBlinkingLights('Yellow')
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
+
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
+            self:StartArmsMoving()
             ChangeState(self, self.BuildingState)
-            self.BuildingUnit = false
         end
+
         self.FactoryBuildFailed = false
     end,
 
@@ -767,6 +774,8 @@ FactoryUnit = Class(StructureUnit) {
         else
             self:DoStopBuild(unitBeingBuilt, order)
         end
+
+        self:StopArmsMoving()
     end,
 
     --- Adds a pause between unit productions
@@ -835,6 +844,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnFailedToBuild(self)
         self:DestroyBuildRotator()
         self:StopBuildFx()
+        self:StopArmsMoving()
         ChangeState(self, self.IdleState)
     end,
 
@@ -945,12 +955,69 @@ FactoryUnit = Class(StructureUnit) {
         end,
     },
 
-
     RollingOffState = State {
         Main = function(self)
             self:RolloffBody()
         end,
     },
+
+    StopArmsMoving = function(self)
+        if not self.ArmSliders or self.Dead or not self.ArmsMoving then return end
+
+        self.ArmsMoving = false
+    end,
+
+    StartArmsMoving = function(self)
+        local arms = self:GetBlueprint().Display.ArmSliders
+        if not arms or self.Dead or self.ArmsMoving then return end
+
+        if not self.ArmSliders then self.ArmSliders = {} end
+        for arm, data in arms do
+            local slider = self.ArmSliders[arm]
+            if not slider then
+                local goals = {}
+
+                if type(data) ~= 'table' then data = {data} end
+                for i, goal in data do
+                    if type(i) == 'number' then
+                        table.insert(goals, goal)
+                    end
+                end
+                if not goals[2] then goals[2] = {0, 0, 0} end
+                local dist = VDist3(goals[1], goals[2])
+                local speed = data.Speed or dist * 2
+                local acc = data.Acceleration or speed / 10
+                slider = CreateSlider(self, arm)
+                slider:SetAcceleration(acc)
+                slider:SetDeceleration(acc)
+                slider:SetSpeed(speed)
+                self.Trash:Add(slider)
+                self.ArmSliders[arm] = slider
+                slider.goals = goals
+                slider.thread = self:ForkThread(self.MoveArmThread, slider)
+            else
+                ResumeThread(slider.thread)
+            end
+        end
+
+        self.ArmsMoving = true
+    end,
+
+    MoveArmThread = function(self, slider)
+        local goals = slider.goals
+
+        while not IsDestroyed(slider) do
+            local i, goal
+            for i=1, 2 do
+                goal = goals[i]
+                slider:SetGoal(goal[1], goal[2], goal[3])
+                WaitFor(slider)
+                if not self.ArmsMoving then
+                    SuspendCurrentThread()
+                end
+            end
+        end
+    end,
 }
 
 

@@ -245,51 +245,6 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildingEffects = function( self, unitBeingBuilt, order )
         self.BuildEffectsBag:Add( self:ForkThread( EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag ) )
     end,
-
-    OnPaused = function(self)
-        SeaFactoryUnit.OnPaused(self)
-        self:StopArmsMoving()
-    end,
-
-    OnUnpaused = function(self)
-        SeaFactoryUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
-            self:StartArmsMoving()
-        end
-    end,
-
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
-        if order ~= 'Upgrade' then
-            self:StartArmsMoving()
-        end
-    end,
-
-    OnStopBuild = function(self, unitBuilding)
-        SeaFactoryUnit.OnStopBuild(self, unitBuilding)
-        self:StopArmsMoving()
-    end,
-
-    OnFailedToBuild = function(self)
-        SeaFactoryUnit.OnFailedToBuild(self)
-        if not self.Dead then
-            self:StopArmsMoving()
-        end
-    end,
-
-    StartArmsMoving = function(self)
-        self.ArmsThread = self:ForkThread(self.MovingArmsThread)
-    end,
-
-    MovingArmsThread = function(self)
-    end,
-
-    StopArmsMoving = function(self)
-        if self.ArmsThread then
-            KillThread(self.ArmsThread)
-            self.ArmsThread = nil
-        end
-    end,
 }
 
 ---------------------------------------------------------------
