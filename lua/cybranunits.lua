@@ -355,7 +355,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
-        
+
         self.Spawn = CreateUnitHPR(
             buildUnit,
             aiBrain.Name,
@@ -367,20 +367,20 @@ CConstructionEggUnit = Class(CStructureUnit) {
                 self.Trash:Add(self.OpenAnimManip)
                 self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
                 self:PlaySound(bp.Audio['EggOpen'])
-                
+
                 WaitFor(self.OpenAnimManip)
 
                 self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
                 self.Trash:Add(self.EggSlider)
                 self:PlaySound(bp.Audio['EggSink'])
-                
+
                 WaitFor(self.EggSlider)
 
                 self:Destroy()
             end
         )
     end,
-    
+
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Spawn then overkillRatio = 1.1 end
         CStructureUnit.OnKilled(self, instigator, type, overkillRatio)

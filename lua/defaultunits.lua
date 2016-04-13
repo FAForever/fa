@@ -1803,7 +1803,7 @@ BaseTransport = Class() {
                 unit.attachmentBone = i
             end
         end
-        
+
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
