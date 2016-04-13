@@ -75,6 +75,21 @@ UnitBlueprint {
     },
     Description = '<LOC ueb0303_desc>Naval Factory HQ',
     Display = {
+        ArmSliders = {
+            Left_Arm = {
+                {20, 0, 0},
+                {10, 0, 0},
+            },
+            Center_Arm = {
+                {-5, 0, 0},
+                {15, 0, 0},
+            },
+            Right_Arm = {
+                {-3, 0, 0},
+                {5, 0, 0},
+            },
+
+        },
         BlinkingLights = {
             {
                 BLBone = 'Dock_Cover',

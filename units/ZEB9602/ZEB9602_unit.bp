@@ -75,6 +75,16 @@ UnitBlueprint {
     Description = '<LOC zeb9602_desc>Air Factory',
     Display = {
         AnimationFinishBuildLand = '/units/zeb9602/zeb9602_aplatform.sca',
+        ArmSliders = {
+            Arm01={
+                {0, -7, 0},
+                {0, 1, 0}
+            },
+            Arm03={
+                {0, 7, 0},
+                {0, -1, 0}
+            }
+        },
         BlinkingLights = {
             {
                 BLBone = 'Tower04',

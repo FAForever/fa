@@ -73,6 +73,16 @@ UnitBlueprint {
     Description = '<LOC ueb0302_desc>Air Factory HQ',
     Display = {
         AnimationFinishBuildLand = '/units/ueb0302/ueb0302_aplatform.sca',
+        ArmSliders = {
+            Arm01={
+                {0, -7, 0},
+                {0, 1, 0}
+            },
+            Arm03={
+                {0, 7, 0},
+                {0, -1, 0}
+            }
+        },
         BlinkingLights = {
             {
                 BLBone = 'Tower04',

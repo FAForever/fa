@@ -82,6 +82,10 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/zrb9503/zrb9503_aupgrade.sca',
+        ArmSliders = {
+            Right_Arm02={{35, 0, 0}, {5, 0, 0}},
+            Right_Arm03={{-20, 0, 0}, {10, 0, 0}},
+        },
         BlinkingLights = {
             {
                 BLBone = 'B03',

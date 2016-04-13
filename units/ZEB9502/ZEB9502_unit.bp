@@ -81,6 +81,10 @@ UnitBlueprint {
         },
         AnimationFinishBuildLand = '/units/ueb0202/ueb0202_aplatform.sca',
         AnimationUpgrade = '/units/ueb0202/ueb0202_aupgrade.sca',
+        ArmSliders = {
+            Arm01={{0, -7, 0}, {0, 1, 0}},
+            Arm02={{0, 7, 0}, {0, -1, 0}},
+        },
         BlinkingLights = {
             {
                 BLBone = 'Tower04',

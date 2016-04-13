@@ -78,6 +78,9 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/ueb0103/ueb0103_aupgrade.sca',
+        ArmSliders = {
+            Right_Arm={0, 0, 50}
+        },
         BlinkingLights = {
             {
                 BLBone = 'Dock_Cover',

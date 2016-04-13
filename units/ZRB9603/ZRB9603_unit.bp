@@ -76,6 +76,11 @@ UnitBlueprint {
     },
     Description = '<LOC zrb9603_desc>Naval Factory',
     Display = {
+        ArmSliders = {
+            Right_Arm01={{48, 0, 0}, {24, 0, 0}},
+            Right_Arm02={{5, 0, 0}, {30, 0, 0}},
+            Right_Arm03={{-15, 0, 0}, {10, 0, 0}},
+        },
         BlinkingLights = {
             {
                 BLBone = 'B03',
