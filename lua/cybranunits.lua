@@ -248,7 +248,9 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnPaused = function(self)
         SeaFactoryUnit.OnPaused(self)
-        self:StopArmsMoving()
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopArmsMoving()
+        end
     end,
 
     OnUnpaused = function(self)
@@ -267,12 +269,14 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
-        self:StopArmsMoving()
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopArmsMoving()
+        end
     end,
 
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
-        if not self.Dead then
+        if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopArmsMoving()
         end
     end,
