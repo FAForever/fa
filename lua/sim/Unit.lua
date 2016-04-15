@@ -1819,6 +1819,17 @@ Unit = Class(moho.unit_methods) {
         self:SetRotation(angle + current_yaw)
     end,
 
+    RotateTowards = function(self, tpos)
+        local pos = self:GetPosition()
+        local rad = math.atan2(tpos[1]-pos[1], tpos[3]-pos[3])
+        self:SetRotation(rad * (180 / math.pi))
+    end,
+
+    RotateTowardsMid = function(self)
+        local x, y = GetMapSize()
+        self:RotateTowards({x/2, 0, y/2})
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
         self:StartBeingBuiltEffects(builder, layer)
         local aiBrain = self:GetAIBrain()
