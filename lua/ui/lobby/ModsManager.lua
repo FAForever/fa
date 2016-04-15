@@ -141,12 +141,12 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
     SaveButton:UseAlphaHitTest(true)
-    LayoutHelpers.AtLeftIn(SaveButton, dialogContent, -2)
+    LayoutHelpers.AtRightIn(SaveButton, dialogContent, 10)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
 
     controlList = {}
     
-    modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- 1
+    modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight)
      
     -- TODO separate mods into two 2 mods lists: UI and Game
     -- so that it is faster to find and activate mods
@@ -241,24 +241,24 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     Tooltip.AddControlTooltip(filterGameMods, { 
         text = 'Filter Game Mods', 
         body = 'Toggle visibility of all game mods in above list of mods.' } )
-    LayoutHelpers.AtRightIn(filterGameMods, dialogContent,position)
-    LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(filterGameMods, dialogContent, position)
+    LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 15)
     
     position = position + 110
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
         text = 'Filter UI Mods', 
         body = 'Toggle visibility of all UI mods in above list of mods.' } )
-    LayoutHelpers.AtRightIn(filterUIMods, dialogContent, position)
-    LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(filterUIMods, dialogContent, position)
+    LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 15)
     
     position = position + 110
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
         text = 'Filter Disabled Mods', 
         body = 'Toggle visibility of all disabled mods in above list of mods.' } )
-    LayoutHelpers.AtRightIn(filterDisabledMods, dialogContent, position)
-    LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
+    LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 15)
      
     GUIOpen = true
 
@@ -401,7 +401,11 @@ function GetModNameVersion(mod)
     end 
     return name
 end
-
+-- Gets a name and type for specified mod
+function GetModNameType(uid)
+    local mod = mods.selectable[uid]
+    return mod.type  .. ' mod - '.. mod.title 
+end
 local posCounter = 1
 -- Append the given list of mods to the UI, applying the given label and activeness state to each.
 function AppendMods(modlist, active, enabled, labelParam, labelSet)
@@ -413,7 +417,9 @@ function AppendMods(modlist, active, enabled, labelParam, labelSet)
         if not enabled then
             entry.bg:Disable()
         end
-
+        if active then
+            LOG('ModsManager activated: ' .. GetModNameType(mod.uid))
+        end
         entry.bg:SetCheck(active, true)
 
         if label then
@@ -478,12 +484,19 @@ function RefreshModsList()
         --    end
         --end
         mod.title = GetModNameVersion(mod)
+        if mod.ui_only then
+            mod.type = 'UI'
+        elseif mod.ui_only == false then
+            mod.type = 'GAME' 
+        end
 
         if ModsBlacklist[uid] then
             -- value is a message explaining why it's blacklisted
+            mod.sort = 'X'
             mod.tags['DISABLED'] = true
             mods.blacklisted[uid] = mod
         elseif mod.enabled == false then
+            mod.sort = 'X'
             mod.tags['DISABLED'] = true
             mods.disabled[uid] = mod
         else
@@ -524,9 +537,10 @@ function RefreshModsList()
                 end
 
                 if mods.missingDependencies[uid] then
-                    mod.type = 'X'
+                    mod.sort = 'X'
+                    mod.tags['DISABLED'] = true
                 else
-                    mod.type = 'UI'
+                    mod.sort = 'UI'
                     mod.tags['UI'] = true
                     
                     if mods.activated[uid] then
@@ -536,29 +550,24 @@ function RefreshModsList()
                     end
                 end
             else
-                mod.tags['GAME'] = true
-                -- We only care about everyone having it if it's a sim mod, and in this case we
-                -- disable it.
-                if not EveryoneHasMod(uid) then
-                    mod.type = 'X'
+                -- check if everyone has sim mod otherwise disable it.
+                if not EveryoneHasMod(uid) then 
+                    mod.sort = 'X'
                     mod.tags['DISABLED'] = true
                     mods.missingByOthers[uid] = mod
-                elseif mods.activated[uid] then
-                    mod.type = 'GAME'
-                    --mod.units = GetModsUnits(mod)
-                    --if table.getsize(mod.units) > 0 then
-                    --    mod.tags['UNITS'] = true
-                    --end
-                    mods.sim.active[uid] = mod
-                -- exclude sim mods that are missing dependency   
-                elseif not mods.missingDependencies[uid] then
-                    mod.type = 'GAME'
-                    --mod.units = GetModsUnits(mod)
-                    --if table.getsize(mod.units) > 0 then
-                    --    mod.tags['UNITS'] = true
-                    --end
-                    mods.sim.inactive[uid] = mod
-                end
+                -- excluding sim mods that are missing dependency   
+                elseif mods.missingDependencies[uid] then 
+                    mod.sort = 'X'
+                    mod.tags['DISABLED'] = true
+                else 
+                    mod.sort = 'GAME'
+                    mod.tags['GAME'] = true
+                    if mods.activated[uid] then
+                        mods.sim.active[uid] = mod
+                    else
+                        mods.sim.inactive[uid] = mod
+                    end
+                end 
             end
         end
     end
@@ -583,23 +592,23 @@ function RefreshModsList()
     end
     --UpdateMods(mods.sim.active)
     
-    -- Create entries for the list of interesting mods.
-    --LOG('MOD  AppendMods --------------mods.sim.active')
+    -- Create entries for the list of interesting mods
     AppendMods(mods.sim.active, true, true)
     AppendMods(mods.ui.active, true, true)
     if IsHost then
         --UpdateMods(mods.sim.inactive)
         AppendMods(mods.sim.inactive, false, true)
-    end
-    --LOG('MOD  AppendMods --------------mods.ui.inactive')
+    end 
     AppendMods(mods.ui.inactive, false, true)
-    --LOG('MOD  AppendMods --------------mods.disabled')
     AppendMods(mods.disabled, false, false)
-    --LOG('MOD  AppendMods --------------mods.missingByOthers')
+    for uid, mod in mods.missingByOthers do
+        LOG('ModsManager others players are missing ' .. GetModNameType(uid))
+    end 
     AppendMods(mods.missingByOthers, false, false, LOC('<LOC uimod_0019>Players missing mod'))
-    --LOG('MOD  AppendMods --------------mods.missingDependencies')
+    for uid, mod in mods.missingDependencies do
+        LOG('ModsManager is missing dependency for ' .. GetModNameType(uid))
+    end 
     AppendMods(mods.missingDependencies, false, false, LOC('<LOC uimod_0020>Missing dependency'))
-    --LOG('MOD  AppendMods --------------mods.blacklisted')
     AppendMods(mods.blacklisted, false, false, nil, ModsBlacklist)
 
     numEnabledUIMods = table.getsize(mods.ui.active)
@@ -612,7 +621,6 @@ function RefreshModsList()
     scrollGroup.top = 1
     scrollGroup:CalcVisible()
 end
-
 -- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
@@ -636,12 +644,10 @@ function ActivateMod(uid, isRecursing, visited)
         -- those are handled here, too.
         if deps.conflicts then
             -- List of uids that need to be disabled for this mod to work.
-
-            WARN("Activating "..uid)
             local activatedConflictingMods = {}
             for uid, _ in deps.conflicts do
                 if mods.activated[uid] then
-                    WARN(uid .. " EEK!")
+                    LOG("ModsManager found conflicting: ".. GetModNameType(uid)) 
                     table.insert(activatedConflictingMods, uid)
                 end
             end
@@ -651,6 +657,7 @@ function ActivateMod(uid, isRecursing, visited)
                 for k, uid in activatedConflictingMods do
                     DeactivateMod(uid)
                     ActivateMod(thisUID, true, visited)
+                    LOG("ModsManager activated: ".. GetModNameType(thisUID)) 
                 end
             end
             -- Prompt the user, and if they approve, turn off all conflicting mods.
@@ -665,7 +672,6 @@ function ActivateMod(uid, isRecursing, visited)
                         "<LOC _Yes>", doEnable,
                         "<LOC _No>", function() target:SetCheck(false, true) end)
                 end
-
                 return
             end
         end
@@ -673,6 +679,7 @@ function ActivateMod(uid, isRecursing, visited)
         if deps.requires then
             for uid, _ in deps.requires do
                 ActivateMod(uid, true, visited)
+                LOG("ModsManager activated dependency: ".. GetModNameType(uid)) 
             end
         end
     end
@@ -721,23 +728,28 @@ end
 
 function SortMods()
     table.sort(controlList, function(a,b)
-        -- sort mods by active state, then by type and finally by name
-        local uid = a.modInfo.uid
-        if mods.activated[a.modInfo.uid] and 
+        -- sort mods by active state, then by type and finally by name 
+        if mods.activated[a.modInfo.uid] and
            not mods.activated[b.modInfo.uid] then 
            return true  
         elseif not mods.activated[a.modInfo.uid] and 
-           mods.activated[b.modInfo.uid] then 
+                   mods.activated[b.modInfo.uid] then 
+           return false 
+        elseif a.modInfo.sort == 'UI' and 
+               b.modInfo.sort == 'GAME' then 
+           return true 
+        elseif a.modInfo.sort == 'GAME' and 
+               b.modInfo.sort == 'UI' then 
            return false 
         else
-            if a.modInfo.type == b.modInfo.type then 
+            if a.modInfo.sort == b.modInfo.sort then 
                 if a.modInfo.name == b.modInfo.name then 
                     return tostring(a.modInfo.version) < tostring(b.modInfo.version)  
                 else
                     return string.upper(a.modInfo.title) < string.upper(b.modInfo.title)  
                 end
             else
-                return a.modInfo.type > b.modInfo.type  
+                return a.modInfo.sort < b.modInfo.sort  
             end
         end  
         return 0
@@ -764,6 +776,10 @@ function CreateListElement(parent, modInfo, Pos)
     group.Width:Set(dialogWidth - 20)  
     LayoutHelpers.AtLeftTopIn(group, parent, 2, group.Height()*(Pos-1))
     LayoutHelpers.FillParent(group.bg, group)
+
+    if not modInfo.icon or modInfo.icon == '' then
+        WARN('ModsManager cannot load an icon for mod: ' .. GetModNameType(modInfo.uid))
+    end
 
     group.icon = Bitmap(group, modInfo.icon)
     group.icon.Height:Set(modIconSize)
@@ -803,9 +819,10 @@ function CreateListElement(parent, modInfo, Pos)
         local uid = modInfo.uid
         group.bg.OnCheck = function(self, checked)
             if checked then
-                table.print(mods.selectable[uid], 'active mod')
+                LOG('ModsManager selected: ' .. GetModNameType(uid))
                 ActivateMod(uid)
             else
+                LOG('ModsManager deselected: ' .. GetModNameType(uid))
                 DeactivateMod(uid)
             end
         end
