@@ -340,6 +340,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
                 cdrUnit:HideBone(0, true)
                 ForkThread(CommanderWarpDelay, cdrUnit, 3)
             end
+            cdrUnit:RotateTowardsMid()
         end
     end
 

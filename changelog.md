@@ -69,6 +69,7 @@ Patch 3652 (pending)
 - Enemy civilians are now colored in a unique red color
 - Fix bomb drop code and enable it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
 - Allowed Aeon Aircraft Carrier to build Bombers and Gunships, same as the others.
+- ACUs start rotated at middle of map as default
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs
