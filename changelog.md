@@ -11,7 +11,7 @@ Patch 3652 (pending)
 - Tiny fix to flag layout
 
 **UI**
-- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Introduced Russian translations of many FAF additions to the game (Exotic_Retard and PerfectWay)
 - Translate some FAF additions to Italian
 - New keybindable action: 'soft_stop'
 - Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
@@ -127,6 +127,7 @@ Patch 3652 (pending)
 - madformuse
 - quark036
 - CodingSquirrel
+- PerfectWay
 
 
 Patch 3650 (August 19, 2015)
