@@ -367,7 +367,7 @@ local function stringPad(text, spaces)
 end
 
 local function init(value) 
-    return value > 1 and value or 0 
+    return value >= 1 and value or 0 
 end 
 
 --- Gets Economy stats for unit/enhancement blueprint and calculates production yield
