@@ -692,10 +692,14 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
+local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
 function SetSlotInfo(slotNum, playerInfo)
+    LOG('lobby.SetSlotInfo slotNum = ' .. tostring(slotNum))
+    table.print(playerInfo, 'lobby.SetSlotInfo playerInfo = ')
     -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
 	if GUI.connectdialog then
 		GUI.connectdialog:Close()
@@ -732,6 +736,11 @@ function SetSlotInfo(slotNum, playerInfo)
     --
     -- The predicate was getting unpleasantly long to read.
     local function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
+        LOG('lobby.teamSelectionEnabled autoTeams = ' .. tostring(autoTeams) ..
+            ', ready = ' .. tostring(ready) ..  
+            ', locallyOwned = ' .. tostring(locallyOwned) .. 
+            ', isHost = ' .. tostring(isHost) ) 
+        WVT.LoggingEnabled = true
         if isHost and not playerInfo.Human then
             return true
         end
