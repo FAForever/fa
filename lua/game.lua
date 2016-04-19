@@ -152,7 +152,7 @@ function AddRestriction(categories, army)
     end
     -- save new restricted categories with an unique key
     -- in order to limit duplicated restrictions
-    local key = repr(categories)
+    local key = ToString(categories)
     if army ~= nil then -- army restriction
         if restrictions.PerArmy[army] == nil then
            restrictions.PerArmy[army] = { }
@@ -177,7 +177,7 @@ function RemoveRestriction(categories, army)
         return
     end
     -- check for existing restriction
-    local key = repr(categories)
+    local key = ToString(categories)
     if army ~= nil then -- army restriction
         if restrictions.PerArmy[army] then
            restrictions.PerArmy[army][key] = false 
