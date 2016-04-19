@@ -103,17 +103,12 @@ local restrictions =  {
     PerArmy = {}, -- set in ScenarioName_Script.lua
 }
 -- stores info about blueprints
-local bps = { 
-    -- table with identifiers of restricted units  
-    restrictions = {
-        Global = {},  -- generated base on restrictions.Global table
-        PerArmy = {}, -- generated base on restrictions.PerArmy table
-        Ignored = false -- flag whether or not to ignore all restrictions
-    },
+local bps = {
     -- table with blueprints that can be upgraded, e.g. T2 shields
-    upgradeable = {}, 
+    upgradeable = {},
     -- table with identifiers of all blueprints, e.g. xab1401 - Aeon Paragon
-    ids = {},  
+    ids = {},
+    Ignored = false,
 }
 
 -- function for converting categories to string
@@ -141,84 +136,69 @@ end
 -- adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'
 -- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
 -- e.g. AddRestriction(categories.TECH2)    -> restricts all T2 units for all armies
-function AddRestriction(categories, army)
-    if army ~= nil then -- convert army name to army index
-       army = GetArmyIndex(army) 
-    end
-    if type(categories) ~= 'userdata' then
-        WARN('Game.AddRestriction() called with invalid categories "' .. ToString(categories) .. '" '
+function AddRestriction(cats, army)
+    if type(cats) ~= 'userdata' then
+        WARN('Game.AddRestriction() called with invalid categories "' .. ToString(cats) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
         return
     end
-    -- save new restricted categories with an unique key
-    -- in order to limit duplicated restrictions
-    local key = ToString(categories)
-    if army ~= nil then -- army restriction
-        if restrictions.PerArmy[army] == nil then
-           restrictions.PerArmy[army] = { }
-        end
-        restrictions.PerArmy[army][key] = categories
-    else -- global restriction
-        restrictions.Global[key] = categories 
+
+    if army then -- convert army name to army index
+       army = GetArmyIndex(army)
     end
-    
-    ResolveRestrictions()
+
+    ResolveRestrictions(true, cats, army)
 end
+
 -- removes restriction of units with specified Entity categories, e.g. 'categories.TECH1 * categories.UEF'
 -- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
 -- e.g. RemoveRestriction(categories.TECH2)    -> removes all T2 units restriction for all armies
-function RemoveRestriction(categories, army)
-    if army ~= nil then -- convert army name to army index
-       army = GetArmyIndex(army) 
-    end
-    if type(categories) ~= 'userdata' then
-        WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(categories) .. '" '
+function RemoveRestriction(cats, army)
+    if type(cats) ~= 'userdata' then
+        WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(cats) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
         return
     end
-    -- check for existing restriction
-    local key = ToString(categories)
-    if army ~= nil then -- army restriction
-        if restrictions.PerArmy[army] then
-           restrictions.PerArmy[army][key] = false 
-        end
-    else -- global restriction
-        restrictions.Global[key] = false 
+
+    if army then -- convert army name to army index
+       army = GetArmyIndex(army)
     end
-    
-    ResolveRestrictions()
+
+    ResolveRestrictions(false, cats, army)
 end
+
 -- toggles whether or not to ignore all restrictions
 -- note this function is useful when trying to transfer restricted units between armies
 function IgnoreRestrictions(isIgnored)
-    bps.restrictions.Ignored = isIgnored
+    bps.Ignored = isIgnored
 end
+
 -- checks whether or not a given blueprint ID is restricted by
 -- * global restrictions (set in UnitsManager) or by
 -- * army restrictions (set in Scenario Script)
 -- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 -- note that global restrictions take precedence over restrictions set on specific armies
 function IsRestricted(unitId, army)
-    if bps.restrictions.Ignored then 
+    if bps.Ignored then 
         return false 
     end
-    if bps.restrictions.Global[unitId] then
+    if restrictions.Global[unitId] then
        return true
     end
     
-    if bps.restrictions.PerArmy[army] then
-       return bps.restrictions.PerArmy[army][unitId] or false
+    if restrictions.PerArmy[army] then
+       return restrictions.PerArmy[army][unitId] or false
     end
 
     return false 
 end 
 -- gets a table with ids of restricted units { Global = {}, PerArmy = {} }
 function GetRestrictions()
-    return bps.restrictions
+    return restrictions
 end
 -- sets a table with ids of restricted units { Global = {}, PerArmy = {} }
 function SetRestrictions(blueprintIDs)
-    bps.restrictions = blueprintIDs
+    restrictions = blueprintIDs
 end
 -- sorts unit blueprints based on build priority
 local function SortUnits(bp1, bp2) 
@@ -253,52 +233,46 @@ local function GetUnitsUpgradable()
 end
 -- resolves category restrictions to a table with ids of restricted units
 -- e.g. restrictions = { categories.TECH1 } -> 
-function ResolveRestrictions()
+function ResolveRestrictions(toggle, cats, army)
     -- initialize blueprints info only once
-    if table.getsize(bps.ids) == 0 or 
-       table.getsize(bps.upgradeable) == 0 then
+    if table.getsize(bps.ids) == 0 or
+        table.getsize(bps.upgradeable) == 0 then
         bps.ids = table.keys(__blueprints)
         bps.upgradeable = GetUnitsUpgradable()
     end
-    -- reset restriction of blueprints
-    bps.restrictions = { Global = {}, PerArmy = {} }
     
     -- find ids of units restricted by global categories
-    for key, category in restrictions.Global do
-        if type(category) == 'userdata' then 
-            local ids = EntityCategoryFilterDown(category, bps.ids)
-            for _, id in ids do
-               bps.restrictions.Global[id] = true
-            end
+    if not toggle or not army then
+        local ids = EntityCategoryFilterDown(cats, bps.ids)
+        for _, id in ids do
+           restrictions.Global[id] = toggle
         end
     end
-    -- find ids of units restricted for each army 
-    for index, categories in restrictions.PerArmy do 
-        if bps.restrictions.PerArmy[index] == nil then
-           bps.restrictions.PerArmy[index] = { }
+    if army then
+        -- find ids of units restricted for each army
+        if not restrictions.PerArmy[army] then
+           restrictions.PerArmy[army] = {}
         end
-        for key, category in categories do
-            if type(category) == 'userdata' then 
-                local ids = EntityCategoryFilterDown(category, bps.ids)
-                for _, id in ids do
-                   bps.restrictions.PerArmy[index][id] = true
-                end
-            end
-        end 
+        local ids = EntityCategoryFilterDown(cats, bps.ids)
+        for _, id in ids do
+           restrictions.PerArmy[army][id] = toggle
+        end
     end
-    -- check for breaks in upgrade-chain of upgradeable units, 
+
+    -- check for breaks in upgrade-chain of upgradeable units,
     -- e.g. T2 MEX restriction should also restrict T3 MEX
-    for _, bp in bps.upgradeable do 
-        local from = bp.General.UpgradesFrom
-        -- check if source blueprint is restricted by global restriction
-        if bps.restrictions.Global[from] then 
-           bps.restrictions.Global[bp.id] = true
-        end
-        -- check if source blueprint is restricted by army restriction
-        for index, army in bps.restrictions.PerArmy do
-            if bps.restrictions.PerArmy[index][from] then 
-               bps.restrictions.PerArmy[index][bp.id] = true
+    -- We only want to do this when restricting, not releasing.
+    if toggle then
+        for _, bp in bps.upgradeable do
+            local from = bp.General.UpgradesFrom
+            -- check if source blueprint is restricted by global restriction
+            if restrictions.Global[from] then
+               restrictions.Global[bp.id] = toggle
+            end
+            -- check if source blueprint is restricted by army restriction
+            if restrictions.PerArmy[army][from] then 
+               restrictions.PerArmy[army][bp.id] = toggle
             end
         end
-    end 
+    end
 end

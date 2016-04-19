@@ -84,8 +84,6 @@ function FindParentChain(markerName)
     return nil
 end
 
-
-
 function GetMarkerChain(name)
     local chain = Scenario.Chains[name]
     if not chain then
