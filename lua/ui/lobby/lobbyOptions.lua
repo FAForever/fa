@@ -468,7 +468,7 @@ AIOpts = {
    {
         default = 1,
         label = "<LOC aisettings_0147>AIx Omni Setting",
-        help = "<LOC aisettings_0148>Set the build rate multiplier for the cheating AIs.",
+        help = "<LOC aisettings_0148>Set the AIx global intel toggle",
         key = 'OmniCheat',
         values = {
             {
