@@ -428,7 +428,7 @@ AIOpts = {
         label = "<LOC aisettings_0119>AI Land Expansion Limit",
         help = "<LOC aisettings_0120>Set the limit for the number of land expansions that each AI can have (will still be modified by the number of AIs).",
         key = 'LandExpansionsAllowed',
-        value_text = "%s%%",
+        value_text = "%s",
         value_help = "<LOC aisettings_0123>%s Land Expansions Allowed",
         values = {
             {
