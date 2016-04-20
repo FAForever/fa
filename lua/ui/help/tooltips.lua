@@ -1888,8 +1888,8 @@ Tooltips = {
         description = "<LOC tooltipui0689>Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
     },
     Lobby_presetDescription = {
-        title = "<LOC tooltipui0690>Lobby Presets",
-        description = "<LOC tooltipui0691>Save and load presets for game settings and maps"
+        title = "<LOC tooltipui0694>Lobby Presets",
+        description = "<LOC tooltipui0695>Save and load presets for game settings and maps"
     },
     
     -- **********************
