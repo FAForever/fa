@@ -9,6 +9,7 @@ Patch 3652 (pending)
 - Default to score off
 - Stopped the map filter preventing the map selected in prefs from prior games from showing
 - Tiny fix to flag layout
+- Fixed descriptions for the AIx Omni option and Lobby Preset button
 
 **UI**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard and PerfectWay)
