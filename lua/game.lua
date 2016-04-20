@@ -182,6 +182,7 @@ function IsRestricted(unitId, army)
     if bps.Ignored then 
         return false 
     end
+
     if restrictions.Global[unitId] then
        return true
     end
@@ -215,7 +216,7 @@ local function GetUnitsUpgradable()
     local units = {}  
     for id, bp in __blueprints or {} do 
         -- check for valid/upgradeable blueprints 
-        if bp ~= nil and bp.General and (string.len(id) > 4) and
+        if bp and bp.General and (string.len(id) > 4) and
          ((bp.General.UpgradesFrom and 
            bp.General.UpgradesFrom ~= 'none') or 
           (bp.General.UpgradesTo and 
@@ -237,7 +238,28 @@ function ResolveRestrictions(toggle, cats, army)
     -- initialize blueprints info only once
     if table.getsize(bps.ids) == 0 or
         table.getsize(bps.upgradeable) == 0 then
-        bps.ids = table.keys(__blueprints)
+
+        local used = {
+            BUILTBYTIER1FACTORY = true,
+            BUILTBYTIER2FACTORY = true,
+            BUILTBYTIER3FACTORY = true,
+            BUILTBYTIER3COMMANDER = true,
+            TRANSPORTBUILTBYTIER1FACTORY = true,
+            TRANSPORTBUILTBYTIER2FACTORY = true,
+            TRANSPORTBUILTBYTIER3FACTORY = true,
+        }
+        
+        -- Limit it to unit blueprints inside certain categories
+        for id, bp in __blueprints do
+            if bp and bp.BlueprintId and bp.Categories then
+                for index, cat in bp.Categories do
+                    if used[cat] then
+                        table.insert(bps.ids, bp.BlueprintId)
+                        break
+                    end
+                end
+            end
+        end
         bps.upgradeable = GetUnitsUpgradable()
     end
     
@@ -248,6 +270,7 @@ function ResolveRestrictions(toggle, cats, army)
            restrictions.Global[id] = toggle
         end
     end
+
     if army then
         -- find ids of units restricted for each army
         if not restrictions.PerArmy[army] then
