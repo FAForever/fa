@@ -864,7 +864,9 @@ function SetupOptionsPanel(parent, curOptions)
                 if optData.default then realDefValue = optData.default end
                 line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
-                    changedOptions[optData.key] = {value = optData.values[index].key or optData.values[index], index = index}
+                    local value = optData.values[index].key
+                    if value == nil then value = optData.values[index] end
+                    changedOptions[optData.key] = {value = value, index = index}
                     if line.combo.EnableColor then
                         line.combo._text:SetColor('DBBADB')
                     end

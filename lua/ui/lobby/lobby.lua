@@ -3750,7 +3750,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             -- Do the slightly stupid thing to check if the option we found in the profile is
             -- a valid key for this option. Some mods muck about with the possibilities, so we
             -- need to make sure we use a sane default if that's happened.
-            if not defValue or not keyIsValidForOption(option, defValue) then
+            if defValue == nil or not keyIsValidForOption(option, defValue) then
                 -- Exception to make AllowObservers work because the engine requires
                 -- the keys to be bool. Custom options should use 'True' or 'False'
                 if option.key == 'AllowObservers' then
