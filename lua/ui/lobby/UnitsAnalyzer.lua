@@ -38,7 +38,7 @@ end
 -- even when they have other categories Skipped
 CategoriesAllowed  = {
     ["SATELLITE"] = true, -- SATELLITEs are also UNTARGETABLE!
-}  
+}
 -- blueprints with these categories/IDs will not be visualized 
 -- unless other categories are allowed in the CategoriesAllowed table
 CategoriesSkipped  = {     
@@ -51,11 +51,11 @@ CategoriesSkipped  = {
     ["UNTARGETABLE"] = true,
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
+    ["ueb5204"] = true,    -- Concrete
+    ["urb5204"] = true,    -- Concrete
     ["ueb5103"] = true,    -- UEF Quantum Gate Beacon
     ["urb5103"] = true,    -- Quantum Gateway Node
-    ["ueb5204"] = true,    -- Concrete
     ["ueb5208"] = true,    -- Sonar Beacon
-    ["urb5204"] = true,    -- Concrete
     ["urb5206"] = true,    -- Tracking Device
     ["urb3103"] = true,    -- Scout-Deployed Land Sensor
     ["uxl0021"] = true,    -- Test Unit Arc Projectile
@@ -1032,53 +1032,47 @@ local function CacheProjectile(bp)
     
     projectiles.All[id] = bp  
 end
+-- checks for valid unit blueprints (not projectiles/effects)
+function IsValidUnit(bp, id)
+    if not bp or not id or string.len(id) <= 4 or string.find(id, '/') or CategoriesSkipped[id] then
+        return false
+    end
+    if bp.Categories then
+        for _, category in bp.Categories do
+            if CategoriesAllowed[category] then
+                return true 
+            elseif CategoriesSkipped[category] then
+                return false 
+            end
+        end
+    end
+    return true
+end
 --- Cache unit blueprints and extract their enhancements as new blueprints
 local function CacheUnit(bp)
     if not bp then return end
       
-    bp.ID = bp.BlueprintId  
-    --bp.Info = bp.Source .. ' (' .. (bp.Interface.HelpText or bp.ID) .. ')'
+    bp.ID = bp.BlueprintId
     bp.Info = bp.Source  
     Show('CACHING', bp.Info .. '...')
     
-    local id = bp.ID --bpID --bp.UnitId 
+    local id = bp.ID 
 
     bp.Name = GetUnitName(bp)
-       -- skip processing units with Skipped IDs
-    if CategoriesSkipped[id] then
-        --LOG(' skipped bp ' .. skipCount .. ' - ' .. bp.Source .. ' ' .. bp.Name)
-        blueprints.Skipped[id] = bp  
+
+    -- skip processing of invalid units 
+    if not IsValidUnit(bp, id) then
+        blueprints.Skipped[id] = bp
         return 
     end
     -- converting categories to hash table for quick lookup 
-    if  bp.Categories then
-        bp.CategoriesInfo = ''
-        local categories = {}
-        for _, category in bp.Categories do
-            if CategoriesSkipped[category] then
-                bp.Skipped = true  
-            else
-                categories[category] = true
-            end
-        end    
-        for _, category in bp.Categories do
-            if CategoriesAllowed[category] then
-                bp.Skipped = false  
-            end
-        end    
-        -- skip processing units with Skipped category
-        if bp.Skipped then 
-            --LOG(' skipped bp ' .. skipCount .. ' - ' .. bp.Source .. ' ' .. bp.Name)
-            blueprints.Skipped[id] = bp  
-            return 
-        end
-        bp.Categories = categories 
-    end
+    bp.Categories = table.hash(bp.Categories)
+
     bp.Faction = GetUnitFaction(bp)
     bp.Type = GetUnitType(bp)
     bp.Tech = GetUnitTech(bp)
     bp.Name = GetUnitName(bp)
-     bp.Color = GetUnitColor(bp)
+    bp.Color = GetUnitColor(bp)
      
     if bp.Mod then
         blueprints.Modified[id] = bp  
