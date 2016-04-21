@@ -304,6 +304,7 @@ end
 --- If t contains duplicate values, it is unspecified which one will be returned.
 --- e.g. table.inverse {foo='x', bar='x'} => possibly {x='bar'} or {x='foo'}
 function table.inverse(t)
+    if not t then return {} end -- prevents looping over nil table
     r = {}
     for k,v in t do
         r[v] = k
@@ -314,6 +315,7 @@ end
 --- Reverses order of values in a table using their index
 --- table.reverse {'one','two','three'} => {'three', 'two', 'one'}
 function table.reverse(t)
+    if not t then return {} end -- prevents looping over nil table
     local reversed = {}
     local items = table.indexize(t) -- convert from hash table
     local itemsCount = table.getsize(t)
@@ -328,6 +330,7 @@ end
 --- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
 ---                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
 function table.indexize(t)
+    if not t then return {} end -- prevents looping over nil table
     local indexized = {}
     for k, v in t do
         table.insert(indexized, v)
@@ -337,6 +340,7 @@ end
 
 --- Converts a table to a new table with values as keys and values equal to true
 function table.hash(t)
+    if not t then return {} end -- prevents looping over nil table
     local lookup = {}
     for k, v in t do
         lookup[tostring(v)] = true
@@ -347,6 +351,7 @@ end
 --- table.map(fn,t) returns a table with the same keys as t but with
 --- fn function applied to each value.
 function table.map(fn, t)
+    if not t then return {} end -- prevents looping over nil table
     r = {}
     for k,v in t do
         r[k] = fn(v)

@@ -211,20 +211,26 @@ local function SortUnits(bp1, bp2)
         return true
     end
 end
+-- check for valid unit blueprints (not projectiles/effects)
+local function IsValidUnit(bp, id)
+    if bp and (string.len(id) > 4) and not string.find(id, '/') then
+        return true
+    end
+    return false
+end
 -- gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
 local function GetUnitsUpgradable()
     local units = {}  
     for id, bp in __blueprints or {} do 
         -- check for valid/upgradeable blueprints 
-        if bp and bp.General and (string.len(id) > 4) and
-         ((bp.General.UpgradesFrom and 
+        if bp and bp.General and IsValidUnit(bp, id) and 
+         ((bp.General.UpgradesFrom ~= '' and 
            bp.General.UpgradesFrom ~= 'none') or 
-          (bp.General.UpgradesTo and 
+          (bp.General.UpgradesTo ~= '' and 
            bp.General.UpgradesTo ~= 'none')) then
-
             local unit = table.deepcopy(bp)
             unit.id = id -- save id for a reference
-            table.insert(units, unit) 
+            table.insert(units, unit)  
         end
     end
     -- ensure units are sorted in increasing order of upgrades
@@ -232,34 +238,23 @@ local function GetUnitsUpgradable()
     table.sort(units, SortUnits)  
     return units
 end
+-- gets ids of valid units
+local function GetUnitsIds()
+    local units = {}
+    for id, bp in __blueprints or {} do
+        if IsValidUnit(bp, id) then
+            table.insert(units, id)
+        end
+    end
+    return units
+end
 -- resolves category restrictions to a table with ids of restricted units
 -- e.g. restrictions = { categories.TECH1 } -> 
 function ResolveRestrictions(toggle, cats, army)
     -- initialize blueprints info only once
     if table.getsize(bps.ids) == 0 or
-        table.getsize(bps.upgradeable) == 0 then
-
-        local used = {
-            BUILTBYTIER1FACTORY = true,
-            BUILTBYTIER2FACTORY = true,
-            BUILTBYTIER3FACTORY = true,
-            BUILTBYTIER3COMMANDER = true,
-            TRANSPORTBUILTBYTIER1FACTORY = true,
-            TRANSPORTBUILTBYTIER2FACTORY = true,
-            TRANSPORTBUILTBYTIER3FACTORY = true,
-        }
-        
-        -- Limit it to unit blueprints inside certain categories
-        for id, bp in __blueprints do
-            if bp and bp.BlueprintId and bp.Categories then
-                for index, cat in bp.Categories do
-                    if used[cat] then
-                        table.insert(bps.ids, bp.BlueprintId)
-                        break
-                    end
-                end
-            end
-        end
+       table.getsize(bps.upgradeable) == 0 then
+        bps.ids = GetUnitsIds()
         bps.upgradeable = GetUnitsUpgradable()
     end
     
