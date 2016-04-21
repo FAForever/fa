@@ -211,13 +211,10 @@ local function SortUnits(bp1, bp2)
         return true
     end
 end
--- check for valid unit blueprints (not projectiles/effects)
-local function IsValidUnit(bp, id)
-    if bp and (string.len(id) > 4) and not string.find(id, '/') then
-        return true
-    end
-    return false
-end
+
+-- checks for valid unit blueprints (not projectiles/effects)
+local IsValidUnit = import('/lua/ui/lobby/UnitsAnalyzer.lua').IsValidUnit
+
 -- gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
 local function GetUnitsUpgradable()
     local units = {}  
@@ -255,7 +252,7 @@ function ResolveRestrictions(toggle, cats, army)
     if table.getsize(bps.ids) == 0 or
        table.getsize(bps.upgradeable) == 0 then
         bps.ids = GetUnitsIds()
-        bps.upgradeable = GetUnitsUpgradable()
+        bps.upgradeable = GetUnitsUpgradable() 
     end
     
     -- find ids of units restricted by global categories
