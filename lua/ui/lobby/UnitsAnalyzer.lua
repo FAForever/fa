@@ -5,22 +5,22 @@
 -- *              using their IDs, CATEGORIES, TECH labels, FACTION affinity, etc. 
 -- ==========================================================================================
 
--- holds info about a blueprint that is being loaded   
+-- Holds info about a blueprint that is being loaded   
 local bpInfo = { ID = nil , Source = nil, Note = ''}
 local bpIndex = 1
   
 local cached = { Images = {}, Tooltips = {}, Enhancements = {} }
  
--- stores blueprints of units and extracted enhancements 
--- similar to Sim's __blueprints but accessible on UI/lobby side
+-- Stores blueprints of units and extracted enhancements 
+-- Similar to Sim's __blueprints but accessible on UI/lobby side
 local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 local projectiles = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 
- -- manages logs messages based on their type/importance/source 
+ -- Manages logs messages based on their type/importance/source 
 local logsTypes = {
-    ["WARNING"] = true,  -- recommend to keep it always true
-    ["CACHING"] = false, -- enable only for debugging
-    ["PARSING"] = false, -- enable only for debugging
+    ["WARNING"] = true,  -- Recommend to keep it always true
+    ["CACHING"] = false, -- Enable only for debugging
+    ["PARSING"] = false, -- Enable only for debugging
     ["STATUS"] = true,
 }
    
@@ -28,18 +28,20 @@ function Show(msgType, msg)
     if not logsTypes[msgType] then return end
 
     msg = 'UnitsAnalyzer ' .. msg
-    if msgType == 'WARNING' then 
-        WARN(msg) 
-    else 
+    if msgType == 'WARNING' then
+        WARN(msg)
+    else
         LOG(msg)
     end
 end
--- blueprints with these categories will be always loaded 
+
+-- Blueprints with these categories will be always loaded 
 -- even when they have other categories Skipped
 CategoriesAllowed  = {
     ["SATELLITE"] = true, -- SATELLITEs are also UNTARGETABLE!
 }
--- blueprints with these categories/IDs will not be visualized 
+
+-- Blueprints with these categories/IDs will not be visualized 
 -- unless other categories are allowed in the CategoriesAllowed table
 CategoriesSkipped  = {     
     ["HOLOGRAM"] = true,
@@ -82,135 +84,136 @@ CategoriesSkipped  = {
     ["brogrnd1"] = true,
     ["brogrnd2"] = true,
 }
--- blueprints with these categories will be hidden in tooltips
+
+-- Blueprints with these categories will be hidden in tooltips
 CategoriesHidden  = {
-    ["NUKESUB"] = true,     
-    ["DESTROYER"] = true,     
-    ["T2SUBMARINE"] = true,     
-    ["NAVALCARRIER"] = true,     
-    ["HIGHALTAIR"] = true,     
-    ["PRODUCTFA"] = true,     
-    ["PRODUCTSC1"] = true,     
-    ["PRODUCTDL"] = true,       
-    ["BUILTBYLANDTIER1FACTORY"] = true,     
-    ["BUILTBYLANDTIER2FACTORY"] = true,     
-    ["BUILTBYLANDTIER3FACTORY"] = true,     
-    ["BUILTBYAIRTIER1FACTORY"] = true,     
-    ["BUILTBYAIRTIER2FACTORY"] = true,     
-    ["BUILTBYAIRTIER3FACTORY"] = true,     
-    ["BUILTBYNAVALTIER1FACTORY"] = true,     
-    ["BUILTBYNAVALTIER2FACTORY"] = true,     
-    ["BUILTBYNAVALTIER3FACTORY"] = true,     
-    ["BUILTBYTIER1FACTORY"] = true,     
-    ["BUILTBYTIER2FACTORY"] = true,     
-    ["BUILTBYTIER3FACTORY"] = true,     
-    ["BUILTBYTIER2SUPPORTFACTORY"] = true,     
-    ["BUILTBYTIER3SUPPORTFACTORY"] = true,     
-    ["BUILTBYTIER1ENGINEER"] = true,     
-    ["BUILTBYTIER2ENGINEER"] = true,     
-    ["BUILTBYTIER3ENGINEER"] = true,     
-    ["BUILTBYTIER4ENGINEER"] = true,  
-    ["BUILTBYTIER1FIELD"] = true,     
-    ["BUILTBYTIER2FIELD"] = true,   
-    ["BUILTBYTIER3FIELD"] = true,   
-    ["BUILTBYTIER1COMMANDER"] = true,     
-    ["BUILTBYTIER2COMMANDER"] = true,     
-    ["BUILTBYTIER3COMMANDER"] = true,    
-    ["BUILTBYTIER4COMMANDER"] = true, 
+    ["NUKESUB"] = true,
+    ["DESTROYER"] = true,
+    ["T2SUBMARINE"] = true,
+    ["NAVALCARRIER"] = true,
+    ["HIGHALTAIR"] = true,
+    ["PRODUCTFA"] = true,
+    ["PRODUCTSC1"] = true,
+    ["PRODUCTDL"] = true,
+    ["BUILTBYLANDTIER1FACTORY"] = true,
+    ["BUILTBYLANDTIER2FACTORY"] = true,
+    ["BUILTBYLANDTIER3FACTORY"] = true,
+    ["BUILTBYAIRTIER1FACTORY"] = true,
+    ["BUILTBYAIRTIER2FACTORY"] = true,
+    ["BUILTBYAIRTIER3FACTORY"] = true,
+    ["BUILTBYNAVALTIER1FACTORY"] = true,
+    ["BUILTBYNAVALTIER2FACTORY"] = true,
+    ["BUILTBYNAVALTIER3FACTORY"] = true,
+    ["BUILTBYTIER1FACTORY"] = true,
+    ["BUILTBYTIER2FACTORY"] = true,
+    ["BUILTBYTIER3FACTORY"] = true,
+    ["BUILTBYTIER2SUPPORTFACTORY"] = true,
+    ["BUILTBYTIER3SUPPORTFACTORY"] = true,
+    ["BUILTBYTIER1ENGINEER"] = true,
+    ["BUILTBYTIER2ENGINEER"] = true,
+    ["BUILTBYTIER3ENGINEER"] = true,
+    ["BUILTBYTIER4ENGINEER"] = true,
+    ["BUILTBYTIER1FIELD"] = true,
+    ["BUILTBYTIER2FIELD"] = true,
+    ["BUILTBYTIER3FIELD"] = true,
+    ["BUILTBYTIER1COMMANDER"] = true,
+    ["BUILTBYTIER2COMMANDER"] = true,
+    ["BUILTBYTIER3COMMANDER"] = true,
+    ["BUILTBYTIER4COMMANDER"] = true,
     ["BUILTBYTIER1ORBITALFACTORY"] = true,
     ["BUILTBYTIER2ORBITALFACTORY"] = true,
     ["BUILTBYTIER3ORBITALFACTORY"] = true,
-    ["BUILTBYTIER4ORBITALFACTORY"] = true,     
-    ["BUILTBYCOMMANDER"] = true,     
-    ["BUILTBYEXPERIMENTALSUB"] = true,     
-    ["BUILTBYQUANTUMGATE"] = true,    
-    ["BUILTBYGANTRY"] = true,     
+    ["BUILTBYTIER4ORBITALFACTORY"] = true,
+    ["BUILTBYCOMMANDER"] = true,
+    ["BUILTBYEXPERIMENTALSUB"] = true,
+    ["BUILTBYQUANTUMGATE"] = true,
+    ["BUILTBYGANTRY"] = true,
     ["VERIFYMISSILEUI"] = true,
-    ["BUBBLESHIELDSPILLOVERCHECK"] = true,      
-    ["BENIGN"] = true,     
-    ["CAPTURE"] = true,     
-    ["CANNOTUSEAIRSTAGING"] = true,     
-    ["CANTRANSPORTCOMMANDER"] = true,     
-    ["CANNOTUSEAIRSTAGING"] = true,     
-    ["CONSTRUCTION"] = true,     
-    ["CONSTRUCTIONSORTDOWN"] = true,    
-    ["DRAGBUILD"] = true,      
-    ["ECONOMIC"] = true,     
-    ["INTELLIGENCE"] = true,     
-    ["RECLAIMABLE"] = true,      
-    ["RALLYPOINT"] = true,    
-    ["SHOWQUEUE"] = true,     
-    ["SPECIALHIGHPRI"] = true,      
-    ["SELECTABLE"] = true,    
-    ["HIGHPRIAIR"] = true,         
-    ["T1SUBMARINE"] = true,     
-    ["USEBUILDPRESETS"] = true,     
-    ["TRANSPORTFOCUS"] = true,     
-    ["TRANSPORTBUILTBYTIER3FACTORY"] = true,     
-    ["TRANSPORTBUILTBYTIER2FACTORY"] = true,     
-    ["TRANSPORTBUILTBYTIER1FACTORY"] = true,     
-    ["VISIBLETORECON"] = true,    
-    ["PODSTAGINGPLATFORM"] = true,     
-    ["STATIONASSISTPOD"] = true,     
-    ["OVERLAYCOUNTERINTEL"] = true, 
-    ["OVERLAYCOUNTERMEASURE"] = true,      
-    ["OVERLAYANTIAIR"] = true,     
-    ["OVERLAYSONAR"] = true,     
-    ["OVERLAYDIRECTFIRE"] = true,     
-    ["OVERLAYRADAR"] = true,     
-    ["OVERLAYOMNI"] = true,     
-    ["OVERLAYDEFENSE"] = true,     
-    ["OVERLAYANTINAVY"] = true,     
-    ["OVERLAYINDIRECTFIRE"] = true,      
-    ["OVERLAYMISC"] = true,     
-    ["ANTITELEPORT"] = true,    
-    ["ABILITYBUTTON"] = true,     
-    ["MOBILE"] = true,     
-    ["MOBILESONAR"] = true,     
-    ["TARGETCHASER"] = true,     
-    ["SIZE4"] = true,     
-    ["SIZE8"] = true,     
-    ["SIZE12"] = true,     
-    ["SIZE16"] = true,     
-    ["SIZE20"] = true,     
-    ["ISPREENHANCEDUNIT"] = true,     
-    ["REBUILDER"] = true,     
-    ["SORTOTHER"] = true,     
-    ["SORTINTEL"] = true,     
-    ["SORTCONSTRUCTION"] = true,     
-    ["SORTECONOMY"] = true,     
-    ["SORTDEFENSE"] = true,     
-    ["SORTSTRATEGIC"] = true,     
-    ["SILO"] = true,     
-    ["SHOWATTACKRETICLE"] = true,     
-    ["TACTICALMISSILEPLATFORM"] = true,     
-    ["NEEDMOBILEBUILD"] = true,     
+    ["BUBBLESHIELDSPILLOVERCHECK"] = true,
+    ["BENIGN"] = true,
+    ["CAPTURE"] = true,
+    ["CANNOTUSEAIRSTAGING"] = true,
+    ["CANTRANSPORTCOMMANDER"] = true,
+    ["CANNOTUSEAIRSTAGING"] = true,
+    ["CONSTRUCTION"] = true,
+    ["CONSTRUCTIONSORTDOWN"] = true,
+    ["DRAGBUILD"] = true,
+    ["ECONOMIC"] = true,
+    ["INTELLIGENCE"] = true,
+    ["RECLAIMABLE"] = true,
+    ["RALLYPOINT"] = true,
+    ["SHOWQUEUE"] = true,
+    ["SPECIALHIGHPRI"] = true,
+    ["SELECTABLE"] = true,
+    ["HIGHPRIAIR"] = true,
+    ["T1SUBMARINE"] = true,
+    ["USEBUILDPRESETS"] = true,
+    ["TRANSPORTFOCUS"] = true,
+    ["TRANSPORTBUILTBYTIER3FACTORY"] = true,
+    ["TRANSPORTBUILTBYTIER2FACTORY"] = true,
+    ["TRANSPORTBUILTBYTIER1FACTORY"] = true,
+    ["VISIBLETORECON"] = true,
+    ["PODSTAGINGPLATFORM"] = true,
+    ["STATIONASSISTPOD"] = true,
+    ["OVERLAYCOUNTERINTEL"] = true,
+    ["OVERLAYCOUNTERMEASURE"] = true,
+    ["OVERLAYANTIAIR"] = true,
+    ["OVERLAYSONAR"] = true,
+    ["OVERLAYDIRECTFIRE"] = true,
+    ["OVERLAYRADAR"] = true,
+    ["OVERLAYOMNI"] = true,
+    ["OVERLAYDEFENSE"] = true,
+    ["OVERLAYANTINAVY"] = true,
+    ["OVERLAYINDIRECTFIRE"] = true,
+    ["OVERLAYMISC"] = true,
+    ["ANTITELEPORT"] = true,
+    ["ABILITYBUTTON"] = true,
+    ["MOBILE"] = true,
+    ["MOBILESONAR"] = true,
+    ["TARGETCHASER"] = true,
+    ["SIZE4"] = true,
+    ["SIZE8"] = true,
+    ["SIZE12"] = true,
+    ["SIZE16"] = true,
+    ["SIZE20"] = true,
+    ["ISPREENHANCEDUNIT"] = true,
+    ["REBUILDER"] = true,
+    ["SORTOTHER"] = true,
+    ["SORTINTEL"] = true,
+    ["SORTCONSTRUCTION"] = true,
+    ["SORTECONOMY"] = true,
+    ["SORTDEFENSE"] = true,
+    ["SORTSTRATEGIC"] = true,
+    ["SILO"] = true,
+    ["SHOWATTACKRETICLE"] = true,
+    ["TACTICALMISSILEPLATFORM"] = true,
+    ["NEEDMOBILEBUILD"] = true,
     ["PATROLHELPER"] = true,
     ["RESEARCH"] = true,
     ["MASSFABRICATION"] = true,
     ["MASSEXTRACTION"] = true,
     ["UPGRADE"] = true,
-    ["PRODUCTBREWLAN"] = true,  
-    ["FAVORSWATER"] = true,  
-}
-   
-Factions = {
-    ["AEON"]     = 'FF238C00', -- #FF238C00
-    ["UEF"]      = 'FF006CD9', -- #FF006CD9
-    ["CYBRAN"]   = 'FFB32D00', -- #FFB32D00
-    ["SERAPHIM"] = 'FFFFBF00', -- #FFFFBF00
-    ["NOMADS"]   = 'FFFF7200', -- #FFFF7200
-    ["UNKNOWN"]  = 'ff808080',
+    ["PRODUCTBREWLAN"] = true,
+    ["FAVORSWATER"] = true,
 }
 
---- Gets unit's color based on faction of given blueprint    
+Factions = {
+    ["AEON"] = 'FF238C00',
+    ["UEF"] = 'FF006CD9',
+    ["CYBRAN"] = 'FFB32D00',
+    ["SERAPHIM"] = 'FFFFBF00',
+    ["NOMADS"] = 'FFFF7200',
+    ["UNKNOWN"] = 'ff808080',
+}
+
+-- Gets unit's color based on faction of given blueprint    
 function GetUnitColor(bp)
-    return Factions[bp.Faction] or 
-           Factions['UNKNOWN']
+    return Factions[bp.Faction] or Factions['UNKNOWN']
 end
---- Gets unit's faction based on categories of given blueprint
+
+-- Gets unit's faction based on categories of given blueprint
 function GetUnitFaction(bp)
-    local faction = bp.General.FactionName --or 'UNKNOWN'
+    local faction = bp.General.FactionName
     if faction then
         faction = string.upper(faction)
        return faction 
@@ -218,21 +221,23 @@ function GetUnitFaction(bp)
         if not bp.Merge then
             Show('WARNING', bp.Info..' - missing bp.General.FactionName')
         end
-        -- using categories to find faction
+        -- Using categories to find faction
         for name, _ in Factions do
-            if bp.Categories[name] then 
-                return name 
-            end 
-        end 
+            if bp.Categories[name] then
+                return name
+            end
+        end
         if not bp.Merge then
             Show('WARNING', bp.Info..' - missing FACTION in Categories')
         end
     end
-    return 'UNKNOWN' 
+
+    return 'UNKNOWN'
 end
---- Gets unit's localizable name of given blueprint or show warning if not found
+
+-- Gets unit's localizable name of given blueprint or show warning if not found
 function GetUnitName(bp)
-    local name = nil  
+    local name = nil
     
     if bp.Interface.HelpText then
         name = bp.Interface.HelpText
@@ -243,37 +248,44 @@ function GetUnitName(bp)
             Show('WARNING', bp.Info..' - missing bp.General.UnitName')
         end
     end
-    if name == 'MISSING NAME' then name = '' end     
-    return name  
+    if name == 'MISSING NAME' then name = '' end
+
+    return name
 end
 
 function GetUnitTitle(bp)
-    local name = nil --bp.Interface.HelpText
+    local name = nil
     if bp.General.UnitName then
-        name = LOCF(bp.General.UnitName) --.. ' - '
+        name = LOCF(bp.General.UnitName)
     end
+
     if bp.Interface.HelpText then
         name = name and (name .. ' - ' ) or ''
         name = name .. LOCF(bp.Interface.HelpText)
     end
+
     if name == 'MISSING NAME' then name = '' end
     name = bp.Tech .. ' ' .. LOCF(bp.Name)
+
     return name  
 end
---- Gets units tech level based on categories of given blueprint
+
+-- Gets units tech level based on categories of given blueprint
 function GetUnitTech(bp)
     if bp.Categories['TECH1'] then return 'T1' end
     if bp.Categories['TECH2'] then return 'T2' end
     if bp.Categories['TECH3'] then return 'T3' end
-    if bp.Categories['COMMAND'] then return 'T0' end 
-    if bp.Categories['EXPERIMENTAL'] then return 'T4' end 
+    if bp.Categories['COMMAND'] then return 'T0' end
+    if bp.Categories['EXPERIMENTAL'] then return 'T4' end
     
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TECH in bp.Categories')
-    end    
+    end
+
     return "T?"
 end
---- Gets units type based on categories of given blueprint
+
+-- Gets units type based on categories of given blueprint
 function GetUnitType(bp)
     if bp.Categories['STRUCTURE'] then return 'BASE' end
     if bp.Categories['AIR'] then return 'AIR' end
@@ -283,127 +295,136 @@ function GetUnitType(bp)
     
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TYPE in bp.Categories')
-    end         
+    end
+    
     return "UNKNOWN"
-end 
---- Gets a path to an image representing a given blueprint and faction
---- Improved version of UIUtil.UIFile() function
+end
+
+-- Gets a path to an image representing a given blueprint and faction
+-- Improved version of UIUtil.UIFile() function
 function GetImagePath(bp, faction)
     local root = ''
     local id = bp.ID or ''
     local icon = bp.Icon or ''
-        
-    -- check if image was cached already
-    if cached.Images[faction..id] then 
+
+    -- Check if image was cached already
+    if cached.Images[faction..id] then
         return cached.Images[faction..id]
     end
-    if cached.Images[faction..icon] then 
-        return cached.Images[faction..icon] 
+
+    if cached.Images[faction..icon] then
+        return cached.Images[faction..icon]
     end
-    if icon and DiskGetFileInfo(icon) then 
-        return icon 
-    end 
+
+    if icon and DiskGetFileInfo(icon) then
+        return icon
+    end
         
     local paths = {
         '/textures/ui/common/icons/units/',
         '/textures/ui/common/icons/',
         '/textures/ui/common/faction_icon-lg/',
         '/icons/units/',
-        '/units/'..id..'/', 
-    } 
+        '/units/'..id..'/',
+    }
     
-    if bp.Type == 'UPGRADE' then    
-        paths = {'/textures/ui/common/game/'..faction..'-enhancements/' } 
+    if bp.Type == 'UPGRADE' then
+        paths = {'/textures/ui/common/game/'..faction..'-enhancements/'}
     end
+
     local name = ''
-    -- first check for icon in game textures
-    for _,path in paths do
+    -- First check for icon in game textures
+    for _, path in paths do
         name = path .. id .. '_icon.dds'
-        if DiskGetFileInfo(name) then 
-            cached.Images[faction..id] = name  
-            return name 
+        if DiskGetFileInfo(name) then
+            cached.Images[faction..id] = name
+            return name
         end
-        name = path .. icon 
-        if not string.find(icon,'.dds') then 
-            name = name .. '_btn_up.dds' 
+
+        name = path .. icon
+        if not string.find(icon,'.dds') then
+            name = name .. '_btn_up.dds'
         end
-            
-        if DiskGetFileInfo(name) then 
+
+        if DiskGetFileInfo(name) then
             cached.Images[faction..icon] = name
-            return name 
+            return name
         end
     end
-    -- next find an icon if one exist in mod's textures folder
+
+    -- Next find an icon if one exist in mod's textures folder
     if bp.Mod then
         root = bp.Mod.location
         for _,path in paths do
             name = root .. path .. id .. '_icon.dds'
-            if DiskGetFileInfo(name) then 
+            if DiskGetFileInfo(name) then
                 cached.Images[faction..id] = name
-                return name 
+                return name
             end
-            name = root .. path .. icon 
-            if not string.find(icon,'.dds') then 
-                name = name .. '_btn_up.dds' 
+            name = root .. path .. icon
+            if not string.find(icon,'.dds') then
+                name = name .. '_btn_up.dds'
             end
-            if DiskGetFileInfo(name) then 
+            if DiskGetFileInfo(name) then
                 cached.Images[faction..icon] = name
-                return name 
+                return name
             end
         end
-    end 
-    -- default to unknown icon if not found icon for the blueprint
+    end
+
+    -- Default to unknown icon if not found icon for the blueprint
     local unknown = '/textures/ui/common/icons/unknown-icon.dds'
     cached.Images[faction..id] = unknown
+
     return unknown 
 end
 
 local function stringPad(text, spaces)
-    local len = string.len(text) 
+    local len = string.len(text)
     if spaces > len then
         return string.rep(' ', spaces - len) .. text
     end
+
     return text
 end
 
-local function init(value) 
-    return value >= 1 and value or 0 
-end 
+local function init(value)
+    return value >= 1 and value or 0
+end
 
---- Gets Economy stats for unit/enhancement blueprint and calculates production yield
+-- Gets Economy stats for unit/enhancement blueprint and calculates production yield
 function GetEconomyStats(bp)
     local eco = {}
-          
-    if bp.Economy then -- unit
-        eco.BuildCostEnergy = init(bp.Economy.BuildCostEnergy)  
-        eco.BuildCostMass = init(bp.Economy.BuildCostMass)  
 
-        eco.BuildTime = init(bp.Economy.BuildTime)  
-        eco.BuildRate = init(bp.Economy.BuildRate)   
+    if bp.Economy then -- Unit
+        eco.BuildCostEnergy = init(bp.Economy.BuildCostEnergy)
+        eco.BuildCostMass = init(bp.Economy.BuildCostMass)
+
+        eco.BuildTime = init(bp.Economy.BuildTime)
+        eco.BuildRate = init(bp.Economy.BuildRate)
         
-        local pods = table.getsize(bp.Economy.EngineeringPods)   
+        local pods = table.getsize(bp.Economy.EngineeringPods)
         if pods > 1 then
-             -- multiply by number of UEF engineering station pods
+             -- Multiply by number of UEF engineering station pods
             eco.BuildRate = eco.BuildRate * pods
-        end 
+        end
 
-        eco.YieldMass = -init(bp.Economy.MaintenanceConsumptionPerSecondMass)  
-        eco.YieldMass = eco.YieldMass + init(bp.Economy.ProductionPerSecondMass)  
-        
-        eco.YieldEnergy = -init(bp.Economy.MaintenanceConsumptionPerSecondEnergy)  
-        eco.YieldEnergy = eco.YieldEnergy + init(bp.Economy.ProductionPerSecondEnergy)  
-        
-    else -- enhancement 
-        eco.BuildCostEnergy = init(bp.BuildCostEnergy)  
-        eco.BuildCostMass = init(bp.BuildCostMass)  
-        eco.BuildTime = init(bp.BuildTime)  
-        eco.BuildRate = init(bp.NewBuildRate)  
-    
-        eco.YieldMass = -init(bp.MaintenanceConsumptionPerSecondMass)  
-        eco.YieldMass = eco.YieldMass + init(bp.ProductionPerSecondMass)  
-        
-        eco.YieldEnergy = -init(bp.MaintenanceConsumptionPerSecondEnergy)  
-        eco.YieldEnergy = eco.YieldEnergy + init(bp.ProductionPerSecondEnergy)  
+        eco.YieldMass = -init(bp.Economy.MaintenanceConsumptionPerSecondMass)
+        eco.YieldMass = eco.YieldMass + init(bp.Economy.ProductionPerSecondMass)
+
+        eco.YieldEnergy = -init(bp.Economy.MaintenanceConsumptionPerSecondEnergy)
+        eco.YieldEnergy = eco.YieldEnergy + init(bp.Economy.ProductionPerSecondEnergy)
+    else -- Enhancement
+        eco.BuildCostEnergy = init(bp.BuildCostEnergy)
+        eco.BuildCostMass = init(bp.BuildCostMass)
+        eco.BuildTime = init(bp.BuildTime)
+        eco.BuildRate = init(bp.NewBuildRate)
+
+        eco.YieldMass = -init(bp.MaintenanceConsumptionPerSecondMass)
+        eco.YieldMass = eco.YieldMass + init(bp.ProductionPerSecondMass)
+
+        eco.YieldEnergy = -init(bp.MaintenanceConsumptionPerSecondEnergy)
+        eco.YieldEnergy = eco.YieldEnergy + init(bp.ProductionPerSecondEnergy)
     end
 
     eco.BuildCostEnergy = math.round(eco.BuildCostEnergy)
@@ -415,16 +436,15 @@ function GetEconomyStats(bp)
     eco.YieldMass = math.round(eco.YieldMass)
     eco.YieldEnergy = math.round(eco.YieldEnergy)
          
-    return eco 
+    return eco
 end
 
 -- Some calculation based on this code
 -- https://github.com/spooky/unitdb/blob/master/app/js/dps.js
-
---- gets shots per second of specified weapon (inverse of RateOfFire)
+-- Gets shots per second of specified weapon (inverse of RateOfFire)
 function GetWeaponRatePerSecond(bp, weapon)
     local rate = weapon.RateOfFire or 1
-    return math.round(10 / rate) / 10 -- ticks per second
+    return math.round(10 / rate) / 10 -- Ticks per second
 end
 
 function GetWeaponDefaults(bp, w)
@@ -432,33 +452,37 @@ function GetWeaponDefaults(bp, w)
     weapon.Category = w.WeaponCategory or '<MISSING_CATEGORY>'
     weapon.DisplayName = weapon.DisplayName or '<MISSING_DISPLAYNAME>'
     weapon.Info = string.format("%s (%s)", weapon.DisplayName, weapon.Category)
-     
+
     weapon.BuildCostEnergy = bp.Economy.BuildCostEnergy or 0
     weapon.BuildCostMass = bp.Economy.BuildCostMass or 0
-    weapon.BuildTime = 0 -- not including built time of the unit
-                  
-    weapon.Count  = 1
-    weapon.Multi  = 1   
-    weapon.Range  = math.round(weapon.MaxRadius or 0)
+    weapon.BuildTime = 0 -- Not including built time of the unit
+        
+    weapon.Count = 1
+    weapon.Multi = 1
+    weapon.Range = math.round(weapon.MaxRadius or 0)
     weapon.Damage = GetWeaponDamage(weapon)
-    weapon.RPS    = GetWeaponRatePerSecond(bp, weapon) 
-    weapon.DPS    = -1  
+    weapon.RPS = GetWeaponRatePerSecond(bp, weapon)
+    weapon.DPS = -1
+
     return weapon
 end
---- Get damage of nuke weapon or normal weapon
+
+-- Get damage of nuke weapon or normal weapon
 function GetWeaponDamage(weapon)
     local damage = 0 
-    if weapon.NukeWeapon then -- stack nuke damages
+    if weapon.NukeWeapon then -- Stack nuke damages
         damage = (weapon.NukeInnerRingDamage or 0)
         damage = (weapon.NukeOuterRingDamage or 0) + damage
-    else -- normal weapon
+    else -- Normal weapon
         damage = (weapon.Damage or 0)
     end
+
     return damage
 end
---- Get specs for a weapon with projectiles 
+
+-- Get specs for a weapon with projectiles
 function GetWeaponProjectile(bp, weapon)
-    -- multipliers is needed to properly calculate split projectiles. 
+    -- Multipliers is needed to properly calculate split projectiles.
     -- Unfortunately these numbers hard-coded here are not available in the blueprint,
     -- but specified in the .lua files for corresponding projectiles.
     local multipliers = {  
@@ -470,173 +494,178 @@ function GetWeaponProjectile(bp, weapon)
 
     if weapon.ProjectileId then
        weapon.Multi = multipliers[weapon.ProjectileId] or 1
-    end 
-    
-    --NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
-    if weapon.MuzzleSalvoSize > 1 then 
+    end
+
+    -- NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
+    if weapon.MuzzleSalvoSize > 1 then
        weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
     end
-    --TODO multiply damage of Salvation by AOE or save as it as Damage potential
-      
+
     local projID = string.lower(weapon.ProjectileId or '')
-    local proj = projectiles.All[projID] 
+    local proj = projectiles.All[projID]
     if proj and proj.Economy then
-        
         weapon.BuildCostEnergy = weapon.BuildCostEnergy + (proj.Economy.BuildCostEnergy or 0)
         weapon.BuildCostMass = weapon.BuildCostMass + (proj.Economy.BuildCostMass or 0)
-         
+
         if proj.Economy.BuildTime and bp.Economy.BuildRate then
-            weapon.RPS = proj.Economy.BuildTime / bp.Economy.BuildRate 
+            weapon.RPS = proj.Economy.BuildTime / bp.Economy.BuildRate
         end
     end
               
     weapon.DPS = (weapon.Multi * weapon.Damage) / weapon.RPS
-    weapon.DPS = math.round(weapon.DPS) 
-    
+    weapon.DPS = math.round(weapon.DPS)
+
     return weapon
 end
---- Get specs for a weapon with beam pulses 
+
+-- Get specs for a weapon with beam pulses 
 function GetWeaponBeamPulse(bp, weapon)
     if weapon.BeamLifetime then
         if weapon.BeamCollisionDelay > 0 then
            weapon.Multi = weapon.BeamCollisionDelay
         end
-        if weapon.BeamLifetime > 0 then
-           weapon.Multi = weapon.Multi * weapon.BeamLifetime * 10  
-        end
-        --weapon.Multi = (weapon.BeamCollisionDelay or 1) * 10  
-        --weapon.Multi = weapon.Multi * (weapon.BeamLifetime or 1) 
 
-        -- rate per second
+        if weapon.BeamLifetime > 0 then
+           weapon.Multi = weapon.Multi * weapon.BeamLifetime * 10
+        end
+
+        -- Rate per second
         weapon.RPS = GetWeaponRatePerSecond(bp, weapon)
         weapon.DPS = (weapon.Multi * weapon.Damage) / weapon.RPS
         weapon.DPS = math.round(weapon.DPS)
     end
+
     return weapon
 end
---- Get specs for a weapon with continuous beam
+
+-- Get specs for a weapon with continuous beam
 function GetWeaponBeamContinuous(bp, weapon)
     if weapon.ContinuousBeam then
        weapon.Multi = 10  
-       -- rate per second
+       -- Rate per second
        weapon.RPS = weapon.BeamCollisionDelay == 0 and 1 or 2
        weapon.DPS = (weapon.Multi * weapon.Damage) / weapon.RPS
        weapon.DPS = math.round(weapon.DPS)
     end
+
     return weapon
 end
---- Get specs for a weapon with dots per pulses 
+
+-- Get specs for a weapon with dots per pulses 
 function GetWeaponDOT(bp, weapon)
     if weapon.DoTPulses then
         local initial = GetWeaponProjectile(bp, weapon)
-        weapon.Multi = (weapon.MuzzleSalvoSize or 1) * weapon.DoTPulses 
-        -- rate per second
+        weapon.Multi = (weapon.MuzzleSalvoSize or 1) * weapon.DoTPulses
+        -- Rate per second
         weapon.RPS = GetWeaponRatePerSecond(bp, weapon)
         weapon.DPS = (initial.DPS + weapon.Multi * weapon.Damage) / weapon.RPS
         weapon.DPS = math.round(weapon.DPS)
     end
+
     return weapon
 end
---- Gets specs for a weapon
+
+-- Gets specs for a weapon
 function GetWeaponSpecs(bp, weapon)
     weapon = GetWeaponDefaults(bp, weapon)
-    
+
     if weapon.DoTPulses then
-        --LOG('GetWeaponDOT')
         weapon = GetWeaponDOT(bp, weapon)
     elseif weapon.ContinuousBeam then
-        --LOG('GetWeaponBeamContinuous')
         weapon = GetWeaponBeamContinuous(bp, weapon)
     elseif weapon.BeamLifetime then
-        --LOG('GetWeaponBeamPulse')
         weapon = GetWeaponBeamPulse(bp, weapon)
     else
-        --LOG('GetWeaponProjectile')
         weapon = GetWeaponProjectile(bp, weapon)
     end
 
     return weapon
 end
 
---- Gets weapons stats in given blueprint, more accurate than in-game unitviewDetails.lua
+-- Gets weapons stats in given blueprint, more accurate than in-game unitviewDetails.lua
 function GetWeaponsStats(bp)
     local weapons = {}
-       
-    --TODO fix bug: SCU weapons (rate, damage, range) are not updated with values from enhancements! 
-    --TODO fix bug: SCU presets for SERA faction, have all weapons from all enhancements! 
-    --check bp.EnhancementPresetAssigned.Enhancements table to get accurate stats
 
+    -- TODO fix bug: SCU weapons (rate, damage, range) are not updated with values from enhancements! 
+    -- TODO fix bug: SCU presets for SERA faction, have all weapons from all enhancements! 
+    -- Check bp.EnhancementPresetAssigned.Enhancements table to get accurate stats
     for id, w in bp.Weapon or {} do
         local damage = GetWeaponDamage(w)
-        -- skipping not important weapons, e.g. UEF shield boat fake weapon
-        if w.WeaponCategory and 
-           w.WeaponCategory ~= 'Death' and 
+        -- Skipping not important weapons, e.g. UEF shield boat fake weapon
+        if w.WeaponCategory and
+           w.WeaponCategory ~= 'Death' and
            w.WeaponCategory ~= 'Teleport' and
-           damage > 0 then 
-            
-           local weapon = GetWeaponSpecs(bp, w) 
+           damage > 0 then
+
+           local weapon = GetWeaponSpecs(bp, w)
            weapon.DPM = weapon.Damage / weapon.BuildCostMass
            weapon.DPE = weapon.Damage / weapon.BuildCostEnergy
-           weapon.Damage = math.round(weapon.Damage) 
-           weapons[id] = weapon   
+           weapon.Damage = math.round(weapon.Damage)
+           weapons[id] = weapon
         end
-    end   
-    -- grouping weapons based on their name/category
+    end
+
+    -- Grouping weapons based on their name/category
     local groupWeapons = {}
     for i, weapon in weapons do
         local id = weapon.DisplayName .. '' .. weapon.Category
-        if groupWeapons[id] then -- count duplicated weapons
-           groupWeapons[id].Count  = groupWeapons[id].Count  + 1
-           groupWeapons[id].Damage = groupWeapons[id].Damage + weapon.Damage  
-           groupWeapons[id].DPS    = groupWeapons[id].DPS    + weapon.DPS  
-           groupWeapons[id].DPM    = groupWeapons[id].DPM    + weapon.DPM  
-        else 
+        if groupWeapons[id] then -- Count duplicated weapons
+           groupWeapons[id].Count = groupWeapons[id].Count + 1
+           groupWeapons[id].Damage = groupWeapons[id].Damage + weapon.Damage
+           groupWeapons[id].DPS = groupWeapons[id].DPS + weapon.DPS
+           groupWeapons[id].DPM = groupWeapons[id].DPM + weapon.DPM
+        else
            groupWeapons[id] = table.deepcopy(weapon)
         end
-    end 
-    -- sort weapons by category (Defense weapons first)
+    end
+
+    -- Sort weapons by category (Defense weapons first)
     weapons = table.indexize(groupWeapons)
-    table.sort(weapons, function(a,b)
+    table.sort(weapons, function(a, b)
         if a.WeaponCategory == 'Defense' and
            b.WeaponCategory ~= 'Defense' then
-            return true  
+            return true
         elseif a.WeaponCategory ~= 'Defense' and
-               b.WeaponCategory == 'Defense'  then
-            return false 
+               b.WeaponCategory == 'Defense' then
+            return false
         else
-            return tostring(a.WeaponCategory) > tostring(b.WeaponCategory)  
+            return tostring(a.WeaponCategory) > tostring(b.WeaponCategory)
         end
     end)
+
     return weapons
 end
 
 function GetWeaponsTotal(weapons)
-    local total = {}    
+    local total = {}
     total.Range = 100000
-    total.Count  = 0
+    total.Count = 0
     total.Damage = 0
-    total.DPM    = 0
-    total.DPS    = 0
+    total.DPM = 0
+    total.DPS = 0
+
     for i, weapon in weapons or {} do
-        -- including only important weapons
-        if weapon.Category and 
-           weapon.Category ~= 'Death' and 
-           weapon.Category ~= 'Defense' and
-           weapon.Category ~= 'Teleport'  then
+        -- Including only important weapons
+        if weapon.Category and
+            weapon.Category ~= 'Death' and
+            weapon.Category ~= 'Defense' and
+            weapon.Category ~= 'Teleport' then
             total.Damage = total.Damage + weapon.Damage
-            total.DPM    = total.DPM + weapon.DPM
-            total.DPS    = total.DPS + weapon.DPS
-            total.Count  = total.Count + 1
-            total.Range  = math.min(total.Range, weapon.Range)
+            total.DPM = total.DPM + weapon.DPM
+            total.DPS = total.DPS + weapon.DPS
+            total.Count = total.Count + 1
+            total.Range = math.min(total.Range, weapon.Range)
         end
     end
-    total.Category    = 'All Weapons'
+
+    total.Category = 'All Weapons'
     total.DisplayName = 'Total'
-    total.Info  = string.format("%s (%s)", total.DisplayName, total.Category)
-      
+    total.Info = string.format("%s (%s)", total.DisplayName, total.Category)
+
     return total 
 end
---- Returns unit's categories that should not be hidden in tooltips 
+
+-- Returns unit's categories that should not be hidden in tooltips 
 function GetUnitsCategories(bp, showAll)
     local ret = {}
     if bp.Categories then
@@ -646,97 +675,107 @@ function GetUnitsCategories(bp, showAll)
             ret = categories
         else
             for _, category in categories do
-                -- ensure categories are nicely formatted
-                if category == 'MASSPRODUCTION' then 
-                    category = 'MASS PRODUCTION'  
-                elseif category == 'MASSSTORAGE' then 
-                    category = 'MASS STORAGE'  
-                elseif category == 'ENERGYPRODUCTION' then 
-                    category = 'ENERGY PRODUCTION'  
-                elseif category == 'ENERGYSTORAGE' then 
-                    category = 'ENERGY STORAGE'  
-                end 
-                -- ensures name of enhancements are nicely formatted
-                if cached.Enhancements[category] then 
+                -- Ensure categories are nicely formatted
+                if category == 'MASSPRODUCTION' then
+                    category = 'MASS PRODUCTION'
+                elseif category == 'MASSSTORAGE' then
+                    category = 'MASS STORAGE'
+                elseif category == 'ENERGYPRODUCTION' then
+                    category = 'ENERGY PRODUCTION'
+                elseif category == 'ENERGYSTORAGE' then
+                    category = 'ENERGY STORAGE'
+                end
+                -- Ensures name of enhancements are nicely formatted
+                if cached.Enhancements[category] then
                     category = 'UPGRADE ' .. StringSplitCamel(category)
                 end
-                if not CategoriesHidden[category] then 
-                    -- ensures all categories have the same case
-                    table.insert(ret, string.upper(category)) 
+                if not CategoriesHidden[category] then
+                    -- Ensures all categories have the same case
+                    table.insert(ret, string.upper(category))
                 end
             end
-        end  
-        -- help showing difference between support and HQ factories  
-        if categories['FACTORY'] and 
-           categories['STRUCTURE'] and 
-           not categories['SUPPORTFACTORY'] then 
-            table.insert(ret, 'HQFACTORY') 
-        end       
-    end  
+        end
+
+        -- Help showing difference between support and HQ factories  
+        if categories['FACTORY'] and
+           categories['STRUCTURE'] and
+           not categories['SUPPORTFACTORY'] then
+            table.insert(ret, 'HQFACTORY')
+        end
+    end
+
     return table.sorted(ret)
 end
---- Creates basic tooltip for given blueprints based on its categories, name, and source
-function GetTooltip(bp)
 
-    -- create unique key for caching tooltips
+-- Creates basic tooltip for given blueprints based on its categories, name, and source
+function GetTooltip(bp)
+    -- Create unique key for caching tooltips
     local key = bp.Source .. ' {' .. bp.Name .. '}'
       
-    if cached.Tooltips[key] then 
+    if cached.Tooltips[key] then
         return cached.Tooltips[key]
     end
-    local tooltip = { 
+
+    local tooltip = {
         text = '',
         body = ''
-    }  
+    }
+
     tooltip.text = LOCF(bp.Name)
-     
     if bp.Tech then
         tooltip.text = bp.Tech .. ' ' .. tooltip.text
-        --tooltip.body = tooltip.body .. ' ' .. bp.Tech .. ' \n\n' 
     end
+
     if bp.Categories then
         local categories = table.keys(bp.Categories)
         for _, category in categories do
-            if not CategoriesHidden[category] then 
+            if not CategoriesHidden[category] then
                 tooltip.body = tooltip.body .. category .. ' \n'
             end
         end
     end
+
     if bp.Source then
-        tooltip.body = tooltip.body .. ' \n BLUEPRINT: ' .. bp.Source .. ' \n' 
+        tooltip.body = tooltip.body .. ' \n BLUEPRINT: ' .. bp.Source .. ' \n'
     end
+
     if bp.ID then
-        tooltip.body = tooltip.body .. ' \n ID: ' .. bp.ID .. ' \n' 
+        tooltip.body = tooltip.body .. ' \n ID: ' .. bp.ID .. ' \n'
     end
+
     if bp.ImagePath then
-        tooltip.body = tooltip.body .. ' \n : ' .. bp.ImagePath .. ' \n' 
+        tooltip.body = tooltip.body .. ' \n : ' .. bp.ImagePath .. ' \n'
     end
-         
+
     if bp.Mod then
-        tooltip.body = tooltip.body .. ' \n --------------------------------- ' 
-        tooltip.body = tooltip.body .. ' \n MOD: ' .. bp.Mod.name 
+        tooltip.body = tooltip.body .. ' \n --------------------------------- '
+        tooltip.body = tooltip.body .. ' \n MOD: ' .. bp.Mod.name
         tooltip.body = tooltip.body .. ' \n --------------------------------- '
     end
+
     tooltip.text = tooltip.text or ''
     tooltip.body = tooltip.body or ''
-    -- save tooltip for re-use
-    cached.Tooltips[key] = tooltip 
-    
-    return tooltip 
+    -- Save tooltip for re-use
+    cached.Tooltips[key] = tooltip
+
+    return tooltip
 end
---- Checks if a unit contains specified ID 
+
+-- Checks if a unit contains specified ID 
 function ContainsID(unit, value)
     if not unit then return false end
     if not unit.ID then return false end
     if not value then return false end
     return string.upper(value) == string.upper(unit.ID)
 end
+
 --- Checks if a unit contains specified faction 
 function ContainsFaction(unit, value)
     if not unit then return false end
     if not value then return false end
     return string.upper(value) == unit.Faction
 end
+
 --- Checks if a unit contains specified categories 
 function ContainsCategory(unit, value)
     if not unit then return false end
@@ -744,24 +783,27 @@ function ContainsCategory(unit, value)
     if not value then return false end
     return unit.Categories[value]
 end
+
 --- Checks if a unit contains categories in specified expression    
 --- e.g. Contains(unit, '(LAND * ENGINEER) + AIR')
 --- this function is similar to ParseEntityCategoryProperly (CategoryUtils.lua) 
 --- but it works on UI/lobby side
-function Contains(unit, expression) 
-    if not expression or expression == '' or 
+function Contains(unit, expression)
+    if not expression or expression == '' or
        not unit then
        return false
     end
+
     local OPERATORS = { -- Operations
         ["("] = true,
         [")"] = true,
-        -- operation on categories: a, b 
-        ["*"] = function(a, b) return a and b end,     -- Intersection    and category
-        ["-"] = function(a, b) return a and not b end, -- Subtraction    not category
-        ["+"] = function(a, b) return a or  b end,        -- Union            or  category
+        -- Operation on categories: a, b 
+        ["*"] = function(a, b) return a and b end, -- Intersection and category
+        ["-"] = function(a, b) return a and not b end, -- Subtraction not category
+        ["+"] = function(a, b) return a or  b end, -- Union or  category
     }
-    expression = '('..expression..')'    
+
+    expression = '('..expression..')'
     local tokens = {}
     local currentIdentifier = ""
     expression:gsub(".", function(c)
@@ -827,10 +869,10 @@ function Contains(unit, expression)
             return false
         end
     end
-    
+
     local function ParseSubexpression(start, finish)
         local currentCategory = nil
-        -- type of the next token we expect (want alternating identifier/operator)
+        -- Type of the next token we expect (want alternating identifier/operator)
         local expectingIdentifier = true
         -- The last operator encountered.
         local currentOperator = nil
@@ -838,7 +880,7 @@ function Contains(unit, expression)
         local i = start
         while i <= finish do
             local token = tokens[i]
-             
+
             if expectingIdentifier then
                 -- Bracket expressions are effectively identifiers
                 if token == "(" then
@@ -846,7 +888,7 @@ function Contains(unit, expression)
                     -- the result onto the working category.
                     local subcategoryEnd = getExpressionEnd(i)
                     local subcategory = ParseSubexpression(i + 1, subcategoryEnd - 1)
-                    
+
                     currentCategory = getSolution(currentCategory, subcategory, currentOperator)
 
                     -- We want 'i' to end up beyond the bracket, and to end up *not* expecting indent,
@@ -856,10 +898,9 @@ function Contains(unit, expression)
                     explode("Expected category identifier, found OPERATOR " .. token)
                     return nil
                 else
-                    -- match token with unit ID or unit categories
-                    local matching = ContainsID(unit, token) or 
-                                     --ContainsFaction(unit, token) or 
-                                     ContainsCategory(unit, token) 
+                    -- Match token with unit ID or unit categories
+                    local matching = ContainsID(unit, token) or
+                                     ContainsCategory(unit, token)
                     currentCategory = getSolution(currentCategory, matching, currentOperator)
                 end
             else
@@ -867,38 +908,36 @@ function Contains(unit, expression)
                     explode("Expected operator, found category identifier: " .. token)
                     return nil
                 end
-                --LOG('parsing.operator ' .. token .. ' ')
                 currentOperator = token
             end
             expectingIdentifier = not expectingIdentifier
             i = i + 1
         end
+
         return currentCategory
     end
-    
     local isMatching = ParseSubexpression(1, numTokens)
-    --Show('PARSING', 'units is' .. isMatching .. ' contains ' )
-    
+
     return isMatching
 end
  
---- Gets units with categories/id/enhancement that match specified expression
+-- Gets units with categories/id/enhancement that match specified expression
 function GetUnits(bps, expression)
     local matches = {}
     local index = 1
     for id, bp in bps do
         local isMatching = Contains(bp, expression)
-        --log.Table(unit.Categories, 'unit.Categories')
         if isMatching then
             matches[id] = bp
             index = index + 1
         end
     end
+
     return matches
 end
---- Groups units based on their categories
-function GetUnitsGroups(bps, factionName)
 
+-- Groups units based on their categories
+function GetUnitsGroups(bps, factionName)
     -- NOTE these unit groupings are for visualization purpose only
        
     local TECH4ARTY = '(EXPERIMENTAL * ARTILLERY - FACTORY - LAND)' -- mobile factory (FATBOY)
@@ -908,14 +947,14 @@ function GetUnitsGroups(bps, factionName)
     -- xrl0005 Crab Egg (Artillery) 
     -- drlk005 Crab Egg (Bouncer)
     local CRABEGG = 'xrl0002 + xrl0003 + xrl0004 + xrl0005 + drlk005'
-    -- including crab eggs with factories so they are not confused with actual units built from crab eggs
+    -- Including crab eggs with factories so they are not confused with actual units built from crab eggs
     local FACTORIES = '((FACTORY * STRUCTURE) + ' .. CRABEGG .. ')'
     
     local faction = {}  
     faction.Name = factionName
     faction.Blueprints      = GetUnits(bps, factionName) 
     faction.Units = {}
-    -- grouping ACU/SCU upgrades in separate tables because they have different cost/stats
+    -- Grouping ACU/SCU upgrades in separate tables because they have different cost/stats
     faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER')
     faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND')
     faction.Units.ALL       = GetUnits(bps, '('..factionName..' - UPGRADE - COMMAND - SUBCOMMANDER)' ) 
@@ -927,14 +966,14 @@ function GetUnitsGroups(bps, factionName)
     faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD)')
     faction.Bases.ECONOMIC  = GetUnits(faction.Bases.ALL, '(STRUCTURE * ECONOMIC)')
     faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
-    
+
     faction.Bases.DEFENSES  = {}
-    -- collect not grouped units above tables into the DEFENSES table
-    -- this way we don't miss showing un-grouped units 
+    -- Collect not grouped units above tables into the DEFENSES table
+    -- This way we don't miss showing un-grouped units 
     for ID, bp in faction.Blueprints do
         if not faction.Units.ACU[ID] and 
            not faction.Units.SCU[ID] and  
-           
+
            not faction.Units.AIR[ID] and 
            not faction.Units.LAND[ID] and 
            not faction.Units.NAVAL[ID] and 
@@ -945,31 +984,30 @@ function GetUnitsGroups(bps, factionName)
            faction.Bases.DEFENSES[ID] = bp
         end
     end
-     
+
     return faction
 end
---- Cache enhancements as new blueprints with Categories, Faction from their parent (unit) blueprints 
-local function CacheEnhancement(key, bp, name, enh)    
-    --Show('CACHING', name .. '...')
-    local categories = {}
 
+-- Cache enhancements as new blueprints with Categories, Faction from their parent (unit) blueprints 
+local function CacheEnhancement(key, bp, name, enh)
+    local categories = {}
     cached.Enhancements[name] = true
 
     if blueprints.All[key].Categories then
         categories = blueprints.All[key].Categories
     end
+
     local commanderType = ''
     categories['UPGRADE'] = true
     if bp.Categories['COMMAND'] then
         commanderType = 'ACU'
         categories['COMMAND'] = true
-        --categories['UPGRADE_ACU'] = true
     elseif bp.Categories['SUBCOMMANDER'] then
         commanderType = 'SCU'
         categories['SUBCOMMANDER'] = true
-        --categories['UPGRADE_SCU'] = true
     end
-    -- create some extra categories used for ordering enhancements in UI  
+
+    -- Create some extra categories used for ordering enhancements in UI  
     if enh.Slot then
         local slot = string.upper(enh.Slot)
         if slot == 'LCH' then
@@ -979,64 +1017,66 @@ local function CacheEnhancement(key, bp, name, enh)
         elseif slot == 'BACK' then
             enh.Slot = 'BACK'
         end
-        categories['UPGRADE '..enh.Slot] = true 
+        categories['UPGRADE '..enh.Slot] = true
     end     
-        
+
     enh.ID = name
     enh.Key = key
     enh.Faction = bp.Faction
-    enh.Source = bp.Source 
+    enh.Source = bp.Source
     enh.SourceID = StringExtract(bp.Source, '/', '_unit.bp', true)
 
     enh.Name = enh.Name or name
     enh.Type = 'UPGRADE'
     enh.Tech = enh.Slot
     enh.Mod = bp.Mod
-         
+
     categories[bp.Faction] = true
     categories[name] = true
-        
+
     enh.Categories = categories
 
     if bp.Mod then
-        blueprints.Modified[key] = enh  
+        blueprints.Modified[key] = enh
     else
-        blueprints.Original[key] = enh  
+        blueprints.Original[key] = enh
     end
-    
-    blueprints.All[key] = enh   
 
+    blueprints.All[key] = enh   
 end
---- Cache projectile blueprints
+
+-- Cache projectile blueprints
 local function CacheProjectile(bp)
     if not bp then return end
 
-    local id = string.lower(bp.Source) 
-    bp.Info = bp.Source or '' -- or bp.BlueprintId  
+    local id = string.lower(bp.Source)
+    bp.Info = bp.Source or ''
     Show('CACHING', bp.Info .. '...')
       
-    -- converting categories to hash table for quick lookup 
+    -- Converting categories to hash table for quick lookup 
     if  bp.Categories then
         local categories = {}
         for _, category in bp.Categories do
             categories[category] = true
-        end    
-        bp.Categories = categories 
+        end
+        bp.Categories = categories
     end
-        
+
     if bp.Mod then
-        projectiles.Modified[id] = bp  
+        projectiles.Modified[id] = bp
     else
-        projectiles.Original[id] = bp  
+        projectiles.Original[id] = bp
     end
-    
+
     projectiles.All[id] = bp  
 end
--- checks for valid unit blueprints (not projectiles/effects)
+
+-- Checks for valid unit blueprints (not projectiles/effects)
 function IsValidUnit(bp, id)
     if not bp or not id or string.len(id) <= 4 or string.find(id, '/') or CategoriesSkipped[id] then
         return false
     end
+
     if bp.Categories then
         for _, category in bp.Categories do
             if CategoriesAllowed[category] then
@@ -1046,68 +1086,70 @@ function IsValidUnit(bp, id)
             end
         end
     end
+
     return true
 end
---- Cache unit blueprints and extract their enhancements as new blueprints
+
+-- Cache unit blueprints and extract their enhancements as new blueprints
 local function CacheUnit(bp)
     if not bp then return end
-      
+
     bp.ID = bp.BlueprintId
     bp.Info = bp.Source  
     Show('CACHING', bp.Info .. '...')
-    
+
     local id = bp.ID 
 
     bp.Name = GetUnitName(bp)
 
-    -- skip processing of invalid units 
+    -- Skip processing of invalid units 
     if not IsValidUnit(bp, id) then
         blueprints.Skipped[id] = bp
         return 
     end
-    -- converting categories to hash table for quick lookup 
-    bp.Categories = table.hash(bp.Categories)
 
+    -- Converting categories to hash table for quick lookup 
+    bp.Categories = table.hash(bp.Categories)
     bp.Faction = GetUnitFaction(bp)
     bp.Type = GetUnitType(bp)
     bp.Tech = GetUnitTech(bp)
     bp.Name = GetUnitName(bp)
     bp.Color = GetUnitColor(bp)
-     
+
     if bp.Mod then
         blueprints.Modified[id] = bp  
     else
         blueprints.Original[id] = bp  
     end
-    
+
     blueprints.All[id] = bp  
 
-    -- extract and cache enhancements so they can be restricted individually 
+    -- Extract and cache enhancements so they can be restricted individually
     for name, enh in bp.Enhancements or {} do
-        -- skip slots or 'removable' enhancements
-        if name ~= 'Slots' and not string.find(name, 'Remove') then 
-            -- some enhancements are shared between factions, e.g. Teleporter
-            -- and other enhancements have different stats and icons 
-            -- depending on faction or whether they are for ACU or SCU  
+        -- Skip slots or 'removable' enhancements
+        if name ~= 'Slots' and not string.find(name, 'Remove') then
+            -- Some enhancements are shared between factions, e.g. Teleporter
+            -- and other enhancements have different stats and icons
+            -- depending on faction or whether they are for ACU or SCU
             -- so store each enhancement with unique key:
             local id = StringExtract(bp.Source, '/', '_unit.bp', true)
             local key = bp.Faction ..'_' .. id .. '_' .. name
-           
-            CacheEnhancement(key, bp, name, enh)    
-        end 
+
+            CacheEnhancement(key, bp, name, enh)
+        end
     end
 end
 
 local mods = { Cached = {}, Active = {}, Changed = false }
 
---- Checks if game mods have changed between consecutive calls to this function    
---- Thus returns whether or not blueprints need to be reloaded
+-- Checks if game mods have changed between consecutive calls to this function    
+-- Thus returns whether or not blueprints need to be reloaded
 function DidModsChanged()
-    
     mods.All = import('/lua/mods.lua').GetGameMods()
     mods.Active = {}
-    mods.Changed = false  
-    for _, mod in mods.All do  
+    mods.Changed = false
+
+    for _, mod in mods.All do
         mods.Active[mod.uid] = true
         if not mods.Cached[mod.uid] then
             mods.Changed = true
@@ -1119,26 +1161,24 @@ function DidModsChanged()
     if mods.CachedCount ~= mods.ActiveCount then
        mods.Changed = true
     end
-  
+
     if mods.Changed then
         Show('STATUS', 'mods changed from ' .. mods.CachedCount .. ' to ' .. mods.ActiveCount)
         mods.Cached = table.deepcopy(mods.Active)
     else
         Show('STATUS', 'mods cached = ' .. mods.CachedCount)
     end
-
     mods.Active = nil
-    
+
     return mods.Changed
 end
 
---- Loads all unit blueprints from the game and given active mods  
+-- Loads all unit blueprints from the game and given active mods
 function GetBlueprints(activeMods, skipGameFiles)
-
     TimerStart()
      
-    -- load original game files only once 
-    local loadedGameFiles = table.getsize(blueprints.Original) > 0 
+    -- Load original game files only once
+    local loadedGameFiles = table.getsize(blueprints.Original) > 0
     if loadedGameFiles then
          skipGameFiles = true
     end
@@ -1154,22 +1194,22 @@ function GetBlueprints(activeMods, skipGameFiles)
         projectiles.All = table.deepcopy(projectiles.Original)
         projectiles.Modified = {}
         projectiles.Skipped = {}
-        
+
         doscript '/lua/system/Blueprints.lua'
 
-        -- loading projectiles first so that they can be used by units
+        -- Loading projectiles first so that they can be used by units
         local dir = {'/projectiles'}
-        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true) 
+        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true)
         for _, bp in bps.Projectile do
-            CacheProjectile(bp) 
+            CacheProjectile(bp)
         end
-        
+
         dir = {'/units'}  
-        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true) 
+        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true)
         for _, bp in bps.Unit do
             if not string.find(bp.Source,'proj_') then
-                CacheUnit(bp) 
-            end 
+                CacheUnit(bp)
+            end
         end
 
         state = state .. ' loaded '
@@ -1181,14 +1221,12 @@ function GetBlueprints(activeMods, skipGameFiles)
     info = info .. table.getsize(projectiles.Modified) .. ' modified), and '
     info = info .. table.getsize(projectiles.Skipped) .. ' skipped projectiles'
     Show('STATUS', info)
-   
+
     info = state.. table.getsize(blueprints.All) .. ' total ('
     info = info .. table.getsize(blueprints.Original) .. ' original, '
     info = info .. table.getsize(blueprints.Modified) .. ' modified), and '
     info = info .. table.getsize(blueprints.Skipped) .. ' skipped units'
-   
     info = info .. ' in ' .. TimerStop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
-     
     Show('STATUS', info)
 
     return blueprints 
