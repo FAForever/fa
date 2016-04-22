@@ -448,7 +448,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     -- Among other things, this clears uimain's override escape handler, allowing our escape
     -- handler manager to work.
     MenuCommon.MenuCleanup()
-    
+
     if GUI then
         WARN('CreateLobby called twice for UI construction (Should be unreachable)')
         GUI:Destroy()
@@ -499,7 +499,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local Prefs = import('/lua/user/prefs.lua')
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
-    
+
     -- Game started. Harvest blueprints ready for use by Unit Manager
     GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), false)
 end
@@ -745,9 +745,9 @@ function SetSlotInfo(slotNum, playerInfo)
     -- The predicate was getting unpleasantly long to read.
     local function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
         LOG('lobby.teamSelectionEnabled autoTeams = ' .. tostring(autoTeams) ..
-            ', ready = ' .. tostring(ready) ..  
-            ', locallyOwned = ' .. tostring(locallyOwned) .. 
-            ', isHost = ' .. tostring(isHost) ) 
+            ', ready = ' .. tostring(ready) ..
+            ', locallyOwned = ' .. tostring(locallyOwned) ..
+            ', isHost = ' .. tostring(isHost) )
         WVT.LoggingEnabled = true
         if isHost and not playerInfo.Human then
             return true
@@ -1032,20 +1032,20 @@ local function autobalance_bestworst(players, teams_arg)
             local slot = table.remove(slots, 1)
             local player
 
-            if(best) then
+            if best then
                 player = table.remove(players, 1)
             else
                 player = table.remove(players)
             end
 
-            if(not player) then break end
+            if not player then break end
 
             teams[i]['sum'] = teams[i]['sum'] + player['rating']
             table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
         end
 
         best = not best
-        if(best) then
+        if best then
             table.sort(teams, team_sort_by_sum)
         end
     end
@@ -1074,13 +1074,13 @@ local function autobalance_avg(players, teams_arg)
 
             for j, p in players do
                 player_key = j
-                if(first_team or t['sum'] + p['rating'] <= max_sum) then
+                if first_team or t['sum'] + p['rating'] <= max_sum then
                     break
                 end
             end
 
             player = table.remove(players, player_key)
-            if(not player) then break end
+            if not player then break end
 
             teams[i]['sum'] = teams[i]['sum'] + player['rating']
             max_sum = math.max(max_sum, teams[i]['sum'])
@@ -1108,16 +1108,16 @@ local function autobalance_rr(players, teams)
 
     local picks = team_picks[table.getn(teams)]
 
-    if(not picks or table.getsize(picks) == 0) then
+    if not picks or table.getsize(picks) == 0 then
         return
     end
 
     i = 1
-    while (table.getn(players) > 0) do
+    while table.getn(players) > 0 do
         local player = table.remove(players, 1)
         local team = table.remove(picks, 1)
         local slot = table.remove(teams[team], 1)
-        if(not player) then break end
+        if not player then break end
 
         table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
     end
@@ -1136,14 +1136,13 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while(table.getn(players) > 0) do
-
+    while table.getn(players) > 0 do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
             local player = table.remove(players, 1)
 
-            if(not player) then break end
+            if not player then break end
 
             table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
         end
@@ -3103,7 +3102,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         -- Scan the values array to find the one with the key matching our value for that option.
         for k, val in optData.values do
             local key = val.key or val
-            
+
             if key == gameOption then
                 option.key = key
                 option.value = val.text or optData.value_text
@@ -3766,7 +3765,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 -- the keys to be bool. Custom options should use 'True' or 'False'
                 if option.key == 'AllowObservers' then
                     defValue = option.values[option.default].key
-                else                    
+                else
                     defValue = option.values[option.default].key or option.values[option.default]
                 end
             end
