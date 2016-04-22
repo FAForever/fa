@@ -52,7 +52,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
-        self.Scorching = nil   
+        self.Scorching = nil
     end,
 
     PassTarget = function(self, entity, position)
@@ -133,12 +133,12 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
                 fxBeam = CreateBeamEmitter(bp, army)
                 AttachBeamToEntity(fxBeam, self, 0, army)
             end
-            
+
             -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
-            
+
             table.insert( self.BeamEffectsBag, fxBeam )
             self.Trash:Add(fxBeam)
         else
@@ -155,7 +155,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
@@ -167,12 +167,12 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     OnDisable = function( self )
         PhasonCollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
-        self.Scorching = nil   
+        self.Scorching = nil
     end,
 
     ScorchThread = function(self)
         local army = self:GetArmy()
-        local size = 1 + (Random() * 1.1) 
+        local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
@@ -186,7 +186,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
-                
+
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1 + (Random() * 1.1)
             CurrentPosition = self:GetPosition(1)
@@ -225,14 +225,14 @@ DSLK004 = Class(SLandUnit) {
             FxBeamEndPointScale = 0.01,
         },
     },
-	
+
     OnStopBeingBuilt = function(self,builder,layer)
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 
         local army =  self:GetArmy()
         local EfctTempl = {
             '/units/DSLK004/effects/orbeffect_01.bp',
-            '/units/DSLK004/effects/orbeffect_02.bp',    
+            '/units/DSLK004/effects/orbeffect_02.bp',
         }
         for k, v in EfctTempl do
             CreateAttachedEmitter(self, 'Orb', army, v)
