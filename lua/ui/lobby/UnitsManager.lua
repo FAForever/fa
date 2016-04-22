@@ -268,7 +268,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     end
       
     factions = {} -- reset factions
-    blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), false)
+    blueprints = import('/lua/ui/lobby/lobby.lua').GetBlueprintList()
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'SERAPHIM')) 
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'UEF')) 
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN')) 

@@ -217,44 +217,49 @@ local IsValidUnit = import('/lua/ui/lobby/UnitsAnalyzer.lua').IsValidUnit
 
 -- gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
 local function GetUnitsUpgradable()
-    local units = {}  
-    for id, bp in __blueprints or {} do 
+    local units = {}
+    if not bps.ids then
+        WARN('ERROR - Trying to fetch upgradable units from an empty list. That is impossible!')
+    end
+
+    for _, id in bps.ids do
+        local bp = __blueprints[id]
         -- check for valid/upgradeable blueprints 
-        if bp and bp.General and IsValidUnit(bp, id) and 
-         ((bp.General.UpgradesFrom ~= '' and 
-           bp.General.UpgradesFrom ~= 'none') or 
-          (bp.General.UpgradesTo ~= '' and 
+        if bp and bp.General and IsValidUnit(bp, id) and
+         ((bp.General.UpgradesFrom ~= '' and
+           bp.General.UpgradesFrom ~= 'none') or
+          (bp.General.UpgradesTo ~= '' and
            bp.General.UpgradesTo ~= 'none')) then
             local unit = table.deepcopy(bp)
             unit.id = id -- save id for a reference
-            table.insert(units, unit)  
+            table.insert(units, unit)
         end
     end
     -- ensure units are sorted in increasing order of upgrades
     -- this increase performance when checking for breaks in upgrade-chain
-    table.sort(units, SortUnits)  
+    table.sort(units, SortUnits)
     return units
 end
+
 -- gets ids of valid units
 local function GetUnitsIds()
     local units = {}
-    for id, bp in __blueprints or {} do
+    for id, bp in __blueprints do
         if IsValidUnit(bp, id) then
             table.insert(units, id)
         end
     end
     return units
 end
+
 -- resolves category restrictions to a table with ids of restricted units
 -- e.g. restrictions = { categories.TECH1 } -> 
 function ResolveRestrictions(toggle, cats, army)
     -- initialize blueprints info only once
-    if table.getsize(bps.ids) == 0 or
-       table.getsize(bps.upgradeable) == 0 then
+    if table.getsize(bps.ids) == 0 or table.getsize(bps.upgradeable) == 0 then
         bps.ids = GetUnitsIds()
-        bps.upgradeable = GetUnitsUpgradable() 
+        bps.upgradeable = GetUnitsUpgradable()
     end
-    
     -- find ids of units restricted by global categories
     if not toggle or not army then
         local ids = EntityCategoryFilterDown(cats, bps.ids)

@@ -42,6 +42,7 @@ local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
+local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 
 local IsSyncReplayServer = false
 
@@ -447,7 +448,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     -- Among other things, this clears uimain's override escape handler, allowing our escape
     -- handler manager to work.
     MenuCommon.MenuCleanup()
-
+    
     if GUI then
         WARN('CreateLobby called twice for UI construction (Should be unreachable)')
         GUI:Destroy()
@@ -498,6 +499,13 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local Prefs = import('/lua/user/prefs.lua')
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
+    
+    -- Game started. Harvest blueprints ready for use by Unit Manager
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), false)
+end
+
+function GetBlueprintList()
+    return GUI.blueprints
 end
 
 -- A map from message types to functions that process particular message types.
@@ -1891,6 +1899,9 @@ local OptionUtils = {
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
 function OnModsChanged(simMods, UIMods, ignoreRefresh)
+    -- Mods have changed, so we need to update our available units list.
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), false)
+
     -- We depend upon ModsManager to not allow the user to change mods they shouldn't be able to
     selectedSimMods = simMods
     selectedUIMods = UIMods
