@@ -377,6 +377,23 @@ function table.shuffle(t)
     return r
 end
 
+-- table.binsert(t, value, cmp) binary insert value into table using cmp-func
+function table.binsert(t, value, cmp)
+      local cmp = cmp or (function( a,b ) return a < b end)
+      local start, stop, mid, state = 1, table.getsize(t), 1, 0
+      while start <= stop do
+         mid = math.floor((start + stop) / 2)
+         if cmp(value, t[mid]) then
+            stop, state = mid - 1, 0
+         else
+            start, state = mid + 1, 1
+         end
+      end
+
+      table.insert(t, mid + state, value)
+      return mid + state
+   end
+
 -- Pretty-print a table. Depressingly large amount of wheel-reinvention were required, thanks to
 -- SC's LUA being a bit weird and the existing solutions to this problem being aggressively optimized
 function printField(k, v, tblName, printer)
