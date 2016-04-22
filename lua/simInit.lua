@@ -31,6 +31,39 @@ end
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
+function ShuffleStartPositions()
+    local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
+    local teams = {}
+    local armies = {}
+    local t, marker
+
+    for name, army in ScenarioInfo.ArmySetup do
+        if not army.Civilian then
+            marker = markers[name]
+            if marker and marker.position then
+                t = teams[army.Team]
+                if not t then
+                    t = {starts={}, names={}}
+                    teams[army.Team] = t
+                end
+                table.insert(t.starts, marker.position)
+                table.insert(t.names, name)
+            end
+        end
+    end
+
+    local pos
+    for _, t in teams do
+        if t.starts[1] then
+            t.starts = table.shuffle(t.starts)
+            for _, name in t.names do
+                pos = table.remove(t.starts, 1)
+                ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers[name].position = pos
+            end
+        end
+    end
+end
+
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
@@ -119,6 +152,12 @@ function SetupSession()
     doscript(ScenarioInfo.save, ScenarioInfo.Env)
 
     Scenario = ScenarioInfo.Env.Scenario
+
+    local spawn = ScenarioInfo.Options.TeamSpawn
+    if spawn and table.find({'random', 'balanced', 'balanced_flex'}, spawn) then
+        -- prevents players from knowing start positions at start
+        ShuffleStartPositions()
+    end
 
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)

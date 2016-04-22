@@ -76,6 +76,7 @@ Patch 3652 (pending)
 - Allowed Aeon Aircraft Carrier to build Bombers and Gunships, same as the others.
 - Fixed restriction system on Sim side such that it cannot be compromised by UI mods 
 - Fixed restriction system that prevented removing restrictions on already restricted units in scenario scripts
+- It is no longer possible to find out a player's starting position by using the connection window (F11)
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs
