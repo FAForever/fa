@@ -1913,6 +1913,8 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         UpdateGame()
     end
+    -- Mods have changed, so we need to update our available units list.
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), true)
 end
 
 function GetAvailableColor()
@@ -3421,6 +3423,8 @@ function UpdateClientModStatus(newHostSimMods)
     end
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
+    -- reload blueprints since the host has changed sim mods
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), true)
 end
 
 -- LobbyComm Callbacks
