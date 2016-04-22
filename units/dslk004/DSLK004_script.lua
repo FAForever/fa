@@ -80,9 +80,10 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             end
             damage = damage * dmgmod
         end
-        if instigator and damage > 0 then
 
+        if damage <= 0 then return end
 
+        if instigator then
             local radius = damageData.DamageRadius
             local BeamEndPos = self:GetPosition(1)
             if targetEntity and targetEntity.GetPosition then
