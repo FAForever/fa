@@ -311,6 +311,11 @@ globalOpts = {
         value_text = "<LOC lobui_0320>%s",
         value_help = "<LOC lobui_0321>Rules enforced for %s mins",
         values = {
+            {
+                text = "<LOC lobui_0318>Off",
+                help = "<LOC lobui_0319>Rules not enforced",
+                key = 'Off',
+            },
             '5', '10', '15', '20', '30'
         },
     },
