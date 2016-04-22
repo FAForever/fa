@@ -1899,9 +1899,6 @@ local OptionUtils = {
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
 function OnModsChanged(simMods, UIMods, ignoreRefresh)
-    -- Mods have changed, so we need to update our available units list.
-    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), false)
-
     -- We depend upon ModsManager to not allow the user to change mods they shouldn't be able to
     selectedSimMods = simMods
     selectedUIMods = UIMods
@@ -1914,6 +1911,8 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         UpdateGame()
     end
+    -- Mods have changed, so we need to update our available units list.
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), true)
 end
 
 function GetAvailableColor()
@@ -3422,6 +3421,8 @@ function UpdateClientModStatus(newHostSimMods)
     end
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
+    -- reload blueprints since the host has changed sim mods
+    GUI.blueprints = UnitsAnalyzer.GetBlueprints(Mods.GetGameMods(), true)
 end
 
 -- LobbyComm Callbacks
