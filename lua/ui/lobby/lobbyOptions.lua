@@ -9,30 +9,20 @@
 teamOptions =
 {
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0088>Spawn",
         help = "<LOC lobui_0089>Determine what positions players spawn on the map",
         key = 'TeamSpawn',
         values = {
-            {
-                text = "<LOC lobui_0092>Fixed",
-                help = "<LOC lobui_0093>Spawn everyone in fixed locations (determined by slot)",
-                key = 'fixed',
-            },
             {
                 text = "<LOC lobui_0090>Random",
                 help = "<LOC lobui_0091>Spawn everyone in random locations",
                 key = 'random',
             },
             {
-                text = "Optimal balance",
-                help = "Teams will be optimally balanced, random start locations",
-                key = 'balanced',
-            },
-            {
-                text = "Flexible balance",
-                help = "Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable",
-                key = 'balanced_flex',
+                text = "<LOC lobui_0092>Fixed",
+                help = "<LOC lobui_0093>Spawn everyone in fixed locations (determined by slot)",
+                key = 'fixed',
             },
         },
     },
