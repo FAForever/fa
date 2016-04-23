@@ -64,9 +64,23 @@ function ShuffleStartPositions()
     end
 end
 
+function AssignRandomFactions()
+    local n_factions = table.getsize(import('/lua/factions.lua').Factions)
+
+    for name, army in ScenarioInfo.ArmySetup do
+        if not army.Civilian then
+            if army.Faction > n_factions then
+                army.Faction = Random(1, n_factions)
+                army.RandomFaction = true
+            end
+        end
+    end
+end
+
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+    AssignRandomFactions()
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
