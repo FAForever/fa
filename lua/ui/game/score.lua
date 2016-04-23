@@ -137,6 +137,7 @@ function SetupPlayerLines()
         if armyIndex ~= 0 and SessionIsReplay() then
             group.faction = Bitmap(group)
             if armyIndex ~= 0 then
+                group.factionIndex = data.faction
                 group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             else
                 group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
@@ -423,6 +424,11 @@ function _OnBeat()
                         line.name:SetFont(UIUtil.bodyFont, 12)
                         line.score:SetFont(UIUtil.bodyFont, 12)
                     end
+
+                    if armiesInfo[index].faction ~= line.factionIndex then
+                        line.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(armiesInfo[index].faction)))
+                    end
+
                     if armiesInfo[index].outOfGame then
                         if scoreData.general.score == -1 then
                             line.score:SetText(LOC("<LOC _Defeated>Defeated"))
