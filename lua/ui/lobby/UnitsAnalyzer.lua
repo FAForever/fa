@@ -1163,21 +1163,20 @@ function DidModsChanged()
     end
 
     if mods.Changed then
-        Show('STATUS', 'mods changed from ' .. mods.CachedCount .. ' to ' .. mods.ActiveCount)
+        Show('STATUS', 'game mods changed from ' .. mods.CachedCount .. ' to ' .. mods.ActiveCount)
         mods.Cached = table.deepcopy(mods.Active)
     else
-        Show('STATUS', 'mods cached = ' .. mods.CachedCount)
+        Show('STATUS', 'game mods cached = ' .. mods.CachedCount)
     end
     mods.Active = nil
 
     return mods.Changed
 end
-
--- Loads all unit blueprints from the game and given active mods
-function GetBlueprints(activeMods, skipGameFiles)
+-- Gets unit blueprints by loading them from the game and given active sim mods
+local function GetBlueprints(activeMods, skipGameFiles)
     TimerStart()
      
-    -- Load original game files only once
+    -- Load original FA blueprints only once
     local loadedGameFiles = table.getsize(blueprints.Original) > 0
     if loadedGameFiles then
          skipGameFiles = true
@@ -1195,6 +1194,7 @@ function GetBlueprints(activeMods, skipGameFiles)
         projectiles.Modified = {}
         projectiles.Skipped = {}
 
+        -- allows execution of LoadBlueprints()
         doscript '/lua/system/Blueprints.lua'
 
         -- Loading projectiles first so that they can be used by units
@@ -1203,7 +1203,7 @@ function GetBlueprints(activeMods, skipGameFiles)
         for _, bp in bps.Projectile do
             CacheProjectile(bp)
         end
-
+        -- Loading units second so that they can use projectiles
         dir = {'/units'}  
         bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true)
         for _, bp in bps.Unit do
@@ -1211,7 +1211,6 @@ function GetBlueprints(activeMods, skipGameFiles)
                 CacheUnit(bp)
             end
         end
-
         state = state .. ' loaded '
     else
         state = state .. ' cached '
@@ -1229,5 +1228,22 @@ function GetBlueprints(activeMods, skipGameFiles)
     info = info .. ' in ' .. TimerStop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
     Show('STATUS', info)
 
-    return blueprints 
+    return blueprints
+end
+-- Gets all unit blueprints that were previously fetched
+function GetBlueprintsList()
+    return blueprints
+end
+-- Fetch asynchronously all unit blueprints from the game and given active sim mods
+function FetchBlueprints(activeMods, skipGameFiles)
+    local bps = {}
+    ForkThread(function() 
+        Show('STATUS', 'forking thread...')
+        bps = GetBlueprints(activeMods, skipGameFiles)
+        -- check if blueprints are loaded
+        while table.getsize(bps) == 0 do 
+            WaitSeconds(0.25) 
+        end
+        Show('STATUS', 'forking thread...done') 
+    end) 
 end
