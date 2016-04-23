@@ -1624,7 +1624,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
-        AssignRandomFactions()
         AssignRandomStartSpots()
         AssignAINames()
         local allRatings = {}
