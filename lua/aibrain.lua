@@ -217,6 +217,18 @@ AIBrain = Class(moho.aibrain_methods) {
         self.PreBuilt = true
     end,
 
+    HideFaction = function(self)
+        if self.realFaction then return end
+        self.realFaction = self:GetFactionIndex()
+        SetArmyFactionIndex(self.Name, 4)
+    end,
+
+    RevealFaction = function(self)
+        if not self.realFaction then return end
+        SetArmyFactionIndex(self.Name, self.realFaction-1)
+        self.realFaction = nil
+    end,
+
     ------------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- GLOBAL AI BRAIN ARMY FEATURES ------------------- ----
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -412,6 +424,11 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
+        end
+
+        if self.realFaction and reconType == 'LOSNow' and val == true and
+            not IsAlly(blip:GetArmy(), self:GetArmy()) and GetGameTick() > 20 then
+            self:RevealFaction()
         end
     end,
 
