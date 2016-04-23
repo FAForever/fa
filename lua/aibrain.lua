@@ -156,7 +156,7 @@ AIBrain = Class(moho.aibrain_methods) {
             self.AIPlansList = AIDefaultPlansList
         end
         self.RepeatExecution = false
-        
+
         if ScenarioInfo.type == 'campaign' then
             self:SetResourceSharing(false)
         end
@@ -216,6 +216,18 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    HideFaction = function(self)
+        if self.realFaction then return end
+        self.realFaction = self:GetFactionIndex()
+        SetArmyFactionIndex(self.Name, 4)
+    end,
+
+    RevealFaction = function(self)
+        if not self.realFaction then return end
+        SetArmyFactionIndex(self.Name, self.realFaction-1)
+        self.realFaction = nil
     end,
 
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -342,7 +354,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    
+
 
     ------------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- TRIGGERS BASED ON AN AI BRAIN       ------------- ----
@@ -416,6 +428,11 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
+        end
+
+        if self.realFaction and reconType == 'LOSNow' and val == true and
+            not IsAlly(blip:GetArmy(), self:GetArmy()) and GetGameTick() > 20 then
+            self:RevealFaction()
         end
     end,
 
@@ -784,7 +801,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if not self.loadingTransport or self.loadingTransport.full then return end
         self.loadingTransport.transData.full = true
-        
+
         if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
             -- "CZAR FULL"
             cue = 'XGG_Computer_CV01_04753'
