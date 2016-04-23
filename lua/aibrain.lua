@@ -44,6 +44,8 @@ local Points = {
 }
 
 AIBrain = Class(moho.aibrain_methods) {
+    -- unit:GetArmy() so why brain:GetArmyIndex() ?!
+    GetArmy = moho.aibrain_methods.GetArmyIndex,
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
