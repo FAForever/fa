@@ -444,6 +444,7 @@ function InitializeArmies()
         tblGroups[ strArmy ] = {}
 
         if tblData then
+            local brain = GetArmyBrain(strArmy)
 
             ----[ If an actual starting position is defined, overwrite the        ]--
             ----[ randomly generated one.                                         ]--
@@ -454,8 +455,8 @@ function InitializeArmies()
 
             --GetArmyBrain(strArmy):InitializePlatoonBuildManager()
             --LoadArmyPBMBuilders(strArmy)
-            if GetArmyBrain(strArmy).SkirmishSystems then
-                GetArmyBrain(strArmy):InitializeSkirmishSystems()
+            if brain.SkirmishSystems then
+                brain:InitializeSkirmishSystems()
             end
 
             local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
@@ -471,6 +472,11 @@ function InitializeArmies()
                 if commander and cdrUnit and ArmyBrains[iArmy].Nickname then
                     cdrUnit:SetCustomName( ArmyBrains[iArmy].Nickname )
                 end
+            end
+
+            if ScenarioInfo.ArmySetup[strArmy].RandomFaction then
+                -- hide faction index from UI
+                brain:HideFaction()
             end
 
             local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
