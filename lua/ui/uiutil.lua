@@ -26,6 +26,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
+local Factions = import('/lua/factions.lua').Factions
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -1007,7 +1008,15 @@ function ShowInfoDialog(parent, dialogText, buttonText, buttonCallback, destroyO
 end
 
 function GetFactionIcon(factionIndex)
-    return import('/lua/factions.lua').Factions[factionIndex + 1].Icon
+    local icon
+
+    if Factions[factionIndex + 1] then
+        icon = import('/lua/factions.lua').Factions[factionIndex + 1].Icon
+    else
+        icon = "/faction_icon-sm/random_ico.dds"
+    end
+
+    return icon
 end
 
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
