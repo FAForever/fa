@@ -1194,16 +1194,8 @@ local function GetBlueprints(activeMods, skipGameFiles)
         projectiles.All = table.deepcopy(projectiles.Original)
         projectiles.Modified = {}
         projectiles.Skipped = {}
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD
-        
-=======
 
         -- allows execution of LoadBlueprints()
->>>>>>> 3ff2d6b... Fixed #1216 by loading units on a new thread
->>>>>>> 3e3b97b... Fixed #1216 by loading units on a new thread
         doscript '/lua/system/Blueprints.lua'
 
         -- Loading projectiles first so that they can be used by units
@@ -1212,15 +1204,8 @@ local function GetBlueprints(activeMods, skipGameFiles)
         for _, bp in bps.Projectile do
             CacheProjectile(bp)
         end
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-        
-=======
         -- Loading units second so that they can use projectiles
->>>>>>> 3ff2d6b... Fixed #1216 by loading units on a new thread
->>>>>>> 3e3b97b... Fixed #1216 by loading units on a new thread
         dir = {'/units'}  
         bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true)
         for _, bp in bps.Unit do
@@ -1245,30 +1230,24 @@ local function GetBlueprints(activeMods, skipGameFiles)
     info = info .. ' in ' .. TimerStop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
     Show('STATUS', info)
 
-<<<<<<< HEAD
-    return blueprints 
-<<<<<<< HEAD
-end
-=======
-=======
     return blueprints
 end
+
 -- Gets all unit blueprints that were previously fetched
 function GetBlueprintsList()
     return blueprints
 end
+
 -- Fetch asynchronously all unit blueprints from the game and given active sim mods
 function FetchBlueprints(activeMods, skipGameFiles)
     local bps = {}
-    ForkThread(function() 
+    ForkThread(function()
         Show('STATUS', 'forking thread...')
         bps = GetBlueprints(activeMods, skipGameFiles)
         -- check if blueprints are loaded
-        while table.getsize(bps) == 0 do 
+        while table.getsize(bps) == 0 do
             WaitSeconds(0.25) 
         end
         Show('STATUS', 'forking thread...done') 
-    end) 
->>>>>>> 3ff2d6b... Fixed #1216 by loading units on a new thread
+    end)
 end
->>>>>>> 3e3b97b... Fixed #1216 by loading units on a new thread
