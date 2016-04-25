@@ -230,13 +230,19 @@ local function GetUnitsUpgradable()
 
         -- Check for valid/upgradeable blueprints 
         if bp and bp.General and IsValidUnit(bp, id) and
-         ((bp.General.UpgradesFrom ~= '' and
-           bp.General.UpgradesFrom ~= 'none') or
-          (bp.General.UpgradesTo ~= '' and
-           bp.General.UpgradesTo ~= 'none')) then
-            local unit = table.deepcopy(bp)
-            unit.id = id -- Save id for a reference
-            table.insert(units, unit)
+            bp.General.UpgradesFrom ~= '' and
+            bp.General.UpgradesFrom ~= 'none' then
+
+            local cats = table.hash(bp.Categories)
+            if not cats['BUILTBYTIER1ENGINEER'] and
+               not cats['BUILTBYTIER2ENGINEER'] and
+               not cats['BUILTBYTIER3ENGINEER'] and
+               not cats['BUILTBYTIER3COMMANDER'] then
+
+               local unit = table.deepcopy(bp)
+               unit.id = id -- Save id for a reference
+               table.insert(units, unit)
+            end
         end
     end
 
