@@ -499,7 +499,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local Prefs = import('/lua/user/prefs.lua')
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
-    
+
     -- fetch unit blueprints for the Unit Manager
     UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), false)
 end
@@ -632,17 +632,11 @@ end
 
 -- TODO: These functions are dumb. We have these things called "hashmaps".
 function FindSlotForID(id)
-    WARN('Inside FindSlotForID with id ' .. id)
     for k, player in gameInfo.PlayerOptions:pairs() do
-        WARN('Inside the for loop')
-        LOG(k)
-        table.print(player)
         if player.OwnerID == id and player.Human then
-            WARN('Returning for key ' .. k)
             return k
         end
     end
-    WARN('Issue detected, for some reason we are returning nil')
     return nil
 end
 
@@ -713,8 +707,6 @@ local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
 function SetSlotInfo(slotNum, playerInfo)
-    LOG('lobby.SetSlotInfo slotNum = ' .. tostring(slotNum))
-    table.print(playerInfo, 'lobby.SetSlotInfo playerInfo = ')
     -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
 	if GUI.connectdialog then
 		GUI.connectdialog:Close()
@@ -751,11 +743,6 @@ function SetSlotInfo(slotNum, playerInfo)
     --
     -- The predicate was getting unpleasantly long to read.
     local function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
-        LOG('lobby.teamSelectionEnabled autoTeams = ' .. tostring(autoTeams) ..
-            ', ready = ' .. tostring(ready) ..
-            ', locallyOwned = ' .. tostring(locallyOwned) ..
-            ', isHost = ' .. tostring(isHost) )
-        WVT.LoggingEnabled = true
         if isHost and not playerInfo.Human then
             return true
         end
@@ -3962,7 +3949,6 @@ function SetGameOptions(options, ignoreRefresh)
     end
 
     for key, val in options do
-        LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
         Prefs.SetToCurrentProfile('LobbyOpt_' .. key, val)
         gameInfo.GameOptions[key] = val
 
