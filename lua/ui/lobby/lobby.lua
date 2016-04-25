@@ -772,12 +772,10 @@ function SetSlotInfo(slotNum, playerInfo)
 
         if isHost then
             -- The host can control the team of others, provided he's not ready himself.
-            
-            WARN('Inside isHost')
-            LOG(localPlayerID)
-            table.print(gameInfo.PlayerOptions)
-            
-            return not gameInfo.PlayerOptions[FindSlotForID(localPlayerID)].Ready
+            local slot = FindSlotForID(localPlayerID)
+            local is_ready = slot and gameInfo.PlayerOptions[slot].Ready -- could be observer
+
+            return not is_ready
         end
     end
 
