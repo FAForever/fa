@@ -632,11 +632,17 @@ end
 
 -- TODO: These functions are dumb. We have these things called "hashmaps".
 function FindSlotForID(id)
+    WARN('Inside FindSlotForID with id ' .. id)
     for k, player in gameInfo.PlayerOptions:pairs() do
+        WARN('Inside the for loop')
+        LOG(k)
+        table.print(player)
         if player.OwnerID == id and player.Human then
+            WARN('Returning for key ' .. k)
             return k
         end
     end
+    WARN('Issue detected, for some reason we are returning nil')
     return nil
 end
 
