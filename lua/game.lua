@@ -271,7 +271,7 @@ function ResolveRestrictions(toggle, cats, army)
     if not toggle or not army then
         local ids = EntityCategoryFilterDown(cats, bps.ids)
         for _, id in ids do
-           restrictions.Global[id] = toggle
+            restrictions.Global[id] = toggle
         end
     end
 
