@@ -45,9 +45,9 @@ Expressions = {
 -- be careful when editing them or you may brake restriction system in FA game
  
     -- excluding engineers and factories because players will not progress to higher tech levels
-    T1          = "(TECH1 - (STRUCTURE * FACTORY) - ENGINEER)",
-    T2          = "(TECH2 - (STRUCTURE * FACTORY) - ENGINEER)",
-    T3          = "(TECH3 - (STRUCTURE * FACTORY) - ENGINEER)",
+    T1          = "(TECH1 - (STRUCTURE * FACTORY))",
+    T2          = "(TECH2 - (STRUCTURE * FACTORY))",
+    T3          = "(TECH3 - (STRUCTURE * FACTORY))",
     T4          = "(EXPERIMENTAL)",
     -- excluding ACUs because game might crash if someone picks restricted faction
     UEF         = "(UEF - COMMAND)",
