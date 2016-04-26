@@ -20,7 +20,7 @@ Patch 3652 (pending)
 - Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
 - Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
 - Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
-- Units explicity repairing (not assisting) a structure that dies will automatically try to rebuild it
+- Units explicitly repairing (not assisting) a structure that dies will automatically try to rebuild it
 - Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
 - Fixed bug with unit regen debuff not being visible in UI
 - Fixed bug with buildpower not visible in unitview
@@ -55,7 +55,7 @@ Patch 3652 (pending)
 - Location of enemy civilian structures are now revealed at start of the game (lobby option)
 - Navy units now should respect their max-range better when having move-attack order
 - Set GuardReturnRadius to 3 as default, will make guarding / patrolling / move-attacking units less prone to move off their designated mission while hunting something
-- Units moving on seabottom now leave treadmarks - they disappear faster though
+- Units moving on sea bottom now leave tread marks - they disappear faster though
 - Re-enabled death animation on non-naval units
 - Seraphim GW now uses all its 3 exits
 - Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
@@ -88,7 +88,7 @@ Patch 3652 (pending)
 - Fixed nukes overkilling bubble shield base structure when out of range and shield up
 - Fixed Continental taking damage from AOE when it has the shield up
 - Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
-- Fixed Underwater Vision not being initialised on unit completion
+- Fixed Underwater Vision not being initialized on unit completion
 - Fixed Engineers not properly reclaiming the target of an assisted, then stopped, Engineer
 - Fixed UEF Drones being untargetable by Interceptors
 - Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
@@ -97,7 +97,7 @@ Patch 3652 (pending)
 - Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
 - Fixed shields sometimes not turning off due to lack of Energy
 - Fixed buffs from enhancements being applied too often after unit transfer
-- Fixed subermsible naval units leaving full reclaim mass
+- Fixed submersible naval units leaving full reclaim mass
 - Nuclear explosions now behave predictably, always bypassing/ignoring bubble shielding
 
 **Performance**
@@ -138,7 +138,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 
 **Seraphim and UEF ACU TML**
 
-- Missle hitpoints: 3 hp → 2 hp
+- Missile hitpoints: 3 hp → 2 hp
 - Flying height: now similar to normal TML
 - Mass cost: 1000 → 1500
 - Minimal range: 5 → 15
@@ -265,7 +265,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 
  **Strategic bombers (all factions)**
 
-Increasing the energy cost of strat bombers to avoid the ability to rush a strat them so easily.
+Increasing the energy cost of strategic bombers to avoid the ability to rush them so easily.
 - Energy cost: 105000 → 144000
 - Build time: 8400 → 9600
 
@@ -276,16 +276,16 @@ Increasing the energy cost of strat bombers to avoid the ability to rush a strat
 
 **Torpedo bombers**
 
-- We made several adjustments to allow torpedo bombers to actually deliever their torpedoes more often.
+- We made several adjustments to allow torpedo bombers to actually deliver their torpedoes more often.
 - Reload time for all torpedo bombers: 12.5 → 10
 
  **Uosioz (Seraphim Torpedo Bomber)**
 
-- Torpedos get now dropped in front of the bomber (like all other bombers)
+- Torpedoes get now dropped in front of the bomber (like all other bombers)
 - Range: 42 → 35
 - Amount of volleys: 2 → 3
-- Now ignores torpedo defence (like all other torpedo bombers)
-- Multiple adjustments to torpedos make them less likely to crash on the ground in shallow water
+- Now ignores torpedo defense (like all other torpedo bombers)
+- Multiple adjustments to torpedoes make them less likely to crash on the ground in shallow water
 
  **Skimmer (Aeon T2 Torpedo Bomber)**
 
@@ -310,7 +310,7 @@ Increasing the energy cost of strat bombers to avoid the ability to rush a strat
 
  **Quantum Gateway**
  
-- We are reducing the adjacency bonus for massfabs next to Quantum Gates to a more normal level.
+- We are reducing the adjacency bonus for mass fabricators next to Quantum Gates to a more normal level.
 - Tech 2 mass fabricator: 2.5% → 0.75%
 - Tech 3 mass fabricator: 15% → 2.25%
 - Tech 3 power generator: 18.75% → 5%
@@ -368,7 +368,7 @@ Bugs
 - Commanders no longer explode immediately with the 'no-land' restriction enabled
 - Upgraded hives are no longer invincible
 - Beam weapons will no longer keep firing their lasers after designated targets have died
-- Nukes will always penerate personal shields again
+- Nukes will always generate personal shields again
 - Paused units which start work on a building will no longer consume resources
 
 Enhancements
@@ -473,7 +473,7 @@ Hitboxes
 Visual
 - Fixed shield structure glows and rotations not playing
 - Fixed bug with capture progress bar not being synced if using multiple engineers
-- Optimised the range-rings shader to reduce the way FPS falls off a cliff
+- Optimized the range-rings shader to reduce the way FPS falls off a cliff
 - Fixed bug with instantly disappearing wrecks due to garbage collection
 - Fixed wrong regen values being reported on UI-side
 - Disable build effect beams on sinking engineers
@@ -482,7 +482,7 @@ Visual
 - Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
 - Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
 - Fuel indicator no longer falls off the unit detail window
-- Seraphim ACU and SCU no longer show the tac missile counter if they don't have the upgrade
+- Seraphim ACU and SCU no longer show the tactical missile counter if they don't have the upgrade
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -554,7 +554,7 @@ UI
 
 Other
 - Engineering Station units now pause on transfer from one player to another
-- Cybran build bots now can assist next build project without respawning
+- Cybran build bots now can assist next build project without re-spawning
 - The least valuable units are destroyed at unit transfer if unitcap is hit
 - Absolver shield disrupter now hovers higher, so it's less likely to hit the
   floor with the very low mounted gun
@@ -594,7 +594,7 @@ Special Thanks To
 Patch 3640 (Jan 6, 2015)
 ==========
 
-- Adress an issue that causes the game to crash with core dumps in long games
+- Addressed an issue that causes the game to crash with core dumps in long games
 
 
 Patch 3639 (Jan 5, 2015)
@@ -677,7 +677,7 @@ Patch 3637 (Dec 12, 2014)
 *Bug fixes*
 - Selection Range Overlay works for multiple units again
 - Score no longer flickers when watching replays
-- Targeting issues, especially related to the seraphim ACU have been adressed
+- Targeting issues, especially related to the seraphim ACU have been addressed
 - Compatibility with certain mods restored
 - Lobby 2.5b included (Changelog shown in game)
 
@@ -727,7 +727,7 @@ Patch 3636 (Dec 12, 2014)
 -  Improved autobalance with random spawns in lobby
 -  SMD can be paused
 -  New "No Walls" Unit Restriction
--  Improved the Unit Restrictions menu descriptions, including localisation
+-  Improved the Unit Restrictions menu descriptions, including localization
 -  Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 -  Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 -  Show replay-ID in score
