@@ -59,21 +59,21 @@ Expressions = {
     T4ARTY      = "(ARTILLERY * SIZE20 * TECH3) + (ARTILLERY * EXPERIMENTAL) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
     T3ARTY      = "(ARTILLERY * SIZE16 * TECH3)",  -- "uab2302 + urb2302 + ueb2302 + xsb2302", Heavy Artillery  
     T2ARTY      = "(ARTILLERY * STRUCTURE * TECH2)",  
-    
+
     SATELLITE   = "(SATELLITE + ORBITALSYSTEM)", --"(xeb2402 + xea0002)",
-    
+
     NUKET4ML    = "(STRUCTURE * NUKE * EXPERIMENTAL)" , -- "xsb2401" -- SERA Yolona Oss
     NUKET3ML    = "(STRUCTURE * NUKE * TECH3)",         -- "uab2305 + urb2305 + ueb2305 + xsb2305"
     NUKET3DEF   = "(STRUCTURE * ANTIMISSILE * (TECH3 + EXPERIMENTAL))",   -- "uab4302 + urb4302 + ueb4302 + xsb4302"
     NUKENAVAL   = "(NUKE * NAVAL)",                     -- "uas0304 + urs0304 + ues0304 + xss0302" -- SERA Battleship
     NUKESUBS    = "(NUKE * SUBMERSIBLE)",               -- "uas0304 + urs0304 + ues0304"
-    
+
     -- unfortunate, some units must be restricted using their IDs unless their categories are updated with a new TML category
     TMLNAVAL    = "(NUKE * SUBMERSIBLE) + xss0303 + xss0202 + xas0306 + ues0202", -- SERA Carrier + AEON Missile Ship + UEF Cruiser
     TMLDEF      = "(STRUCTURE * TECH2 * ANTIMISSILE)",
     TMLBASE     = "(STRUCTURE * TECH2 * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
-    
+
     -- added exclusion of engineers and structures because they are restricted by other presets 
     LAND        = "(LAND - ENGINEER - STRUCTURE)",  
     -- added restriction of AA structures because they are not needed when all air units are out
@@ -83,14 +83,13 @@ Expressions = {
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",  
     AMPHIBIOUS  = "(AMPHIBIOUS)", -- requires adding AMPHIBIOUS category to appropriate units, e.g. Monkey Lord, CYBRIAN T2 Destroyer
     SUBS        = "(NAVAL * SUBMERSIBLE)",  
-     
+
     DEF_LAND    = "(STRUCTURE * (DIRECTFIRE + WALL))",
     DEF_AIR     = "(STRUCTURE * ANTIAIR)",
     DEF_NAVY    = "(STRUCTURE * ANTINAVY)",
     DEF_SHIELD  = "(STRUCTURE * SHIELD)",  
     DEF_BUBBLES = "(STRUCTURE * SHIELD) + (MOBILE * SHIELD) - TANK - BOT - AIR", -- excluding personal shields
     DEF_WALLS   = "(STRUCTURE * WALL)", 
-    
     -- units buildable by CYBRAN T4 Megalith:
     -- xrl0002 Crab Egg (Engineer)
     -- xrl0003 Crab Egg (Brick)
@@ -98,7 +97,6 @@ Expressions = {
     -- xrl0005 Crab Egg (Artillery) 
     -- drlk005 Crab Egg (Bouncer) 
     CRABEGG       = '(xrl0002 + xrl0003 + xrl0004 + xrl0005 + drlk005)',
-
     -- added exclusion of aircraft carriers, Tzar, and Atlantis in T3_AIR expression since they can build air
     --T3_AIR        = "(TECH3 * AIR) + (TECH3 * CARRIER) + (EXPERIMENTAL * CARRIER) - SATELLITE - BATTLESHIP",  
     T3_AIR        = "(TECH3 * AIR - FACTORY)",
@@ -123,21 +121,21 @@ Expressions = {
     
     BOTS         = "(LAND * BOT)",
     TANKS        = "(LAND * TANK)",
-     
+
     SUPPFAC      = "SUPPORTFACTORY",
     ENGISTATION  = "(STRUCTURE * ENGINEERSTATION)", -- no need to exclude pod drones
     ENGIDRONES   = "(STRUCTURE * ENGINEERSTATION * UEF) + (SUBCOMMANDER * Pod) + POD", -- UEF COM WITH DRONES
-     
+
     PARAGON      = "(EXPERIMENTAL * MASSPRODUCTION * ENERGYPRODUCTION)",
     FABS         = "(STRUCTURE * MASSFABRICATION) - EXPERIMENTAL", 
     MASSINCOME   = "(STRUCTURE * (MASSEXTRACTION + MASSSTORAGE) - EXPERIMENTAL)",
     ENGYINCOME   = "(STRUCTURE * (ENERGYPRODUCTION + ENERGYSTORAGE) - EXPERIMENTAL)",
-    
+
     SUPCOMS      = "(SUBCOMMANDER + GATE)",
     RASCOMS      = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)" 
     TMLCOMS      = "(SUBCOMMANDER * Missile)",              -- TML SCU PRESET xsl0301_missile
     TELECOMS     = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
-    
+
     --INTEL      = "(STRUCTURE * OPTICS) + (STRUCTURE * OMNI) + (STRUCTURE * RADAR) + (STRUCTURE * SONAR) + (NAVAL * SONAR * TECH3)",
     INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR",
     INTELOPTICS  = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301", 
@@ -272,17 +270,15 @@ local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
     local presetMerging = false
     -- check if a preset already exists 
     local preset = presetsRestrictions[key] 
-    if not preset then 
+    if not preset then
         preset = {}
         preset.categories = nil
         preset.enhancements = nil
         presetMerging = true -- perform restrictions merge on a new preset
     end
-   
     preset.key = key
     preset.groups = {}
-    
-    if not tooltip or not name or not icon then  
+    if not tooltip or not name or not icon then
         preset.visible = false
         preset.groups = { }
     else
@@ -292,9 +288,8 @@ local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
         preset.Icon = icon
         preset.tooltip = tooltip
     end
-                
+
     for _, presetKey in presetsKeys do
-    
         local  restriction = presetsRestrictions[presetKey]
         if not restriction then 
             WARN(' UnitManager Attempting to combine not existing preset: ' .. presetKey)
@@ -313,15 +308,12 @@ local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
                     end
                 end
             end
-         
             table.insert(preset.groups, presetKey)
         end
     end
-       
     -- add group to restricted units
     presetsRestrictions[key] = preset
 end
-
 --- Initializes presets and groups some presets 
 local function CreatePresets()
     -- FACTIONS restrictions  
@@ -350,7 +342,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_NOMADS>No Nomads Units", 
         "/textures/ui/common/faction_icon-lg/nomads_ico.dds",
         Expressions.NOMADS, nil)
-    
     -- TECH restrictions
     CreatePreset("T1", 
         "<LOC restricted_units_info_T1>Prevents all T1 units and structures, except engineers and factories",
@@ -372,7 +363,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_T4>No Experimental Units", 
         "/textures/ui/common/icons/presets/tech-4.dds",
         Expressions.T4, nil)
- 
     -- TYPES restrictions
     CreatePreset("LAND", 
         "<LOC restricted_units_info_LAND>Prevents all land units and anti-land structures, except engineers and factories",
@@ -404,7 +394,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_.>No Submersible Units", 
         "/textures/ui/common/icons/presets/type-subs.dds",
         Expressions.SUBS, nil)
-         
     -- NUKES restrictions
     CreatePreset("NUKET4ML", 
         "<LOC restricted_units_info_NUKET4ML>Prevents T4 structures with strategic missile launchers (SML)",
@@ -426,7 +415,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_NUKENAVAL>No Nuke Naval Launchers", 
         "/textures/ui/common/icons/presets/nukes-ships.dds",
         Expressions.NUKENAVAL, nil)
-         
     CreatePreset("T2ARTY", 
         "<LOC restricted_units_info_T2ARTY>Prevents T2 artillery structures",
         "<LOC restricted_units_data_T2ARTY>No Tech 2 Artillery", 
@@ -448,14 +436,12 @@ local function CreatePresets()
         "<LOC restricted_units_data_SATELLITE>No Satellite", 
         "/textures/ui/common/icons/presets/base-satellites.dds",
         Expressions.SATELLITE, nil)
-          
     -- ADVANCED restrictions 
     CreatePreset("AIR_TANSPORTS", 
         "<LOC restricted_units_info_AIR_TANSPORTS>Prevents all transport units",
         "<LOC restricted_units_data_AIR_TANSPORTS>No Transports", 
         "/textures/ui/common/icons/presets/air-transports.dds",
         Expressions.AIR_TANSPORTS, nil)
-
     CreatePreset("AIR_GUNSHIPS", 
         "<LOC restricted_units_info_AIR_GUNSHIPS>Prevents all gunships",
         "<LOC restricted_units_data_AIR_GUNSHIPS>No All Gunships", 
@@ -466,7 +452,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_T3_AIR_GUNSHIPS>No T3 Gunships", 
         "/textures/ui/common/icons/presets/air-t3-gunships.dds",
         Expressions.T3_AIR_GUNSHIPS, nil)
-        
     CreatePreset("AIR_BOMBERS", 
         "<LOC restricted_units_info_AIR_BOMBERS>Prevents all bombers",
         "<LOC restricted_units_data_AIR_BOMBERS>No Bombers", 
@@ -477,7 +462,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_T3_AIR_BOMBERS>No T3 Bombers", 
         "/textures/ui/common/icons/presets/air-t3-bombers.dds",
         Expressions.T3_AIR_BOMBERS, nil)
-                
     CreatePreset("AIR_FIGHTERS", 
         "<LOC restricted_units_info_AIR_FIGHTERS>Prevents all interceptors and air fighters",
         "<LOC restricted_units_data_AIR_FIGHTERS>No Air Fighters", 
@@ -499,7 +483,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_T3_DIRECT_SHIPS>No T3 Direct Fire Ships", 
         "/textures/ui/common/icons/presets/ships-t3-directfire.dds",
         Expressions.T3_DIRECT_SHIPS, nil)
-                    
+
     CreatePreset("SNIPES", 
         "<LOC restricted_units_info_SNIPES>Prevents all units capable of sniping ACU or strategic structures from a long range or in a few flybys",
         "<LOC restricted_units_data_SNIPES>No Unit Snipers", 
@@ -521,7 +505,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_T1_NAVY_SPAM>No T1 Navy Spam", 
         "/textures/ui/common/icons/presets/ships-t1-spam.dds",
         Expressions.T1_NAVY_SPAM, nil)
-
     -- SUPPORT restrictions
      CreatePreset("SUPCOMS", 
         "<LOC restricted_units_info_SUPCOMS>Prevents all support commander units (SCUs) and quantum gateway structures", 
@@ -543,7 +526,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_ENGIDRONES>No Engineering Drones", 
         "/textures/ui/common/icons/presets/eng-drones.dds",
         Expressions.ENGIDRONES, enhancements.DRONES)
-           
     -- COMMANDER UPGRADES restrictions 
     CreatePreset("TELE", 
         "<LOC restricted_units_info_TELE>Prevents commander upgrade that provides teleporting ability",
@@ -565,7 +547,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_TMLPACK>No Tactical Missile Pack", 
         "/textures/ui/common/icons/presets/enh-tml-icon.dds",
         Expressions.TMLCOMS, enhancements.TMLPACK)
-             
     -- DEFENSE restrictions 
     CreatePreset("DEF_LAND", 
         "<LOC restricted_units_info_DEF_LAND>Prevents all structures for anti-land defense ",
@@ -587,8 +568,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_DEF_SHIELD>No Shields Defense", 
         "/textures/ui/common/icons/presets/base-def-shields.dds",
         Expressions.DEF_SHIELD, nil)
-
-       -- INTEL restrictions       
+    -- INTEL restrictions
     CreatePreset("INTELBASIC", 
         "<LOC restricted_units_info_INTELBASIC>Prevents all structures that provide basic intelligence such as radar, sonar, and omni",
         "<LOC restricted_units_data_INTELBASIC>No Basic-Intel Structures", 
@@ -609,14 +589,13 @@ local function CreatePresets()
         "<LOC restricted_units_data_INTELAIR>No Intel Aircrafts", 
         "/textures/ui/common/icons/presets/air-intel.dds",
         Expressions.INTELAIR, nil)
-    
     -- TACTICAL MISSILES restrictions 
     CreatePreset("TMLDEF", 
         "<LOC restricted_units_info_TMLDEF>Prevents all structures that provide tactical missile defense (TMD) ability",
         "<LOC restricted_units_data_TMLDEF>No Tactical Missile Defense", 
         "/textures/ui/common/icons/presets/tml-def.dds",
         Expressions.TMLDEF, nil)
-      CreatePreset("TMLBASE", 
+    CreatePreset("TMLBASE", 
         "<LOC restricted_units_info_TMLBASE>Prevents all structures that provide tactical missile launch (TML) ability ",
         "<LOC restricted_units_data_TMLBASE>No Tactical Missile Launchers", 
         "/textures/ui/common/icons/presets/tml-base.dds",
@@ -631,7 +610,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_TMLNAVAL>No Tactical Missile Ships", 
         "/textures/ui/common/icons/presets/tml-naval.dds",
         Expressions.TMLNAVAL, nil)
-     
     -- eco restrictions
     CreatePreset("MASSINCOME", 
         "<LOC restricted_units_info_MASSINCOME>Prevents all structures that extract mass ",
@@ -653,7 +631,6 @@ local function CreatePresets()
         "<LOC restricted_units_data_PARAGON>No Paragon", 
         "/textures/ui/common/icons/presets/base-paragon.dds",
         Expressions.PARAGON, nil)
-    
     -- grouped presets 
     CreatePresetGroup({"TMLDEF", "TMLBASE", "TMLMOBILE", "TMLNAVAL", "TMLPACK"}, "TML", 
         "<LOC restricted_units_info_TML>Prevents all units with tactical missile launchers (TML) and tactical missile defense structures (TMD) ", 
@@ -663,7 +640,6 @@ local function CreatePresets()
         "<LOC restricted_units_info_NUKE>Prevents all units with strategic missile launchers (SML) and strategic missile defense (SMD) ", 
         "<LOC restricted_units_data_NUKE>No Nukes",
         "/textures/ui/common/icons/presets/nukes-all.dds")
-
     --CreatePresetGroup({"T3ARTY", "T4ARTY", "SATELLITE", "PARAGON"}, "GAMEENDERS", 
     --"restricted_units_gameenders", "<LOC restricted_units_data_0012>No Game Enders",
     --"")
