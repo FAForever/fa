@@ -36,29 +36,33 @@ Patch 3652 (pending)
 - In Units Manager, separated some existing preset restrictions (e.g. game-enders, nukes) for better selection
 - In Units Manager, added custom restrictions for all FA units 
 - In Units Manager, added custom restrictions for modded units when mods are activated
-- In Units Manager, added option to restrict units using preset restrictions and/or custom restrictions
-- In Units Manager, added grouping of units based on faction, type, purpose
+- In Units Manager, added mechanism for restricting units using preset restrictions and/or custom restrictions
+- In Units Manager, added grouping of units based on faction, type, purpose, and tech level
 - In Units Manager, added detailed tooltips with stats for weapons, defense, and eco for all units 
+- In Units Manager, added visualization of modded units using small purple icon with letter M 
 - In Units Manager, improved description of preset restrictions
 - In Mods Manager, added filters for UI/Game/Disabled mods 
-- In Mods Manager, improved sorting mods by their activation status and names  
+- In Mods Manager, improved sorting mods by their activation status and names
+- In Mods Manager, added cleanup of mod names with mismatching mod versions
+- In Mods Manager, added mod versions next to mod names
+- Added pre-loading and caching of blueprints for usage in the Units Manager 
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
 - Air units are now able to fire at water-landed transports
 - Hoplite now calculate their aim correctly when firing at a fleeing target
-- Slight increase of unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
+- Slightly increased unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
 - Seraphim Experimental Nuke now deals damage to itself
 - Cybran drones no longer leave wreckage when killed
 - Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
-- Remove friendly fire on Atlantis AA
-- Location of enemy civilian structures are now revealed at start of the game (lobby option)
+- Removed friendly fire on Atlantis AA
+- Locations of enemy civilian structures are now revealed at start of the game (lobby option)
 - Navy units now should respect their max-range better when having move-attack order
 - Set GuardReturnRadius to 3 as default, will make guarding / patrolling / move-attacking units less prone to move off their designated mission while hunting something
 - Units moving on sea bottom now leave tread marks - they disappear faster though
 - Re-enabled death animation on non-naval units
 - Seraphim GW now uses all its 3 exits
-- Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
+- Spread attack targets are now spread more uniformly among all units during the initial attack orders, further ones are random.
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
@@ -66,10 +70,12 @@ Patch 3652 (pending)
 - Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
 - Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
 - Fixed Cybran T3 MAA hitbox/bones making lots of units miss
-- Fixed Sera T1 sub not being hit by torpedoes 80% of the time while surfaced.
+- Fixed Seraphim T1 sub not being hit by torpedoes 80% of the time while surfaced.
 - Enemy civilians are now colored in a unique red color
-- Fix bomb drop code and enable it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
+- Fixed bomb drop code and enabled it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
 - Allowed Aeon Aircraft Carrier to build Bombers and Gunships, same as the others.
+- Fixed restriction system on Sim side such that it cannot be compromised by UI mods 
+- Fixed restriction system that prevented removing restrictions on already restricted units in scenario scripts
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs
