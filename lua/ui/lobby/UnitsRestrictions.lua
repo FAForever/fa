@@ -136,6 +136,7 @@ Expressions = {
     SUPCOMS      = "(SUBCOMMANDER + GATE)",
     RASCOMS      = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)" 
     TMLCOMS      = "(SUBCOMMANDER * Missile)",              -- TML SCU PRESET xsl0301_missile
+    TELECOMS     = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
     
     --INTEL      = "(STRUCTURE * OPTICS) + (STRUCTURE * OMNI) + (STRUCTURE * RADAR) + (STRUCTURE * SONAR) + (NAVAL * SONAR * TECH3)",
     INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR",
@@ -548,7 +549,7 @@ local function CreatePresets()
         "<LOC restricted_units_info_TELE>Prevents commander upgrade that provides teleporting ability",
         "<LOC restricted_units_data_TELE>No Teleporting", 
         "/textures/ui/common/icons/presets/enh-tele-icon.dds",
-        nil, enhancements.TELE)
+        Expressions.TELECOMS, enhancements.TELE)
     CreatePreset("BILLY", 
         "<LOC restricted_units_info_BILLY>Prevents commander upgrade that provides tactical nuke launchers ",
         "<LOC restricted_units_data_BILLY>No Billy", 
