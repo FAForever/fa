@@ -1174,7 +1174,7 @@ function DidModsChanged()
 end
 
 -- Gets unit blueprints by loading them from the game and given active sim mods
-function GetBlueprints(activeMods, skipGameFiles)
+local function GetBlueprints(activeMods, skipGameFiles)
     TimerStart()
 
     -- Load original FA blueprints only once
