@@ -98,11 +98,10 @@ Expressions = {
     -- drlk005 Crab Egg (Bouncer) 
     CRABEGG       = '(xrl0002 + xrl0003 + xrl0004 + xrl0005 + drlk005)',
     -- added exclusion of aircraft carriers, Tzar, and Atlantis in T3_AIR expression since they can build air
-    --T3_AIR        = "(TECH3 * AIR) + (TECH3 * CARRIER) + (EXPERIMENTAL * CARRIER) - SATELLITE - BATTLESHIP",  
     T3_AIR        = "(TECH3 * AIR - FACTORY)",
     T3_LAND       = "(TECH3 * LAND - FACTORY)",
     T3_SUBS       = "(TECH3 * SUBMERSIBLE - FACTORY)",
-    --             "dalk003 + delk002 + drlk001 + drlk005 + dslk004" 
+
     T3_MOBILE_AA    = "(TECH3 * LAND * MOBILE * BUILTBYTIER3FACTORY * ANTIAIR) + drlk005",   -- + Crab Egg AA 
     T3_MOBILE_ARTY  = "(TECH3 * LAND * MOBILE * BUILTBYTIER3FACTORY * ARTILLERY) + xrl0005", -- + Crab Egg Arty
     T3_AIR_GUNSHIPS = "(TECH3 * AIR * GROUNDATTACK)",
@@ -136,7 +135,6 @@ Expressions = {
     TMLCOMS      = "(SUBCOMMANDER * Missile)",              -- TML SCU PRESET xsl0301_missile
     TELECOMS     = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
 
-    --INTEL      = "(STRUCTURE * OPTICS) + (STRUCTURE * OMNI) + (STRUCTURE * RADAR) + (STRUCTURE * SONAR) + (NAVAL * SONAR * TECH3)",
     INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR",
     INTELOPTICS  = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301", 
     INTELSONAR   = "(STRUCTURE * SONAR) + MOBILESONAR",
@@ -185,7 +183,6 @@ local presetsOrder = {
     --"SUBS",    
     --"AMPHIBIOUS",
     "", -- preset separator 
-    --"NUKE",
     "NUKET3DEF",
     "NUKET3ML",
     "NUKET4ML",
@@ -201,8 +198,6 @@ local presetsOrder = {
     "MASSINCOME",
     "FABS",
     "", -- preset separator 
-    --"BOTS",
-    --"TANKS",
     "T3_MOBILE_ARTY",
     "T3_MOBILE_AA",
     "T3_AIR_BOMBERS",
@@ -223,7 +218,6 @@ local presetsOrder = {
     "T1_NAVY_SPAM",
     "SNIPES",
     "", -- preset separator 
-    --"TML",
     "TMLDEF",
     "TMLBASE",
     "TMLMOBILE",
@@ -239,13 +233,10 @@ local presetsOrder = {
     "INTELCOUNTER",
     "INTELAIR",
     "", -- preset separator 
-    --"T3_AIR",
     "AIR_TANSPORTS",
     "AIR_FIGHTERS",
     "AIR_BOMBERS",
     "AIR_GUNSHIPS",
-    ----"WALL",
-    ----"SUPERGAMEENDERS", 
 }
 --- Creates restriction preset from specified categories expression and/or enhancements list
 local function CreatePreset(key, tooltip, name, icon, categories, enhancements)
@@ -640,9 +631,6 @@ local function CreatePresets()
         "<LOC restricted_units_info_NUKE>Prevents all units with strategic missile launchers (SML) and strategic missile defense (SMD) ", 
         "<LOC restricted_units_data_NUKE>No Nukes",
         "/textures/ui/common/icons/presets/nukes-all.dds")
-    --CreatePresetGroup({"T3ARTY", "T4ARTY", "SATELLITE", "PARAGON"}, "GAMEENDERS", 
-    --"restricted_units_gameenders", "<LOC restricted_units_data_0012>No Game Enders",
-    --"")
 end 
 --- Generates restriction presets or returns cached presets 
 function GetPresetsData()
