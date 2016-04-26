@@ -1780,16 +1780,25 @@ function FormatData(unitData, type)
                 
                 for index, unit in units do
                     -- show UI data/icons only for not restricted units
+                    
+                    local restrict = false
                     if not IsRestricted(unit, GetFocusArmy()) then
                         local bp = __blueprints[unit] 
                         -- check if upgradeable structure
-                        if isStructure and 
-                           bp and bp.General and 
-                           bp.General.UpgradesFrom and
-                           bp.General.UpgradesFrom ~= 'none' then
-                            table.insert(retData, { type = 'arrow'})
+                        if isStructure and
+                                bp and bp.General and 
+                                bp.General.UpgradesFrom and
+                                bp.General.UpgradesFrom ~= 'none' then
+
+                            restrict = IsRestricted(bp.General.UpgradesFrom, GetFocusArmy())
+                            if not restrict then
+                                table.insert(retData, { type = 'arrow'})
+                            end
                         end
-                        table.insert(retData, { type = 'item', id = unit })
+
+                        if not restrict then
+                            table.insert(retData, { type = 'item', id = unit })
+                        end
                     end
                 end
             end
