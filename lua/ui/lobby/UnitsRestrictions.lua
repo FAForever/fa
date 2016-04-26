@@ -64,7 +64,7 @@ Expressions = {
     
     NUKET4ML    = "(STRUCTURE * NUKE * EXPERIMENTAL)" , -- "xsb2401" -- SERA Yolona Oss
     NUKET3ML    = "(STRUCTURE * NUKE * TECH3)",         -- "uab2305 + urb2305 + ueb2305 + xsb2305"
-    NUKET3DEF   = "(STRUCTURE * SILO * ANTIMISSILE)",   -- "uab4302 + urb4302 + ueb4302 + xsb4302"
+    NUKET3DEF   = "(STRUCTURE * ANTIMISSILE * (TECH3 + EXPERIMENTAL))",   -- "uab4302 + urb4302 + ueb4302 + xsb4302"
     NUKENAVAL   = "(NUKE * NAVAL)",                     -- "uas0304 + urs0304 + ues0304 + xss0302" -- SERA Battleship
     NUKESUBS    = "(NUKE * SUBMERSIBLE)",               -- "uas0304 + urs0304 + ues0304"
     
