@@ -47,7 +47,7 @@ Expressions = {
     -- excluding engineers and factories because players will not progress to higher tech levels
     T1          = "(TECH1 - (STRUCTURE * FACTORY))",
     T2          = "(TECH2 - (STRUCTURE * FACTORY))",
-    T3          = "(TECH3 - (STRUCTURE * FACTORY))",
+    T3          = "(TECH3)", -- all T3 because no unit can upgrade to T4
     T4          = "(EXPERIMENTAL)",
     -- excluding ACUs because game might crash if someone picks restricted faction
     UEF         = "(UEF - COMMAND)",
@@ -345,7 +345,7 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/tech-2.dds",
         Expressions.T2, nil)
     CreatePreset("T3", 
-        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, except factories",
+        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, including factories",
         "<LOC restricted_units_data_T3>No Tech 3 Units", 
         "/textures/ui/common/icons/presets/tech-3.dds",
         Expressions.T3, nil)
