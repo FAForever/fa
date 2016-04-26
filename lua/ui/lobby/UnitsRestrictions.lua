@@ -344,17 +344,17 @@ local function CreatePresets()
         Expressions.NOMADS, nil)
     -- TECH restrictions
     CreatePreset("T1", 
-        "<LOC restricted_units_info_T1>Prevents all T1 units and structures, except engineers and factories",
+        "<LOC restricted_units_info_T1>Prevents all T1 units and structures, except factories",
         "<LOC restricted_units_data_T1>No Tech 1 Units", 
         "/textures/ui/common/icons/presets/tech-1.dds",
         Expressions.T1, nil)
     CreatePreset("T2", 
-        "<LOC restricted_units_info_T2>Prevents all T2 units and structures, except engineers and factories",
+        "<LOC restricted_units_info_T2>Prevents all T2 units and structures, except factories",
         "<LOC restricted_units_data_T2>No Tech 2 Units", 
         "/textures/ui/common/icons/presets/tech-2.dds",
         Expressions.T2, nil)
     CreatePreset("T3", 
-        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, except engineers and factories",
+        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, except factories",
         "<LOC restricted_units_data_T3>No Tech 3 Units", 
         "/textures/ui/common/icons/presets/tech-3.dds",
         Expressions.T3, nil)
@@ -438,7 +438,7 @@ local function CreatePresets()
         Expressions.SATELLITE, nil)
     -- ADVANCED restrictions 
     CreatePreset("AIR_TANSPORTS", 
-        "<LOC restricted_units_info_AIR_TANSPORTS>Prevents all transport units",
+        "<LOC restricted_units_info_AIR_TANSPORTS>Prevents all air units capable of transporting other units",
         "<LOC restricted_units_data_AIR_TANSPORTS>No Transports", 
         "/textures/ui/common/icons/presets/air-transports.dds",
         Expressions.AIR_TANSPORTS, nil)
@@ -496,7 +496,7 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/land-t1-spam.dds",
         Expressions.T1_LAND_SPAM, nil)
     CreatePreset("T1_AIR_SPAM", 
-        "<LOC restricted_units_info_T1_AIR_SPAM>Prevents spamming T1 air units ",
+        "<LOC restricted_units_info_T1_AIR_SPAM>Prevents spamming T1 air units, except T1 air scouts and transports",
         "<LOC restricted_units_data_T1_AIR_SPAM>No T1 Air Spam", 
         "/textures/ui/common/icons/presets/air-t1-spam.dds",
         Expressions.T1_AIR_SPAM, nil)
@@ -512,54 +512,54 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/eng-scus.dds",
         Expressions.SUPCOMS, nil)
      CreatePreset("SUPPFAC", 
-        "<LOC restricted_units_info_SUPPFAC>Prevents upgrading all factories to support factories",        
+        "<LOC restricted_units_info_SUPPFAC>Prevents all factories from upgrading to support factories",
         "<LOC restricted_units_data_SUPPFAC>No Support Factories", 
         "/textures/ui/common/icons/presets/base-factory.dds",
         Expressions.SUPPFAC, nil)
      CreatePreset("ENGISTATION", 
-        "<LOC restricted_units_info_ENGISTATION>Prevents all engineering stations (UEF Kennel and Cybran Hive structures)",
+        "<LOC restricted_units_info_ENGISTATION>Prevents all engineering stations including UEF Kennel and Cybran Hive structures",
         "<LOC restricted_units_data_ENGISTATION>No Engineering Stations", 
         "/textures/ui/common/icons/presets/eng-stations.dds",
         Expressions.ENGISTATION, nil)
      CreatePreset("ENGIDRONES", 
-        "<LOC restricted_units_info_ENGIDRONES>Prevents all upgrades enabling engineering drones and UEF Kennel structures",
+        "<LOC restricted_units_info_ENGIDRONES>Prevents all upgrades that enable engineering drones and UEF Kennel structures",
         "<LOC restricted_units_data_ENGIDRONES>No Engineering Drones", 
         "/textures/ui/common/icons/presets/eng-drones.dds",
         Expressions.ENGIDRONES, enhancements.DRONES)
     -- COMMANDER UPGRADES restrictions 
     CreatePreset("TELE", 
-        "<LOC restricted_units_info_TELE>Prevents commander upgrade that provides teleporting ability",
+        "<LOC restricted_units_info_TELE>Prevents commander upgrades that provide teleporting ability",
         "<LOC restricted_units_data_TELE>No Teleporting", 
         "/textures/ui/common/icons/presets/enh-tele-icon.dds",
         Expressions.TELECOMS, enhancements.TELE)
     CreatePreset("BILLY", 
-        "<LOC restricted_units_info_BILLY>Prevents commander upgrade that provides tactical nuke launchers ",
+        "<LOC restricted_units_info_BILLY>Prevents commander upgrades that provide tactical nuke launchers, UEF Billy Nuke",
         "<LOC restricted_units_data_BILLY>No Billy", 
         "/textures/ui/common/icons/presets/enh-billy-icon.dds",
         nil, enhancements.BILLY)
     CreatePreset("RAS", 
-        "<LOC restricted_units_info_RAS>Prevents commander upgrade that generates resources via resource allocation system (RAS)",
+        "<LOC restricted_units_info_RAS>Prevents commander upgrades that generate resources via resource allocation system (RAS)",
         "<LOC restricted_units_data_RAS>No Resource Allocation System", 
         "/textures/ui/common/icons/presets/enh-ras-icon.dds",
         Expressions.RASCOMS, enhancements.RAS)
     CreatePreset("TMLPACK", 
-        "<LOC restricted_units_info_TMLPACK>Prevents commander upgrade that enables tactical missile launchers (TML)",
+        "<LOC restricted_units_info_TMLPACK>Prevents commander upgrades that enable tactical missile launchers (TML)",
         "<LOC restricted_units_data_TMLPACK>No Tactical Missile Pack", 
         "/textures/ui/common/icons/presets/enh-tml-icon.dds",
         Expressions.TMLCOMS, enhancements.TMLPACK)
     -- DEFENSE restrictions 
     CreatePreset("DEF_LAND", 
-        "<LOC restricted_units_info_DEF_LAND>Prevents all structures for anti-land defense ",
+        "<LOC restricted_units_info_DEF_LAND>Prevents all structures with anti-land defense ",
         "<LOC restricted_units_data_DEF_LAND>No Land Defense", 
         "/textures/ui/common/icons/presets/base-def-land.dds",
         Expressions.DEF_LAND, nil)
     CreatePreset("DEF_AIR", 
-        "<LOC restricted_units_info_DEF_AIR>Prevents all structures for anti-air defense ",
+        "<LOC restricted_units_info_DEF_AIR>Prevents all structures with anti-air defense ",
         "<LOC restricted_units_data_DEF_AIR>No Air Defense", 
         "/textures/ui/common/icons/presets/base-def-air.dds",
         Expressions.DEF_AIR, nil)
     CreatePreset("DEF_NAVY", 
-        "<LOC restricted_units_info_DEF_NAVY>Prevents all structures for anti-navy defense ",
+        "<LOC restricted_units_info_DEF_NAVY>Prevents all structures with anti-navy defense ",
         "<LOC restricted_units_data_DEF_NAVY>No Navy Defense", 
         "/textures/ui/common/icons/presets/base-def-navy.dds",
         Expressions.DEF_NAVY, nil)
@@ -580,7 +580,7 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/base-intel-optics.dds", 
         Expressions.INTELOPTICS, nil)
     CreatePreset("INTELCOUNTER", 
-        "<LOC restricted_units_info_INTELCOUNTER>Prevents all structures that provide stealth field for nearby units ",
+        "<LOC restricted_units_info_INTELCOUNTER>Prevents all structures that provide stealth field for nearby units or structures",
         "<LOC restricted_units_data_INTELCOUNTER>No Stealth Structures", 
         "/textures/ui/common/icons/presets/base-intel-counter.dds",
         Expressions.INTELCOUNTER, nil)
