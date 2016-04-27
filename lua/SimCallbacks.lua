@@ -78,6 +78,22 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
+Callbacks.CapMex = function(data, units)
+    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
+    if not units[1] then return end
+    local mex = EntityCategoryFilterDown(categories.MASSEXTRACTION, SecureUnits(data.target))[1]
+    if not mex then return end
+
+    local pos = mex:GetPosition()
+    local bpid = mex:GetBlueprint().BlueprintId
+    local prefix = string.sub(bpid, 0, 3)
+
+    IssueBuildMobile(units, Vector(pos.x, pos.y, pos.z-2), prefix .. '1106', {})
+    IssueBuildMobile(units, Vector(pos.x+2, pos.y, pos.z), prefix .. '1106', {})
+    IssueBuildMobile(units, Vector(pos.x, pos.y, pos.z+2), prefix .. '1106', {})
+    IssueBuildMobile(units, Vector(pos.x-2, pos.y, pos.z), prefix .. '1106', {})
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer

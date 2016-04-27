@@ -162,6 +162,11 @@ function OnCommandIssued(command)
                 SimCallback(cb, true)
             end
         end
+
+        if EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * (categories.TECH2+categories.TECH3), command.Blueprint) then
+            local cb = { Func = 'CapMex', Args = { target = command.Target.EntityId } }
+            SimCallback(cb, true)
+        end
     elseif command.CommandType == 'BuildMobile' then
 		AddCommandFeedbackBlip({
 			Position = command.Target.Position, 
