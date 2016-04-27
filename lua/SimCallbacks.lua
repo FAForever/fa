@@ -78,6 +78,24 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
+Callbacks.CapMex = function(data, units)
+    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
+    if not units[1] then return end
+    local mex = GetEntityById(data.target)
+    if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
+    local pos = mex:GetPosition()
+    local bpid = mex:GetBlueprint().BlueprintId
+    local msid = string.sub(bpid, 0, 3) .. '1106'
+
+    for _, u in units do
+        -- TODO, race specific prefix per builder, see lua/ui/construction.lua
+        IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
+        IssueBuildMobile({u}, Vector(pos.x+2, pos.y, pos.z), msid, {})
+        IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z+2), msid, {})
+        IssueBuildMobile({u}, Vector(pos.x-2, pos.y, pos.z), msid, {})
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer

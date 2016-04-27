@@ -11,6 +11,8 @@ local Construction = import('/lua/ui/game/construction.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Orders = import('/lua/ui/game/orders.lua')
 local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
+local Prefs = import('/lua/user/prefs.lua')
+
 
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
@@ -144,6 +146,36 @@ function AddCommandFeedbackByType(pos, type)
         
     return true;
 end
+
+function AssistMex(command)
+    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
+    if not units[1] then return end
+    local mex = GetUnitById(command.Target.EntityId)
+    if not mex or IsDestroyed(mex) then return end
+
+    local eco = mex:GetEconData()
+    local bp = mex:GetBlueprint()
+    local is_capped = eco.massProduced == bp.Economy.ProductionPerSecondMass * 1.5
+    if is_capped then return end
+
+    local cap = false
+    local focus = mex:GetFocus()
+
+    if focus then -- upgrading
+        for _, u in units do
+            if u:GetFocus() == focus then
+                cap = true
+                break
+            end
+        end
+    elseif mex:IsInCategory('TECH2') then
+        cap = true
+    end
+
+    if cap then
+        SimCallback({Func = 'CapMex', Args = {target = command.Target.EntityId}}, true)
+    end
+end
     
 
 function OnCommandIssued(command)
@@ -161,6 +193,10 @@ function OnCommandIssued(command)
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end
+        end
+        if EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION, command.Blueprint) then
+            local options = Prefs.GetFromCurrentProfile('options')
+            if options['assist_mex'] then AssistMex(command) end
         end
     elseif command.CommandType == 'BuildMobile' then
 		AddCommandFeedbackBlip({
