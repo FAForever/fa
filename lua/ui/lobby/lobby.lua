@@ -5054,8 +5054,8 @@ function InitHostUtils()
                 return
             end
 
-            ClearSlotInfo(slot)
             gameInfo.PlayerOptions[slot] = nil
+            ClearSlotInfo(slot)
             lobbyComm:BroadcastData(
                 {
                     Type = 'ClearSlot',
