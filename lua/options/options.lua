@@ -256,6 +256,18 @@ options = {
                     },
                 },
             },
+            {
+                title = "Assist Mex to Build Mass Storages",
+                key = 'assist_mex',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = false},
+                        {text = "<LOC _On>", key = true},
+                    },
+                },
+            }
         },
     },
     ui = {
