@@ -39,6 +39,10 @@ URA0001 = Class(CAirUnit) {
         self:StopBuildingEffects()
     end,
     
+    -- Don't cycle intel!
+    EnableUnitIntel = function(self, disabler, intel)
+    end,
+    
     -- Don't make wreckage
     CreateWreckage = function (self, overkillRatio)
         overkillRatio = 1.1
