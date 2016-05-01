@@ -496,13 +496,13 @@ function InitializeArmies()
                         end
 
                         if ScenarioInfo.Options['RevealCivilians'] == 'Yes' and ScenarioInfo.ArmySetup[strEnemy].Human then
-                            local real_state = state
-                            SetAlliance(a, e, 'Ally')
                             ForkThread(function()
+                                WaitSeconds(.1)
+                                local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
+                                SetAlliance(a, e, 'Ally')
                                 WaitSeconds(1)
                                 SetAlliance(a, e, real_state)
                             end)
-                            state = nil
                         end
                     end
 
