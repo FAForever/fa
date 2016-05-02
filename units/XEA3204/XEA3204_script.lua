@@ -1,15 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XEA3204/XEA3204_script.lua
-#**  Author(s):  Dru Staltman
-#**
-#**  Summary  :  UEF CDR Pod Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/XEA3204/XEA3204_script.lua
+-- Author(s):  Dru Staltman
+-- Summary  :  UEF CDR Pod Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
-
 
 XEA3204 = Class(TConstructionUnit) {
 
@@ -32,19 +28,22 @@ XEA3204 = Class(TConstructionUnit) {
         end
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-    
+
     OnStartBuild = function(self, unitBeingBuilt, order )
         TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order )
         self.returning = false
-    end,    
+    end,
+
     OnStopBuild = function(self, unitBuilding)
         TConstructionUnit.OnStopBuild(self, unitBuilding)
         self.returning = true
     end,
+
     OnFailedToBuild = function(self)
         TConstructionUnit.OnFailedToBuild(self)
         self.returning = true
     end,
+
     OnMotionHorzEventChange = function( self, new, old )
         if self and not self:IsDead() then
             if self.Parent and not self.Parent:IsDead() then
@@ -54,17 +53,13 @@ XEA3204 = Class(TConstructionUnit) {
                 if self.docked and distSq > 0 and not self.returning then
                     self.docked = false
                     self.Parent:ForkThread(self.Parent.NotifyOfPodStartBuild)
-                    #LOG("Leaving dock! " .. distSq)
                 elseif not self.docked and distSq < 1 and self.returning then
                     self.docked = true
                     self.Parent:ForkThread(self.Parent.NotifyOfPodStopBuild)
-                    #LOG("Docked again " .. distSq)
                 end
             end
         end
     end,
-    
-                
 }
 
 TypeClass = XEA3204
