@@ -34,6 +34,12 @@ UEA0003 = Class(TConstructionUnit) {
         self.Parent = nil
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
+    
+    -- Don't make wreckage
+    CreateWreckage = function (self, overkillRatio)
+        overkillRatio = 1.1
+        TConstructionUnit.CreateWreckage(self, overkillRatio)
+    end,
 }
 
 TypeClass = UEA0003
