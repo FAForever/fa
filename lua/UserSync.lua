@@ -61,14 +61,18 @@ function OnSync()
     if Sync.Reclaim then
         for _, r in Sync.Reclaim do
             if not r.mass or r.mass < 1 then
-                import('/modules/reclaim.lua').RemoveReclaim(r)
+                import('/lua/ui/game/reclaim.lua').RemoveReclaim(r)
             else
-                import('/modules/reclaim.lua').AddReclaim(r)
+                import('/lua/ui/game/reclaim.lua').AddReclaim(r)
             end
         end
     end
 	
     if Sync.Teamkill then
+        local armiesInfo = GetArmiesTable()
+        local victimName = armiesInfo.armiesTable[Sync.Teamkill.victim].nickname
+        local killerName = armiesInfo.armiesTable[Sync.Teamkill.instigator].nickname
+        GpgNetSend('TeamkillHappened', Sync.Teamkill.killTime, victimName, killerName)
         if(GetFocusArmy() == Sync.Teamkill.victim) then
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
         end

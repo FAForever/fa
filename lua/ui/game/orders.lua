@@ -20,6 +20,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
 local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 controls =
 {
@@ -170,12 +171,12 @@ local function GetOrderBitmapNames(bitmapId)
     end
     
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
-    return UIUtil.SkinnableFile(button_prefix .. "up.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds")
+    return UIUtil.SkinnableFile(button_prefix .. "up.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
         , "UI_Action_MouseDown", "UI_Action_Rollover"   -- sets click and rollover cues
 end
 
@@ -204,6 +205,44 @@ end
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
+end
+
+function Stop(units)
+    local units = units or GetSelectedUnits()
+
+    if units[1] then
+        IssueUnitCommand(units, 'Stop')
+    end
+end
+
+function ClearCommands(units)
+    local cb = { Func = 'ClearCommands'}
+
+    if units then
+        local ids = {}
+        for _, u in units do
+            table.insert(ids, u:GetEntityId())
+        end
+        cb.Args = {ids=ids}
+    end
+
+    SimCallback(cb, true)
+end
+
+function SoftStop(units)
+    local units = units or GetSelectedUnits()
+    import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
+    ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
+    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY+categories.SILO, units))
+end
+
+function StopOrderBehavior(self, modifiers)
+    local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
+    if userKeyMap['S'] == 'soft_stop' and not modifiers.Shift then
+        SoftStop()
+    else
+        Stop()
+    end
 end
 
 -- used by things that build weapons, etc
@@ -633,56 +672,117 @@ local function TacticalBtnText(button)
     end
 end
 
-function EnterOverchargeMode()
-    local econData = GetEconomyTotals()
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return end
-    local bp = currentSelection[1]:GetBlueprint()
-    local overchargeLevel = 0
-    local overchargeFound = false
-    local overchargePaused = currentSelection[1]:IsOverchargePaused()
+function FindOCWeapon(bp)
     for index, weapon in bp.Weapon do
         if weapon.OverChargeWeapon then
-            overchargeLevel = weapon.EnergyRequired
-            overchargeFound = true
-            break
+            return weapon
         end
     end
-    if overchargeFound then
-        if overchargeLevel > 0 and econData["stored"]["ENERGY"] > overchargeLevel and not overchargePaused then
-            ConExecute('StartCommandMode order RULEUCC_Overcharge')
+
+    return
+end
+
+local function IsAutoOCMode(units)
+    return UnitData[units[1]:GetEntityId()].AutoOvercharge == true
+end
+
+local function OverchargeInit(control, unitList)
+    if not control.autoModeIcon then
+        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_green.dds'))
+        LayoutHelpers.AtCenterIn(control.autoModeIcon, control)
+        control.autoModeIcon:DisableHitTest()
+        control.autoModeIcon:SetAlpha(0)
+        control.autoModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
         end
+    end 
+
+    if not control.mixedModeIcon then
+        control.mixedModeIcon = Bitmap(control.autoModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control.mixedModeIcon, control)
+        control.mixedModeIcon:DisableHitTest()
+        control.mixedModeIcon:SetAlpha(0)
+        control.mixedModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
+        end
+    end
+
+    control._isAutoMode = IsAutoOCMode(unitList)
+
+    control._curHelpText = control._data.helpText
+    if control._isAutoMode then
+        control.autoModeIcon:SetAlpha(1)
+    else
+        control.autoModeIcon:SetAlpha(0)
+    end
+
+    -- needs to override this to prevent call to self:DisableHitTest()
+    control.Disable = function(self)
+        self._isDisabled = true
+        self:OnDisable()
     end
 end
 
-local function OverChargeFrame(self, deltaTime)
-    if deltaTime then
-        if currentSelection[1]:IsDead() then return end
-        local econData = GetEconomyTotals()
-        local bp = currentSelection[1]:GetBlueprint()
-        local overchargeLevel = 0
-        local overchargePaused = currentSelection[1]:IsOverchargePaused()
-        for index, weapon in bp.Weapon do
-            if weapon.OverChargeWeapon then
-                overchargeLevel = weapon.EnergyRequired
-                break
-            end
-        end
-        if overchargeLevel > 0 then
-            if econData["stored"]["ENERGY"] > overchargeLevel and not overchargePaused then
-                if self:IsDisabled() then
-                    self:Enable()
-                    local armyTable = GetArmiesTable()
-                    local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
-                    local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
-                    PlayVoice(sound)
-                end
-            else
-                if not self:IsDisabled() then
-                    self:Disable()
-                end
-            end
+function OverchargeBehavior(self, modifiers)
+    if modifiers.Left then
+        EnterOverchargeMode()
+    elseif modifiers.Right then
+        self._curHelpText = self._data.helpText
+        if self._isAutoMode then
+            self.autoModeIcon:SetAlpha(0)
+            self._isAutoMode = false
         else
-            self:SetNeedsFrameUpdate(false)
+            self.autoModeIcon:SetAlpha(1)
+            self._isAutoMode = true
+        end
+
+        if controls.mouseoverDisplay.text then
+            controls.mouseoverDisplay.text:SetText(self._curHelpText)
+        end
+
+        local cb = { Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }
+        SimCallback(cb, true)
+    end
+end
+
+function EnterOverchargeMode()
+    local unit = currentSelection[1]
+    if not unit or unit:IsDead() or unit:IsOverchargePaused() then return end
+    local bp = unit:GetBlueprint()
+    local weapon = FindOCWeapon(unit:GetBlueprint())
+    if not weapon then return end
+
+    local econData = GetEconomyTotals()
+    if econData["stored"]["ENERGY"] >= weapon.EnergyRequired then
+        ConExecute('StartCommandMode order RULEUCC_Overcharge')
+    end
+end
+
+local function OverchargeFrame(self, deltaTime)
+    local unit = currentSelection[1]
+    if not unit or unit:IsDead() then return end
+    local weapon = FindOCWeapon(unit:GetBlueprint())
+    if not weapon then 
+        self:SetNeedsFrameUpdate(false)
+        return
+    end
+   
+    local econData = GetEconomyTotals()
+    if econData["stored"]["ENERGY"] >= weapon.EnergyRequired and not unit:IsOverchargePaused() then
+        if self:IsDisabled() then
+            self:Enable()
+            local armyTable = GetArmiesTable()
+            local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
+            local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
+            PlayVoice(sound)
+        end
+    else
+        if not self:IsDisabled() then
+            self:Disable()
         end
     end
 end
@@ -697,15 +797,14 @@ local defaultOrdersTable = {
     RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 1,  behavior = StandardOrderBehavior,},
     RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 2,  behavior = StandardOrderBehavior, },
     RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
-    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = MomentaryOrderBehavior, },
+    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = StopOrderBehavior, },
     RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 5,  behavior = StandardOrderBehavior, },
-    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction, },
-
+    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
-    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
-    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
-    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = StandardOrderBehavior,       onframe = OverChargeFrame},
-    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 7,  behavior = StandardOrderBehavior,},
+    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
+    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 7,  behavior = StandardOrderBehavior},
     RULEUCC_Transport = {           helpText = "transport",     bitmapId = 'unload',                preferredSlot = 8,  behavior = StandardOrderBehavior, },
     RULEUCC_Nuke = {                helpText = "fire_nuke",     bitmapId = 'launch-nuke',           preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
     RULEUCC_Tactical = {            helpText = "fire_tactical", bitmapId = 'launch-tactical',       preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
@@ -838,14 +937,18 @@ local function AddOrder(orderInfo, slot, batchMode)
     end
 
     -- set up tooltips
+
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            if controls.orderGlow then
-                controls.orderGlow:Destroy()
-                controls.orderGlow = false
-            end                
             CreateMouseoverDisplay(self, self._curHelpText, 1)
-            glowThread = CreateOrderGlow(self)
+
+            if not self:IsDisabled() then
+                if controls.orderGlow then
+                    controls.orderGlow:Destroy()
+                    controls.orderGlow = false
+                end
+                glowThread = CreateOrderGlow(self)
+            end
         elseif event.Type == 'MouseExit' then
             if controls.mouseoverDisplay then
                 controls.mouseoverDisplay:Destroy()

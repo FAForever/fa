@@ -26,7 +26,7 @@
 --   off the source file name. (Units don't have this problem because the BlueprintId is
 --   shortened and doesn't include the original path).
 --
---   Third, a mod can can contain a blueprint with the same ID as an existing blueprint,
+--   Third, a mod can contain a blueprint with the same ID as an existing blueprint,
 --   and with the special field "Merge = true". This causes the mod to be merged with,
 --   rather than replace, the original blueprint.
 --
@@ -54,8 +54,10 @@ local getinfo = debug.getinfo
 local here = getinfo(1).source
 
 local original_blueprints
+local current_mod
 
 local function InitOriginalBlueprints()
+    current_mod = nil
     original_blueprints = {
         Mesh = {},
         Unit = {},
@@ -95,8 +97,6 @@ local function StoreBlueprint(group, bp)
         t[id] = bp
     end
 end
-
-
 --
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the entire filename. Either this or SetLongId() should really be got rid of.
@@ -105,8 +105,6 @@ local function SetBackwardsCompatId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = lower(bp.Source)
 end
-
-
 --
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the full resource name except with ".bp" stripped off
@@ -120,8 +118,6 @@ local function SetLongId(bp)
         bp.BlueprintId = id
     end
 end
-
-
 --
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns just the base filename, without any blueprint type info or extension. Used
@@ -132,8 +128,6 @@ local function SetShortId(bp)
     bp.BlueprintId = bp.BlueprintId or
         gsub(lower(bp.Source), "^.*/([^/]+)_[a-z]+%.bp$", "%1")
 end
-
-
 --
 -- If the bp contains a 'Mesh' section, move that over to a separate Mesh blueprint, and
 -- point bp.MeshBlueprint at it.
@@ -245,6 +239,8 @@ end
 
 
 function UnitBlueprint(bp)
+    -- save info about mods that changed this blueprint
+    bp.Mod = current_mod 
     SetShortId(bp)
     StoreBlueprint('Unit', bp)
 end
@@ -257,6 +253,8 @@ end
 
 
 function ProjectileBlueprint(bp)
+    -- save info about mods that changed this blueprint
+    bp.Mod = current_mod 
     SetBackwardsCompatId(bp)
     StoreBlueprint('Projectile', bp)
 end
@@ -319,9 +317,9 @@ end
 
 -- Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
 -- after building SCU.
-function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
+function HandleUnitWithBuildPresets(bps, all_bps)
 
-    local SortCats = { 'SORTOTHER', 'SORTINTEL', 'SORTSTRATEGIC', 'SORTDEFENSE', 'SORTECONOMY', 'SORTCONSTRUCTION', }
+    local sortCats = { 'SORTOTHER', 'SORTINTEL', 'SORTSTRATEGIC', 'SORTDEFENSE', 'SORTECONOMY', 'SORTCONSTRUCTION', }
     local tempBp = {}
 
     for k, bp in bps do
@@ -340,20 +338,24 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             local e, m, t = 0, 0, 0
             if not preset.BuildCostEnergyOverride or not preset.BuildCostMassOverride or not preset.BuildTimeOverride then
                 for k, enh in preset.Enhancements do
-                    if not tempBp.Enhancements[enh] then
+                    -- replaced continue by reversing if statement
+                    if tempBp.Enhancements[enh] then
+                        e = e + (tempBp.Enhancements[enh].BuildCostEnergy or 0)
+                        m = m + (tempBp.Enhancements[enh].BuildCostMass or 0)
+                        t = t + (tempBp.Enhancements[enh].BuildTime or 0)
+                        -- HUSSAR added name of the enhancement so that preset units cannot be built 
+                        -- if they have restricted enhancement(s)
+                        table.insert(tempBp.Categories, enh) -- do not change case of enhancements
+                    else
                         WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
-                        continue
                     end
-                    e = e + (tempBp.Enhancements[enh].BuildCostEnergy or 0)
-                    m = m + (tempBp.Enhancements[enh].BuildCostMass or 0)
-                    t = t + (tempBp.Enhancements[enh].BuildTime or 0)
                 end
             end
             tempBp.Economy.BuildCostEnergy = preset.BuildCostEnergyOverride or (tempBp.Economy.BuildCostEnergy + e)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
             tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
 
-            -- teleport cost adjustments. Teleporting a manually enhanced SCU is cheaper than a prebuild SCU because the latter has its cost
+            -- teleport cost adjustments. Manually enhanced SCU with teleport is cheaper than a prebuild SCU because the latter has its cost
             -- adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
             if preset.TeleportNoCostAdjustment ~= false then
                 -- set teleport cost overrides to cost of base unit
@@ -363,8 +365,8 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
 
             -- Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
-                if table.find(SortCats, preset.SortCategory) or preset.SortCategory == 'None' then
-                    for _, v in SortCats do
+                if table.find(sortCats, preset.SortCategory) or preset.SortCategory == 'None' then
+                    for _, v in sortCats do
                         table.removeByValue(tempBp.Categories, v)
                     end
                     if preset.SortCategory ~= 'None' then
@@ -373,7 +375,8 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
                 end
             end
 
-            -- change other things relevant things aswell
+            -- change other things relevant things as well
+            tempBp.BaseBlueprintId = tempBp.BlueprintId
             tempBp.BlueprintId = tempBp.BlueprintId .. '_' .. name
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
@@ -385,7 +388,7 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             table.removeByValue(tempBp.Categories, 'USEBUILDPRESETS')
             tempBp.EnhancementPresets = nil
 
-            table.insert( allUnitBlueprints.Unit, tempBp )
+            table.insert(all_bps.Unit, tempBp )
             --LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
 
             BlueprintLoaderUpdateProgress()
@@ -393,7 +396,7 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
     end
 end
 
--- Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
+-- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
 
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
@@ -428,6 +431,14 @@ function PreModBlueprints(all_bps)
             cats[cat] = true
         end
 
+        if cats.ENGINEER then -- show build range overlay for engineers
+            if not bp.AI then bp.AI = {} end
+            bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
+            if not cats.OVERLAYMISC then
+                table.insert(bp.Categories, 'OVERLAYMISC')
+            end
+        end
+
         if cats.NAVAL and not bp.Wreckage then
             -- Add naval wreckage
             --LOG("Adding wreckage information to ", bp.Description)
@@ -451,10 +462,15 @@ function PreModBlueprints(all_bps)
         -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
-        if cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
+        local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
+                       (cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER)) or
+                       (cats.STRUCTURE and (cats.DIRECTFIRE or cats.INDIRECTFIRE) and (cats.DEFENSE or cats.ARTILLERY))
+                       )
+
+        if modGSR then
             local br = nil
 
-            if cats.ENGINEER and not cats.SUBCOMMANDER then
+            if cats.ENGINEER and not cats.SUBCOMMANDER and not cats.COMMAND then
                 br = 26
             elseif cats.SCOUT then
                 br = 10
@@ -488,6 +504,9 @@ function PreModBlueprints(all_bps)
             if br then
                 if not bp.AI then bp.AI = {} end
                 bp.AI.GuardScanRadius = br
+                if not bp.AI.GuardReturnRadius then
+                    bp.AI.GuardReturnRadius = 3
+                end
             end
         end
 
@@ -504,7 +523,7 @@ function PostModBlueprints(all_bps)
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
-    local PresetUnitBPs = {}
+    local preset_bps = {}
     local cats = {}
 
     for _, bp in all_bps.Unit do
@@ -521,66 +540,115 @@ function PostModBlueprints(all_bps)
         end
 
         if cats.USEBUILDPRESETS then
+            -- HUSSAR adding logic for finding issues in enhancements table
+            local issues = {}
+            if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
+            if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
+            if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
+            if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
             -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if bp.Enhancements and type(bp.Enhancements) == 'table' and bp.EnhancementPresets and type(bp.EnhancementPresets) == 'table' then
-                table.insert(PresetUnitBPs, table.deepcopy(bp))
+            if table.getsize(issues) == 0 then
+                table.insert(preset_bps, table.deepcopy(bp))
             else
-                WARN('Unit BP '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but no or invalid Enhancements or EnhancementPresets data')
+                issues = table.concat(issues,', ') 
+                WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
 
         BlueprintLoaderUpdateProgress()
     end
 
-    HandleUnitWithBuildPresets(PresetUnitBPs, all_bps)
+    HandleUnitWithBuildPresets(preset_bps, all_bps)
 end
+-----------------------------------------------------------------------------------------------
+--- Loads all blueprints with optional parameters
+--- @param pattern           - specifies pattern of files to load, defaults to '*.bp'
+--- @param directories       - specifies table of directory paths to load blueprints from, defaults to all directories
+--- @param mods              - specifies table of mods to load blueprints from, defaults to active mods
+--- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
+--- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
+--- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
+--- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
+--- Sim -> LoadBlueprints() - no arguments, no changes!
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true)  used in ModsManager.lua 
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true) used in UnitsAnalyzer.lua 
+function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration)
 
+    -- set default parameters if they are not provided  
+    if not pattern then pattern = '*.bp' end
+    if not directories then 
+        directories = {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'}
+    end
 
--- Load all blueprints
-function LoadBlueprints()
-    LOG('Loading blueprints...')
+    LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
+    
+    if not mods then 
+        mods = __active_mods or import('/lua/mods.lua').GetGameMods()
+    end
     InitOriginalBlueprints()
 
-    for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'} do
-        for k,file in DiskFindFiles(dir, '*.bp') do
-            BlueprintLoaderUpdateProgress()
-            safecall("loading blueprint "..file, doscript, file)
+    if not skipGameFiles then
+        for i,dir in directories do
+            for k,file in DiskFindFiles(dir, pattern) do
+                BlueprintLoaderUpdateProgress()
+                safecall("Blueprints Loading org file "..file, doscript, file)
+            end
         end
     end
+    local stats = {}
+    stats.UnitsOrg = table.getsize(original_blueprints.Unit)
+    stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
-    for i,m in __active_mods do
-        for k,file in DiskFindFiles(m.location, '*.bp') do
+    for i,mod in mods or {} do
+        current_mod = mod -- used in UnitBlueprint()
+        for k,file in DiskFindFiles(mod.location, pattern) do
             BlueprintLoaderUpdateProgress()
-            LOG("applying blueprint mod "..file)
-            safecall("loading mod blueprint "..file, doscript, file)
+            safecall("Blueprints Loading mod file "..file, doscript, file)
         end
+    end
+    stats.UnitsMod = table.getsize(original_blueprints.Unit) - stats.UnitsOrg
+    stats.ProjsMod = table.getsize(original_blueprints.Projectile) - stats.ProjsOrg
+
+    if not skipExtraction then
+        BlueprintLoaderUpdateProgress()
+        LOG('Blueprints Extracting mesh...')
+        ExtractAllMeshBlueprints()
     end
 
     BlueprintLoaderUpdateProgress()
-    LOG('Extracting mesh blueprints.')
-    ExtractAllMeshBlueprints()
-
-    BlueprintLoaderUpdateProgress()
-    LOG('Modding blueprints.')
+    LOG('Blueprints Modding...')
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
     PostModBlueprints(original_blueprints)
-
-    BlueprintLoaderUpdateProgress()
-    LOG('Registering blueprints...')
-    RegisterAllBlueprints(original_blueprints)
-    original_blueprints = nil
-
-    LOG('Blueprints loaded')
+     
+    stats.UnitsTotal = table.getsize(original_blueprints.Unit)
+    stats.UnitsPreset = stats.UnitsTotal - stats.UnitsOrg - stats.UnitsMod
+    if stats.UnitsTotal > 0 then
+        LOG('Blueprints Loading... completed: ' .. stats.UnitsOrg .. ' original, '
+                                                .. stats.UnitsMod .. ' modded, and ' 
+                                                .. stats.UnitsPreset .. ' preset units')
+    end
+    stats.ProjsTotal = table.getsize(original_blueprints.Projectile)
+    if stats.ProjsTotal > 0 then
+        LOG('Blueprints Loading... completed: ' .. stats.ProjsOrg .. ' original and '
+                                                .. stats.ProjsMod .. ' modded projectiles')
+    end
+     
+    if not skipRegistration then
+        BlueprintLoaderUpdateProgress()
+        LOG('Blueprints Registering...')
+        RegisterAllBlueprints(original_blueprints)
+        original_blueprints = nil
+    else
+        return original_blueprints
+    end
 
 end
-
-
 -- Reload a single blueprint
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
 
-    safecall("reloading blueprint "..file, doscript, file)
+    safecall("Blueprints Reloading... "..file, doscript, file)
 
     ExtractAllMeshBlueprints()
     ModBlueprints(original_blueprints)

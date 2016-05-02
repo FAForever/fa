@@ -1,12 +1,10 @@
--- ****************************************************************************
--- **
--- **  File     :  /lua/scenarioFramework.lua
--- **  Author(s): John Comes, Drew Staltman
--- **
--- **  Summary  : Functions for use in the Operations.
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-- ==========================================================================================
+-- * File       : /lua/scenarioFramework.lua
+-- * Authors    : John Comes, Drew Staltman
+-- * Summary    : Functions for use in the scenario scripts.
+-- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ==========================================================================================
+
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
@@ -31,12 +29,12 @@ end
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
 function EndOperation(_success, _allPrimary, _allSecondary)
     Sync.OperationComplete = {
-        opKey = ScenarioInfo.campaignInfo.opKey or '',
+        opKey = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.opKey or '',
         success = _success,
-        difficulty = ScenarioInfo.campaignInfo.difficulty or '',
+        difficulty = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.difficulty or ScenarioInfo.Options.Difficulty,
         allPrimary = _allPrimary,
         allSecondary = _allSecondary,
-        campaignID = ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
+        campaignID = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
     }
     -- EndGame()
 end
@@ -74,7 +72,7 @@ end
 -- Single Area Trigger Creation
 -- This will create an area trigger around <rectangle>.  It will fire when <categoy> is met of <aiBrain>.
 -- onceOnly means it will not continue to run after the first time it fires.
--- invert meants it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
+-- invert means it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
 -- number refers to the number of units it will take to fire.  If not inverted.  It will fire when that many are in the area-- If inverted, it will fire when less than that many are in the area
 function CreateAreaTrigger( callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
     return TriggerFile.CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
@@ -89,7 +87,7 @@ end
 
 -- Single Line timer Trigger creation
 -- Fire the <cb> function after <seconds> number of seconds.
--- you can have the function repeant <repeatNum> times which will fire every <seconds>
+-- you can have the function repeat <repeatNum> times which will fire every <seconds>
 -- until <repeatNum> is met
 local timerThread = nil
 function CreateTimerTrigger( cb, seconds, displayBool)
@@ -174,16 +172,16 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 
     if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
         --Handle ships that can walk on land...
-        --TODO: Uncommont once we have a sound for URS0201 for this case
+        --TODO: Uncomment once we have a sound for URS0201 for this case
         --self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
     end
 
 
-    -- If factory, destory what I'm building if I die
+    -- If factory, destroy what I'm building if I die
     if EntityCategoryContains(categories.FACTORY, self) then
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() != 1 then
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
             self.UnitBeingBuilt:Kill()
         end
     end
@@ -204,7 +202,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     if instigator and IsUnit(instigator) then
         instigator:OnKilledUnit(self)
     end
-    if self.DeathWeaponEnabled != false then
+    if self.DeathWeaponEnabled ~= false then
         self:DoDeathWeapon()
     end
     self:DisableShield()
@@ -212,11 +210,8 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:ForkThread(self.DeathThread, overkillRatio , instigator)
 end
 
-
-
-
 function GiveUnitToArmy( unit, newArmyIndex )
-    -- We need the brain to ignore army cap when transfering the unit
+    -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     local newBrain = ArmyBrains[newArmyIndex]
     SetIgnoreArmyUnitCap(newArmyIndex, true)
@@ -226,7 +221,6 @@ function GiveUnitToArmy( unit, newArmyIndex )
     end
     return newUnit
 end
-
 
 -- Single Line unit death trigger creation
 -- When <unit> is killed, reclaimed, or captured it will call the <cb> function provided
@@ -310,7 +304,7 @@ function CreateUnitVeterancyTrigger(cb, unit)
 end
 
 -- Single line Group Death Trigger creation
--- When all units in <group> are destoyed, <cb> function will be called
+-- When all units in <group> are destroyed, <cb> function will be called
 function CreateGroupDeathTrigger( cb, group )
    return TriggerFile.CreateGroupDeathTrigger(cb, group)
 end
@@ -345,7 +339,7 @@ function UnitsInAreaCheck( Cat, Rectangle )
     return false
 end
 
--- Retruns the number of <cat> units in <area> belonging to <brain>
+-- Returns the number of <cat> units in <area> belonging to <brain>
 function NumCatUnitsInArea(cat, area, brain)
     if type(area) == 'string' then
         area = ScenarioUtils.AreaToRect(area)
@@ -365,7 +359,7 @@ function NumCatUnitsInArea(cat, area, brain)
     return result
 end
 
--- Retruns the units in <area> of <cat> belonging to <brain>
+-- Returns the units in <area> of <cat> belonging to <brain>
 function GetCatUnitsInArea(cat, area, brain)
     if type(area) == 'string' then
         area = ScenarioUtils.AreaToRect(area)
@@ -398,8 +392,6 @@ end
 function CreateUnitDistanceTrigger( callbackFunction, unitOne, unitTwo, distance )
     TriggerFile.CreateUnitDistanceTrigger( callbackFunction, unitOne, unitTwo, distance )
 end
-
-
 
 -- Stat trigger creation
 -- === triggerTable spec === -- 
@@ -436,8 +428,6 @@ end
 function CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
     TriggerFile.CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
 end
-
-
 
 -- Fires when the threat level of <position> of size <rings> is related to <value>
 -- if <greater> is true it will fire if the threat is greater than <value>
@@ -523,7 +513,7 @@ function PlatoonMoveChain( platoon, chain, squad )
     end
 end
 
--- orders a platoon to patrol all teh points in a chain
+-- orders a platoon to patrol all the points in a chain
 function PlatoonPatrolChain( platoon, chain, squad )
     for k,v in ScenarioUtils.ChainToPositions(chain) do
         if squad then
@@ -657,7 +647,7 @@ function SetupMFDSync(movieTable, text)
     local tempText = LOC(text)
     local tempData = {}
     local nameStart = string.find(tempText, ']')
-    if nameStart != nil then
+    if nameStart ~= nil then
         tempData.name = LOC("<LOC "..string.sub(tempText, 2, nameStart-1)..">")
         tempData.text = string.sub(tempText, nameStart+2)
     else
@@ -688,6 +678,7 @@ end
 function PlayDialogue()
     while table.getn(ScenarioInfo.DialogueQueue) > 0 do
         local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
+        if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
         if not dTable.Flushed and ( not ScenarioInfo.OpEnded or dTable.Critical ) then
             for k,v in dTable do
                 if v ~= nil and not dTable.Flushed and ( not ScenarioInfo.OpEnded or dTable.Critical ) then
@@ -807,10 +798,17 @@ function PlayVoiceOver( voSound )
 end
 
 -- Set enhancement restrictions
--- Supply a table of strings of the names of enhancements you do not want the player to build
+-- Supply a table of  the names of enhancements you do not want the player to build
+-- Example: {"Teleport", "ResourceAllocation"}
 function RestrictEnhancements( table )
-    SimUIVars.SaveEnhancementRestriction(table)
-    Sync.EnhanceRestrict = table
+    local rest = {}
+    for _, e in table do
+        rest[e] = true
+    end
+
+    SimUIVars.SaveEnhancementRestriction(rest)
+    import('/lua/enhancementcommon.lua').RestrictList(rest)
+    Sync.EnhanceRestrict = rest
 end
 
 -- returns true if all units in group are dead
@@ -833,6 +831,53 @@ function CheckObjectives( list )
     return true
 end
 
+function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
+    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
+    local Delay = 0
+
+    if effect then
+        if effect == 'Gate' then
+            FakeGateInUnit(ACU)
+        elseif effect == 'Warp' then
+            ACU:PlayCommanderWarpInEffect()
+            Delay = 2.2
+        else
+            WARN('*WARNING: Invalid effect type: ' .. effect .. '. Available types: Gate, Warp.')
+        end
+    end
+
+    -- If true is passed as parameter then it uses default name.
+    if name == true then
+        ACU:SetCustomName(GetArmyBrain(brain).Nickname)
+    elseif type(name) == 'string' then
+        ACU:SetCustomName(name)
+    end
+
+    -- WarpIn effects hides extra enhancements bones on ACU so creating upgrades after it finnishes.
+    if enhancements then
+        ForkThread(function()
+            WaitSeconds(Delay)
+            if type(enhancements) == 'string' then
+                ACU:CreateEnhancement(upgrades)
+            elseif type(enhancements) == 'table' then
+                for k, enhancement in enhancements do
+                    ACU:CreateEnhancement(enhancement)
+                end
+            end
+        end)
+    end
+
+    if PauseAtDeath then
+        PauseUnitDeath(ACU)
+    end
+
+    if DeathTrigger then
+        CreateUnitDeathTrigger(DeathTrigger, ACU)
+    end
+
+    return ACU
+end
+
 -- FakeTeleportUnitThread
 -- Run teleport effect then delete unit
 function FakeTeleportUnit(unit,killUnit)
@@ -846,7 +891,7 @@ function FakeTeleportUnit(unit,killUnit)
 
     unit:CleanupTeleportChargeEffects()
     unit:PlayTeleportOutEffects()
-	unit:PlayUnitSound('GateOut')
+    unit:PlayUnitSound('GateOut')
     WaitSeconds(1)
 
     if killUnit then
@@ -931,7 +976,6 @@ function FakeGateInUnit(unit, callbackFunction)
     end
 end
 
-
 -- Upgrades unit - for use with engineers, factories, radar, and other single upgrade path units.
 --                 Commander upgrades are too complicated for this
 function UpgradeUnit(unit)
@@ -949,24 +993,58 @@ function HelpPrompt(show)
     end
 end
 
--- Build restriction notification for the UI
+-- function for converting categories to string
+local ToString = import('/lua/sim/CategoryUtils.lua').ToString
+local Game = import('/lua/game.lua')
+
+-- adds scenario restriction for specified army and notify the UI/sim
+-- e.g. AddRestriction(1, categories.TECH2) -> restricts all T2 units for army 1
+-- e.g. AddRestriction('ARMY_1', categories.TECH2) -> restricts all T2 units for army 1
 function AddRestriction(army, categories)
-    -- LOG(repr(categories))
-    SimUIVars.SaveTechRestriction(categories)
-    AddBuildRestriction(army, categories)
-end
 
-function RemoveRestriction(army, categories, isSilent)
-    -- LOG(repr(categories))
-    SimUIVars.SaveTechAllowance(categories)
-    if not isSilent then
-        if not Sync.NewTech then Sync.NewTech = {} end
-        table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+    if type(categories) ~= 'userdata' then
+        WARN('ScenarioFramework.AddRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
+          .. 'instead of category expression, e.g. categories.LAND ' )
+    else
+        --LOG('Scenario.AddRestriction'.. ToString(categories) .. ' - ' .. tostring(army) )
+        SimUIVars.SaveTechRestriction(categories)
+        AddBuildRestriction(army, categories)
+        -- add scenario restriction to game restrictions
+        Game.AddRestriction(categories, army)
+        Sync.Restrictions = Game.GetRestrictions() 
     end
-    RemoveBuildRestriction(army, categories)
 end
+-- removes scenario restriction for specified army and notify the UI/sim
+-- e.g. RemoveRestriction('ARMY_1', categories.TECH2) -> removes T2 units restriction for army 1
+function RemoveRestriction(army, categories, isSilent)
 
-
+    if type(categories) ~= 'userdata' then
+        WARN('ScenarioFramework.RemoveRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
+          .. 'instead of category expression, e.g. categories.LAND ' )
+    else
+        --LOG('Scenario.RemoveRestriction'.. ToString(categories) .. ' - ' .. tostring(army) )
+        SimUIVars.SaveTechAllowance(categories)
+        if not isSilent then
+            if not Sync.NewTech then Sync.NewTech = {} end
+            table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+        end
+        RemoveBuildRestriction(army, categories)
+        -- remove scenario restriction from game restrictions
+        Game.RemoveRestriction(categories, army)
+        Sync.Restrictions = Game.GetRestrictions()
+    end
+end
+-- toggles whether or not to ignore all restrictions
+-- this function is useful when trying to transfer restricted units between armies
+--[[ e.g.
+--  ScenarioFramework.IgnoreRestrictions(true)
+--  ScenarioFramework.GiveUnitToArmy(unit, armyIndex)
+--  ScenarioFramework.IgnoreRestrictions(false)
+--]] 
+function IgnoreRestrictions(isIgnored)
+    Game.IgnoreRestrictions(isIgnored)
+    Sync.Restrictions = Game.GetRestrictions() 
+end
 -- returns lists of factories by category
 -- <point> and <radius> are optional
 -- this allows you to know which factories can build and which can't
@@ -1014,7 +1092,7 @@ end
 
 -- Creates a visible area for <vizArmy> at <vizLocation> of <vizRadius> size.
 -- If vizLifetime is 0, the entity lasts forever.  Otherwise for <vizLifetime> seconds.
--- Function returns an entitiy so you can destroy it later if you want
+-- Function returns an entity so you can destroy it later if you want
 function CreateVisibleAreaLocation( vizRadius, vizLocation, vizLifetime, vizArmy )
     if type(vizLocation) == 'string' then
         vizLocation = ScenarioUtils.MarkerToPosition(vizLocation)
@@ -1043,8 +1121,7 @@ function CreateVisibleAreaAtUnit( vizRadius, vizUnit, vizLifetime, vizArmy )
     return vizEntity
 end
 
-
--- Similar to the above funtion except it taks in an { X, Z } location rather
+-- Similar to the above function except it takes in an { X, Z } location rather
 -- Than an { X, Y, Z } position
 function CreateVisibleArea( vizRadius, vizX, vizZ, vizLifetime, vizArmy )
     local spec = {
@@ -1220,22 +1297,20 @@ function SetUEFAlly2Color( number )
 end
 
 --   Seraphim
-
 function SetSeraphimColor( number )
     SetArmyColor( number, 167, 150, 2 )
 end
 
 --   Loyalist
-
 function SetLoyalistColor( number )
     SetArmyColor( number, 0, 100, 0 )
 end
 
 function AMPlatoonCounter( aiBrain, name )
-    if not aiBrain.AttackData.AMPlatoonCount[name] then
-        aiBrain.AttackData.AMPlatoonCount[name] = 0
+    if not aiBrain.AttackData.PlatoonCount[name] then
+        aiBrain.AttackData.PlatoonCount[name] = 0
     end
-    return aiBrain.AttackData.AMPlatoonCount[name]
+    return aiBrain.AttackData.PlatoonCount[name]
 end
 
 function PlatoonAttackWithTransports( platoon, landingChain, attackChain, instant )
@@ -1368,7 +1443,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Lrg) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Lrg, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1403,7 +1478,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Med) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Med, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1426,7 +1501,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Sml) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Sml, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                     end
                     i = i + 1
@@ -1469,7 +1544,6 @@ end
 function GetRandomEntry( tableOfData )
     return tableOfData[Random( 1, table.getn( tableOfData ))]
 end
-
 
 function KillBaseInArea( brain, area, category )
     local rect = area
@@ -1657,7 +1731,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     end
     if (unlock) then
         WaitSeconds(time)
-        -- Matt 11/27/06. This is fuctional now, but the snap is pretty harsh. Need someone else to look at it
+        -- Matt 11/27/06. This is functional now, but the snap is pretty harsh. Need someone else to look at it
         -- cam:SyncPlayableRect(ScenarioInfo.MapData.PlayableRect)
         -- local rectangle = ScenarioInfo.MapData.PlayableRect
         -- import('/lua/SimSync.lua').SyncPlayableRect(  Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4]) )
@@ -1667,9 +1741,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     end
 end
 
--- -------------------------
 -- For mid-operation NISs
--- -------------------------
 function MissionNISCamera( unit, blendtime, holdtime, orientationoffset, positionoffset, zoomval )
     ForkThread(MissionNISCameraThread, unit, blendtime, holdtime, orientationoffset, positionoffset, zoomval)
 end
@@ -1697,9 +1769,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
     end
 end
 
--- ------------
 -- NIS Garbage
--- ------------
 function OperationNISCamera( unit, camInfo )
     if camInfo.markerCam then
         ForkThread(OperationNISCameraThread, unit, camInfo )
@@ -1914,7 +1984,7 @@ function EngineerBuildUnits( army, unitName, ... )
     local engUnit = ScenarioUtils.CreateArmyUnit(army, unitName)
     local aiBrain = engUnit:GetAIBrain()
     for k,v in arg do
-        if k != 'n' then
+        if k ~= 'n' then
             local unitData = ScenarioUtils.FindUnit(v, Scenario.Armies[army].Units)
             if not unitData then
                 WARN('*WARNING: Invalid unit name ' .. v)
@@ -1937,237 +2007,232 @@ end
 
 -- Below is for anti-off mapping function
 function GenerateOffMapAreas()
-	local playablearea = {}
-	local OffMapAreas = {}
-	
-	if  ScenarioInfo.MapData.PlayableRect then
-		playablearea = ScenarioInfo.MapData.PlayableRect
-	else
-		-- local x0,y0,x1,y1 = {0,ScenarioInfo.size[1],0,ScenarioInfo.size[2]}
-		playablearea = {0,0,ScenarioInfo.size[1],ScenarioInfo.size[2]}
-	end
-	-- local playablearea = {x0,y0,x1,y1}
-	
-	LOG('playable area coordinates are ' .. repr(playablearea))
-	
-	local x0 = playablearea[1]
-	local y0 = playablearea[2]
-	local x1 = playablearea[3]
-	local y1 = playablearea[4]
-	
-	-- This is a rectangle above the playable area that is longer, left to right, than the playable area
-	local OffMapArea1 = {}
-	OffMapArea1.x0 = (x0 - 100) 
-	OffMapArea1.y0 = (y0 - 100)
-	OffMapArea1.x1 = (x1 + 100)
-	OffMapArea1.y1 = y0
-	
-	-- This is a rectangle below the playable area that is longer, left to right, than the playable area
-	local OffMapArea2 = {}
-	OffMapArea2.x0 = (x0 - 100) 
-	OffMapArea2.y0 = (y1)
-	OffMapArea2.x1 = (x1 + 100)
-	OffMapArea2.y1 = (y1 + 100)
-	
-	-- This is a rectangle to the left of the playable area, that is the same height (up to down) as the playable area
-	local OffMapArea3 = {}
-	OffMapArea3.x0 = (x0 - 100) 
-	OffMapArea3.y0 = y0
-	OffMapArea3.x1 = x0
-	OffMapArea3.y1 = y1
-	
-	-- This is a rectangle to the right of the playable area, that is the same height (up to down) as the playable area
-	local OffMapArea4 = {}
-	OffMapArea4.x0 = x1 
-	OffMapArea4.y0 = y0
-	OffMapArea4.x1 = (x1 + 100)
-	OffMapArea4.y1 = y1 
-	
-	OffMapAreas = {OffMapArea1,OffMapArea2,OffMapArea3,OffMapArea4}
-	
-	ScenarioInfo.OffMapAreas = OffMapAreas
-	ScenarioInfo.PlayableArea = playablearea
-	
-	LOG('Offmapareas are ' .. repr(OffMapAreas))
-	
+    local playablearea = {}
+    local OffMapAreas = {}
+    
+    if  ScenarioInfo.MapData.PlayableRect then
+        playablearea = ScenarioInfo.MapData.PlayableRect
+    else
+        -- local x0,y0,x1,y1 = {0,ScenarioInfo.size[1],0,ScenarioInfo.size[2]}
+        playablearea = {0,0,ScenarioInfo.size[1],ScenarioInfo.size[2]}
+    end
+    -- local playablearea = {x0,y0,x1,y1}
+    
+    LOG('playable area coordinates are ' .. repr(playablearea))
+    
+    local x0 = playablearea[1]
+    local y0 = playablearea[2]
+    local x1 = playablearea[3]
+    local y1 = playablearea[4]
+    
+    -- This is a rectangle above the playable area that is longer, left to right, than the playable area
+    local OffMapArea1 = {}
+    OffMapArea1.x0 = (x0 - 100) 
+    OffMapArea1.y0 = (y0 - 100)
+    OffMapArea1.x1 = (x1 + 100)
+    OffMapArea1.y1 = y0
+    
+    -- This is a rectangle below the playable area that is longer, left to right, than the playable area
+    local OffMapArea2 = {}
+    OffMapArea2.x0 = (x0 - 100) 
+    OffMapArea2.y0 = (y1)
+    OffMapArea2.x1 = (x1 + 100)
+    OffMapArea2.y1 = (y1 + 100)
+    
+    -- This is a rectangle to the left of the playable area, that is the same height (up to down) as the playable area
+    local OffMapArea3 = {}
+    OffMapArea3.x0 = (x0 - 100) 
+    OffMapArea3.y0 = y0
+    OffMapArea3.x1 = x0
+    OffMapArea3.y1 = y1
+    
+    -- This is a rectangle to the right of the playable area, that is the same height (up to down) as the playable area
+    local OffMapArea4 = {}
+    OffMapArea4.x0 = x1 
+    OffMapArea4.y0 = y0
+    OffMapArea4.x1 = (x1 + 100)
+    OffMapArea4.y1 = y1 
+    
+    OffMapAreas = {OffMapArea1,OffMapArea2,OffMapArea3,OffMapArea4}
+    
+    ScenarioInfo.OffMapAreas = OffMapAreas
+    ScenarioInfo.PlayableArea = playablearea
+    
+    LOG('Offmapareas are ' .. repr(OffMapAreas))
+    
 end
 
 function AntiOffMapMainThread()
-	WaitTicks(10)
-	GenerateOffMapAreas()
-	local OffMapAreas = {}
-	local UnitsThatAreOffMap = {}
-	-- WARN(repr(ScenarioInfo.ArmySetup))
-	
-	while ScenarioInfo.OffMapPreventionThreadAllowed == true do
-		OffMapAreas = ScenarioInfo.OffMapAreas
-		NewUnitsThatAreOffMap = {}
-		
-		for index,OffMapArea in OffMapAreas do
-			local UnitsThatAreInOffMapRect = GetUnitsInRect(OffMapArea)
-				if UnitsThatAreInOffMapRect then
-					for index, UnitThatIsOffMap in  UnitsThatAreInOffMapRect do
-						if not UnitThatIsOffMap.IAmOffMapThread then
-							table.insert(NewUnitsThatAreOffMap,UnitThatIsOffMap)
-						end
-					end
-				else
-				
-				end
-		end
-		
-		local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
-		
-		-- WARN('the number of new units that are off map is ' .. repr(NumberOfUnitsOffMap))
-		
-		for index,NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
-			if not NewUnitThatIsOffMap.IAmOffMap then
-				NewUnitThatIsOffMap.IAmOffMap = true
-			end
-			-- this is to make sure that we only do this check for air units
-			if not NewUnitThatIsOffMap.IAmOffMapThread and EntityCategoryContains( categories.AIR, NewUnitThatIsOffMap) then
-				
-				
-				-- this is to make it so it only impacts player armies, not AI or civilian or mission map armies
-				if IsHumanUnit(NewUnitThatIsOffMap) then
-					NewUnitThatIsOffMap.IAmOffMapThread = NewUnitThatIsOffMap:ForkThread(IAmOffMap)
-				else 
-					-- So that we don't bother checking each AI unit more than once
-					NewUnitThatIsOffMap.IAmOffMapThread = true
-				end
-			end
-		end
-		
-		
-		WaitSeconds(1)
-		NewUnitsThatAreOffMap = nil
-	end
-	
-
+    WaitTicks(10)
+    GenerateOffMapAreas()
+    local OffMapAreas = {}
+    local UnitsThatAreOffMap = {}
+    -- WARN(repr(ScenarioInfo.ArmySetup))
+    
+    while ScenarioInfo.OffMapPreventionThreadAllowed == true do
+        OffMapAreas = ScenarioInfo.OffMapAreas
+        NewUnitsThatAreOffMap = {}
+        
+        for index,OffMapArea in OffMapAreas do
+            local UnitsThatAreInOffMapRect = GetUnitsInRect(OffMapArea)
+                if UnitsThatAreInOffMapRect then
+                    for index, UnitThatIsOffMap in  UnitsThatAreInOffMapRect do
+                        if not UnitThatIsOffMap.IAmOffMapThread then
+                            table.insert(NewUnitsThatAreOffMap,UnitThatIsOffMap)
+                        end
+                    end
+                else
+                
+                end
+        end
+        
+        local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
+        
+        -- WARN('the number of new units that are off map is ' .. repr(NumberOfUnitsOffMap))
+        
+        for index,NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
+            if not NewUnitThatIsOffMap.IAmOffMap then
+                NewUnitThatIsOffMap.IAmOffMap = true
+            end
+            -- this is to make sure that we only do this check for air units
+            if not NewUnitThatIsOffMap.IAmOffMapThread and EntityCategoryContains( categories.AIR, NewUnitThatIsOffMap) then
+                
+                
+                -- this is to make it so it only impacts player armies, not AI or civilian or mission map armies
+                if IsHumanUnit(NewUnitThatIsOffMap) then
+                    NewUnitThatIsOffMap.IAmOffMapThread = NewUnitThatIsOffMap:ForkThread(IAmOffMap)
+                else 
+                    -- So that we don't bother checking each AI unit more than once
+                    NewUnitThatIsOffMap.IAmOffMapThread = true
+                end
+            end
+        end
+        
+        
+        WaitSeconds(1)
+        NewUnitsThatAreOffMap = nil
+    end
 end
 
 IsHumanUnit = function(self)
-	local ArmyTable = ScenarioInfo.ArmySetup
-	local ArmyIndex = self:GetArmy()
-	
-	for ArmyName,Army in ArmyTable do
-		if Army.ArmyIndex == ArmyIndex then
-			if Army.Human == true then
-				return true
-			else
-				return false
-			end
-			
-		end
-	end
-
-
+    local ArmyTable = ScenarioInfo.ArmySetup
+    local ArmyIndex = self:GetArmy()
+    
+    for ArmyName,Army in ArmyTable do
+        if Army.ArmyIndex == ArmyIndex then
+            if Army.Human == true then
+                return true
+            else
+                return false
+            end
+            
+        end
+    end
 end
 
 function IsUnitInPlayableArea(unit)
 
-	local playableArea = ScenarioInfo.PlayableArea
-	local position = unit:GetPosition()
-	-- WARN('unit position is ' .. repr(position))
-	-- format is x0,y0,x1,y1 for rect, x,y,z for position
-	if  position[1] > playableArea[1] and position[1] < playableArea[3] and  position[3] > playableArea[2] and position[3] < playableArea[4] then
-		-- WARN('unit is in playable area')
-		return true
-	else 
-		-- WARN('unit remains in unplayable area')
-		return false
-	end
-	
+    local playableArea = ScenarioInfo.PlayableArea
+    local position = unit:GetPosition()
+    -- WARN('unit position is ' .. repr(position))
+    -- format is x0,y0,x1,y1 for rect, x,y,z for position
+    if  position[1] > playableArea[1] and position[1] < playableArea[3] and  position[3] > playableArea[2] and position[3] < playableArea[4] then
+        -- WARN('unit is in playable area')
+        return true
+    else 
+        -- WARN('unit remains in unplayable area')
+        return false
+    end
+    
 end
 
 -- this is for bad units who choose to go off map, shame on them
 function IAmOffMap(self)
-	self.TimeIHaveBeenOffMap = 0
-	self.TimeIHaveBeenOnMap = 0
-	self.TimeIAmAllowedToBeOffMap = GetTimeIAmAllowedToBeOffMap(self)
-	while not self.Dead do
-		-- local playableArea = ScenarioInfo.PlayableArea
-		if IsUnitInPlayableArea(self) then
-			self.TimeIHaveBeenOnMap = (self.TimeIHaveBeenOnMap + 1)
-			
-			if self.TimeIHaveBeenOnMap > 5 then 
-				self:ForkThread(KillIAmOffMapThread)
-			end
-		else
-			self.TimeIHaveBeenOffMap = (self.TimeIHaveBeenOffMap + 1)
-			-- WARN('time I have been off map is ' .. repr(self.TimeIHaveBeenOffMap))
-		end
-		
-		if self.TimeIHaveBeenOffMap > self.TimeIAmAllowedToBeOffMap then
-			self:ForkThread(IAmABadUnit)
-			
-		end
-		
-		WaitSeconds(1)
-	end
+    self.TimeIHaveBeenOffMap = 0
+    self.TimeIHaveBeenOnMap = 0
+    self.TimeIAmAllowedToBeOffMap = GetTimeIAmAllowedToBeOffMap(self)
+    while not self.Dead do
+        -- local playableArea = ScenarioInfo.PlayableArea
+        if IsUnitInPlayableArea(self) then
+            self.TimeIHaveBeenOnMap = (self.TimeIHaveBeenOnMap + 1)
+            
+            if self.TimeIHaveBeenOnMap > 5 then 
+                self:ForkThread(KillIAmOffMapThread)
+            end
+        else
+            self.TimeIHaveBeenOffMap = (self.TimeIHaveBeenOffMap + 1)
+            -- WARN('time I have been off map is ' .. repr(self.TimeIHaveBeenOffMap))
+        end
+        
+        if self.TimeIHaveBeenOffMap > self.TimeIAmAllowedToBeOffMap then
+            self:ForkThread(IAmABadUnit)
+            
+        end
+        
+        WaitSeconds(1)
+    end
 end
 
-
 function IAmABadUnit(self)
-	local position = self:GetPosition()
-	local playableArea = ScenarioInfo.PlayableArea
-	local NearestOnPlayableAreaPointToMe = {}
-	
-	-- format is x0,y0,x1,y1 for rect, x,y,z for position
-	-- to conver position to rect, z is y, and y is height
-		
-	NearestOnPlayableAreaPointToMe[2] = position[2]	
-		
-	if position[1] > playableArea[1] and position[1] < playableArea[3] then
-		NearestOnPlayableAreaPointToMe[1] = position[1]
-	elseif position[1] < playableArea[1] then
-		NearestOnPlayableAreaPointToMe[1] = (playableArea[1] + 5)
-	elseif position[1] > playableArea[3] then
-		NearestOnPlayableAreaPointToMe[1] = (playableArea[3] - 5)
-	end
-	
-	
-	if position[3] > playableArea[2] and position[3] < playableArea[4] then
-		NearestOnPlayableAreaPointToMe[3] = position[3]
-	elseif position[3] < playableArea[2] then
-		NearestOnPlayableAreaPointToMe[3] = (playableArea[2] + 5)
-	elseif position[3] > playableArea[4] then
-		NearestOnPlayableAreaPointToMe[3] = (playableArea[4] - 5)
-	end
-	
-	IssueClearCommands({self})
-	IssueMove({self},position)
-	-- WARN('Unit was off map too long, so has been cleared of all orders')
-	
+    local position = self:GetPosition()
+    local playableArea = ScenarioInfo.PlayableArea
+    local NearestOnPlayableAreaPointToMe = {}
+    
+    -- format is x0,y0,x1,y1 for rect, x,y,z for position
+    -- to conver position to rect, z is y, and y is height
+        
+    NearestOnPlayableAreaPointToMe[2] = position[2]    
+        
+    if position[1] > playableArea[1] and position[1] < playableArea[3] then
+        NearestOnPlayableAreaPointToMe[1] = position[1]
+    elseif position[1] < playableArea[1] then
+        NearestOnPlayableAreaPointToMe[1] = (playableArea[1] + 5)
+    elseif position[1] > playableArea[3] then
+        NearestOnPlayableAreaPointToMe[1] = (playableArea[3] - 5)
+    end
+    
+    
+    if position[3] > playableArea[2] and position[3] < playableArea[4] then
+        NearestOnPlayableAreaPointToMe[3] = position[3]
+    elseif position[3] < playableArea[2] then
+        NearestOnPlayableAreaPointToMe[3] = (playableArea[2] + 5)
+    elseif position[3] > playableArea[4] then
+        NearestOnPlayableAreaPointToMe[3] = (playableArea[4] - 5)
+    end
+    
+    IssueClearCommands({self})
+    IssueMove({self},position)
+    -- WARN('Unit was off map too long, so has been cleared of all orders')
+    
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-	
-	local airspeed = self:GetBlueprint().Air.MaxAirspeed
-	local value = airspeed
+    
+    local airspeed = self:GetBlueprint().Air.MaxAirspeed
+    local value = airspeed
 
-	if EntityCategoryContains( categories.BOMBER, self ) then
-		value = airspeed / 5
-	elseif EntityCategoryContains( categories.TRANSPORTATION, self ) then
-		value = 2	
-	end
-	
-	for i = 1, self:GetWeaponCount() do
-		local wep = self:GetWeapon(i)
-		if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
-			if wep:GetCurrentTarget()  then
-				value = airspeed * 2
-			end
-			
-		end
-	end
-	return value
+    if EntityCategoryContains( categories.BOMBER, self ) then
+        value = airspeed / 5
+    elseif EntityCategoryContains( categories.TRANSPORTATION, self ) then
+        value = 2    
+    end
+    
+    for i = 1, self:GetWeaponCount() do
+        local wep = self:GetWeapon(i)
+        if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
+            if wep:GetCurrentTarget()  then
+                value = airspeed * 2
+            end
+            
+        end
+    end
+    return value
 end
 
 function KillIAmOffMapThread(self)
 
-	KillThread(self.IAmOffMapThread)
-	self.IAmOffMapThread = nil
-	self.TimeIHaveBeenOffMap = 0
-	self.TimeIHaveBeenOnMap = 0
+    KillThread(self.IAmOffMapThread)
+    self.IAmOffMapThread = nil
+    self.TimeIHaveBeenOffMap = 0
+    self.TimeIHaveBeenOnMap = 0
 end

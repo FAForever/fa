@@ -67,6 +67,7 @@ scoreData {
                     built,
                     lost,
                 },
+                ... and more for specific units
             },
             resources {
                 massin {

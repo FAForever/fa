@@ -89,7 +89,7 @@ Tooltips = {
     },
     overcharge = {
         title = "<LOC tooltipui0016>Overcharge",
-        description = "",
+        description = "<LOC tooltipui0017>Needs 5000 energy in storage to activate. Right click to toggle auto-fire",
         keyID = "overcharge",
     },
     transport = {
@@ -1029,6 +1029,10 @@ Tooltips = {
         title = '<LOC lobui_0585>AI Markers',
         description = '<LOC lobui_0586>Select maps with AI Markers.',
     },
+    map_obsolete = {
+        title = '<LOC MAPSEL_0035>Hide Obsolete',
+        description = '<LOC MAPSEL_0036>Hides maps which have been replaced by new versions',
+    },
     
     -- **********************
     -- ** Profile Strings
@@ -1884,8 +1888,8 @@ Tooltips = {
         description = "<LOC tooltipui0689>Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
     },
     Lobby_presetDescription = {
-        title = "<LOC tooltipui0690>Lobby Presets",
-        description = "<LOC tooltipui0691>Save and load presets for game settings and maps"
+        title = "<LOC tooltipui0694>Lobby Presets",
+        description = "<LOC tooltipui0695>Save and load presets for game settings and maps"
     },
     
     -- **********************

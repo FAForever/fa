@@ -43,6 +43,41 @@ local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
+Callbacks.AutoOvercharge = function(data, units)
+    for _, u in units or {} do
+        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) and u.SetAutoOvercharge then
+            u:SetAutoOvercharge(data.auto == true)
+        end
+    end
+end
+
+Callbacks.PersistFerry = function(data, units)
+    local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
+    if table.getsize(transports) == 0 then return end
+    local start = data.route[1]
+
+    local helper = CreateUnit('hel0001', units[1]:GetArmy(), start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
+    table.insert(units, helper)
+    IssueClearCommands(units)
+    for _, r in data.route do
+        IssueFerry(units, r)
+    end
+end
+
+Callbacks.TransportLock = function(data)
+    local units = SecureUnits(data.ids)
+    if not units[1] then return end
+
+    for _, u in units do
+        u:TransportLock(data.lock == true)
+    end
+end
+
+Callbacks.ClearCommands = function(data, units)
+    local safe = SecureUnits(data.ids or units)
+    IssueClearCommands(safe)
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
@@ -148,8 +183,10 @@ Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 Callbacks.ValidateAssist = function(data, units)
     local target = GetEntityById(data.target)
     if units and target then
+        if GetFocusArmy() ~= target:GetArmy() then return end
+
         for k, u in units do
-            if IsEntity(u) and OkayToMessWithArmy(target:GetArmy()) and IsInvalidAssist(u, target) then
+            if IsEntity(u) and IsInvalidAssist(u, target) then
                 IssueClearCommands({target})
                 return
             end

@@ -1,11 +1,150 @@
+Patch 3652 (pending)
+============================
+
+**Lobby**
+- Name filter when selecting map
+- Prevent host from changing player teams while he is ready
+- Game quality in lobby now visible again
+- Reduced autobalance random variation to get team setups with better overall quality
+- Default to score off
+- Stopped the map filter preventing the map selected in prefs from prior games from showing
+- Tiny fix to flag layout
+- Fixed descriptions for the AIx Omni option and Lobby Preset button
+
+**UI**
+- Introduced Russian translations of many FAF additions to the game (Exotic_Retard and PerfectWay)
+- Translate some FAF additions to Italian
+- New keybindable action: 'soft_stop'
+- Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
+- Hold down Alt when giving a factory order to soft stop factory before issuing next order
+- Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
+- Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
+- Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
+- Units explicitly repairing (not assisting) a structure that dies will automatically try to rebuild it
+- Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
+- Fixed bug with unit regen debuff not being visible in UI
+- Fixed bug with buildpower not visible in unitview
+- Score display in the top-right no longer counts reclaim into the Mass/Energy income shown in observer mode
+- Allow Hotbuild to find Support Factories
+- Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
+- Show ren_networkstats in Connectivity Screen (F11)
+- Show name of the one resuming a paused game
+- Reverted the change to T1 PD icons from 3641, so now they don't give free intel on mouse-over when trying to fake PD-wall with all-wall radar ghosts.
+- Render build range of engineers using native overlay system instead of decal hack
+- Enabled Pause button in replays
+- In Units Manager, added more preset restrictions (e.g. No T1 spam, No Snipes, No TMLs)
+- In Units Manager, separated some existing preset restrictions (e.g. game-enders, nukes) for better selection
+- In Units Manager, added custom restrictions for all FA units 
+- In Units Manager, added custom restrictions for modded units when mods are activated
+- In Units Manager, added mechanism for restricting units using preset restrictions and/or custom restrictions
+- In Units Manager, added grouping of units based on faction, type, purpose, and tech level
+- In Units Manager, added detailed tooltips with stats for weapons, defense, and eco for all units 
+- In Units Manager, added visualization of modded units using small purple icon with letter M 
+- In Units Manager, improved description of preset restrictions
+- In Mods Manager, added filters for UI/Game/Disabled mods 
+- In Mods Manager, improved sorting mods by their activation status and names
+- In Mods Manager, added cleanup of mod names with mismatching mod versions
+- In Mods Manager, added mod versions next to mod names
+- Added pre-loading and caching of blueprints for usage in the Units Manager 
+
+**Gameplay**
+- Teamkill is now detected and a player can make an explicit report
+- Air units are now able to fire at water-landed transports
+- Hoplite now calculate their aim correctly when firing at a fleeing target
+- Slightly increased unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
+- Seraphim Experimental Nuke now deals damage to itself
+- Cybran drones no longer leave wreckage when killed
+- Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
+- Removed friendly fire on Atlantis AA
+- Locations of enemy civilian structures are now revealed at start of the game (lobby option)
+- Navy units now should respect their max-range better when having move-attack order
+- Set GuardReturnRadius to 3 as default, will make guarding / patrolling / move-attacking units less prone to move off their designated mission while hunting something
+- Units moving on sea bottom now leave tread marks - they disappear faster though
+- Re-enabled death animation on non-naval units
+- Seraphim GW now uses all its 3 exits
+- Spread attack targets are now spread more uniformly among all units during the initial attack orders, further ones are random.
+- Diplomacy now allowed in Coop mode
+- Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
+- Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
+- Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
+- Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
+- Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
+- Fixed Cybran T3 MAA hitbox/bones making lots of units miss
+- Fixed Seraphim T1 sub not being hit by torpedoes 80% of the time while surfaced.
+- Enemy civilians are now colored in a unique red color
+- Fixed bomb drop code and enabled it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
+- Allowed Aeon Aircraft Carrier to build Bombers and Gunships, same as the others.
+- Fixed restriction system on Sim side such that it cannot be compromised by UI mods 
+- Fixed restriction system that prevented removing restrictions on already restricted units in scenario scripts
+
+**Bugs**
+- Fixed free mass exploit with Megalith eggs
+- Fixed bug with Cybran SCUs getting EMP for free
+- Fixed bug with units getting invincible after a visit to their nearest carrier
+- Fixed bug with not able to target a blip of a given / upgraded structure
+- Fixed bug which caused silo missiles to disappear at launch stage
+- Fixed bug with water sounds not playing while a unit was submerged
+- Fixed bug with omni buff instead getting radius of radar
+- Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
+- Fixed bug with commander not always being selected at start
+- Fixed wrecks not giving resources in Coop mode
+- Fixed Coop missions getting stuck at completion
+- Added missing Seraphim objective icons
+- Shields now overkill damage correctly based on their type
+- Fixed nukes overkilling bubble shield base structure when out of range and shield up
+- Fixed Continental taking damage from AOE when it has the shield up
+- Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
+- Fixed Underwater Vision not being initialized on unit completion
+- Fixed Engineers not properly reclaiming the target of an assisted, then stopped, Engineer
+- Fixed UEF Drones being untargetable by Interceptors
+- Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
+- Fixed UEF AI unit templates in coop mode
+- Fixed an exploit with being able to upgrade restricted enhancements
+- Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
+- Fixed shields sometimes not turning off due to lack of Energy
+- Fixed buffs from enhancements being applied too often after unit transfer
+- Fixed submersible naval units leaving full reclaim mass
+- Nuclear explosions now behave predictably, always bypassing/ignoring bubble shielding
+
+**Performance**
+- Optimization of score accumulation
+- Tweaks to hive build effects to reduce performance impact
+- Cleanup of enhancement sync code to make it faster and more secure
+- Entities now re-use repeated sound FX instead of creating new ones every time
+- Reduce load on render thread
+- No net_lag in single-player to increase UI response speed
+
+**Other**
+- Added game-side support for future achievement system
+- Tech-level filter in debug window now works as intended
+- Log-spam from various known events heavily reduced
+- Lots of work adapting and improving AI behavior for coop gameplay (speed2)
+- Scale aeon build effects according to build progress 
+- Show wreckage debris in reclaim beam
+
+**Contributors**
+- Sheeo
+- IceDreamer
+- Crotalus
+- speed2
+- Exotic_Retard
+- duk3luk3
+- HUSSAR
+- Downlord
+- madformuse
+- quark036
+- CodingSquirrel
+- PerfectWay
+
+
 Patch 3650 (August 19, 2015)
 ===========================
 
 HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
 
-Seraphim and UEF ACU TML
+**Seraphim and UEF ACU TML**
 
-- Missle hitpoints: 3 hp → 2 hp
+- Missile hitpoints: 3 hp → 2 hp
 - Flying height: now similar to normal TML
 - Mass cost: 1000 → 1500
 - Minimal range: 5 → 15
@@ -14,33 +153,33 @@ Seraphim and UEF ACU TML
 - Area of effect: 3 → 2
 - The flying arc at close range will now be similar to the UEF ACU TML
 
-Cybran TML
+**Cybran TML**
 
 - TMDs (except Aeon) will now survive a single cybran tactical missile if they have full HP
 
-TML friendly Fire
+**TML friendly Fire**
 
 - TML missiles no longer deal friendly fire
 
-sACU changes
+**sACU changes**
 
 - Hitbox: lasers can now hit SCUs more reliably
 - SCUs now leave a normal wreckage with 81% of their mass value when destroyed
 - A RAS preset for UEF, Cybran and Aeon is now available for production from the Quantum Gateways.
  
-Aeon SCU
+ **Aeon SCU**
 
 - Reacton Cannon (Gun upgrade) energy cost: 36000 → 46200, build time: 5040 → 6048
 - Heavy Personal Shield hitpoints: 35000 → 40000, mass cost = 1500 → 1800
 
- UEF SCU
+ **UEF SCU**
 
 - Personal Shield Generator HP: 32000 → 26000 HP
 - Heavy Plasma Cannon (Gun Upgrade) rate of fire x2.5 → x1.82 (DPS 750 → 546), AOE: 2.5 → 2
 - Radar Jammer mass cost: 600 → 300, energy cost = 18000 → 8000
 - Bubble shield energy cost: 400000 → 360800
 
- Cybran SCU
+ **Cybran SCU**
 
 - Nano-Repair System regeneration rate: 400 hp/s → 375 hp/s, mass cost: 2000 → 2200
 - Focus Convertor (Gun upgrade) adds damage: 250 → 200
@@ -49,7 +188,7 @@ Aeon SCU
 - Stealth upgrade mass cost: 600 → 400, energy cost: 18000 → 7400
 - Cloak upgrade energy cost: 500000 → 382200
 
- Seraphim SCU
+ **Seraphim SCU**
 
 - Overcharge: now tracks (like ACU overcharge)
 - Overcharge reload time: 5 seconds → 7.5 seconds
@@ -57,60 +196,60 @@ Aeon SCU
 - Overcharge DPS: 2400 → 1333
 - Shield mass cost: 1500 → 1200, shield hitpoints: 25000 → 20000
 
-Seraphim (Yenzyne)
+**Seraphim (Yenzyne)**
 
 - Build time: 880 → 1050
 - Speed on water: 4.3 → 3
  
- Aeon (Blaze)
+ **Aeon (Blaze)**
 
 - Build time: 880 → 1050
 - Speed on water: 4.3 → 3
 
- UEF (Riptide)
+ **UEF (Riptide)**
 
 - Build time: 1320 → 1600
 - Speed on water: 3.7 → 3
 - Mass cost: 362 → 360
 - Energy cost: 1980 → 2000
 
- Hover flak (Seraphim and Aeon)
+ **Hover flak (Seraphim and Aeon)**
 
 - Speed: 3.6 → 3
 
-Seraphim Tech 2 bot and Tech 3 Tank Changes
+**Seraphim Tech 2 bot and Tech 3 Tank Changes**
 
  - We are carefully toning down both areas while keeping the idea behind it intact. Ilshavoh becomes weaker, and Othuum becomes stronger.
  - 
- Ilshavoh
+ **Ilshavoh**
 
 - Turret turn rate: 180°/s → 70°/s
 
- Othuum
+ **Othuum**
 
 - Speed: 2.5 → 2.6
 
- Harbinger
+ **Harbinger**
 
 - Will now take longer to make, making it harder to spam them so fast and allowing opponents slightly more time to bring counters into play.
 - Veterancy: 15/30/45/60/75 → 18/36/54/72/90
 - Build time: 3600 → 4500
 - Can no longer fire while reclaiming
 
- Sniper bots (Seraphim and Aeon)
+ **Sniper bots (Seraphim and Aeon)**
 
 - It is annoying when sniper bots lose all their damage while moving and trying to shoot. They will hit more often now, even - though using them stationary will still lead to the best results.
 - Firing randomness when moving: 0.8 → 0.5
 
- UEF T3MAA
+ **UEF T3MAA**
 
 - Other faction’s T3 MAA were hitting much better than the UEF one. This change is improving its accuracy to similar levels.
 - Slight tracking added with small turn rate (20)
 - Muzzle velocity: 100 → 110
 
-Navy
+**Navy**
 
- Summit
+ **Summit**
 
 - Is now more expensive, giving other factions more time to beat them before they are able to gather a critical mass.
 - Mass cost: 9000 → 10500
@@ -118,7 +257,7 @@ Navy
 - Build time: 28800 → 33000
 - Area of effect: 3 → 2
 
- Aeon frigates
+ **Aeon Frigates**
 
  - Will now be more effective vs hover, but not vs ships. 
 
@@ -128,88 +267,87 @@ Navy
 - MuzzleChargeDelay: 0.5 → 0
 - Anti-torpedo weapon reload time: 10 → 12.5
 
-Air
+**Air**
 
- Strategic bombers (all factions)
+ **Strategic bombers (all factions)**
 
-Increasing the energy cost of strat bombers to avoid the ability to rush a strat them so easily.
+Increasing the energy cost of strategic bombers to avoid the ability to rush them so easily.
 - Energy cost: 105000 → 144000
 - Build time: 8400 → 9600
 
- Corsair
+ **Corsair**
 
 - Reducing the speed of their projectiles to make them as easy (or hard) to dodge as they were before the range decrease.
 - muzzle velocity: 35 → 30
 
-Torpedo bombers
+**Torpedo bombers**
 
-- We made several adjustments to allow torpedo bombers to actually deliever their torpedoes more often.
+- We made several adjustments to allow torpedo bombers to actually deliver their torpedoes more often.
 - Reload time for all torpedo bombers: 12.5 → 10
 
- Uosioz (Seraphim Torpedo Bomber)
+ **Uosioz (Seraphim Torpedo Bomber)**
 
-- Torpedos get now dropped in front of the bomber (like all other bombers)
+- Torpedoes get now dropped in front of the bomber (like all other bombers)
 - Range: 42 → 35
 - Amount of volleys: 2 → 3
-- Now ignores torpedo defence (like all other torpedo bombers)
-- Multiple adjustments to torpedos make them less likely to crash on the ground in shallow water
+- Now ignores torpedo defense (like all other torpedo bombers)
+- Multiple adjustments to torpedoes make them less likely to crash on the ground in shallow water
 
- Skimmer (Aeon T2 Torpedo Bomber)
+ **Skimmer (Aeon T2 Torpedo Bomber)**
 
 - Depth charges get now dropped in front of the bomber (like all other bombers)
 - Range: 42 → 35
 - Amount of volleys: 2 → 3
 - Multiple adjustments to depth charges make them less likely to crash on the ground in shallow water
 
- Solace (Aeon T3 Torpedo Bomber)
+ **Solace (Aeon T3 Torpedo Bomber)**
 
 - Range: 42 → 32
 - Projectile turn rate increased
 
- Awhassa
+ **Awhassa**
 
 
 - Added armour to ASF to guard them from the bomb, reducing their damage taken to 10%
 - Veterancy: 50/100/150/200/250 → 100/200/300/400/500
 - Reload time: 10 → 12
 
-Other
+**Other**
 
- Quantum Gateway
+ **Quantum Gateway**
  
-- We are reducing the adjacency bonus for massfabs next to Quantum Gates to a more normal level.
+- We are reducing the adjacency bonus for mass fabricators next to Quantum Gates to a more normal level.
 - Tech 2 mass fabricator: 2.5% → 0.75%
 - Tech 3 mass fabricator: 15% → 2.25%
 - Tech 3 power generator: 18.75% → 5%
-Preset names improved
+- Preset names improved
 
- T3 Land HQ
+ **T3 Land HQ**
 
 
 Build time: 9400 → 11000
 
-Sonars
+**Sonars**
 
- T2 sonar
+ **T2 sonar**
 
 - Mass cost: 120 → 150 (sera stays 180)
 - Energy drain: 100 → 150
 
- UEF/Aeon T3 sonar
+ **UEF/Aeon T3 sonar**
 
 - Mass cost: 400 → 1000
 - Energy drain: 100 → 250
 
- Cybran T3 sonar
+ **Cybran T3 sonar**
 
 - Mass cost: 480 → 1200
 - Energy drain: 250 → 400
 
- Energy/Mass overflow
+ **Energy/Mass overflow**
 
 The bug, that caused resources to disappear when they got shared to several teammates and one of them had full storage does not exist and is a FAF urban legend. If a teammate has full storage, the resources get properly shared to a different teammate instead. It is not needed to use any mods to prevent resources from getting lost or to inform others about this "bug".
 - No change required
-
 
 
 Patch 3648 (August 13, 2015)
@@ -236,7 +374,7 @@ Bugs
 - Commanders no longer explode immediately with the 'no-land' restriction enabled
 - Upgraded hives are no longer invincible
 - Beam weapons will no longer keep firing their lasers after designated targets have died
-- Nukes will always penerate personal shields again
+- Nukes will always generate personal shields again
 - Paused units which start work on a building will no longer consume resources
 
 Enhancements
@@ -341,7 +479,7 @@ Hitboxes
 Visual
 - Fixed shield structure glows and rotations not playing
 - Fixed bug with capture progress bar not being synced if using multiple engineers
-- Optimised the range-rings shader to reduce the way FPS falls off a cliff
+- Optimized the range-rings shader to reduce the way FPS falls off a cliff
 - Fixed bug with instantly disappearing wrecks due to garbage collection
 - Fixed wrong regen values being reported on UI-side
 - Disable build effect beams on sinking engineers
@@ -350,7 +488,7 @@ Visual
 - Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
 - Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
 - Fuel indicator no longer falls off the unit detail window
-- Seraphim ACU and SCU no longer show the tac missile counter if they don't have the upgrade
+- Seraphim ACU and SCU no longer show the tactical missile counter if they don't have the upgrade
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -422,7 +560,7 @@ UI
 
 Other
 - Engineering Station units now pause on transfer from one player to another
-- Cybran build bots now can assist next build project without respawning
+- Cybran build bots now can assist next build project without re-spawning
 - The least valuable units are destroyed at unit transfer if unitcap is hit
 - Absolver shield disrupter now hovers higher, so it's less likely to hit the
   floor with the very low mounted gun
@@ -462,7 +600,7 @@ Special Thanks To
 Patch 3640 (Jan 6, 2015)
 ==========
 
-- Adress an issue that causes the game to crash with core dumps in long games
+- Addressed an issue that causes the game to crash with core dumps in long games
 
 
 Patch 3639 (Jan 5, 2015)
@@ -545,7 +683,7 @@ Patch 3637 (Dec 12, 2014)
 *Bug fixes*
 - Selection Range Overlay works for multiple units again
 - Score no longer flickers when watching replays
-- Targeting issues, especially related to the seraphim ACU have been adressed
+- Targeting issues, especially related to the seraphim ACU have been addressed
 - Compatibility with certain mods restored
 - Lobby 2.5b included (Changelog shown in game)
 
@@ -595,7 +733,7 @@ Patch 3636 (Dec 12, 2014)
 -  Improved autobalance with random spawns in lobby
 -  SMD can be paused
 -  New "No Walls" Unit Restriction
--  Improved the Unit Restrictions menu descriptions, including localisation
+-  Improved the Unit Restrictions menu descriptions, including localization
 -  Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 -  Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 -  Show replay-ID in score

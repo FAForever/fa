@@ -1,8 +1,10 @@
 function ToggleSelfDestruct(data)
-    -- supress self destruct in tutorial missions as they screw up the mission end
+
+    -- Suppress self destruct in tutorial missions as they screw up the mission end
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
     end
+    
     if data.owner != -1 then
         local unitEntities = {}
         for _, unitId in data.units do
@@ -26,52 +28,41 @@ function ToggleSelfDestruct(data)
                 for _, unitEnt in unitEntities do
                     local unit = unitEnt
 
-                    # added by brute51 - makes selfdestruct alterable through BP files
-                    # instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
-                    # fires weapons with FireOnSelfDestruct = true in units weapon table
-
+                    -- Unit and weapon bp flags can be used to control behaviour on SelfDestruct
+                    -- Instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
+                    -- Fires weapons with FireOnSelfDestruct = true in units weapon table
                     local bp = unit:GetBlueprint()
                     if bp.General.InstantDeathOnSelfDestruct then
-                        local wepCount = unit:GetWeaponCount()
-                        for i = 1, wepCount do
-                            local wep = unit:GetWeapon(i)
-                            local wepBP = wep:GetBlueprint()
-                            if wepBP.FireOnSelfDestruct then
-                                if wep.Fire then
-                                    wep.Fire()
-                                else
-                                    wep.OnFire(wep)
-                                end
-                            end
-                        end
+                        FireSelfdestructWeapons(unit)
                         unit:Kill()
                     else
-
-                    # regular self destruct cycle
+                        -- Regular self destruct cycle
                         local entityId = unit:GetEntityId()
                         StartCountdown(entityId)
                         unit.SelfDestructThread = ForkThread(function()
                             WaitSeconds(5)
-                            local wepCount = unit:GetWeaponCount()
-                            for i = 1, wepCount do
-                                local wep = unit:GetWeapon(i)
-                                local wepBP = wep:GetBlueprint()
-                                if wepBP.FireOnSelfDestruct then
-                                    if wep.Fire then
-                                        wep.Fire()
-                                    else
-                                        wep.OnFire(wep)
-                                    end
-                                end
-                            end
+                            if unit:BeenDestroyed() then return end
+                            FireSelfdestructWeapons(unit)
                             unit:Kill()
                         end)
                     end
-
-
                 end
             end
         end
     end
 end
 
+function FireSelfdestructWeapons(unit)
+    local wepCount = unit:GetWeaponCount()
+    for i = 1, wepCount do
+        local wep = unit:GetWeapon(i)
+        local wepBP = wep:GetBlueprint()
+        if wepBP.FireOnSelfDestruct then
+            if wep.Fire then
+                wep.Fire()
+            else
+                wep.OnFire(wep)
+            end
+        end
+    end
+end

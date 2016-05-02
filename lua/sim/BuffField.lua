@@ -154,7 +154,7 @@ BuffField = Class(Entity) {
 
         if bp.DisableInTransport then
             Owner:AddUnitCallback(self.DisableInTransport, 'OnAttachedToTransport')
-            Owner:AddUnitCallback(self.EnableOutTransport, 'OnDetachedToTransport')
+            Owner:AddUnitCallback(self.EnableOutTransport, 'OnDetachedFromTransport')
         end
 
         self:OnCreated()

@@ -15,7 +15,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local Buff = import('/lua/sim/Buff.lua')
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
-local CIFCommanderDeathWeapon = CWeapons.CIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
@@ -25,7 +25,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 
 URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {
-        DeathWeapon = Class(CIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         RightRipper = Class(CCannonMolecularWeapon) {},
         Torpedo = Class(CANTorpedoLauncherWeapon) {},
         MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {
@@ -46,6 +46,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         },
 
         OverCharge = Class(CDFOverchargeWeapon) {},
+        AutoOverCharge = Class(CDFOverchargeWeapon) {},
     },
 
     __init = function(self)
@@ -172,7 +173,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             self.StealthEnh = false
-			self.CloakEnh = true
+            self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranACUCloakBonus'] then
                BuffBlueprint {
@@ -230,8 +231,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -240,8 +241,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if Buff.HasBuff( self, 'CybranACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'CybranACUT2BuildRate' )
             end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         --T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -272,8 +273,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -283,8 +284,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             self:AddBuildRestriction( categories.CYBRAN * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
 
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
@@ -294,6 +295,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             microwave:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
@@ -304,6 +307,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             microwave:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'MicrowaveLaserGenerator' then
             self:SetWeaponEnabledByLabel('MLG', true)
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
@@ -313,7 +318,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:EnableUnitIntel('Enhancement', 'Sonar')
         elseif enh == 'NaniteTorpedoTubeRemove' then
             self:SetWeaponEnabledByLabel('Torpedo', false)
-			self:DisableUnitIntel('Enhancement', 'Sonar')
+            self:DisableUnitIntel('Enhancement', 'Sonar')
         end
     end,
 
@@ -321,47 +326,47 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Intel
     -- **********
     IntelEffects = {
-		Cloak = {
-		    {
-			    Bones = {
-				    'Head',
-				    'Right_Turret',
-				    'Left_Turret',
-				    'Right_Arm_B01',
-				    'Left_Arm_B01',
-				    'Chest_Right',
-				    'Chest_Left',
-				    'Left_Leg_B01',
-				    'Left_Leg_B02',
-				    'Left_Foot_B01',
-				    'Right_Leg_B01',
-				    'Right_Leg_B02',
-				    'Right_Foot_B01',
-			    },
-			    Scale = 1.0,
-			    Type = 'Cloak01',
-		    },
-		},
-		Field = {
-		    {
-			    Bones = {
-				    'Head',
-				    'Right_Turret',
-				    'Left_Turret',
-				    'Right_Arm_B01',
-				    'Left_Arm_B01',
-				    'Chest_Right',
-				    'Chest_Left',
-				    'Left_Leg_B01',
-				    'Left_Leg_B02',
-				    'Left_Foot_B01',
-				    'Right_Leg_B01',
-				    'Right_Leg_B02',
-				    'Right_Foot_B01',
-			    },
-			    Scale = 1.6,
-			    Type = 'Cloak01',
-		    },
+        Cloak = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Turret',
+                    'Left_Turret',
+                    'Right_Arm_B01',
+                    'Left_Arm_B01',
+                    'Chest_Right',
+                    'Chest_Left',
+                    'Left_Leg_B01',
+                    'Left_Leg_B02',
+                    'Left_Foot_B01',
+                    'Right_Leg_B01',
+                    'Right_Leg_B02',
+                    'Right_Foot_B01',
+                },
+                Scale = 1.0,
+                Type = 'Cloak01',
+            },
+        },
+        Field = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Turret',
+                    'Left_Turret',
+                    'Right_Arm_B01',
+                    'Left_Arm_B01',
+                    'Chest_Right',
+                    'Chest_Left',
+                    'Left_Leg_B01',
+                    'Left_Leg_B02',
+                    'Left_Foot_B01',
+                    'Right_Leg_B01',
+                    'Right_Leg_B02',
+                    'Right_Foot_B01',
+                },
+                Scale = 1.6,
+                Type = 'Cloak01',
+            },
         },
     },
 
@@ -371,16 +376,16 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
-			    self.IntelEffectsBag = {}
-			    self.CreateTerrainTypeEffects( self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
-			end
+                self.IntelEffectsBag = {}
+                self.CreateTerrainTypeEffects( self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
+            end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
-	            self.IntelEffectsBag = {}
-		        self.CreateTerrainTypeEffects( self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
-		    end
+                self.IntelEffectsBag = {}
+                self.CreateTerrainTypeEffects( self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
+            end
         end
     end,
 
@@ -410,7 +415,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         --if we could find a blueprint with v.Add.OnDeath, then add the buff
         if bp ~= nil then
             --Apply Buff
-			self:AddBuff(bp)
+            self:AddBuff(bp)
         end
         --otherwise, we should finish killing the unit
         ACUUnit.OnKilled(self, instigator, type, overkillRatio)

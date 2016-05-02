@@ -42,6 +42,7 @@ local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
+local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 
 local IsSyncReplayServer = false
 
@@ -498,6 +499,14 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local Prefs = import('/lua/user/prefs.lua')
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
+
+    -- fetch unit blueprints for the Unit Manager
+    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), false)
+end
+
+function GetBlueprintList()
+    -- return previously fetched blueprints
+    return UnitsAnalyzer.GetBlueprintsList()
 end
 
 -- A map from message types to functions that process particular message types.
@@ -692,6 +701,8 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
+local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -748,7 +759,10 @@ function SetSlotInfo(slotNum, playerInfo)
 
         if isHost then
             -- The host can control the team of others, provided he's not ready himself.
-            return not gameInfo.PlayerOptions[FindSlotForID(localPlayerID)].Ready
+            local slot = FindSlotForID(localPlayerID)
+            local is_ready = slot and gameInfo.PlayerOptions[slot].Ready -- could be observer
+
+            return not is_ready
         end
     end
 
@@ -828,11 +842,7 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
-                if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                    AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy", playerName))
-                else
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
-                end
+                AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
 
                 table.insert(ConnectionEstablished, playerName)
                 for k, v in CurrentConnection do
@@ -893,6 +903,7 @@ function ClearSlotInfo(slotIndex)
 
     local hostKey
     if lobbyComm:IsHost() then
+        GpgNetSend('ClearSlot', slotIndex)
         hostKey = 'host'
     else
         hostKey = 'client'
@@ -1018,20 +1029,20 @@ local function autobalance_bestworst(players, teams_arg)
             local slot = table.remove(slots, 1)
             local player
 
-            if(best) then
+            if best then
                 player = table.remove(players, 1)
             else
                 player = table.remove(players)
             end
 
-            if(not player) then break end
+            if not player then break end
 
             teams[i]['sum'] = teams[i]['sum'] + player['rating']
             table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
         end
 
         best = not best
-        if(best) then
+        if best then
             table.sort(teams, team_sort_by_sum)
         end
     end
@@ -1060,13 +1071,13 @@ local function autobalance_avg(players, teams_arg)
 
             for j, p in players do
                 player_key = j
-                if(first_team or t['sum'] + p['rating'] <= max_sum) then
+                if first_team or t['sum'] + p['rating'] <= max_sum then
                     break
                 end
             end
 
             player = table.remove(players, player_key)
-            if(not player) then break end
+            if not player then break end
 
             teams[i]['sum'] = teams[i]['sum'] + player['rating']
             max_sum = math.max(max_sum, teams[i]['sum'])
@@ -1094,16 +1105,16 @@ local function autobalance_rr(players, teams)
 
     local picks = team_picks[table.getn(teams)]
 
-    if(not picks or table.getsize(picks) == 0) then
+    if not picks or table.getsize(picks) == 0 then
         return
     end
 
     i = 1
-    while (table.getn(players) > 0) do
+    while table.getn(players) > 0 do
         local player = table.remove(players, 1)
         local team = table.remove(picks, 1)
         local slot = table.remove(teams[team], 1)
-        if(not player) then break end
+        if not player then break end
 
         table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
     end
@@ -1122,14 +1133,13 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while(table.getn(players) > 0) do
-
+    while table.getn(players) > 0 do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
             local player = table.remove(players, 1)
 
-            if(not player) then break end
+            if not player then break end
 
             table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
         end
@@ -1175,7 +1185,7 @@ function PossiblyAnnounceGameFull()
     end
 
     -- Game is full, let's tell the client.
-    GPGNetSend("GameFull")
+    GpgNetSend("GameFull")
 end
 
 --- Assign the "random" (really autobalanced) start positions.
@@ -1335,15 +1345,6 @@ local function AssignRandomStartSpots()
         HostUtils.SendPlayerSettingsToServer(r.slot)
     end
 end
-
--- This function is used to double check the observers.
--- TODO: IT MUST DIE.
-local function sendObserversList()
-    for k, observer in gameInfo.Observers:pairs() do
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
-    end
-end
-
 
 local function AssignAutoTeams()
     -- A function to take a player index and return the team they should be on.
@@ -1604,9 +1605,6 @@ local function TryLaunch(skipNoObserversCheck)
     numberOfPlayers = numPlayers
 
     local function LaunchGame()
-        -- Redundantly send the observer list, because we're mental.
-        sendObserversList()
-
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -1876,11 +1874,17 @@ local OptionUtils = {
     SetDefaults = function()
         local options = {}
         for index, option in globalOpts do
-            options[option.key] = option.values[option.default].key
+            -- Exception to make AllowObservers work because the engine requires
+            -- the keys to be bool. Custom options should use 'True' or 'False'
+            if option.key == 'AllowObservers' then
+                options[option.key] = option.values[option.default].key
+            else
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
         end
 
         for index, option in AIOpts do
-            options[option.key] = option.values[option.default].key
+            options[option.key] = option.values[option.default].key or option.values[option.default]
         end
 
         SetGameOptions(options)
@@ -1903,6 +1907,8 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         UpdateGame()
     end
+    -- Mods have changed, so fetch blueprints for selected game mods
+    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 function GetAvailableColor()
@@ -2069,7 +2075,7 @@ function CreateSlotsUI(makeLabel)
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
         newSlot.KinderCountry = flag
         flag.Width:Set(20)
-        flag.Height:Set(15)
+        flag.Height:Set(16)
         newSlot:AddChild(flag)
 
         -- TODO: Factorise this boilerplate.
@@ -2689,9 +2695,9 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
             end
-            line.text:SetText(LOC(data.text))
+            line.text:SetText(LOCF(data.text, data.key))
             line.bg:Show()
-            line.value:SetText(LOC(data.value))
+            line.value:SetText(LOCF(data.value, data.key))
             line.bg2:Show()
             line.bg.HandleEvent = Group.HandleEvent
             line.bg2.HandleEvent = Bitmap.HandleEvent
@@ -2772,7 +2778,7 @@ function CreateUI(maxPlayers)
     else
         GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0332>Unit Manager"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
+            import('/lua/ui/lobby/UnitsManager.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
@@ -2948,7 +2954,7 @@ function CreateUI(maxPlayers)
 
     if singlePlayer then
         -- observers are always allowed in skirmish games.
-        SetGameOption("AllowObservers",true)
+        SetGameOption("AllowObservers", true)
         -- Hide all the multiplayer-only UI elements (we still create them because then we get to
         -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
         -- nop, instead of needing to keep checking if UI controls actually exist...
@@ -3091,9 +3097,12 @@ function RefreshOptionDisplayData(scenarioInfo)
 
         -- Scan the values array to find the one with the key matching our value for that option.
         for k, val in optData.values do
-            if val.key == gameOption then
-                option.value = val.text
-                option.valueTooltip = {text = optData.label, body = val.help }
+            local key = val.key or val
+
+            if key == gameOption then
+                option.key = key
+                option.value = val.text or optData.value_text
+                option.valueTooltip = {text = optData.label, body = val.help or optData.value_help}
 
                 table.insert(formattedOptions, option)
 
@@ -3163,9 +3172,6 @@ function CalcConnectionStatus(peer)
             slot.name._text:SetFont('Arial Gras', 15)
             if not table.find(ConnectionEstablished, peer.name) then
                 if playerInfo.Human and not IsLocallyOwned(peerSlot) then
-                    if table.find(ConnectedWithProxy, peer.id) then
-                        AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy.", peer.name), "Engine0032")
-                    end
                     table.insert(ConnectionEstablished, peer.name)
                     for k, v in CurrentConnection do -- Remove PlayerName in this Table
                         if v == peer.name then
@@ -3177,7 +3183,6 @@ function CalcConnectionStatus(peer)
             end
 
             table.insert(connectedTo, peer.id)
-            GpgNetSend('Connected', string.format("%d", peer.id))
         end
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
@@ -3412,6 +3417,8 @@ function UpdateClientModStatus(newHostSimMods)
     end
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
+    -- fetch blueprints for clients since the host has changed sim mods
+    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 -- LobbyComm Callbacks
@@ -3449,7 +3456,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerID = myID
         localPlayerName = myName
 
-        GpgNetSend('connectedToHost', string.format("%d", hostID))
         lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = Mods.GetLocallyAvailableMods(), Name = localPlayerName} )
 
         lobbyComm:SendData(hostID,
@@ -3515,7 +3521,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
                 gameInfo.PlayerOptions[data.Slot][key] = val
                 if isHost then
-                    GpgNetSend('PlayerOption', data.Slot, key, val)
+                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
+                    if playerInfo.Human then
+                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
+                    else
+                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
+                    end
+
 
                     -- TODO: This should be a global listener on PlayerData objects, but I'm in too
                     -- much pain to implement that listener system right now. EVIL HACK TIME
@@ -3731,11 +3743,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --- Returns true if the given option has the given key as a valid setting.
         local function keyIsValidForOption(option, key)
             for k, v in option.values do
-                if v.key == key then
+                if v.key or v == key then
                     return true
                 end
             end
-
             return false
         end
 
@@ -3747,8 +3758,14 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             -- Do the slightly stupid thing to check if the option we found in the profile is
             -- a valid key for this option. Some mods muck about with the possibilities, so we
             -- need to make sure we use a sane default if that's happened.
-            if not defValue or not keyIsValidForOption(option, defValue) then
-                defValue = option.values[option.default].key
+            if defValue == nil or not keyIsValidForOption(option, defValue) then
+                -- Exception to make AllowObservers work because the engine requires
+                -- the keys to be bool. Custom options should use 'True' or 'False'
+                if option.key == 'AllowObservers' then
+                    defValue = option.values[option.default].key
+                else
+                    defValue = option.values[option.default].key or option.values[option.default]
+                end
             end
 
             SetGameOption(option.key, defValue, true)
@@ -3823,7 +3840,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         UpdateGame()
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
+    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
 
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
@@ -3929,7 +3946,6 @@ function SetGameOptions(options, ignoreRefresh)
     end
 
     for key, val in options do
-        LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
         Prefs.SetToCurrentProfile('LobbyOpt_' .. key, val)
         gameInfo.GameOptions[key] = val
 
@@ -4957,12 +4973,14 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
+            local ownerID = gameInfo.PlayerOptions[playerSlot].OwnerID
             gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
             gameInfo.PlayerOptions[playerSlot] = nil
 
             if lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
+                GpgNetSend('PlayerOption', ownerID, 'Team', -1)
+                GpgNetSend('PlayerOption', ownerID, 'Army', -1)
+                GpgNetSend('PlayerOption', ownerID, 'StartSpot', -index)
             end
 
             ClearSlotInfo(playerSlot)
@@ -5036,8 +5054,8 @@ function InitHostUtils()
                 return
             end
 
-            ClearSlotInfo(slot)
             gameInfo.PlayerOptions[slot] = nil
+            ClearSlotInfo(slot)
             lobbyComm:BroadcastData(
                 {
                     Type = 'ClearSlot',
@@ -5275,11 +5293,18 @@ function InitHostUtils()
         --- Send player settings to the server
         SendPlayerSettingsToServer = function(slotNum)
             local playerInfo = gameInfo.PlayerOptions[slotNum]
-            local playerName = playerInfo.PlayerName
-            GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
-            GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
-            GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
-            GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+            local sendPlayerOption = function(key, value)
+                if playerInfo.Human then
+                    GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+                else
+                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+                end
+            end
+            sendPlayerOption('Faction', playerInfo.Faction)
+            sendPlayerOption('Color', playerInfo.PlayerColor)
+            sendPlayerOption('Team', playerInfo.Team)
+            sendPlayerOption('StartSpot', slotNum)
+            sendPlayerOption('Army', slotNum)
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.

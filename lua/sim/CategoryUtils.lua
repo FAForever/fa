@@ -88,7 +88,7 @@ function ParseEntityCategoryProperly(categoryExpression)
     --- Given two categories and an operator token, return the result of applying the operator to
     -- the two categories (in the order given)
     local function mergeCategories(currentCategory, newCategory, operator)
-        -- Initialisation case.
+        -- Initialization case.
         if not operator and not currentCategory then
             return newCategory
         end
@@ -116,7 +116,7 @@ function ParseEntityCategoryProperly(categoryExpression)
         local i = start
         while i <= finish do
             local token = tokens[i]
-            WARN(token)
+            LOG('Parsing token: ' .. token)
 
             if expectingIdentifier then
                 -- Bracket expressions are effectively identifiers
@@ -154,4 +154,16 @@ function ParseEntityCategoryProperly(categoryExpression)
     end
 
     return _parseSubexpression(1, numTokens)
+end
+-- converts specified category expression to a string 
+-- representing it in global categories or returns repr(categoryExpression)  
+function ToString(categoryExpression)
+    for key, value in categories or {} do 
+        if categoryExpression == value then
+            return 'categories.' .. key
+        end
+    end    
+    -- TODO find a way to revers ParseEntityCategoryProperly and get a string 
+    -- representing categoryExpression, e.g. categories.TECH2 * categories.AIR
+    return repr(categoryExpression)
 end

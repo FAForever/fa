@@ -1,3 +1,5 @@
+local Utilities = import('/lua/utilities.lua')
+
 -- ATTACK MANAGER SPEC
 --{
 --    AttackCheckInterval = interval,
@@ -27,7 +29,7 @@
 AttackManager = Class({
     brain = nil,
     NeedSort = false,
-    AMPlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
+    PlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
 
     __init = function(self, brain, attackDataTable)
         self.Trash = TrashBag()
@@ -258,7 +260,7 @@ AttackManager = Class({
                         local addUnits = {}
                         if v.LocationType then
                             local location = false
-                            for locNum, locData in self.PBM.Locations do
+                            for locNum, locData in self.brain.PBM.Locations do
                                 if v.LocationType == locData.LocationType then
                                     location = locData
                                     break
@@ -358,10 +360,12 @@ AttackManager = Class({
         end
     end,
 
-    DecrementCount = function(self, platoon)
+    -- XXX: refactor this later, artifact from moving AttackManager from aibrain
+    DecrementCount = function(brain, platoon)
+        local AM = brain.AttackManager
         local data = platoon.PlatoonData
         for k,v in data.AMPlatoons do
-            self.AMPlatoonCount[v] = self.AMPlatoonCount[v] - 1
+            AM.PlatoonCount[v] = AM.PlatoonCount[v] - 1
         end
     end
 })

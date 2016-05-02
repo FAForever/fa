@@ -6,6 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local utils = import('/lua/system/utils.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -95,7 +96,6 @@ function SetLayout(layout)
     import('/lua/ui/game/missiontext.lua').SetLayout()
     import('/lua/ui/game/helptext.lua').SetLayout()
     import('/lua/ui/game/score.lua').SetLayout()
-    import('/lua/ui/game/economy.lua').SetLayout()
     import('/lua/ui/game/tabs.lua').SetLayout()
     import('/lua/ui/game/controlgroups.lua').SetLayout()
     import('/lua/ui/game/chat.lua').SetLayout()
@@ -105,30 +105,38 @@ end
 function OnFirstUpdate()
     import('/modules/hotbuild.lua').init()
     EnableWorldSounds()
+    import('/lua/UserMusic.lua').StartPeaceMusic()
+
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
         local armiesInfo = GetArmiesTable()
         local focusArmy = armiesInfo.focusArmy
         local playerName = armiesInfo.armiesTable[focusArmy].nickname
         avatars[1]:SetCustomName(playerName)
+        PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
+        ForkThread(function()
+            WaitSeconds(1)
+            UIZoomTo(avatars, 1)
+            WaitSeconds(1.5)
+            local selected = false
+            repeat
+                WaitSeconds(0.1)
+                if not gameUIHidden then
+                    SelectUnits(avatars)
+                    selected = GetSelectedUnits()
+                end
+            until table.getsize(selected) > 0 or GameTick() > 50
+        end)
     end
-    import('/lua/UserMusic.lua').StartPeaceMusic()
+
+    FlushEvents()
+    if not IsNISMode() then
+        import('/lua/ui/game/worldview.lua').UnlockInput()
+    end
+
     if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
         import('/lua/ui/game/score.lua').CreateScoreUI()
     end
-    PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
-    ForkThread(
-               function()
-                   WaitSeconds(1.5)
-                   UIZoomTo(avatars, 1)
-                   WaitSeconds(1.5)
-                   SelectUnits(avatars)
-                   FlushEvents()
-                   if not IsNISMode() then
-                       import('/lua/ui/game/worldview.lua').UnlockInput()
-                   end
-               end
-               )
 
     if Prefs.GetOption('skin_change_on_start') ~= 'no' then
         local focusarmy = GetFocusArmy()
@@ -223,13 +231,18 @@ function CreateUI(isReplay)
     ConExecute('res_PrefetcherActivityDelay 1')
 
     -- below added for FAF
-    import("/modules/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
+    else
+        local clients = GetSessionClients()
+        if table.getsize(clients) <= 1 then
+            -- no need for unnecessary lag when playing alone
+            ConExecute('net_lag 0')
+        end
     end
 
     import('/modules/scumanager.lua').Init()
@@ -237,6 +250,27 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
+
+    RegisterChatFunc(SendResumedBy, 'SendResumedBy')
+end
+
+-- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
+-- Lets find out max hz capability of adapter so we don't render unecessary frames, should help a bit with render thread at 100%
+function AdjustFrameRate()
+    if options.vsync == 1 then return end
+
+    local video = options.video
+    local fps = 100
+
+    if type(options.primary_adapter) == 'string' then
+        local data = utils.StringSplit(options.primary_adapter, ',')
+        local hz = tonumber(data[3])
+        if hz then
+            fps = math.max(60, math.min(100, hz))
+        end
+    end
+
+    ConExecute("SC_FrameTimeClamp " .. (1000 / fps ))
 end
 
 local provider = false
@@ -377,6 +411,7 @@ function CreateWldUIProvider()
         end
         supressExitDialog = false
         FlushEvents()
+        AdjustFrameRate()
     end
 
     provider.DestroyGameInterface = function(self)
@@ -404,6 +439,9 @@ end
 --      added: Which units were added to the old selection
 --      removed: Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+    if import('/lua/ui/game/selection.lua').IsHidden() then
+        return
+    end
 
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
     local isOldSelection = table.equal(oldSelection, newSelection)
@@ -455,24 +493,26 @@ end
 -- Called after the Sim has confirmed the game is indeed paused. This will happen
 -- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
-    local isOwner = false
-    if pausedBy == SessionGetLocalCommandSource() then
-        isOwner = true
-    end
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
-    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining, isOwner)
+    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
 -- Called after the Sim has confirmed that the game has resumed.
+local ResumedBy = nil
+function SendResumedBy(sender)
+    if not ResumedBy then ResumedBy = sender end
+end
+
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
-    import('/lua/ui/game/tabs.lua').OnPause(false)
+    import('/lua/ui/game/tabs.lua').OnPause(false, ResumedBy)
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
+    ResumedBy = nil
 end
 
 -- Called immediately when the user hits the pause button. This only ever gets
@@ -496,13 +536,15 @@ end
 
 local _beatFunctions = {}
 
-function AddBeatFunction(fn)
-    table.insert(_beatFunctions, fn)
+-- throttle means never run function more than 10 times per second to reduce
+-- UI load when speeding up sim / replay
+function AddBeatFunction(fn, throttle)
+    table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
 end
 
 function RemoveBeatFunction(fn)
     for i,v in _beatFunctions do
-        if v == fn then
+        if v.fn == fn then
             table.remove(_beatFunctions, i)
             break
         end
@@ -510,9 +552,22 @@ function RemoveBeatFunction(fn)
 end
 
 -- this function is called whenever the sim beats
+local last = 0
 function OnBeat()
+    local rate = GetSimRate()
+    local throttle = false
+
+    if rate > 0 then
+        if GetSystemTimeSeconds() - last < 0.1 then
+            throttle = true
+        else
+            last = GetSystemTimeSeconds()
+        end
+    end
+
     for i,v in _beatFunctions do
-        if v then v() end
+        if v.throttle and throttle then continue end
+        if v.fn then v.fn() end
     end
 end
 

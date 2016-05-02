@@ -12,7 +12,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
 local SDFChronotronOverChargeCannonWeapon = SWeapons.SDFChronotronCannonOverChargeWeapon
-local SIFCommanderDeathWeapon = SWeapons.SIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
@@ -20,7 +20,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 
 XSL0001 = Class(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(SIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
         Missile = Class(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
@@ -29,6 +29,7 @@ XSL0001 = Class(ACUUnit) {
             end,
         },
         OverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
+        AutoOverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
     },
 
     __init = function(self)
@@ -132,27 +133,25 @@ XSL0001 = Class(ACUUnit) {
                 local buff_bp = {
                     Name = buff,
                     DisplayName = buff,
-                    BuffType = 'COMMANDERAURA',
+                    BuffType = 'COMMANDERAURA_' .. enh,
                     Stacks = 'REPLACE',
                     Duration = 5,
                     Affects = {
-                        RegenPercent = {
+                        Regen = {
                             Add = 0,
                             Mult = bp.RegenPerSecond or 0.1,
                             Ceil = bp.RegenCeiling,
-                            Floor = bp.RegenFloor,
                         },
                     },
                 }
 
                 if enh == 'AdvancedRegenAura' then
-                    buff_bp.Affects.MaxHealth =
-                    {
-                            Add = 0,
-                            Mult = bp.MaxHealthFactor or 1.0,
-                            DoNoFill = true,
-                }
-            end
+                    buff_bp.Affects.MaxHealth = {
+                        Add = 0,
+                        Mult = bp.MaxHealthFactor or 1.0,
+                        DoNoFill = true,
+                    }
+                end
 
                 BuffBlueprint(buff_bp)
             end
@@ -186,8 +185,8 @@ XSL0001 = Class(ACUUnit) {
                 for k, v in self.ShieldEffectsBag do
                     v:Destroy()
                 end
-		        self.ShieldEffectsBag = {}
-		    end
+                self.ShieldEffectsBag = {}
+            end
 
             KillThread(self.RegenThreadHandle)
             self.RegenThreadHandle = nil
@@ -241,7 +240,7 @@ XSL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
             end
             Buff.ApplyBuff(self, 'SeraphimACUDamageStabilization')
-      	elseif enh == 'DamageStabilizationAdvanced' then
+          elseif enh == 'DamageStabilizationAdvanced' then
             if not Buffs['SeraphimACUDamageStabilizationAdv'] then
                BuffBlueprint {
                     Name = 'SeraphimACUDamageStabilizationAdv',
@@ -321,8 +320,8 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT2BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
 
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
@@ -331,9 +330,9 @@ XSL0001 = Class(ACUUnit) {
             self:AddBuildRestriction( categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'SeraphimACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUT2BuildRate' )
-	     end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+         end
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
 
         --T3 Engineering
         elseif enh =='T3Engineering' then
@@ -365,8 +364,8 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT3BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -375,8 +374,8 @@ XSL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff( self, 'SeraphimACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.SERAPHIM * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+        self:updateBuildRestrictions()
         --Blast Attack
         elseif enh == 'BlastAttack' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
@@ -393,6 +392,8 @@ XSL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 44)
         elseif enh == 'RateOfFireRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
@@ -401,6 +402,8 @@ XSL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
         end
     end,
 }

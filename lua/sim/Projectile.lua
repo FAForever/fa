@@ -57,7 +57,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
                     ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(), DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
                 end
-            --ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
+            -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
             elseif DamageData.DamageAmount and targetEntity then
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, DamageData.DamageAmount, DamageData.DamageType)
@@ -77,9 +77,12 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 end
             end
         end
+        if self.InnerRing and self.OuterRing then
+            local pos = self:GetPosition()
+            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
+            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
+        end
     end,
-
-
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self,spec)
@@ -156,11 +159,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
         if (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.TORPEDO, other)) or
-           (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
-           (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.MISSILE, other)) or
-           (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
-           (EntityCategoryContains(categories.DIRECTFIRE, self) and EntityCategoryContains(categories.MISSILE, other)) or
-           (self:GetArmy() == other:GetArmy()) then
+            (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
+            (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.MISSILE, other)) or
+            (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
+            (EntityCategoryContains(categories.DIRECTFIRE, self) and EntityCategoryContains(categories.MISSILE, other)) or
+            (self:GetArmy() == other:GetArmy()) then
             return false
         end
 
@@ -187,7 +190,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
 				end
 			end
 		end
-
         return true
     end,
 

@@ -104,9 +104,7 @@ CConstructionUnit = Class(ConstructionUnit){
         end
     end,
 
-    OnLayerChange = function(self, new, old)
-        ConstructionUnit.OnLayerChange(self, new, old)
-
+    LayerChangeTrigger = function(self, new, old)
         if self:GetBlueprint().Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
@@ -250,7 +248,9 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnPaused = function(self)
         SeaFactoryUnit.OnPaused(self)
-        self:StopArmsMoving()
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopArmsMoving()
+        end
     end,
 
     OnUnpaused = function(self)
@@ -269,12 +269,16 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
-        self:StopArmsMoving()
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopArmsMoving()
+        end
     end,
 
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
-        self:StopArmsMoving()
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopArmsMoving()
+        end
     end,
 
     StartArmsMoving = function(self)
@@ -353,55 +357,37 @@ CConstructionEggUnit = Class(CStructureUnit) {
         LandFactoryUnit.OnStopBeingBuilt(self,builder,layer)
         local bp = self:GetBlueprint()
         local buildUnit = bp.Economy.BuildUnit
-
         local pos = self:GetPosition()
-
         local aiBrain = self:GetAIBrain()
-        CreateUnitHPR(
+        
+        self.Spawn = CreateUnitHPR(
             buildUnit,
             aiBrain.Name,
             pos[1], pos[2], pos[3],
             0, 0, 0
         )
-        ForkThread( function()
-                        self.OpenAnimManip = CreateAnimator(self)
-                        self.Trash:Add(self.OpenAnimManip)
-                        self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+        ForkThread(function()
+                self.OpenAnimManip = CreateAnimator(self)
+                self.Trash:Add(self.OpenAnimManip)
+                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+                self:PlaySound(bp.Audio['EggOpen'])
+                
+                WaitFor(self.OpenAnimManip)
 
+                self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
+                self.Trash:Add(self.EggSlider)
+                self:PlaySound(bp.Audio['EggSink'])
+                
+                WaitFor(self.EggSlider)
 
-
-                        self:PlaySound(bp.Audio['EggOpen'])
-                        WaitFor(self.OpenAnimManip)
-
-                        --CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
-                        self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
-                        self.Trash:Add(self.EggSlider)
-
-                        self:PlaySound(bp.Audio['EggSink'])
-                        WaitFor(self.EggSlider)
-
-                        self:Destroy()
-                    end
-                  )
-
-        --ChangeState( self, self.EggConstruction )
-    end,
-
-    EggConstruction = State {
-        Main = function(self)
-            local bp = self:GetBlueprint()
-            local buildUnit = bp.Economy.BuildUnit
-            self:GetAIBrain():BuildUnit( self, buildUnit, 1 )
-        end,
-    },
-
-    OnStopBuild = function(self, unitBeingBuilt, order)
-        if unitBeingBuilt:GetFractionComplete() == 1 then
-            ForkThread(function()
-                WaitSeconds(0.1)
                 self:Destroy()
-            end)
-        end
+            end
+        )
+    end,
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if self.Spawn then overkillRatio = 1.1 end
+        CStructureUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 }
 

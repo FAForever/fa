@@ -11,7 +11,7 @@ UnitBlueprint {
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
-        CombatTurnSpeed = 0.75, # 0.7
+        CombatTurnSpeed = 0.75,
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -21,13 +21,13 @@ UnitBlueprint {
         KRollDamping = 2,
         KTurn = 0.7,
         KTurnDamping = 1,
-        LiftFactor = 10, # 7
+        LiftFactor = 10,
         MaxAirspeed = 10,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
-        TurnSpeed = 0.75, # 0.7
+        TurnSpeed = 0.75,
         Winged = true,
     },
     Audio = {
@@ -37,46 +37,55 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
         AmbientMove = Sound {
+
             Bank = 'XSA',
             Cue = 'XSA0103_Move_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Destroyed = Sound {
+
             Bank = 'XSA_Destroy',
             Cue = 'XSA_Destroy_Air_Killed',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Killed = Sound {
+
             Bank = 'XSA_Destroy',
             Cue = 'XSA_Destroy_Air_Killed',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Landing = Sound {
+
             Bank = 'XSA',
             Cue = 'XSA0103_Move_Land',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Refueling = Sound {
+
             Bank = 'XSB',
             Cue = 'XSB5202_Repair_Refuel',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         StartMove = Sound {
+
             Bank = 'XSA',
             Cue = 'XSA0103_Move_Start',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         StopMove = Sound {
+
             Bank = 'XSA',
             Cue = 'XSA0103_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Thruster = Sound {
+
             Bank = 'XSA',
             Cue = 'XSA0103_Move_Thruster',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {
+
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Air',
             LodCutoff = 'UnitMove_LodCutoff',
@@ -93,11 +102,13 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 40,
     Categories = {
+
         'PRODUCTFA',
         'SELECTABLE',
         'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2FACTORY',
         'BUILTBYTIER3FACTORY',
+
         'SERAPHIM',
         'MOBILE',
         'AIR',
@@ -129,6 +140,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
+
                             'XSA0103',
                         },
                         Type = 'Landing01',
@@ -139,6 +151,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
+
                             'XSA0103',
                         },
                         Type = 'TakeOff01',
@@ -165,12 +178,15 @@ UnitBlueprint {
             },
         },
         MovementEffects = {
+
             Air = {
                 Contrails = {
                     Bones = {
                         'Left_Exhaust',
                         'Right_Exhaust',
                     },
+
+
                 },
                 Effects = {
                     {
@@ -253,9 +269,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.26,
     SizeSphere = 1.6,
-    SizeX = 2,
-    SizeY = 0.25,
-    SizeZ = 0.625,
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
     StrategicIconName = 'icon_bomber1_directfire',
     StrategicIconSortPriority = 75,
     Transport = {
@@ -274,6 +290,8 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
+
+
                     Bank = 'XSA_Weapon',
                     Cue = 'XSA0103_Othe_Tactical_Bomb',
                     LodCutoff = 'Weapon_LodCutoff',
@@ -288,13 +306,16 @@ UnitBlueprint {
             DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Othe Tactical Bomb',
+
+
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-			FixBombTrajectory = true,  # [152]
+
+            FixBombTrajectory = true,
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
@@ -302,7 +323,6 @@ UnitBlueprint {
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
             ProjectileId = '/projectiles/SBOOtheTacticalBomb01/SBOOtheTacticalBomb01_proj.bp',
-            ProjectileLifetime = 30,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -319,7 +339,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.25, #from 0.5
+            RateOfFire = 0.25,
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

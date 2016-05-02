@@ -6,6 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = import('/lua/ui/uiutil.lua').DiskGetFileInfo
 
 iconBmpHeight = 48
@@ -16,7 +17,7 @@ iconHeight = iconBmpHeight + (2 * iconVertPadding)
 iconWidth = iconBmpWidth + (2 * iconHorzPadding)
 
 function GetUnitIconFileNames(blueprint)
-    local iconName = '/textures/ui/common/icons/units/' .. blueprint.Display.IconName .. '_icon.dds'
+    local iconName = UIUtil.UIFile('/icons/units/' .. blueprint.Display.IconName .. '_icon.dds', true)
     local upIconName = '/textures/ui/common/icons/units/' .. blueprint.Display.IconName .. '_build_btn_up.dds'
     local downIconName = '/textures/ui/common/icons/units/' .. blueprint.Display.IconName .. '_build_btn_down.dds'
     local overIconName = '/textures/ui/common/icons/units/' .. blueprint.Display.IconName .. '_build_btn_over.dds'

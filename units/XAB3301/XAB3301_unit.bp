@@ -136,6 +136,9 @@ UnitBlueprint {
         BuildTime = 2575,
         InitialRemoteViewingEnergyDrain = 10000,
         MaintenanceConsumptionPerSecondEnergy = 5000,
+        RebuildBonusIds = {
+            'xab3301',
+        },
     },
     Footprint = {
         SizeX = 6,

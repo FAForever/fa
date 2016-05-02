@@ -2958,7 +2958,7 @@ float4 AeonBuildPuddlePS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows)
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
+    light = 0.4 * lightMultiplier * light + ( 1 - light ) * shadowFill;
 
 	float emissive = glowMultiplier * specular.b;
 	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;

@@ -365,20 +365,16 @@ function CreateAeonBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     slider:SetWorldUnits(true)
     slider:SetGoal(0, -sy, 0)
     slider:SetSpeed(-1)
-    WaitFor(slider)
-    slider:SetGoal(0,0,0)
-    slider:SetSpeed(.05)
 
-    -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 1.0 do
-        WaitSeconds(0.5)
+    local fraction = unitBeingBuilt:GetFractionComplete()
+    while not unitBeingBuilt.Dead and fraction < 1 do
+        scale = 1.2 - math.pow(fraction, 4)
+        BuildBaseEffect:SetScale(sx * scale, 1.5*sy*scale, sz * scale)
+        slider:SetGoal(0, (fraction*sy - sy), 0)
+        WaitSeconds(0.1)
+        fraction = unitBeingBuilt:GetFractionComplete()
     end
 
-    if not BuildBaseEffect:BeenDestroyed() then
-	    BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-	end
-    slider:SetSpeed(2)
-	WaitSeconds(0.5)
     slider:Destroy()
     BuildBaseEffect:Destroy()
 end
@@ -574,9 +570,9 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
 
     -- Create a pool mercury that slow draws into the build unit
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0,0,1, nil, nil, nil )
-    BuildBaseEffect:SetScale(sx, 1, sz)
+    BuildBaseEffect:SetScale(sx, 1.5*sy, sz)
     ------BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp( BuildBaseEffect, Vector(x,y-0.05,z))
+    Warp( BuildBaseEffect, Vector(x, y-0.05, z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
 
@@ -595,32 +591,25 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
 		end
 	end
 
-    local slider = CreateSlider( unitBeingBuilt, 0 )
+    local slider = CreateSlider(unitBeingBuilt, 0)
     unitBeingBuilt.Trash:Add(slider)
     EffectsBag:Add(slider)
     slider:SetWorldUnits(true)
-    slider:SetGoal(0, -sy, 0)
     slider:SetSpeed(-1)
-    WaitFor(slider)
-    if not unitBeingBuilt.Dead then
-        slider:SetGoal(0,0,0)
-        slider:SetSpeed(.05)
-    end
+    slider:SetGoal(0, -sy*0.5, 0)
 
-    -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
-        WaitSeconds(0.5)
+    local fraction = unitBeingBuilt:GetFractionComplete()
+    local scale
+    while not unitBeingBuilt.Dead and fraction < 1 and not IsDestroyed(slider) do
+        scale = 1-math.pow(fraction, 2)
+        BuildBaseEffect:SetScale(sx * scale, 1.5*sy*scale, sz * scale)
+        slider:SetGoal(0, 0.5*(fraction*sy - sy), 0)
+        WaitSeconds(0.1)
+        fraction = unitBeingBuilt:GetFractionComplete()
     end
-
-    if not unitBeingBuilt.Dead then
-	    BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-        slider:SetSpeed(2)
-	    WaitSeconds(0.5)
-	end
 
     slider:Destroy()
     BuildBaseEffect:Destroy()
-
 end
 
 
@@ -1374,47 +1363,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
         unit:PlayUnitAmbientSound('TeleportChargingAtUnit')
 
         if faction == 'UEF' then                                                              -------- UEF --------
-
-            local fn = function(unit, sx, sy, sz, ox, oy, oz, EffectsBag)
-
-                -- get position of unit and adjust for centerpoint offset found in blueprint
-                local pos = unit:GetPosition()
-                local heading = unit:GetHeading()
-                pos[1] = pos[1] + ((math.cos(heading) * ox) - (math.sin(heading) * oz))
-                pos[2] = pos[2] + oy
-                pos[3] = pos[3] + ((math.sin(heading) * ox) - (math.cos(heading) * oz))
-
-                -- creates a single flash of the cube
-                local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                Warp(cfx, pos, unit:GetOrientation())
-                cfx:SetScale(sx, sy, sz)
-                EffectsBag:Add(cfx)
-
-                WaitSeconds(0.1)
-
-                -- creates a static cube, doesn't have effects of its own
-                local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
-                Warp(cube1, pos, unit:GetOrientation())
-                cube1:SetScale(sx, sy, sz)
-                EffectsBag:Add(cube1)
-
-                WaitSeconds(0.5)
-
-                -- continuously create flashes of the cube
-                while unit and not unit.Dead and cube1 do
-                    cfx:Destroy()
-                    cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                    Warp(cfx, pos, unit:GetOrientation())
-                    cfx:SetScale(sx, sy, sz)
-                    EffectsBag:Add(cfx)
-
-                    WaitSeconds(0.6)
-                end
-            end
-
-            local sx, sy, sz, ox, oy, oz = TeleportGetUnitSizes(unit)
-            local thread1 = unit:ForkThread(fn, sx, sy, sz, ox, oy, oz, EffectsBag)
-            EffectsBag:Add(thread1)
 
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01, EffectsBag)
 

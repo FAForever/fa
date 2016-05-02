@@ -31,6 +31,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 local prevBuildables = false
 local prevSelection = false
@@ -42,6 +43,8 @@ local allFactories = nil
 if options.gui_templates_factory ~= 0 then
     allFactories = false
 end
+
+local missingIcons = {}
 
 local dragging = false
 local index = nil --index of the item in the queue currently being dragged
@@ -182,6 +185,31 @@ function IssueUpgradeOrders(units, bpid)
 
     for _, o in upgrades[unitid] do
         IssueBlueprintCommand("UNITCOMMAND_Upgrade", o, 1, false)
+    end
+end
+
+function ResetOrderQueue(factory)
+    local queue = SetCurrentFactoryForQueueDisplay(factory)
+    if queue then
+        SelectUnits({factory})
+        for index = table.getn(queue), 1, -1  do
+            local count = queue[index].count
+            if index == 1 and factory:GetWorkProgress() > 0 then
+                count = count - 1
+            end
+            DecreaseBuildCountInQueue(index, count)
+        end
+    end
+end
+
+function ResetOrderQueues(units)
+    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY, units)
+    if factories[1] then
+        Select.Hidden(function()
+            for _, factory in factories do
+                ResetOrderQueue(factory)
+            end
+        end)
     end
 end
 
@@ -457,7 +485,7 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     if not validIcons[bp.General.Icon] then
-        WARN(debug.traceback(nil, "Invalid icon for unit " .. tostring(unitID)))
+        if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
         bp.General.Icon = "land"
     end
 
@@ -483,11 +511,11 @@ end
 
 function GetEnhancementTextures(unitID, iconID)
     local prefix = GetEnhancementPrefix(unitID, iconID)
-    return UIUtil.UIFile(prefix .. '_btn_up.dds'),
-    UIUtil.UIFile(prefix .. '_btn_down.dds'),
-    UIUtil.UIFile(prefix .. '_btn_over.dds'),
-    UIUtil.UIFile(prefix .. '_btn_up.dds'),
-    UIUtil.UIFile(prefix .. '_btn_sel.dds')
+    return UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_down.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_over.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_sel.dds', true)
 end
 
 function CommonLogic()
@@ -511,8 +539,8 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds')) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds'))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -669,8 +697,8 @@ function CommonLogic()
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds')) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds'))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -761,7 +789,7 @@ function CommonLogic()
             control.Height:Set(48)
             control.Width:Set(48)
             if control.Data.template.icon then
-                control.Icon:SetTexture('/textures/ui/common/icons/units/' .. control.Data.template.icon .. '_icon.dds')
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.template.icon .. '_icon.dds', true))
             else
                 control.Icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')
             end
@@ -937,7 +965,8 @@ function StratIconReplacement(control)
             LayoutHelpers.ResetBottom(control.StratIcon)
             LayoutHelpers.ResetLeft(control.StratIcon)
             control.StratIcon:SetAlpha(0.8)
-        else
+        elseif not missingIcons[iconName] then
+            missingIcons[iconName] = true
             LOG('Strat Icon Mod Error: updated strat icon required for: ', iconName)
         end
     end
@@ -1148,6 +1177,11 @@ function OnClickHandler(button, modifiers)
                 end
             end
 
+            -- hold alt to reset queue, same as hotbuild
+            if modifiers.Alt then
+                ResetOrderQueues(sortedOptions.selection)
+            end
+
             if performUpgrade then
                 IssueUpgradeOrders(sortedOptions.selection, item.id)
             else
@@ -1354,7 +1388,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                     end
                 end
                 for iconType, _ in contents do
-                    local bmp = Bitmap(group, '/textures/ui/common/icons/units/' .. iconType .. '_icon.dds')
+                    local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                     bmp.Height:Set(30)
                     bmp.Width:Set(30)
                     bmp.ID = iconType
@@ -1725,7 +1759,17 @@ function FormatData(unitData, type)
 
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
-
+        -- get function for checking for restricted units
+        local IsRestricted = import('/lua/game.lua').IsRestricted
+        
+        -- This section adds the arrows in for a build icon which is an upgrade from the
+        -- selected unit. If there is an upgrade chain, it will display them split by arrows.
+        -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
+        -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
+        -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
+        local unitSelected = sortedOptions.selection[1]
+        local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
+                
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
@@ -1733,16 +1777,33 @@ function FormatData(unitData, type)
                 if table.getn(retData) > 0 then
                     table.insert(retData, { type = 'spacer' })
                 end
-                for unitIndex, unit in units do
-                    local bp = __blueprints[unit]
-                    local from = bp.General.UpgradesFrom
-                     if from and from ~= 'none' and EntityCategoryContains(categories.STRUCTURE, sortedOptions.selection[1]) then
-                        table.insert(retData, { type = 'arrow'})
+                
+                for index, unit in units do
+                    -- show UI data/icons only for not restricted units
+                    
+                    local restrict = false
+                    if not IsRestricted(unit, GetFocusArmy()) then
+                        local bp = __blueprints[unit] 
+                        -- check if upgradeable structure
+                        if isStructure and
+                                bp and bp.General and 
+                                bp.General.UpgradesFrom and
+                                bp.General.UpgradesFrom ~= 'none' then
+
+                            restrict = IsRestricted(bp.General.UpgradesFrom, GetFocusArmy())
+                            if not restrict then
+                                table.insert(retData, { type = 'arrow'})
+                            end
+                        end
+
+                        if not restrict then
+                            table.insert(retData, { type = 'item', id = unit })
+                        end
                     end
-                    table.insert(retData, { type = 'item', id = unit })
                 end
             end
         end
+
         CreateExtraControls('construction')
         SetSecondaryDisplay('buildQueue')
     elseif type == 'selection' then
@@ -1831,21 +1892,15 @@ function FormatData(unitData, type)
         }
         local filteredEnh = {}
         local usedEnhancements = {}
-        local restrictList = EnhanceCommon.GetRestricted()
+        local restEnh = EnhanceCommon.GetRestricted()
+
+        -- filter enhancements based on restrictions
         for index, enhTable in unitData do
-            if not string.find(enhTable.ID, 'Remove') then
-                local restricted = false
-                for _, enhancement in restrictList do
-                    if enhancement == enhTable.ID then
-                        restricted = true
-                        break
-                    end
-                end
-                if not restricted then
-                    table.insert(filteredEnh, enhTable)
-                end
+            if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
+                table.insert(filteredEnh, enhTable)
             end
         end
+
         local function GetEnhByID(id)
             for i, enh in filteredEnh do
                 if enh.ID == id then

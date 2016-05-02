@@ -34,13 +34,13 @@ XRB0304 = Class(CConstructionStructureUnit)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CConstructionStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
-        
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(1)
+        
+        CConstructionStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
     
     OnStopBuild = function(self, unitBeingBuilt)

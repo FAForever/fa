@@ -405,14 +405,14 @@ GenericTeleportInWeapon01 = {
 }
 
 UEFTeleportCharge01 = {
---    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_02_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
 }
 
 UEFTeleportCharge02 = {
     EmtBpPath .. 'uef_teleport_charge_01_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_02_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_06_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_05_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_07_emit.bp',
@@ -544,6 +544,8 @@ ReclaimBeams = {
     EmtBpPath .. 'reclaim_beam_01_emit.bp',
     EmtBpPath .. 'reclaim_beam_02_emit.bp',
     EmtBpPath .. 'reclaim_beam_03_emit.bp',	
+    EmtBpPath .. 'reclaim_beam_04_emit.bp',
+    EmtBpPath .. 'reclaim_beam_05_emit.bp',
 }
 
 ReclaimObjectAOE = { '/effects/emitters/reclaim_01_emit.bp' }

@@ -48,7 +48,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
         self._IsUp = false
-        if spec.ImpactEffects != '' then
+        if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
             self.ImpactEffects = {}
@@ -174,19 +174,14 @@ Shield = Class(moho.shield_methods,Entity) {
     end,    
 
     OnDamage = function(self, instigator, amount, vector, dmgType)
+        -- Only called when a shield is directly impacted, so not for Personal Shields
+        -- This means personal shields never have ApplyDamage called with doOverspill as true
         self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        if self.Owner != instigator then
+        if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
-
-            if self.PassOverkillDamage or dmgType == "Nuke" then
-                local overkill = self:GetOverkill(instigator,amount,dmgType)    
-                if self.Owner and IsUnit(self.Owner) and overkill > 0 then
-                    self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
-                end
-            end
 
             self:AdjustHealth(instigator, -absorbed)
             self:UpdateShieldRatio(-1)
@@ -232,7 +227,7 @@ Shield = Class(moho.shield_methods,Entity) {
         local ImpactMesh = Entity { Owner = self.Owner }
         Warp( ImpactMesh, self:GetPosition())        
 
-        if self.ImpactMeshBp != '' then
+        if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
@@ -248,7 +243,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
     OnDestroy = function(self)
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -297,7 +292,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetCollisionShape('None')
 
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -392,7 +387,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(-1)
 
                 fraction = self.Owner:GetResourceConsumed()
-                if fraction != 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
+                if fraction ~= 1 and aiBrain:GetEconomyStored('ENERGY') <= 1 then
                     if test then
                         on = false
                     else
@@ -518,7 +513,20 @@ PersonalBubble = Class(Shield) {
         self:SetCollisionShape('None')
         self:SetType('Personal')
     end,
-
+    
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+        -- We want all personal shields to pass overkill damage, including this one
+        -- Was handled by self.PassOverkillDamage bp value, now defunct
+        if self.Owner ~= instigator then
+            local overkill = self:GetOverkill(instigator,amount,dmgType)    
+            if self.Owner and IsUnit(self.Owner) and overkill > 0 then
+                self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
+            end
+        end
+        
+        Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
+    end,
+    
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
         self:SetCollisionShape('None')
@@ -566,6 +574,8 @@ PersonalBubble = Class(Shield) {
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 TransportShield = Class(Shield) {
+
+    -- Yes it says contents, but this includes the generating transport too
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
             k:SetCanTakeDamage(canTakeDamage)
@@ -590,8 +600,10 @@ TransportShield = Class(Shield) {
     -- Protect the contents while the shield is up.
     OnState = State(Shield.OnState) {
         Main = function(self)
-            self:SetContentsVulnerable(false)
+            -- We want to protect ourself too!
+            self:AddProtectedUnit(self.Owner)
 
+            self:SetContentsVulnerable(false)
             Shield.OnState.Main(self)
         end,
 
@@ -626,7 +638,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
-UnitShield = Class(Shield){
+PersonalShield = Class(Shield){
 
     OnCreate = function(self,spec)
         self.Trash = TrashBag()
@@ -666,6 +678,19 @@ UnitShield = Class(Shield){
         self.PassOverkillDamage = spec.PassOverkillDamage
 
         ChangeState(self, self.OnState)
+    end,
+    
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)        
+        -- We want all personal shields to pass overkill damage
+        -- Was handled by self.PassOverkillDamage bp value, now defunct
+        if self.Owner ~= instigator then
+            local overkill = self:GetOverkill(instigator,amount,dmgType)    
+            if self.Owner and IsUnit(self.Owner) and overkill > 0 then
+                self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
+            end
+        end
+        
+        Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
     end,
 
     CreateImpactEffect = function(self, vector)

@@ -93,4 +93,26 @@ Blacklist = {
     ['7749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
+
+    -- ==================================================================
+    -- INTEGRATED mods due to added preset restrictions in Units Manager:
+    -- ==================================================================
+    -- No TML v1.0
+    ['63472293-f7d7-4b77-ba7b-d04ad09f63de'] = INTEGRATED, 
+    -- No Tactical Missile Launchers v1.0 
+    ['922b87a0-31b9-12dd-bd11-0800200c9a66'] = INTEGRATED, 
+    -- No Mobile Missile Launchers v1.0  
+    ['dcdbdbcb-b5f1-4828-9298-dca2f4f17a9a'] = INTEGRATED, 
+    -- No MML v1.0 
+    ['bcd271f7-92a4-4b8b-b0c3-ec20189f7663'] = INTEGRATED, 
+    -- No Heavy Art v1.0 
+    ['ffeca075-c0cd-4355-861b-0bb29c75af10'] = INTEGRATED, 
+    -- No T3 Mobile Anti-Air units v5.0  
+    ['ba3d087d-ceb7-495a-b606-3e1593750a5d'] = INTEGRATED, 
+    -- No Strategic Missile Launchers v1.0 
+    ['9-22b87a0-31c9-12dd-bd11-4583459c9a66'] = INTEGRATED,
+    -- ==================================================================
+
+
+
 }
