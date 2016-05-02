@@ -790,6 +790,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartReclaim = function(self, target)
+        self:SetUnitState('Reclaiming', true)
+        self:SetFocusEntity(target)
+        self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
         self:StartReclaimEffects(target)
         self:PlayUnitSound('StartReclaim')
@@ -809,6 +812,7 @@ Unit = Class(moho.unit_methods) {
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
+        self:SetUnitState('Reclaiming', false)
         if target.MaxMassReclaim then -- this is a prop
             target:UpdateReclaimLeft()
         end
@@ -2162,13 +2166,21 @@ Unit = Class(moho.unit_methods) {
             return
         end
 
-        local f = self:GetGuardedUnit()
-        if f and not f.Dead and f:IsUnitState('Building') then
-            local built = f:GetFocusUnit()
-            if built then
+        local guarded = self:GetGuardedUnit()
+        if guarded and not guarded.Dead then
+            local focus = guarded:GetFocusUnit()
+            if not focus then return end
+            local cmd
+            if guarded:IsUnitState('Reclaiming') then
+                cmd = IssueReclaim
+            elseif guarded:IsUnitState('Building') then
+                cmd = IssueRepair
+            end
+
+            if cmd then
                 IssueClearCommands({self})
-                IssueRepair({self}, built)
-                IssueGuard({self}, f)
+                cmd({self}, focus)
+                IssueGuard({self}, guarded)
             end
         end
     end,
