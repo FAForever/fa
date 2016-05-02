@@ -60,6 +60,12 @@ XEA3204 = Class(TConstructionUnit) {
             end
         end
     end,
+
+    -- Don't make wreckage
+    CreateWreckage = function (self, overkillRatio)
+        overkillRatio = 1.1
+        TConstructionUnit.CreateWreckage(self, overkillRatio)
+    end,
 }
 
 TypeClass = XEA3204
