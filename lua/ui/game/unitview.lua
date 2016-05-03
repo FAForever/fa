@@ -285,6 +285,10 @@ function UpdateWindow(info)
 
         if info.health then
             controls.healthBar:Show()
+            
+            -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
+            info.health = math.min(info.health, info.maxHealth)
+            
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
                 controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
