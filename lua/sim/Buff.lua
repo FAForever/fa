@@ -61,7 +61,7 @@ function ApplyBuff(unit, buffName, instigator)
     -- we need the advanced version to take precedence over the lower version, but not vice versa.
     if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
     
-    if buffName == 'SeraphimACUAdvancedRegenAura' then
+    if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
         for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
             RemoveBuff(unit, key, true)
         end
