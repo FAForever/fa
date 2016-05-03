@@ -90,7 +90,7 @@ XSL0001 = Class(ACUUnit) {
     end,
 
     GetUnitsToBuff = function(self, bp)
-        local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
         local brain = self:GetAIBrain()
         local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
         local units = {}
@@ -112,6 +112,7 @@ XSL0001 = Class(ACUUnit) {
             local units = self:GetUnitsToBuff(bp)
             for _,unit in units do
                 Buff.ApplyBuff(unit, buff)
+                unit:RequestRefreshUI()
             end
             WaitSeconds(5)
         end
@@ -139,7 +140,7 @@ XSL0001 = Class(ACUUnit) {
                     Affects = {
                         Regen = {
                             Add = 0,
-                            Mult = bp.RegenPerSecond or 0.1,
+                            Mult = bp.RegenPerSecond,
                             Ceil = bp.RegenCeiling,
                         },
                     },
@@ -148,7 +149,7 @@ XSL0001 = Class(ACUUnit) {
                 if enh == 'AdvancedRegenAura' then
                     buff_bp.Affects.MaxHealth = {
                         Add = 0,
-                        Mult = bp.MaxHealthFactor or 1.0,
+                        Mult = bp.MaxHealthFactor,
                         DoNoFill = true,
                     }
                 end
@@ -156,24 +157,26 @@ XSL0001 = Class(ACUUnit) {
                 BuffBlueprint(buff_bp)
             end
 
-            if not Buffs[buff .. 'SelfBuff'] then   -- AURA SELF BUFF
+            buff2 = buff .. 'SelfBuff'
+
+            if not Buffs[buff2] then   -- AURA SELF BUFF
                 BuffBlueprint {
-                    Name = buff .. 'SelfBuff',
-                    DisplayName = buff .. 'SelfBuff',
+                    Name = buff2,
+                    DisplayName = buff2,
                     BuffType = 'COMMANDERAURAFORSELF',
                     Stacks = 'REPLACE',
                     Duration = -1,
                     Affects = {
                         MaxHealth = {
-                            Add = bp.ACUAddHealth or 0,
+                            Add = bp.ACUAddHealth,
                             Mult = 1,
                         },
                     },
                 }
             end
 
-            Buff.ApplyBuff(self, buff .. 'SelfBuff')
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
+            Buff.ApplyBuff(self, buff2)
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
             if self.RegenThreadHandle then
                 KillThread(self.RegenThreadHandle)
                 self.RegenThreadHandle = nil
