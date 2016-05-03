@@ -443,11 +443,7 @@ StructureUnit = Class(Unit) {
                 local blip = self:GetBlip(i)
 
                 if blip then
-                    if not blip:IsSeenEver(i) and (blip:IsOnRadar(i) or blip:IsOnSonar(i)) then
-                        -- Remove dead radar blip out of map so we don't reveal what's under it
-                        blip:SetPosition(Vector(-100, 0, -100), true)
-                    end
-
+                    blip:SetPosition(Vector(-100, 0, -100), true)
                     -- expired blip will disappear with this
                     blip:InitIntel(i, 'Vision', 2)
                     blip:EnableIntel('Vision')
