@@ -36,6 +36,7 @@ local gameInfo = {
         Timeouts = '3',
         CheatsEnabled = 'false',
         CivilianAlliance = 'enemy',
+        RevealCivilians = 'Yes',
         GameSpeed = 'normal',
         FogOfWar = 'explored',
         UnitCap = '1000',
