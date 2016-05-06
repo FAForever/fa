@@ -1,3 +1,20 @@
+
+Hotpatch 3654 (May 6, 2016)
+============================
+**Bugs**
+- Reclaiming something under construction won't stall out any more
+- Drones no longer display build-range rings
+- UEF Drones no longer leave wrecks
+- Fixed Seraphim Regen Aura level two not applying to newly built units
+
+**Other**
+- Removed unused code
+
+**Contributors**
+- IceDreamer
+- Crotalus
+- Softly
+
 Patch 3652 (May 2, 2016)
 ============================
 
