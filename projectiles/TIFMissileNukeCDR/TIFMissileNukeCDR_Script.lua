@@ -36,6 +36,18 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         end
     end,
 
+    DoDamage = function(self, instigator, DamageData, targetEntity)
+        local nukeDamage = function(self, instigator, pos, brain, army, damageType)
+            if self.TotalTime == 0 then
+                DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true)
+            end
+        end
+
+        self.InnerRing.DoNukeDamage = nukeDamage
+        self.OuterRing.DoNukeDamage = nukeDamage
+        TIFMissileNuke.DoDamage(self, instigator, DamageData, targetEntity)
+    end,
+
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > 50 then        
