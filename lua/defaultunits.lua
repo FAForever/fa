@@ -453,7 +453,6 @@ StructureUnit = Class(Unit) {
     end,
 
     DestroyUnit = function(self, overkillRatio)
-        self:RefreshIntel()
         Unit.DestroyUnit(self, overkillRatio)
     end,
 
