@@ -1700,7 +1700,7 @@ Unit = Class(moho.unit_methods) {
         ChangeState(self, self.DeadState)
     end,
 
-    RefreshIntel = function(self)
+    RefreshIntel = function(self, was_upgrade)
     end,
 
     HideLandBones = function(self)
@@ -1871,7 +1871,7 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
-            builder:RefreshIntel()
+            builder:RefreshIntel(true)
             self.IsUpgrade = nil
         end
 
