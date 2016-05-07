@@ -1871,7 +1871,10 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
-            builder:RefreshIntel()
+            -- new building inherits builder's blip, including vision so refresh must happen with a 1 tick delay
+            ForkThread(function()
+                builder:RefreshIntel()
+            end)
             self.IsUpgrade = nil
         end
 
