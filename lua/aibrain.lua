@@ -398,9 +398,6 @@ AIBrain = Class(moho.aibrain_methods) {
     --   val: true or false
     -- calls callback function with blip it saw.
 
-
-
-
     OnIntelChange = function(self, blip, reconType, val)
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
