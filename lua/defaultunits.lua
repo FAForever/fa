@@ -126,6 +126,10 @@ StructureUnit = Class(Unit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
+        if self.IsUpgrade and builder then
+            builder:RefreshIntel(true)
+        end
+
         Unit.OnStopBeingBuilt(self,builder,layer)
         -- Whaa why can't we have sane inheritance chains :/
         if self:GetBlueprint().General.FactionName == "Seraphim" then
