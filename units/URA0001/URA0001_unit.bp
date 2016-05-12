@@ -24,6 +24,7 @@ UnitBlueprint {
     Categories = {
         'CONSTRUCTION',
         'ENGINEER',
+        'POD',
         'REPAIR',
         'UNTARGETABLE',
         'NOFORMATION',
