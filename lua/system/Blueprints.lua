@@ -434,7 +434,7 @@ function PreModBlueprints(all_bps)
         if cats.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not cats.OVERLAYMISC then
+            if not cats.OVERLAYMISC and not cats.POD then -- Exclude Build Drones
                 table.insert(bp.Categories, 'OVERLAYMISC')
             end
         end
