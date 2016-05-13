@@ -216,6 +216,7 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            AimsStraightOnDisable = false,
             AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
@@ -246,7 +247,6 @@ UnitBlueprint {
             MuzzleVelocity = 15,
             ProjectileId = '/projectiles/CAANanoDartEx/CAANanoDartEx_proj.bp',
             ProjectileLifetime = 7.0,
-            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -314,7 +314,7 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
+            TrackingRadius = 1,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel01',
             TurretBoneYaw = 'Turret01',
@@ -349,7 +349,7 @@ UnitBlueprint {
             FiringRandomness = 0,
             FiringTolerance = 2,
             Label = 'Lazor',
-            MaxRadius = 60,
+            MaxRadius = 52,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             PreferPrimaryWeaponTarget = true,
@@ -400,6 +400,7 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
+            AimsStraightOnDisable = false,
             AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
@@ -426,9 +427,9 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 10,
+            MuzzleVelocityReduceDistance = 30,
             ProjectileId = '/projectiles/CAANanoDartExGr/CAANanoDartExGr_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
