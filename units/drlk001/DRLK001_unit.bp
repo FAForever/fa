@@ -159,15 +159,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
-        OrderOverrides = {
-            RULEUTC_WeaponToggle = {
-                bitmapId = 'toggle-weapon-air',
-            },
-        },
         TechLevel = 'RULEUTL_Secret',
-        ToggleCaps = {
-            RULEUTC_WeaponToggle = true,
-        },
         UnitName = '<LOC DRLK001_name>Bouncer',
         UnitWeight = 1,
     },
@@ -322,7 +314,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            ToggleWeapon = 'GroundGun',
             TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel01',
@@ -378,9 +369,9 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 3,
+            RateOfFire = 10,
             ReTargetOnMiss = true,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE HIGHPRIAIR',
@@ -503,7 +494,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            ToggleWeapon = 'AAGun',
             TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel01',
