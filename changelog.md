@@ -1,11 +1,16 @@
 
-Hotpatch 3654 (May 6, 2016)
+Patch 3654 (May 13, 2016)
 ============================
+**UI**
+- Fixed reductions in MaxHealth resulting in UI displaying 10000/9000 HP
+
 **Bugs**
 - Reclaiming something under construction won't stall out any more
 - Drones no longer display build-range rings
 - UEF Drones no longer leave wrecks
 - Fixed Seraphim Regen Aura level two not applying to newly built units
+- Fixed Billy using the full 'Ignore shields' nuke code
+- Fixed issue with upgrades granting permanent free intel
 
 **Other**
 - Removed unused code
