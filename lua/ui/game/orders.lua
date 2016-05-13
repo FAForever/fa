@@ -399,11 +399,18 @@ end
 -- generic script button specific behvior
 local function ScriptButtonOrderBehavior(self, modifiers)
     local state = self:IsChecked()
+    local mixed = false
     if self._mixedIcon then
+        mixed = true
         self._mixedIcon:Destroy()
         self._mixedIcon = nil
     end
-	ToggleScriptBit(currentSelection, self._data.extraInfo, state)
+    -- mixed shields get special behaviour: turn everything on, not off
+    if mixed and self._data.extraInfo == 0 then
+        ToggleScriptBit(currentSelection, self._data.extraInfo, false)
+    else
+        ToggleScriptBit(currentSelection, self._data.extraInfo, state)
+    end
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
