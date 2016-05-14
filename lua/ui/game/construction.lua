@@ -775,11 +775,13 @@ function CommonLogic()
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
             if control.Data.Disabled then
-                control:Disable()
+                --control:Disable()
+                control.Data.TooltipOnly = true
                 if not control.Data.Selected then
                     control.Icon:SetSolidColor('aa000000')
                 end
             else
+                control.Data.TooltipOnly = false
                 control:Enable()
             end
         elseif type == 'templates' then
@@ -1280,7 +1282,7 @@ function OnClickHandler(button, modifiers)
             end
         end
 
-    elseif item.type == 'enhancement' then
+    elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
         if existingEnhancements[item.enhTable.Slot] and existingEnhancements[item.enhTable.Slot] ~= item.enhTable.Prerequisite then
             if existingEnhancements[item.enhTable.Slot] ~= item.id then
