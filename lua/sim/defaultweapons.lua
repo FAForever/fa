@@ -130,7 +130,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     CheckBallisticAcceleration = function(self, proj)
         local bp = self:GetBlueprint()
         if bp.FixBombTrajectory then
-            local acc = CalculateBallisticAcceleration(self, proj, bp.MuzzleSalvoSize, bp.MuzzleSalvoDelay)
+            local acc = CalculateBallisticAcceleration(self, proj)
             proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
         end
     end,
