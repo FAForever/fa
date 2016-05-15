@@ -1,8 +1,11 @@
 
-Patch 3654 (May 13, 2016)
+Patch 3654 (May 15, 2016)
 ============================
 **UI**
 - Fixed reductions in MaxHealth resulting in UI displaying 10000/9000 HP
+- Added slot numbers in the lobby
+- Toggling the shield on a selection of units with a mix of active and inactive shields now toggles them ON instead of OFF
+- The tooltip now shows for ACU and sACU upgrades that are not yet buildable
 
 **Bugs**
 - Reclaiming something under construction won't stall out any more
@@ -11,14 +14,18 @@ Patch 3654 (May 13, 2016)
 - Fixed Seraphim Regen Aura level two not applying to newly built units
 - Fixed Billy using the full 'Ignore shields' nuke code
 - Fixed issue with upgrades granting permanent free intel
+- Fixed a typo in the Seraphim ACU which prevented the Gun upgrade from being completed
 
 **Other**
 - Removed unused code
 
 **Contributors**
-- IceDreamer
 - Crotalus
+- duk3luk3
+- IceDreamer
+- Sheeo
 - Softly
+- Uveso
 
 Patch 3652 (May 2, 2016)
 ============================
