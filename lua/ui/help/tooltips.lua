@@ -1025,6 +1025,10 @@ Tooltips = {
         title = '<LOC lobui_0750>Rating',
         description = '<LOC lobui_0751>Global ladder rating.',
     },
+    slot_number = {
+        title = '<LOC lobui_0754>Slot',
+        description = '<LOC lobui_0755>Player slot number, useful for moving players around as host',
+    },
     map_ai_markers = {
         title = '<LOC lobui_0585>AI Markers',
         description = '<LOC lobui_0586>Select maps with AI Markers.',

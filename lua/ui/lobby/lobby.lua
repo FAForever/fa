@@ -2079,6 +2079,7 @@ function CreateSlotsUI(makeLabel)
         slotNumber.Width:Set(20)
         slotNumber.Width:Set(16)
         newSlot:AddChild(slotNumber)
+        newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
 
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
