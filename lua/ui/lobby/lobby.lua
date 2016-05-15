@@ -1997,17 +1997,17 @@ function CreateSlotsUI(makeLabel)
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
-    -- No label required for the first column (flag), so skip it. (evil hack)
-    labelGroup.numChildren = 1
-
     GUI.labelGroup = labelGroup
     labelGroup.Width:Set(791)
     labelGroup.Height:Set(21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
-    local slotLabel = makeLabel("", 14)
+    local slotLabel = makeLabel("#", 14)
     labelGroup:AddChild(slotLabel)
-    Tooltip.AddControlTooltip(slotLabel, 'rating')
+    Tooltip.AddControlTooltip(slotLabel, 'slot_number')
+
+    -- No label required for the second column (flag), so skip it. (Even eviler hack)
+    labelGroup.numChildren = labelGroup.numChildren + 1
 
     local ratingLabel = makeLabel("R", 14)
     labelGroup:AddChild(ratingLabel)
