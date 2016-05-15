@@ -1240,9 +1240,10 @@ function PossiblyAnnounceGameFull()
     GpgNetSend("GameFull")
 end
 
---- Assign the "random" (really autobalanced) start positions.
 local function AssignRandomStartSpots()
-    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+    local teamSpawn = gameInfo.GameOptions['TeamSpawn']
+
+    if teamSpawn == 'fixed' then
         return
     end
 
@@ -1251,6 +1252,29 @@ local function AssignRandomStartSpots()
             teams[team] = {}
         end
         table.insert(teams[team], spot)
+    end
+
+    -- rearrange players according to the provided setup
+    function rearrangePlayers(data)
+        gameInfo.GameOptions['Quality'] = data.quality
+
+        -- Copy a reference to each of the PlayerData objects indexed by their original slots.
+        local orgPlayerOptions = {}
+        for k, p in gameInfo.PlayerOptions do
+            orgPlayerOptions[k] = p
+        end
+
+        -- Rearrange the players in the slots to match the chosen configuration. The result object
+        -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
+        -- an object (and because swapping is too much like hard work).
+        gameInfo.PlayerOptions = {}
+        for _, r in data.setup do
+            local playerOptions = orgPlayerOptions[r.player]
+            playerOptions.Team = r.team + 1
+            playerOptions.StartSpot = r.slot
+            gameInfo.PlayerOptions[r.slot] = playerOptions
+            HostUtils.SendPlayerSettingsToServer(r.slot)
+        end
     end
 
     local numAvailStartSpots = nil
@@ -1336,67 +1360,55 @@ local function AssignRandomStartSpots()
         end
     end
 
+    if teamSpawn == 'random' then
+        s = autobalance_random(ratingTable, teams)
+        q = autobalance_quality(s)
+        rearrangePlayers{setup=s, quality=q}
+        return
+    end
+
     ratingTable = table.shuffle(ratingTable) -- random order for people with same rating
     table.sort(ratingTable, function(a, b) return a['rating'] > b['rating'] end)
 
+    local setups = {}
     local functions = {
         rr=autobalance_rr,
         bestworst=autobalance_bestworst,
         avg=autobalance_avg,
     }
 
-    local best = {quality=0, result=nil}
-    local r, q
+    local cmp = function(a, b) return a.quality > b.quality end
+    local s, q
     for fname, f in functions do
-        r = f(ratingTable, teams)
-        if r then
-            q = autobalance_quality(r)
-
-            -- when all functions fail, use one as default
-            if q > best.quality or best.result == nil then
-                best.result = r
-                best.quality = q
-            end
+        s = f(ratingTable, teams)
+        if s then
+            q = autobalance_quality(s)
+            table.binsert(setups, {setup=s, quality=q}, cmp)
         end
     end
 
-    local results = {}
-    table.insert(results, best)
-
-    -- add 100 random compositions and keep 3 with at least 95% of best quality
+    local n_random = 0
+    local frac = teamSpawn == 'balanced_flex' and 0.95 or 1
+    -- add 100 random compositions and keep 3 with at least <frac%> of best quality
     for i=1, 100 do
-        r = autobalance_random(ratingTable, teams)
-        q = autobalance_quality(r)
+        s = autobalance_random(ratingTable, teams)
+        q = autobalance_quality(s)
 
-        if q > 0.85 and q > best.quality*0.95 then
-            table.insert(results, {quality=q, result=r})
-
-            if(table.getsize(results) > 4) then break end
+        if q > setups[1].quality * frac then
+            table.binsert(setups, {setup=s, quality=q}, cmp)
+            n_random = n_random + 1
+            if n_random > 2 then break end
         end
     end
 
-    results = table.shuffle(results)
-    best = table.remove(results, 1)
-    gameInfo.GameOptions['Quality'] = best.quality
-
-    -- Copy a reference to each of the PlayerData objects indexed by their original slots.
-    local orgPlayerOptions = {}
-    for k, p in gameInfo.PlayerOptions do
-        orgPlayerOptions[k] = p
+    if teamSpawn == 'balanced_flex' then
+        setups = table.shuffle(setups)
     end
 
-    -- Rearrange the players in the slots to match the chosen configuration. The result object
-    -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
-    -- an object (and because swapping is too much like hard work).
-    gameInfo.PlayerOptions = {}
-    for _, r in best.result do
-        local playerOptions = orgPlayerOptions[r.player]
-        playerOptions.Team = r.team + 1
-        playerOptions.StartSpot = r.slot
-        gameInfo.PlayerOptions[r.slot] = playerOptions
-        HostUtils.SendPlayerSettingsToServer(r.slot)
-    end
+    best = table.remove(setups, 1)
+    rearrangePlayers(best)
 end
+
 
 local function AssignAutoTeams()
     -- A function to take a player index and return the team they should be on.
@@ -1869,7 +1881,7 @@ function ShowGameQuality()
     GUI.GameQualityLabel:SetText("")
 
     -- Can't compute a game quality for random spawns!
-    if gameInfo.GameOptions.TeamSpawn == 'random' then
+    if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
         return
     end
 
@@ -2108,7 +2120,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
@@ -3313,6 +3325,7 @@ end
 function RefreshMapPosition(mapCtrl, slotIndex)
 
     local playerInfo = gameInfo.PlayerOptions[slotIndex]
+    local notFixed = gameInfo.GameOptions['TeamSpawn'] ~= 'fixed'
 
     -- Evil autoteams voodoo.
     if gameInfo.GameOptions.AutoTeams and not gameInfo.AutoTeams[slotIndex] and lobbyComm:IsHost() then
@@ -3325,7 +3338,7 @@ function RefreshMapPosition(mapCtrl, slotIndex)
         marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
     end
 
-    mapCtrl:UpdatePlayer(slotIndex, playerInfo, gameInfo.GameOptions['TeamSpawn'] == 'random')
+    mapCtrl:UpdatePlayer(slotIndex, playerInfo, notFixed)
 
     -- Nothing more for us to do for a closed or missing slot.
     if gameInfo.ClosedSlots[slotIndex] or not marker then
@@ -3335,7 +3348,7 @@ function RefreshMapPosition(mapCtrl, slotIndex)
     if gameInfo.GameOptions.AutoTeams then
         if gameInfo.GameOptions.AutoTeams == 'lvsr' then
             local midLine = mapCtrl.Left() + (mapCtrl.Width() / 2)
-            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            if notFixed then
                 local markerPos = marker.Left()
                 if markerPos < midLine then
                     marker:SetTeam(2)
@@ -3345,7 +3358,7 @@ function RefreshMapPosition(mapCtrl, slotIndex)
             end
         elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
             local midLine = mapCtrl.Top() + (mapCtrl.Height() / 2)
-            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            if notFixed then
                 local markerPos = marker.Top()
                 if markerPos < midLine then
                     marker:SetTeam(2)
@@ -3354,14 +3367,14 @@ function RefreshMapPosition(mapCtrl, slotIndex)
                 end
             end
         elseif gameInfo.GameOptions.AutoTeams == 'pvsi' then
-            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            if notFixed then
                 if math.mod(slotIndex, 2) ~= 0 then
                     marker:SetTeam(2)
                 else
                     marker:SetTeam(3)
                 end
             end
-        elseif gameInfo.GameOptions.AutoTeams == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+        elseif gameInfo.GameOptions.AutoTeams == 'manual' and notFixed then
             marker:SetTeam(gameInfo.AutoTeams[slotIndex] or 1)
         end
     end
@@ -3401,7 +3414,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
         end
 
         marker.OnClick = function(self)
-            if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+            if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
                 if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
                     if IsPlayer(localPlayerID) then
                         if lobbyComm:IsHost() then
@@ -3443,7 +3456,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                 if gameInfo.GameOptions.AutoTeams and lobbyComm:IsHost() then
                     -- Handle the manual-mode reassignment of slots to teams.
                     if gameInfo.GameOptions.AutoTeams == 'manual' then
-                        if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                        if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] ~= 'fixed') then
                             local targetTeam
                             if gameInfo.AutoTeams[slot] == 7 then
                                 -- 2 here corresponds to team 1, since a team value of 1 represents
