@@ -7622,8 +7622,8 @@ lobui_0750="Рейтинг"
 lobui_0751="Global-рейтинг"
 lobui_0752="Перезапустить тест CPU"
 lobui_0753="Переоценивает ваш CPU"
-lobui_0754="Slot"
-lobui_0755="Player slot number, useful for moving players around as host"
+lobui_0754="Ячейка"
+lobui_0755="Номер ячейки, полезен для перемещения игроков"
 
 # uimod_0010 in earlier but not sure if it should be changed
 uimod_0016="Включен игровой мод"
