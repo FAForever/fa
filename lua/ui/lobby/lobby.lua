@@ -2004,34 +2004,27 @@ function CreateSlotsUI(makeLabel)
 
     local slotLabel = makeLabel("#", 14)
     labelGroup:AddChild(slotLabel)
-    Tooltip.AddControlTooltip(slotLabel, 'slot_number')
 
     -- No label required for the second column (flag), so skip it. (Even eviler hack)
     labelGroup.numChildren = labelGroup.numChildren + 1
 
     local ratingLabel = makeLabel("R", 14)
     labelGroup:AddChild(ratingLabel)
-    Tooltip.AddControlTooltip(ratingLabel, 'rating')
 
     local numGamesLabel = makeLabel("G", 14)
     labelGroup:AddChild(numGamesLabel)
-    Tooltip.AddControlTooltip(numGamesLabel, 'num_games')
 
     local nameLabel = makeLabel(LOC("<LOC NICKNAME>Nickname"), 14)
     labelGroup:AddChild(nameLabel)
-    Tooltip.AddControlTooltip(nameLabel, 'lob_slot')
 
     local colorLabel = makeLabel(LOC("<LOC lobui_0214>Color"), 14)
     labelGroup:AddChild(colorLabel)
-    Tooltip.AddControlTooltip(colorLabel, 'lob_color')
 
     local factionLabel = makeLabel(LOC("<LOC lobui_0215>Faction"), 14)
     labelGroup:AddChild(factionLabel)
-    Tooltip.AddControlTooltip(factionLabel, 'lob_faction')
 
     local teamLabel = makeLabel(LOC("<LOC lobui_0216>Team"), 14)
     labelGroup:AddChild(teamLabel)
-    Tooltip.AddControlTooltip(teamLabel, 'lob_team')
 
     if not singlePlayer then
         labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0419>Ping/CPU"), 14))
