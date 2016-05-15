@@ -2007,7 +2007,6 @@ function CreateSlotsUI(makeLabel)
 
     local slotLabel = makeLabel("", 14)
     labelGroup:AddChild(slotLabel)
-    Tooltip.AddControlTooltip(slotLabel, 'rating')
 
     local ratingLabel = makeLabel("R", 14)
     labelGroup:AddChild(ratingLabel)
