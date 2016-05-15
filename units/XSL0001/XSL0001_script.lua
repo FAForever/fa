@@ -396,7 +396,7 @@ XSL0001 = Class(ACUUnit) {
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bpDisrupt or 44)
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'RateOfFireRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
