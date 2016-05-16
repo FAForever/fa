@@ -18,7 +18,7 @@ DamageArea = function(instigator, location, radius, damage, type, damageAllies, 
         end
     end
     
-    local reclaim = GetReclaimablesInRect(location[1]-radius, location[3]-radius, location[1]+radius, location[1]+radius) or {}
+    local reclaim = GetReclaimablesInRect(rect) or {}
     for _, r in reclaim do
         if IsProp(r) and VDist3(r:GetPosition(), location) <= radius then
             Damage(instigator, location, r, damage, type)
