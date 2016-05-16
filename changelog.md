@@ -15,6 +15,7 @@ Patch 3654 (May 15, 2016)
 - Fixed Billy using the full 'Ignore shields' nuke code
 - Fixed issue with upgrades granting permanent free intel
 - Fixed a typo in the Seraphim ACU which prevented the Gun upgrade from being completed
+- Fixed Chrono Dampener getting jammed by Overcharge
 
 **Other**
 - Removed unused code
