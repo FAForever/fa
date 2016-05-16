@@ -121,9 +121,6 @@ UnitBlueprint {
     },
     Description = '<LOC ura0103_desc>Attack Bomber',
     Display = {
-        Abilities = {
-            '<LOC ability_radar>Radar',
-        },
         LayerChangeEffects = {
             AirLand = {
                 Effects = {

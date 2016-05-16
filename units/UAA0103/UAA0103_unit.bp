@@ -123,7 +123,6 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_stun>EMP Weapon',
-            '<LOC ability_radar>Radar',
         },
         LayerChangeEffects = {
             AirLand = {
