@@ -168,7 +168,7 @@ function AssistMex(command)
                 break
             end
         end
-    elseif mex:IsInCategory('TECH2') then
+    elseif not mex:IsInCategory('TECH1')  then
         cap = true
     end
 
