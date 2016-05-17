@@ -1824,7 +1824,7 @@ local function TryLaunch(skipNoObserversCheck)
             return
         end
 
-        HostUtils.KickObservers()
+        HostUtils.KickObservers("GameLaunched")
     end
 
     if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
@@ -6091,9 +6091,9 @@ function InitHostUtils()
             return -1
         end,
 
-        KickObservers = function()
+        KickObservers = function(reason)
             for k,observer in gameInfo.Observers:pairs() do
-                lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
+                lobbyComm:EjectPeer(observer.OwnerID, reason or "KickedByHost")
             end
             gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
         end
