@@ -68,6 +68,8 @@ ACUButton = Class(Group) {
             elseif state == "exit" then
                 self.indicator:Stop()
             end
+
+            self:OnRollover(state)
         end
         self.markerOverlay = markerOverlay
 
@@ -180,5 +182,7 @@ ACUButton = Class(Group) {
     OnClick = function(self) end,
 
     --- Called when the button is right-clicked.
-    OnRightClick = function(self) end
+    OnRightClick = function(self) end,
+
+    OnRollover = function(self, state) end,
 }

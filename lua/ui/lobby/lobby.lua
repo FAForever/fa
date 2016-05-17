@@ -3336,6 +3336,15 @@ function ConfigureMapListeners(mapCtrl, scenario)
         -- The ACUButton instance representing this slot.
         local marker = mapCtrl.startPositions[inSlot]
 
+        marker.OnRollover = function(self, state)
+            LOG("OnRollover " .. tostring(state))
+            if state == 'enter' then
+                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+            elseif state == 'exit' then
+                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+            end
+        end
+
         marker.OnClick = function(self)
             if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
                 if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
