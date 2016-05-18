@@ -360,7 +360,6 @@ StructureUnit = Class(Unit) {
                 NotifyUpgrade(self, unitBuilding)
                 self:StopUpgradeEffects(unitBuilding)
                 self:PlayUnitSound('UpgradeEnd')
-                self:RefreshIntel(true)
                 self:Destroy()
             end
         end,
@@ -437,23 +436,28 @@ StructureUnit = Class(Unit) {
 
     -- Refresh intel on a destroyed / upgraded unit by setting vision on the actual blip.
     -- The expired blip will actually be destroyed right after when the intel system notices it's no longer there
-    RefreshIntel = function(self, was_upgrade)
-        local unit_army = self:GetArmy()
-
+    RefreshIntel = function(self)
+        local army = self:GetArmy()
         for i, brain in ArmyBrains do
-            local army = brain:GetArmyIndex()
-
-            if army ~= unit_army and not IsAlly(army, unit_army) then
-                local blip = self:GetBlip(army)
+            if army ~= i and not IsAlly(i, army) then
+                local blip = self:GetBlip(i)
 
                 if blip then
-                    blip:FlashIntel(army, was_upgrade)
+                    if not blip:IsSeenEver(i) and (blip:IsOnRadar(i) or blip:IsOnSonar(i)) then
+                        -- Remove dead radar blip out of map so we don't reveal what's under it
+                        blip:SetPosition(Vector(-100, 0, -100), true)
+                    end
+
+                    -- expired blip will disappear with this
+                    blip:InitIntel(i, 'Vision', 2)
+                    blip:EnableIntel('Vision')
                 end
             end
         end
     end,
 
     DestroyUnit = function(self, overkillRatio)
+        self:RefreshIntel()
         Unit.DestroyUnit(self, overkillRatio)
     end,
 
