@@ -112,7 +112,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         -- changing owner
-        unit:RefreshIntel()
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
             continue

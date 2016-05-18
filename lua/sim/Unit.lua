@@ -1704,9 +1704,6 @@ Unit = Class(moho.unit_methods) {
         ChangeState(self, self.DeadState)
     end,
 
-    RefreshIntel = function(self)
-    end,
-
     HideLandBones = function(self)
         --Hide the bones for buildings built on land
         if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
@@ -1875,7 +1872,6 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
-            builder:RefreshIntel()
             self.IsUpgrade = nil
         end
 
