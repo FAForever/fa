@@ -1,6 +1,9 @@
 
-Patch 3654 (May 15, 2016)
+Patch 3654 (May 18, 2016)
 ============================
+**Reverted**
+- The change in 3652 which refreshed intel for a blip on upgrade had unintentional free intel side effects we have been unable to solve. As such, that change has been reversed
+
 **UI**
 - Fixed reductions in MaxHealth resulting in UI displaying 10000/9000 HP
 - Added slot numbers in the lobby
@@ -13,9 +16,9 @@ Patch 3654 (May 15, 2016)
 - UEF Drones no longer leave wrecks
 - Fixed Seraphim Regen Aura level two not applying to newly built units
 - Fixed Billy using the full 'Ignore shields' nuke code
-- Fixed issue with upgrades granting permanent free intel
 - Fixed a typo in the Seraphim ACU which prevented the Gun upgrade from being completed
 - Fixed Chrono Dampener getting jammed by Overcharge
+- Fixed FX bug on Deceiver
 
 **Other**
 - Removed unused code
