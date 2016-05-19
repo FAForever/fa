@@ -45,7 +45,7 @@ function CreateDialog(teamkillTable)
     forgiveBtn.OnClick = function(self, modifiers)
         dialog:Close()
     end
-    
+
     local reportBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0003>Report")
     LayoutHelpers.AtBottomIn(reportBtn, dialogContent, 10)
     LayoutHelpers.AtLeftIn(reportBtn, dialogContent, 10)
@@ -59,14 +59,14 @@ function CreateDialog(teamkillTable)
         GpgNetSend('TeamkillReport',  killTime,victimName,killerName)
         dialog:Close()
     end
-    
+
     dialog.OnClosed = function(self)
         dialog = false
     end
-    
+
     dialog.OnEscapePressed = function(self)
     end
-    
+
     dialog.OnShadowClicked = function(self)
     end
 end
