@@ -1992,8 +1992,8 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 47, 91, 135, 472, 542, 612, 682, 754}
-    local COLUMN_WIDTHS = {20, 45, 45, 249, 59, 59, 59, 62, 51}
+    local COLUMN_POSITIONS = {1, 21, 67, 111, 135, 472, 542, 612, 682, 754}
+    local COLUMN_WIDTHS = {20, 20, 45, 45, 229, 59, 59, 59, 62, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
@@ -2004,6 +2004,9 @@ function CreateSlotsUI(makeLabel)
     labelGroup.Width:Set(791)
     labelGroup.Height:Set(21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
+
+    local slotLabel = makeLabel("", 14)
+    labelGroup:AddChild(slotLabel)
 
     local ratingLabel = makeLabel("R", 14)
     labelGroup:AddChild(ratingLabel)
@@ -2069,6 +2072,12 @@ function CreateSlotsUI(makeLabel)
             return Group.HandleEvent(self, event)
         end
         newSlot.HandleEvent = defaultHandler
+
+        -- Slot number
+        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        slotNumber.Width:Set(20)
+        slotNumber.Width:Set(16)
+        newSlot:AddChild(slotNumber)
 
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
