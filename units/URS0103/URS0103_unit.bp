@@ -337,7 +337,7 @@ UnitBlueprint {
             MaxRadius = 48,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 60,
+            MuzzleVelocity = 45,
             ProjectileId = '/projectiles/CAAAutocannon01/CAAAutocannon01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 1,
