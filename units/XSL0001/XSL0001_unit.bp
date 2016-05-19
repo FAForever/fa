@@ -343,8 +343,7 @@ UnitBlueprint {
             Icon = 'aes',
             Name = '<LOC enhancements_0000>Tech 2 Engineering Suite',
             NewBuildRate = 42,
-            NewHealth = 3000,
-            NewRegenRate = 20,
+            NewHealth = 1500,
             ShowBones = {
                 'Left_Upgrade',
             },
@@ -714,9 +713,8 @@ UnitBlueprint {
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER SERAPHIM',
             Icon = 'ees',
             Name = '<LOC enhancements_0018>Tech 3 Engineering Suite',
-            NewBuildRate = 126,
-            NewHealth = 7000,
-            NewRegenRate = 35,
+            NewBuildRate = 100,
+            NewHealth = 5500,
             Prerequisite = 'AdvancedEngineering',
             ShowBones = {
                 'Left_Upgrade',
