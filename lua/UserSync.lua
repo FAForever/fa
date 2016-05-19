@@ -66,14 +66,22 @@ function OnSync()
             end
         end
     end
-	
-    if Sync.Teamkill then
-        local armiesInfo = GetArmiesTable()
-        local victimName = armiesInfo.armiesTable[Sync.Teamkill.victim].nickname
-        local killerName = armiesInfo.armiesTable[Sync.Teamkill.instigator].nickname
-        GpgNetSend('TeamkillHappened', Sync.Teamkill.killTime, victimName, killerName)
-        if(GetFocusArmy() == Sync.Teamkill.victim) then
-            import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
+
+    if Sync.Teamkill and not SessionIsReplay() then
+        local armies, clients = GetArmiesTable().armiesTable, GetSessionClients()
+        local victim, instigator = Sync.Teamkill.victim, Sync.Teamkill.instigator
+        local data = {time=Sync.Teamkill.killTime, victim={}, instigator={}}
+
+        for k, army in {victim=victim, instigator=instigator} do
+            data[k].name = armies[army] and armies[army].nickname or "-"
+            data[k].id = clients[army] and clients[army].uid or 0
+        end
+
+        GpgNetSend('TeamkillHappened', data.time, data.victim.id, data.victim.name,  data.instigator.id, data.instigator.name)
+        WARN(string.format("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
+
+        if GetFocusArmy() == victim then
+            import('/lua/ui/dialogs/teamkill.lua').CreateDialog(data)
         end
     end
 end
