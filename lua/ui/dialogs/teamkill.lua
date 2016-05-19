@@ -13,15 +13,9 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local dialog = false
 local shouldReport = false
 
-function CreateDialog(teamkillTable)
-    local killTime = teamkillTable.killTime
-    WARN("Teamkill at tick" .. killTime)
+function CreateDialog(teamkill)
     if dialog then
        return
-    end
-
-    if SessionIsReplay() then
-        return
     end
 
     local dialogContent = Group(GetFrame(0))
@@ -50,13 +44,8 @@ function CreateDialog(teamkillTable)
     LayoutHelpers.AtBottomIn(reportBtn, dialogContent, 10)
     LayoutHelpers.AtLeftIn(reportBtn, dialogContent, 10)
     reportBtn.OnClick = function(self, modifiers)
-        local armiesInfo = GetArmiesTable()
-        local victimName = armiesInfo.armiesTable[teamkillTable.victim].nickname
-        local killerName = armiesInfo.armiesTable[teamkillTable.instigator].nickname
-        WARN("Was teamkilled: " .. victimName)
-        WARN("At time: " .. killTime)
-        WARN("Killed by: " .. killerName)
-        GpgNetSend('TeamkillReport',  killTime,victimName,killerName)
+        GpgNetSend('TeamkillReport',  teamkill.time, teamkill.victim.id, teamkill.victim.name, teamkill.instigator.id, teamkill.instigator.name)
+        WARN("TEAMKILL WAS REPORTED")
         dialog:Close()
     end
     
