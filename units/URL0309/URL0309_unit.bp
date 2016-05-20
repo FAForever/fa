@@ -85,8 +85,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 540,
-        MaxHealth = 540,
+        Health = 740,
+        MaxHealth = 740,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -182,10 +182,10 @@ UnitBlueprint {
         UniformScale = 0.12,
     },
     Economy = {
-        BuildCostEnergy = 2200,
-        BuildCostMass = 440,
+        BuildCostEnergy = 1560,
+        BuildCostMass = 312,
         BuildRate = 30,
-        BuildTime = 2200,
+        BuildTime = 1560,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
         },
@@ -282,9 +282,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
