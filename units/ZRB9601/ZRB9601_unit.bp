@@ -59,14 +59,14 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'SUPPORTFACTORY',
+        'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 49,
-        Health = 9500,
-        MaxHealth = 9500,
+        Health = 6000,
+        MaxHealth = 6000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -96,7 +96,7 @@ UnitBlueprint {
             Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = 'Attachpoint',
-	Mesh = {
+        Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
@@ -130,11 +130,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 11550,
-        BuildCostMass = 1290,
+        BuildCostEnergy = 11600,
+        BuildCostMass = 1440,
         BuildRate = 90,
-        BuildTime = 3000,
-	DifferentialUpgradeCostCalculation = true, 
+        BuildTime = 4000,
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zrb9601',
         },
@@ -143,7 +143,8 @@ UnitBlueprint {
             'BUILTBYTIER3FACTORY CYBRAN STRUCTURE LAND',
             'BUILTBYTIER3FACTORY CYBRAN MOBILE LAND',
         },
-        StorageEnergy = 0,        StorageMass = 320,
+        StorageEnergy = 0,
+        StorageMass = 320,
     },
     Footprint = {
         SizeX = 5,
@@ -184,7 +185,7 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
-	UpgradesFromBase = 'urb0101',
+    UpgradesFromBase = 'urb0101',
         UpgradesFrom = 'zrb9501',
     },
     Intel = {
