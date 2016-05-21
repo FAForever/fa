@@ -1992,7 +1992,7 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 21, 67, 111, 135, 472, 542, 612, 682, 754}
+    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 467, 537, 607, 677, 749}
     local COLUMN_WIDTHS = {20, 20, 45, 45, 229, 59, 59, 59, 62, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
