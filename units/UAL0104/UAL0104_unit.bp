@@ -55,8 +55,8 @@ UnitBlueprint {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 200,
-        MaxHealth = 200,
+        Health = 360,
+        MaxHealth = 360,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -120,9 +120,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 140,
-        BuildCostMass = 28,
-        BuildTime = 140,
+        BuildCostEnergy = 275,
+        BuildCostMass = 55,
+        BuildTime = 220,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -151,7 +151,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20, # 18
+        VisionRadius = 20,
     },
     Interface = {
         HelpText = '<LOC ual0104_help>Mobile Anti-Air Gun',
@@ -170,10 +170,10 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 3,
-        MaxBrake = 3,
-        MaxSpeed = 3,
-        MaxSpeedReverse = 0,
+        MaxAcceleration = 2.8,
+        MaxBrake = 2.8,
+        MaxSpeed = 2.8,
+        MaxSpeedReverse = 2.8,
         MaxSteerForce = 10,
         MeshExtentsX = 0.7,
         MeshExtentsY = 0.5,
@@ -190,9 +190,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.67,
-    SizeX = 0.7, #from 0.55
-    SizeY = 0.7, #from 0.45
-    SizeZ = 1, #
+    SizeX = 0.7,
+    SizeY = 0.7,
+    SizeZ = 1,
     StrategicIconName = 'icon_land1_antiair',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -218,7 +218,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 5,
+            Damage = 10,
             DamageType = 'Normal',
             DisplayName = 'Sonic Pulse Battery',
             FireTargetLayerCapsTable = {
