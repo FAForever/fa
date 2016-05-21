@@ -28,7 +28,7 @@ UnitBlueprint {
         RandomBreakOffDistanceMult = 1,        
         StartTurnDistance = 1.4,
         TightTurnMultiplier = 0,
-        TurnSpeed = 1..5,
+        TurnSpeed = 1.5,
         Winged = true,
     },
     Audio = {
