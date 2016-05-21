@@ -35,7 +35,7 @@ States = {
     massViewState = Prefs.GetFromCurrentProfile("massRateView") or 1,
 }
 
-function Contract() 
+function Contract()
     UIState = false
 end
 
@@ -63,17 +63,17 @@ function CreateUI()
     GUI.bg.panel = Bitmap(GUI.bg)
     GUI.bg.leftBracket = Bitmap(GUI.bg)
     GUI.bg.leftBracketGlow = Bitmap(GUI.bg)
-    
+
     GUI.bg.rightGlowTop = Bitmap(GUI.bg)
     GUI.bg.rightGlowMiddle = Bitmap(GUI.bg)
     GUI.bg.rightGlowBottom = Bitmap(GUI.bg)
-    
+
     GUI.collapseArrow = Checkbox(savedParent)
     Tooltip.AddCheckboxTooltip(GUI.collapseArrow, 'econ_collapse')
-    
+
     local function CreateResourceGroup(warningBitmap)
         local group = Group(GUI.bg)
-        
+
         group.warningBG = Bitmap(group)
         group.warningBG.Depth:Set(group.Depth)
         group.warningBG.State = ''
@@ -95,7 +95,7 @@ function CreateUI()
                 self:SetNeedsFrameUpdate(true)
             end
         end
-        
+
         group.warningBG.OnFrame = function(self, deltaTime)
             if self.State == 'hide' then
                 local newAlpha = self:GetAlpha() - deltaTime
@@ -121,22 +121,22 @@ function CreateUI()
                 end
             end
         end
-        
+
         group.icon = Bitmap(group)
         group.rate = UIUtil.CreateText(group, '', 18, UIUtil.bodyFont)
         group.rate:SetDropShadow(true)
-        group.storageBar = StatusBar(group, 0, 100, false, false, 
-            UIUtil.UIFile('/game/resource-mini-bars/mini-energy-bar-back_bmp.dds'), 
+        group.storageBar = StatusBar(group, 0, 100, false, false,
+            UIUtil.UIFile('/game/resource-mini-bars/mini-energy-bar-back_bmp.dds'),
             UIUtil.UIFile('/game/resource-mini-bars/mini-energy-bar_bmp.dds'), false)
-            
+
         group.curStorage = UIUtil.CreateText(group, '', 10, UIUtil.bodyFont)
         group.curStorage:SetDropShadow(true)
         group.maxStorage = UIUtil.CreateText(group, '', 10, UIUtil.bodyFont)
         group.maxStorage:SetDropShadow(true)
-        
+
         group.storageTooltipGroup = Group(group.storageBar)
         group.storageTooltipGroup.Depth:Set(function() return group.storageBar.Depth() + 10 end)
-        
+
         group.income = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.income:SetDropShadow(true)
         group.expense = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
@@ -152,10 +152,10 @@ function CreateUI()
         group.curStorage:DisableHitTest()
         group.maxStorage:DisableHitTest()
         group.storageBar:DisableHitTest()
-        
+
         return group
     end
-    
+
     GUI.mass = CreateResourceGroup('mass')
     GUI.energy = CreateResourceGroup('energy')
 end
@@ -186,7 +186,7 @@ function CommonLogic()
             end
             return true
         end
-        
+
         group.rate.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 Tooltip.CreateMouseoverDisplay(self, prefix .. "_rate", nil, true)
@@ -204,18 +204,18 @@ function CommonLogic()
             return true
         end
     end
-    
+
     AddGroupLogic(GUI.mass, 'mass')
     AddGroupLogic(GUI.energy, 'energy')
 
     GUI.bg.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(_BeatFunction)
     end
-    
+
     GUI.collapseArrow.OnCheck = function(self, checked)
         ToggleEconPanel()
     end
-    
+
     return GUI.mass, GUI.energy
 end
 
@@ -364,14 +364,14 @@ function ConfigureBeatFunction()
         return function()
             local econData = GetEconomyTotals()
             local simFrequency = GetSimTicksPerSecond()
-            
+
             -- Deal with the reclaim column
             -------------------------------
             local totalReclaimed = econData.reclaimed[resourceType]
 
             -- Reclaimed this tick
             local thisTick = totalReclaimed - lastReclaimTotal
-            
+
             -- Set a new lastReclaimTotal to carry over
             lastReclaimTotal = totalReclaimed
 
@@ -381,24 +381,24 @@ function ConfigureBeatFunction()
             -- Set the text
             reclaimDelta:SetText('+' .. fmtnum(reclaimRate))
             reclaimTotal:SetText(fmtnum(totalReclaimed))
-        
+
             -- Deal with the Storage
             ------------------------
             local maxStorageVal = econData.maxStorage[resourceType]
             local storedVal = econData.stored[resourceType]
-            
+
             -- Set the bar fill
             storageBar:SetRange(0, maxStorageVal)
             storageBar:SetValue(storedVal)
-            
+
             -- Set the text displays
             curStorage:SetText(math.round(storedVal))
             maxStorage:SetText(math.round(maxStorageVal))
-            
+
             -- Deal with the income/expense column
             --------------------------------------
             local incomeVal = econData.income[resourceType]
-            
+
             -- Should always be positive integer
             local incomeSec = math.max(0, incomeVal * simFrequency)
             local generatedIncome = incomeSec - lastReclaimRate
@@ -410,19 +410,19 @@ function ConfigureBeatFunction()
             else
                 expense = econData.lastUseRequested[resourceType] * simFrequency
             end
-            
+
             -- Set the text displays. incomeTxt should be only from non-reclaim.
             -- incomeVal is delayed by 1 tick when it comes to accounting for reclaim.
             -- This necessitates the use of the lastReclaimRate stored value.
             incomeTxt:SetText(string.format("+%d", fmtnum(generatedIncome)))
             expenseTxt:SetText(string.format("-%d", fmtnum(expense)))
-            
+
             -- Store this tick's reclaimRate for next tick
             lastReclaimRate = reclaimRate
-            
+
             -- Deal with the primary income/expense display
             -----------------------------------------------
-            
+
             -- incomeSec and expense are already limit-checked and integers
             local rateVal = incomeSec - expense
 

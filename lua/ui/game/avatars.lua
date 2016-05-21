@@ -767,7 +767,7 @@ function AvatarUpdate()
     -- armiesTable[GetFocusArmy()].faction returns 0 = UEF, 1 = Aeon, 2 = Cybran, 3 = Seraphim, 4 = Civilian Army, 5 = Civilian Neutral
     -- We want 1 - 4, with 4 max
     currentFaction = math.min(GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1, 4)
-    
+
     if avatars then
         for _, unit in avatars do
             if controls.avatars[unit:GetEntityId()] then
@@ -838,7 +838,7 @@ function AvatarUpdate()
     local buttons = import('/modules/scumanager.lua').buttonGroup
     if options.gui_scu_manager == 0 then
         buttons:Hide()
-    else 
+    else
         buttons:Show()
         buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
         buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)
