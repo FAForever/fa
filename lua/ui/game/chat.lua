@@ -46,12 +46,8 @@ for option, value in defOptions do
     end
 end
 
-GUI = {
-    bg = false,
-    chatLines = {},
-    chatContainer = false,
-    config = false,
-}
+GUI = import('/lua/ui/controls.lua').Get()
+GUI.chatLines = GUI.chatLines or {}
 
 local FactionsIcon = {}
 local Factions = import('/lua/factions.lua').Factions

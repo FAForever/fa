@@ -23,12 +23,9 @@ local UIState = true
 
 local _BeatFunction = nil
 
-group = false
-savedParent = false
-
-GUI = {
-    bg = false,
-}
+GUI = import('/lua/ui/controls.lua').Get()
+group = GUI.group or false
+savedParent = GUI.savedParent or false
 
 States = {
     energyViewState = Prefs.GetFromCurrentProfile("energyRateView") or 1,
@@ -54,6 +51,7 @@ end
 
 function CreateEconomyBar(parent)
     savedParent = parent
+    GUI.savedParent = savedParent
     CreateUI()
     return SetLayout()
 end
@@ -73,6 +71,7 @@ function CreateUI()
 
     local function CreateResourceGroup(warningBitmap)
         local group = Group(GUI.bg)
+        GUI.group = group
 
         group.warningBG = Bitmap(group)
         group.warningBG.Depth:Set(group.Depth)

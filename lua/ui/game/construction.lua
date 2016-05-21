@@ -112,12 +112,8 @@ local activeTab = nil
 
 local showBuildIcons = false
 
-controls = {
-    minBG = false,
-    maxBG = false,
-    midBG = false,
-    tabs = {},
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.tabs = controls.tabs or {}
 
 local constructionTabs = { 't1', 't2', 't3', 't4', 'templates' }
 local nestedTabKey = {
