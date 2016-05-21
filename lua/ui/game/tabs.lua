@@ -330,12 +330,7 @@ function ExitGameSaveWindow()
         SaveKillBehavior, saveType)
 end
 
-controls = {
-    parent = false,
-    bgBottomGlow = false,
-    bgTopGlow = false,
-    bgStretch = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
 
 function CreateStretchBar(parent, topPiece)
     local group = Group(parent)

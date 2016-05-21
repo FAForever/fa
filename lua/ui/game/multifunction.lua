@@ -28,11 +28,11 @@ local filters = import('/lua/ui/game/rangeoverlayparams.lua').RangeOverlayParams
 local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
 savedParent = false
 
-controls = {
-    bg = false,
-    overlayBtns = {},
-    pingBtns = {},
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.overlayBtns = controls.overlayBtns or {}
+controls.pingBtns = controls.pingBtns or {}
+
+savedParent = controls.savedParent
 
 local activeFilters = Prefs.GetFromCurrentProfile('activeFilters') or {}
 

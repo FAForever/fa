@@ -21,15 +21,7 @@ local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 
-controls =
-{
-    mouseoverDisplay = false,
-    orderButtonGrid = false,
-    bg = false,
-    orderGlow = false,
-    controlClusterGroup = false,
-    mfdControl = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
 
 -- positioning controls, don't belong to file
 local layoutVar = false

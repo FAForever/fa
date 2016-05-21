@@ -23,7 +23,7 @@ local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverI
 local selectedUnit = nil
 local updateThread = nil
 
-controls = {}
+controls = import('/lua/ui/controls.lua').Get()
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
