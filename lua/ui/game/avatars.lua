@@ -839,7 +839,7 @@ function AvatarUpdate()
     local buttons = import('/modules/scumanager.lua').buttonGroup
     if options.gui_scu_manager == 0 then
         buttons:Hide()
-    else 
+    else
         buttons:Show()
         buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
         buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)

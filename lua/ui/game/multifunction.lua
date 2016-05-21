@@ -180,7 +180,7 @@ function SetActiveOverlays()
     GetButton('military'):SetCheck(buttonState, true)
     SetOverlayFilters(tempFilters)
 end
-    
+
 function PreNIS()
     SetOverlayFilters({})
 end
@@ -188,22 +188,22 @@ end
 function PostNIS()
     SetActiveOverlays()
 end
-    
+
 function Create(parent)
     savedParent = parent
-    
+
     controls.bg = Group(savedParent)
-    
+
     controls.bg.panel = Bitmap(savedParent)
     controls.bg.leftBrace = Bitmap(savedParent)
     controls.bg.leftGlow = Bitmap(savedParent)
     controls.bg.rightGlowTop = Bitmap(savedParent)
     controls.bg.rightGlowMiddle = Bitmap(savedParent)
     controls.bg.rightGlowBottom = Bitmap(savedParent)
-    
+
     controls.collapseArrow = Checkbox(savedParent)
     Tooltip.AddCheckboxTooltip(controls.collapseArrow, 'mfd_collapse')
-    
+
     local function CreateOverlayBtn(buttonData)
         local btn = false
         if buttonData.button then
@@ -211,7 +211,7 @@ function Create(parent)
                 UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
                 UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_down.dds'),
                 UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_over.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'), 
+                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'),
                 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
             Tooltip.AddButtonTooltip(btn, buttonData.tooltip)
         else
@@ -227,7 +227,7 @@ function Create(parent)
         end
         btn.ID = buttonData.id
         btn:UseAlphaHitTest(true)
-        
+
         if buttonData.dropout then
             btn.dropout = Checkbox(btn,
                 UIUtil.SkinnableFile('/game/filter-arrow_btn/tab-open_btn_up.dds'),
@@ -239,10 +239,10 @@ function Create(parent)
                 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
             Tooltip.AddCheckboxTooltip(btn.dropout, buttonData.dropout_tooltip)
         end
-        
+
         return btn
     end
-    
+
     local function CreatePingBtn(buttonData)
         local btn = Button(controls.bg,
             UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
@@ -259,19 +259,19 @@ function Create(parent)
         end
         return btn
     end
-    
+
     for index, buttonData in buttons.overlays do
         controls.overlayBtns[index] = CreateOverlayBtn(buttonData)
     end
-    
+
     for index, buttonData in buttons.pings do
         controls.pingBtns[index] = CreatePingBtn(buttonData)
     end
-    
+
     for overlay, info in filters do
         SetOverlayFilter(overlay,info.Categories,info.NormalColor,info.SelectColor,info.RolloverColor,info.Inner[1],info.Inner[2],info.Outer[1],info.Outer[2])
     end
-    
+
     for _, info in filterConditionals do
         if info.Pref then
             local pref = Prefs.GetFromCurrentProfile(info.Pref)
@@ -284,9 +284,9 @@ function Create(parent)
             end
         end
     end
-    
+
     SetLayout()
-    
+
     SetActiveOverlays()
 
     function EndBehavior(mode, data)
@@ -371,19 +371,19 @@ end
 function CreateMapDropout(parent)
     import('/lua/ui/game/chat.lua').CloseChatConfig()
     local bg = CreateDropoutBG(false)
-    
+
     local function CreateMapOptions(inMapControl)
         local function CreateToggleItem(parent, label)
             local bg = Bitmap(parent)
             bg.checked = true
-            
+
             bg.treehorz = Bitmap(bg)
             bg.treehorz:SetSolidColor(UIUtil.fontColor)
             bg.treehorz.Height:Set(1)
             bg.treehorz.Width:Set(6)
             LayoutHelpers.AtLeftIn(bg.treehorz, bg)
             LayoutHelpers.AtVerticalCenterIn(bg.treehorz, bg)
-            
+
             bg.check = Bitmap(bg, UIUtil.SkinnableFile('/game/temp_textures/checkmark.dds'))
             LayoutHelpers.AtLeftIn(bg.check, bg, 8)
             LayoutHelpers.AtVerticalCenterIn(bg.check, bg)
@@ -392,20 +392,20 @@ function CreateMapDropout(parent)
                     return true
                 end
             end
-            
+
             bg.label = UIUtil.CreateText(bg, LOC(label), 12, UIUtil.bodyFont)
-            LayoutHelpers.RightOf(bg.label, bg.check) 
+            LayoutHelpers.RightOf(bg.label, bg.check)
             LayoutHelpers.AtVerticalCenterIn(bg.label, bg)
-            
+
             bg.Width:Set(parent.Width)
             bg.Height:Set(bg.label.Height)
-            
+
             bg.OnCheck = function() end
             bg.SetCheck = function(self, checked)
                 self.checked = checked
                 self.check:SetHidden(not checked)
             end
-            
+
             bg.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     self:SetSolidColor('ff444444')
@@ -423,7 +423,7 @@ function CreateMapDropout(parent)
                     self:OnCheck(self.checked)
                 end
             end
-            
+
             return bg
         end
         # Make an option group consisting of a checkbox and a name
@@ -433,7 +433,7 @@ function CreateMapDropout(parent)
 
         group.title = UIUtil.CreateText(group, LOC(mapControl._displayName), 14, UIUtil.bodyFont)
         LayoutHelpers.AtLeftTopIn(group.title, group)
-        
+
         group.toggles = {}
         if camName == 'MiniMap' then
             group.toggles[1] = CreateToggleItem(group, '<LOC map_options_0000>Enabled')
@@ -468,22 +468,22 @@ function CreateMapDropout(parent)
             end
             LayoutHelpers.Below(group.toggles[3], group.toggles[2])
         end
-            
+
         LayoutHelpers.AtLeftTopIn(group.toggles[1], group, 0, 20)
         LayoutHelpers.Below(group.toggles[2], group.toggles[1])
-        
+
         group.treeVert = Bitmap(group)
         group.treeVert:SetSolidColor(UIUtil.fontColor)
         group.treeVert.Width:Set(1)
         LayoutHelpers.AtLeftIn(group.treeVert, bg)
         group.treeVert.Top:Set(group.title.Bottom)
         group.treeVert.Bottom:Set(function() return group.toggles[table.getsize(group.toggles)].Top() + (group.toggles[1].Height()/2) end)
-        
+
         group.Width:Set(170)
         group.Height:Set(function() return group.title.Height() + (table.getsize(group.toggles) * group.toggles[1].Height()) end)
         return group
     end
-    
+
     local viewControls = import('/lua/ui/game/worldview.lua').GetWorldViews()
     local Views = {}
     for _, control in viewControls do
@@ -508,24 +508,24 @@ function CreateMapDropout(parent)
         maxWidth = math.max(prevControl.Width()+5, maxWidth)
         totHeight = totHeight + prevControl.Height() + 5
     end
-    
+
     local function SetItemAlpha(alpha)
         for _, item in bg.mapControls do
             item:SetAlpha(alpha, true)
         end
     end
-    
+
     bg.Height:Set(totHeight + 0)
     bg.Width:Set(maxWidth + 30)
     LayoutHelpers.AtCenterIn(bg, GetFrame(0))
     bg.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    
+
     bg.Close = function(self)
         parent:SetCheck(false, true)
         parent.Dropout = nil
         self:Destroy()
     end
-    
+
     local okButton = UIUtil.CreateButtonStd(bg, '/game/menu-btns/close', "", 12)
     LayoutHelpers.AtRightTopIn(okButton, bg, -10, -10)
     okButton.OnClick = function(self, modifiers)
@@ -550,7 +550,7 @@ end
 
 function CreateFilterDropout(parent)
     local bg = CreateDropoutBG()
-    
+
     local weaponFilters = {}
     local intelFilters = {}
     for _, data in filters do
@@ -563,7 +563,7 @@ function CreateFilterDropout(parent)
             table.insert(intelFilters, data)
         end
     end
-    
+
     local function SortFunc(a,b)
         if a.Combo or b.Combo then
             if a.Combo then
@@ -575,12 +575,12 @@ function CreateFilterDropout(parent)
             return a.key < b.key
         end
     end
-    
+
     table.sort(weaponFilters, SortFunc)
     table.sort(intelFilters, SortFunc)
-    
+
     bg.items = {}
-    
+
     local function SetTitleCheck(type)
         local titleControl = false
         local checkState = false
@@ -624,7 +624,7 @@ function CreateFilterDropout(parent)
             titleControl.check:SetTexture(UIUtil.SkinnableFile('/game/temp_textures/checkmark_dark.dds'))
         end
     end
-    
+
     local function TitleEventHandler(self, event)
         if event.Type == 'MouseEnter' then
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Opt_Mini_Button_Over'}))
@@ -652,7 +652,7 @@ function CreateFilterDropout(parent)
             SetActiveOverlays()
         end
     end
-    
+
     local function OnComboChecked(self)
         local color = false
         if self.checked then
@@ -678,7 +678,7 @@ function CreateFilterDropout(parent)
             end
         end
     end
-    
+
     local function GetCombo(type)
         for _, control in bg.items do
             if control.Data.Combo and control.Data.Type == type then
@@ -686,7 +686,7 @@ function CreateFilterDropout(parent)
             end
         end
     end
-    
+
     local function OnChecked(self)
         if self.checked then
             self.check:Show()
@@ -698,7 +698,7 @@ function CreateFilterDropout(parent)
                 else
                     color = 'dd'..string.sub(self.Data.NormalColor, 3, 8)
                 end
-            end 
+            end
             if self.checkBGColor then
                 self.checkBGColor:SetSolidColor(color)
             end
@@ -715,7 +715,7 @@ function CreateFilterDropout(parent)
             Prefs.SetToCurrentProfile(self.Data.Pref, self.checked)
         end
     end
-    
+
     local function EventHandler(self, event)
         if event.Type == 'MouseEnter' then
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Opt_Mini_Button_Over'}))
@@ -732,7 +732,7 @@ function CreateFilterDropout(parent)
             SetActiveOverlays()
         end
     end
-    
+
     local function CreateEntry(parent, data, title)
         local bg = Bitmap(parent)
         bg.Data = data
@@ -750,10 +750,10 @@ function CreateFilterDropout(parent)
                 bg.OnChecked = OnChecked
             end
         end
-        
+
         bg.check = Bitmap(bg)
-        
-        
+
+
         if data.Combo then
             bg.check:SetTexture(UIUtil.SkinnableFile('/game/temp_textures/combo_up.dds'))
         else
@@ -766,38 +766,38 @@ function CreateFilterDropout(parent)
             bg.checkBorder.t.Left:Set(bg.check.Left)
             bg.checkBorder.t.Right:Set(bg.check.Right)
             bg.checkBorder.t.Height:Set(1)
-            
+
             bg.checkBorder.b = Bitmap(bg)
             bg.checkBorder.b:SetSolidColor(UIUtil.fontColor)
             bg.checkBorder.b.Top:Set(bg.check.Bottom)
             bg.checkBorder.b.Left:Set(bg.check.Left)
             bg.checkBorder.b.Right:Set(bg.check.Right)
             bg.checkBorder.b.Height:Set(1)
-            
+
             bg.checkBorder.l = Bitmap(bg)
             bg.checkBorder.l:SetSolidColor(UIUtil.fontColor)
             bg.checkBorder.l.Right:Set(bg.check.Left)
             bg.checkBorder.l.Top:Set(bg.checkBorder.t.Top)
             bg.checkBorder.l.Bottom:Set(bg.checkBorder.b.Bottom)
             bg.checkBorder.l.Width:Set(1)
-            
+
             bg.checkBorder.r = Bitmap(bg)
             bg.checkBorder.r:SetSolidColor(UIUtil.fontColor)
             bg.checkBorder.r.Left:Set(bg.check.Right)
             bg.checkBorder.r.Top:Set(bg.checkBorder.t.Top)
             bg.checkBorder.r.Bottom:Set(bg.checkBorder.b.Bottom)
             bg.checkBorder.r.Width:Set(1)
-            
+
             bg.checkBGColor = Bitmap(bg)
             LayoutHelpers.FillParent(bg.checkBGColor, bg.check)
-            
+
             bg.checkBorder.t.Depth:Set(function() return bg.check.Depth() - 1 end)
             bg.checkBorder.b.Depth:Set(function() return bg.check.Depth() - 1 end)
             bg.checkBorder.l.Depth:Set(function() return bg.check.Depth() - 1 end)
             bg.checkBorder.r.Depth:Set(function() return bg.check.Depth() - 1 end)
             bg.checkBGColor.Depth:Set(function() return bg.check.Depth() - 1 end)
         end
-        
+
         if activeFilters[data.key] then
             bg.checked = true
             if bg.OnChecked then
@@ -806,7 +806,7 @@ function CreateFilterDropout(parent)
                 bg.check:Show()
             end
         end
-        
+
         bg.text = UIUtil.CreateText(bg, data.Label, fontSize, UIUtil.bodyFont)
         if title or data.Combo then
             LayoutHelpers.AtLeftIn(bg.text, bg, 20)
@@ -819,12 +819,12 @@ function CreateFilterDropout(parent)
             bg.treeVert.Width:Set(1)
             bg.treeVert.Height:Set(bg.Height)
             LayoutHelpers.AtLeftTopIn(bg.treeVert, bg, 5)
-            
+
             bg.treeHorz = Bitmap(bg)
             bg.treeHorz:SetSolidColor(UIUtil.fontColor)
             bg.treeHorz.Width:Set(6)
             bg.treeHorz.Height:Set(1)
-            
+
             LayoutHelpers.AtLeftIn(bg.treeHorz, bg, 5)
             LayoutHelpers.AtVerticalCenterIn(bg.treeHorz, bg)
             LayoutHelpers.RightOf(bg.text, bg.check, 5)
@@ -832,12 +832,12 @@ function CreateFilterDropout(parent)
             LayoutHelpers.RightOf(bg.check, bg.treeHorz)
             LayoutHelpers.AtVerticalCenterIn(bg.check, bg)
         end
-        
+
         bg.Height:Set(function() return bg.text.Height() + 4 end)
-        
+
         return bg
     end
-    
+
     local function ProcessItems(table, index, maxWidth, title, type, tooltip)
         if title and type then
             bg.items[index] = CreateEntry(bg, {Label = title, Type = type}, true)
@@ -874,30 +874,30 @@ function CreateFilterDropout(parent)
         end
         return index, maxWidth
     end
-    
+
     local maxWidth = 0
     local index = 1
-    
+
     index, maxWidth = ProcessItems(filterConditionals, index, maxWidth, '<LOC filters_0002>Conditions', 3, "overlay_conditions")
     index, maxWidth = ProcessItems(weaponFilters, index, maxWidth, '<LOC filters_0000>Military', 1, "overlay_military")
     index, maxWidth = ProcessItems(intelFilters, index, maxWidth, '<LOC filters_0001>Intel', 2, "overlay_intel")
-    
+
     SetTitleCheck(1)
     SetTitleCheck(2)
     SetTitleCheck(3)
-    
+
     local totalHeight = 0
     for _, filter in bg.items do
         totalHeight = filter.Height() + totalHeight
         filter.Width:Set(maxWidth)
     end
-    
+
     local function SetItemAlpha(alpha)
         for _, item in bg.items do
             item:SetAlpha(alpha, true)
         end
     end
-        
+
     bg.Height:Set(30)
     bg.Width:Set(5)
     bg.Left:Set(function() return controls.bg.Right() + 36 end)
@@ -960,9 +960,9 @@ function CreateFilterDropout(parent)
             end
         end
     end
-    
+
     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_MFD_checklist'}))
-    
+
     bg.MouseClickFunc = function(event)
         if bg.Active then
             if (event.x < bg.Left() or event.x > bg.Right()) or (event.y < bg.Top() or event.y > bg.Bottom()) then
@@ -973,64 +973,64 @@ function CreateFilterDropout(parent)
             UIMain.RemoveOnMouseClickedFunc(bg.MouseClickFunc)
         end
     end
-    
+
     UIMain.AddOnMouseClickedFunc(bg.MouseClickFunc)
-    
+
     bg.MouseClickFunc.OnDestroy = function(self)
         UIMain.RemoveOnMouseClickedFunc(bg.MouseClickFunc)
     end
-    
+
     parent.list = bg
 end
 
 function CreateDropoutBG(createConnector)
     local bg = Bitmap(controls.bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
-    
+
     if createConnector != false then
         bg.connector = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
         LayoutHelpers.AtVerticalCenterIn(bg.connector, controls.bg)
         bg.connector.Left:Set(function() return controls.bg.Right() - 2 end)
         bg.connector.Depth:Set(function() return bg.Depth() - 5 end)
     end
-    
+
     bg.bgTL = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
     bg.bgTL.Bottom:Set(bg.Top)
     bg.bgTL.Right:Set(bg.Left)
-    
+
     bg.bgTR = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
     bg.bgTR.Bottom:Set(bg.Top)
     bg.bgTR.Left:Set(bg.Right)
-    
+
     bg.bgTM = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
     bg.bgTM.Bottom:Set(bg.Top)
     bg.bgTM.Left:Set(bg.bgTL.Right)
     bg.bgTM.Right:Set(bg.bgTR.Left)
-    
+
     bg.bgBL = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
     bg.bgBL.Top:Set(bg.Bottom)
     bg.bgBL.Right:Set(bg.Left)
-    
+
     bg.bgBR = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
     bg.bgBR.Top:Set(bg.Bottom)
     bg.bgBR.Left:Set(bg.Right)
-    
+
     bg.bgBM = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
     bg.bgBM.Top:Set(bg.Bottom)
     bg.bgBM.Left:Set(bg.bgTL.Right)
     bg.bgBM.Right:Set(bg.bgTR.Left)
-    
+
     bg.bgL = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
     bg.bgL.Top:Set(bg.Top)
     bg.bgL.Bottom:Set(bg.Bottom)
     bg.bgL.Right:Set(bg.Left)
-    
+
     bg.bgR = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
     bg.bgR.Top:Set(bg.Top)
     bg.bgR.Bottom:Set(bg.Bottom)
     bg.bgR.Left:Set(bg.Right)
-    
+
     bg:DisableHitTest(true)
-    
+
     return bg
 end
 
