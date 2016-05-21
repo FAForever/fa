@@ -455,7 +455,7 @@ function _OnBeat()
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         currentScores = false -- dont render score UI until next score update
     end
-    
+
     if observerLine then
         if GetFocusArmy() == -1 then
             observerLine.name:SetColor('ffff7f00')

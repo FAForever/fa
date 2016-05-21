@@ -285,10 +285,10 @@ function UpdateWindow(info)
 
         if info.health then
             controls.healthBar:Show()
-            
+
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
-            
+
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
                 controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
@@ -506,7 +506,7 @@ function CreateUI()
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
-    
+
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
         if not info and selectedUnit then
@@ -536,7 +536,7 @@ function OnSelection(units)
     if options.gui_enhanced_unitview == 0 then
         return
     end
-    
+
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else
