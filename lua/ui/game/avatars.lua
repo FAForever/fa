@@ -22,11 +22,8 @@ local Factions = import('/lua/factions.lua').Factions
 local options = Prefs.GetFromCurrentProfile('options')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 
-controls = {
-    avatars = {},
-    idleEngineers = false,
-    idleFactories = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.avatars = controls.avatars or {}
 
 local recievingBeatUpdate = false
 local currentFaction = GetArmiesTable().armiesTable[GetFocusArmy()].faction

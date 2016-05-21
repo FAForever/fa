@@ -40,13 +40,8 @@ local needsSquadLayoutPostNIS = false
 local preCreationQueue = {}
 local preCreationWaitThread = false
 
-controls = {
-    parent = false,
-    bg = false,
-    objItems = {},
-    tooltip = false,
-    movie = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.objItems = controls.objItems or {}
 
 function CreateUI(inParent)
     controls.parent = inParent

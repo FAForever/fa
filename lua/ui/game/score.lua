@@ -21,7 +21,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-controls = {}
+controls = import('/lua/ui/controls.lua').Get()
+
 savedParent = false
 local observerLine = false
 
