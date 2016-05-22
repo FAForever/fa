@@ -485,10 +485,13 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     local icon = "land"
-    if unitID and unitID ~= 'default' and not validIcons[bp.General.Icon] then
-        if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
-        bp.General.Icon = "land"
-        icon = bp.General.Icon
+    if unitID and unitID ~= 'default' then
+		if not validIcons[bp.General.Icon] then
+			if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
+			bp.General.Icon = "land"
+		else
+			icon = bp.General.Icon
+		end
     end
     return UIUtil.UIFile('/icons/units/' .. icon .. '_up.dds'),
            UIUtil.UIFile('/icons/units/' .. icon .. '_down.dds'),
