@@ -360,8 +360,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
-                local currentSlot = FindSlotForID(localPlayerID)
-                HostUtils.MovePlayerToEmptySlot(currentSlot, slot)
+                HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
                                    RequestedSlot = slot})
@@ -415,7 +414,7 @@ local function DoSlotBehavior(slot, key, name)
             HostUtils.AddAI(name, key, slot)
         end
     end
-
+    LblPlayerRatingMapview()
 end --\\ End DoSlotBehavior()
 
 local function IsModAvailable(modId)
@@ -723,7 +722,6 @@ function SetSlotInfo(slotNum, playerInfo)
     local slot = GUI.slots[slotNum]
     local isHost = lobbyComm:IsHost()
     local isLocallyOwned = IsLocallyOwned(slotNum)
-    local ratingLabel = GUI.mapView.ratingLabel[slotNum]
 
     -- Set enabledness of controls according to host privelage etc.
     -- Yeah, we set it twice. No, it's not brilliant. Blurgh.
@@ -817,15 +815,6 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.ratingText:SetText(playerInfo.PL)
     slot.ratingText:SetColor(playerInfo.RC)
 
-    -- Showing the rating labels on the map preview
-    ratingLabel:Show()
-    if slotState == 'ai' then
-        ratingLabel:SetText(playerInfo.PlayerName)
-    else
-        ratingLabel:SetText(playerInfo.PL)
-    end
-
-
     slot.numGamesText:Show()
     slot.numGamesText:SetText(playerInfo.NG)
 
@@ -908,11 +897,11 @@ function SetSlotInfo(slotNum, playerInfo)
 
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotNum)
+    LblPlayerRatingMapview()
 end
 
 function ClearSlotInfo(slotIndex)
     local slot = GUI.slots[slotIndex]
-    local ratingLabel = GUI.mapView.ratingLabel[slotIndex]
 
     local hostKey
     if lobbyComm:IsHost() then
@@ -956,11 +945,11 @@ function ClearSlotInfo(slotIndex)
     end
 
     slot:HideControls()
-    ratingLabel:Hide()
 
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
+    LblPlayerRatingMapview()
 end
 
 function IsColorFree(colorIndex)
@@ -1005,6 +994,7 @@ local function GetRandomFactionIndex()
     end
     return randomfaction
 end
+
 
 local function AssignRandomFactions()
     local randomFactionID = table.getn(FactionData.Factions) + 1
@@ -5444,4 +5434,133 @@ function InitHostUtils()
             return -1
         end
     }
+end
+
+
+function DestroyLblPlayerRatingMapPreview()
+    if GUI.mapViewPlayerRating_1 then GUI.mapViewPlayerRating_1:Destroy() end
+    if GUI.mapViewPlayerRating_2 then GUI.mapViewPlayerRating_2:Destroy() end
+    if GUI.mapViewPlayerRating_3 then GUI.mapViewPlayerRating_3:Destroy() end
+    if GUI.mapViewPlayerRating_4 then GUI.mapViewPlayerRating_4:Destroy() end
+    if GUI.mapViewPlayerRating_5 then GUI.mapViewPlayerRating_5:Destroy() end
+    if GUI.mapViewPlayerRating_6 then GUI.mapViewPlayerRating_6:Destroy() end
+    if GUI.mapViewPlayerRating_7 then GUI.mapViewPlayerRating_7:Destroy() end
+    if GUI.mapViewPlayerRating_8 then GUI.mapViewPlayerRating_8:Destroy() end
+    if GUI.mapViewPlayerRating_9 then GUI.mapViewPlayerRating_9:Destroy() end
+    if GUI.mapViewPlayerRating_10 then GUI.mapViewPlayerRating_10:Destroy() end
+    if GUI.mapViewPlayerRating_11 then GUI.mapViewPlayerRating_11:Destroy() end
+    if GUI.mapViewPlayerRating_12 then GUI.mapViewPlayerRating_12:Destroy() end
+end
+
+function LblPlayerRatingMapview()
+
+    local scenarioInfo
+
+    --Check if scenario is selected
+    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    else
+        DestroyLblPlayerRatingMapPreview()
+        return
+    end
+
+    -- ugly destruction of all existing labels on the map preview
+    DestroyLblPlayerRatingMapPreview()
+    if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+        return
+    end
+
+    local marker_left = 0
+    local marker_top = 0
+    local rating = 0
+
+    for slots, player in gameInfo.PlayerOptions:pairs() do
+        --check if peer
+        if player.Human and player.OwnerID ~= localPlayerID then
+            local peer = lobbyComm:GetPeer(player.OwnerID)
+            local peerSlot = FindSlotForID(peer.id)
+            local playerInfo = gameInfo.PlayerOptions[peerSlot]
+            local PeerRating = playerInfo.PL
+            rating = PeerRating
+        elseif player.Human and (player.OwnerID == localPlayerID) then --check if local player
+            local myPlayerData = GetLocalPlayerData()
+            rating = myPlayerData.PL
+        else --what is left should be AI, so just insert name instead of rank
+            rating = player.PlayerName
+        end
+
+        if not slots then
+            return
+        end
+
+        -- we need to do this because of windows resizing
+        marker_left     = GUI.mapView.startPositions[slots].Left()-((GUI.Width()-GUI.panel.Width())/2) -9
+        marker_top      = GUI.mapView.startPositions[slots].Top()-((GUI.Height()-GUI.panel.Height())/2) -11
+
+        local lblDepth  = 4
+        local ratingLabelTextSize = 10
+
+        ---Create labels, it's dumb, but it works
+        ---lets hope there are never more than 12 players on a map
+        if slots == 1 then
+        GUI.mapViewPlayerRating_1 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_1, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_1, GUI.mapPanel, lblDepth)
+        end
+        if slots == 2 then
+        GUI.mapViewPlayerRating_2 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_2, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_2, GUI.mapPanel, lblDepth)
+        end
+        if slots == 3 then
+        GUI.mapViewPlayerRating_3 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_3, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_3, GUI.mapPanel, lblDepth)
+        end
+        if slots == 4 then
+        GUI.mapViewPlayerRating_4 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_4, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_4, GUI.mapPanel, lblDepth)
+        end
+        if slots == 5 then
+        GUI.mapViewPlayerRating_5 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_5, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_5, GUI.mapPanel, lblDepth)
+        end
+        if slots == 6 then
+        GUI.mapViewPlayerRating_6 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_6, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_6, GUI.mapPanel, lblDepth)
+        end
+        if slots == 7 then
+        GUI.mapViewPlayerRating_7 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_7, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_7, GUI.mapPanel, lblDepth)
+        end
+        if slots == 8 then
+        GUI.mapViewPlayerRating_8 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_8, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_8, GUI.mapPanel, lblDepth)
+        end
+        if slots == 9 then
+        GUI.mapViewPlayerRating_9 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_9, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_9, GUI.mapPanel, lblDepth)
+        end
+        if slots == 10 then
+        GUI.mapViewPlayerRating_10 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_10, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_10, GUI.mapPanel, lblDepth)
+        end
+        if slots == 11 then
+        GUI.mapViewPlayerRating_11 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_11, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_11, GUI.mapPanel, lblDepth)
+        end
+        if slots == 12 then
+        GUI.mapViewPlayerRating_12 = UIUtil.CreateText(GUI.panel, rating, ratingLabelTextSize, 'Arial Gras', true)
+        LayoutHelpers.AtLeftTopIn(GUI.mapViewPlayerRating_12, GUI.panel, marker_left, marker_top)
+        LayoutHelpers.DepthOverParent(GUI.mapViewPlayerRating_12, GUI.mapPanel, lblDepth)
+        end
+    end
 end

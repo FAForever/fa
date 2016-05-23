@@ -31,7 +31,6 @@ ResourceMapPreview = Class(Group) {
         self.hydromarkers = {}
         self.wreckagemarkers = {}
         self.startPositions = {}
-        self.ratingLabel = {}
 
         self.mapPreview = MapPreview(self)
         self.mapPreview.Width:Set(size)
@@ -57,14 +56,9 @@ ResourceMapPreview = Class(Group) {
             v:Destroy()
         end
 
-        for k, v in pairs(self.ratingLabel) do
-            v:Destroy()
-        end
-
         self.massmarkers = {}
         self.hydromarkers = {}
         self.startPositions = {}
-        self.ratingLabel = {}
     end,
 
     --- Delete all resource markers and clear the map preview.
@@ -204,13 +198,10 @@ ResourceMapPreview = Class(Group) {
 
             -- Create an ACUButton for each start position.
             local marker = ACUButton(self.mapPreview, not self.buttonsDisabled)
-            local markerWidth = xOffset + ((pos[1] / mWidth) * self.size * xFactor) - (marker.Width() / 2)
-            local markerHeight = yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2)
-            LayoutHelpers.AtLeftTopIn(marker, self.mapPreview, markerWidth, markerHeight)
 
-            -- Create Labels above markers to show rating of player or AI names
-            self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
-            LayoutHelpers.AtLeftTopIn(self.ratingLabel[slot], self.mapPreview, markerWidth-9, markerHeight-11)
+            LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
+                xOffset + ((pos[1] / mWidth) * self.size * xFactor) - (marker.Width() / 2),
+                yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2))
 
             startPositions[slot] = marker
         end
