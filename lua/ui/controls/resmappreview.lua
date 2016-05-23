@@ -211,6 +211,7 @@ ResourceMapPreview = Class(Group) {
             -- Create Labels above markers to show rating of player or AI names
             self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
             LayoutHelpers.AtLeftTopIn(self.ratingLabel[slot], self.mapPreview, markerWidth-9, markerHeight-11)
+            --self.ratingLabels[slot]:Hide()
 
             startPositions[slot] = marker
         end

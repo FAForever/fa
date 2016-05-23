@@ -1006,6 +1006,7 @@ local function GetRandomFactionIndex()
     return randomfaction
 end
 
+
 local function AssignRandomFactions()
     local randomFactionID = table.getn(FactionData.Factions) + 1
     for index, player in gameInfo.PlayerOptions do
