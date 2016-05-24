@@ -65,6 +65,8 @@ local Warning_MAP = false
 local LrgMap = false
 
 local HostUtils
+local mapPreviewSlotSwapFrom = 0
+local mapPreviewSlotSwap = false
 
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
@@ -3369,6 +3371,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         else
                             lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
                         end
+                        -- if first click is a not empty slot and second click is a empty slot: reset vars
+                        if mapPreviewSlotSwap == true then
+                            mapPreviewSlotSwap = false
+                            mapPreviewSlotSwapFrom = 0
+                        end
                     elseif IsObserver(localPlayerID) then
                         if lobbyComm:IsHost() then
                             local requestedFaction = GetSanitisedLastFaction()
@@ -3383,6 +3390,15 @@ function ConfigureMapListeners(mapCtrl, scenario)
                                 }
                             )
                         end
+                    end
+                else -- swap players on map preview
+                    if lobbyComm:IsHost() and mapPreviewSlotSwap == false then
+                        mapPreviewSlotSwapFrom = slot
+                        mapPreviewSlotSwap = true
+                    elseif lobbyComm:IsHost() and mapPreviewSlotSwap == true and mapPreviewSlotSwapFrom ~= slot then
+                        mapPreviewSlotSwap = false
+                        DoSlotBehavior(mapPreviewSlotSwapFrom, 'move_player_to_slot' .. slot, '')
+                        mapPreviewSlotSwapFrom = 0
                     end
                 end
             else
