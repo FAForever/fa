@@ -5197,8 +5197,7 @@ function InitHostUtils()
 
             -- Move the observer into the slot the first player came from.
             HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
-            WARN(fromOpts.PlayerName)
-            WARN(toOpts.PlayerName)
+
             -- %s has switched with %s
             SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
         end,
