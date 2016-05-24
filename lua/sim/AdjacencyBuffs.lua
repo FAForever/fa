@@ -58,6 +58,11 @@ for a, buffs in adj do
             local size = i * 4
             local display_name = a .. t
             local name = display_name .. 'Size' .. size
+            local category = 'STRUCTURE SIZE' .. size
+
+            if t == 'RateOfFire' and size == 4 then
+                category = category .. ' ARTILLERY'
+            end
 
             BuffBlueprint {
                 Name = name,
@@ -65,7 +70,7 @@ for a, buffs in adj do
                 BuffType = string.upper(t) .. 'BONUS',
                 Stacks = 'ALWAYS',
                 Duration = -1,
-                EntityCategory = 'STRUCTURE SIZE' .. size,
+                EntityCategory = category,
                 BuffCheckFunction = AdjBuffFuncs[t .. 'BuffCheck'],
                 OnBuffAffect = AdjBuffFuncs.DefaultBuffAffect,
                 OnBuffRemove = AdjBuffFuncs.DefaultBuffRemove,
