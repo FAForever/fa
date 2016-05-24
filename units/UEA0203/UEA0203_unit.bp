@@ -109,6 +109,7 @@ UnitBlueprint {
         'TECH2',
         'GROUNDATTACK',
         'TRANSPORTATION',
+        'TRANSPORTFOCUS',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
