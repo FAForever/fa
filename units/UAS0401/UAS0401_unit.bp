@@ -440,7 +440,7 @@ UnitBlueprint {
         {
             Audio = {
                 Fire = Sound {
-                    Bank = 'UALWeapon',
+                    Bank = 'UASWeapon',
                     Cue = 'UAS0201_Depth_Charge',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
