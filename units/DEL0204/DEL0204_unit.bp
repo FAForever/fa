@@ -152,7 +152,7 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'land',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC del0204_name>Mongoose',
         UnitWeight = 1,
     },

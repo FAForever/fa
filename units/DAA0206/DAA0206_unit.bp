@@ -184,7 +184,7 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC daa0206_name>Mercy',
         UnitWeight = 1,
     },

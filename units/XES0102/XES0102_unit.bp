@@ -160,7 +160,7 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'sea',
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xes0102_name>Cooper',
         UnitWeight = 1,
     },

@@ -164,7 +164,7 @@ UnitBlueprint {
                 helpText = 'toggle_sonar',
             },
         },
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
         },

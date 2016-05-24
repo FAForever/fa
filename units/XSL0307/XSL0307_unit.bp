@@ -230,7 +230,7 @@ UnitBlueprint {
                 helpText = 'toggle_shield_dome',
             },
         },
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_ShieldToggle = true,
         },

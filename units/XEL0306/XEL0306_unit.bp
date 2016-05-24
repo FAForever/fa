@@ -144,7 +144,7 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'land',
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xel0306_name>Spearhead',
         UnitWeight = 1,
     },

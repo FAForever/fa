@@ -140,7 +140,7 @@ UnitBlueprint {
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xrl0302_name>Fire Beetle',
         UnitWeight = 1,
     },

@@ -142,7 +142,7 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xeb2402_name>Novax Center',
         UnitWeight = 1,
     },
