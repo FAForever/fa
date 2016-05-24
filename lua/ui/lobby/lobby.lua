@@ -5208,7 +5208,7 @@ function InitHostUtils()
             )
 
             -- %s has joined as an observer.
-            SendSystemMessage("lobui_0202", observerName)
+            SendSystemMessage("lobui_0202", observerData.PlayerName)
             refreshObserverList()
         end,
 
