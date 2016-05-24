@@ -68,12 +68,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_stun>EMP Weapon',
         },
-        AnimationDeath = {
-            {
-                Animation = '/units/URL0103/URL0103_adeath01.sca',
-                Weight = 100,
-            },
-        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
