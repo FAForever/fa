@@ -65,7 +65,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'DRAGBUILD',
         'SORTINTEL',
-		'NAVAL',
+        'NAVAL',
     },
     CollisionOffsetY = -0.25,
     Defense = {
