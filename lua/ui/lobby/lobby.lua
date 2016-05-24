@@ -1488,7 +1488,6 @@ function UpdateAvailableSlots( numAvailStartSpots )
     numOpenSlots = numAvailStartSpots
     for i = 1, numAvailStartSpots do
         if gameInfo.ClosedSlots[i] then
-            gameInfo.ClosedSlots[i] = nil
             GUI.slots[i]:Show()
             if not gameInfo.PlayerOptions[i] then
                 ClearSlotInfo(i)
