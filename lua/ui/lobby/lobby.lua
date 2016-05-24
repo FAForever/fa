@@ -414,7 +414,7 @@ local function DoSlotBehavior(slot, key, name)
             HostUtils.AddAI(name, key, slot)
         end
     end
-end --\\ End DoSlotBehavior()
+end
 
 local function IsModAvailable(modId)
     for k,v in availableMods do
@@ -721,6 +721,7 @@ function SetSlotInfo(slotNum, playerInfo)
     local slot = GUI.slots[slotNum]
     local isHost = lobbyComm:IsHost()
     local isLocallyOwned = IsLocallyOwned(slotNum)
+    local ratingLabel = GUI.mapView.ratingLabel[slotNum]
 
     -- Set enabledness of controls according to host privelage etc.
     -- Yeah, we set it twice. No, it's not brilliant. Blurgh.
@@ -814,6 +815,15 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.ratingText:SetText(playerInfo.PL)
     slot.ratingText:SetColor(playerInfo.RC)
 
+    -- Showing the rating labels on the map preview
+    ratingLabel:Show()
+    if slotState == 'ai' then
+        ratingLabel:SetText(playerInfo.PlayerName)
+    else
+        ratingLabel:SetText(playerInfo.PL)
+    end
+
+
     slot.numGamesText:Show()
     slot.numGamesText:SetText(playerInfo.NG)
 
@@ -900,6 +910,7 @@ end
 
 function ClearSlotInfo(slotIndex)
     local slot = GUI.slots[slotIndex]
+    local ratingLabel = GUI.mapView.ratingLabel[slotIndex]
 
     local hostKey
     if lobbyComm:IsHost() then
@@ -943,6 +954,7 @@ function ClearSlotInfo(slotIndex)
     end
 
     slot:HideControls()
+    ratingLabel:Hide()
 
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
@@ -979,6 +991,7 @@ local function GetPlayersNotReady()
             table.insert(notReady, v.PlayerName)
         end
     end
+
     return notReady
 end
 
@@ -991,7 +1004,6 @@ local function GetRandomFactionIndex()
     end
     return randomfaction
 end
-
 
 local function AssignRandomFactions()
     local randomFactionID = table.getn(FactionData.Factions) + 1
