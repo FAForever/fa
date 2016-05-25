@@ -229,8 +229,21 @@ function GetLocallyAvailableMods()
     return result
 end
 
+-- Get List of selected mods and check if they still exist.
 function GetSelectedMods()
-    return GetPreference('active_mods') or {}
+    local ModsFromGamePrefs = GetPreference('active_mods') or {}
+    local ModsFromDisk= {}
+    for modid,moddata in AllMods() do
+        ModsFromDisk[moddata.uid] = true
+    end
+    for modid in ModsFromGamePrefs do
+        if not ModsFromDisk[modid] then
+            SPEW('Mod ID='..modid..' is selected as active mod, but missing on Disk!')
+            ModsFromGamePrefs[modid] = nil
+            SetPreference('active_mods', ModsFromGamePrefs)
+        end
+    end
+    return ModsFromGamePrefs
 end
 
 function GetSelectedSimMods()
