@@ -65,7 +65,7 @@ UnitBlueprint {
         },
         Thruster = Sound {
             Bank = 'URA',
-            Cue = 'URA0203_Move_Thruster',
+            Cue = 'URA0103_Move_Thruster',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {

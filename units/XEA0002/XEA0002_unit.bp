@@ -47,7 +47,7 @@ UnitBlueprint {
         },
         Thruster = Sound {
             Bank = 'XEA',
-            Cue = 'XEA0002_Move_Thruster',
+            Cue = 'XEA0306_Move_Thruster',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {

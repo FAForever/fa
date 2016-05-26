@@ -18,7 +18,7 @@ UnitBlueprint {
         },
         Killed = Sound {
             Bank = 'UESDestroy',
-            Cue = 'UES0305_Destroy',
+            Cue = 'UES_Expl_Underwater',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         StartMove = Sound {
