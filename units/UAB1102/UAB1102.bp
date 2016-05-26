@@ -1,0 +1,7 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = "uab1102",
+    General = {
+        Icon = 'amph',
+    },
+}
