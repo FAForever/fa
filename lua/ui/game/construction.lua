@@ -1059,7 +1059,7 @@ function OnRolloverHandler(button, state)
         end
     else
         if state == 'enter' then
-            if item.type == 'item' then
+            if item.type == 'item' or item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
                 UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
             elseif item.type == 'enhancement' then
                 UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
