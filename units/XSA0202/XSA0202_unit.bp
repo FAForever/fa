@@ -227,7 +227,7 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'air',
         TarmacGlowDecal = 0.5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xsa0202_name>Notha',
         UnitWeight = 1,
     },
@@ -457,7 +457,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 60, # 45
             MuzzleSalvoDelay = 0,

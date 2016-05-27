@@ -65,7 +65,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'DRAGBUILD',
         'SORTINTEL',
-		'NAVAL',
+        'NAVAL',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -164,7 +164,7 @@ UnitBlueprint {
                 helpText = 'toggle_sonar',
             },
         },
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
         },

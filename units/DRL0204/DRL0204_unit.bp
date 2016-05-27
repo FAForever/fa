@@ -1,10 +1,10 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'Torso',		
-			'Turret_Barrel',
-		},
-	},
+    AI = {
+        TargetBones = {
+            'Torso',        
+            'Turret_Barrel',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -162,7 +162,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC drl0204_name>Hoplite',
         UnitWeight = 1,
     },
