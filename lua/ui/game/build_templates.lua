@@ -36,7 +36,7 @@ end
 function GetInitialName(template)
     for _, entry in template do
         if type(entry) != 'table' then continue end
-        return __blueprints[entry[1]].Description
+        return (string.gsub(__blueprints[entry[1]].Description, '^<[^>]*>', '')) -- removes <LOC xyz_desc> from name
     end
 end
 
@@ -44,11 +44,15 @@ function GetInitialIcon(template)
     for _, entry in template do
         if type(entry) != 'table' then continue end
         if DiskGetFileInfo('/textures/ui/common/icons/units/'..entry[1]..'_icon.dds') then
-            return entry[1]
+            return entry[1] -- Original unit found
         else
-            return false
+            local UIUtil = import('/lua/ui/uiutil.lua')
+            if UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds', true) then
+                return entry[1] -- Modded unit found.
+            end
         end
     end
+    return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
 function AddTemplate(newTemplate)
