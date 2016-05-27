@@ -1,7 +1,0 @@
-UnitBlueprint {
-    Merge = true,
-    BlueprintId = "xsb1102",
-    General = {
-        Icon = 'amph',
-    },
-}
