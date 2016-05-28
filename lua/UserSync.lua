@@ -77,4 +77,8 @@ function OnSync()
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
         end
     end
+	
+    if Sync.EnforceRating then
+        GpgNetSend('EnforceRating')
+    end
 end
