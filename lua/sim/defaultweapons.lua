@@ -1269,7 +1269,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local pos = proj:GetPosition()
         local army = launcher:GetArmy()
         local brain = launcher:GetAIBrain()
-        local damageType = 'Deathnuke'
+        local damageType = bp.DamageType
         proj.InnerRing:DoNukeDamage(launcher, pos, brain, army, damageType)
         proj.OuterRing:DoNukeDamage(launcher, pos, brain, army, damageType)
         
