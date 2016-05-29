@@ -40,11 +40,13 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     end
 
     if bombs_left[id] ~= nil then -- bomber will drop several bombs
-        -- calculate the total length of the carpet bombing, this is multiplied by 0.5
+        -- calculate space between bombs, this is multiplied by 0.5
         -- to get the bombs overlapping a bit
         local len = MuzzleSalvoDelay * dist.vel * 0.5
+        local current_bomb = MuzzleSalvoSize - bombs_left[id]
+
         -- calculate the position for this particular bomb
-        dist.pos = dist.pos + (len * MuzzleSalvoSize)/2 - len*bombs_left[id]
+        dist.pos = dist.pos - (len * (MuzzleSalvoSize - 1)) / 2 + len * current_bomb
         bombs_left[id] = bombs_left[id] > 1 and bombs_left[id] - 1 or nil
     end
 
