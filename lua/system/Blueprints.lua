@@ -86,15 +86,54 @@ end
 
 
 local function StoreBlueprint(group, bp)
-    local id = bp.BlueprintId
-    local t = original_blueprints[group]
-
-    if t[id] and bp.Merge then
-        bp.Merge = nil
-        bp.Source = nil
-        t[id] = table.merged(t[id], bp)
-    else
-        t[id] = bp
+    local function Store(group, bp, targetid)
+        local t = original_blueprints[group]
+        if t[targetid] and bp.Merge then
+            bp.Merge = nil
+            bp.Source = nil
+            t[targetid] = table.merged(t[targetid], bp)
+        else
+            t[targetid] = bp
+        end
+    end
+    local function StoreMulti(group, bp, targettable)
+        local Source = bp.Source
+        local Merge = true
+        for targetid in targettable do
+            bp.Merge = Merge
+            bp.Source = Source
+            bp.BlueprintId = targetid
+            Store(group, bp, targetid)
+        end
+    end
+    if bp.Merge and type(bp.Merge) == 'table' then
+        local SearchCAT = {}
+        local targetBP = {}
+        local needmatch = 0
+        for _, cat in bp.Merge do
+            SearchCAT[cat] = true
+            needmatch = needmatch + 1
+        end
+        local t = original_blueprints[group]
+        for tid, tbp in t do
+            local hit = 0
+            if tbp.Categories then
+                for _, cat in tbp.Categories do
+                    if SearchCAT[cat] then
+                        hit = hit + 1
+                    end
+                end
+            end
+            if hit == needmatch then
+                targetBP[tid] = true
+            end
+        end
+        StoreMulti(group, bp, targetBP)
+    elseif type(bp.BlueprintId) == 'string' then
+        local targetid = bp.BlueprintId
+        Store(group, bp, targetid)
+    elseif type(bp.BlueprintId) == 'table' then
+        StoreMulti(group, bp, bp.BlueprintId)
     end
 end
 --
