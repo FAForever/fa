@@ -1,5 +1,4 @@
-
-Patch 3654 (May 19, 2016)
+Patch 3654 (May 30, 2016)
 ============================
 **Reverted**
 - The change in 3652 which refreshed intel for a blip on upgrade had unintentional free intel side effects we have been unable to solve. As such, that change has been reversed
