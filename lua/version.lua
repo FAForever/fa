@@ -1,3 +1,3 @@
 function GetVersion()
-    return "3652"
+    return "3654"
 end
