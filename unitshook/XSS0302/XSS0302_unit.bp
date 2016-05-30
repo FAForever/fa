@@ -1,0 +1,9 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = "xss0302",
+    General = {
+        CommandCaps = {
+            RULEUCC_Pause = true,
+        },
+    },
+}
