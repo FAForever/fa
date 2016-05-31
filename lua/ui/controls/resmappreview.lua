@@ -208,6 +208,9 @@ ResourceMapPreview = Class(Group) {
             local markerHeight = yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2)
             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview, markerWidth, markerHeight)
 
+            -- TODO: Create a text box for the rating label, and position it relative to the ACUButton.
+            -- The ACUButton we just made is the little icon representing the player.
+
             -- Create Labels above markers to show rating of player or AI names
             self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
             LayoutHelpers.AtLeftTopIn(self.ratingLabel[slot], self.mapPreview, markerWidth-9, markerHeight-11)
@@ -216,6 +219,30 @@ ResourceMapPreview = Class(Group) {
         end
 
         self.startPositions = startPositions
+    end,
+
+    --- Update the representation of a particular player.
+    -- @param slot The slot index of the player to update.
+    -- @param playerInfo The player's PlayerInfo object.
+    -- @param hideColours A flag indicating if the player's colour should be shown or now.
+    UpdatePlayer = function(self, slotIndex, playerInfo, hideColours)
+        -- The ACUButton instance representing this slot, if any.
+        local marker = self.startPositions[slotIndex]
+
+        if hideColours then
+            marker:SetColor("00777777")
+        else
+            -- If spawns are fixed, show the colour/team of the person in this slot.
+            if playerInfo then
+                marker:SetColor(gameColors.PlayerColors[playerInfo.PlayerColor])
+                marker:SetTeam(playerInfo.Team)
+            else
+                marker:Clear()
+            end
+        end
+
+        -- TODO: Update the contents of the rating label text box with the rating value in playerInfo.
+
     end,
 
     OnDestroy = function(self)

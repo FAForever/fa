@@ -3277,21 +3277,11 @@ function RefreshMapPosition(mapCtrl, slotIndex)
         marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
     end
 
+    mapCtrl:UpdatePlayer(slotIndex, playerInfo, gameInfo.GameOptions['TeamSpawn'] == 'random')
+
     -- Nothing more for us to do for a closed or missing slot.
     if gameInfo.ClosedSlots[slotIndex] or not marker then
         return
-    end
-
-    if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-        marker:SetColor("00777777")
-    else
-        -- If spawns are fixed, show the colour/team of the person in this slot.
-        if playerInfo then
-            marker:SetColor(gameColors.PlayerColors[playerInfo.PlayerColor])
-            marker:SetTeam(playerInfo.Team)
-        else
-            marker:Clear()
-        end
     end
 
     if gameInfo.GameOptions.AutoTeams then
