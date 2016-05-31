@@ -3755,7 +3755,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --- Returns true if the given option has the given key as a valid setting.
         local function keyIsValidForOption(option, key)
             for k, v in option.values do
-                if v.key or v == key then
+                if v.key == key or v == key then
                     return true
                 end
             end
