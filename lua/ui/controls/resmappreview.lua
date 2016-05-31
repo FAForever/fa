@@ -5,6 +5,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local TexturePool = import('/lua/ui/texturepool.lua').TexturePool
 local ACUButton = import('/lua/ui/controls/acubutton.lua').ACUButton
+local gameColors = import('/lua/gameColors.lua').GameColors
 
 -- The default size of the mass/hydrocarbon icons
 local DEFAULT_HYDROCARBON_ICON_SIZE = 14
@@ -213,7 +214,7 @@ ResourceMapPreview = Class(Group) {
 
             -- Create Labels above markers to show rating of player or AI names
             self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
-            LayoutHelpers.AtLeftTopIn(self.ratingLabel[slot], self.mapPreview, markerWidth-9, markerHeight-11)
+            LayoutHelpers.CenteredAbove(self.ratingLabel[slot], marker, 5)
 
             startPositions[slot] = marker
         end
@@ -225,9 +226,9 @@ ResourceMapPreview = Class(Group) {
     -- @param slot The slot index of the player to update.
     -- @param playerInfo The player's PlayerInfo object.
     -- @param hideColours A flag indicating if the player's colour should be shown or now.
-    UpdatePlayer = function(self, slotIndex, playerInfo, hideColours)
+    UpdatePlayer = function(self, slot, playerInfo, hideColours)
         -- The ACUButton instance representing this slot, if any.
-        local marker = self.startPositions[slotIndex]
+        local marker = self.startPositions[slot]
 
         if hideColours then
             marker:SetColor("00777777")
@@ -241,8 +242,15 @@ ResourceMapPreview = Class(Group) {
             end
         end
 
-        -- TODO: Update the contents of the rating label text box with the rating value in playerInfo.
+        -- Set text to rating, or name if AI, or empty if nil playerInfo (Emptying slot)
+        local text
+        if playerInfo.Human then
+            text = playerInfo.PL
+        else
+            text = playerInfo.PlayerName or ""
+        end
 
+        self.ratingLabel[slot]:SetText(text)
     end,
 
     OnDestroy = function(self)

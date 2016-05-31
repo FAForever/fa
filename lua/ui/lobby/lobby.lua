@@ -4091,21 +4091,6 @@ function RefreshLargeMap()
     LrgMap.content.mapPreview:SetScenario(scenarioInfo, true)
     ConfigureMapListeners(LrgMap.content.mapPreview, scenarioInfo)
     ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo)
-
-    -- Showing the rating labels on the map preview
-    for i = 1, LobbyComm.maxPlayerSlots do
-        if gameInfo.PlayerOptions[i] then
-            local ratingLabel = LrgMap.content.mapPreview.ratingLabel[i]
-            local player = gameInfo.PlayerOptions[i]
-
-            ratingLabel:Show()
-            if not player.Human then
-                ratingLabel:SetText(player.PlayerName)
-            else
-                ratingLabel:SetText(player.PL)
-            end
-        end
-    end
 end
 
 --CPU Status Bar Configuration
