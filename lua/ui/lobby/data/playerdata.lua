@@ -23,7 +23,6 @@ local DEFAULT_MAPPING = {
     MEAN = 0,
     DEV = 0,
     PL = 0,  -- Rating
-    RC = "ffffffff",  -- Rating colour
     NG = 0,  -- Number of games.
 
     Country = false,

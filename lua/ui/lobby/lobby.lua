@@ -105,7 +105,6 @@ local function parseCommandlineArguments()
     local CMDLINE_ARGUMENT_KEYS = {
         ["/init"] = true,
         ["/country"] = true,
-        ["/ratingcolor"] = true,
         ["/numgames"] = true,
         ["/mean"] = true,
         ["/clan"] = true,
@@ -126,7 +125,6 @@ local function parseCommandlineArguments()
     return {
         PrefLanguage = tostring(string.lower(GetCommandLineArgOrDefault("/country", "world"))),
         initName = GetCommandLineArgOrDefault("/init", ""),
-        ratingColor = GetCommandLineArgOrDefault("/ratingcolor", "ffffffff"),
         numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
         playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
@@ -342,7 +340,6 @@ function GetLocalPlayerData()
             Faction = GetSanitisedLastFaction(),
             PlayerClan = argv.playerClan,
             PL = playerRating,
-            RC = argv.ratingColor,
             NG = argv.numGames,
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
@@ -713,6 +710,30 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
+--- Players with a higher deviation have their rating colour tarnished, to make smurfs easier to
+-- detect.
+function GetRatingColour(deviation)
+    if deviation < 100 then
+        return "ffffffff"
+    end
+
+    if deviation > 150 then
+        return "ff333333"
+    end
+
+    -- Linear scale of greyness in between.
+
+    -- Fraction of the way between 100 and 150 we are.
+    local greynessFraction = (deviation - 100) / 50
+
+    -- Grey colour value we want (value between 0 and 255). 51 is 0x33.
+    local greyness = 51 + (1 - greynessFraction) * 204
+
+    -- Shoehorn that into a colour value string. Madly, because Lua.
+    local value = string.format('%02x', greyness)
+    return "ff" .. value .. value .. value
+end
+
 local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
 
 -- update the data in a player slot
@@ -824,7 +845,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     slot.ratingText:Show()
     slot.ratingText:SetText(playerInfo.PL)
-    slot.ratingText:SetColor(playerInfo.RC)
+    slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
 
     slot.numGamesText:Show()
     slot.numGamesText:SetText(playerInfo.NG)
