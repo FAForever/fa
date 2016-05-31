@@ -221,6 +221,7 @@ ResourceMapPreview = Class(Group) {
     OnDestroy = function(self)
         self.massIconPool:Destroy()
         self.hydroIconPool:Destroy()
+        self.wreckageIconPool:Destroy()
         Group.OnDestroy(self)
     end
 }
