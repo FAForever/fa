@@ -1,3 +1,21 @@
+Patch 3656 (Upcoming)
+============================
+
+**UI**
+- UEF T2 Gunship will now display the transport icon when selected and hovering the mouse over one of your units
+- Fixed typo in Seraphim ACU description
+- Hydrocarbon Plants now use the amphibious background in the build menu
+
+**Lobby**
+- Fixed observer messages not showing in chat
+
+**Bugs**
+- Fixed death animations for Cybran T1 mobile artillery and Seraphim T3 mobile artillery
+- Fixed soundbank errors in several units
+- Fixed torpedoes colliding with missiles and destroying them
+- Paragon no longer does low damage to buildings and ACUs
+
+
 Patch 3654 (May 30, 2016)
 ============================
 **Reverted**
