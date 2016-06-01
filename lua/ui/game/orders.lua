@@ -287,9 +287,9 @@ local function DiveOrderBehavior(self, modifiers)
             if EntityCategoryContains(categories.SUBMERSIBLE, v) then
                 local submergedSUBState = GetIsSubmerged({v})
                 if submergedSUBState == 1 then
-                    submergedSUB = true
-                elseif submergedSUBState == -1 then
                     surfacedSUB = true
+                elseif submergedSUBState == -1 then
+                    submergedSUB = true
                 end
             end
         end
