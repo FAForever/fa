@@ -1,8 +1,8 @@
 local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 
--- This table stores numbers of bombs left in a cluster bomb run
--- format : bombs_left[entityId] = <n_left>
-local bombs_left = {}
+-- This table stores last acceleration and numbers of bombs left in a cluster bomb run
+-- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>}
+local bomb_data = {}
 
 CalculateBallisticAcceleration = function(weapon, projectile)
     local bp = weapon:GetBlueprint()
@@ -13,8 +13,8 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     if not launcher then return acc end
     local id = launcher:GetEntityId()
 
-    if MuzzleSalvoSize > 1 and bombs_left[id] == nil then
-        bombs_left[id] = MuzzleSalvoSize
+    if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
+        bomb_data[id] = {acc=4.75, n_left=MuzzleSalvoSize}
     end
 
     -- Get projectile position and velocity
@@ -22,12 +22,26 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local proj = {pos=projectile:GetPosition(), vel=VMult(Vector(launcher:GetVelocity()), 10)}
     local entity = launcher:GetTargetEntity()
     local target
+
     if entity and IsUnit(entity) then
         -- target is a entity
         target = {pos=entity:GetPosition(), vel=VMult(Vector(entity:GetVelocity()), 10)}
     else
         -- target is something else i.e. attack ground
         target = {pos=weapon:GetCurrentTargetPos(), vel=Vector(0, 0, 0)}
+    end
+
+    if not target.pos then -- target no longer alive
+        if bomb_data[id] then
+            -- use same acceleration as last bomb
+            acc = bomb_data[id].acc
+            bomb_data[id].n_left = bomb_data[id].n_left - 1
+            if bomb_data[id].n_left < 1 then
+                bomb_data[id] = nil
+            end
+        end
+
+        return acc
     end
 
     -- calculate flat(exclude y-axis) distance and velocity between projectile and target
@@ -39,15 +53,18 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         dist.pos = dist.pos * math.clamp(1 - bp.DropBombShort, 0, 1)
     end
 
-    if bombs_left[id] ~= nil then -- bomber will drop several bombs
+    if bomb_data[id] ~= nil then -- bomber will drop several bombs
         -- calculate space between bombs, this is multiplied by 0.5
         -- to get the bombs overlapping a bit
         local len = MuzzleSalvoDelay * dist.vel * 0.5
-        local current_bomb = MuzzleSalvoSize - bombs_left[id]
+        local current_bomb = MuzzleSalvoSize - bomb_data[id].n_left
 
         -- calculate the position for this particular bomb
         dist.pos = dist.pos - (len * (MuzzleSalvoSize - 1)) / 2 + len * current_bomb
-        bombs_left[id] = bombs_left[id] > 1 and bombs_left[id] - 1 or nil
+        bomb_data[id].n_left = bomb_data[id].n_left - 1
+        if bomb_data[id].n_left < 1 then
+            bomb_data[id] = nil
+        end
     end
 
     -- how many seconds until the bomb hits the target in xz-space
@@ -66,6 +83,11 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- a = 2 * (1/t)^2 * x
 
     acc = 2 * math.pow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
+
+    if bomb_data[id] then
+        -- store last acceleration in case target dies in the middle of carpet bomb run
+        bomb_data[id].acc = acc
+    end
 
     return acc
 end
