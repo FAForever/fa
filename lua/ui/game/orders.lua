@@ -155,7 +155,7 @@ end
 local function CreateOrderButtonGrid()
     controls.orderButtonGrid = Grid(controls.bg, GameCommon.iconWidth, GameCommon.iconHeight)
     controls.orderButtonGrid:SetName("Orders Grid")
-	controls.orderButtonGrid:DeleteAll()
+    controls.orderButtonGrid:DeleteAll()
 end
 
 -- local logic data
@@ -248,9 +248,9 @@ end
 -- used by things that build weapons, etc
 local function BuildOrderBehavior(self, modifiers)
     if modifiers.Left then
-	    IssueCommand(GetUnitCommandFromCommandCap(self._order))
+        IssueCommand(GetUnitCommandFromCommandCap(self._order))
     elseif modifiers.Right then
-	    self:ToggleCheck()
+        self:ToggleCheck()
         if self:IsChecked() then
             self._curHelpText = self._data.helpText .. "_auto"
             self.autoBuildEffect = CreateAutoBuildEffect(self)
@@ -261,7 +261,7 @@ local function BuildOrderBehavior(self, modifiers)
         if controls.mouseoverDisplay.text then
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
-	    SetAutoMode(currentSelection, self:IsChecked())
+        SetAutoMode(currentSelection, self:IsChecked())
     end
 end
 
@@ -279,7 +279,7 @@ end
 -- used by subs that can dive/surface
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
-	    IssueCommand(GetUnitCommandFromCommandCap(self._order))
+        IssueCommand(GetUnitCommandFromCommandCap(self._order))
         self:ToggleCheck()
     elseif modifiers.Right then
         if self._isAutoMode then
@@ -300,7 +300,7 @@ local function DiveOrderBehavior(self, modifiers)
         if controls.mouseoverDisplay.text then
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
-	    SetAutoSurfaceMode(currentSelection, self._isAutoMode)
+        SetAutoSurfaceMode(currentSelection, self._isAutoMode)
     end
 end
 
@@ -361,8 +361,8 @@ end
 -- pause button specific behvior
 -- TODO pause button will be moved to construction manager
 local function PauseOrderBehavior(self, modifiers)
-	Checkbox.OnClick(self)
-	SetPaused(currentSelection, self:IsChecked())
+    Checkbox.OnClick(self)
+    SetPaused(currentSelection, self:IsChecked())
 end
 
 local function PauseInitFunction(control, unitList)
@@ -414,7 +414,7 @@ local function ScriptButtonOrderBehavior(self, modifiers)
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
-	Checkbox.OnClick(self)
+    Checkbox.OnClick(self)
 end
 
 local function ScriptButtonInitFunction(control, unitList)
