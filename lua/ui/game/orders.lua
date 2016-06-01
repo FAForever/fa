@@ -279,7 +279,31 @@ end
 -- used by subs that can dive/surface
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
-        IssueCommand(GetUnitCommandFromCommandCap(self._order))
+        local unitList = GetSelectedUnits()
+        local submergedSUB = false
+        local surfacedSUB = false
+        -- Searching the unitlist for SUB's and memorizing submerged and surfaced state
+        for i, v in unitList do
+            if EntityCategoryContains(categories.SUBMERSIBLE, v) then
+                local submergedSUBState = GetIsSubmerged({v})
+                if submergedSUBState == 1 then
+                    submergedSUB = true
+                elseif submergedSUBState == -1 then
+                    surfacedSUB = true
+                end
+            end
+        end
+        -- if we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
+        if submergedSUB and surfacedSUB then 
+            for i, v in unitList do
+                local submergedSUBState = GetIsSubmerged({v})
+                if submergedSUBState == 1 then
+                    IssueUnitCommand({v}, GetUnitCommandFromCommandCap(self._order))
+                end
+            end
+        else
+            IssueCommand(GetUnitCommandFromCommandCap(self._order))
+        end
         self:ToggleCheck()
     elseif modifiers.Right then
         if self._isAutoMode then
