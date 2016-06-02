@@ -546,6 +546,36 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Anti Air',
         },
+        {
+            Damage = 0,
+            DisplayName = 'Weapon Guidance System',
+            FireTargetLayerCapsTable = {
+                Air = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',
+            },
+            Label = 'GuidanceSystem',
+            MaxRadius = 22,
+            MuzzleSalvoDelay = 1,
+            MuzzleSalvoSize = 0,
+            ProjectileId = '/projectiles/AAASonicPulse02/AAASonicPulse02_proj.bp',
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Muzzle_R',
+                    },
+                    RackBone = 'Turret_Right',
+                },
+            },
+            RackRecoilDistance = 0,
+            RangeCategory = 'UWRC_DirectFire',
+            TargetRestrictDisallow = 'UNTARGETABLE AIR',
+            TurretPitch = 0,
+            TurretPitchRange = 45,
+            TurretPitchSpeed = 360,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 360,
+        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
