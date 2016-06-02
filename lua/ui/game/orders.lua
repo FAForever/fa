@@ -291,16 +291,21 @@ local function DiveOrderBehavior(self, modifiers)
                 elseif submergedSUBState == -1 then
                     submergedSUB = true
                 end
+                -- bail out if we know, we have mixed SUBs
+                if surfacedSUB and submergedSUB then
+                    break
+                end
             end
         end
         -- if we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
-        if submergedSUB and surfacedSUB then 
+        if submergedSUB and surfacedSUB then
+            local SurfacedSubs = {}
             for i, v in unitList do
-                local submergedSUBState = GetIsSubmerged({v})
-                if submergedSUBState == 1 then
-                    IssueUnitCommand({v}, GetUnitCommandFromCommandCap(self._order))
+                if GetIsSubmerged({v}) == 1 then
+                    table.insert(SurfacedSubs, v)
                 end
             end
+            IssueUnitCommand(SurfacedSubs, GetUnitCommandFromCommandCap(self._order))
         else
             IssueCommand(GetUnitCommandFromCommandCap(self._order))
         end
