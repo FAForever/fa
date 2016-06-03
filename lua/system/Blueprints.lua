@@ -594,6 +594,12 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
                 safecall("Blueprints Loading org file "..file, doscript, file)
             end
         end
+        -- Loading ingame Merge-Blueprints from /unitshook/
+        for k,file in DiskFindFiles('/unitshook', '*_unit.bp') do
+            SPEW('Merging Blueprint : '..file)
+            BlueprintLoaderUpdateProgress()
+            safecall("Blueprints Loading org file "..file, doscript, file)
+        end
     end
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
