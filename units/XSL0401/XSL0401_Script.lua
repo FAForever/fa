@@ -116,6 +116,24 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
 
+        self:PlayUnitSound('Destroyed')
+
+        if instigator then
+            self.Suicided = (self:GetEntityId() == instigator:GetEntityId())
+        end
+
+        self:Destroy()
+    end,
+
+    OnDestroy = function(self)
+        SWalkingLandUnit.OnDestroy(self)
+
+        -- Control when we get the energy being, as follows:
+        -- Ctrl-K command = nil instigator to OnKilled, spawns
+        -- Reclaimed to 0 HP = directly to OnDestroy from engine, spawns
+        -- Hotbuild Instant-Suicide command = self passed as instigator, no spawn
+        if self.Suicided then return end
+
         -- Spawn the Energy Being
         local position = self:GetPosition()
         local spiritUnit = CreateUnitHPR('XSL0402', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)
@@ -123,10 +141,7 @@ XSL0401 = Class(SWalkingLandUnit) {
         -- Create effects for spawning of energy being
         for k, v in self.SpawnEffects do
             CreateAttachedEmitter(spiritUnit, -1, self:GetArmy(), v)
-        end    
-
-        self:PlayUnitSound('Destroyed')
-        self:Destroy()
+        end
     end,
 }
 
