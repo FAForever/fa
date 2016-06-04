@@ -595,7 +595,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
             end
         end
         -- Loading ingame Merge-Blueprints from /unitshook/
-        for k,file in DiskFindFiles('/unitshook', '*_unit.bp') do
+        for k,file in DiskFindFiles('/unitshook', '*.bp') do
             SPEW('Merging Blueprint : '..file)
             BlueprintLoaderUpdateProgress()
             safecall("Blueprints Loading org file "..file, doscript, file)
