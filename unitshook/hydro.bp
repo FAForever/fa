@@ -1,0 +1,12 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = {
+        "uab1102",
+        "ueb1102",
+        "urb1102",
+        "xsb1102",
+    },
+    General = {
+        Icon = 'air',
+    },
+}

@@ -97,11 +97,8 @@ local function StoreBlueprint(group, bp)
         end
     end
     local function StoreMulti(group, bp, targettable)
-        local Source = bp.Source
-        local Merge = true
         for index, targetid in targettable do
-            bp.Merge = Merge
-            bp.Source = Source
+            bp.Merge = true
             bp.BlueprintId = targetid
             SPEW('Merging to Blueprint : '..targetid)
             Store(group, bp, targetid)
@@ -110,8 +107,7 @@ local function StoreBlueprint(group, bp)
     if type(bp.BlueprintId) == 'table' then
         StoreMulti(group, bp, bp.BlueprintId)
     else
-        local targetid = bp.BlueprintId
-        Store(group, bp, targetid)
+        Store(group, bp, bp.BlueprintId)
     end
 end
 --
