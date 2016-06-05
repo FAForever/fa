@@ -2084,4 +2084,8 @@ Tooltips = {
         title = 'Zoom Pop Distance',
         description = 'Adjusts distance to which Zoom Pop zooms to.',
     },
+    options_confirm_self_destruct = {
+        title = 'Confirm Self Destruct',
+        description = 'Asks for confirmation before self destructing selected units.',
+    },
 }
