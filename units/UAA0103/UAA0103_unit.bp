@@ -11,7 +11,7 @@ UnitBlueprint {
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
-        CombatTurnSpeed = 1.5, # 0.7
+        CombatTurnSpeed = 1.5,
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -21,14 +21,14 @@ UnitBlueprint {
         KRollDamping = 2,
         KTurn = 0.8,
         KTurnDamping = 1,
-        LiftFactor = 10, # 7
+        LiftFactor = 10,
         MaxAirspeed = 10,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 3,
         RandomBreakOffDistanceMult = 1,
         StartTurnDistance = 1.4,
         TightTurnMultiplier = 0,
-        TurnSpeed = 1.5, # 0.7
+        TurnSpeed = 1.5,
         Winged = true,
     },
     Audio = {
@@ -181,7 +181,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 2100,
-        BuildCostMass = 100,
+        BuildCostMass = 120,
         BuildTime = 700,
     },
     Footprint = {
