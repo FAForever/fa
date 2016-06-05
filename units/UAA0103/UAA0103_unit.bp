@@ -214,7 +214,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 36,
+        VisionRadius = 32,
     },
     Interface = {
         HelpText = '<LOC uaa0103_help>Attack Bomber',
