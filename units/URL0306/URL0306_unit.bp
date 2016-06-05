@@ -110,7 +110,7 @@ UnitBlueprint {
         BuildCostEnergy = 800,
         BuildCostMass = 80,
         BuildTime = 400,
-        MaintenanceConsumptionPerSecondEnergy = 25,
+        MaintenanceConsumptionPerSecondEnergy = 75,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
