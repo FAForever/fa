@@ -187,6 +187,7 @@ UnitBlueprint {
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
+        TransportClass = 2,
         CanFireFromTransport = false,
     },
     Weapon = {
