@@ -1,4 +1,4 @@
-    UnitBlueprint {
+UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
@@ -421,8 +421,8 @@
         },
         EnhancedSensors = {
             BuildCostEnergy = 9000,
-            BuildCostMass = 300,
-            BuildTime = 300,
+            BuildCostMass = 320,
+            BuildTime = 400,
             Icon = 'ess',
             Name = '<LOC enhancements_0006>Enhanced Sensor System',
             NewOmniRadius = 100,
