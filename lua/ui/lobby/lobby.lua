@@ -354,7 +354,7 @@ end
 function GetAIPlayerData(name, AIPersonality)
     return PlayerData(
         {
-            OwnerID = hostID,
+            OwnerID = 999999,
             PlayerName = name,
             Ready = true,
             Human = false,
@@ -3391,7 +3391,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         end
                     end
                 else -- swap players on map preview
-                    if lobbyComm:IsHost() and mapPreviewSlotSwap == false then
+                    if lobbyComm:IsHost() and mapPreviewSlotSwap == false  then
                         mapPreviewSlotSwapFrom = slot
                         mapPreviewSlotSwap = true
                     elseif lobbyComm:IsHost() and mapPreviewSlotSwap == true and mapPreviewSlotSwapFrom ~= slot then
@@ -5188,9 +5188,11 @@ function InitHostUtils()
                 return
             end
 
-            -- So we're switching two humans or AI. Time to do the stupid thing until we make a saner way.
-            -- Clear the ready flag for the other target.
-            HostUtils.SetPlayerNotReady(moveTo)
+            if toOpts.Human then
+                -- We're switching with a human. Time to do the stupid thing until we make a saner way.
+                -- Clear the ready flag for the other target if it is a human.
+                HostUtils.SetPlayerNotReady(moveTo)
+            end
 
             -- Move the player in the target slot to observers.
             HostUtils.ConvertPlayerToObserver(moveTo, true)
