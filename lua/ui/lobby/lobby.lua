@@ -281,6 +281,15 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
 
     for index, key in slotMenuData[stateKey][hostKey] do
         if key == 'ailist' then
+            if slotNum then
+                for i = 1, numOpenSlots, 1 do
+                    if i ~= slotNum then
+                        table.insert(keys, 'move_player_to_slot' .. i)
+                        table.insert(strings, LOCF("<LOC lobui_0607>Move AI to slot %s", i))
+                        table.insert(tooltips, nil)
+                    end
+                end
+            end
             local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
@@ -5182,9 +5191,8 @@ function InitHostUtils()
         --- Swap the players in the two given slots.
         --
         -- If the target slot is unoccupied, the player in the first slot is simply moved there.
-        -- If an AI occupies the target slot, it is deleted and the player moved there.
         -- If the target slot is closed, this is a no-op.
-        -- If a human occupies both slots, they are swapped.
+        -- If a player or ai occupies both slots, they are swapped.
         SwapPlayers = function(moveFrom, moveTo)
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(moveFrom, moveTo) then
@@ -5205,14 +5213,7 @@ function InitHostUtils()
                 return
             end
 
-            -- If we're moving a human onto an AI, evict the AI and move the player into the space.
-            if not toOpts.Human then
-                HostUtils.RemoveAI(moveTo)
-                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
-                return
-            end
-
-            -- So we're switching two humans. Time to do the stupid thing until we make a saner way.
+            -- So we're switching two humans or AI. Time to do the stupid thing until we make a saner way.
             -- Clear the ready flag for the other target.
             HostUtils.SetPlayerNotReady(moveTo)
 
