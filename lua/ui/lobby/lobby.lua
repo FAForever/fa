@@ -354,7 +354,7 @@ end
 function GetAIPlayerData(name, AIPersonality)
     return PlayerData(
         {
-            OwnerID = hostID,
+            OwnerID = 999999,
             PlayerName = name,
             Ready = true,
             Human = false,
@@ -3401,7 +3401,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         end
                     end
                 else -- swap players on map preview
-                    if lobbyComm:IsHost() and mapPreviewSlotSwap == false then
+                    if lobbyComm:IsHost() and mapPreviewSlotSwap == false  then
                         mapPreviewSlotSwapFrom = slot
                         mapPreviewSlotSwap = true
                     elseif lobbyComm:IsHost() and mapPreviewSlotSwap == true and mapPreviewSlotSwapFrom ~= slot then
@@ -5213,21 +5213,45 @@ function InitHostUtils()
                 return
             end
 
-            -- So we're switching two humans or AI. Time to do the stupid thing until we make a saner way.
-            -- Clear the ready flag for the other target.
-            HostUtils.SetPlayerNotReady(moveTo)
+            if fromOpts.Human then
+                -- We're switching a human with an AI/human. Time to do the stupid thing until we make a saner way.
+                -- Clear the ready flag for the other target if it is a human.
+                if toOpts.Human then
+                    HostUtils.SetPlayerNotReady(moveTo)
+                end
 
-            -- Move the player in the target slot to observers.
-            HostUtils.ConvertPlayerToObserver(moveTo, true)
+                -- Move the player in the target slot to observers.
+                HostUtils.ConvertPlayerToObserver(moveTo, true)
 
-            -- Move the other player into the slot.
-            HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+                -- Move the other player into the slot.
+                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
 
-            -- Move the observer into the slot the first player came from.
-            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
+                -- Move the observer into the slot the first player came from.
+                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
 
-            -- %s has switched with %s
-            SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
+                -- %s has switched with %s
+                SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
+            end
+
+            if not fromOpts.Human then
+                -- We're switching an AI with a Human/AI. Time to do the stupid thing until we make a saner way.
+                -- Clear the ready flag for the other target if it is a human.
+                if toOpts.Human then
+                    HostUtils.SetPlayerNotReady(moveTo)
+                end
+
+                -- Move the player in the target slot to observers.
+                HostUtils.ConvertPlayerToObserver(moveTo, true)
+
+                -- Move the other player into the slot.
+                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+
+                -- Move the observer into the slot the first player came from.
+                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
+
+                -- %s has switched with %s
+                SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
+            end
         end,
 
         --- Add an observer
