@@ -5368,13 +5368,16 @@ function InitHostUtils()
             -- Is at least one person not ready?
             local playerNotReady = GetPlayersNotReady() ~= false
 
-            UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
-            UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
-            UIUtil.setEnabled(GUI.randMap, playerNotReady)
-            UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
+            -- host should be able to set game options even if he is observer
+            if not IsObserver(localPlayerID) then
+                UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
+                UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
+                UIUtil.setEnabled(GUI.randMap, playerNotReady)
+                UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
 
-            -- Launch button enabled if everyone is ready.
-            UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
+                -- Launch button enabled if everyone is ready.
+                UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
+            end
         end,
 
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then
