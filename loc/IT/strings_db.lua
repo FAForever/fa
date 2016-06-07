@@ -7473,6 +7473,7 @@ lobui_0604="Autoteam manuale"
 lobui_0605="Le posizioni iniziali dei team sono legate dall'host cliccando sulle posizioni sulla mappa. questo funziona solo quando la generazione casuale e abilitato."
 lobui_0606="Sinistra contro destra"
 lobui_0607="Move AI to slot %s"
+lobui_0608="No slots available"
 
 desync_0002="Non dirmelo di nuovo"
 desync_0003="Lo stato del gioco è diventato incoerente tra i giocatori in questo gioco . Questo significa che la simulazione può evolvere in modo diverso per i giocatori da questo punto. Ê estremamente probabile che il gioco si interromperà bruscamente."

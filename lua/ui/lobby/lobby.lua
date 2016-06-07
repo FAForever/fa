@@ -5045,6 +5045,24 @@ function InitHostUtils()
             -- If no slot is specified (user clicked "go player" button), select a default.
             if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
                 toPlayerSlot = HostUtils.FindEmptySlot()
+
+                -- If it's still -1 (No slots available) check for AIs and evict the first one
+                if toPlayerSlot < 1 then
+                    for i = 1, numOpenSlots do
+                        local slot = gameInfo.PlayerOptions[i]
+                        if slot and not slot.Human then
+                            HostUtils.RemoveAI(i)
+                            toPlayerSlot = i
+                            break
+                        end
+                    end
+
+                    -- There are no AIs and no slots, so break out with a message
+                    if toPlayerSlot < 1 then
+                        SendSystemMessage("lobui_0608")
+                        return
+                    end
+                end
             end
 
             if not gameInfo.Observers[fromObserverSlot] then -- IF no Observer on the current slot : QUIT
