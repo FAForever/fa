@@ -5369,7 +5369,7 @@ function InitHostUtils()
             local playerNotReady = GetPlayersNotReady() ~= false
 
             -- host should be able to set game options even if he is observer
-            if not IsObserver(localPlayerID) then
+            if GetPlayerCount() > 0 then
                 UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
                 UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
                 UIUtil.setEnabled(GUI.randMap, playerNotReady)
