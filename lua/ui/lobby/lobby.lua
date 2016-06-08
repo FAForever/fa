@@ -917,6 +917,10 @@ function SetSlotInfo(slotNum, playerInfo)
 
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotNum)
+
+    if isHost then
+        HostUtils.RefreshButtonEnabledness()
+    end
 end
 
 function ClearSlotInfo(slotIndex)
@@ -5039,6 +5043,8 @@ function InitHostUtils()
                 -- %s has switched from a player to an observer.
                 SendSystemMessage("lobui_0226", gameInfo.Observers[index].PlayerName)
             end
+
+            UpdateGame()
         end,
 
         ConvertObserverToPlayer = function(fromObserverSlot, toPlayerSlot, ignoreMsg)
@@ -5364,16 +5370,21 @@ function InitHostUtils()
             -- Is at least one person not ready?
             local playerNotReady = GetPlayersNotReady() ~= false
 
-            -- host should be able to set game options even if he is observer
-            if GetPlayerCount() > 0 then
-                UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
-                UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
-                UIUtil.setEnabled(GUI.randMap, playerNotReady)
-                UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
-
-                -- Launch button enabled if everyone is ready.
-                UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
+            -- Host should be able to set game options even if he is observer if all slots are AI
+            local hostObserves = false
+            if not playerNotReady and IsObserver(localPlayerID) and GetPlayerCount() > 0 then
+                hostObserves = true
             end
+
+            local buttonState = hostObserves or playerNotReady
+
+            UIUtil.setEnabled(GUI.gameoptionsButton, buttonState)
+            UIUtil.setEnabled(GUI.defaultOptions, buttonState)
+            UIUtil.setEnabled(GUI.randMap, buttonState)
+            UIUtil.setEnabled(GUI.autoTeams, buttonState)
+
+            -- Launch button enabled if everyone is ready.
+            UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or hostObserves or not playerNotReady)
         end,
 
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then
