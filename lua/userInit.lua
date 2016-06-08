@@ -13,6 +13,8 @@ doscript '/lua/globalInit.lua'
 local AvgFPS = 10
 WaitFrames = coroutine.yield
 
+ConExecute('net_CompressionMethod 0')
+
 function WaitSeconds(n)
     local start = CurrentTime()
     local elapsed_frames = 0
