@@ -123,6 +123,9 @@ XSL0401 = Class(SWalkingLandUnit) {
     OnDestroy = function(self)
         SWalkingLandUnit.OnDestroy(self)
 
+        -- Don't make the energy being if not built
+        if self:GetFractionComplete() ~= 1 then return end
+        
         -- Spawn the Energy Being
         local position = self:GetPosition()
         local spiritUnit = CreateUnitHPR('XSL0402', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)
