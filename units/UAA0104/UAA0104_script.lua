@@ -25,6 +25,7 @@ UAA0104 = Class(AirTransport) {
         SonicPulseBattery2 = Class(AAASonicPulseBatteryWeapon) {},
         SonicPulseBattery3 = Class(AAASonicPulseBatteryWeapon) {},
         SonicPulseBattery4 = Class(AAASonicPulseBatteryWeapon) {},
+        GuidanceSystem = Class(AAASonicPulseBatteryWeapon) {},
     },
 
     -- Override air destruction effects so we can do something custom here
