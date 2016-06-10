@@ -11,7 +11,7 @@ Sinker = Class(Projectile) {
         self:SetStayUpright(false)
     end,
 
-    --- Start the sinking after the given delay for the given entity/bone.
+    -- Start the sinking after the given delay for the given entity/bone.
     -- Invokes sunkCallback when the unit reaches the bottom of the ocean.
     Start = function(self, delay, targEntity, targBone, sunkCallback)
         self.callback = sunkCallback
@@ -39,16 +39,19 @@ Sinker = Class(Projectile) {
 
         if not targetEntity:BeenDestroyed() then
             local bp = self:GetBlueprint()
-            local acc = -bp.Physics.SinkSpeed
+            local unitbp = targetEntity:GetBlueprint() -- Use special value from unit blueprint if there is one
+            local acc = -unitbp.Physics.SinkSpeed or -bp.Physics.SinkSpeed
             self:SetBallisticAcceleration(acc + GetRandomFloat(-0.02, 0.02))
         end
     end,
 
-    --- Destroy the sinking unit when it hits the bottom of the ocean.
+    -- Destroy the sinking unit when it hits the bottom of the ocean.
     OnImpact = function(self, targetType, targetEntity)
         if targetType == 'Terrain' then
             self:Destroy()
-            ForkThread(self.callback)
+            if self.callback then -- Allow nil callback to enable sinkers which don't callback on impact
+                ForkThread(self.callback)
+            end
         end
     end,
 }
