@@ -5360,7 +5360,7 @@ function InitHostUtils()
 
             -- Host should be able to set game options even if he is observer if all slots are AI
             local hostObserves = false
-            if not playerNotReady and IsObserver(localPlayerID) and GetPlayerCount() > 0 then
+            if not playerNotReady and IsObserver(localPlayerID) then
                 hostObserves = true
             end
 
@@ -5370,6 +5370,7 @@ function InitHostUtils()
             UIUtil.setEnabled(GUI.defaultOptions, buttonState)
             UIUtil.setEnabled(GUI.randMap, buttonState)
             UIUtil.setEnabled(GUI.autoTeams, buttonState)
+            UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, buttonState)
 
             -- Launch button enabled if everyone is ready.
             UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or hostObserves or not playerNotReady)
