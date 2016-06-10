@@ -2126,6 +2126,14 @@ function CreateSlotsUI(makeLabel)
             DoSlotBehavior(curRow, self.slotKeys[index], text)
         end
 
+        -- Hide the marker when the dropdown is hidden
+        nameLabel.OnHide = function()
+            local associatedMarker = GUI.mapView.startPositions[curRow]
+            if associatedMarker then
+                associatedMarker.indicator:Stop()
+            end
+        end
+
         -- Color
         local colorSelector = BitmapCombo(newSlot, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.color = colorSelector

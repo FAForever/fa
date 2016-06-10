@@ -190,6 +190,7 @@ Combo = Class(Group) {
                 self._btnMid:SetTexture(bitmaps.button.mid.up)
                 self._text:SetColor(self._titleColor or UIUtil.fontColor)
                 activeCombo = nil
+                self:OnHide()
             end
         end
 
@@ -384,6 +385,10 @@ Combo = Class(Group) {
     
     -- overload to get rolled over item index
     OnOverItem = function(self, index, text)
+    end,
+
+    -- Triggered when the dropdown list is hidden
+    OnHide = function()
     end,
 }
 
