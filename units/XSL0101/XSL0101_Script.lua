@@ -1,11 +1,8 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSL0101/XSL0101_script.lua
-#**
-#**  Summary  :  Seraphim Land Scout Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/XSL0101/XSL0101_script.lua
+-- Summary  :  Seraphim Land Scout Script
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
@@ -31,11 +28,11 @@ XSL0101 = Class(SWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         
-        #These start enabled, so before going to InvisState, disabled them.. they'll be reenabled shortly
+        -- These start enabled, so before going to InvisState, disabled them.. they'll be reenabled shortly
         self:DisableUnitIntel('RadarStealth')
 		self:DisableUnitIntel('Cloak')
 		self.Cloaked = false
-        ChangeState( self, self.InvisState ) # If spawned in we want the unit to be invis, normally the unit will immediately start moving
+        ChangeState( self, self.InvisState ) -- If spawned in we want the unit to be invis, normally the unit will immediately start moving
     end,
     
     InvisState = State() {
