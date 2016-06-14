@@ -8,67 +8,48 @@ local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
 
 XSL0101 = Class(SWalkingLandUnit) {
-
     Weapons = {
-		LaserTurret = Class(SDFPhasicAutoGunWeapon) {
-			OnWeaponFired = function(self, target)
-				SDFPhasicAutoGunWeapon.OnWeaponFired(self, target)
-				ChangeState( self.unit, self.unit.VisibleState )
-			end,
-			
-			OnLostTarget = function(self)
-				SDFPhasicAutoGunWeapon.OnLostTarget(self)
-				if self.unit:IsIdleState() then
-				    ChangeState( self.unit, self.unit.InvisState )
-				end
-			end,
-        },
+		LaserTurret = Class(SDFPhasicAutoGunWeapon) {},
     },
-    
-    OnStopBeingBuilt = function(self, builder, layer)
-        SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        
-        -- These start enabled, so before going to InvisState, disabled them.. they'll be reenabled shortly
-        self:DisableUnitIntel('RadarStealth')
-		self:DisableUnitIntel('Cloak')
-		self.Cloaked = false
-        ChangeState( self, self.InvisState ) -- If spawned in we want the unit to be invis, normally the unit will immediately start moving
+
+    -- Set custom flag and add Stealth toggles to the cloak switch
+    OnScriptBitSet = function(self, bit)
+        SWalkingLandUnit.OnScriptBitSet(self, bit)
+        if bit == 8 then
+            self.HiddenSelen = false
+            self:SetWeaponEnabledByLabel('LaserTurret', true)
+            self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
+            self:DisableUnitIntel('ToggleBit5', 'RadarStealthField')
+            self:DisableUnitIntel('ToggleBit5', 'SonarStealth')
+            self:DisableUnitIntel('ToggleBit5', 'SonarStealthField')
+        end
+    end,
+
+    OnScriptBitClear = function(self, bit)
+        SWalkingLandUnit.OnScriptBitClear(self, bit)
+        if bit == 8 then
+            self.HiddenSelen = true
+            self:SetWeaponEnabledByLabel('LaserTurret', false)
+            self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
+            self:EnableUnitIntel('ToggleBit5', 'RadarStealthField')
+            self:EnableUnitIntel('ToggleBit5', 'SonarStealth')
+            self:EnableUnitIntel('ToggleBit5', 'SonarStealthField')
+            
+            IssueStop({self})
+        end
     end,
     
-    InvisState = State() {
-        Main = function(self)
-            self.Cloaked = false
-            local bp = self:GetBlueprint()
-            if bp.Intel.StealthWaitTime then
-                WaitSeconds( bp.Intel.StealthWaitTime )
-            end
-			self:EnableUnitIntel('RadarStealth')
-			self:EnableUnitIntel('Cloak')
-			self.Cloaked = true
-        end,
-        
-        OnMotionHorzEventChange = function(self, new, old)
-            if new != 'Stopped' then
-                ChangeState( self, self.VisibleState )
-            end
-            SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
-        end,
-    },
+    -- Turn off the cloak to begin with
+    OnStopBeingBuilt = function(self, builder, layer)
+        SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:SetScriptBit('RULEUTC_CloakToggle', true)
+    end,
     
-    VisibleState = State() {
-        Main = function(self)
-            if self.Cloaked then
-                self:DisableUnitIntel('RadarStealth')
-			    self:DisableUnitIntel('Cloak')
-			end
-        end,
-        
-        OnMotionHorzEventChange = function(self, new, old)
-            if new == 'Stopped' then
-                ChangeState( self, self.InvisState )
-            end
-            SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
-        end,
-    },
+    OnMotionHorzEventChange = function(self, new, old)
+        if new ~= 'Stopped' and self.HiddenSelen then
+            self:SetScriptBit('RULEUTC_CloakToggle', true)
+        end
+        SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+    end,
 }
 TypeClass = XSL0101

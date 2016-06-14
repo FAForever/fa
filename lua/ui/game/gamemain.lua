@@ -432,6 +432,31 @@ function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
 
+-- Function to remove hidden selens from a selection which includes units other than hidden selens
+function DeselectSelens(selection)
+    local newSelection = selection
+    local hiddenSelen = {}
+    local otherUnits = false
+
+    -- Find any selens with the hidden flag
+    for id, unit in newSelection do
+        if unit.HiddenSelen then -- Is Unit an activated Selen?
+            table.insert(hiddenSelen, id)
+        else
+            otherUnits = true
+        end
+    end
+
+    -- Remove them from the selection
+    if table.getn(hiddenSelen) > 0 and otherUnits then
+        for id, unit in hiddenSelen do
+            table.remove(newSelection, id)
+        end
+    end
+    
+    return newSelection
+end
+
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
 --      oldSelection: What the selection was before
@@ -443,6 +468,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         return
     end
 
+    -- Deselect Selens if necessary
+    if newSelection then
+        newSelection = DeselectSelens(newSelection)
+    end
+    
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
     local isOldSelection = table.equal(oldSelection, newSelection)
 
