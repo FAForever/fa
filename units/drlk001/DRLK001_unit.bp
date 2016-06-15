@@ -229,9 +229,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Targeting Laser',
             FireTargetLayerCapsTable = {
-                Air = 'Air',
                 Land = 'Air',
-                Water = 'Air',
             },
             Label = 'TargetPainter',
             MaxRadius = 52,
@@ -303,9 +301,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanodart Launcher',
             FireTargetLayerCapsTable = {
-                Air = 'Air',
                 Land = 'Air',
-                Water = 'Air',
             },
             FiringTolerance = 10,
             Label = 'AAGun',
@@ -415,9 +411,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanodart Ground Launcher',
             FireTargetLayerCapsTable = {
-                Air = 'Land',
-                Land = 'Land',
-                Water = 'Land',
+                Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 1,
             FiringTolerance = 2,

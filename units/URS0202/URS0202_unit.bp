@@ -206,14 +206,8 @@ UnitBlueprint {
                 bitmapId = 'deploy',
                 helpText = 'deploy',
             },
-            RULEUTC_WeaponToggle = {
-                bitmapId = 'toggle-weapon-air',
-            },
         },
         TechLevel = 'RULEUTL_Advanced',
-        ToggleCaps = {
-            RULEUTC_WeaponToggle = true,
-        },
         UnitName = '<LOC urs0202_name>Siren Class',
         UnitWeight = 1,
     },

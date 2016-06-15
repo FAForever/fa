@@ -138,15 +138,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
-        OrderOverrides = {
-            RULEUTC_WeaponToggle = {
-                bitmapId = 'toggle-weapon-air',
-            },
-        },
         TechLevel = 'RULEUTL_Basic',
-        ToggleCaps = {
-            RULEUTC_WeaponToggle = true,
-        },
         UnitName = '<LOC url0104_name>Sky Slammer',
         UnitWeight = 1,
     },
@@ -220,9 +212,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanodart Launcher',
             FireTargetLayerCapsTable = {
-                Air = 'Air',
                 Land = 'Air',
-                Water = 'Air',
             },
             FiringRandomness = 1.5,
             FiringTolerance = 2,
@@ -296,9 +286,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanodart Launcher',
             FireTargetLayerCapsTable = {
-                Air = 'Land|Water|Seabed',
                 Land = 'Land|Water|Seabed',
-                Water = 'Land|Water|Seabed',
             },
             FiringRandomness = 1.5,
             FiringTolerance = 2,
