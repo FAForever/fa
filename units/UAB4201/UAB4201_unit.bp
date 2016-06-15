@@ -208,7 +208,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp',
-            ProjectileLifetime = 4,
+            ProjectileLifetime = 2,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -225,7 +225,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             #RangeCategory = '',  #removed this line so there is no error about the range category
-            RateOfFire = 0.32,
+            RateOfFire = 0.66,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TACTICAL MISSILE',
