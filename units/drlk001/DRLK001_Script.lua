@@ -12,8 +12,8 @@ local Effects = import('/lua/effecttemplates.lua')
 
 DRLK001 = Class(CWalkingLandUnit) {
     Weapons = {
-		AAGun = Class(CAANanoDartWeapon) {},    
-		Lazor = Class(TargetingLaser) {
+        AAGun = Class(CAANanoDartWeapon) {},    
+        Lazor = Class(TargetingLaser) {
             FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
             
             -- Unit in range. Cease ground fire and turn on AA
@@ -39,7 +39,7 @@ DRLK001 = Class(CWalkingLandUnit) {
             },
             
         },
-		GroundGun = Class(CAANanoDartWeapon) {},
+        GroundGun = Class(CAANanoDartWeapon) {},
     },
 }
 
