@@ -8,40 +8,36 @@
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
+local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
 
 URL0104 = Class(CLandUnit) {
     Weapons = {
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {
-            SetOnTransport = function(self, transportstate)
-                CAANanoDartWeapon.SetOnTransport(self, transportstate)
-                self.unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+        TargetPainter = Class(TargetingLaser) {
+            -- Unit in range. Cease ground fire and turn on AA
+            OnWeaponFired = function(self)
+                if not self.AA then
+                    self.unit:SetWeaponEnabledByLabel('GroundGun', false)
+                    self.unit:SetWeaponEnabledByLabel('AAGun', true)
+                    self.unit:GetWeaponManipulatorByLabel('AAGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('GroundGun'):GetHeadingPitch())
+                    self.AA = true
+                end
+                TargetingLaser.OnWeaponFired(self)
             end,
-        },
-    },
-    
-    OnCreate = function(self)
-        CLandUnit.OnCreate(self)
-        self:SetWeaponEnabledByLabel('GroundGun', false)
-    end,
-    
-    OnScriptBitSet = function(self, bit)
-        CLandUnit.OnScriptBitSet(self, bit)
-        if bit == 1 then 
-            self:SetWeaponEnabledByLabel('GroundGun', true)
-            self:SetWeaponEnabledByLabel('AAGun', false)
-            self:GetWeaponManipulatorByLabel('GroundGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch() )
-        end
-    end,
 
-    OnScriptBitClear = function(self, bit)
-        CLandUnit.OnScriptBitClear(self, bit)
-        if bit == 1 then 
-            self:SetWeaponEnabledByLabel('GroundGun', false)
-            self:SetWeaponEnabledByLabel('AAGun', true)
-            self:GetWeaponManipulatorByLabel('AAGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('GroundGun'):GetHeadingPitch() )
-        end
-    end,
+            IdleState = State(TargetingLaser.IdleState) {
+                -- Start with the AA gun off to reduce twitching of ground fire
+                Main = function(self)
+                    self.unit:SetWeaponEnabledByLabel('GroundGun', true)
+                    self.unit:SetWeaponEnabledByLabel('AAGun', false)
+                    self.unit:GetWeaponManipulatorByLabel('GroundGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch())
+                    self.AA = false
+                    TargetingLaser.IdleState.Main(self)
+                end,
+            },
+        },
+        AAGun = Class(CAANanoDartWeapon) {},
+        GroundGun = Class(CAANanoDartWeapon) {},
+    },
 }
 
 TypeClass = URL0104
