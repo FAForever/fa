@@ -502,8 +502,8 @@ UnitBlueprint {
             BuildTime = 1400,
             Icon = 'ras',
             Name = '<LOC enhancements_0087>Resource Allocation System',
-            ProductionPerSecondEnergy = 3500,
-            ProductionPerSecondMass = 12,
+            ProductionPerSecondEnergy = 2800,
+            ProductionPerSecondMass = 8,
             ShowBones = {
                 'Back_Upgrade',
             },
@@ -551,9 +551,9 @@ UnitBlueprint {
             },
         },
         StealthGenerator = {
-            BuildCostEnergy = 5250,
+            BuildCostEnergy = 5000,
             BuildCostMass = 350,
-            BuildTime = 350,
+            BuildTime = 500,
             Icon = 'psg',
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
