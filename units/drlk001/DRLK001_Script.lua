@@ -12,10 +12,9 @@ local Effects = import('/lua/effecttemplates.lua')
 
 DRLK001 = Class(CWalkingLandUnit) {
     Weapons = {
-        AAGun = Class(CAANanoDartWeapon) {},    
-        Lazor = Class(TargetingLaser) {
+        TargetPainter = Class(TargetingLaser) {
             FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
-            
+
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
                 if not self.AA then
@@ -26,7 +25,7 @@ DRLK001 = Class(CWalkingLandUnit) {
                 end
                 TargetingLaser.OnWeaponFired(self)
             end,
-            
+
             IdleState = State(TargetingLaser.IdleState) {
                 -- Start with the AA gun off to reduce twitching of ground fire
                 Main = function(self)
@@ -37,8 +36,8 @@ DRLK001 = Class(CWalkingLandUnit) {
                     TargetingLaser.IdleState.Main(self)
                 end,
             },
-            
         },
+        AAGun = Class(CAANanoDartWeapon) {},
         GroundGun = Class(CAANanoDartWeapon) {},
     },
 }
