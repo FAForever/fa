@@ -425,8 +425,8 @@ UnitBlueprint {
             BuildTime = 500,
             Icon = 'ess',
             Name = '<LOC enhancements_0006>Enhanced Sensor System',
-            NewOmniRadius = 100,
-            NewVisionRadius = 50,
+            NewOmniRadius = 80,
+            NewVisionRadius = 80,
             ShowBones = {
                 'Right_Upgrade',
             },
