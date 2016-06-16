@@ -39,14 +39,12 @@ UAS0401 = Class(ASeaUnit) {
         ChangeState(self, self.IdleState)
         
         if not self.SinkSlider then --setup the slider and get blueprint values
-            WARN('creating slider')
             self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) --create sink controller to overlay ontop of original collision detection
             self.Trash:Add(self.SinkSlider)
         end
         
-        local bp = self:GetBlueprint()
-        self.elevation = bp.Physics.Elevation or 0 -- backup value is -15
-        --self.SinkSlider:SetGoal(difference)
+        --local bp = self:GetBlueprint() -- saved for later, sets depth to elevation in bp
+        --self.elevation = bp.Physics.Elevation -- saved for later, sets depth to elevation in bp
         self.WatchDepth = false
         
     end,
@@ -70,23 +68,11 @@ UAS0401 = Class(ASeaUnit) {
             self:PlayUnitSound('Close')
         end
         
-
-        
-        
-        
-        
-
-        
         if (new == 'Up' and old == 'Bottom') then --when starting to surface
-            WARN('reseting + disabling slider')
             self.WatchDepth = false
             if self.DiverThread then
             end
         end
-        
-
-
-        
         if (new == 'Bottom' and old == 'Down') then --when finished diving
             WARN('enabling slider')
             self.WatchDepth = true
@@ -94,36 +80,27 @@ UAS0401 = Class(ASeaUnit) {
                 self.DiverThread = self:ForkThread(self.DiveDepthThread)
             end
         end
-
-
-
     end,
-
-    
     
     DiveDepthThread = function(self)
         -- takes the given location, adjusts the Y value to the surface height on that location, with an offset
-        local Yoffset = 2 --the default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
-        
+        local Yoffset = 1.2 --the default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
+        -- 1.2 is for tempest to clear the torpedo tubes from most cases of ground clipping, keeping overall height minimal.
         while self.WatchDepth == true do
             local pos = self:GetPosition()
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) --target depth, in this case the seabed
-            local difference = pos[2] - math.max((seafloor + Yoffset), self.elevation)
-            
+            --local difference = pos[2] - math.max((seafloor + Yoffset), self.elevation) -- saved for later, sets depth to elevation in bp
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) --doesnt sink too much, just maneuveres the bed better.
             self.SinkSlider:SetSpeed(1)
             
-            self.SinkSlider:SetGoal(0, -difference, 0)
-            WARN('Setting slider:' .. -difference)
-            --self.SinkSlider:SetSpeed(10)
+            self.SinkSlider:SetGoal(0, difference, 0)
+            WARN('Setting slider:' .. difference)
             WaitSeconds(0.2)
         end
-        self.SinkSlider:SetGoal(0, 0, 0)
-        WARN('resetting slider' )
-        WaitFor(self.SinkSlider)
-        WARN('slider reset' )
+        self.SinkSlider:SetGoal(0, 0, 0) --reset the slider while we are not watching depth
+        WaitFor(self.SinkSlider)-- we have to wait for it to finish before killing the thread or it stops
         
-        KillThread(self.DiverThread)  
-        
+        KillThread(self.DiverThread)
     end,
     
     
