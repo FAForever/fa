@@ -70,11 +70,8 @@ UAS0401 = Class(ASeaUnit) {
         
         if (new == 'Up' and old == 'Bottom') then --when starting to surface
             self.WatchDepth = false
-            if self.DiverThread then
-            end
         end
         if (new == 'Bottom' and old == 'Down') then --when finished diving
-            WARN('enabling slider')
             self.WatchDepth = true
             if not self.DiverThread then
                 self.DiverThread = self:ForkThread(self.DiveDepthThread)
@@ -94,7 +91,6 @@ UAS0401 = Class(ASeaUnit) {
             self.SinkSlider:SetSpeed(1)
             
             self.SinkSlider:SetGoal(0, difference, 0)
-            WARN('Setting slider:' .. difference)
             WaitSeconds(0.2)
         end
         self.SinkSlider:SetGoal(0, 0, 0) --reset the slider while we are not watching depth
