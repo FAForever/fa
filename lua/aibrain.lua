@@ -35,7 +35,6 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
-local unitStats = {}
 local observer = false
 
 local Points = {
@@ -46,6 +45,7 @@ local Points = {
 
 AIBrain = Class(moho.aibrain_methods) {
     Result = nil,
+    unitStats = {},
 
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
