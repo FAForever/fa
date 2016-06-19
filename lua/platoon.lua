@@ -2230,8 +2230,7 @@ Platoon = Class(moho.platoon_methods) {
             reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, pos[1], pos[3],
                                                             cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
             if not reference then
-                relative = true
-                reference = true
+                reference = pos
             end
             table.insert( baseTmplList, AIBuildStructures.AIBuildBaseTemplateFromLocation( baseTmpl, reference ) )
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
