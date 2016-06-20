@@ -1,24 +1,24 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/lua/editor/EconomyBuildConditions.lua
-#**  Author(s): Dru Staltman, John Comes
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/lua/editor/EconomyBuildConditions.lua
+--#**  Author(s): Dru Staltman, John Comes
+--#**
+--#**  Summary  : Generic AI Platoon Build Conditions
+--#**             Build conditions always return true or false
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
-##############################################################################################################
-# function: NeedAnyStructure = BuildCondition	doc = "Please work function docs."
-#
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: string	baseName = "base_name"
-#
-##############################################################################################################
+--##############################################################################################################
+--# function: NeedAnyStructure = BuildCondition	doc = "Please work function docs."
+--#
+--# parameter 0: string	aiBrain		= "default_brain"
+--# parameter 1: string	baseName = "base_name"
+--#
+--##############################################################################################################
 function NeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -38,7 +38,7 @@ function NeedAnyStructure(aiBrain, baseName)
             end
             for k,v in buildTemplate do
                 if bManager:CheckStructureBuildable(v[1][1]) then
-                    # get the building to build
+                    -- get the building to build
                     local category
                     for catName,catData in buildList do
                         if catData.StructureType == v[1][1] then
@@ -46,10 +46,10 @@ function NeedAnyStructure(aiBrain, baseName)
                             break
                         end
                     end
-                    # iterate through build locations
+                    -- iterate through build locations
                     for num, location in v do
                         if category and num > 1 then
-                            # Check if it can be built and then build
+                            -- Check if it can be built and then build
                             if aiBrain:CanBuildStructureAt( category, {location[1], 0, location[2]} ) 
                             and bManager:CheckUnitBuildCounter(location, buildCounter) then
                                 return true
@@ -63,15 +63,15 @@ function NeedAnyStructure(aiBrain, baseName)
     return false
 end
 
-##############################################################################################################
-# function: NumUnitsLessNearBase = BuildCondition	doc = "Please work function docs."
-#
-# parameter 0: string	aiBrain         = "default_brain"
-# parameter 1: string	baseName        = "MAIN"			doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS
-# parameter 3: string   varName             = "VariableName"
-#
-##############################################################################################################
+--##############################################################################################################
+--# function: NumUnitsLessNearBase = BuildCondition	doc = "Please work function docs."
+--#
+--# parameter 0: string	aiBrain         = "default_brain"
+--# parameter 1: string	baseName        = "MAIN"			doc = "docs for param1"
+--# parameter 2: expr   category        = categories.ALLUNITS
+--# parameter 3: string   varName             = "VariableName"
+--#
+--##############################################################################################################
 function NumUnitsLessNearBase( aiBrain, baseName, category, varName )
     if aiBrain.BaseManagers[baseName] == nil then
         return false
@@ -125,13 +125,13 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
         local base = aiBrain.BaseManagers[eBaseName]
         if base and base:GetPosition() and base:GetRadius() then
             local count = base:GetCurrentEngineerCount()
-#            local unitList = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('ENGINEER'), base:GetPosition(), base:GetRadius(),'Ally' )
-#            local count = 0
-#            for i,unit in unitList do
-#                if unit:GetAIBrain() == aiBrain then
-#                    count = count + 1
-#                end
-#            end
+            -- local unitList = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('ENGINEER'), base:GetPosition(), base:GetRadius(),'Ally' )
+            -- local count = 0
+            -- for i,unit in unitList do
+                -- if unit:GetAIBrain() == aiBrain then
+                    -- count = count + 1
+                -- end
+            -- end
             if ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers'] then
                 count = count + ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers']
             end
@@ -165,7 +165,7 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
                 return false
             end
             for k,v in buildTemplate do
-                # get the building to build
+                -- get the building to build
                 local category
                 for catName,catData in buildList do
                     if catData.StructureType == v[1][1] then
@@ -174,9 +174,9 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
                     end
                 end
                 if category and cdrUnit:CanBuild(category) then
-                    # iterate through build locations
+                    -- iterate through build locations
                     for num, location in v do
-                        # Check if it can be built and then build
+                        -- Check if it can be built and then build
                         if num > 1 and aiBrain:CanBuildStructureAt( category, {location[1], 0, location[2]} ) then
                             return true
                         end
@@ -210,7 +210,7 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
                 return false
             end
             for k,v in buildTemplate do
-                # get the building to build
+                -- get the building to build
                 local category
                 for catName,catData in buildList do
                     if catData.StructureType == v[1][1] then
@@ -219,9 +219,9 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
                     end
                 end
                 if category and cdrUnit:CanBuild(category) then
-                    # iterate through build locations
+                    -- iterate through build locations
                     for num, location in v do
-                        # Check if it can be built and then build
+                        -- Check if it can be built and then build
                         if num > 1 and aiBrain:CanBuildStructureAt( category, {location[1], 0, location[2]} ) then
                             return true
                         end
@@ -329,7 +329,7 @@ function UnfinishedBuildingsCheck( aiBrain, baseName )
     if not bManager then
         return false
     end
-    # Return out if the list is empty or all buildings are finished
+    -- Return out if the list is empty or all buildings are finished
     if table.getn(bManager.UnfinishedBuildings) == 0 then
         return false
     else
@@ -345,7 +345,7 @@ function UnfinishedBuildingsCheck( aiBrain, baseName )
         end
     end
 
-    # Check list
+    -- Check list
     local armyIndex = bManager.AIBrain:GetArmyIndex()
     local beingBuiltList = {}
     local buildingEngs = bManager.AIBrain:GetListOfUnits( categories.ENGINEER, false )
