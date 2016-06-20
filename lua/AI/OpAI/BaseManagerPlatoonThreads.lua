@@ -36,7 +36,7 @@ function BaseManagerEngineerPlatoonSplit(platoon)
                 end
                 local engPlat = aiBrain:MakePlatoon( '', '' )
                 aiBrain:AssignUnitsToPlatoon( engPlat, { v }, 'Support', 'None' )
-                engPlat.PlatoonData = platoon.PlatoonData
+                engPlat.PlatoonData = table.deepcopy(platoon.PlatoonData)
                 v.BaseName = baseName
                 engPlat:ForkAIThread( BaseManagerSingleEngineerPlatoon )
                 -- if engineer is not a commander or sub-commander, increment number of units working for the base
