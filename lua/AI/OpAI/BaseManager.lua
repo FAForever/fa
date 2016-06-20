@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/ai/OpAI/BaseManager.lua
-#**
-#**  Summary  : Base manager for operations
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /lua/ai/OpAI/BaseManager.lua
+--#**
+--#**  Summary  : Base manager for operations
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
@@ -25,12 +25,6 @@ local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
-
-
-
-
-
-
 
 -- Default rebuild numbers for buildings based on type; -1 is infinite
 local BuildingCounterDefaultValues = {
@@ -318,7 +312,7 @@ BaseManager = Class {
             end
         end,
 
-        # Make sure name of OpAI doesn't already exist
+        -- Make sure name of OpAI doesn't already exist
         CheckOpAIName = function(self, name)
             if self.OpAITable[name] then
                 error('*AI ERROR: Duplicate OpAI name: ' .. name .. ' - for base manager: ' .. self.BaseName)
@@ -337,7 +331,7 @@ BaseManager = Class {
             return self.OpAITable[name]
         end,
         
-        # Add generated naval AI.  Uses different OpAI type because it generates platoon data
+        -- Add generated naval AI.  Uses different OpAI type because it generates platoon data
         AddNavalAI = function(self, name, data)
             if not self.AIBrain then
                 error('*AI ERROR: No AI Brain for base manager')
@@ -405,9 +399,9 @@ BaseManager = Class {
             self.Radius = rad
         end,
 
-        #------------------------------------------------------------------------------
-        #-- Functions for tracking the number of engineers working in a base manager --
-        #------------------------------------------------------------------------------
+        ------------------------------------------------------------------------------
+        -- Functions for tracking the number of engineers working in a base manager --
+        ------------------------------------------------------------------------------
         AddCurrentEngineer = function(self, num)
             if not num then
                 num = 1
@@ -521,29 +515,29 @@ BaseManager = Class {
         end,
 
         SetEngineerCount = function(self, count)
-            # If we have a table, we have various possible ways of counting engineers
-            # { tNum1, tNum2, tNum3 } - This is a difficulty defined total number of engs
-            # { { tNum1, tNum2, tNum3, }, { aNum1, aNum2, aNum3 } } - This is a difficulty defined total and permanent assisters
-            # { tNum, aNum } - This is a single defined total with permanent assist
-            # num - this is the number of total engineers
+            -- If we have a table, we have various possible ways of counting engineers
+            -- { tNum1, tNum2, tNum3 } - This is a difficulty defined total number of engs
+            -- { { tNum1, tNum2, tNum3, }, { aNum1, aNum2, aNum3 } } - This is a difficulty defined total and permanent assisters
+            -- { tNum, aNum } - This is a single defined total with permanent assist
+            -- num - this is the number of total engineers
 
             if type(count) == 'table' then
 
-                # Table of tables means set the permanent assist count with total count
+                -- Table of tables means set the permanent assist count with total count
                 if type(count[1]) == 'table' then
                     self:SetTotalEngineerCount(count[1][ScenarioInfo.Options.Difficulty])
                     self:SetPermanentAssistCount(count[2][ScenarioInfo.Options.Difficulty])
 
-                # Table with 3 entries is a dificulty table
+                -- Table with 3 entries is a dificulty table
                 elseif table.getn(count) == 3 then
                     self:SetTotalEngineerCount(count[ScenarioInfo.Options.Difficulty])
 
-                # Table with 2 entries means first is total engs, 2nd is num permanent assisting
+                -- Table with 2 entries means first is total engs, 2nd is num permanent assisting
                 elseif table.getn(count) == 2 then
                     self:SetTotalEngineerCount(count[1])
                     self:SetPermanentAssistCount(count[2])
 
-                # Unknown number of entries
+                -- Unknown number of entries
                 else
                     error('*Base Manager Error: Unknown number of entries passed to SetEngineerCount')
                 end
@@ -577,9 +571,9 @@ BaseManager = Class {
             self.EngineerBuildRateBuff = buffName
         end,
 
-        #------------------------------------------------------
-        #-- Get/Set of default chains for base funcitonality --
-        #------------------------------------------------------
+        ------------------------------------------------------
+        -- Get/Set of default chains for base funcitonality --
+        ------------------------------------------------------
         GetDefaultEngineerPatrolChain = function(self)
             return self.DefaultEngineerPatrolChain
         end,
@@ -607,13 +601,13 @@ BaseManager = Class {
             return true
         end,
 
-        # Returns all factories working at a base manager
+        -- Returns all factories working at a base manager
         GetAllBaseFactories = function(self, category)
             if not category then
                 return self.AIBrain:PBMGetAllFactories(self.BaseName)
             end
             
-            # filter factories by category passed in
+            -- filter factories by category passed in
             local retFacs = {}
             for k,v in self.AIBrain:PBMGetAllFactories(self.BaseName) do
                 if EntityCategoryContains( category, v ) then
@@ -623,11 +617,11 @@ BaseManager = Class {
             return retFacs
         end,
         
-        # Add in the ability for an expansion base to move out and help another base manager at another location
-        #   Functionality should mean that you simply specifiy the name of the base and it will then send out an
-        #   engineer to build it.  You can also specify the number of engineers you would like to support with
-        #   baseData is a field that does nothing currently.  If we ever need more data (transports maybe) it would
-        #   be housed there.
+        -- Add in the ability for an expansion base to move out and help another base manager at another location
+        --   Functionality should mean that you simply specifiy the name of the base and it will then send out an
+        --   engineer to build it.  You can also specify the number of engineers you would like to support with
+        --   baseData is a field that does nothing currently.  If we ever need more data (transports maybe) it would
+        --   be housed there.
         AddExpansionBase = function(self,baseName,engQuantity,baseData)
             if not engQuantity then
                 engQuantity = 1
@@ -639,14 +633,14 @@ BaseManager = Class {
             end
         end,
 
-        #-----------------------------------------------
-        #-- Base Manager Unit Upgrade Level functions --
-        #-----------------------------------------------
+        -----------------------------------------------
+        -- Base Manager Unit Upgrade Level functions --
+        -----------------------------------------------
 
-        # Set what type of upgrades you want on what types of units.  Applies to only ACU and SACU right now.
-        #   upgradeTable houses the data for upgrades in a table of strings, ex: { 'ResourceEnhancement', 'T3Engineering' }
-        #   unitName is the unit type, DefaultACU and DefaultSACU use the appropriate unit based on faction
-        #   startActive if true the unit will start with the enhancements, if not then they will upgrade to the enhancements.
+        -- Set what type of upgrades you want on what types of units.  Applies to only ACU and SACU right now.
+        --   upgradeTable houses the data for upgrades in a table of strings, ex: { 'ResourceEnhancement', 'T3Engineering' }
+        --   unitName is the unit type, DefaultACU and DefaultSACU use the appropriate unit based on faction
+        --   startActive if true the unit will start with the enhancements, if not then they will upgrade to the enhancements.
         SetUnitUpgrades = function(self, upgradeTable, unitName, startActive)
             if not unitName then
                 error('*AI Debug: No unit name given for unit upgrades: Base named - ' .. self.BaseName, 2 )
@@ -675,13 +669,13 @@ BaseManager = Class {
             end
         end,
 
-        # Determines if a specific unit needs upgrades, returns name of upgrade if needed
+        -- Determines if a specific unit needs upgrades, returns name of upgrade if needed
         UnitNeedsUpgrade = function(self, unit, unitType)
             if unit:IsDead() then
                 return false
             end
 
-            # Find appropriate data about unit upgrade info
+            -- Find appropriate data about unit upgrade info
             local upgradeTable = false
             if unitType then
                 upgradeTable = self.UnitUpgrades[unitType]
@@ -692,7 +686,7 @@ BaseManager = Class {
                 return false
             end
 
-            # which table to use to determine upgrade dependencies.
+            -- which table to use to determine upgrade dependencies.
             local crossCheckTable = false
             if unitType == 'DefaultACU' then
                 crossCheckTable = self.ACUUpgradeNames
@@ -700,7 +694,7 @@ BaseManager = Class {
                 crossCheckTable = self.SACUUpgradeNames
             end
 
-            # find unit faction
+            -- find unit faction
             local faction = 0
             if EntityCategoryContains(categories.UEF, unit) then
                 faction = 'uef'
@@ -710,18 +704,18 @@ BaseManager = Class {
                 faction = 'cybran'
             end
 
-            # Check upgrade info, if any final upgrades are missing or pre-requisites return true
+            -- Check upgrade info, if any final upgrades are missing or pre-requisites return true
             for num,upgradeName in upgradeTable do
-                # Check requirements for the upgrade
+                -- Check requirements for the upgrade
                 if crossCheckTable then
                     for uName,uData in crossCheckTable do
                         if not unit:HasEnhancement(upgradeName) then
 
-                            # if can build the upgradeName then return out that specific upgrade; already has requirement
+                            -- if can build the upgradeName then return out that specific upgrade; already has requirement
                             if uName == upgradeName and not uData[1] and self:EnhancementFactionCheck( faction, uData[3] ) then
                                 return upgradeName
 
-                            # if it has a requirement and the requirement isn't built, spit out the requirement
+                            -- if it has a requirement and the requirement isn't built, spit out the requirement
                             elseif uName == upgradeName and uData[1] and self:EnhancementFactionCheck( faction, uData[3] ) then
                                 if not unit:HasEnhancement(uData[1]) then
                                     return uData[1]
@@ -732,7 +726,7 @@ BaseManager = Class {
                         end
                     end
                 else
-                    # no requirement, return upgrade name
+                    -- no requirement, return upgrade name
                     if not unit:HasEnhancement(upgradeName) then
                         return upgradeName
                     end
@@ -741,7 +735,7 @@ BaseManager = Class {
             return false
         end,
 
-        # Returns appropriate faction table for upgrades
+        -- Returns appropriate faction table for upgrades
         EnhancementFactionCheck = function(self,faction,factionTable)
             if factionTable[1] == 'all' then
                 return true
@@ -754,13 +748,13 @@ BaseManager = Class {
             return false
         end,
 
-        # Check if a unit has upgrade
+        -- Check if a unit has upgrade
         CheckEnhancement = function(self, unit, upgrade)
             if unit:IsDead() then
                 return false
             end
 
-            # Find faction of the unit (for ACU and sACU upgrades)
+            -- Find faction of the unit (for ACU and sACU upgrades)
             local faction
             if EntityCategoryContains( categories.UEF, unit ) then
                 faction = 'uef'
@@ -770,7 +764,7 @@ BaseManager = Class {
                 faction = 'aeon'
             end
 
-            # Choose which table to find the upgrade data in
+            -- Choose which table to find the upgrade data in
             local upgradeTable = false
             if EntityCategoryContains( categories.COMMAND, unit ) then
                 upgradeTable = self.ACUUpgradeNames
@@ -778,7 +772,7 @@ BaseManager = Class {
                 upgradeTable = self.SACUUpgradeNames
             end
 
-            # Check upgrades
+            -- Check upgrades
             if not upgradeTable then
                 return true
             end
@@ -802,15 +796,15 @@ BaseManager = Class {
             return false
         end,
 
-        # Table for upgrade requirements for ACU
+        -- Table for upgrade requirements for ACU
         ACUUpgradeNames = {
-            # UpgadeName = { prereq/false, slot, { factions/all } },
+            -- UpgadeName = { prereq/false, slot, { factions/all } },
             AdvancedEngineering = { false, 'LCH', {'all'} },
             T3Engineering = {'AdvancedEngineering', 'LCH', {'all'} },
             ResourceAllocation = { false, 'RCH', {'all'} },
             Teleporter = { false, 'Back', {'all'} },
 
-            # UEF
+            -- UEF
             DamageStabilization = { false, 'LCH', {'uef'} },
             HeavyAntiMatterCannon = { false, 'RCH', {'uef'} },
             LeftPod = { false, 'Back', {'uef'} },
@@ -820,14 +814,14 @@ BaseManager = Class {
             TacticalMissile = { false, 'Back', {'uef'} },
             TacticalNukeMissile = { 'TacticalMissile', 'Back', {'uef'} },
 
-            # Cybran
+            -- Cybran
             CloakingGenerator = { false, 'Back', {'cybran'} },
             CoolingUpgrade = { false, 'LCH', {'cybran'} },
             MicrowaveLaserGenerator = { false, 'RCH', {'cybran'} },
             NaniteTorpedoTube = { false, 'RCH', {'cybran'} },
             StealthGenerator = { 'CloakingGenerator', 'Back', {'cybran'} },
 
-            # Aeon
+            -- Aeon
             ChronoDampener = { false, 'Back', {'aeon'} },
             CrysalisBeam = { false, 'LCH', {'aeon'} },
             EnhancedSensors = { false, 'RCH', {'aeon'} },
@@ -836,13 +830,13 @@ BaseManager = Class {
             ShieldHeavy = { 'Shield', 'Back', {'aeon'} },
         },
 
-        # Table for upgrade requirements for SACU
+        -- Table for upgrade requirements for SACU
         SACUUpgradeNames = {
-            # UpgadeName = { prereq/false, slot, { factions/all } },
+            -- UpgadeName = { prereq/false, slot, { factions/all } },
             Shield = { false, 'Back', {'uef','aeon'} },
             ResourceAllocation = { false, 'RCH', {'all'} },
 
-            # UEF
+            -- UEF
             AdvancedCoolingUpgrade = { false, 'LCH', {'uef'} },
             HighExplosiveOrdnance = { false, 'RCH', {'uef'} },
             Pod = { false, 'Back', {'uef'} },
@@ -850,7 +844,7 @@ BaseManager = Class {
             SensorRangeEnhancer = { false, 'LCH', {'uef'} },
             ShieldGeneratorField = { 'Shield', 'Back', {'uef'} },
 
-            # Cybran
+            -- Cybran
             CloakingGenerator = { false, 'Back', {'cybran'} },
             EMPCharge = { false, 'LCH', {'cybran'} },
             FocusConverter = { false, 'RCH', {'cybran'} },
@@ -859,7 +853,7 @@ BaseManager = Class {
             StealthGenerator = { false, 'Back', {'cybran'} },
             SwitchBack = { false, 'LCH', {'cybran'} },
 
-            # Aeon
+            -- Aeon
             EngineeringFocusingModule = { false, 'LCH', {'aeon'} },
             ShieldHeavy = { 'Shield', 'Back', {'aeon'} },
             StabilitySuppressant = { false, 'RCH', {'aeon'} },
@@ -892,8 +886,6 @@ BaseManager = Class {
                 WaitSeconds(waitTime)
             end
         end,
-
-
 
         -- Sort build groups by priority
         SortGroupNames = function(self)
@@ -1157,7 +1149,6 @@ BaseManager = Class {
             return false
         end,
 
-
         -- Enable/Disable functionality of base parts through functions
         SetActive = function(self,actType,val)
             if self.ActivationFunctions[actType..'Active'] then
@@ -1241,10 +1232,6 @@ BaseManager = Class {
                 self.FunctionalityStates.AirScouting = val
             end,
         },
-
-
-
-
 
         -- Enable/Disable building of buildings and stuff
         SetBuild = function(self,buildType,val)
@@ -1418,7 +1405,6 @@ BaseManager = Class {
             end,
         },
 
-
         ----------------------------------------
         -- Default builders for base managers --
         ----------------------------------------
@@ -1445,7 +1431,7 @@ BaseManager = Class {
                 self.AIBrain:PBMAddPlatoon(defaultBuilder)
             end
 
-            # -- Disband platoons - engineers built here
+            -- Disband platoons - engineers built here
             for i=1,3 do
                 for j=1,5 do
                     for num,pType in { 'Air', 'Land', 'Sea' } do
@@ -1462,15 +1448,15 @@ BaseManager = Class {
                                 BaseName = self.BaseName,
                             },
                             BuildConditions = {
-                                    { BMBC, 'BaseEngineersEnabled', { self.BaseName }},
-                                    { BMBC, 'BaseBuildingEngineers', { self.BaseName }},
-                                    { BMBC, 'HighestFactoryLevel', { i, self.BaseName }},
-                                    { BMBC, 'FactoryCountAndNeed', { i, j, pType, self.BaseName }},
-                                    { BMBC, 'BaseActive', {self.BaseName}},
-                                },
+                                { BMBC, 'BaseEngineersEnabled', { self.BaseName }},
+                                { BMBC, 'BaseBuildingEngineers', { self.BaseName }},
+                                { BMBC, 'HighestFactoryLevel', { i, self.BaseName }},
+                                { BMBC, 'FactoryCountAndNeed', { i, j, pType, self.BaseName }},
+                                { BMBC, 'BaseActive', {self.BaseName}},
+                            },
                             PlatoonBuildCallbacks = { { BMBC, 'BaseManagerEngineersStarted' }, },
                             InstanceCount = 3,
-                            BuildTimeOut = 10, # Timeout really fast because they dont need to really finish
+                            BuildTimeOut = 10, -- Timeout really fast because they dont need to really finish
                         }
                         self.AIBrain:PBMAddPlatoon( defaultBuilder )
                     end
@@ -1479,7 +1465,7 @@ BaseManager = Class {
         end,
 
         LoadDefaultBaseCDRs = function(self)
-            # -- CDR Build
+            -- CDR Build
             local defaultBuilder = {
                 BuilderName = 'BaseManager_CDRPlatoon_' .. self.BaseName,
                 PlatoonTemplate = self:CreateCommanderPlatoonTemplate(),
@@ -1503,7 +1489,7 @@ BaseManager = Class {
         end,
 
         LoadDefaultBaseSupportCDRs = function(self)
-            # -- CDR Build
+            -- CDR Build
             local defaultBuilder = {
                 BuilderName = 'BaseManager_sCDRPlatoon_' .. self.BaseName,
                 PlatoonTemplate = self:CreateSupportCommanderPlatoonTemplate(),
@@ -1521,24 +1507,24 @@ BaseManager = Class {
             }
             self.AIBrain:PBMAddPlatoon( defaultBuilder )
 
-            # -- Disband platoon
+            -- Disband platoon
             defaultBuilder = {
-                    BuilderName = 'BaseManager_sACUDisband_' .. self.BaseName,
-                    PlatoonAIPlan = 'DisbandAI',
-                    PlatoonTemplate = self:CreateSupportCommanderPlatoonTemplate(),
-                    Priority = 900,
-                    PlatoonType = 'Gate',
-                    RequiresConstruction = true,
-                    LocationType = self.BaseName,
-                    BuildConditions = {
-                            { BMBC, 'BaseEngineersEnabled', { self.BaseName }},
-                            { BMBC, 'NumUnitsLessNearBase', { self.BaseName, ParseEntityCategory( 'SUBCOMMANDER' ), self.BaseName ..'_sACUNumber' } },
-                            { BMBC, 'BaseActive', {self.BaseName} },
-                        },
-                    InstanceCount = 2,
-                    BuildTimeOut = 10, # Timeout really fast because they dont need to really finish
-                }
-                self.AIBrain:PBMAddPlatoon( defaultBuilder )
+                BuilderName = 'BaseManager_sACUDisband_' .. self.BaseName,
+                PlatoonAIPlan = 'DisbandAI',
+                PlatoonTemplate = self:CreateSupportCommanderPlatoonTemplate(),
+                Priority = 900,
+                PlatoonType = 'Gate',
+                RequiresConstruction = true,
+                LocationType = self.BaseName,
+                BuildConditions = {
+                        { BMBC, 'BaseEngineersEnabled', { self.BaseName }},
+                        { BMBC, 'NumUnitsLessNearBase', { self.BaseName, ParseEntityCategory( 'SUBCOMMANDER' ), self.BaseName ..'_sACUNumber' } },
+                        { BMBC, 'BaseActive', {self.BaseName} },
+                    },
+                InstanceCount = 2,
+                BuildTimeOut = 10, # Timeout really fast because they dont need to really finish
+            }
+            self.AIBrain:PBMAddPlatoon( defaultBuilder )
         end,
 
         LoadDefaultScoutingPlatoons = function(self)
