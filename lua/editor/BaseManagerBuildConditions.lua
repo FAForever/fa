@@ -125,18 +125,33 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
         local base = aiBrain.BaseManagers[eBaseName]
         if base and base:GetPosition() and base:GetRadius() then
             local count = base:GetCurrentEngineerCount()
-            -- local unitList = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('ENGINEER'), base:GetPosition(), base:GetRadius(),'Ally' )
-            -- local count = 0
-            -- for i,unit in unitList do
-                -- if unit:GetAIBrain() == aiBrain then
-                    -- count = count + 1
-                -- end
-            -- end
-            if ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers'] then
-                count = count + ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers']
-            end
+            count = count + eData.IncomingEngineers
             if count < eData.Engineers then
                 return true
+            end
+        end
+    end
+    return false
+end
+
+-- Check if specific expansion base needs engineers
+function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
+    if not aiBrain.BaseManagers[baseName] or not aiBrain.BaseManagers[eBaseName] then
+        return false
+    end
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager.ExpansionBaseData then
+        return false
+    end
+    for num,eData in bManager.ExpansionBaseData do
+        if eData.BaseName == eBaseName then
+            local base = aiBrain.BaseManagers[eBaseName]
+            if base and base:GetPosition() and base:GetRadius() then
+                local count = base:GetCurrentEngineerCount()
+                count = count + eData.IncomingEngineers
+                if count < eData.Engineers then
+                    return true
+                end
             end
         end
     end

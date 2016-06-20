@@ -626,7 +626,7 @@ BaseManager = Class {
             if not engQuantity then
                 engQuantity = 1
             end
-            table.insert( self.ExpansionBaseData, { BaseName = baseName, Engineers = engQuantity } )
+            table.insert( self.ExpansionBaseData, { BaseName = baseName, Engineers = engQuantity, IncomingEngineers = 0} )
             self.FunctionalityStates.ExpansionBases = true
             if baseData then
                 -- Setup base here

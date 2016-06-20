@@ -68,6 +68,13 @@ function BaseManagerSingleDestroyed(unit)
     end
 end
 
+-- Callback when unit is removed from base manager
+function BaseManagerSingleRemoved(unit)
+    local aiBrain = unit:GetAIBrain()
+    local bManager = aiBrain.BaseManagers[unit.BaseName]
+    bManager:SubtractCurrentEngineer()
+end
+
 -- Main function for base manager engineers
 function BaseManagerSingleEngineerPlatoon(platoon)
     platoon.PlatoonData.DontDisband = true
@@ -109,7 +116,6 @@ function BaseManagerSingleEngineerPlatoon(platoon)
             -- finish unfinished buildings
             elseif BMBC.UnfinishedBuildingsCheck( aiBrain, baseName ) then
                 BuildUnfinishedStructures(platoon)
-
 
             -- reclaim nearby wreckage/trees/rocks/people; never do this right now dont want to destroy props and stuff
             elseif false and BMBC.BaseReclaimEnabled( aiBrain, baseName ) and MIBC.ReclaimablesInArea( aiBrain, baseName ) then
@@ -650,42 +656,53 @@ end
 function ExpansionEngineer( platoon )
     platoon:Stop()
     -- LOG('*AI DEBUG: ExpansionEngineer starting.')
+
     local unitCount = table.getn(platoon:GetPlatoonUnits())
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
+
     if not (data.BaseName and aiBrain.BaseManagers[data.BaseName] and aiBrain.BaseManagers[data.BaseName].ExpansionBaseData) then
         aiBrain:DisbandPlatoon(platoon)
         -- LOG('*AI DEBUG Invalied data for expansion.  Returning out')
         return
     end
+
     local bManager = aiBrain.BaseManagers[data.BaseName]
     local cmd = false
-    local eBaseName = false
+
     for num,eData in bManager.ExpansionBaseData do
-        if BMBC.NumUnitsLessNearBase(aiBrain, eData.BaseName, ParseEntityCategory( 'ENGINEER' ), eData.Engineers) then
-            if not ScenarioInfo.VarTable[eData.BaseName..'_ExpansionEngineers'] then
-                ScenarioInfo.VarTable[eData.BaseName..'_ExpansionEngineers'] = 0
+        -- Find out what expansion base needs engineers
+        if BMBC.NumEngiesInExpansionBase(aiBrain, data.BaseName, eData.BaseName) then
+            if data.ExpansionBase ~= eData.BaseName then
+                data.ExpansionBase = eData.BaseName
             end
-            eBaseName = eData.BaseName
-            ScenarioInfo.VarTable[eData.BaseName..'_ExpansionEngineers'] = ScenarioInfo.VarTable[eData.BaseName..'_ExpansionEngineers'] + unitCount
+
+            -- Tracks engineers that are on the way to the expansion base
+            eData.IncomingEngineers = eData.IncomingEngineers + unitCount
+
+            -- Remove engieneer from IncomingEngineers if it dies on the way
+            platoon:AddDestroyCallback(ExpansionPlatoonDestroyed)
+
             if eData.TransportPlatoon or VDist3( platoon:GetPlatoonPosition(), aiBrain.BaseManagers[eData.BaseName]:GetPosition() ) > 250 then
                 cmd = TransportUnitsToLocation(platoon, aiBrain.BaseManagers[eData.BaseName]:GetPosition())
             end
+
             if not cmd then
                 cmd = platoon:MoveToLocation( aiBrain.BaseManagers[eData.BaseName]:GetPosition(), false )
-                break
-            else
-                break
             end
+            break
         else
             -- LOG('*AI DEBUG: Somethin dun screwed up')
         end
     end
-    WaitSeconds(1)
+
+    WaitSeconds(2)
+
     if not aiBrain:PlatoonExists(platoon) then
         -- LOG('*AI DEBUG: Platoon no longer exists')
         return
     end
+
     if cmd and type(cmd) ~= 'boolean' then
         while platoon:IsCommandsActive(cmd) do
             WaitSeconds(5)
@@ -696,14 +713,32 @@ function ExpansionEngineer( platoon )
     else
         -- LOG('*AI DEBUG: No valid command')
     end
-    if eBaseName then
-        ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers'] = ScenarioInfo.VarTable[eBaseName..'_ExpansionEngineers'] - unitCount
+
+    for num,eData in bManager.ExpansionBaseData do
+        if eData.BaseName == data.ExpansionBase then
+            eData.IncomingEngineers = eData.IncomingEngineers - 1
+        end
     end
+
     if aiBrain:PlatoonExists(platoon) then
         -- LOG('*AI DEBUG: Disbanding expansion engineer\n')
         local unit = platoon:GetPlatoonUnits()[1]
-        BaseManagerSingleDestroyed(unit)
+        BaseManagerSingleRemoved(unit)
+        platoon:RemoveDestroyCallback(ExpansionPlatoonDestroyed)
         aiBrain:DisbandPlatoon(platoon)
+    end
+end
+
+function ExpansionPlatoonDestroyed(brain, platoon)
+    local aiBrain = platoon:GetBrain()
+    local data = platoon.PlatoonData
+    local bManager = aiBrain.BaseManagers[data.BaseName]
+    local eBaseName = false
+
+    for num,eData in bManager.ExpansionBaseData do
+        if eData.BaseName == data.ExpansionBase then
+            eData.IncomingEngineers = eData.IncomingEngineers - 1
+        end
     end
 end
 
