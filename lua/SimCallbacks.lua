@@ -84,11 +84,10 @@ Callbacks.CapMex = function(data, units)
     local mex = GetEntityById(data.target)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
     local pos = mex:GetPosition()
-    local bpid = mex:GetBlueprint().BlueprintId
-    local msid = string.sub(bpid, 0, 3) .. '1106'
+    local msid
 
     for _, u in units do
-        -- TODO, race specific prefix per builder, see lua/ui/construction.lua
+        msid = string.sub(u:GetBlueprint().BlueprintId, 0, 2) .. 'b1106'
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
         IssueBuildMobile({u}, Vector(pos.x+2, pos.y, pos.z), msid, {})
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z+2), msid, {})
