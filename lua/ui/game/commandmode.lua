@@ -136,17 +136,18 @@ function AddCommandFeedbackByType(pos, type)
         return false;
     else
         AddCommandFeedbackBlip({
-                    Position = pos, 
+                    Position = pos,
                     MeshName = commandMeshResources[type][1],
                     TextureName = commandMeshResources[type][2],
                     ShaderName = 'CommandFeedback',
                     UniformScale = 0.125,
                 }, 0.7)
     end
-        
+
     return true;
 end
 
+local lastMex = nil
 function AssistMex(command)
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
     if not units[1] then return end
@@ -162,12 +163,8 @@ function AssistMex(command)
     local focus = mex:GetFocus()
 
     if focus then -- upgrading
-        for _, u in units do
-            if u:GetFocus() == focus then
-                cap = true
-                break
-            end
-        end
+        cap = IsKeyDown('Shift') and lastMex == mex
+        lastMex = mex
     elseif not mex:IsInCategory('TECH1')  then
         cap = true
     end
