@@ -44,9 +44,6 @@ local Points = {
 }
 
 AIBrain = Class(moho.aibrain_methods) {
-    Result = nil,
-    unitStats = {},
-
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
@@ -57,35 +54,35 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     AddUnitStat = function(self, unitId, statName, value)
-        if unitStats[unitId] == nil then
-            unitStats[unitId] = {}
+        if self.unitStats[unitId] == nil then
+            self.unitStats[unitId] = {}
         end
 
-        if unitStats[unitId][statName] == nil then
-            unitStats[unitId][statName] = value
+        if self.unitStats[unitId][statName] == nil then
+            self.unitStats[unitId][statName] = value
         else
-            unitStats[unitId][statName] = unitStats[unitId][statName] + value
+            self.unitStats[unitId][statName] = self.unitStats[unitId][statName] + value
         end
     end,
 
     SetUnitStat = function(self, unitId, statName, value)
-        if unitStats[unitId] == nil then
-            unitStats[unitId] = {}
+        if self.unitStats[unitId] == nil then
+            self.unitStats[unitId] = {}
         end
 
-        unitStats[unitId][statName] = value
+        self.unitStats[unitId][statName] = value
     end,
 
     GetUnitStat = function(self, unitId, statName)
-        if unitStats[unitId] == nil or unitStats[unitId][statName] == nil then
+        if self.unitStats[unitId] == nil or self.unitStats[unitId][statName] == nil then
             return 0
         end
 
-        return unitStats[unitId][statName]
+        return self.unitStats[unitId][statName]
     end,
 
     GetUnitStats = function(self)
-        return unitStats
+        return self.unitStats
     end,
 
     OnCreateAI = function(self, planName)
@@ -144,6 +141,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     CreateBrainShared = function(self,planName)
+        self.Result = nil -- no-op, just to be explicit it starts as nil
+        self.unitStats = {}
         self.Trash = TrashBag()
         local aiScenarioPlans = self:ImportScenarioArmyPlans(planName)
         if aiScenarioPlans then
