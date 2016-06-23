@@ -2128,6 +2128,12 @@ Unit = Class(moho.unit_methods) {
                 local progress = p:GetFractionComplete() * 0.5
                 -- set health according to how much is left of the wreck
                 unit:SetHealth(self, unit:GetMaxHealth() * progress)
+
+                -- Clear up wreck after rebuild bonus applied if engine won't
+                if not unit.EngineIsDeletingWreck then
+                    p:Destroy()
+                end
+
                 return
             end
         end
