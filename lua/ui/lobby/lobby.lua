@@ -355,7 +355,7 @@ end
 function GetAIPlayerData(name, AIPersonality)
     return PlayerData(
         {
-            OwnerID = 999999,
+            OwnerID = hostID,
             PlayerName = name,
             Ready = true,
             Human = false,
@@ -689,12 +689,12 @@ function FindObserverSlotForID(id)
             return k
         end
     end
+
     return nil
 end
 
 function IsLocallyOwned(slot)
-    return (gameInfo.PlayerOptions[slot].OwnerID == localPlayerID) or
-        (lobbyComm:IsHost() and gameInfo.PlayerOptions[slot].OwnerID == 999999)
+    return gameInfo.PlayerOptions[slot].OwnerID == localPlayerID
 end
 
 function IsPlayer(id)
@@ -3299,7 +3299,7 @@ function EveryoneHasEstablishedConnections()
     end
     local result = true
     for k, id in important do
-        if id ~= localPlayerID and id ~= 999999 then -- Not myself or an AI
+        if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
             for k2, other in important do
                 if id ~= other and not table.find(peer.establishedPeers, other) then
@@ -3757,6 +3757,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 ClearSlotInfo(data.OldSlot)
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+            elseif data.Type == 'SwapPlayers' then
+                DoSlotSwap(data.Slot1, data.Slot2)
             elseif data.Type == 'ObserverAdded' then
                 gameInfo.Observers[data.Slot] = PlayerData(data.Options)
                 refreshObserverList()
@@ -5087,6 +5089,16 @@ function WarnIncompatibleMods()
         "<LOC _Ok>")
 end
 
+function DoSlotSwap(slot1, slot2)
+    local player1 = gameInfo.PlayerOptions[slot1]
+    local player2 = gameInfo.PlayerOptions[slot2]
+
+    gameInfo.PlayerOptions[slot2] = player1
+    gameInfo.PlayerOptions[slot1] = player2
+    SetSlotInfo(slot2, player1)
+    SetSlotInfo(slot1, player2)
+end
+
 --- Create the HostUtils object, containing host-only functions. By not assigning this for non-host
 -- players, we ensure a hard crash should a non-host somehow end up trying to call them, simplifying
 -- debugging somewhat (as well as reducing the number of toplevel definitions a fair bit).
@@ -5318,43 +5330,45 @@ function InitHostUtils()
         -- If the target slot is unoccupied, the player in the first slot is simply moved there.
         -- If the target slot is closed, this is a no-op.
         -- If a player or ai occupies both slots, they are swapped.
-        SwapPlayers = function(moveFrom, moveTo)
+        SwapPlayers = function(slot1, slot2)
             -- Bail out early for the stupid cases.
-            if not HostUtils.SanityCheckSlotMovement(moveFrom, moveTo) then
+            if not HostUtils.SanityCheckSlotMovement(slot1, slot2) then
                 return
             end
 
-            local fromOpts = gameInfo.PlayerOptions[moveFrom]
-            local toOpts = gameInfo.PlayerOptions[moveTo]
+            local player1 = gameInfo.PlayerOptions[slot1]
+            local player2 = gameInfo.PlayerOptions[slot2]
 
             -- Unready the move-ee
-            if fromOpts.Human then
-                HostUtils.SetPlayerNotReady(moveFrom)
+            if player1.Human then
+                HostUtils.SetPlayerNotReady(slot1)
             end
 
             -- If we're moving onto a blank, take the easy way out.
-            if not toOpts then
-                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+            if not player2 then
+                HostUtils.MovePlayerToEmptySlot(slot1, slot2)
                 return
             end
 
-            if toOpts.Human then
-                -- We're switching with a human. Time to do the stupid thing until we make a saner way.
-                -- Clear the ready flag for the other target if it is a human.
-                HostUtils.SetPlayerNotReady(moveTo)
+            -- If we're switching with a human, we need to clear their ready state for the move
+            if player2.Human then
+                HostUtils.SetPlayerNotReady(slot2)
             end
 
-            -- Move the player in the target slot to observers.
-            HostUtils.ConvertPlayerToObserver(moveTo, true)
+            -- Do the swap on our end
+            DoSlotSwap(slot1, slot2)
 
-            -- Move the other player into the slot.
-            HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
-
-            -- Move the observer into the slot the first player came from.
-            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
+            -- Tell everyone else to do the swap too
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'SwapPlayers',
+                    Slot1 = slot1,
+                    Slot2 = slot2,
+                }
+            )
 
             -- %s has switched with %s
-            SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
+            SendSystemMessage("lobui_0417", player1.PlayerName, player2.PlayerName)
         end,
 
         --- Add an observer
