@@ -679,7 +679,8 @@ function FindObserverSlotForID(id)
 end
 
 function IsLocallyOwned(slot)
-    return (gameInfo.PlayerOptions[slot].OwnerID == localPlayerID)
+    return (gameInfo.PlayerOptions[slot].OwnerID == localPlayerID) or
+        (lobbyComm:IsHost() and gameInfo.PlayerOptions[slot].OwnerID == 999999)
 end
 
 function IsPlayer(id)
@@ -3231,32 +3232,32 @@ end
 
 function EveryoneHasEstablishedConnections()
     local important = {}
-    for slot,player in gameInfo.PlayerOptions:pairs() do
+    for slot, player in gameInfo.PlayerOptions:pairs() do
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
     end
-    for slot,observer in gameInfo.Observers:pairs() do
+    for slot, observer in gameInfo.Observers:pairs() do
         if not table.find(important, observer.OwnerID) then
             table.insert(important, observer.OwnerID)
         end
     end
     local result = true
-    for k,id in important do
-        if id ~= localPlayerID then
-        local peer = lobbyComm:GetPeer(id)
-        for k2,other in important do
-            if id ~= other and not table.find(peer.establishedPeers, other) then
-                result = false
-                AddChatText(LOCF("<LOC lobui_0299>%s doesn't have an established connection to %s",
-                                 peer.name,
-                                 lobbyComm:GetPeer(other).name
-                ))
+    for k, id in important do
+        if id ~= localPlayerID and id ~= 999999 then -- Not myself or an AI
+            local peer = lobbyComm:GetPeer(id)
+            for k2, other in important do
+                if id ~= other and not table.find(peer.establishedPeers, other) then
+                    result = false
+                    AddChatText(LOCF("<LOC lobui_0299>%s doesn't have an established connection to %s",
+                                     peer.name,
+                                     lobbyComm:GetPeer(other).name
+                    ))
+                end
             end
         end
     end
-end
-return result
+    return result
 end
 
 function AddChatText(text)
