@@ -731,22 +731,18 @@ AIBrain = Class(moho.aibrain_methods) {
     ---- ---------- System for playing VOs to the Player ------------ ----
     ------------------------------------------------------------------------------------------------------------------------------------
     VOSounds = {
-        -- {timeout delay, default cue}
-        NuclearLaunchDetected = {1, nil},
-        OnTransportFull = {1, nil},
-        OnFailedUnitTransfer = {10, 'Computer_Computer_CommandCap_01298'},
-        OnPlayNoStagingPlatformsVO = {5, 'XGG_Computer_CV01_04756'},
-        OnPlayBusyStagingPlatformsVO = {5, 'XGG_Computer_CV01_04755'},
-        OnPlayCommanderUnderAttackVO = {15, 'Computer_Computer_Commanders_01314'},
+        -- {timeout delay, default cue, observers}
+        NuclearLaunchDetected =        {timeout=1,  bank=nil, obs=true},
+        OnTransportFull =              {timeout=1,  bank=nil},
+        OnFailedUnitTransfer =         {timeout=10, bank='Computer_Computer_CommandCap_01298'},
+        OnPlayNoStagingPlatformsVO =   {timeout=5,  bank='XGG_Computer_CV01_04756'},
+        OnPlayBusyStagingPlatformsVO = {timeout=5,  bank='XGG_Computer_CV01_04755'},
+        OnPlayCommanderUnderAttackVO = {timeout=15, bank='Computer_Computer_Commanders_01314'},
     },
 
 
     PlayVOSound = function(self, string, sound)
         if not self.VOTable then self.VOTable = {} end
-
-        if GetFocusArmy() ~= self:GetArmyIndex() or self.VOTable[string] then
-            return
-        end
 
         local VO = self.VOSounds[string]
         if not VO then
@@ -754,11 +750,15 @@ AIBrain = Class(moho.aibrain_methods) {
             return
         end
 
+        if (not VO['obs'] and GetFocusArmy() ~= self:GetArmyIndex()) or self.VOTable[string] then
+            return
+        end
+
         local cue, bank
         if sound then
             cue, bank = GetCueBank(sound)
         else
-            cue, bank = VO[2], 'XGG'
+            cue, bank = VO['bank'], 'XGG'
         end
 
         if not (bank and cue) then
@@ -769,7 +769,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.VOTable[string] = true
         table.insert(Sync.Voice, {Cue=cue, Bank=bank} )
 
-        local timeout = VO[1]
+        local timeout = VO['timeout']
         ForkThread(function()
             WaitSeconds(timeout)
             self.VOTable[string] = nil
