@@ -863,7 +863,9 @@ function CategoryHunterPlatoonAI(platoon)
         local newTarget = false
         local platPos = platoon:GetPlatoonPosition()
         for catNum,category in platoon.PlatoonData.CategoryList do
-            local unitList = ArmyBrains[GetFocusArmy()]:GetListOfUnits( category, false, false )
+            local enemy = aiBrain:GetCurrentEnemy()
+            if not enemy then break end
+            local unitList = enemy:GetListOfUnits( category, false, false )
             if table.getn(unitList) > 0 then
                 local distance = 100000
                 for k,v in unitList do
