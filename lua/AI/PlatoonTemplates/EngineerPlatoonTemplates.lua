@@ -77,7 +77,7 @@ PlatoonTemplate {
     Name = 'T2EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
+        { categories.ENGINEER * categories.TECH2 - categories.ENGINEERSTATION, 1, 1, 'support', 'None' }
     },
 }
 
@@ -85,7 +85,7 @@ PlatoonTemplate {
     Name = 'T2EngineerTransfer',
     Plan = 'TransferAI',
     GlobalSquads = {
-        { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'none' },
+        { categories.ENGINEER * categories.TECH2 - categories.ENGINEERSTATION, 1, 1, 'support', 'none' },
     },
 }
 
@@ -101,7 +101,7 @@ PlatoonTemplate {
     Name = 'CybranT2EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.CYBRAN * categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
+        { categories.CYBRAN * categories.ENGINEER * categories.TECH2 - categories.ENGINEERSTATION, 1, 1, 'support', 'None' }
     },
 }
 
@@ -125,7 +125,7 @@ PlatoonTemplate {
     Name = 'T3EngineerTransfer',
     Plan = 'TransferAI',
     GlobalSquads = {
-        { categories.ENGINEER * categories.TECH3, 1, 1, 'support', 'none' },
+        { categories.ENGINEER * categories.TECH3 - categories.ENGINEERSTATION, 1, 1, 'support', 'none' },
     },
 }
 
@@ -149,7 +149,7 @@ PlatoonTemplate {
     Name = 'CybranT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.CYBRAN * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
+        { categories.CYBRAN * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ) - categories.ENGINEERSTATION, 1, 1, 'support', 'None' }
     },
 }
 
