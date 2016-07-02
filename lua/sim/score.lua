@@ -95,6 +95,10 @@ function ScoreThread()
                 }
             },
 
+            blueprints = {
+                -- filled dynamically below
+            },
+
             units = {
                 -- filled dynamically below
             },
@@ -166,12 +170,12 @@ function ScoreThread()
             ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
 
             for unitId, stats in brain:GetUnitStats() do
-                if ArmyScore[index].units[unitId] == nil then
-                    ArmyScore[index].units[unitId] = {}
+                if ArmyScore[index].blueprints[unitId] == nil then
+                    ArmyScore[index].blueprints[unitId] = {}
                 end
 
                 for statName, value in stats do
-                    ArmyScore[index].units[unitId][statName] = value
+                    ArmyScore[index].blueprints[unitId][statName] = value
                 end
             end
 
