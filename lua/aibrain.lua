@@ -749,7 +749,9 @@ AIBrain = Class(moho.aibrain_methods) {
             return
         end
 
-        if (not VO['obs'] and GetFocusArmy() ~= self:GetArmyIndex()) or self.VOTable[string] then
+        if not self.VOTable[string] and VO['obs'] and GetFocusArmy() == -1 and self:GetArmyIndex() == 1 then
+            -- Don't stop sound IF not repeated AND sound is flagged as 'obs' AND i'm observer AND only from PlayerIndex=1
+        elseif self.VOTable[string] or GetFocusArmy() ~= self:GetArmyIndex() then
             return
         end
 
