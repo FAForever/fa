@@ -1580,7 +1580,7 @@ Unit = Class(moho.unit_methods) {
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
-            not EntityCategoryContains(categories.STRUCTURE * categories.FACTORY, self)  -- Exclude structures
+            not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
         )
         WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
