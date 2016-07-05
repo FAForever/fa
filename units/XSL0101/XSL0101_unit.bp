@@ -183,7 +183,6 @@ UnitBlueprint {
         Cloak = true,
         RadarRadius = 40,
         RadarStealth = true,
-        StealthWaitTime = 1,
         VisionRadius = 24,
     },
     Interface = {
