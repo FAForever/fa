@@ -12,16 +12,14 @@ XSL0101 = Class(SWalkingLandUnit) {
 		LaserTurret = Class(SDFPhasicAutoGunWeapon) {},
     },
 
-    -- Set custom flag and add Stealth toggles to the cloak switch
+    -- Set custom flag and add Stealth and Cloak toggles to the switch
     OnScriptBitSet = function(self, bit)
         SWalkingLandUnit.OnScriptBitSet(self, bit)
         if bit == 8 then
             self.HiddenSelen = false
             self:SetWeaponEnabledByLabel('LaserTurret', true)
             self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
-            self:DisableUnitIntel('ToggleBit5', 'RadarStealthField')
-            self:DisableUnitIntel('ToggleBit5', 'SonarStealth')
-            self:DisableUnitIntel('ToggleBit5', 'SonarStealthField')
+            self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
     end,
 
@@ -31,11 +29,10 @@ XSL0101 = Class(SWalkingLandUnit) {
             self.HiddenSelen = true
             self:SetWeaponEnabledByLabel('LaserTurret', false)
             self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
-            self:EnableUnitIntel('ToggleBit5', 'RadarStealthField')
-            self:EnableUnitIntel('ToggleBit5', 'SonarStealth')
-            self:EnableUnitIntel('ToggleBit5', 'SonarStealthField')
+            self:EnableUnitIntel('ToggleBit8', 'Cloak')
             
             IssueStop({self})
+            IssueClearCommands({self})
         end
     end,
     
