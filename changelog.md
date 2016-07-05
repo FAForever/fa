@@ -1,6 +1,9 @@
 Patch 3656 (Upcoming)
 ============================
 
+**Exploits**
+- Fixed an exploit where Factories and QGates could be made to build units at half-price
+
 **UI**
 - UEF T2 Gunship will now display the transport icon when selected and hovering the mouse over one of your units
 - Fixed typo in Seraphim ACU description
@@ -12,6 +15,7 @@ Patch 3656 (Upcoming)
 - The map previews now show the rating for each player slot currently assigned, and AI Names
 - You can now set up your games via the map previews. Click on two players to swap them. Click an empty spot to occupy it.
 - Fixed map preview highlights not going away when you exit the player switch drop-down menu in certain ways
+- The colour of your rating text now changes colour, getting darker with higher deviation. This should make identifying smurf accounts easier.
 
 **Bugs**
 - Fixed death animations for Cybran T1 mobile artillery and Seraphim T3 mobile artillery
@@ -19,7 +23,8 @@ Patch 3656 (Upcoming)
 - Fixed torpedoes colliding with missiles and destroying them
 - Paragon no longer does low damage to buildings and ACUs
 - Fixed Size 4 buildings such as T2 PD and Flak getting a Rate-Of-Fire adjacency buff from PGens
-- Fixed bug in AI Engineer behaviour
+- Fixed bug in AI Engineer behaviour which let to an engine crash
+- Fixed unit stats being reported identical for all players. This is an important step towards a working achievement system.
 
 **Gameplay**
 - The Ythotha now spawns the energy being no matter the method used to kill it
@@ -27,6 +32,7 @@ Patch 3656 (Upcoming)
 - Added pause button for Nuke Subs and Seraphim Battleship
 - Nuke Launched warning now plays for Observers
 - Overhauled bomb-drop aim calculation code. It now takes the Y axis into account, and spaces multi-projectile drops properly. In theory, this should be the last word in bombers missing stupidly.
+- Improved AI base management in campaign scenarios
 
 
 Patch 3654 (May 30, 2016)
@@ -54,11 +60,15 @@ Patch 3654 (May 30, 2016)
 - Removed unused code
 
 **Contributors**
+- ckitching
 - Crotalus
+- Downlord
 - duk3luk3
 - IceDreamer
+- Justify87
 - Sheeo
 - Softly
+- Speed2
 - Uveso
 
 Patch 3652 (May 2, 2016)
