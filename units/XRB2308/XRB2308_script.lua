@@ -93,16 +93,12 @@ XRB2308 = Class(CStructureUnit) {
         self:DestroyAllDamageEffects()
         self:PlaySound(bp.Audio.Destroyed)
 
-        -- Here down is shadowing the function, all to change the entity subset. Dumb, right?
-        local layer = self:GetCurrentLayer()
-        local isNaval = EntityCategoryContains(categories.NAVAL, self)
-        local shallSink = (
-            (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
-            not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
-        )
-        WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
+        -- Here down is near-shadowing the function, all to change the entity subset. Dumb, right?
+        local isNaval = true
+        local shallSink = true -- This unit should definitely sink, no need to check cats.
+
+        WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
         self:DestroyAllDamageEffects()
-        self:DestroyTopSpeedEffects()
         self:DestroyIdleEffects()
         self:DestroyBeamExhaust()
         self:DestroyAllBuildEffects()
@@ -117,39 +113,20 @@ XRB2308 = Class(CStructureUnit) {
             self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
-        if shallSink then
-            self.DisallowCollisions = true
+        self.DisallowCollisions = true
 
-            -- Bubbles and stuff coming off the sinking wreck.
-            self:ForkThread(self.SinkDestructionEffects)
+        -- Bubbles and stuff coming off the sinking wreck.
+        self:ForkThread(self.SinkDestructionEffects)
 
-            -- Avoid slightly ugly need to propagate this through callback hell...
-            self.overkillRatio = overkillRatio
+        -- Avoid slightly ugly need to propagate this through callback hell...
+        self.overkillRatio = overkillRatio
 
-            if isNaval and self:GetBlueprint().Display.AnimationDeath then
-                -- Waits for wreck to hit bottom or end of animation
-                self:SeabedWatcher()
-            else
-                -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's
-                -- make one up.
-
-                local this = self
-                self:StartSinking(
-                    function()
-                        this:DestroyUnit(overkillRatio)
-                    end
-                )
-
-                -- Wait for the sinking callback to actually destroy the unit.
-                return
+        local this = self
+        self:StartSinking(
+            function()
+                this:DestroyUnit(overkillRatio)
             end
-        elseif self.DeathAnimManip then -- wait for non-sinking animations
-            WaitFor(self.DeathAnimManip)
-        end
-
-        -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
-        self:PlayUnitSound('Destroyed')
-        self:DestroyUnit(overkillRatio)
+        )
     end,
 
     -- Called from unit.lua DeathThread
