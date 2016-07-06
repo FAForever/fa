@@ -2163,6 +2163,10 @@ ACUUnit = Class(CommandUnit) {
         --If there is a killer, and it's not me
         if instigator and instigator:GetArmy() ~= self:GetArmy() then
             local instigatorBrain = ArmyBrains[instigator:GetArmy()]
+
+            Sync.EnforceRating = {}
+            WARN('ACU kill detected. Rating for ranked games is now enforced.')
+
             --if we are teamkilled
             if IsAlly(self:GetArmy(), instigator:GetArmy()) then
                 WARN('Teamkill detected')
