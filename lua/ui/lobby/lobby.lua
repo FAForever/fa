@@ -4141,14 +4141,12 @@ end
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
     if LrgMap then
-        LrgMap.isHidden = false
         RefreshLargeMap()
-        LrgMap:Show()
         return
     end
 
     -- Size of the map preview to generate.
-    local MAP_PREVIEW_SIZE = 721
+    local MAP_PREVIEW_SIZE = (GUI.Height() / 100) * 95
 
     -- The size of the mass/hydrocarbon icons
     local HYDROCARBON_ICON_SIZE = 14
@@ -4162,14 +4160,15 @@ function CreateBigPreview(parent)
 
     -- The LrgMap shouldn't be destroyed due to issues related to texture pooling. Evil hack ensues.
     local onTryMapClose = function()
-        LrgMap:Hide()
-        LrgMap.isHidden = true
+        LrgMap:Close()
+        LrgMap = nil
+        return
     end
     LrgMap.OnEscapePressed = onTryMapClose
     LrgMap.OnShadowClicked = onTryMapClose
 
     -- Create the map preview
-    local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE)
+    local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE, false, true)
     dialogContent.mapPreview = mapPreview
     LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
 
@@ -4180,6 +4179,16 @@ function CreateBigPreview(parent)
     -- Keep the close button on top of the border (which is itself on top of the map preview)
     LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 2)
 
+    local chkBoxLabels =UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "Show/Hide labels")
+    LayoutHelpers.AtLeftTopIn(chkBoxLabels, dialogContent, 10, 1)
+    LayoutHelpers.DepthOverParent(chkBoxLabels, dialogContent, 2)
+    chkBoxLabels.OnCheck = function(self, checked)
+        if checked == true then
+            mapPreview:HideLabels(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile))
+        else
+            mapPreview:ShowLabels(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile), gameInfo.PlayerOptions)
+        end
+    end
     RefreshLargeMap()
 end
 

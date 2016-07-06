@@ -38,6 +38,7 @@ ACUButton = Class(Group) {
         local teamIndicator = Bitmap(colourBmp)
         LayoutHelpers.AnchorToRight(teamIndicator, colourBmp, 1)
         LayoutHelpers.AtTopIn(teamIndicator, colourBmp, 5)
+        LayoutHelpers.DepthOverParent(teamIndicator, self, 3)
         teamIndicator:DisableHitTest()
         self.teamIndicator = teamIndicator
 
