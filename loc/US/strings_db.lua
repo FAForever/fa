@@ -6812,6 +6812,8 @@ lobui_0742="Full Share"
 lobui_0743="You can give units to your allies and they will not be destroyed when you die"
 lobui_0744="Share Until Death"
 lobui_0745="All the units you gave to your allies will be destroyed when you die"
+lobui_0756="%s was kicked by host"
+
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
 aisettings_0003="Cheat multiplier of %s"

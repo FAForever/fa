@@ -7454,6 +7454,7 @@ lobui_0524="Ripristina tutte le opzioni di gioco ai valori predefiniti"
 lobui_0501="Mappa casuale"
 lobui_0502="Seleziona una mappa casuale"
 lobui_0413="Paese"
+lobui_0756="%s was kicked by host"
 
 lobui_0592="Permetti osservatori"
 lobui_0593="Gli osservatori sono permessi dopo che il gioco e iniziato?"
