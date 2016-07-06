@@ -7626,6 +7626,7 @@ lobui_0752="Перезапустить тест CPU"
 lobui_0753="Переоценивает ваш CPU"
 lobui_0754="Ячейка"
 lobui_0755="Номер ячейки, полезен для перемещения игроков"
+lobui_0756="%s was kicked by host"
 
 # uimod_0010 in earlier but not sure if it should be changed
 uimod_0016="Включен игровой мод"

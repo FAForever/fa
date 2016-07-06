@@ -408,7 +408,11 @@ local function DoSlotBehavior(slot, key, name)
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                "<LOC lobui_0167>Kick Player",
-                               function() lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost") end,
+                               function()
+                                   SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
+                                   lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost")
+                               end
+                               ,
                                "<LOC _Cancel>", nil,
                                nil, nil,
                                true,
@@ -3011,6 +3015,7 @@ function CreateUI(maxPlayers)
         if isHost and event.Modifiers.Right then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                     "<LOC lobui_0167>Kick Player", function()
+                                        SendSystemMessage("lobui_0756", gameInfo.Observers[row+1].PlayerName)
                                         lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
                                     end,
                                     "<LOC _Cancel>", nil,
