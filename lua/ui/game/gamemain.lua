@@ -434,27 +434,30 @@ end
 
 -- Function to remove hidden selens from a selection which includes units other than hidden selens
 function DeselectSelens(selection)
-    local newSelection = selection
-    local hiddenSelen = {}
-    local otherUnits = false
+    local hiddenSelens = false
+    local other = false
 
     -- Find any selens with the hidden flag
-    for id, unit in newSelection do
-        if unit.HiddenSelen then -- Is Unit an activated Selen?
-            table.insert(hiddenSelen, id)
+    for id, unit in selection do
+        -- Stupid-ass UnitData table uses string numbers as keys. Because reasons?
+        if unit:IsInCategory("xsl0101") and unit:IsIdle() and GetFireState({unit}) == 1 then -- Is Unit an activated Selen?
+            if not hiddenSelens then hiddenSelens = {} end -- Ugly hack to make later logic easier
+            hiddenSelens[id] = unit
         else
-            otherUnits = true
+            other = true
         end
     end
 
-    -- Remove them from the selection
-    if table.getn(hiddenSelen) > 0 and otherUnits then
-        for id, unit in hiddenSelen do
-            table.remove(newSelection, id)
-        end
+    -- Return original selection with no-change key if nothing has changed
+    if (other and not hiddenSelens) or (not other and hiddenSelens) then
+        return selection, false
+    end
+
+    for id, unit in hiddenSelens do
+        table.remove(selection, id)
     end
     
-    return newSelection
+    return selection, true
 end
 
 -- This function is called whenever the set of currently selected units changes
@@ -469,8 +472,16 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     end
 
     -- Deselect Selens if necessary
-    if newSelection then
-        newSelection = DeselectSelens(newSelection)
+    local changed = false -- Prevent recursion
+    if newSelection and table.getn(newSelection) > 0 then
+        newSelection, changed = DeselectSelens(newSelection)
+
+        if changed then
+            ForkThread(function()
+                SelectUnits(newSelection)
+            end)
+            return
+        end
     end
     
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)

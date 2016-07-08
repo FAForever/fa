@@ -70,7 +70,7 @@ XSL0101 = Class(SWalkingLandUnit) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        if new ~= 'Stopped' and self.HiddenSelen then
+        if new ~= 'Stopped' and not self:IsIdleState() and self.HiddenSelen then
             self:SetScriptBit('RULEUTC_CloakToggle', true)
         end
 
