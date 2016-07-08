@@ -435,29 +435,25 @@ end
 -- Function to remove hidden selens from a selection which includes units other than hidden selens
 function DeselectSelens(selection)
     local hiddenSelens = false
-    local other = false
+    local otherUnits = false
 
     -- Find any selens with the hidden flag
     for id, unit in selection do
         -- Stupid-ass UnitData table uses string numbers as keys. Because reasons?
         if unit:IsInCategory("xsl0101") and unit:IsIdle() and GetFireState({unit}) == 1 then -- Is Unit an activated Selen?
-            if not hiddenSelens then hiddenSelens = {} end -- Ugly hack to make later logic easier
-            hiddenSelens[id] = unit
+            hiddenSelens = true
         else
-            other = true
+            if not otherUnits then otherUnits = {} end -- Ugly hack to make later logic easier
+            table.insert(otherUnits, unit)
         end
     end
 
     -- Return original selection with no-change key if nothing has changed
-    if (other and not hiddenSelens) or (not other and hiddenSelens) then
+    if (otherUnits and not hiddenSelens) or (not otherUnits and hiddenSelens) then
         return selection, false
     end
-
-    for id, unit in hiddenSelens do
-        table.remove(selection, id)
-    end
     
-    return selection, true
+    return otherUnits, true
 end
 
 -- This function is called whenever the set of currently selected units changes
