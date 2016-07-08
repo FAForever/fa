@@ -28,8 +28,8 @@ XSL0101 = Class(SWalkingLandUnit) {
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         -- These start enabled, so before going to InvisState, disabled them.. they'll be reenabled shortly
-        self:DisableUnitIntel('RadarStealth')
-        self:DisableUnitIntel('Cloak')
+        self:DisableUnitIntel('Motion', 'RadarStealth')
+        self:DisableUnitIntel('Motion', 'Cloak')
         self.Cloaked = false
 
         ChangeState(self, self.InvisState) -- If spawned in we want the unit to be invis, normally the unit will immediately start moving
@@ -43,8 +43,8 @@ XSL0101 = Class(SWalkingLandUnit) {
                 WaitSeconds(bp.Intel.StealthWaitTime)
             end
 
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('Cloak')
+            self:EnableUnitIntel('Motion', 'RadarStealth')
+            self:EnableUnitIntel('Motion', 'Cloak')
             self.Cloaked = true
         end,
         
@@ -59,8 +59,8 @@ XSL0101 = Class(SWalkingLandUnit) {
     VisibleState = State() {
         Main = function(self)
             if self.Cloaked then
-                self:DisableUnitIntel('RadarStealth')
-                self:DisableUnitIntel('Cloak')
+                self:DisableUnitIntel('Motion', 'RadarStealth')
+                self:DisableUnitIntel('Motion', 'Cloak')
             end
         end,
 
