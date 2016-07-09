@@ -2,7 +2,6 @@
 -- File: lua/modules/ui/game/build_templates.lua
 -- Author: Ted Snook
 -- Summary: Build Templates UI
---
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
@@ -41,13 +40,10 @@ end
 
 function GetInitialIcon(template)
     for _, entry in template do
-        --if type(entry) == 'table' and (DiskGetFileInfo('/textures/ui/common/icons/units/'..entry[1]..'_icon.dds')or UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds', true)) then
         if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds', true) then
-            LOG(entry[1]..' Unit Icon found!')
             return entry[1] -- Original or modded unit found
         end
     end
-    LOG(entry[1]..' No Unit Icon!')
     return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
