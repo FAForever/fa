@@ -25,6 +25,7 @@ Patch 3656 (Upcoming)
 - Fixed Size 4 buildings such as T2 PD and Flak getting a Rate-Of-Fire adjacency buff from PGens
 - Fixed bug in AI Engineer behaviour which let to an engine crash
 - Fixed unit stats being reported identical for all players. This is an important step towards a working achievement system.
+- Fixed templates not working if a unit added by a mod was the first built in the selection used to form the template
 
 **Gameplay**
 - The Ythotha now spawns the energy being no matter the method used to kill it
