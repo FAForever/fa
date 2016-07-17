@@ -150,7 +150,7 @@ function ControlGroup(Type,Complete,Title,Description,Target)
                 end
             end
 
-            if lastReqsMet != reqsMet then
+            if lastReqsMet ~= reqsMet then
                 local progress = string.format('(%s/%s)', reqsMet, totalReqs)
                 UpdateObjective( Title, 'Progress', progress, objective.Tag )
                 objective:OnProgress(reqsMet,totalReqs)
@@ -566,7 +566,7 @@ function ReclaimProp(Type,Complete,Title,Description,Target)
 
     local image = GetActionIcon("reclaim")
     local objective = AddObjective(Type,Complete,Title,Description,image)
-    
+
     -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
@@ -694,7 +694,7 @@ function SpecificUnitsInArea(Type,Complete,Title,Description,Target)
                 end
             end
 
-            if cnt != Target.Count then
+            if cnt ~= Target.Count then
                 Target.Count = cnt
                 local progress = string.format('(%s/%s)', Target.Count, numRequired)
                 objective:OnProgress(Target.Count,numRequired)
@@ -818,7 +818,7 @@ function CategoriesInArea(Type,Complete,Title,Description,Action,Target)
                 end
             end
 
-            if lastReqsMet != reqsMet then
+            if lastReqsMet ~= reqsMet then
                 local progress = string.format('(%s/%s)', reqsMet, totalReqs)
                 UpdateObjective( Title, 'Progress', progress, objective.Tag )
                 objective:OnProgress(reqsMet,totalReqs)
