@@ -1297,15 +1297,12 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         table.insert( SavedList, {AddArgs = {Type, Complete, Title, Description, ActionImage, Target, true, tag, n=8}, Tag=tag} )
     end
 
-    --LOG("Debug: AddObjective: ", Title,":", Description, " (Tag=", tag,")")
-
     -- Set up objective table to return.
     local objective = {
         -- Used to synchronize sim objectives with user side objectives
         Tag = tag,
 
-        -- Whether the objective is in progress or not and does not indicate
-        -- success or failure.
+        -- Whether the objective is in progress or not and does not indicate success or failure.
         Active = true,
 
         -- success or failure.
@@ -1350,7 +1347,6 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         -- Dont override these if you want notification. Call Add???Callback
         -- intead
         OnResult = function(self, success, data)
-
             self.Complete = success
 
             for k, v in self.ResultCallbacks do v(success, data) end
@@ -1403,11 +1399,9 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
     -- Takes a unit that is an objective target and uses its recon detect
     -- event to notify the objectives that we have a blip for the unit.
     local function SetupNotify(obj, unit, targetTag)
-
         -- Add a detectedBy callback to notify the user layer when our recon
         -- on the target comes in and out.
         local detectedByCB = function(cbunit, armyindex)
-            --LOG('detected by ', armyindex, ' focus = ', GetFocusArmy())
             if not obj.Active then
                 return
             end
@@ -1440,7 +1434,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
                                 -- If it's not mobile we can exit the thread since
                                 -- the blip won't move.
-                                if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains( categories.MOBILE, unit ) then
+                                if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains(categories.MOBILE, unit) then
                                     return
                                 end
                             end
@@ -1500,8 +1494,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                         return
                     end
 
-                    UpdateObjective(Title,
-                                    'Target',
+                    UpdateObjective(Title, 'Target',
                                     {
                                         Type = 'Position',
                                         Value = unit:GetPosition(),
@@ -1510,11 +1503,11 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                                     },
                                     obj.Tag )
 
-                    -- If it's not mobile we can exit the thread since
-                    -- the unit won't move.
-                    if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains( categories.MOBILE, unit ) then
+                    -- If it's not mobile we can exit the thread since the unit won't move.
+                    if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains(categories.MOBILE, unit) then
                         return
                     end
+
                     WaitTicks(10)
                 end
             end
@@ -1534,8 +1527,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             -- when the blip is destroyed, tell objectives we dont
             -- have a blip anymore. This doesnt necessarily mean the
             -- unit is killed, we simply lost the blip.
-            UpdateObjective(Title,
-                            'Target',
+            UpdateObjective(Title, 'Target',
                             {
                                 Type = 'Position',
                                 Value = nil,
@@ -1547,7 +1539,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
         -- When the unit is destroyed have it call this callback
         -- function (defined above)
-        Triggers.CreateUnitDeathTrigger(destroyCB, unit )
+        Triggers.CreateUnitDeathTrigger(destroyCB, unit)
     end
 
     function SetupVizMarker(objective, object)
