@@ -651,7 +651,7 @@ end
 
 --####################################################################################################################
 --### SplitPatrolThread
---###     - Gives random patrol chain from the list to each unit of a platoon 
+--###     - Gives random patrol chain from the list to each unit of a platoon
 --###
 --### PlatoonData
 --###     - PatrolChains - List of chains to choose from
@@ -835,6 +835,18 @@ function EngineersBuildPlatoon(platoon)
     end
 end
 
+function GetHumanEnemies(armyIndex)
+    humans = {}
+
+    for i, brain in ArmyBrains do
+        if brain.BrainType == 'Human' and IsEnemy(armyIndex, brain:GetArmyIndex()) then
+            table.insert(humans, brain)
+        end
+    end
+
+    return humans
+end
+
 
 --####################################################################################################################
 --### CategoryHunterPlatoonAI
@@ -857,34 +869,34 @@ function CategoryHunterPlatoonAI(platoon)
     local data = platoon.PlatoonData
     local target = false
     while aiBrain:PlatoonExists(platoon) do
-
         -- Find nearest enemy category to this platoon
         -- Cheat to find the focus army's units
         local newTarget = false
         local platPos = platoon:GetPlatoonPosition()
-        for catNum,category in platoon.PlatoonData.CategoryList do
-            local enemy = aiBrain:GetCurrentEnemy()
-            if not enemy then break end
-            local unitList = enemy:GetListOfUnits( category, false, false )
-            if table.getn(unitList) > 0 then
-                local distance = 100000
-                for k,v in unitList do
-                    if not v:IsDead() then
-                        local currDist = VDist3( platPos, v:GetPosition() )
-                        if currDist < distance then
-                            newTarget = v
-                            distance = currDist
+        local enemies = table.shuffle(GetHumanEnemies(aiBrain:GetArmyIndex()))
+        for i, enemy in enemies do
+            for catNum, category in platoon.PlatoonData.CategoryList do
+                local unitList = enemy:GetListOfUnits( category, false, false )
+                if table.getn(unitList) > 0 then
+                    local distance = 100000
+                    for k,v in unitList do
+                        if not v:IsDead() then
+                            local currDist = VDist3( platPos, v:GetPosition() )
+                            if currDist < distance then
+                                newTarget = v
+                                distance = currDist
+                            end
                         end
                     end
+                    -- If the target has changed, attack new target
+                    if newTarget != target then
+                        platoon:Stop()
+                        platoon:AttackTarget( newTarget )
+                    end
                 end
-                -- If the target has changed, attack new target
-                if newTarget != target then
-                    platoon:Stop()
-                    platoon:AttackTarget( newTarget )
+                if newTarget then
+                    break
                 end
-            end
-            if newTarget then
-                break
             end
         end
 
