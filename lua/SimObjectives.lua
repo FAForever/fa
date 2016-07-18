@@ -33,6 +33,18 @@ local DecalLOD = 4000
 local objectiveDecal = '/env/utility/decals/objective_debug_albedo.dds'
 local SavedList = {}
 
+-- Return one of the human players in a game, using this instead of GetFocusArmy()
+-- to get a deterministic army index in coop.
+local playerArmy
+function GetPlayerArmy()
+    if not playerArmy then
+        local brain = GetArmyBrain("Player")
+        playerArmy = brain:GetArmyIndex()
+    end
+
+    return playerArmy
+end
+
 -- #
 -- # Camera objective by roates
 -- # Creates markers that satisfy the objective when they are all inside of the camera viewport
@@ -643,7 +655,7 @@ function Locate(Type, Complete, Title, Description, Target)
     for k, unit in Target.Units do
         local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
         IntelTrigger(OnUnitLocated,
-                    GetArmyBrain(GetFocusArmy()),
+                    GetArmyBrain(GetPlayerArmy()),
                     'LOSNow',
                     unit,
                     true,
@@ -1407,7 +1419,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             end
 
             -- now if weve been detected by the focus army ...
-            if armyindex == GetFocusArmy() then
+            if armyindex == GetPlayerArmy() then
                 -- get the blip that is associated with the unit
                 local blip = cbunit:GetBlip(armyindex)
 
@@ -1478,9 +1490,9 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         unit:AddDetectedByHook(detectedByCB)
 
         -- See if we can detect the unit right now
-        local blip = unit:GetBlip(GetFocusArmy())
+        local blip = unit:GetBlip(GetPlayerArmy())
         if blip then
-            detectedByCB(unit, GetFocusArmy())
+            detectedByCB(unit, GetPlayerArmy())
         end
     end
 
@@ -1552,7 +1564,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
-                Army = GetFocusArmy(),
+                Army = GetPlayerArmy(),
             }
             local vizmarker = VizMarker(spec)
             object.Trash:Add(vizmarker)
@@ -1568,7 +1580,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
-                Army = GetFocusArmy(),
+                Army = GetPlayerArmy(),
             }
             local vizmarker = VizMarker(spec)
             table.insert(objective.VizMarkers, vizmarker);
@@ -1587,7 +1599,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                 Omni = false,
                 Vision = true,
                 Radar = false,
-                Army = GetFocusArmy(),
+                Army = GetPlayerArmy(),
             }
             local vizmarker = VizMarker(spec)
             object.Trash:Add(vizmarker)
@@ -1604,7 +1616,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                 Omni = false,
                 Vision = true,
                 Radar = false,
-                Army = GetFocusArmy(),
+                Army = GetPlayerArmy(),
             }
             local vizmarker = VizMarker(spec)
         end
@@ -1658,7 +1670,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
     objective.AddUnitTarget = function(self, unit)
         self.NextTargetTag = self.NextTargetTag + 1
-        if unit:GetArmy() == GetFocusArmy() then
+        if unit:GetArmy() == GetPlayerArmy() then
             SetupFocusNotify(self, unit, self.NextTargetTag)
         else
             SetupNotify(self, unit, self.NextTargetTag)
