@@ -1051,9 +1051,8 @@ function OnRolloverHandler(button, state)
                 button.dragMarker:Destroy()
                 button.dragMarker = false
             end
-            UnitViewDetail.Hide()
         end
-    else
+    end
         if state == 'enter' then
             if item.type == 'item' or item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
                 UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
@@ -1063,7 +1062,7 @@ function OnRolloverHandler(button, state)
         else
             UnitViewDetail.Hide()
         end
-    end
+    
 end
 
 function OnClickHandler(button, modifiers)
