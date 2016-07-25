@@ -291,6 +291,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Hells Fury Riot Gun',
             FireTargetLayerCapsTable = {
+                Water = 'Air|Land|Water|Seabed',
                 Air = 'Air|Land|Water|Seabed',
                 Land = 'Air|Land|Water|Seabed',
             },
