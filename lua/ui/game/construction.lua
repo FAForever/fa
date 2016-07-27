@@ -2299,9 +2299,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                             end
                         end
                         if valid then
-                            if converted then
-                                template.icon = ConvertID(template.icon)
-                            end
+                            template.icon = ConvertID(template.icon)
                             template.templateID = templateIndex
                             table.insert(sortedOptions.templates, template)
                         end
