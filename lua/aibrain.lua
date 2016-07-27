@@ -152,7 +152,7 @@ AIBrain = Class(moho.aibrain_methods) {
             self.AIPlansList = AIDefaultPlansList
         end
         self.RepeatExecution = false
-        
+
         if ScenarioInfo.type == 'campaign' then
             self:SetResourceSharing(false)
         end
@@ -338,7 +338,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    
+
 
     ------------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- TRIGGERS BASED ON AN AI BRAIN       ------------- ----
@@ -782,7 +782,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if not self.loadingTransport or self.loadingTransport.full then return end
         self.loadingTransport.transData.full = true
-        
+
         if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
             -- "CZAR FULL"
             cue = 'XGG_Computer_CV01_04753'
