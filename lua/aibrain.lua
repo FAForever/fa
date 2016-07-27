@@ -538,6 +538,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local shareOption = ScenarioInfo.Options.Share or "no"
             -- "no" means full share
             if shareOption == "ShareAfterDeath" then
+            elseif shareOption == "TransferAfterDeath" then
                 -- this part determines who the allies are
                 for index, brain in ArmyBrains do
                     brain.index = index
