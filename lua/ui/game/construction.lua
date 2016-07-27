@@ -2269,31 +2269,14 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                 if currentFaction then
                     sortedOptions.templates = {}
                     local function ConvertID(BPID)
-                        local prefixes = {
-                            ["AEON"] = {
-                                "uab",
-                                "xab",
-                                "dab",
-                            },
-                            ["UEF"] = {
-                                "ueb",
-                                "xeb",
-                                "deb",
-                            },
-                            ["CYBRAN"] = {
-                                "urb",
-                                "xrb",
-                                "drb",
-                            },
-                            ["SERAPHIM"] = {
-                                "xsb",
-                                "usb",
-                                "dsb",
-                            },
-                        }
-                        for i, prefix in prefixes[string.upper(currentFaction)] do
-                            if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                                return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+                        local FirstLetterArray = { "%1", "x", "u", "b" }
+                        local SecondLetterArray = { ["Aeon"] = "a", ["UEF"] = "e", ["Cybran"] = "r", ["Seraphim"] = "s" }
+                        local SecondLetter = SecondLetterArray[currentFaction]
+                        for _, FirstLetter in FirstLetterArray do
+                            local NewBPID = string.gsub(BPID, "(%a)(%a)(%a)(%d+)",FirstLetter..SecondLetter.. "%3%4")
+                        -- =local xsb1012 = string.gsub(ueb1012, "(u)(e)(b)(1012)",x..s.. "b1012")
+                            if table.find(buildableUnits, NewBPID) then
+                                return NewBPID
                             end
                         end
                         return false
