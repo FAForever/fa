@@ -537,7 +537,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
             -- "no" means full share
-            if shareOption == "no" then
+            if shareOption == "ShareAfterDeath" then
                 -- this part determines who the allies are
                 for index, brain in ArmyBrains do
                     brain.index = index
@@ -557,7 +557,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             -- "yes" means share until death
-            elseif shareOption == "yes" then
+            elseif shareOption == "ShareUntilDeath" then
                 import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                 -- return borrowed units to their real owners

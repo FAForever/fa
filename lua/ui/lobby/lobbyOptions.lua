@@ -377,14 +377,14 @@ globalOpts = {
         key = 'Share',
         values = {
             {
-                text = "<LOC lobui_0742>Full Share",
+                text = "<LOC lobui_0742>Share After Death",
                 help = "<LOC lobui_0743>You can give units to your allies and they will not be destroyed when you die",
-                key = 'no',
+                key = 'ShareAfterDeath',
             },
             {
                 text = "<LOC lobui_0744>Share Until Death",
                 help = "<LOC lobui_0745>All the units you gave to your allies will be destroyed when you die",
-                key = 'yes',
+                key = 'ShareUntilDeath',
             },
         },
     },
