@@ -386,6 +386,11 @@ globalOpts = {
                 help = "<LOC lobui_0745>All the units you gave to your allies will be destroyed when you die",
                 key = 'ShareUntilDeath',
             },
+            {
+                text = "Transfer After Death",
+                help = "All your units will be transfered to your ally with the highest score if you die",
+                key = 'TransferAfterDeath',
+            },
         },
     },
 }
