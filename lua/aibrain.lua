@@ -575,19 +575,18 @@ AIBrain = Class(moho.aibrain_methods) {
                 local borrowed = {}
                 for index,unit in units do
                     local oldowner = unit.oldowner
-                    if oldowner and oldowner ~= self:GetArmyIndex() then
-                        if not borrowed[oldowner] and not GetArmyBrain(oldowner):IsDefeated() then
+                    if oldowner and oldowner ~= self:GetArmyIndex() and not GetArmyBrain(oldowner):IsDefeated() then
+                        if not borrowed[oldowner] then
                             borrowed[oldowner] = {}
                         end
-
-                        if borrowed[oldowner] then
-                            table.insert(borrowed[unit.oldowner], unit)
+                        table.insert(borrowed[unit.oldowner], unit)
+                        if SorianAI ~= nil then
+                            RemovePlatoonHandleFromUnit(unit)
                         end
                     end
                 end
-
-                for owner, units in borrowed do
-                    TransferUnitsOwnership(units, owner)
+                for owner, unit in borrowed do
+                    TransferUnitsOwnership(unit, owner)
                 end
             end
 
