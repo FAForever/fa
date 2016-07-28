@@ -529,11 +529,8 @@ AIBrain = Class(moho.aibrain_methods) {
         local function KillArmy()
             local SorianAI = string.find(ScenarioInfo.ArmySetup[self.Name].AIPersonality, 'sorian')
             local function RemovePlatoonHandleFromUnit(unit)
-                LOG('Sorian Platoonhandle')
                 if not unit.Dead then
-                    LOG('if not unit.Dead then')
                     if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
-                        LOG('if unit.PlatoonHandle then')
                         unit.PlatoonHandle:Stop()
                         unit.PlatoonHandle:PlatoonDisbandNoAssign()
                     end
@@ -546,7 +543,6 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitSeconds(10)
             -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
-            -- "no" means full share
             if shareOption == "ShareAfterDeath" then
                 -- Give borrowed units a new owner
                 for index, brain in ArmyBrains do
@@ -583,7 +579,6 @@ AIBrain = Class(moho.aibrain_methods) {
                         end
                     end
                 end
-            -- "yes" means share until death
             elseif shareOption == "ShareUntilDeath" then
                 import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
