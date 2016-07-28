@@ -548,6 +548,17 @@ AIBrain = Class(moho.aibrain_methods) {
             local shareOption = ScenarioInfo.Options.Share or "no"
             -- "no" means full share
             if shareOption == "ShareAfterDeath" then
+                -- Give borrowed units a new owner
+                for index, brain in ArmyBrains do
+                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
+                        local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                        for _,unit in units do
+                            if unit.oldowner == selfIndex then
+                                unit.oldowner = nil
+                            end
+                        end
+                    end
+                end
             elseif shareOption == "TransferAfterDeath" then
                 -- this part determines who the allies are
                 for index, brain in ArmyBrains do
