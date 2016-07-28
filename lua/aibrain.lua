@@ -519,10 +519,6 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.BrainType == 'AI' then
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
         end
-        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-        if string.find(per, 'sorian') then
-            SUtils.GiveAwayMyCrap(self)
-        end
         ------end sorian AI bit
 
         SetArmyOutOfGame(self:GetArmyIndex())
@@ -531,6 +527,20 @@ AIBrain = Class(moho.aibrain_methods) {
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
+            local SorianAI = string.find(ScenarioInfo.ArmySetup[self.Name].AIPersonality, 'sorian')
+            local function RemovePlatoonHandleFromUnit(unit)
+                LOG('Sorian Platoonhandle')
+                if not unit.Dead then
+                    LOG('if not unit.Dead then')
+                    if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
+                        LOG('if unit.PlatoonHandle then')
+                        unit.PlatoonHandle:Stop()
+                        unit.PlatoonHandle:PlatoonDisbandNoAssign()
+                    end
+                    IssueStop({unit})
+                    IssueClearCommands({unit})
+                end
+            end
             local allies = {}
             local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
