@@ -387,8 +387,8 @@ globalOpts = {
                 key = 'ShareUntilDeath',
             },
             {
-                text = "Transfer After Death",
-                help = "All your units will be transfered to your ally with the highest score if you die",
+                text = "<LOC lobui_0738>Transfer After Death",
+                help = "<LOC lobui_0739>All your units will be transfered to your ally with the highest score if you die",
                 key = 'TransferAfterDeath',
             },
         },
