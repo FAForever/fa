@@ -2652,6 +2652,11 @@ Unit = Class(moho.unit_methods) {
     --LAYER EVENTS
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
+        if self.transportDrop then
+            self.transportDrop = nil
+            self:SetImmobile(false)
+        end
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -4027,6 +4032,9 @@ Unit = Class(moho.unit_methods) {
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
         self:DoUnitCallbacks( 'OnDetachedFromTransport', transport, bone)
+         -- set unit immobile to prevent it to accelerate in air, cleared in OnLayerChange
+        self:SetImmobile(true)
+        self.transportDrop = true
     end,
 
     --- Deprecated functionality
