@@ -560,10 +560,15 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- This part determines which ally has the highest score and transfers ownership of all units to him
                 if table.getn(allies) > 0 then
                     table.sort(allies, function(a,b) return a.score > b.score end)
-                    for k,v in allies do
+                    for k,brain in allies do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
-                            TransferUnitsOwnership(units, v.index)
+                            if SorianAI ~= nil then
+                                for _,unit in units do
+                                    RemovePlatoonHandleFromUnit(unit)
+                                end
+                            end
+                            TransferUnitsOwnership(units, brain.index)
                         end
                     end
                 end
