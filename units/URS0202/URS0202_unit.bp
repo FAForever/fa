@@ -201,12 +201,6 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'sea',
-        OrderOverrides = {
-            RULEUCC_Transport = {
-                bitmapId = 'deploy',
-                helpText = 'deploy',
-            },
-        },
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC urs0202_name>Siren Class',
         UnitWeight = 1,
