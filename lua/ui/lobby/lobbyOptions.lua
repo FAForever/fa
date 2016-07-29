@@ -373,7 +373,7 @@ globalOpts = {
    {
         default = 2,
         label = "<LOC lobui_0740>Share Conditions",
-        help = "<LOC lobui_0741>Kill all the units you shared to your allies and send back the units your allies shared with you when you die",
+        help = "<LOC lobui_0741>Destroy or share units when you die",
         key = 'Share',
         values = {
             {
@@ -383,12 +383,12 @@ globalOpts = {
             },
             {
                 text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>All the units you gave to your allies will be destroyed when you die",
+                help = "<LOC lobui_0745>Destroy all the units you shared to your allies and send back the units your allies shared with you when you die",
                 key = 'ShareUntilDeath',
             },
             {
                 text = "<LOC lobui_0738>Transfer After Death",
-                help = "<LOC lobui_0739>All your units will be transfered to your ally with the highest score if you die",
+                help = "<LOC lobui_0739>All your units will be transfered to your ally with the highest score when you die",
                 key = 'TransferAfterDeath',
             },
         },
