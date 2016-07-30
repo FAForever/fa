@@ -472,6 +472,19 @@ Projectile = Class(moho.projectile_methods, Entity) {
             Owner = self,
             Radius = tbl.Radius or 5,
         }
+        if tbl.Stack == true then
+            self.MyUpperFlare = FlareUpper {
+                Owner = self,
+                Radius = tbl.Radius or 5,
+            }
+            self.MyLowerFlare = FlareLower {
+                Owner = self,
+                Radius = tbl.Radius or 5,
+            }
+            self.Trash:Add(self.MyUpperFlare)
+            self.Trash:Add(self.MyLowerFlare)
+        end
+
         self.Trash:Add(self.MyFlare)
     end,
 
