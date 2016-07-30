@@ -94,20 +94,20 @@ local chartInfoText = false
 --mySkinnableFile("/game/resources/mass_btn_up.dds")
 local histo={
     main_histo={
-        [1]={name="mass",icon=mySkinnableFile("/game/unit_view_icons/mass.dds"),label1="mass",link="mass_histo",Tooltip="mass",
+        [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="mass",
             data={{name="mass incombe",icon="",path={"resources","massin","total"},color="green",Tooltip="Mass_incoming"},
-            {name="mass wasted",icon=mySkinnableFile("/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }},
-        [2]={name="energy",icon=mySkinnableFile("/game/unit_view_icons/energy.dds"),label1="energy",link="energy_histo",Tooltip="energy",
+            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }},
+        [2]={name="energy",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/energy.dds"),label1="energy",link="energy_histo",Tooltip="energy",
             data={{name="energy incombe",icon="",path={"resources","energyin","total"},color="orange",Tooltip="Energy_incoming"},
-            {name="energy wasted",icon=mySkinnableFile("/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }},
-        [3]={name="units built",icon=mySkinnableFile("/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="built_units",
+            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }},
+        [3]={name="units built",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="built_units",
             data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="air"},
             {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="land"},
             {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="naval"},
             {name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="xp"},
             {name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="cdr"},
             {name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="struct"} }},
-        [4]={name="units kills",icon=mySkinnableFile("/game/unit_view_icons/kills.dds"),label1="kills",label2="",Tooltip="kills_units",link="kills_histo",
+        [4]={name="units kills",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/kills.dds"),label1="kills",label2="",Tooltip="kills_units",link="kills_histo",
             data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="air"},
             {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="land"},
             {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="naval"},
@@ -121,7 +121,7 @@ local histo={
         [2]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-out-icon.dds"),label1="out",label2="",Tooltip="Mass_outgoing",link="main_histo",
             data={{name="mass out",icon="",path={"resources","massout","total"},color="5fdc5c",Tooltip="Mass_outgoing"} }},
         [3]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-waste-icon.dds"),label1="wasted",label2="",Tooltip="Mass_wasted",link="main_histo",
-            data={{name="mass wasted",icon=mySkinnableFile("/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }}
+            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }}
     },
     energy_histo={
         [1]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-in-icon.dds"),label1="in",label2="",Tooltip="Energy_incoming",link="main_histo",
@@ -129,7 +129,7 @@ local histo={
         [2]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-out-icon.dds"),label1="out",label2="",Tooltip="Energy_outgoing",link="main_histo",
             data={{name="energy out",icon="",path={"resources","energyout","total"},color="dcb05c",Tooltip="Energy_outgoing"} }},
         [3]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-waste-icon.dds"),label1="wasted",label2="",Tooltip="Energy_wasted",link="main_histo",
-            data={{name="energy wasted",icon=mySkinnableFile("/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }}
+            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }}
     },
     built_histo={
         [1]={name="units built",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="air",link="main_histo",
