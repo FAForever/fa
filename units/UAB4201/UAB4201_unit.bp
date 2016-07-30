@@ -188,6 +188,7 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
+            CannotAttackGround = false,
             CollideFriendly = false,
             Damage = 30,
             DamageType = 'Normal',
@@ -201,14 +202,15 @@ UnitBlueprint {
             Flare = {
                 Category = 'MISSILE',
                 Radius = 15,
+                Stack = true,   -- special flag to trigger multi-sphere collision
             },
             Label = 'AntiMissile',            
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 15,
             ProjectileId = '/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp',
-            ProjectileLifetime = 2,
+            ProjectileLifetime = 3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -225,7 +227,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             #RangeCategory = '',  #removed this line so there is no error about the range category
-            RateOfFire = 0.66,
+            RateOfFire = 0.32,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TACTICAL MISSILE',
@@ -239,8 +241,8 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
 		{ # dummy weapon used manipulate the game to show correct range circle [129]
-            EffectiveRadius = 10,             
-            MaxRadius = 10,
+            EffectiveRadius = 12.5,             
+            MaxRadius = 12.5,
             RangeCategory = 'UWRC_Countermeasure',
         }, 
     },
