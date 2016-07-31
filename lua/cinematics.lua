@@ -121,9 +121,11 @@ end
 -- Zoom is measured in LOD units. It's the value of the width of the view frustum at the focus point
 function CameraTrackEntities(units, zoom, seconds)
     local army = GetFocusArmy()
-    for i, v in units do
-        if army ~= v:GetArmy() then
-            units[i] = v:GetBlip(army)
+    if army ~= -1 then
+        for i, v in units do
+            if army ~= v:GetArmy() then
+                units[i] = v:GetBlip(army)
+            end
         end
     end
 
