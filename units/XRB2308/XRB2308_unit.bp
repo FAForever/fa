@@ -70,7 +70,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_personalstealth>Personal Stealth',
         },
         AnimationPermOpen = '/units/xrb2308/xrb2308_aopen.sca',
         IdleEffects = {

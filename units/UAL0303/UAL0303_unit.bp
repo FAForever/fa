@@ -98,7 +98,6 @@ UnitBlueprint {
             '<LOC ability_personalshield>Personal Shield',
             '<LOC ability_reclaim>Reclaims',
             '<LOC ability_repairs>Repairs',
-            '<LOC ability_shielddome>Shield Dome',
         },
         AnimationDeath = {
             {
