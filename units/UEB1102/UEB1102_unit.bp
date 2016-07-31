@@ -54,6 +54,9 @@ UnitBlueprint {
     },
     Description = '<LOC ueb1102_desc>Hydrocarbon Power Plant',
     Display = {
+        Abilities = {
+            '<LOC ability_amphibious>Amphibious',
+        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

@@ -57,6 +57,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_sonar>Sonar',
+            '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/uab3202/uab3202_aopen.sca',
         IdleEffects = {
