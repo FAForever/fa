@@ -54,7 +54,6 @@ UnitBlueprint {
     },
     Description = '<LOC ueb1102_desc>Hydrocarbon Power Plant',
     Display = {
-        AnimationOpen = '/units/UEB1102/ueb1102_Aopen.sca',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
