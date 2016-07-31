@@ -122,7 +122,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_depthcharge>Depth Charges',
-            '<LOC ability_torpedo>Torpedoes',
         },
         LayerChangeEffects = {
             AirLand = {

@@ -126,7 +126,6 @@ UnitBlueprint {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
             '<LOC ability_submersible>Submersible',
-            '<LOC ability_carrier>Carrier',
         },
         AnimationDeath = {
             {

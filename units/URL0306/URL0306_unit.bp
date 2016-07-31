@@ -56,7 +56,6 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_stealthfield>Stealth Field',
-            '<LOC ability_personalstealth>Personal Stealth',
         },
         Mesh = {
             IconFadeInZoom = 130,
