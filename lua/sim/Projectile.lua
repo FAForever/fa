@@ -12,6 +12,8 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
+local FlareUpper = import('/lua/defaultantiprojectile.lua').FlareUpper
+local FlareLower = import('/lua/defaultantiprojectile.lua').FlareLower
 
 Projectile = Class(moho.projectile_methods, Entity) {
 
