@@ -60,6 +60,9 @@ UnitBlueprint {
     },
     Description = '<LOC xsb1102_desc>Hydrocarbon Power Plant',
     Display = {
+        Abilities = {
+            '<LOC ability_amphibious>Amphibious',
+        },
         LoopingAnimation = '/units/XSB1102/XSB1102_aloop.sca',
         Mesh = {
             IconFadeInZoom = 130,

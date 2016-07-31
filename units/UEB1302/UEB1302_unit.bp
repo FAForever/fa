@@ -51,6 +51,9 @@ UnitBlueprint {
     },
     Description = '<LOC ueb1302_desc>Mass Extractor',
     Display = {
+        Abilities = {
+            '<LOC ability_amphibious>Amphibious',
+        },
         AnimationOpen = '/units/ueb1302/ueb1302_Apump.sca',
         AnimationUpgrade = '/units/ueb1302/ueb1302_Aupgrade.sca',
         Mesh = {

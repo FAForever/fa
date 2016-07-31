@@ -103,11 +103,12 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_amphibious>Amphibious',
             '<LOC ability_aa>Anti-Air',
-            '<LOC ability_massive>Massive',
-            '<LOC ability_stealthfield>Stealth Field',
-            '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
+            '<LOC ability_sonar>Sonar',
+            '<LOC ability_massive>Massive',
             '<LOC ability_deathaoe>Volatile',
+            '<LOC ability_stealthfield>Stealth Field',
+            '<LOC ability_personalstealth>Personal Stealth',
         },
         AnimationActivate = '/units/URL0402/URL0402_aactivate.sca',
         AnimationDeath = {

@@ -56,6 +56,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
+            '<LOC ability_amphibious>Amphibious',
         },
         AnimationOpen = '/units/ueb1103/ueb1103_Apump.sca',
         AnimationUpgrade = '/units/ueb1103/ueb1103_Aupgrade.sca',
