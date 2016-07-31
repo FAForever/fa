@@ -120,8 +120,8 @@ UnitBlueprint {
     Description = '<LOC uaa0204_desc>Torpedo Bomber',
     Display = {
         Abilities = {
-            '<LOC ability_depthcharge>Depth Charges',
             '<LOC ability_sonar>Sonar',
+            '<LOC ability_depthcharge>Depth Charges',
         },
         LayerChangeEffects = {
             AirLand = {

@@ -122,9 +122,10 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_factory>Factory',
             '<LOC ability_radar>Radar',
+            '<LOC ability_torpedodef>Torpedo Defense',
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_torpedodef>Torpedo Defense',
+            '<LOC ability_submersible>Submersible',
         },
         AnimationDeath = {
             {
