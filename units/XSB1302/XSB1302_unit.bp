@@ -57,6 +57,9 @@ UnitBlueprint {
     },
     Description = '<LOC xsb1302_desc>Mass Extractor',
     Display = {
+        Abilities = {
+            '<LOC ability_amphibious>Amphibious',
+        },
         AnimationActivate = '/units/XSB1302/XSB1302_Apump.sca',
         AnimationDeath = {
             {

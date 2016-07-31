@@ -100,6 +100,8 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_engineeringsuite>Engineering Suite',
             '<LOC ability_upgradable>Upgradeable',
+            '<LOC ability_reclaim>Reclaims',
+            '<LOC ability_repairs>Repairs',
         },
         AnimationOpen = '/units/XRB0104/XRB0104_Aopen.sca',
         Mesh = {
