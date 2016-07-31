@@ -136,7 +136,6 @@ UnitBlueprint {
             '<LOC ability_radar>Radar',
             '<LOC ability_sonar>Sonar',
         },
-        AnimationOpen = '/units/UAA0310/UAA0310_aopen.sca',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
