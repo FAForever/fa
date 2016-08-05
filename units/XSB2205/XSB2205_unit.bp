@@ -85,7 +85,6 @@ UnitBlueprint {
                 Weight = 1,
             },
         },
-        AnimationOpen = '/units/UAB2205/UAB2205_Aopen.sca',
         DamageEffects = {
             {
                 Bone = 0,

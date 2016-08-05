@@ -135,7 +135,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
         },
-        AnimationOpen = '/units/UAA0310/UAA0310_aopen.sca',
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
