@@ -339,11 +339,14 @@ function table.indexize(t)
 end
 
 --- Converts a table to a new table with values as keys and values equal to true
+--- it is useful for quickly looking up values in tables instead of looping over it 
+--- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C' } => 
+--             { [A] = true, [B] = true, [C] = true } 
 function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
     local lookup = {}
     for k, v in t do
-        lookup[tostring(v)] = true
+        lookup[v] = true
     end
     return lookup 
 end
