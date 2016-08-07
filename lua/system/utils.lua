@@ -237,24 +237,35 @@ function sort_down_by(field)
     end
 end
 
---- table.keys(t, [comp]) -- Return a list of the keys of t, sorted.
+--- table.keys(t, [comp], [skip]) returns a list of the keys of t, sorted.
 --- [comp] is an optional comparison function, defaulting to less-than.
-function table.keys(t, comp)
+--- [skip] is an optional boolean that specifies if sorting is needed, defaulting to true
+function table.keys(t, comp, skip)
     local r = {}
     if not t then return r end -- prevents looping over nil table
+    local n = 1
     for k,v in t do
-        table.insert(r,k)
+        r[n] = k -- faster than table.insert(r,k)
+        n = n + 1
     end
-    table.sort(r, comp)
+    if not skip then table.sort(r, comp) end
     return r
+end
+
+--- table.keysfast(t) returns a list of the keys of t, in unspecified order.
+--- this function is about 3 times faster than table.keys(t, [comp], [skip])
+function table.keysfast(t)
+    return table.keys(t, nil, true)
 end
 
 --- table.values(t) Return a list of the values of t, in unspecified order.
 function table.values(t)
     local r = {}
     if not t then return r end -- prevents looping over nil table
+    local n = 1
     for k,v in t do
-        table.insert(r,v)
+        r[n] = v -- faster than table.insert(r,v)
+        n = n + 1
     end
     return r
 end
@@ -316,26 +327,28 @@ end
 --- table.reverse {'one','two','three'} => {'three', 'two', 'one'}
 function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
-    local reversed = {}
+    local r = {}
     local items = table.indexize(t) -- convert from hash table
     local itemsCount = table.getsize(t)
     for k, v in ipairs(items) do
-        reversed[itemsCount + 1 - k] = v
+        r[itemsCount + 1 - k] = v
     end
-    return reversed
+    return r
 end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
 --- it is useful for preparing hash table before sorting its values
---- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
----                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
+--- table.indexize { [a] = 'one', [b] = 'two', [c] = 'three' } => 
+---                { [1] = 'one', [2] = 'two', [3] = 'three' } 
 function table.indexize(t)
     if not t then return {} end -- prevents looping over nil table
-    local indexized = {}
+    local r = {}
+    local n = 1
     for k, v in t do
-        table.insert(indexized, v)
+        r[n] = v -- faster than table.insert(r, v)
+        n = n + 1
     end
-    return indexized
+    return r
 end
 
 --- Converts a table to a new table with values as keys and values equal to true
@@ -344,11 +357,39 @@ end
 --             { [A] = true, [B] = true, [C] = true } 
 function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
-    local lookup = {}
+    local r = {}
     for k, v in t do
-        lookup[v] = true
+        r[v] = true
     end
-    return lookup 
+    return r 
+end
+
+--- Converts a table to a new table with values as keys only if their values are true
+--- it is reverse logic of table.hash(t) 
+--- table.unhash { [A] = true, [B] = true, [C] = false }  => 
+--               { [1] = 'A',  [2] = 'B', }
+function table.unhash(t)
+    if not t then return {} end -- prevents looping over nil table
+    local r = {}
+    local n = 1
+    for k, v in t do
+        if v then
+            r[n] = k -- faster than table.insert(r, k)
+            n = n + 1
+        end
+    end
+    return r
+end
+
+--- Concatenate keys of hash table if their values equal to specified boolean value, defaults to true
+--- it is useful to check which keys are present or not in a hash table
+--- t = { [A] = true, [B] = true, [C] = false }
+--- table.hashkeys(t, true)  =>  'A, B'
+--- table.hashkeys(t, false) =>  'C'
+function table.hashkeys(t, value)
+    if value == nil then value = true end -- defaulting to true
+    local r = table.filter(t, function(v) return v == value end)
+    return table.concatkeys(r)
 end
 
 --- table.map(fn,t) returns a table with the same keys as t but with
@@ -444,19 +485,27 @@ function table.print(tbl, tblPrefix, printer)
 end
 
 --- Filter a table using a function.
---- @param t Table to filter
---- @param filterFunc Decision function to use to filter the table.
---- @return A new table containing every mapping from t for which filterFunc 
---- returns `true` when passed the value.
+--- @param t is a table to filter
+--- @param fn is decision function to use to filter the table.
+--- @return A new table containing every mapping from t for which fn function returns `true` when passed the value.
 function table.filter(t, filterFunc)
-    local newTable = {}
+    local r = {}
+    if not fn then fn = function(v) return v end end  
     for k, v in t do
-        if filterFunc(v) then
-            newTable[k] = v
+        if fn(v) then
+            r[k] = v
         end
     end
 
-    return newTable
+    return r
+end
+--- Returns total count of values that match fn function or if values exist in table
+--- @param fn is optional filtering function that is applied to each value of the table
+function table.count(t, fn)
+    if not t then return 0 end -- prevents looping over nil table
+    if not fn then fn = function(v) return v end end  
+    local r = table.filter(t, fn)
+    return table.getsize(r)
 end
 
 --- Returns a new table with unique values
@@ -464,10 +513,11 @@ function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}
     local ins = {}
-
+    local n = 0
     for k, v in t do
         if not ins[v] then
-            table.insert(unique, v)
+            n = n + 1
+            unique[n] = v -- faster than table.insert(unique, v)
             ins[v] = true
         end
     end
