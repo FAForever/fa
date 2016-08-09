@@ -299,10 +299,13 @@ Hotfix Patch 3656 (August 8, 2016)
 **Server Compatibility**
 - Made teamkill reporting work alongside the server update V0.3
 - Change the format of unit statistics to enable server harvesting for achievements
+<<<<<<< 69729e53caa8070e636bfc098e6c4bf072d087c4
 
 **Contributors**
 - Crotalus
 - Downlord
+=======
+>>>>>>> Update changelog.md (#1422)
 
 Patch 3654 (May 30, 2016)
 ============================
