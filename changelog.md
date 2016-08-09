@@ -1,4 +1,4 @@
-Patch 3656 (Upcoming)
+Patch 3658 (Upcoming)
 ============================
 
 **Exploits**
@@ -24,7 +24,6 @@ Patch 3656 (Upcoming)
 - Paragon no longer does low damage to buildings and ACUs
 - Fixed Size 4 buildings such as T2 PD and Flak getting a Rate-Of-Fire adjacency buff from PGens
 - Fixed bug in AI Engineer behaviour which let to an engine crash
-- Fixed unit stats being reported identical for all players. This is an important step towards a working achievement system.
 - Fixed templates not working if a unit added by a mod was the first built in the selection used to form the template
 
 **Gameplay**
@@ -35,6 +34,11 @@ Patch 3656 (Upcoming)
 - Overhauled bomb-drop aim calculation code. It now takes the Y axis into account, and spaces multi-projectile drops properly. In theory, this should be the last word in bombers missing stupidly.
 - Improved AI base management in campaign scenarios
 
+Hotfix Patch 3656 (August 8, 2016)
+==================================
+**Server Compatibility**
+- Made teamkill reporting work alongside the server update V0.3
+- Change the format of unit statistics to enable server harvesting for achievements
 
 Patch 3654 (May 30, 2016)
 ============================
