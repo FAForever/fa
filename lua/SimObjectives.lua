@@ -1078,6 +1078,10 @@ function Protect(Type, Complete, Title, Description, Target)
         end
     end
 
+    local function onTick(newTime)
+        UpdateObjective( Title, 'timer', {Time = newTime}, objective.Tag)
+    end
+
     local function OnExpired()
         if objective.Active then
             objective.Active = false
@@ -1103,7 +1107,9 @@ function Protect(Type, Complete, Title, Description, Target)
         timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
             OnExpired,
             Target.Timer,
-            true
+            true,
+            true,
+            onTick
         )
     end
 
