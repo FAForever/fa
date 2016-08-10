@@ -5,7 +5,8 @@ Flare = Class(Entity) {
     OnCreate = function(self, spec)
         self.Owner = spec.Owner
         self.Radius = spec.Radius or 5
-        self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
+        self.OffsetMult = spec.OffsetMult or 0
+        self:SetCollisionShape('Sphere', 0, 0, self.Radius * self.OffsetMult, self.Radius)
         self:SetDrawScale(self.Radius)
         self:AttachTo(spec.Owner, -1)
         self.RedirectCat = spec.Category or 'MISSILE'
