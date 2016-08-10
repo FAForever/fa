@@ -12,8 +12,6 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
-local FlareUpper = import('/lua/defaultantiprojectile.lua').FlareUpper
-local FlareLower = import('/lua/defaultantiprojectile.lua').FlareLower
 
 Projectile = Class(moho.projectile_methods, Entity) {
 
@@ -474,14 +472,16 @@ Projectile = Class(moho.projectile_methods, Entity) {
             Owner = self,
             Radius = tbl.Radius or 5,
         }
-        if tbl.Stack == true then
-            self.MyUpperFlare = FlareUpper {
+        if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
+            self.MyUpperFlare = Flare {
                 Owner = self,
-                Radius = tbl.Radius or 5,
+                Radius = tbl.Radius,
+                OffsetMult = tbl.OffsetMult,
             }
-            self.MyLowerFlare = FlareLower {
+            self.MyLowerFlare = Flare {
                 Owner = self,
-                Radius = tbl.Radius or 5,
+                Radius = tbl.Radius,
+                OffsetMult = -tbl.OffsetMult,
             }
             self.Trash:Add(self.MyUpperFlare)
             self.Trash:Add(self.MyLowerFlare)

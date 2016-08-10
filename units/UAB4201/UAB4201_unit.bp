@@ -203,6 +203,7 @@ UnitBlueprint {
                 Category = 'MISSILE',
                 Radius = 15,
                 Stack = true,   -- Special flag to trigger multi-sphere collision
+                OffsetMult = 1.33,
             },
             Label = 'AntiMissile',            
             MaxRadius = 30,
