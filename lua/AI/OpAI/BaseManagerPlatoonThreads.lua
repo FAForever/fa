@@ -1202,6 +1202,7 @@ function UnitUpgradeThread(unit)
     local aiBrain = unit:GetAIBrain()
     local bManager = false
     local pool = aiBrain:GetPlatoonUniquelyNamed( 'ArmyPool' )
+
     if unit.CDRData.BaseName and aiBrain.BaseManagers[unit.CDRData.BaseName] then
         bManager = aiBrain.BaseManagers[unit.CDRData.BaseName]
     end
@@ -1227,13 +1228,19 @@ function UnitUpgradeThread(unit)
                     break
                 end
             end
+
             -- if its in the pool and needs an upgrade
             local upgradeName = bManager:UnitNeedsUpgrade(unit,unitType)
+
             if found and upgradeName then
                 local platoon = aiBrain:MakePlatoon('','')
                 aiBrain:AssignUnitsToPlatoon( platoon, {unit}, 'support', 'none' )
 
-                IssueEnhance({unit}, upgradeName)
+                local order = {
+                    TaskName = "EnhanceTask",
+                    Enhancement = upgradeName
+                }
+                IssueScript({unit}, order)
 
                 repeat
                     WaitSeconds(3)
