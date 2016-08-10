@@ -1511,7 +1511,7 @@ BaseManager = Class {
         end,
 
         LoadDefaultBaseSupportCDRs = function(self)
-            -- CDR Build
+            -- sCDR Build
             local defaultBuilder = {
                 BuilderName = 'BaseManager_sCDRPlatoon_' .. self.BaseName,
                 PlatoonTemplate = self:CreateSupportCommanderPlatoonTemplate(),
@@ -1519,6 +1519,9 @@ BaseManager = Class {
                 PlatoonType = 'Any',
                 RequiresConstruction = false,
                 LocationType = self.BaseName,
+                PlatoonAddFunctions = {
+                    { BMPT, 'UnitUpgradeBehavior' },
+                },
                 PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
                 BuildConditions = {
                     { BMBC, 'BaseActive', {self.BaseName} },
