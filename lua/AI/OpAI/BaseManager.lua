@@ -702,6 +702,8 @@ BaseManager = Class {
                 faction = 'aeon'
             elseif EntityCategoryContains(categories.CYBRAN, unit) then
                 faction = 'cybran'
+            elseif EntityCategoryContains(categories.SERAPHIM, unit) then
+                faction = 'seraphim'
             end
 
             -- Check upgrade info, if any final upgrades are missing or pre-requisites return true
@@ -762,6 +764,8 @@ BaseManager = Class {
                 faction = 'cybran'
             elseif EntityCategoryContains( categories.AEON, unit ) then
                 faction = 'aeon'
+            elseif EntityCategoryContains( categories.SERAPHIM, unit ) then
+                faction = 'seraphim'
             end
 
             -- Choose which table to find the upgrade data in
@@ -808,7 +812,7 @@ BaseManager = Class {
             DamageStabilization = { false, 'LCH', {'uef'} },
             HeavyAntiMatterCannon = { false, 'RCH', {'uef'} },
             LeftPod = { false, 'Back', {'uef'} },
-            RightPod = { false, 'Back', {'uef'} },
+            RightPod = { 'LeftPod', 'Back', {'uef'} },
             Shield = { false, 'Back', {'uef','aeon'} },
             ShieldGeneratorField = { 'Shield', 'Back', {'uef'} },
             TacticalMissile = { false, 'Back', {'uef'} },
@@ -828,13 +832,23 @@ BaseManager = Class {
             HeatSink = { false, 'RCH', {'aeon'} },
             ResourceAllocationAdvanced = { false, 'Back', {'aeon'} },
             ShieldHeavy = { 'Shield', 'Back', {'aeon'} },
+
+            -- Seraphim
+            AdvancedRegenAura = { 'RegenAura', 'RCH', {'seraphim'} },
+            BlastAttack = { false, 'LCH', {'seraphim'} },
+            DamageStabilization = { false, 'Back', {'seraphim'} },
+            DamageStabilizationAdvanced = { 'DamageStabilization', 'Back', {'seraphim'} },
+            Missile = { false, 'Back', {'seraphim'} },
+            RateOfFire = { false, 'RCH', {'seraphim'} },
+            RegenAura = { false, 'RCH', {'seraphim'} },
+            ResourceAllocationAdvanced = { false, 'Back', {'seraphim'} },
         },
 
         -- Table for upgrade requirements for SACU
         SACUUpgradeNames = {
             -- UpgadeName = { prereq/false, slot, { factions/all } },
-            Shield = { false, 'Back', {'uef','aeon'} },
-            ResourceAllocation = { false, 'RCH', {'all'} },
+            Shield = { false, 'Back', {'uef','aeon','seraphim'} },
+            ResourceAllocation = { false, 'RCH', {'aeon','cybran','uef'} },
 
             -- UEF
             AdvancedCoolingUpgrade = { false, 'LCH', {'uef'} },
@@ -859,6 +873,14 @@ BaseManager = Class {
             StabilitySuppressant = { false, 'RCH', {'aeon'} },
             SystemIntegrityCompensator = { false, 'Back', {'aeon'} },
             Teleporter = { false, 'Back', {'aeon'} },
+
+            -- Seraphim
+            DamageStabilization = {false, 'LCH', {'seraphim'} },
+            EngineeringThroughput = {false, 'LCH', {'seraphim'} },
+            EnhancedSensors = {false, 'Back', {'seraphim'} },
+            Missile = {false, 'Back', {'seraphim'} },
+            Overcharge = {false, 'RCH', {'seraphim'} },
+            Teleporter = {false, 'RCH', {'seraphim'} },
         },
 
         SetACUUpgrades = function(self, upgradeTable, startActive)
