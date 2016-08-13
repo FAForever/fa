@@ -84,7 +84,6 @@ local function GetSource()
     return DiskToLocal(there)
 end
 
-
 local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
@@ -177,7 +176,6 @@ function ExtractMeshBlueprint(bp)
     end
 end
 
-
 function ExtractWreckageBlueprint(bp)
     local meshid = bp.Display.MeshBlueprint
     if not meshid then return end
@@ -230,13 +228,11 @@ function ExtractBuildMeshBlueprint(bp)
     end
 end
 
-
 function MeshBlueprint(bp)
     -- fill in default values
     SetLongId(bp)
     StoreBlueprint('Mesh', bp)
 end
-
 
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
@@ -245,12 +241,10 @@ function UnitBlueprint(bp)
     StoreBlueprint('Unit', bp)
 end
 
-
 function PropBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Prop', bp)
 end
-
 
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
@@ -259,24 +253,20 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
-
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)
 end
-
 
 function EmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Emitter', bp)
 end
 
-
 function BeamBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Beam', bp)
 end
-
 
 function ExtractAllMeshBlueprints()
 
@@ -296,7 +286,6 @@ function ExtractAllMeshBlueprints()
     end
 end
 
-
 function RegisterAllBlueprints(blueprints)
 
     local function RegisterGroup(g, fun)
@@ -313,7 +302,6 @@ function RegisterAllBlueprints(blueprints)
     RegisterGroup(blueprints.Emitter, RegisterEmitterBlueprint)
     RegisterGroup(blueprints.Beam, RegisterBeamBlueprint)
 end
-
 
 -- Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
 -- after building SCU.
@@ -528,11 +516,9 @@ function PostModBlueprints(all_bps)
 
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
-
     local preset_bps = {}
 
     for _, bp in all_bps.Unit do
-
         -- skip units without categories
         if not bp.Categories then
             continue
@@ -558,10 +544,8 @@ function PostModBlueprints(all_bps)
                 WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
-
         BlueprintLoaderUpdateProgress()
     end
-
     HandleUnitWithBuildPresets(preset_bps, all_bps)
 end
 -----------------------------------------------------------------------------------------------
@@ -646,7 +630,6 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     else
         return original_blueprints
     end
-
 end
 -- Reload a single blueprint
 function ReloadBlueprint(file)
