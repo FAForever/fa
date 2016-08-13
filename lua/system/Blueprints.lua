@@ -357,17 +357,12 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
                 if sortCategories[preset.SortCategory] or preset.SortCategory == 'None' then
-                    --local id = tempBp.BlueprintId .. '_' .. name ..' ' ..preset.SortCategory 
-                    --LOG(id ..' '  .. table.count(tempBp.CategoriesHash) .. ' = '  .. table.hashkeys(tempBp.CategoriesHash)) 
                     for k, v in sortCategories do
-                        --table.removeByValue(tempBp.Categories, v)
                         tempBp.CategoriesHash[k] = false
                     end
                     if preset.SortCategory ~= 'None' then
-                        --table.insert(tempBp.Categories, preset.SortCategory)
                         tempBp.CategoriesHash[preset.SortCategory] = true
                     end
-                    --LOG(id .. ' ' .. table.count(tempBp.CategoriesHash) .. ' = ' .. table.hashkeys(tempBp.CategoriesHash)) 
                 end
             end
 
@@ -386,7 +381,6 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
             table.insert(all_bps.Unit, tempBp )
-            --LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
 
             BlueprintLoaderUpdateProgress()
         end
@@ -427,7 +421,7 @@ function PreModBlueprints(all_bps)
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
             if not bp.CategoriesHash.OVERLAYMISC and not bp.CategoriesHash.POD then -- Exclude Build Drones
-                bp.CategoriesHash['OVERLAYMISC'] = true
+                bp.CategoriesHash.OVERLAYMISC = true
             end
         end
 
