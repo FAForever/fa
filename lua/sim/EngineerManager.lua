@@ -1,9 +1,6 @@
 --****************************************************************************
---*
 --**  File     :  /lua/sim/EngineerManager.lua
---**
 --**  Summary  : Manage engineers for a location
---**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
@@ -959,7 +956,6 @@ EngineerManager = Class(BuilderManager) {
         self:ForkThread( self.EngineerWaiting, unit )
     end,
     
-    
     ManagerLoopBody = function(self,builder,bType)
         if builder.OldPriority and not builder.SetByStrat then
             builder:ResetPriority()
@@ -981,7 +977,6 @@ EngineerManager = Class(BuilderManager) {
         -- Nope
         return false
     end,
-    
 }
 
 function CreateEngineerManager(brain, lType, location, radius)
