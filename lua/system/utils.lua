@@ -1,5 +1,5 @@
 -- ==========================================================================================
--- * File       : lua/modules/ui/lobby/UnitsManager.lua 
+-- * File       : lua/system/utils.lua 
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains global functions for working with tables and strings
 -- ==========================================================================================
