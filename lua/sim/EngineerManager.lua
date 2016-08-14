@@ -664,19 +664,17 @@ EngineerManager = Class(BuilderManager) {
             if not v.EngineerBuildQueue or table.getn(v.EngineerBuildQueue) == 0 then
                 continue
             end
-            
-            local buildCats = self.Brain:GetUnitBlueprint( v.EngineerBuildQueue[1][1] ).Categories
+            local buildName = v.EngineerBuildQueue[1][1]
+            local buildBp = self.Brain:GetUnitBlueprint(buildName)
             local buildingTypes = SUtils.split(buildingType, ' ')
             local found = false
             local count = 0
-            for k,v in buildCats do
-                for x,z in buildingTypes do
-                    if v == z then
-                        count = count + 1
-                    end
-                    if table.getn(buildingTypes) == count then found = true end
-                    if found then break end
+            for x,z in buildingTypes do
+                if buildBp.CategoriesHash[z] then
+                    count = count + 1
                 end
+                if table.getn(buildingTypes) == count then found = true end
+                if found then break end
             end
             
             if not found then
