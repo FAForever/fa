@@ -76,7 +76,7 @@ function Create(parent, bp)
     elseif bp.Name  then
         title = ' ' .. LOCF(bp.Name)
     end
-    if bp.General.UnitName and not bp.Categories['SUBCOMMANDER'] then
+    if bp.General.UnitName and not bp.CategoriesHash['SUBCOMMANDER'] then
         title = title .. ' (' .. LOCF(bp.General.UnitName) .. ')'
     end
     
