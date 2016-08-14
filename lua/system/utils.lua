@@ -384,12 +384,12 @@ end
 --- Concatenate keys of hash table if their values equal to specified boolean value, defaults to true
 --- it is useful to check which keys are present or not in a hash table
 --- t = { [A] = true, [B] = true, [C] = false }
---- table.hashkeys(t, true)  =>  'A, B'
---- table.hashkeys(t, false) =>  'C'
+--- table.hashkeys(t, true)  =>  { 'A', 'B' }
+--- table.hashkeys(t, false) =>  { 'C' }
 function table.hashkeys(t, value)
     if value == nil then value = true end -- defaulting to true
     local r = table.filter(t, function(v) return v == value end)
-    return table.concatkeys(r)
+    return table.keys(r)
 end
 
 --- table.map(fn,t) returns a table with the same keys as t but with
@@ -488,7 +488,7 @@ end
 --- @param t is a table to filter
 --- @param fn is decision function to use to filter the table.
 --- @return A new table containing every mapping from t for which fn function returns `true` when passed the value.
-function table.filter(t, filterFunc)
+function table.filter(t, fn)
     local r = {}
     if not fn then fn = function(v) return v end end  
     for k, v in t do
@@ -496,7 +496,6 @@ function table.filter(t, filterFunc)
             r[k] = v
         end
     end
-
     return r
 end
 --- Returns total count of values that match fn function or if values exist in table
