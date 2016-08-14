@@ -221,9 +221,9 @@ function GetUnitFaction(bp)
         if not bp.Merge then
             Show('WARNING', bp.Info..' - missing bp.General.FactionName')
         end
-        -- Using categories to find faction
+        -- Using CategoriesHash to quickly find faction
         for name, _ in Factions do
-            if bp.Categories[name] then
+            if bp.CategoriesHash[name] then
                 return name
             end
         end
@@ -272,11 +272,11 @@ end
 
 -- Gets units tech level based on categories of given blueprint
 function GetUnitTech(bp)
-    if bp.Categories['TECH1'] then return 'T1' end
-    if bp.Categories['TECH2'] then return 'T2' end
-    if bp.Categories['TECH3'] then return 'T3' end
-    if bp.Categories['COMMAND'] then return 'T0' end
-    if bp.Categories['EXPERIMENTAL'] then return 'T4' end
+    if bp.CategoriesHash['TECH1'] then return 'T1' end
+    if bp.CategoriesHash['TECH2'] then return 'T2' end
+    if bp.CategoriesHash['TECH3'] then return 'T3' end
+    if bp.CategoriesHash['COMMAND'] then return '' end
+    if bp.CategoriesHash['EXPERIMENTAL'] then return 'T4' end
 
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TECH in bp.Categories')
@@ -287,11 +287,11 @@ end
 
 -- Gets units type based on categories of given blueprint
 function GetUnitType(bp)
-    if bp.Categories['STRUCTURE'] then return 'BASE' end
-    if bp.Categories['AIR'] then return 'AIR' end
-    if bp.Categories['LAND'] then return 'LAND' end
-    if bp.Categories['NAVAL'] then return 'NAVAL' end
-    if bp.Categories['HOVER'] then return 'HOVER' end
+    if bp.CategoriesHash['STRUCTURE'] then return 'BASE' end
+    if bp.CategoriesHash['AIR'] then return 'AIR' end
+    if bp.CategoriesHash['LAND'] then return 'LAND' end
+    if bp.CategoriesHash['NAVAL'] then return 'NAVAL' end
+    if bp.CategoriesHash['HOVER'] then return 'HOVER' end
 
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TYPE in bp.Categories')
@@ -668,13 +668,13 @@ end
 -- Returns unit's categories that should not be hidden in tooltips
 function GetUnitsCategories(bp, showAll)
     local ret = {}
-    if bp.Categories then
+    if bp.CategoriesHash then
 
-        local categories = table.keys(bp.Categories)
         if showAll then
-            ret = categories
+            ret = bp.CategoriesHash
         else
-            for _, category in categories do
+            for key, val in bp.CategoriesHash do
+                local category = key
                 -- Ensure categories are nicely formatted
                 if category == 'MASSPRODUCTION' then
                     category = 'MASS PRODUCTION'
@@ -684,6 +684,8 @@ function GetUnitsCategories(bp, showAll)
                     category = 'ENERGY PRODUCTION'
                 elseif category == 'ENERGYSTORAGE' then
                     category = 'ENERGY STORAGE'
+                elseif category == 'SUPPORTFACTORY' then
+                    category = 'SUPPORT FACTORY'
                 end
                 -- Ensures name of enhancements are nicely formatted
                 if cached.Enhancements[category] then
@@ -691,20 +693,24 @@ function GetUnitsCategories(bp, showAll)
                 end
                 if not CategoriesHidden[category] then
                     -- Ensures all categories have the same case
-                    table.insert(ret, string.upper(category))
+                    ret[string.upper(category)] = true
                 end
             end
         end
 
-        -- Help showing difference between support and HQ factories
-        if categories['FACTORY'] and
-           categories['STRUCTURE'] and
-           not categories['SUPPORTFACTORY'] then
-            table.insert(ret, 'HQFACTORY')
+        -- Help showing difference between Support and HQ factories
+        if bp.CategoriesHash['FACTORY'] and
+           bp.CategoriesHash['STRUCTURE'] and 
+           not bp.CategoriesHash['TECH1'] and -- T1 factories are the same
+           not bp.CategoriesHash['GATE'] then  
+            ret['FACTORY'] = false -- hiding FACTORY* duplicate
+            if not bp.CategoriesHash['SUPPORTFACTORY']  then
+               ret['HQ FACTORY'] = true
+            end
         end
     end
 
-    return table.sorted(ret)
+    return table.hashkeys(ret, true)
 end
 
 -- Creates basic tooltip for given blueprints based on its categories, name, and source
@@ -726,12 +732,9 @@ function GetTooltip(bp)
         tooltip.text = bp.Tech .. ' ' .. tooltip.text
     end
 
-    if bp.Categories then
-        local categories = table.keys(bp.Categories)
-        for _, category in categories do
-            if not CategoriesHidden[category] then
-                tooltip.body = tooltip.body .. category .. ' \n'
-            end
+    for category, _ in bp.CategoriesHash or {} do
+        if not CategoriesHidden[category] then
+            tooltip.body = tooltip.body .. category .. ' \n'
         end
     end
 
@@ -778,10 +781,10 @@ end
 
 --- Checks if a unit contains specified categories
 function ContainsCategory(unit, value)
-    if not unit then return false end
-    if not unit.Categories then return false end
     if not value then return false end
-    return unit.Categories[value]
+    if not unit then return false end
+    if not unit.CategoriesHash then return false end
+    return unit.CategoriesHash[value]
 end
 
 --- Checks if a unit contains categories in specified expression
@@ -990,21 +993,21 @@ end
 
 -- Cache enhancements as new blueprints with Categories, Faction from their parent (unit) blueprints
 local function CacheEnhancement(key, bp, name, enh)
-    local categories = {}
+    enh.CategoriesHash = {}
     cached.Enhancements[name] = true
 
-    if blueprints.All[key].Categories then
-        categories = blueprints.All[key].Categories
+    if blueprints.All[key].CategoriesHash then
+        enh.CategoriesHash = blueprints.All[key].CategoriesHash
     end
 
     local commanderType = ''
-    categories['UPGRADE'] = true
-    if bp.Categories['COMMAND'] then
+    enh.CategoriesHash['UPGRADE'] = true
+    if bp.CategoriesHash['COMMAND'] then
         commanderType = 'ACU'
-        categories['COMMAND'] = true
-    elseif bp.Categories['SUBCOMMANDER'] then
+        enh.CategoriesHash['COMMAND'] = true
+    elseif bp.CategoriesHash['SUBCOMMANDER'] then
         commanderType = 'SCU'
-        categories['SUBCOMMANDER'] = true
+        enh.CategoriesHash['SUBCOMMANDER'] = true
     end
 
     -- Create some extra categories used for ordering enhancements in UI
@@ -1017,7 +1020,7 @@ local function CacheEnhancement(key, bp, name, enh)
         elseif slot == 'BACK' then
             enh.Slot = 'BACK'
         end
-        categories['UPGRADE '..enh.Slot] = true
+        enh.CategoriesHash['UPGRADE '..enh.Slot] = true
     end
 
     enh.ID = name
@@ -1031,10 +1034,8 @@ local function CacheEnhancement(key, bp, name, enh)
     enh.Tech = enh.Slot
     enh.Mod = bp.Mod
 
-    categories[bp.Faction] = true
-    categories[name] = true
-
-    enh.Categories = categories
+    enh.CategoriesHash[bp.Faction] = true
+    enh.CategoriesHash[name] = true
 
     if bp.Mod then
         blueprints.Modified[key] = enh
@@ -1055,11 +1056,11 @@ local function CacheProjectile(bp)
 
     -- Converting categories to hash table for quick lookup
     if  bp.Categories then
-        local categories = {}
-        for _, category in bp.Categories do
-            categories[category] = true
-        end
-        bp.Categories = categories
+        --local categories = {}
+        --for _, category in bp.Categories do
+        --    categories[category] = true
+        --end
+        bp.CategoriesHash = table.hash(bp.Categories) 
     end
 
     if bp.Mod then
@@ -1100,16 +1101,12 @@ local function CacheUnit(bp)
 
     local id = bp.ID
 
-    bp.Name = GetUnitName(bp)
-
     -- Skip processing of invalid units
     if not IsValidUnit(bp, id) then
         blueprints.Skipped[id] = bp
         return
     end
 
-    -- Converting categories to hash table for quick lookup
-    bp.Categories = table.hash(bp.Categories)
     bp.Faction = GetUnitFaction(bp)
     bp.Type = GetUnitType(bp)
     bp.Tech = GetUnitTech(bp)
