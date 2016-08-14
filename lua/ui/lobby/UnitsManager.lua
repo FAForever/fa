@@ -469,8 +469,8 @@ function CreateUnitIcon(parent, bp, faction)
     checkbox:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(checkbox, control, 5, 5)
 
-    if not bp.Categories.UPGRADE and
-          (bp.Categories.COMMAND or bp.Categories.SUBCOMMANDER) then
+    if not bp.CategoriesHash.UPGRADE and
+          (bp.CategoriesHash.COMMAND or bp.CategoriesHash.SUBCOMMANDER) then
 
         imagePath = '/textures/ui/icons_strategic/commander_generic.dds'
         local position = cellSize - unitFontSize - 2
@@ -514,7 +514,7 @@ function CreateUnitIcon(parent, bp, faction)
     LayoutHelpers.AtHorizontalCenterIn(overlay, control)
 
     if bp.Type == 'UPGRADE' or
-       bp.Categories.ISPREENHANCEDUNIT then
+       bp.CategoriesHash.ISPREENHANCEDUNIT then
         colors.TextChecked = 'ffffffff'
         colors.TextUncheck = 'ffffffff'
         colors.FillChecked = 'ad575757'
@@ -529,7 +529,7 @@ function CreateUnitIcon(parent, bp, faction)
         overlay:SetSolidColor(colors.FillUncheck)
         techUI:SetColor(colors.TextUncheck)
 
-        if bp.Categories.ISPREENHANCEDUNIT then
+        if bp.CategoriesHash.ISPREENHANCEDUNIT then
             techUI:SetText(bp.Tech or '')
             LayoutHelpers.AtLeftTopIn(techUI, control, 2, 2)
         end
@@ -914,12 +914,12 @@ function CompareUnitsOrder(a, b, sortCategories, sortReversed, depth, item)
 
     -- Find sorting index using units' Categories or IDs
     for orderIndex, category in sortCategories do
-        local isMatching = a.Categories[category] or a.ID == category
+        local isMatching = a.CategoriesHash[category] or a.ID == category
         if not orderA and isMatching then
             orderA = orderIndex
             categoryA = category
         end
-        local isMatching = b.Categories[category] or b.ID == category
+        local isMatching = b.CategoriesHash[category] or b.ID == category
         if not orderB and isMatching then
             orderB = orderIndex
             categoryB = category
