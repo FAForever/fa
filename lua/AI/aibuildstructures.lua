@@ -610,14 +610,12 @@ end
 
 function StructureCheck( unitName )
     local bp = ArmyBrains[1]:GetUnitBlueprint(unitName)
-    for k,v in bp.Categories do
-        if v == 'BUILTBYTIER1ENGINEER' then
-            return true
-        elseif v == 'BUILTBYTIER2ENGINEER' then
-            return true
-        elseif v == 'BUILTBYTIER3ENGINEER' then
-            return true
-        end
+    if bp.CategoriesHash.BUILTBYTIER1ENGINEER then
+        return true
+    elseif bp.CategoriesHash.BUILTBYTIER2ENGINEER then
+        return true
+    elseif bp.CategoriesHash.BUILTBYTIER3ENGINEER then
+        return true
     end
     return false
 end

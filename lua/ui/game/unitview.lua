@@ -222,9 +222,9 @@ function UpdateWindow(info)
         end
         local techLevel = false
         local levels = {TECH1 = 1,TECH2 = 2,TECH3 = 3}
-        for i, v in bp.Categories do
-            if levels[v] then
-                techLevel = levels[v]
+        for cat, level in levels do
+            if bp.CategoriesHash[cat] then
+                techLevel = level
                 break
             end
         end
