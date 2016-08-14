@@ -6,6 +6,11 @@ local MapUtil = import('/lua/ui/maputil.lua')
 local TexturePool = import('/lua/ui/texturepool.lua').TexturePool
 local ACUButton = import('/lua/ui/controls/acubutton.lua').ACUButton
 local gameColors = import('/lua/gameColors.lua').GameColors
+local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
+local FactionData = import('/lua/factions.lua')
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+--local Button = import('/lua/maui/button.lua').Button
 
 -- The default size of the mass/hydrocarbon icons
 local DEFAULT_HYDROCARBON_ICON_SIZE = 14
@@ -13,7 +18,7 @@ local DEFAULT_MASS_ICON_SIZE = 10
 
 --- UI control to show a preview image of a map, with optional resource markers.
 ResourceMapPreview = Class(Group) {
-    __init = function(self, parent, size, massIconSize, hydroIconSize, buttonsDisabled)
+    __init = function(self, parent, size, massIconSize, hydroIconSize, buttonsDisabled, showAdvancedPlayerStats)
         Group.__init(self, parent)
         self.size = size
         self.buttonsDisabled = buttonsDisabled or false
@@ -32,12 +37,20 @@ ResourceMapPreview = Class(Group) {
         self.hydromarkers = {}
         self.wreckagemarkers = {}
         self.startPositions = {}
+
         self.ratingLabel = {}
+        self.gamesPlayedLabel = {}
+        self.playerNameLabel = {}
+        self.factionBitmap = {}
+        self.slotInfoBG = {}
+        self.slotInfoBGHead = {}
 
         self.mapPreview = MapPreview(self)
         self.mapPreview.Width:Set(size)
         self.mapPreview.Height:Set(size)
         LayoutHelpers.AtLeftTopIn(self.mapPreview, self)
+
+        self.showAdvancedPlayerStats = showAdvancedPlayerStats or false
     end,
 
     --- Discard all resource markers
@@ -62,10 +75,36 @@ ResourceMapPreview = Class(Group) {
             v:Destroy()
         end
 
+        for k, v in pairs(self.gamesPlayedLabel) do
+            v:Destroy()
+        end
+
+        for k, v in pairs(self.playerNameLabel) do
+            v:Destroy()
+        end
+
+        for k, v in pairs(self.factionBitmap) do
+            v:Destroy()
+        end
+
+        for k, v in pairs(self.slotInfoBG) do
+            v:Destroy()
+        end
+
+        for k, v in pairs(self.slotInfoBGHead) do
+            v:Destroy()
+        end
+
         self.massmarkers = {}
         self.hydromarkers = {}
         self.startPositions = {}
+
         self.ratingLabel = {}
+        self.gamesPlayedLabel = {}
+        self.playerNameLabel = {}
+        self.factionBitmap = {}
+        self.slotInfoBG = {}
+        self.slotInfoBGHead = {}
     end,
 
     --- Delete all resource markers and clear the map preview.
@@ -199,6 +238,19 @@ ResourceMapPreview = Class(Group) {
         local playerArmyArray = MapUtil.GetArmies(scenarioInfo)
 
         local startPositions = {}
+
+
+        -- get faction icons
+        local factionBmps = {}
+        local factionTooltips = {}
+
+        for index, tbl in FactionData.Factions do
+            factionBmps[index] = tbl.SmallIcon
+            factionTooltips[index] = tbl.TooltipID
+        end
+        table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
+        table.insert(factionTooltips, 'lob_random')
+
         for inSlot, army in playerArmyArray do
             local pos = startPos[army]
             local slot = inSlot
@@ -209,16 +261,51 @@ ResourceMapPreview = Class(Group) {
             local markerHeight = yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2)
             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview, markerWidth, markerHeight)
 
+            startPositions[slot] = marker
+
             -- TODO: Create a text box for the rating label, and position it relative to the ACUButton.
             -- The ACUButton we just made is the little icon representing the player.
 
-            -- Create Labels above markers to show rating of player or AI names
+            -- Create various Labels
             self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
-            LayoutHelpers.CenteredAbove(self.ratingLabel[slot], marker, 5)
 
-            startPositions[slot] = marker
+            if self.showAdvancedPlayerStats == true then
+                self.slotInfoBG[slot] = Bitmap(self)
+                self.slotInfoBG[slot]:SetSolidColor('FF212123')
+                self.slotInfoBG[slot].Width:Set(75)
+                self.slotInfoBG[slot].Height:Set(50)
+                self.slotInfoBG[slot]:SetAlpha(0.75)
+                LayoutHelpers.AtLeftTopIn(self.slotInfoBG[slot], marker, -45, -20)
+                LayoutHelpers.DepthOverParent(self.slotInfoBG[slot],self, 1)
+
+                self.slotInfoBGHead[slot] = Bitmap(self)
+                self.slotInfoBGHead[slot]:SetSolidColor('FF212123')
+                self.slotInfoBGHead[slot].Width:Set(75)
+                self.slotInfoBGHead[slot].Height:Set(19)
+                self.slotInfoBGHead[slot]:SetAlpha(0.95)
+                LayoutHelpers.AtLeftTopIn(self.slotInfoBGHead[slot], self.slotInfoBG[slot], 0, 0)
+                LayoutHelpers.DepthOverParent(self.slotInfoBGHead[slot],self, 1)
+
+                self.gamesPlayedLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
+                self.playerNameLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 12, 'Arial Gras', true)
+                LayoutHelpers.AtLeftTopIn(self.playerNameLabel[slot], self.slotInfoBG[slot], 20, 1)
+                LayoutHelpers.AtLeftTopIn(self.gamesPlayedLabel[slot], self.slotInfoBG[slot], 2, 20)
+                LayoutHelpers.AtLeftTopIn(self.ratingLabel[slot], self.slotInfoBG[slot], 2, 35)
+
+                local bmp = Bitmap(self, UIUtil.UIFile(factionBmps[table.getn(factionBmps)]))
+                self.factionBitmap[slot] = bmp
+                LayoutHelpers.AtLeftTopIn(self.factionBitmap[slot], self.slotInfoBG[slot], 2, 2)
+                LayoutHelpers.DepthOverParent(self.factionBitmap[slot],self, 13)
+
+                self.slotInfoBG[slot]:Hide()
+                self.slotInfoBGHead[slot]:Hide()
+                self.gamesPlayedLabel[slot]:Hide()
+                self.playerNameLabel[slot]:Hide()
+                self.factionBitmap[slot]:Hide()
+            else
+                LayoutHelpers.CenteredAbove(self.ratingLabel[slot], marker, 5)
+            end
         end
-
         self.startPositions = startPositions
     end,
 
@@ -244,15 +331,72 @@ ResourceMapPreview = Class(Group) {
             end
         end
 
-        -- Set text to rating, or name if AI, or empty if nil playerInfo (Emptying slot)
-        local text
-        if playerInfo.Human then
-            text = playerInfo.PL
-        else
-            text = playerInfo.PlayerName or ""
+        local rating
+        local numGames
+        local playerName
+
+        playerName = playerInfo.PlayerName or ""
+
+        local factionBmps = {}
+        local factionTooltips = {}
+
+        for index, tbl in FactionData.Factions do
+            factionBmps[index] = tbl.SmallIcon
+            factionTooltips[index] = tbl.TooltipID
         end
 
-        self.ratingLabel[slot]:SetText(text)
+        table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
+        table.insert(factionTooltips, 'lob_random')
+
+        -- if a slot is occupied and playerstats on the preview are enabled, update stats, rating is always shown (little preview)
+        if playerInfo then
+            if self.showAdvancedPlayerStats == true then
+                if playerInfo.Human then
+                    rating = "R " .. playerInfo.PL
+                    numGames = "G " .. playerInfo.NG
+                else
+                    rating = ""
+                    numGames = ""
+                end
+                self.factionBitmap[slot]:SetTexture(UIUtil.UIFile(factionBmps[playerInfo.Faction], 0))
+                self.playerNameLabel[slot]:SetText(playerName)
+                self.gamesPlayedLabel[slot]:SetText(numGames)
+
+                self.slotInfoBG[slot].Width:Set(self.playerNameLabel[slot].Width() + 30)
+                self.slotInfoBGHead[slot].Width:Set(self.playerNameLabel[slot].Width() + 30)
+
+                -- depending on the type of player this sets the height of the label and background according to the labels we show
+                if playerInfo.Human then
+                    self.slotInfoBG[slot].Height:Set(self.playerNameLabel[slot].Height()+ (self.gamesPlayedLabel[slot].Height() * 2 + 10))
+                    LayoutHelpers.AtLeftTopIn(self.slotInfoBG[slot], marker, -(self.playerNameLabel[slot].Width()+10), -50)
+                else
+                    self.slotInfoBG[slot].Height:Set(self.playerNameLabel[slot].Height()+ 2)
+                    LayoutHelpers.AtLeftTopIn(self.slotInfoBG[slot], marker, -(self.playerNameLabel[slot].Width()-10), -(self.playerNameLabel[slot].Height()+5))
+                end
+
+                self.slotInfoBG[slot]:Show()
+                self.slotInfoBGHead[slot]:Show()
+                self.gamesPlayedLabel[slot]:Show()
+                self.playerNameLabel[slot]:Show()
+                self.factionBitmap[slot]:Show()
+            else
+                if playerInfo.Human then
+                    rating = playerInfo.PL
+                else
+                    rating = playerInfo.PlayerName or ""
+                end
+            end
+        else -- if no player is present, hide all labels. Since the rating label is shown on the little preview, it doesn't get really hidden
+            rating = ""
+            if self.showAdvancedPlayerStats == true then
+                self.slotInfoBG[slot]:Hide()
+                self.slotInfoBGHead[slot]:Hide()
+                self.gamesPlayedLabel[slot]:Hide()
+                self.playerNameLabel[slot]:Hide()
+                self.factionBitmap[slot]:Hide()
+            end
+        end
+        self.ratingLabel[slot]:SetText(rating)
     end,
 
     OnDestroy = function(self)
@@ -260,5 +404,41 @@ ResourceMapPreview = Class(Group) {
         self.hydroIconPool:Destroy()
         self.wreckageIconPool:Destroy()
         Group.OnDestroy(self)
+    end,
+
+    HideLabels = function(self, scenarioInfo)
+        local startPos = MapUtil.GetStartPositions(scenarioInfo)
+        local playerArmyArray = MapUtil.GetArmies(scenarioInfo)
+        local startPositions = {}
+
+        for inSlot, army in playerArmyArray do
+            local slot = inSlot
+
+            self.slotInfoBG[slot]:Hide()
+            self.slotInfoBGHead[slot]:Hide()
+            self.gamesPlayedLabel[slot]:Hide()
+            self.playerNameLabel[slot]:Hide()
+            self.factionBitmap[slot]:Hide()
+            self.ratingLabel[slot]:Hide()
+        end
+    end,
+
+    ShowLabels = function(self, scenarioInfo, playerOptions)
+        local startPos = MapUtil.GetStartPositions(scenarioInfo)
+        local playerArmyArray = MapUtil.GetArmies(scenarioInfo)
+        local startPositions = {}
+
+        for inSlot, army in playerArmyArray do
+            local slot = inSlot
+            if playerOptions[slot] then
+                self.slotInfoBG[slot]:Show()
+                self.slotInfoBGHead[slot]:Show()
+                self.gamesPlayedLabel[slot]:Show()
+                self.playerNameLabel[slot]:Show()
+                self.factionBitmap[slot]:Show()
+                self.ratingLabel[slot]:Show()
+            end
+        end
+
     end
 }
