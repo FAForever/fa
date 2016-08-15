@@ -83,7 +83,6 @@
 		  Weight = 1,
 	      },
 	  },
-	  AnimationOpen = '/units/uab4202/uab4202_aopen.sca',
 	  Mesh = {
 	      IconFadeInZoom = 130,
 	      LODs = {
