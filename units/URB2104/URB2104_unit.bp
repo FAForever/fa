@@ -72,7 +72,6 @@ UnitBlueprint {
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_aquatic>Aquatic',
         },
-        AnimationOpen = '/units/urb2104/URB2104_aagro.sca',
         IdleEffects = {
             Water = {
                 Effects = {
