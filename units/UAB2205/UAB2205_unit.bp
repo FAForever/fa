@@ -71,7 +71,6 @@ UnitBlueprint {
             '<LOC ability_personalstealth>Personal Stealth',
             '<LOC ability_torpedo>Torpedoes',
         },
-        AnimationOpen = '/units/UAB2205/UAB2205_Aopen.sca',
         DamageEffects = {
             {
                 Bone = 0,
