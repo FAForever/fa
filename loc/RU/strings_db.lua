@@ -7685,6 +7685,8 @@ OPTIONS_0243="Показывать вражеские индикаторы жи�
 OPTIONS_0244="Показывать вооружение в строит-ом меню"
 OPTIONS_0245="Улучшенный сброс выбранных боевых ед-ц"
 OPTIONS_0246="Показывать утилизированную материю"
+OPTIONS_0247="Auto create Display Abilities"
+OPTIONS_0248="Off: Use original abilities from Unitblueprint -- Medium: Use original abilities and auto-create if no abilities where found -- Full: Always auto-create abilities."
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
