@@ -11,7 +11,7 @@ function CountCurrentUnits(brain,categoryCheck)
     local ListOfUnits = brain:GetListOfUnits(categoryCheck, false)
     local count = 0
     for index,unit in ListOfUnits do
-        if unit.CanBeKilled == true and unit.Dead == false then
+        if unit.CanBeKilled and not unit.Dead then
             count = count + 1
         end
     end
