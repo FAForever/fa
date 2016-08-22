@@ -591,7 +591,7 @@ UnitBlueprint {
             Icon = 'ees',
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
             NewBuildRate = 100,
-            NewHealth = 5500,
+            NewHealth = 3500,
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
