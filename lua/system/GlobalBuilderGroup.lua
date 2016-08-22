@@ -53,7 +53,7 @@ BuilderGroupDefMeta.__call = function(...)
     end
 
     if BuilderGroups[arg[2].BuilderGroupName] then
-        WARN('Duplicate PlatoonTemplate detected - overriding/appending old: ', arg[2].BuilderGroupName)
+        LOG('Hooked PlatoonTemplate: ', arg[2].BuilderGroupName)
         for k,v in arg[2] do
             BuilderGroups[arg[2].BuilderGroupName][k] = v
         end
