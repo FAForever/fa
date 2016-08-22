@@ -1,16 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/system/GlobalBuilderTemplate.lua
-#**
-#**  Summary  :  Global builder table and template methods
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+----------------------------------------------------------------------------
+--
+--  File     :  /lua/system/GlobalBuilderTemplate.lua
+--
+--  Summary  :  Global builder table and template methods
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------
 
-# Global list of all buffs found in the system.
+-- Global list of all buffs found in the system.
 Builders = {}
 
-# 
+--
 Builder = {}
 BuilderDefMeta = {}
 
@@ -20,22 +20,22 @@ BuilderDefMeta.__call = function(...)
         LOG('Invalid Builder: ', repr(arg))
         return
     end
-    
+
     if not arg[2].BuilderName then
         WARN('Missing BuilderName for Builder definition: ',repr(arg))
         return
     end
-    
+
     if not arg[2].Priority then
         WARN('Missing Priority for Builder definition - BuilderName = ' .. arg[2].BuilderName)
         return
     end
-    
+
     if not arg[2].BuilderType then
         WARN('Missing BuilderType for Builder definition - BuilderName = ' .. arg[2].BuilderName)
         return
     end
-    
+
     if Builders[arg[2].BuilderName] then
         WARN('Duplicate Builder detected - overriding/appending old: ', arg[2].BuilderName)
         for k,v in arg[2] do
@@ -44,11 +44,11 @@ BuilderDefMeta.__call = function(...)
     else
         Builders[arg[2].BuilderName] = arg[2]
     end
-    
+
     if not arg[2].BuilderData then
         arg[2].BuilderData = {}
     end
-    #SPEW('Builder Registered: ', arg[2].BuilderName)
+    --SPEW('Builder Registered: ', arg[2].BuilderName)
     return arg[2].BuilderName
 end
 
