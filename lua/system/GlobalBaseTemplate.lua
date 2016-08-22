@@ -47,7 +47,7 @@ BaseBuilderTemplateDefMeta.__call = function(...)
     end
 
     if BaseBuilderTemplates[arg[2].BaseTemplateName] then
-        WARN('Duplicate BaseBuilderTemplate detected - overriding/appending old: ', arg[2].BaseTemplateName)
+        LOG('Hooked BaseBuilderTemplate: ', arg[2].BaseTemplateName)
         for k,v in arg[2] do
             BaseBuilderTemplates[arg[2].BaseTemplateName][k] = v
         end

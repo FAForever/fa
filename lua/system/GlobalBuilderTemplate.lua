@@ -37,7 +37,7 @@ BuilderDefMeta.__call = function(...)
     end
 
     if Builders[arg[2].BuilderName] then
-        WARN('Duplicate Builder detected - overriding/appending old: ', arg[2].BuilderName)
+        LOG('Hooked Builder: ', arg[2].BuilderName)
         for k,v in arg[2] do
             Builders[arg[2].BuilderName][k] = v
         end

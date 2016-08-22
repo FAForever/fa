@@ -34,7 +34,7 @@ PlatoonTemplateDefMeta.__call = function(...)
 
     local oldFactionSquads = false
     if InitialRegistration and PlatoonTemplates[arg[2].Name] then
-        WARN('Duplicate PlatoonTemplate detected - overriding old: ', arg[2].Name)
+        LOG('Hooked PlatoonTemplate: ', arg[2].Name)
         -- Save out any old faction squads in case they aren't being overwritten
         oldFactionSquads = PlatoonTemplates[arg[2].Name]
     end
