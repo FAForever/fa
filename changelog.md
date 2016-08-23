@@ -232,6 +232,7 @@ Patch 3658 (August 29th, 2016)
 - ckitching
 - Crotalus
 - Downlord
+- Exotic_Retard
 - IceDreamer
 - JaggedAppliance
 - JJ173
