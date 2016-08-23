@@ -1,4 +1,4 @@
-Patch 3658 (Upcoming)
+Patch 3658 (August 29th, 2016)
 ============================
 
 **Exploits**
