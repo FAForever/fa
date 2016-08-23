@@ -241,7 +241,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 240,
     Weapon = {
         {
-            Damage = 5500,
+            Damage = 6000,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',
