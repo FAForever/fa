@@ -41,11 +41,216 @@ Patch 3658 (Upcoming)
 - Improved AI base management in campaign scenarios
 - Sub dive toggle now prioritizes dive in mixed groups
 
+**Balance**
+- Light Assault Bots
+    - Build time reduced 140 -> 120
+- Cybran T2 Mobile Stealth
+    - Energy drain increased 25 -> 75
+- Fire Beetle
+    - Now takes two transport slots the same as all other T2 units
+- UEF T1 Mobile Artillery
+    - Health increased 200 -> 205
+- Scathis
+    - Mass cost increased 85,000 -> 110,000
+    - Energy cost increased 1,500,000 -> 2,000,000
+    - Build time cost increased 31,500 -> 50,000
+    - Weapon range decreased 330 -> 300
+- Selen
+    - Reworked hiding ability into a button toggle:
+       - When pressed, puts the unit in hide mode. The weapon is disabled,
+          all commands are removed from the unit, and it comes to a halt. 
+          Counter-intel Stealth and Cloak come online once it's stopped.
+       - Selens in hide mode have lowered selection priority: They cannot
+          be selected alongside other units.
+    - Introduced power drain in hide mode - 5 energy/second
+- Mobile T1 AA
+    - Mass cost increased 28 -> 55
+    - Energy cost increased 140 -> 275
+    - Build time increased 140 -> 220
+   - UEF
+        - Health increased 200 -> 360
+        - Speed increased 2.8 -> 3.3
+        - Damage increased 8 -> 16
+   - Cybran
+        - Health increased 130 -> 260
+        - Damage increased 8 -> 16
+        - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+            depending on what is in range, prioritising AA.
+   - Aeon
+        - Health increased 200 -> 360
+        - Speed decreased 3 -> 2.8
+        - Damage increased 5 -> 10
+   - Seraphim
+        - Health increased 200 -> 360
+        - Speed increased 2.5 -> 3.4
+        - Damage increased 4 -> 8
+- T2 Hover Tanks
+   - UEF
+        - Increased speed on water 3 -> 3.3
+   - Aeon
+        - Increased speed on water 3 -> 3.5
+   - Seraphim
+        - Increased speed on water 3 -> 3.5
+- T2 Flak
+   - UEF
+        - Increased speed 2.8 -> 3
+   - Cybran
+        - Decreased speed 2.9 -> 2.7
+   - Aeon
+        - Increased speed on water 3 -> 3.5
+        - Decreased speed on land 3 -> 2.6
+   - Seraphim
+        - Increased speed on water 3 -> 3.5
+        - Decreased speed on land 3 -> 2.5
+- Engineers
+   - T2 Engineers
+        - Decreased energy cost 700 -> 650
+        - Decreased mass cost 140 -> 130
+        - Decreased build time 700 -> 650
+       - UEF
+            - Increased health 300 -> 400
+       - Cybran
+            - Increased health 290 -> 390
+       - Aeon
+            - Increased health 240 -> 340
+       - Seraphim
+            - Increased health 250 -> 350
+   - T3 Engineers
+        - Decreased energy cost 2200 -> 1560
+        - Decreased mass cost 440 -> 312
+        - Decreased build time 2200 -> 1560
+       - UEF
+            - Increased health 600 -> 800
+       - Cybran
+            - Increased health 540 -> 740
+       - Aeon
+            - Increased health 480 -> 680
+            - Decreased build rate 40 -> 30
+       - Seraphim
+            - Increased health 500 -> 700
+            - Decreased build rate 40 -> 30
+- T1 Bombers
+    - Increased energy cost 2250- 2400
+    - Increased mass cost 80 -> 120
+    - Increased build time 500 -> 800
+    - Removed Radar ability
+    - Increased RateOfFire 0.25 -> 0.2
+   - Cybran and UEF
+        - Decreased FiringRandomness 3 -> 0
+   - Flight Parameters
+        - Decreased BreakOffDistance 30 -> 24
+        - Increased CombatTurnSpeed 0.75 -> 1.5
+        - Increased KTurn 0.7 -> 0.8
+        - Decreased StartTurnDistance 5 -> 1.4
+        - Increased TurnSpeed 0.75 -> 1.5
+        - Decreased RandomBreakOffDistanceMult 1.5 -> 1
+- Ahwasssa
+    - Decreased StartTurnDistance 15 -> 1
+    - Increased TurnSpeed 0.65 -> 0.9
+- Cybran T1 Frigate
+    - Decreased AA MuzzleVelocity 60 -> 45
+    - Removed AA projectile tracking
+    - Removed AA projectile TurnRate
+- Cybran T2 Destroyer
+    - Decreased AA damage 10 -> 5
+- Cybran T1 Static AA
+    - Fixed bug preventing it from shooting scouts on certain approaches
+- Tactical Missile Launchers
+   - UEF
+        - Decreased clip size 12 -> 6
+   - Cybran
+        - Decreased clip size 10 -> 4
+   - Aeon
+        - Decreased clip size 16 -> 6
+   - Seraphim
+        - Decreased clip size 20 -> 8
+- T2 Static Artillery
+    - Decreased build time 1608 -> 1200
+- Aeon TMD
+    - Adapted weapon collision to prevent flare failing to intercept missiles flying near
+        the top of the range sphere
+- Factory Cost Changes
+    - T2 Land HQs
+        - Increased mass cost 800 -> 1280
+        - Increased energy cost 7200 -> 11200
+        - Increased build time 1600 -> 2600
+    - T2 Land Support Factories
+        - Increased mass cost 300 -> 340
+        - Increased build time 1300 -> 1600
+    - T3 Land Support Factories
+        - Increased mass cost 750 -> 860
+        - Increased build time 3000 -> 4000
+    - T2 Navy HQs
+        - Increased mass cost 1370 -> 1700
+        - Increased energy cost 6600 -> 8500
+        - Increased build time 2400 -> 3600
+        - Increased build power 60 -> 90
+    - T3 Navy HQs
+        - Increased mass cost 5450 -> 7500
+        - Increased energy cost 24472 -> 35000
+        - Increased build time 8200 -> 11250
+        - Increased build power 120 -> 150
+    - T2 Navy Support Factories
+        - Increased mass cost 500 -> 800
+        - Increased energy cost 2500 -> 4000
+        - Increased build time 2000 -> 3000
+        - Increased build power 60 -> 90
+    - T3 Navy Support Factories
+        - Increased mass cost 800 -> 1100
+        - Increased energy cost 3429 -> 5500
+        - Decreased build time 4000 -> 3500
+        - Increased build power 120 -> 150 
+- Cybran T3 MAA
+    - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+            depending on what is in range, prioritising AA
+- Cybran T2 Cruiser
+    - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+            depending on what is in range, prioritising AA
+- All ACUs
+    - T2 Upgrade
+        - Removed health regen bonus
+        - Decreased health increase 3000 -> 1500 (UEF, Aeon, Seraphim) 3500 -> 2000 (Cybran)
+    - T3 Upgrade
+        - Removed health regen bonus
+        - Decreased health increase to respect the T2 adjustment
+        - Decreased buildpower 126 -> 100
+    - Aeon ACU
+       - Enhanced Sensor System Upgrade
+            - Decreased mass cost 400 -> 350
+            - Decreased energy cost 10000 -> 5000
+            - Decreased omni radius 100 -> 80
+            - Increased visual radius 50 -> 80
+    - Cybran ACU
+        - Decreased health regen 17 -> 15
+        - Changed regen per veterancy level 21/24/27/30/33 -> 19/23/27/31/35
+        - Personal Stealth System Upgrade
+            - Decreased energy cost 5250 -> 5000
+            - Increased build time 350 -> 500
+
+**Contributors**
+- Brutus5000
+- ckitching
+- Crotalus
+- Downlord
+- IceDreamer
+- JaggedAppliance
+- JJ173
+- Justify87
+- Shalkya
+- Sheeo
+- Speed2
+- Uveso
+- ZockyZock
+
 Hotfix Patch 3656 (August 8, 2016)
 ==================================
 **Server Compatibility**
 - Made teamkill reporting work alongside the server update V0.3
 - Change the format of unit statistics to enable server harvesting for achievements
+
+**Contributors**
+- Crotalus
+- Downlord
 
 Patch 3654 (May 30, 2016)
 ============================
