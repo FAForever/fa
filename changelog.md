@@ -8,6 +8,8 @@ Patch 3658 (Upcoming)
 - UEF T2 Gunship will now display the transport icon when selected and hovering the mouse over one of your units
 - Fixed typo in Seraphim ACU description
 - Hydrocarbon Plants now use the amphibious background in the build menu
+- Added rehost functionality to allow easy rehosting with the same game settings
+- Enabled tooltips on queuestack, unitstack, and attachedunit entities (Shows tooltip when hovering over just about any unit build queue icon now)
 
 **Lobby**
 - Fixed observer messages not showing in chat
@@ -16,6 +18,8 @@ Patch 3658 (Upcoming)
 - You can now set up your games via the map previews. Click on two players to swap them. Click an empty spot to occupy it.
 - Fixed map preview highlights not going away when you exit the player switch drop-down menu in certain ways
 - The colour of your rating text now changes colour, getting darker with higher deviation. This should make identifying smurf accounts easier.
+- Added new spawn options: Fixed, Random, Optimal Balance, Flexible Balance
+- Added message "Player kicked by host" to chat
 
 **Bugs**
 - Fixed death animations for Cybran T1 mobile artillery and Seraphim T3 mobile artillery
@@ -25,6 +29,8 @@ Patch 3658 (Upcoming)
 - Fixed Size 4 buildings such as T2 PD and Flak getting a Rate-Of-Fire adjacency buff from PGens
 - Fixed bug in AI Engineer behaviour which let to an engine crash
 - Fixed templates not working if a unit added by a mod was the first built in the selection used to form the template
+- Fixed Selen radar not enabling on build
+- Fixed possible desync trigger in AI games
 
 **Gameplay**
 - The Ythotha now spawns the energy being no matter the method used to kill it
@@ -33,6 +39,7 @@ Patch 3658 (Upcoming)
 - Nuke Launched warning now plays for Observers
 - Overhauled bomb-drop aim calculation code. It now takes the Y axis into account, and spaces multi-projectile drops properly. In theory, this should be the last word in bombers missing stupidly.
 - Improved AI base management in campaign scenarios
+- Sub dive toggle now prioritizes dive in mixed groups
 
 Hotfix Patch 3656 (August 8, 2016)
 ==================================
