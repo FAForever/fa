@@ -493,7 +493,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 2800,
+            BuildTime = 1400,
             Icon = 'ras',
             Name = '<LOC enhancements_0010>Resource Allocation System',
             ProductionPerSecondEnergy = 2000,
@@ -514,7 +514,7 @@ UnitBlueprint {
         ResourceAllocationAdvanced = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 2800,
+            BuildTime = 1400,
             Icon = 'eras',
             Name = '<LOC enhancements_0011>Advanced Resource Allocation System',
             Prerequisite = 'ResourceAllocation',
