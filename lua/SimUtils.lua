@@ -110,6 +110,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 end
             end
         end
+        
+        unit.TestTranferProtocol = true
 
         -- changing owner
         unit = ChangeUnitArmy(unit,ToArmyIndex)

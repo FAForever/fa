@@ -121,7 +121,11 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     OnDestroy = function(self)
+    
+        WARN('OnDestroy')
         SWalkingLandUnit.OnDestroy(self)
+        
+        LOG(self.TestTranferProtocol)
 
         -- Don't make the energy being if not built
         if self:GetFractionComplete() ~= 1 then return end
