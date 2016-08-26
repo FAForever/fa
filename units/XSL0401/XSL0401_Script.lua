@@ -121,14 +121,10 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     OnDestroy = function(self)
-    
-        WARN('OnDestroy')
         SWalkingLandUnit.OnDestroy(self)
-        
-        LOG(self.TestTranferProtocol)
 
-        -- Don't make the energy being if not built
-        if self:GetFractionComplete() ~= 1 then return end
+        -- Don't make the energy being if not built, or if this is a unit transfer
+        if self:GetFractionComplete() ~= 1 or self.IsBeingTransferred then return end
         
         -- Spawn the Energy Being
         local position = self:GetPosition()
