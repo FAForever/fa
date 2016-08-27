@@ -133,12 +133,12 @@ Description = {
     ['ueb0303'] = "<LOC Unit_Description_0087> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
     
     -- UEF -- Support Factories
-    ['zeb9603'] = "<LOC Unit_Description_s082> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
-    ['zeb9602'] = "<LOC Unit_Description_s083> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
-    ['zeb9601'] = "<LOC Unit_Description_s084> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
-    ['zeb9503'] = "<LOC Unit_Description_s085> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
-    ['zeb9502'] = "<LOC Unit_Description_s086> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
-    ['zeb9501'] = "<LOC Unit_Description_s087> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+    ['zeb9501'] = "<LOC Unit_Description_s082> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zeb9502'] = "<LOC Unit_Description_s083> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zeb9503'] = "<LOC Unit_Description_s084> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zeb9601'] = "<LOC Unit_Description_s085> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zeb9602'] = "<LOC Unit_Description_s086> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zeb9603'] = "<LOC Unit_Description_s087> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
   
     -- UEF -- Resource Structures   
     ['ueb1101'] = "<LOC Unit_Description_0088> Generates Energy. Construct next to other structures for adjacency bonus.",
@@ -293,12 +293,12 @@ Description = {
     ['urb0303'] = "<LOC Unit_Description_0204> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
        
     -- CYBRAN -- Support Factories  
-    ['zrb9603'] = "<LOC Unit_Description_s199> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
-    ['zrb9602'] = "<LOC Unit_Description_s200> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
-    ['zrb9601'] = "<LOC Unit_Description_s201> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
-    ['zrb9503'] = "<LOC Unit_Description_s202> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
-    ['zrb9502'] = "<LOC Unit_Description_s203> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
-    ['zrb9501'] = "<LOC Unit_Description_s204> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+    ['zrb9501'] = "<LOC Unit_Description_s199> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zrb9502'] = "<LOC Unit_Description_s200> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zrb9503'] = "<LOC Unit_Description_s201> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zrb9601'] = "<LOC Unit_Description_s202> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zrb9602'] = "<LOC Unit_Description_s203> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zrb9603'] = "<LOC Unit_Description_s204> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
  
     -- CYBRAN -- Resource Structures
     ['urb1101'] = "<LOC Unit_Description_0205> Generates Energy. Construct next to other structures for adjacency bonus.",
@@ -439,12 +439,12 @@ Description = {
     ['uab0303'] = "<LOC Unit_Description_0284> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
        
     -- AEON -- Support Factories
-    ['zab9603'] = "<LOC Unit_Description_s279> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
-    ['zab9602'] = "<LOC Unit_Description_s280> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
-    ['zab9601'] = "<LOC Unit_Description_s281> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
-    ['zab9503'] = "<LOC Unit_Description_s282> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
-    ['zab9502'] = "<LOC Unit_Description_s283> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
-    ['zab9501'] = "<LOC Unit_Description_s284> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+    ['zab9501'] = "<LOC Unit_Description_s279> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zab9502'] = "<LOC Unit_Description_s280> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zab9503'] = "<LOC Unit_Description_s281> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zab9601'] = "<LOC Unit_Description_s282> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zab9602'] = "<LOC Unit_Description_s283> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zab9603'] = "<LOC Unit_Description_s284> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
 
     -- AEON -- Resource Structures
     ['uab1101'] = "<LOC Unit_Description_0285> Generates Energy. Construct next to other structures for adjacency bonus.",
