@@ -779,7 +779,7 @@ function CommonLogic()
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
             if control.Data.Disabled then
-                --control:Disable()
+                control:Enable()
                 control.Data.TooltipOnly = true
                 if not control.Data.Selected then
                     control.Icon:SetSolidColor('aa000000')
