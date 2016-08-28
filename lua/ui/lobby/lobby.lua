@@ -340,7 +340,7 @@ function GetLocalPlayerData()
             PlayerName = localPlayerName,
             OwnerID = localPlayerID,
             Human = true,
-            PlayerColor = Prefs.GetFromCurrentProfile('LastColor'),
+            PlayerColor = Prefs.GetFromCurrentProfile('LastColorFAF'),
             Faction = GetSanitisedLastFaction(),
             PlayerClan = argv.playerClan,
             PL = playerRating,
@@ -927,7 +927,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.ready:SetCheck(playerInfo.Ready, true)
 
     if isLocallyOwned and playerInfo.Human then
-        Prefs.SetToCurrentProfile('LastColor', playerInfo.PlayerColor)
+        Prefs.SetToCurrentProfile('LastColorFAF', playerInfo.PlayerColor)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
