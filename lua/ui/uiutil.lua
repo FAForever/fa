@@ -1093,8 +1093,8 @@ function GetReplayId()
 end
 
 -- Create an input dialog with the given title and listener function.
-function CreateInputDialog(parent, title, listener, fallbackBox)
-    local dialog = InputDialog(parent, title, fallbackBox)
+function CreateInputDialog(parent, title, listener, fallbackBox, str)
+    local dialog = InputDialog(parent, title, fallbackBox, str)
     dialog.OnInput = listener
 
     return dialog
