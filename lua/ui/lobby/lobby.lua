@@ -406,17 +406,19 @@ local function DoSlotBehavior(slot, key, name)
         end
     elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                               "<LOC lobui_0167>Kick Player",
-                               function()
-                                   SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
-                                   lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost")
-                               end
-                               ,
-                               "<LOC _Cancel>", nil,
-                               nil, nil,
-                               true,
-                               {worldCover = false, enterButton = 1, escapeButton = 2})
+            local kickMessage = function(self, str)
+                    local msg
+
+                    if str == "" then
+                        msg = "\n Kicked by host"
+                    else
+                        msg = "\n Kicked by host. \n Reason: " .. str
+                    end
+
+                    SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
+                    lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
+                end
+            CreateInputDialog(GUI, "Kick the player?", kickMessage)
         else
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
