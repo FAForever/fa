@@ -171,9 +171,12 @@ Patch 3658 (August 29th, 2016)
         the top of the range sphere
 - Factory Cost Changes
     - T2 Land HQs
-        - Increased mass cost 800 -> 1280
-        - Increased energy cost 7200 -> 11200
+        - Increased mass cost 800 -> 1520
+        - Increased energy cost 7200 -> 13300
         - Increased build time 1600 -> 2600
+    - T3 Land HQs (Price increase due to the T2 cost increase)
+        - Increased mass cost 4540 -> 4920
+        - Increased energy cost 41100 -> 43900
     - T2 Land Support Factories
         - Increased mass cost 300 -> 340
         - Increased build time 1300 -> 1600
@@ -206,6 +209,9 @@ Patch 3658 (August 29th, 2016)
 - Cybran T2 Cruiser
     - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
             depending on what is in range, prioritising AA
+    - Decreased AG toggle weapon damage 60 -> 20
+    - Increased AG toggle weapon rate of fire 0.5 -> 1
+    - Increased AG toggle weapon FiringRandomness 0.3 -> 0.9
 - All ACUs
     - T2 Upgrade
         - Removed health regen bonus
