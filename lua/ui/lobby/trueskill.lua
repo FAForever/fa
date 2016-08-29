@@ -461,5 +461,6 @@ function computeQuality(team)
 
     local result = math.exp(expPart) * math.sqrt(sqrtPart)
 
-    return tonumber(round(result, 4) * 100)
+    if quality <= 0 or quality > 100 then return 0 end
+    return round(result, 4) * 100
 end
