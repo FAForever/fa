@@ -418,7 +418,7 @@ local function DoSlotBehavior(slot, key, name)
                     SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
                     lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
                 end
-            CreateInputDialog(GUI, "Kick the player?", kickMessage, "Reason (optional)")
+            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, "Reason (optional)")
         else
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
