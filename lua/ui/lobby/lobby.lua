@@ -5093,9 +5093,7 @@ function DoSlotSwap(slot1, slot2)
     local player1 = gameInfo.PlayerOptions[slot1]
     local player2 = gameInfo.PlayerOptions[slot2]
 
-    local team_bucket
-
-    team_bucket = player1.Team
+    local team_bucket = player1.Team
     player1.Team = player2.Team
     player2.Team = team_bucket
 
