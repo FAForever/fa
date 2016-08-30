@@ -565,7 +565,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 40,
             DamageType = 'Normal',
             DisplayName = 'Nanodart Launcher',
             FireTargetLayerCapsTable = {
@@ -576,18 +576,22 @@ UnitBlueprint {
             Label = 'GroundGun',
             LeadTarget = true,
             MaxRadius = 80,
-            MuzzleSalvoDelay = 0.3,
-            MuzzleSalvoSize = 6,
+            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoSize = 3,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CAANanoDart02/CAANanoDart02_proj.bp',
             ProjectileLifetime = 5.5,
-            ProjectilesPerOnFire = 6,
             RackBones = {
                 {
                     MuzzleBones = {
                         'Right_Launcher_Muzzle01',
                         'Right_Launcher_Muzzle02',
                         'Right_Launcher_Muzzle03',
+                    },
+                    RackBone = 'launcher_barrel',
+                },
+                {
+                    MuzzleBones = {
                         'Left_Launcher_Muzzle01',
                         'Left_Launcher_Muzzle02',
                         'Left_Launcher_Muzzle03',
@@ -597,7 +601,7 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 0,
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
