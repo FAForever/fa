@@ -216,7 +216,7 @@ UnitBlueprint {
             DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Rapid-Fire Artillery Cannon',
-            EnergyDrainPerSecond = 7500,
+            EnergyDrainPerSecond = 10000,
             EnergyRequired = 15000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
@@ -227,7 +227,7 @@ UnitBlueprint {
             Label = 'MainGun',
             MaxRadius = 1800,
             MinRadius = 175,
-            MuzzleChargeDelay = 0.2,
+            MuzzleChargeDelay = 0.15,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 98,
