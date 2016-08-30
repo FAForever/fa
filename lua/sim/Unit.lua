@@ -3769,6 +3769,7 @@ Unit = Class(moho.unit_methods) {
         if loading then self:HideBone(0, true)
         else self:ShowBone(0, true) end
         self:SetCanTakeDamage(not loading)
+        self:SetDoNotTarget(loading)
         self:SetReclaimable(not loading)
         self:SetCapturable(not loading)
     end,
