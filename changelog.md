@@ -209,8 +209,9 @@ Patch 3658 (August 29th, 2016)
 - Cybran T2 Cruiser
     - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
             depending on what is in range, prioritising AA
-    - Decreased AG toggle weapon damage 60 -> 20
+    - Decreased AG toggle weapon damage 60 -> 40
     - Increased AG toggle weapon rate of fire 0.5 -> 1
+    - Decreased AG toggle weapon rockets per salvo 6 -> 3
     - Increased AG toggle weapon FiringRandomness 0.3 -> 0.9
 - All ACUs
     - T2 Upgrade
