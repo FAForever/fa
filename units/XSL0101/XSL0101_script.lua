@@ -12,55 +12,34 @@ XSL0101 = Class(SWalkingLandUnit) {
 		LaserTurret = Class(SDFPhasicAutoGunWeapon) {},
     },
 
-    -- Set custom flag and add Stealth and Cloak toggles to the switch
+    -- Toggle disabled
     OnScriptBitSet = function(self, bit)
         if bit == 8 then
-            if self.CloakThread then
-                KillThread(self.CloakThread)
-                self.CloakThread = nil
-            end
-
-            self.HiddenSelen = false
-            self:SetFireState(0)
-            self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
-            self:DisableUnitIntel('ToggleBit8', 'Cloak')
-            
-            if not self.MaintenanceConsumption then
-                self.ToggledOff = true
-            end
+            self.Sync.LowPriority = false
         else
             SWalkingLandUnit.OnScriptBitSet(self, bit)
         end
     end,
 
+    -- Toggle enabled
     OnScriptBitClear = function(self, bit)
         if bit == 8 then
-            if not self.CloakThread then
-                self.CloakThread = ForkThread(function()
-                    WaitSeconds(1)
-
-                    self.HiddenSelen = true
-                    self:SetFireState(1)
-                    self:SetMaintenanceConsumptionActive()
-                    self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
-                    self:EnableUnitIntel('ToggleBit8', 'Cloak')
-
-                    IssueStop({self})
-                    IssueClearCommands({self})
-
-                    if self.MaintenanceConsumption then
-                        self.ToggledOff = false
-                    end
-                end)
-            end
-
-            -- This sends one stop, to force the unit to a halt etc
-            IssueStop({self})
-            IssueClearCommands({self})
+            self.Sync.LowPriority = true
         else
             SWalkingLandUnit.OnScriptBitClear(self, bit)
         end
+    end,
+
+    RevealUnit = function(self)
+        if self.CloakThread then
+            KillThread(self.CloakThread)
+            self.CloakThread = nil
+        end
+
+        self:SetFireState(0)
+        self:SetMaintenanceConsumptionInactive()
+        self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
+        self:DisableUnitIntel('ToggleBit8', 'Cloak')
     end,
 
     -- Turn off the cloak to begin with
@@ -70,8 +49,26 @@ XSL0101 = Class(SWalkingLandUnit) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        if new ~= 'Stopped' and not self:IsIdleState() and self.HiddenSelen then
-            self:SetScriptBit('RULEUTC_CloakToggle', true)
+        if self.Sync.LowPriority then
+            -- If we begin moving and it wasn't from a bump, reveal ourselves
+            if old == 'Stopped' and not self:IsIdleState() then
+                self:RevealUnit()
+            end
+
+            -- If we stopped moving, hide
+            if new == 'Stopped' then
+                -- We need to fork in order to use WaitSeconds
+                self.CloakThread = ForkThread(function()
+                    WaitSeconds(2)
+
+                    self:SetFireState(1)
+                    self:SetMaintenanceConsumptionActive()
+                    self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
+                    self:EnableUnitIntel('ToggleBit8', 'Cloak')
+
+                    self.CloakThread = nil
+                end)
+            end
         end
 
         SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)

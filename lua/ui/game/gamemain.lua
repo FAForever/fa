@@ -432,16 +432,16 @@ function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
 
--- Function to remove hidden selens from a selection which includes units other than hidden selens
+-- Function to remove low priority units from a selection which includes units other than low priority ones
 function DeselectSelens(selection)
-    local hiddenSelens = false
+    local LowPriorityUnits = false
     local otherUnits = false
 
-    -- Find any selens with the hidden flag
+    -- Find any units with the low priority flag
     for id, unit in selection do
-        -- Stupid-ass UnitData table uses string numbers as keys. Because reasons?
-        if unit:IsInCategory("xsl0101") and unit:IsIdle() and GetFireState({unit}) == 1 then -- Is Unit an activated Selen?
-            hiddenSelens = true
+        -- Stupid-ass UnitData table uses string number IDs as keys
+        if UnitData[unit:GetEntityId()].LowPriority then
+            LowPriorityUnits = true
         else
             if not otherUnits then otherUnits = {} end -- Ugly hack to make later logic easier
             table.insert(otherUnits, unit)
@@ -449,10 +449,10 @@ function DeselectSelens(selection)
     end
 
     -- Return original selection with no-change key if nothing has changed
-    if (otherUnits and not hiddenSelens) or (not otherUnits and hiddenSelens) then
+    if (otherUnits and not LowPriorityUnits) or (not otherUnits and LowPriorityUnits) then
         return selection, false
     end
-    
+
     return otherUnits, true
 end
 

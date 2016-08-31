@@ -138,7 +138,7 @@ UnitBlueprint {
         },
         TransportDropAnimation = {
             {
-                Animation = '[...]XSL0101_aunfold.sca', # /units/XSL0101/XSL0101_aunfold.sca   [146]
+                Animation = '[...]XSL0101_aunfold.sca',
                 Weight = 100,
             },
         },
@@ -172,6 +172,11 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         Icon = 'land',
+        OrderOverrides = {
+            RULEUTC_CloakToggle = {
+                helpText = '<LOC xsl0101_toggle>Toggle Selection Priority',
+            },
+        },
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_CloakToggle = true,
