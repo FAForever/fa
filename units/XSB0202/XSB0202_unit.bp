@@ -56,7 +56,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -143,11 +143,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 14100,
+        BuildCostEnergy = 14400,
         BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
-	DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'xsb0202',
         },
@@ -157,7 +157,8 @@ UnitBlueprint {
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE AIR',
             'TRANSPORTBUILTBYTIER2FACTORY SERAPHIM MOBILE AIR',
         },
-        StorageEnergy = 0,        StorageMass = 160,
+        StorageEnergy = 0,
+        StorageMass = 160,
     },
     Footprint = {
         SizeX = 5,

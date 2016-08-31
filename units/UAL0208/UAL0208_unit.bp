@@ -93,8 +93,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 240,
-        MaxHealth = 240,
+        Health = 340,
+        MaxHealth = 340,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -191,10 +191,10 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 700,
-        BuildCostMass = 140,
+        BuildCostEnergy = 650,
+        BuildCostMass = 130,
         BuildRate = 12.5,
-        BuildTime = 700,
+        BuildTime = 650,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER AEON',
         },
@@ -294,9 +294,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

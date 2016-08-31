@@ -116,10 +116,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 4,
-            Level2 = 7,
-            Level3 = 10,
-            Level4 = 13,
-            Level5 = 16,
+            Level2 = 8,
+            Level3 = 12,
+            Level4 = 16,
+            Level5 = 20,
         },
     },
     Categories = {
@@ -151,7 +151,7 @@ UnitBlueprint {
         EconomyThreatLevel = 5,
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 17,
+        RegenRate = 15,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 75,
     },
@@ -326,8 +326,7 @@ UnitBlueprint {
             Icon = 'aes',
             Name = '<LOC enhancements_0077>Tech 2 Engineering Suite',
             NewBuildRate = 42,
-            NewHealth = 3500,
-            NewRegenRate = 20,
+            NewHealth = 2000,
             ShowBones = {
                 'Right_Upgrade',
             },
@@ -552,9 +551,9 @@ UnitBlueprint {
             },
         },
         StealthGenerator = {
-            BuildCostEnergy = 5250,
+            BuildCostEnergy = 5000,
             BuildCostMass = 350,
-            BuildTime = 350,
+            BuildTime = 500,
             Icon = 'psg',
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
@@ -591,9 +590,8 @@ UnitBlueprint {
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER CYBRAN',
             Icon = 'ees',
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
-            NewBuildRate = 126,
-            NewHealth = 7000,
-            NewRegenRate = 35,
+            NewBuildRate = 100,
+            NewHealth = 3500,
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {

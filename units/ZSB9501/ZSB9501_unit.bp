@@ -62,7 +62,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'SUPPORTFACTORY',
+        'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -165,10 +165,10 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 4800,
-        BuildCostMass = 540,
+        BuildCostMass = 580,
         BuildRate = 40,
-        BuildTime = 1300,
-	DifferentialUpgradeCostCalculation = true, 
+        BuildTime = 1600,
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zsb9501',
         },
@@ -177,7 +177,8 @@ UnitBlueprint {
             'BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE LAND',
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE LAND',
         },
-        StorageEnergy = 0,        StorageMass = 160,
+        StorageEnergy = 0,
+        StorageMass = 160,
     },
     Footprint = {
         SizeX = 5,

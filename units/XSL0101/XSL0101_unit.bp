@@ -53,6 +53,7 @@ UnitBlueprint {
         'LAND',
         'TECH1',
         'SCOUT',
+        'INTELLIGENCE',
         'RADAR',
         'COUNTERINTELLIGENCE',
         'DIRECTFIRE',
@@ -147,6 +148,7 @@ UnitBlueprint {
         BuildCostEnergy = 80,
         BuildCostMass = 20,
         BuildTime = 80,
+        MaintenanceConsumptionPerSecondEnergy = 5,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -171,6 +173,9 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'land',
         TechLevel = 'RULEUTL_Basic',
+        ToggleCaps = {
+            RULEUTC_CloakToggle = true,
+        },
         UnitName = '<LOC xsl0101_name>Selen',
         UnitWeight = 1,
     },
@@ -178,7 +183,6 @@ UnitBlueprint {
         Cloak = true,
         RadarRadius = 40,
         RadarStealth = true,
-        StealthWaitTime = 1,
         VisionRadius = 24,
     },
     Interface = {

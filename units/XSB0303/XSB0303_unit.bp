@@ -50,7 +50,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -136,11 +136,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 32572,
-        BuildCostMass = 7120,
-        BuildRate = 120,
-        BuildTime = 9200,
-	DifferentialUpgradeCostCalculation = true, 
+        BuildCostEnergy = 45000,
+        BuildCostMass = 9500,
+        BuildRate = 150,
+        BuildTime = 11250,
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'xsb0303',
         },
@@ -151,7 +151,8 @@ UnitBlueprint {
         },
         InitialRallyX = 0,
         InitialRallyZ = 10,
-        StorageEnergy = 0,        StorageMass = 320,
+        StorageEnergy = 0,
+        StorageMass = 320,
     },
     Footprint = {
         MinWaterDepth = 1.5,

@@ -432,6 +432,30 @@ function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
 
+-- Function to remove hidden selens from a selection which includes units other than hidden selens
+function DeselectSelens(selection)
+    local hiddenSelens = false
+    local otherUnits = false
+
+    -- Find any selens with the hidden flag
+    for id, unit in selection do
+        -- Stupid-ass UnitData table uses string numbers as keys. Because reasons?
+        if unit:IsInCategory("xsl0101") and unit:IsIdle() and GetFireState({unit}) == 1 then -- Is Unit an activated Selen?
+            hiddenSelens = true
+        else
+            if not otherUnits then otherUnits = {} end -- Ugly hack to make later logic easier
+            table.insert(otherUnits, unit)
+        end
+    end
+
+    -- Return original selection with no-change key if nothing has changed
+    if (otherUnits and not hiddenSelens) or (not otherUnits and hiddenSelens) then
+        return selection, false
+    end
+    
+    return otherUnits, true
+end
+
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
 --      oldSelection: What the selection was before
@@ -443,6 +467,19 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         return
     end
 
+    -- Deselect Selens if necessary
+    local changed = false -- Prevent recursion
+    if newSelection and table.getn(newSelection) > 0 then
+        newSelection, changed = DeselectSelens(newSelection)
+
+        if changed then
+            ForkThread(function()
+                SelectUnits(newSelection)
+            end)
+            return
+        end
+    end
+    
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
     local isOldSelection = table.equal(oldSelection, newSelection)
 

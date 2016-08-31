@@ -63,7 +63,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-        'SUPPORTFACTORY',
+            'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -141,16 +141,16 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 4800,
-        BuildCostMass = 540,
+        BuildCostMass = 580,
         BuildRate = 40,
-        BuildTime = 1300,
-	DifferentialUpgradeCostCalculation = true, 
+        BuildTime = 1600,
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zeb9501',
         },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION',
-	    'BUILTBYTIER2SUPPORTFACTORY UEF STRUCTURE LAND',
+        'BUILTBYTIER2SUPPORTFACTORY UEF STRUCTURE LAND',
             'BUILTBYTIER2FACTORY UEF MOBILE LAND',
             'BUILTBYLANDTIER2FACTORY UEF MOBILE CONSTRUCTION',
         },

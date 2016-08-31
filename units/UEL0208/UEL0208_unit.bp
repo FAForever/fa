@@ -92,8 +92,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 300,
-        MaxHealth = 300,
+        Health = 400,
+        MaxHealth = 400,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -196,10 +196,10 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 700,
-        BuildCostMass = 140,
+        BuildCostEnergy = 650,
+        BuildCostMass = 130,
         BuildRate = 12.5,
-        BuildTime = 700,
+        BuildTime = 650,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER UEF',
         },
@@ -299,9 +299,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

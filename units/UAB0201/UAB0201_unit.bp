@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -150,11 +150,11 @@ UnitBlueprint {
         UniformScale = 0.275,
     },
     Economy = {
-        BuildCostEnergy = 9300,
-        BuildCostMass = 1040,
+        BuildCostEnergy = 13300,
+        BuildCostMass = 1520,
         BuildRate = 40,
-        BuildTime = 1600,
-	DifferentialUpgradeCostCalculation = true,
+        BuildTime = 2600,
+        DifferentialUpgradeCostCalculation = true,
         BuildableCategory = {
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY AEON STRUCTURE LAND',
@@ -163,7 +163,8 @@ UnitBlueprint {
         RebuildBonusIds = {
             'uab0201',
         },
-        StorageEnergy = 0,        StorageMass = 160,
+        StorageEnergy = 0,
+        StorageMass = 160,
     },
     Footprint = {
         SizeX = 5,

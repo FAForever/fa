@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -137,11 +137,11 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 14100,
+        BuildCostEnergy = 14400,
         BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
-	DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'urb0202',
         },
@@ -151,7 +151,8 @@ UnitBlueprint {
             'BUILTBYTIER2FACTORY CYBRAN MOBILE AIR',
             'TRANSPORTBUILTBYTIER2FACTORY CYBRAN MOBILE AIR',
         },
-        StorageEnergy = 0,        StorageMass = 160,
+        StorageEnergy = 0,
+        StorageMass = 160,
     },
     Footprint = {
         SizeX = 5,

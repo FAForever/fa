@@ -91,8 +91,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 500,
-        MaxHealth = 500,
+        Health = 700,
+        MaxHealth = 700,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -220,14 +220,14 @@ UnitBlueprint {
         UniformScale = 0.07,
     },
     Economy = {
-        BuildCostEnergy = 2200,
-        BuildCostMass = 440,
-        BuildRate = 40,
-        BuildTime = 2200,
+        BuildCostEnergy = 1560,
+        BuildCostMass = 312,
+        BuildRate = 30,
+        BuildTime = 1560,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = false,  ##like uef for faster building
+        NeedToFaceTargetToBuild = false,
         StorageEnergy = 0,
         StorageMass = 40,
         TeleportEnergyMod = 0.15,
@@ -337,9 +337,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

@@ -110,6 +110,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 end
             end
         end
+        
+        unit.IsBeingTransferred = true
 
         -- changing owner
         unit = ChangeUnitArmy(unit,ToArmyIndex)
@@ -120,7 +122,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         table.insert(newUnits, unit)
 
         unit.oldowner = oldowner
-        unit.IsBeingTransferred = true
 
         if IsAlly(owner, ToArmyIndex) then
             if not unit.oldowner then

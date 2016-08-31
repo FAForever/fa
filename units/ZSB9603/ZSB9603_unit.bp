@@ -52,7 +52,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'SUPPORTFACTORY',
+        'SUPPORTFACTORY',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -138,11 +138,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 7429,
-        BuildCostMass = 1600,
-        BuildRate = 120,
-        BuildTime = 4000,
-	DifferentialUpgradeCostCalculation = true, 
+        BuildCostEnergy = 11000,
+        BuildCostMass = 2200,
+        BuildRate = 150,
+        BuildTime = 3500,
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zsb9603',
         },
@@ -153,7 +153,8 @@ UnitBlueprint {
         },
         InitialRallyX = 0,
         InitialRallyZ = 10,
-        StorageEnergy = 0,        StorageMass = 320,
+        StorageEnergy = 0,
+        StorageMass = 320,
     },
     Footprint = {
         MinWaterDepth = 1.5,

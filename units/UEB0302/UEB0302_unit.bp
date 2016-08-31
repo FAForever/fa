@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+        'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -124,11 +124,11 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 99191,
+        BuildCostEnergy = 99400,
         BuildCostMass = 4090,
         BuildRate = 120,
         BuildTime = 10400,
-	DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'ueb0302',
         },
@@ -139,7 +139,8 @@ UnitBlueprint {
             'TRANSPORTBUILTBYTIER3FACTORY UEF MOBILE AIR',
             'BUILTBYAIRTIER3FACTORY UEF MOBILE CONSTRUCTION',
         },
-        StorageEnergy = 0,        StorageMass = 320,
+        StorageEnergy = 0,
+        StorageMass = 320,
     },
     Footprint = {
         SizeX = 5,

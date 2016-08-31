@@ -33,9 +33,9 @@ UnitBlueprint {
         MaxAirspeed = 20,
         MinAirspeed = 18,
         PredictAheadForBombDrop = 3,
-        StartTurnDistance = 15,
+        StartTurnDistance = 1,
         TightTurnMultiplier = 0,
-        TurnSpeed = 0.65,
+        TurnSpeed = 0.9,
         Winged = true,
     },
     Audio = {

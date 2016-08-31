@@ -218,7 +218,7 @@ UnitBlueprint {
             InitialProjectileStorage = 0,
             Label = 'CruiseMissile',
             ManualFire = true,
-            MaxProjectileStorage = 12,
+            MaxProjectileStorage = 6,
             MaxRadius = 256,
             MinRadius = 15,
             MuzzleChargeDelay = 1.5,
