@@ -682,6 +682,7 @@ options = {
                         {text = "<LOC _Off>", key = 1 },
                         {text = "<LOC _Medium>", key = 2 },
                         {text = "<LOC _Full>", key = 3 },
+                        {text = "<LOC _Advanced>", key = 4 },
                     },
                 },
             },

@@ -352,6 +352,15 @@ function Show(bp, buildingUnit, bpID)
             CreateDisplayAbilities(bp),
             LOC(UnitDescriptions[bpID]),
             View.Description)
+    -- we need to show armament_detail even if we don't have a unit.Description
+    elseif options.gui_render_armament_detail == 1 then
+        WrapAndPlaceText(bp.Air,
+            bp.Physics,
+            bp.Weapon,
+            CreateDisplayAbilities(bp),
+            "no Text1",
+            "no Text2",
+            bp)
     end
     local showShield = false
     if bp.Defense.Shield and bp.Defense.Shield.ShieldMaxHealth then
@@ -709,7 +718,11 @@ local Abilities = {
                DezimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
     end,
 }
-
+local ReserveAbilities = {
+    ["Armed"] = function (bp)
+        return type(bp.Weapon) == 'table'
+    end,
+}
 function DezimalToBinary(String)
     local number = tonumber(String)
     local BitArray = {}
@@ -726,7 +739,21 @@ function DezimalToBinary(String)
     end
     return BitArray
 end
-
+function ExtractAbilityFromString(ability)
+    local i = string.find(ability,">")
+    if i then
+        ability = string.sub(ability,6,i-1)
+    end
+    return ability
+end
+function ValidateUnitDescriptions(bp)
+    local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
+    local Description = LOC(UnitDescriptions[bp.BlueprintId]) or LOC(bp.Interface.Help.HelpText)
+    if Description then
+        return true
+    end
+    return false
+end
 function CreateDisplayAbilities(bp)
     -- Without this we have to reload the game to get the new option if the user changed something.
     options = Prefs.GetFromCurrentProfile('options')
@@ -743,6 +770,29 @@ function CreateDisplayAbilities(bp)
         if matching(bp) then
             count = count + 1
             newAbilities[count] = '<LOC '..ability..'>'..LocalisationUS[ability]
+        end
+    end
+    -- stop here, if AutoAbility options are Off, Medium or Full.
+    if options.gui_show_AutoAbility < 4 then return newAbilities end
+    
+    -- option Advanced(4) merge bp.Abilities to the generated one
+    -- We only merge unknown abilities and cross fingers that the mod-author did it right :)
+    if type(bp.Display.Abilities) == "table" then
+        for _,ability in bp.Display.Abilities do
+            if not Abilities[ExtractAbilityFromString(ability)] then
+                count = count + 1
+                newAbilities[count] = ability
+            end
+        end
+    end
+    -- if we don't have an ability and the unit don't has a description, we add a Weapon ability
+    -- to display the tooltip for advanced unit-stats.
+    if not newAbilities[1] and not ValidateUnitDescriptions(bp) then
+        for ability, matching in ReserveAbilities do
+            if matching(bp) then
+                count = count + 1
+                newAbilities[count] = ability
+            end
         end
     end
     return newAbilities

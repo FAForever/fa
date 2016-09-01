@@ -2094,6 +2094,6 @@ Tooltips = {
     },
     options_gui_show_AutoAbility = {
         title = '<LOC OPTIONS_0247>Auto create Display Abilities',
-        description = '<LOC OPTIONS_0248>Off: Use original abilities from Unitblueprint -- Medium: Use original abilities and auto-create if no abilities where found -- Full: Always auto-create abilities.',
+        description = '<LOC OPTIONS_0248>Off: Use original abilities from Unitblueprint -- Medium: Use original abilities and auto-create if no abilities where found -- Full: Always auto-create abilities -- Advanced: Merge auto-create and unitblueprint abilities.',
     },
 }
