@@ -358,9 +358,8 @@ function Show(bp, buildingUnit, bpID)
             bp.Physics,
             bp.Weapon,
             CreateDisplayAbilities(bp),
-            "no Text1",
-            "no Text2",
-            bp)
+            nil,
+            nil)
     end
     local showShield = false
     if bp.Defense.Shield and bp.Defense.Shield.ShieldMaxHealth then
