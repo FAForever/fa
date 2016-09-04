@@ -1,3 +1,22 @@
+Patch 3660 (Upcoming)
+
+**Coop**
+- Fixed cinematics playing in coop games
+- Improved AI sACU usage
+- Fixed objective protection timer
+
+**Bugfixes**
+- Fixed custom FAF player colours conflicting with Steam launcher
+
+**UI**
+- Fixed UEF Engineering station strategic icon not matching the gtech level
+- Added missing strategic build icons used in "Bigger" mode
+- Fixed displayed abilities on several units
+
+**Other**
+- Removed obsolete strategic icons and corrected file paths inside Hotstats module
+
+
 Patch 3658 (August 29th, 2016)
 
 **Exploits**
