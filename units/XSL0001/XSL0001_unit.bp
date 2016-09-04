@@ -632,12 +632,12 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 150000,
+            BuildCostEnergy = 175000,
             BuildCostMass = 5000,
-            BuildTime = 1400,
+            BuildTime = 2800,
             Icon = 'ras',
             Name = '<LOC enhancements_0010>Resource Allocation System',
-            ProductionPerSecondEnergy = 3000,
+            ProductionPerSecondEnergy = 2000,
             ProductionPerSecondMass = 16,
             ShowBones = {
                 'Back_Upgrade',
@@ -648,13 +648,13 @@ UnitBlueprint {
             },
         },
         ResourceAllocationAdvanced = {
-            BuildCostEnergy = 150000,
+            BuildCostEnergy = 175000,
             BuildCostMass = 5000,
-            BuildTime = 1400,
+            BuildTime = 2800,
             Icon = 'eras',
             Name = '<LOC enhancements_0011>Advanced Resource Allocation System',
             Prerequisite = 'ResourceAllocation',
-            ProductionPerSecondEnergy = 6000,
+            ProductionPerSecondEnergy = 4000,
             ProductionPerSecondMass = 32,
             ShowBones = {
                 'Back_Upgrade',

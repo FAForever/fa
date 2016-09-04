@@ -503,12 +503,12 @@ UnitBlueprint {
             Slot = 'Back',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 150000,
+            BuildCostEnergy = 175000,
             BuildCostMass = 5000,
-            BuildTime = 1400,
+            BuildTime = 2800,
             Icon = 'isb',
             Name = '<LOC enhancements_0045>Resource Allocation System',
-            ProductionPerSecondEnergy = 3300,
+            ProductionPerSecondEnergy = 2500,
             ProductionPerSecondMass = 14,
             ShowBones = {
                 'Right_Upgrade',
