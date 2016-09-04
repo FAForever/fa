@@ -25,8 +25,8 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 4,
-        MaxHealth = 4,
+        Health = 2,
+        MaxHealth = 2,
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -44,9 +44,9 @@ ProjectileBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 316260,
-        BuildCostMass = 3000,
-        BuildTime = 3060,
+        BuildCostEnergy = 50000,
+        BuildCostMass = 1000,
+        BuildTime = 3000,
     },
     General = {
         Category = 'Missile',
