@@ -1,3 +1,21 @@
+Patch 3660 (Upcoming)
+============================
+**Coop**
+- Fixed cinematics playing in coop games
+- Improved AI sACU usage
+- Fixed objective protection timer
+
+**Bugfixes**
+- Fixed custom FAF player colours conflicting with Steam launcher
+
+**UI**
+- Fixed UEF Engineering station strategic icon not matching the gtech level
+- Added missing strategic build icons used in "Bigger" mode
+- Fixed displayed abilities on several units
+
+**Other**
+- Removed obsolete strategic icons and corrected file paths inside Hotstats module
+
 Hotfix Patch 3659 (September 12th, 2016)
 ============================
 
@@ -260,13 +278,10 @@ Hotfix Patch 3656 (August 8, 2016)
 **Server Compatibility**
 - Made teamkill reporting work alongside the server update V0.3
 - Change the format of unit statistics to enable server harvesting for achievements
-<<<<<<< 69729e53caa8070e636bfc098e6c4bf072d087c4
 
 **Contributors**
 - Crotalus
 - Downlord
-=======
->>>>>>> Update changelog.md (#1422)
 
 Patch 3654 (May 30, 2016)
 ============================
