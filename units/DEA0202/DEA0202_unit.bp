@@ -453,11 +453,11 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 5,
             DamageFriendly = true,
-            DamageRadius = 3,
+            DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Napalm Carpet Bomb',
             DoTPulses = 15,
-            DoTTime = 2.5,
+            DoTTime = 5,
             FireTargetLayerCapsTable = {
                 Air = 'Land|Seabed|Water',
                 Land = 'Land|Seabed|Water',
