@@ -398,6 +398,7 @@ UnitBlueprint {
             BuildCostEnergy = 44800,
             BuildCostMass = 1200,
             BuildTime = 1400,
+            NewHealth = 1500,
             Icon = 'dsu',
             Name = '<LOC enhancements_0039>Nano-Repair System',
             NewRegenRate = 60,
