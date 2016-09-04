@@ -6,7 +6,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 
 --- A popup that asks the user for a string.
 InputDialog = Class(Popup) {
-    __init = function(self, parent, title, fallbackInputbox)
+    __init = function(self, parent, title, fallbackInputbox, str)
         -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or
         -- in-game keybindings can be called and cause the world to end.
         -- This parameter allows you to pass the box you insist we always keep focus on to the input
@@ -34,6 +34,10 @@ InputDialog = Class(Popup) {
         nameEdit.Width:Set(334)
         nameEdit.Height:Set(24)
         nameEdit:AcquireFocus()
+
+        if str then
+           nameEdit:SetText(str)
+        end
 
         nameEdit.OnLoseKeyboardFocus = function(self)
             nameEdit:AcquireFocus()

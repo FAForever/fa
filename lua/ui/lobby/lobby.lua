@@ -406,17 +406,19 @@ local function DoSlotBehavior(slot, key, name)
         end
     elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                               "<LOC lobui_0167>Kick Player",
-                               function()
-                                   SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
-                                   lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost")
-                               end
-                               ,
-                               "<LOC _Cancel>", nil,
-                               nil, nil,
-                               true,
-                               {worldCover = false, enterButton = 1, escapeButton = 2})
+            local kickMessage = function(self, str)
+                    local msg
+
+                    if str == "" or str == "Reason (optional)" then
+                        msg = "\n Kicked by host"
+                    else
+                        msg = "\n Kicked by host. \n Reason: " .. str
+                    end
+
+                    SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
+                    lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
+                end
+            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, "Reason (optional)")
         else
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
@@ -4655,8 +4657,8 @@ function SavePresetsList(list)
 end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
-function CreateInputDialog(parent, title, listener)
-    UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit)
+function CreateInputDialog(parent, title, listener, str)
+    UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit, str)
 end
 
 -- Show the lobby preset UI.
