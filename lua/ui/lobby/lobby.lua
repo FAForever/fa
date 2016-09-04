@@ -407,17 +407,18 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             local kickMessage = function(self, str)
-                    local msg
+                local msg
 
-                    if str == "" or str == "Reason (optional)" then
-                        msg = "\n Kicked by host"
-                    else
-                        msg = "\n Kicked by host. \n Reason: " .. str
-                    end
-
-                    SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
-                    lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
+                if str == "" or str == "Reason (optional)" then
+                    msg = "\n Kicked by host"
+                else
+                    msg = "\n Kicked by host. \n Reason: " .. str
                 end
+
+                SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
+                lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
+            end
+
             CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, "Reason (optional)")
         else
             if lobbyComm:IsHost() then
