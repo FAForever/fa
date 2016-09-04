@@ -395,13 +395,13 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         DamageStablization = {
-            BuildCostEnergy = 44800,
-            BuildCostMass = 1200,
-            BuildTime = 1400,
-            NewHealth = 1500,
+            BuildCostEnergy = 24000,
+            BuildCostMass = 800,
+            BuildTime = 800,
             Icon = 'dsu',
             Name = '<LOC enhancements_0039>Nano-Repair System',
-            NewRegenRate = 60,
+            NewHealth = 2000,
+            NewRegenRate = 40,
             ShowBones = {
                 'Left_Upgrade',
             },
