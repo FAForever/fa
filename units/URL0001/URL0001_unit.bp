@@ -510,7 +510,7 @@ UnitBlueprint {
             BuildTime = 2800,
             Icon = 'ras',
             Name = '<LOC enhancements_0087>Resource Allocation System',
-            ProductionPerSecondEnergy = 3500,
+            ProductionPerSecondEnergy = 2000,
             ProductionPerSecondMass = 12,
             ShowBones = {
                 'Back_Upgrade',
