@@ -1,20 +1,33 @@
 Patch 3660 (Upcoming)
 
+**Lobby**
+- Fixed team number switching slots alongside a player
+- Added new feature: Kick Reasons. When kicking a player from your lobby, you get a new dialog. You may type in a reason for the kick to notify the player. If you blank it, or leave the message as presented, it will play the old message. 
+
 **Coop**
 - Fixed cinematics playing in coop games
 - Improved AI sACU usage
 - Fixed objective protection timer
 
-**Bugfixes**
-- Fixed custom FAF player colours conflicting with Steam launcher
+**Gameplay**
+- Improved Selen toggle. It now behaves with no abilities by default, then when toggled on it hides and shows based on motion as before.
+
+**Bugs**
+- Fixed units carried by UEF T2 Gunship from firing from inside a carrier
+- Fixed Salvation fire rate slowing at max adjacency instead of speeding up
+- Fixed units being able to fire at aircraft docked inside carriers, damaging the carrier
 
 **UI**
 - Fixed UEF Engineering station strategic icon not matching the gtech level
 - Added missing strategic build icons used in "Bigger" mode
 - Fixed displayed abilities on several units
+- Fixed unit descriptions on support factories displaying for the wrong ones
+- Fixed game quality displaying a corrupted string
+- Fixed the scroll button in ACU enhancements freezing the tooltip popup action
 
 **Other**
 - Removed obsolete strategic icons and corrected file paths inside Hotstats module
+- Fixed custom FAF player colours conflicting with Steam launcher
 
 
 Patch 3658 (August 29th, 2016)
