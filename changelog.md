@@ -1,5 +1,5 @@
 Patch 3660 (Upcoming)
-
+============================
 **Lobby**
 - Fixed team number switching slots alongside a player
 - Added new feature: Kick Reasons. When kicking a player from your lobby, you get a new dialog. You may type in a reason for the kick to notify the player. If you blank it, or leave the message as presented, it will play the old message. 
@@ -31,7 +31,7 @@ Patch 3660 (Upcoming)
 
 
 Patch 3658 (August 29th, 2016)
-
+============================
 **Exploits**
 - Fixed an exploit where Factories and QGates could be made to build units at half-price
 
@@ -282,6 +282,7 @@ Patch 3658 (August 29th, 2016)
 - ZockyZock
 
 Hotfix Patch 3656 (August 8, 2016)
+============================
 **Server Compatibility**
 - Made teamkill reporting work alongside the server update V0.3
 - Change the format of unit statistics to enable server harvesting for achievements
