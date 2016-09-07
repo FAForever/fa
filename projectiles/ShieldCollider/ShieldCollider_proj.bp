@@ -1,0 +1,49 @@
+ProjectileBlueprint {
+    Categories = {
+        'PROJECTILE',
+        'HELPER',
+        'SHIELDCOLLIDE'
+    },
+    Display = {
+        CameraFollowsProjectile = false,
+        Mesh = {
+            IconFadeInZoom = 1000,
+            LODs = {
+                {
+                    LODCutoff = 1000,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                },
+            },
+        },
+        UniformScale = 10,
+    },
+    General = {
+        Category = 'HELPER',
+        EntityCategory = {
+        'PROJECTILE',
+        'HELPER',
+        'SHIELDCOLLIDE'
+        },
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        CollideEntity = false,
+        DestroyOnWater = true,
+        InitialSpeed = 0,
+        LeadTarget = false,
+        Lifetime = 10,     -- projectile should be alive long enough to hit ground
+        UseGravity = true,
+        VelocityAlign = false,
+        RotationalVelocity = 0,
+        -- RotationalVelocityRange = 6,
+        -- DirectionX = 0,
+        -- DirectionXRange = 1,
+        -- DirectionY = 1,
+        -- DirectionYRange = 0.5,
+        -- DirectionZ = 0,
+        -- DirectionZRange = 1,
+    },
+}

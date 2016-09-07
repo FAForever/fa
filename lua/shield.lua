@@ -232,7 +232,7 @@ Shield = Class(moho.shield_methods,Entity) {
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
         end
-
+        
         for k, v in self.ImpactEffects do
             CreateEmitterAtBone( ImpactMesh, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
         end
@@ -250,9 +250,33 @@ Shield = Class(moho.shield_methods,Entity) {
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
-
+    
+    --it should be noted that this shield.lua file is not reloaded with /enablediskwatch :(
+    
     -- Return true to process this collision, false to ignore it.
     OnCollisionCheck = function(self,other)
+    
+        if EntityCategoryContains( categories.SHIELDCOLLIDE, other ) then
+        --this is our special detection projectile hitting the shield
+        --we pass a bunch of data to it and its companion unit, and then make it collide, but only once
+            local unit = other:GetLauncher()
+            
+            unit.ShieldCollideMaxHealth = self:GetMaxHealth()
+            table.insert(unit, self.ShieldCollideMaxHealth) --pass max hp to the unit
+            
+            other.ShieldCollVector = VDiff(self:GetPosition(),other:GetPosition() )
+            table.insert(other, other.ShieldCollVector) --pass direction of shield to projectile
+            
+            if not other.AlreadyHit then --we only want to detect it once
+            other:OnImpact('Shield') --let the projectile know it hit a shield
+                return false 
+            else
+                return false --we return false so the projectile may pass through
+            end
+        else
+            self.EmitterScale = 1 --normal shield impact size for everything else
+        end
+    
         if other:GetArmy() == -1 then
             return false
         end
