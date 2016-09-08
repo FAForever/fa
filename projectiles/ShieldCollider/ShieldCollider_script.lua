@@ -115,34 +115,34 @@ ShieldCollider = Class(Projectile) {
         vy = 10*vy
         vz = 10*vz
         
-        local Speed = math.sqrt(vx*vx + vy*vy + vz*vz) --the length of our vector
-        local ShieldMag = math.sqrt(wx*wx + wy*vy + wz*wz) --the length of our other vector
+        local speed = math.sqrt(vx*vx + vy*vy + vz*vz) --the length of our vector
+        local shieldMag = math.sqrt(wx*wx + wy*vy + wz*wz) --the length of our other vector
         
         
-        local KE = 0.5*volume*Speed*Speed*1 --our kinetic energy, used to scale the stoppingpower
-        local StoppingPower = math.min(((80/KE)) ,2) --2 is a perfect bounce, anything less is the shield starting to give, 0 is unaffected velocity.
-        --WARN('kinetic energy: ' .. KE .. ' stopping power: ' .. StoppingPower) --for tuning constants
-        local ForceScalar = 0.5 -- 0.5 is our bounciness coefficient. i set it to my taste; 1.0 is a 'perfect' bounce
+        local ke = 0.5*volume*speed*speed*1 --our kinetic energy, used to scale the stoppingpower
+        local stoppingPower = math.min(((80/ke)) ,2) --2 is a perfect bounce, anything less is the shield starting to give, 0 is unaffected velocity.
+        --WARN('kinetic energy: ' .. ke .. ' stopping power: ' .. StoppingPower) --for tuning constants
+        local forceScalar = 0.5 -- 0.5 is our bounciness coefficient. i set it to my taste; 1.0 is a 'perfect' bounce
         --TODO: make this coefficient dependent on angle - 1.0 or more for glancing hits and 0.2 or sth for direct hits
-        --TODO: make KE affect the vector properly, so more means less affected speed. you know - physics.
+        --TODO: make ke affect the vector properly, so more means less affected speed. you know - physics.
         --normalizing all our shield vector, so we dont need to deal with scalar nonsense
-        wx = wx/ShieldMag
-        wy = wy/ShieldMag
-        wz = wz/ShieldMag
+        wx = wx/shieldMag
+        wy = wy/shieldMag
+        wz = wz/shieldMag
         
         -- get our dot products going
-        local DotProduct = vx*wx + vy*wy + vz*wz
+        local dotProduct = vx*wx + vy*wy + vz*wz
         
         --applying our bounce velocity
-        vx = -StoppingPower*wx*DotProduct + vx 
-        vy = -StoppingPower*wy*DotProduct + vy
-        vz = -StoppingPower*wz*DotProduct + vz
+        vx = -stoppingPower*wx*dotProduct + vx 
+        vy = -stoppingPower*wy*dotProduct + vy
+        vz = -stoppingPower*wz*dotProduct + vz
         
         --so sometimes absurd values pop up, probably due to rounding errors or something, so we prevent huge speeds here
         vx = math.min(7,vx)
         vy = math.min(4,vy) -- less for y so we dont get planes flying into space
         vz = math.min(7,vz)
-        self:SetVelocity(ForceScalar*vx, ForceScalar*vy, ForceScalar*vz)
+        self:SetVelocity(forceScalar*vx, forceScalar*vy, forceScalar*vz)
     end,
     
     LifeTimeThread = function(self)

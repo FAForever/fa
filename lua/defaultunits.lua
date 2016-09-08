@@ -1718,10 +1718,10 @@ AirUnit = Class(MobileUnit) {
 
         for i, numWeapons in bp.Weapon do
             if(bp.Weapon[i].Label == 'DeathImpact') then
-                local Damage = (bp.Weapon[i].Damage - self.ShieldDamageAbsorbed)
-                --WARN(Damage .. ' crash damage dealt to ground') -- since our shield collision subtracts damage, this may be nice to know how much is left
-                if Damage > 0 then
-                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, (bp.Weapon[i].Damage - self.ShieldDamageAbsorbed), bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                local damage = (bp.Weapon[i].Damage - self.ShieldDamageAbsorbed)
+                --WARN(damage .. ' crash damage dealt to ground') -- since our shield collision subtracts damage, this may be nice to know how much is left
+                if damage > 0 then
+                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                 end
                 
                 break
