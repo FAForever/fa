@@ -1714,7 +1714,6 @@ AirUnit = Class(MobileUnit) {
         -- Damage the area we have impacted with.
         local bp = self:GetBlueprint()
         local i = 1
-        local numWeapons = table.getn(bp.Weapon)
 
         for i, numWeapons in bp.Weapon do
             if(bp.Weapon[i].Label == 'DeathImpact') then
@@ -1767,7 +1766,6 @@ AirUnit = Class(MobileUnit) {
                 function()
                     local bp = self:GetBlueprint()
                     local i = 1
-                    local numWeapons = table.getn(bp.Weapon)
                     
                     for i, numWeapons in bp.Weapon do
                         if(bp.Weapon[i].Label == 'DeathImpact') then
