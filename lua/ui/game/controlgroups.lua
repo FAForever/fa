@@ -117,9 +117,8 @@ function OnSelectionSetChanged(name, units, applied)
                         break
                     end
                 end
-
-                if iconID != '' and DiskGetFileInfo('/textures/ui/common/icons/units/'..iconID..'_icon.dds') then
-                    self.icon:SetTexture('/textures/ui/common/icons/units/'..iconID..'_icon.dds')
+                if iconID != '' and UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true) then
+                    self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true))
                 else
                     self.icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')
                 end
