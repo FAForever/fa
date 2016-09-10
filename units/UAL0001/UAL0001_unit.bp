@@ -572,7 +572,7 @@ UnitBlueprint {
             BuildTime = 1000,
             Icon = 'ptsg',
             ImpactEffects = 'AeonShieldHit01',
-            MaintenanceConsumptionPerSecondEnergy = 250,
+            MaintenanceConsumptionPerSecondEnergy = 150,
             Name = '<LOC enhancements_0014>Personal Shield Generator',
             OwnerShieldMesh = '/units/ual0001/ual0001_phaseshield_mesh',
             PersonalShield = true,
