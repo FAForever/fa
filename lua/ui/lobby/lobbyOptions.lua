@@ -391,6 +391,11 @@ globalOpts = {
                 help = "<LOC lobui_0739>All your units will be transfered to your ally with the highest score when you die",
                 key = 'TransferAfterDeath',
             },
+            {
+                text = "<LOC lobui_0740>Gain Control",
+                help = "<LOC lobui_0741>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
+                key = 'TransferToEnemyAfterDeath',
+            },
         },
     },
 }

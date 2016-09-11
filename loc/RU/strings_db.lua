@@ -7751,6 +7751,8 @@ lobui_0744="Передача до смерти"
 lobui_0745="Destroy all the units you shared to your allies and send back the units your allies shared with you when you die"
 lobui_0738="Transfer After Death"
 lobui_0739="All your units will be transfered to your ally with the highest score when you die"
+lobui_0740="Gain Control"
+lobui_0741="Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are."
 
 lobui_0748="Количество игр"
 lobui_0749="Количество сыгранных игр в режиме Global"

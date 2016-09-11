@@ -539,6 +539,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
             local allies = {}
+            local enemies = {}
             local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
             -- this part determiens the share condition
@@ -568,6 +569,41 @@ AIBrain = Class(moho.aibrain_methods) {
                 if table.getn(allies) > 0 then
                     table.sort(allies, function(a,b) return a.score > b.score end)
                     for k,brain in allies do
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if units and table.getn(units) > 0 then
+                            if SorianAI ~= nil then
+                                for _,unit in units do
+                                    RemovePlatoonHandleFromUnit(unit)
+                                end
+                            end
+                            TransferUnitsOwnership(units, brain.index)
+                        end
+                    end
+                end
+            elseif shareOption == "TransferToEnemyAfterDeath" then
+                -- transfer ownership of borrowed units
+                for index, brain in ArmyBrains do
+                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
+                        local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                        for _,unit in units do
+                            if unit.oldowner == selfIndex then
+                                unit.oldowner = nil
+                            end
+                        end
+                    end
+                end
+                -- this part determines who the enemies are
+                for index, brain in ArmyBrains do
+                    brain.index = index
+                    brain.score = CalculateBrainScore(brain)
+                    if IsEnemy(selfIndex, brain:GetArmyIndex()) and not brain:IsDefeated() then
+                        table.insert(enemies, brain)
+                    end
+                end
+                -- This part determines which enemy has the highest score and transfers ownership of all units to him
+                if table.getn(enemies) > 0 then
+                    table.sort(enemies, function(a,b) return a.score > b.score end)
+                    for k,brain in enemies do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
                             if SorianAI ~= nil then
