@@ -1,3 +1,8 @@
+Hotfix Patch 3659 (September 12th, 2016)
+============================
+
+- Fixed UEF T2 Naval Support Factory HP typo 900 -> 9000
+
 Patch 3658 (August 29th, 2016)
 ============================
 
