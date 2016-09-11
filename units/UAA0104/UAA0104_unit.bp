@@ -567,7 +567,6 @@ UnitBlueprint {
                 },
             },
             RackRecoilDistance = 0,
-            RangeCategory = 'UWRC_DirectFire',
             TargetRestrictDisallow = 'UNTARGETABLE AIR',
             TurretPitch = 0,
             TurretPitchRange = 45,
