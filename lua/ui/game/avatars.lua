@@ -325,6 +325,17 @@ function CreateIdleTab(unitData, id, expandFunc)
                 end
                 i = i - 1
             end
+           if needIcon == true then
+               local ExpFactories = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.allunits)
+               if table.getn(ExpFactories) > 0 then
+                   local FactoryUnitId = ExpFactories[1]:GetUnitId()
+                   if UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true) then
+                       self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true))
+                   else
+                       self.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
+                   end
+               end
+           end
         end
         self.count:SetText(table.getsize(self.allunits))
 
