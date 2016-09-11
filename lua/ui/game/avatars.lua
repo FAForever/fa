@@ -132,7 +132,9 @@ function CreateAvatar(unit)
 
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 5, 5)
-    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds', true)) then
+
+    -- Commander icon
+    if UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds', true) then
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds', true))
     else
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
@@ -278,8 +280,9 @@ function CreateIdleTab(unitData, id, expandFunc)
             while i > 0 do
                 if table.getn(sortedUnits[i]) > 0 then
                     if needIcon then
-                        if Factions[currentFaction].IdleEngTextures[keyToIcon[i]] and DiskGetFileInfo('/textures/ui/common'..Factions[currentFaction].IdleEngTextures[keyToIcon[i]]) then
-                            self.icon:SetTexture('/textures/ui/common'..Factions[currentFaction].IdleEngTextures[keyToIcon[i]])
+                        -- Idle engineer icons
+                        if Factions[currentFaction].IdleEngTextures[keyToIcon[i]] and UIUtil.UIFile(Factions[currentFaction].IdleEngTextures[keyToIcon[i]],true) then
+                            self.icon:SetTexture(UIUtil.UIFile(Factions[currentFaction].IdleEngTextures[keyToIcon[i]],true))
                         else
                             self.icon:SetTexture(UIUtil.UIFile(Factions[currentFaction].IdleEngTextures['T2']))
                         end
@@ -307,8 +310,9 @@ function CreateIdleTab(unitData, id, expandFunc)
                 for curCat = 1, 3 do
                     if table.getn(sortedFactories[curCat][i]) > 0 then
                         if needIcon then
-                            if DiskGetFileInfo('/textures/ui/common'..Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i]) then
-                                self.icon:SetTexture('/textures/ui/common'..Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i])
+                            -- Idle factory icons
+                            if UIUtil.UIFile(Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i],true) then
+                                self.icon:SetTexture(UIUtil.UIFile(Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i],true))
                             else
                                 self.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
                             end
@@ -501,8 +505,9 @@ function CreateIdleEngineerList(parent, units)
             local entry = Group(self)
 
             entry.icon = Bitmap(entry)
-            if DiskGetFileInfo('/textures/ui/common'..icontexture) then
-                entry.icon:SetTexture('/textures/ui/common'..icontexture)
+            -- Iddle engineer icons groupwindow
+            if UIUtil.UIFile(icontexture,true) then
+                entry.icon:SetTexture(UIUtil.UIFile(icontexture,true))
             else
                 entry.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -660,8 +665,9 @@ function CreateIdleFactoryList(parent, units)
     for type, category in iconData do
         local function CreateIcon(texture)
             local icon = Bitmap(bg)
-            if DiskGetFileInfo('/textures/ui/common'..texture) then
-                icon:SetTexture('/textures/ui/common'..texture)
+            -- Idle facory icons groupwindow
+            if UIUtil.UIFile(texture,true) then
+                icon:SetTexture(UIUtil.UIFile(texture,true))
             else
                 icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
