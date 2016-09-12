@@ -7755,6 +7755,8 @@ lobui_0762="Gain Control"
 lobui_0763="Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are."
 lobui_0764="Civilian Desertion"
 lobui_0765="After your dead all units will desert to civilians, given that civilian armies exist on the map, otherwise they will die."
+lobui_0766="Defectors"
+lobui_0767="All your units will be transfered to your enemy with the highest score when you die."
 
 lobui_0748="Количество игр"
 lobui_0749="Количество сыгранных игр в режиме Global"

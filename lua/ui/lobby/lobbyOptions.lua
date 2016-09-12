@@ -378,23 +378,28 @@ globalOpts = {
         values = {
             {
                 text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>You can give units to your allies and they will not be destroyed when you die",
+                help = "<LOC lobui_0743>You can give units to your allies and they will not be destroyed when you die.",
                 key = 'ShareAfterDeath',
             },
             {
                 text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>Destroy all the units you shared to your allies and send back the units your allies shared with you when you die",
+                help = "<LOC lobui_0745>Destroy all the units you shared to your allies and send back the units your allies shared with you when you die.",
                 key = 'ShareUntilDeath',
             },
             {
                 text = "<LOC lobui_0760>Transfer After Death",
-                help = "<LOC lobui_0761>All your units will be transfered to your ally with the highest score when you die",
+                help = "<LOC lobui_0761>All your units will be transfered to your ally with the highest score when you die.",
                 key = 'TransferAfterDeath',
             },
             {
                 text = "<LOC lobui_0762>Gain Control",
                 help = "<LOC lobui_0763>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
-                key = 'TransferToEnemyAfterDeath',
+                key = 'TransferToKiller',
+            },
+            {
+                text = "<LOC lobui_0766>Defectors",
+                help = "<LOC lobui_0767>All your units will be transfered to your enemy with the highest score when you die.",
+                key = 'Defectors',
             },
             {
                 text = "<LOC lobui_0764>Civilian Desertion",
