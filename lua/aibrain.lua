@@ -544,14 +544,17 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitSeconds(10)
             -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
+            local victoryOption = ScenarioInfo.Options.Victory or "no"
             if shareOption == "ShareAfterDeath" then
-                -- Give borrowed units a new owner
+                -- transfer ownership of borrowed units
                 for index, brain in ArmyBrains do
                     if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
                         local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                        for _,unit in units do
-                            if unit.oldowner == selfIndex then
-                                unit.oldowner = nil
+                        if units and table.getn(units) > 0 then
+                            for _,unit in units do
+                                if unit.oldowner == selfIndex then
+                                    unit.oldowner = nil
+                                end
                             end
                         end
                     end
@@ -561,7 +564,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = CalculateBrainScore(brain)
-                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
+                    if IsAlly(selfIndex, index) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() and not ArmyIsCivilian(index) then
                         table.insert(allies, brain)
                     end
                 end
@@ -577,6 +580,7 @@ AIBrain = Class(moho.aibrain_methods) {
                                 end
                             end
                             TransferUnitsOwnership(units, brain.index)
+                            WaitSeconds(1)
                         end
                     end
                 end
@@ -592,18 +596,36 @@ AIBrain = Class(moho.aibrain_methods) {
                         end
                     end
                 end
-                -- this part determines who the enemies are
+                -- Transfer units to the enemy who killed me
+                local Killer = 0
+                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                if units and table.getn(units) > 0 then
+                    if SorianAI ~= nil then
+                        for _,unit in units do
+                            RemovePlatoonHandleFromUnit(unit)
+                        end
+                    end
+                    if victoryOption == 'demoralization' then
+                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.COM
+                        TransferUnitsOwnership(units, KillerIndex)
+                    else
+                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.unit
+                        TransferUnitsOwnership(units, KillerIndex)
+                    end
+                end
+                WaitSeconds(1)
+                -- this part determines who else is enemy
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = CalculateBrainScore(brain)
-                    if IsEnemy(selfIndex, brain:GetArmyIndex()) and not brain:IsDefeated() then
+                    if IsEnemy(selfIndex, index) and index ~= KillerIndex and not brain:IsDefeated() and not ArmyIsCivilian(index) then
                         table.insert(enemies, brain)
                     end
                 end
-                -- This part determines which enemy has the highest score and transfers ownership of all units to him
+                -- This part determines which enemy has the highest score and transfers ownership of all units which are not already transfered to the killer
                 if table.getn(enemies) > 0 then
                     table.sort(enemies, function(a,b) return a.score > b.score end)
-                    for k,brain in enemies do
+                    for _,brain in enemies do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
                             if SorianAI ~= nil then
@@ -612,6 +634,7 @@ AIBrain = Class(moho.aibrain_methods) {
                                 end
                             end
                             TransferUnitsOwnership(units, brain.index)
+                            WaitSeconds(1)
                         end
                     end
                 end
@@ -637,7 +660,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-            WaitSeconds(0.1)
+            WaitSeconds(1)
 
             local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
             if tokill and table.getn(tokill) > 0 then

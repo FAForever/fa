@@ -2199,6 +2199,9 @@ ACUUnit = Class(CommandUnit) {
                     instigatorBrain:ReportScore()
                 end)
             end
+            ArmyBrains[self:GetArmy()]:SetUnitStat('LastKilled', "COM", instigator:GetArmy())
+        else
+            ArmyBrains[self:GetArmy()]:SetUnitStat('LastKilled', "COM", self:GetArmy())
         end
     end,
 
