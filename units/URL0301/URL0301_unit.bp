@@ -387,7 +387,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 68600,
+            BuildCostEnergy = 90000,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
