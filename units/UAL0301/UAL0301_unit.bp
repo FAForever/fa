@@ -343,7 +343,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 68000,
+            BuildCostEnergy = 90000,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
