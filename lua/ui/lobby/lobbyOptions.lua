@@ -387,14 +387,19 @@ globalOpts = {
                 key = 'ShareUntilDeath',
             },
             {
-                text = "<LOC lobui_0738>Transfer After Death",
-                help = "<LOC lobui_0739>All your units will be transfered to your ally with the highest score when you die",
+                text = "<LOC lobui_0760>Transfer After Death",
+                help = "<LOC lobui_0761>All your units will be transfered to your ally with the highest score when you die",
                 key = 'TransferAfterDeath',
             },
             {
-                text = "<LOC lobui_0740>Gain Control",
-                help = "<LOC lobui_0741>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
+                text = "<LOC lobui_0762>Gain Control",
+                help = "<LOC lobui_0763>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
                 key = 'TransferToEnemyAfterDeath',
+            },
+            {
+                text = "<LOC lobui_0764>Civilian Desertion",
+                help = "<LOC lobui_0765>After your dead all units will desert to civilians, given that civilian armies exist on the map, otherwise they will die.",
+                key = 'CivilianDeserter',
             },
         },
     },

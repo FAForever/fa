@@ -540,6 +540,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
             local allies = {}
             local enemies = {}
+            local civilians = {}
             local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
             -- this part determiens the share condition
@@ -572,6 +573,29 @@ AIBrain = Class(moho.aibrain_methods) {
                 if table.getn(allies) > 0 then
                     table.sort(allies, function(a,b) return a.score > b.score end)
                     for k,brain in allies do
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if units and table.getn(units) > 0 then
+                            if SorianAI ~= nil then
+                                for _,unit in units do
+                                    RemovePlatoonHandleFromUnit(unit)
+                                end
+                            end
+                            TransferUnitsOwnership(units, brain.index)
+                            WaitSeconds(1)
+                        end
+                    end
+                end
+            elseif shareOption == "CivilianDeserter" then
+                -- this part determines who are civilians
+                for index, brain in ArmyBrains do
+                    brain.index = index
+                    if ArmyIsCivilian(index) then
+                        table.insert(civilians, brain)
+                    end
+                end
+                -- transfer all units to the civilian armies
+                if table.getn(civilians) > 0 then
+                    for k,brain in civilians do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
                             if SorianAI ~= nil then
