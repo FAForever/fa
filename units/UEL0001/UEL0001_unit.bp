@@ -356,14 +356,15 @@ UnitBlueprint {
     },
     Enhancements = {
         AdvancedEngineering = {
-            BuildCostEnergy = 18000,
-            BuildCostMass = 720,
-            BuildTime = 900,
+            BuildCostEnergy = 21000,
+            BuildCostMass = 800,
+            BuildTime = 1000,
             BuildableCategoryAdds = 'BUILTBYTIER2COMMANDER UEF',
             Icon = 'aes',
             Name = '<LOC enhancements_0037>Tech 2 Engineering Suite',
             NewBuildRate = 42,
-            NewHealth = 1500,
+            NewHealth = 2000,
+            NewRegenRate = 10,
             ShowBones = {
                 'Left_Upgrade',
             },
@@ -690,6 +691,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0053>Tech 3 Engineering Suite',
             NewBuildRate = 100,
             NewHealth = 3000,
+            NewRegenRate = 20,
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
