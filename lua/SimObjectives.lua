@@ -1143,6 +1143,7 @@ function Timer(Type, Complete, Title, Description, Target)
 
     local image = GetActionIcon("timer")
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
+    local timer = nil
 
     -- call ManualResult
     objective.ManualResult = function(self, result)
@@ -1155,6 +1156,8 @@ function Timer(Type, Complete, Title, Description, Target)
             resultStr = 'failed'
         end
         UpdateObjective( Title, 'complete', resultStr, self.Tag )
+        Sync.ObjectiveTimer = 0
+        KillThread(timer)
     end
 
     local function onTick(newTime)
@@ -1173,7 +1176,7 @@ function Timer(Type, Complete, Title, Description, Target)
         Sync.ObjectiveTimer = 0
     end
 
-    import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+    timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
         OnExpired,
         Target.Timer,
         false,
