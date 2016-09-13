@@ -344,14 +344,15 @@ UnitBlueprint {
     },
     Enhancements = {
         AdvancedEngineering = {
-            BuildCostEnergy = 18000,
-            BuildCostMass = 720,
-            BuildTime = 900,
+            BuildCostEnergy = 21000,
+            BuildCostMass = 800,
+            BuildTime = 1000,
             BuildableCategoryAdds = 'BUILTBYTIER2COMMANDER SERAPHIM',
             Icon = 'aes',
             Name = '<LOC enhancements_0000>Tech 2 Engineering Suite',
             NewBuildRate = 42,
-            NewHealth = 1500,
+            NewHealth = 2000,
+            NewRegenRate = 10,
             ShowBones = {
                 'Left_Upgrade',
             },
@@ -723,6 +724,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0018>Tech 3 Engineering Suite',
             NewBuildRate = 100,
             NewHealth = 3500,
+            NewRegenRate = 20,
             Prerequisite = 'AdvancedEngineering',
             ShowBones = {
                 'Left_Upgrade',
