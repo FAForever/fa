@@ -401,7 +401,7 @@ UnitBlueprint {
             BuildTime = 800,
             Icon = 'dsu',
             Name = '<LOC enhancements_0039>Nano-Repair System',
-            NewHealth = 1500,
+            NewHealth = 2000,
             NewRegenRate = 40,
             ShowBones = {
                 'Left_Upgrade',
