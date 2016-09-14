@@ -174,7 +174,7 @@ UnitBlueprint {
         Icon = 'land',
         OrderOverrides = {
             RULEUTC_CloakToggle = {
-                helpText = '<LOC xsl0101_toggle>Toggle Selection Priority',
+                helpText = 'xsl0101_toggle',
             },
         },
         TechLevel = 'RULEUTL_Basic',

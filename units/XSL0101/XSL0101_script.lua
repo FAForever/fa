@@ -50,11 +50,6 @@ XSL0101 = Class(SWalkingLandUnit) {
 
     OnMotionHorzEventChange = function(self, new, old)
         if self.Sync.LowPriority then
-            -- If we begin moving and it wasn't from a bump, reveal ourselves
-            if old == 'Stopped' and not self:IsIdleState() then
-                self:RevealUnit()
-            end
-
             -- If we stopped moving, hide
             if new == 'Stopped' then
                 -- We need to fork in order to use WaitSeconds
@@ -70,6 +65,12 @@ XSL0101 = Class(SWalkingLandUnit) {
                 end)
             end
         end
+
+        -- If we begin moving, reveal ourselves
+        if old == 'Stopped' then
+            self:RevealUnit()
+        end
+
 
         SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
     end,

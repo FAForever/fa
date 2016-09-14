@@ -317,6 +317,10 @@ Tooltips = {
         title = "<LOC _Delete>Delete",
         description = "",
     },
+    xsl0101_toggle = {
+        title = "<LOC xsl0101_toggle>Toggle Selection Priority",
+        description = "<LOC xsl0101_toggle_description>Toggles selection priority\nToggles Motion-Cloak ability",
+    },
 
     -- **********************
     -- ** Chat Strings
