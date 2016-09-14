@@ -1229,7 +1229,7 @@ Tooltips = {
         description = "<LOC tooltipui0284>Begin this Game again",
     },
     esc_rehost = {
-        title = "<LOC tooltipui0694>Rehost",
+        title = "<LOC tooltipui0696>Rehost",
         description = "<LOC tooltipui0284>Begin this Game again",
     },
     esc_exit = {
