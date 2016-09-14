@@ -1,12 +1,9 @@
--- ****************************************************************************
--- **
--- **  File     :  /data/units/XEA0306/XEA0306_script.lua
--- **  Author(s):  Jessica St. Croix
--- **
--- **  Summary  :  UEF Heavy Air Transport Script
--- **
--- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /data/units/XEA0306/XEA0306_script.lua
+-- Author(s):  Jessica St. Croix
+-- Summary  :  UEF Heavy Air Transport Script
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
@@ -76,15 +73,14 @@ XEA0306 = Class(AirTransport) {
         self.MyShield:AddProtectedUnit(unit)
     end,
 
-
     OnTransportDetach = function(self, attachBone, unit)
         AirTransport.OnTransportDetach(self, attachBone, unit)
         self.MyShield:RemoveProtectedUnit(unit)
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if EntityCategoryContains(categories.NUKE, instigator) then
-            self.MyShield:SetContentsVulnerable()
+        if damageType == 'Nuke' or damageType == 'Deathnuke' then
+            self.MyShield:SetContentsVulnerable(true)
         end
 
         AirTransport.OnDamage(self, instigator, amount, vector, damageType)
