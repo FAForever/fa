@@ -11,11 +11,16 @@ Patch 3660 (Upcoming)
 
 **Gameplay**
 - Improved Selen toggle. It now behaves with no abilities by default, then when toggled on it hides and shows based on motion as before.
+- Added dummy weapon to Aeon T2 Transport to allow LABs be targeted to specific enemies
+- Allowed UEF T2 Transport to be given targets while landed on water
+- Enabled templates to be created with modded units as the primary unit
 
 **Bugs**
 - Fixed units carried by UEF T2 Gunship from firing from inside a carrier
 - Fixed Salvation fire rate slowing at max adjacency instead of speeding up
 - Fixed units being able to fire at aircraft docked inside carriers, damaging the carrier
+- Fixed games not ending properly with AIs
+- Fixed Continental not fying to nukes (Again)
 
 **UI**
 - Fixed UEF Engineering station strategic icon not matching the gtech level
@@ -24,10 +29,13 @@ Patch 3660 (Upcoming)
 - Fixed unit descriptions on support factories displaying for the wrong ones
 - Fixed game quality displaying a corrupted string
 - Fixed the scroll button in ACU enhancements freezing the tooltip popup action
+- Added mod icon support for various UI elements
+- Added build mode support for SCU presets
 
 **Other**
 - Removed obsolete strategic icons and corrected file paths inside Hotstats module
 - Fixed custom FAF player colours conflicting with Steam launcher
+- Added German translation to FAF
 
 
 Hotfix Patch 3659 (September 12th, 2016)
