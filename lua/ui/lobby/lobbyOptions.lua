@@ -56,33 +56,33 @@ teamOptions =
     },
     {
         default = 1,
-        label = "<LOC lobui_0532>Auto Teams",
-        help = "<LOC lobui_0533>Auto ally the players before the game starts",
+        label = "<LOC lobui_0609>Auto Teams",
+        help = "<LOC lobui_0610>Auto ally the players before the game starts",
         key = 'AutoTeams',
         values = {
             {
                 text = "<LOC lobui_0244>None",
-                help = "<LOC lobui_0534>No automatic teams",
+                help = "<LOC lobui_0603>No automatic teams",
                 key = 'none',
             },
             {
-                text = "<LOC lobui_0530>Top vs Bottom",
-                help = "<LOC lobui_0535>The game will be Top vs Bottom",
+                text = "<LOC lobui_0597>Top vs Bottom",
+                help = "<LOC lobui_0598>Slots in the upper half of the map against those in the lower half",
                 key = 'tvsb',
             },
             {
-                text = "<LOC lobui_0529>Left vs Right",
-                help = "<LOC lobui_0536>The game will be Left vs Right",
+                text = "<LOC lobui_0606>Left vs Right",
+                help = "<LOC lobui_0599>Slots in the left half of the map against those in the right half",
                 key = 'lvsr',
             },
             {
-                text = "<LOC lobui_0571>Even Slots vs Odd Slots",
-                help = "<LOC lobui_0572>The game will be Even Slots vs Odd Slots",
+                text = "<LOC lobui_0600>Odd vs Even",
+                help = "<LOC lobui_0601>Odd numbered slots vs even numbered slots. Subject to map design, your mileage may vary",
                 key = 'pvsi',
             },
             {
                 text = "<LOC lobui_0604>Manual Select",
-                help = "<LOC lobui_0605>You can select the teams clicking on the icons in the map preview, it only works with random spawn",
+                help = "<LOC lobui_0605>Start positions are bound to teams in a way defined by the host by clicking on the positions on the map. This only works when random spawns are enabled.",
                 key = 'manual',
             },
         },

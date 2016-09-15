@@ -7475,6 +7475,8 @@ lobui_0605="Start positions are bound to teams in a way defined by the host by c
 lobui_0606="Left vs Right"
 lobui_0607="Move AI to slot %s"
 lobui_0608="No slots available"
+lobui_0609="Auto Teams"
+lobui_0610="Auto ally the players before the game starts"
 
 desync_0002="Don't tell me any more"
 desync_0003="Game state has become inconsistent between the players in this game. This means the simulation may evolve differently for different players from this point. The game is extremely likely to terminate abruptly quite soon."
