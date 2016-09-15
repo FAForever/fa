@@ -25,13 +25,13 @@ teamOptions =
                 key = 'random',
             },
             {
-                text = "Optimal balance",
-                help = "Teams will be optimally balanced, random start locations",
+                text = "<LOC lobui_0079>Optimal balance",
+                help = "<LOC lobui_0080>Teams will be optimally balanced, random start locations",
                 key = 'balanced',
             },
             {
-                text = "Flexible balance",
-                help = "Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable",
+                text = "<LOC lobui_0081>Flexible balance",
+                help = "<LOC lobui_0082>Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable",
                 key = 'balanced_flex',
             },
         },
