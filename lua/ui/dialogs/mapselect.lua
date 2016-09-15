@@ -460,7 +460,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     dialogContent.selectButton = selectButton
 
     local doNotRepeatMap
-    local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0503>Random Map")
+    local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0501>Random Map")
     LayoutHelpers.AtHorizontalCenterIn(randomMapButton, dialogContent)
     LayoutHelpers.AtVerticalCenterIn(randomMapButton, selectButton)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
