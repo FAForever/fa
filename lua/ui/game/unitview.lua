@@ -19,6 +19,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
+local CreateDisplayAbilities = import('/lua/ui/game/unitviewDetail.lua').CreateDisplayAbilities
 
 local selectedUnit = nil
 local updateThread = nil
@@ -355,13 +356,14 @@ function UpdateWindow(info)
             controls.actionText:Hide()
         end
 
-        if Prefs.GetOption('uvd_format') == 'full' and bp.Display.Abilities then
+        local Abilities = CreateDisplayAbilities(bp)
+        if Prefs.GetOption('uvd_format') == 'full' and table.getn(Abilities) > 0 then
             local i = 1
             local maxWidth = 0
-            local index = table.getn(bp.Display.Abilities)
-            while bp.Display.Abilities[index] do
+            local index = table.getn(Abilities)
+            while Abilities[index] do
                 if not controls.abilityText[i] then
-                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, LOC(bp.Display.Abilities[index]), 12, UIUtil.bodyFont)
+                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, LOC(Abilities[index]), 12, UIUtil.bodyFont)
                     controls.abilityText[i]:DisableHitTest()
                     if i == 1 then
                         LayoutHelpers.AtLeftIn(controls.abilityText[i], controls.abilities)
@@ -370,7 +372,7 @@ function UpdateWindow(info)
                         LayoutHelpers.Above(controls.abilityText[i], controls.abilityText[i-1])
                     end
                 else
-                    controls.abilityText[i]:SetText(LOC(bp.Display.Abilities[index]))
+                    controls.abilityText[i]:SetText(LOC(Abilities[index]))
                 end
                 maxWidth = math.max(maxWidth, controls.abilityText[i].Width())
                 index = index - 1
