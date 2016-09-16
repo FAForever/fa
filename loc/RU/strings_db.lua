@@ -7822,6 +7822,8 @@ OPTIONS_0245="Улучшенный сброс выбранных боевых е
 OPTIONS_0246="Показывать утилизированную материю"
 OPTIONS_0247="Enable Cycle Preview for Hotbuild"
 OPTIONS_0248="When on, you can cycle the Hotbuild preview"
+OPTIONS_0249="Auto create Display Abilities"
+OPTIONS_0250="Off: Use original abilities from Unitblueprint -- Medium: Use original abilities and auto-create if no abilities where found -- Full: Always auto-create abilities -- Advanced: Merge auto-create and unitblueprint abilities."
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
