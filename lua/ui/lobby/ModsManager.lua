@@ -98,11 +98,11 @@ local function EveryoneHasMod(modID)
 end
 
 local modsTags = {
- UI       =  { key = 'UI', name = 'UI MODS',   filtered = false,  color = 'FF21AEDE', }, -- #FF21AEDE UI mod
- GAME     =  { key = 'GAME', name = 'GAME MODS', filtered = false, color = 'FFDE4521', }, -- #FFDE4521 game mod
- UNITS    =  { key = 'UNITS', name = 'UNITS',    filtered = false, color = 'FFDED621', }, -- #FFDED621 units mod  
- DISABLED =  { key = 'DISABLED', name = 'DISABLED', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
- LOCAL    =  { key = 'LOCAL', name = 'LOCAL', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
+ UI       =  { key = 'UI', name = '<LOC uiunitmanager_10>UI MODS',   filtered = false,  color = 'FF21AEDE', }, -- #FF21AEDE UI mod
+ GAME     =  { key = 'GAME', name = '<LOC uiunitmanager_11>GAME MODS', filtered = false, color = 'FFDE4521', }, -- #FFDE4521 game mod
+ UNITS    =  { key = 'UNITS', name = '<LOC uiunitmanager_12>UNITS',    filtered = false, color = 'FFDED621', }, -- #FFDED621 units mod  
+ DISABLED =  { key = 'DISABLED', name = '<LOC uiunitmanager_13>DISABLED', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
+ LOCAL    =  { key = 'LOCAL', name = '<LOC uiunitmanager_14>LOCAL', filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
 }
  
 -- Create the dialog for Mod Manager
@@ -239,24 +239,24 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local position = 5 
     local filterGameMods = CreateModsFilter(dialogContent, modsTags.GAME)
     Tooltip.AddControlTooltip(filterGameMods, { 
-        text = 'Filter Game Mods', 
-        body = 'Toggle visibility of all game mods in above list of mods.' } )
+        text = LOC('<LOC uiunitmanager_01>Filter Game Mods'), 
+        body = LOC('<LOC uiunitmanager_02>Toggle visibility of all game mods in above list of mods.') } )
     LayoutHelpers.AtLeftIn(filterGameMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 15)
     
     position = position + 110
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
-        text = 'Filter UI Mods', 
-        body = 'Toggle visibility of all UI mods in above list of mods.' } )
+        text = LOC('<LOC uiunitmanager_03>Filter UI Mods'), 
+        body = LOC('<LOC uiunitmanager_04>Toggle visibility of all UI mods in above list of mods.') } )
     LayoutHelpers.AtLeftIn(filterUIMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 15)
     
     position = position + 110
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
-        text = 'Filter Disabled Mods', 
-        body = 'Toggle visibility of all disabled mods in above list of mods.' } )
+        text = LOC('<LOC uiunitmanager_05>Filter Disabled Mods'), 
+        body = LOC('<LOC uiunitmanager_06>Toggle visibility of all disabled mods in above list of mods.') } )
     LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 15)
      
@@ -292,7 +292,7 @@ function CreateModsFilter(parent, tag)
             states.active,
             states.highlight,
             states.disabled,
-            tag.name,
+            LOC(tag.name),
             11)
         
     local height = filterToggle.label.Height() + 30
