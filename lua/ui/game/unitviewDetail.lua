@@ -8,6 +8,7 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
+local LocalisationUS = {} doscript('/loc/' .. 'us' .. '/strings_db.lua', LocalisationUS)
 
 View = false
 ViewState = "full"
@@ -348,9 +349,17 @@ function Show(bp, buildingUnit, bpID)
         WrapAndPlaceText(bp.Air,
             bp.Physics,
             bp.Weapon,
-            bp.Display.Abilities,
+            CreateDisplayAbilities(bp),
             LOC(UnitDescriptions[bpID]),
             View.Description)
+    -- we need to show armament_detail even if we don't have a unit.Description
+    elseif options.gui_render_armament_detail == 1 then
+        WrapAndPlaceText(bp.Air,
+            bp.Physics,
+            bp.Weapon,
+            CreateDisplayAbilities(bp),
+            nil,
+            nil)
     end
     local showShield = false
     if bp.Defense.Shield and bp.Defense.Shield.ShieldMaxHealth then
@@ -449,4 +458,341 @@ function SetupUnitViewLayout(parent)
     SetLayout()
     View:Hide()
     View:DisableHitTest(true)
+end
+
+local Abilities = {
+    ["ability_radar"] = function (bp)
+        return bp.CategoriesHash.OVERLAYRADAR and bp.Intel.RadarRadius > 0
+    end,
+    ["ability_sonar"] = function (bp)
+        return bp.CategoriesHash.OVERLAYSONAR and bp.Intel.SonarRadius > 0
+    end,
+    ["ability_omni"] = function (bp)
+        return bp.CategoriesHash.OVERLAYOMNI and bp.Intel.OmniRadius > 0
+    end,
+    ["ability_hover"] = function (bp)
+        return bp.CategoriesHash.MOBILE and bp.Physics.MotionType == 'RULEUMT_Hover'
+    end,
+    ["ability_amphibious"] = function (bp)
+        local BitArray = DezimalToBinary(bp.Physics.BuildOnLayerCaps)
+        return (bp.CategoriesHash.STRUCTURE and not 
+                bp.CategoriesHash.FACTORY and 
+                BitArray[0] == 1 and  -- LAYER_Land
+                BitArray[1] == 1)     -- LAYER_Seabed
+            or (bp.CategoriesHash.MOBILE and 
+               (bp.Physics.MotionType == 'RULEUMT_Amphibious' or 
+                bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating')) 
+    end,
+    ["ability_aquatic"] = function (bp)
+        local BitArray = DezimalToBinary(bp.Physics.BuildOnLayerCaps)
+        return bp.CategoriesHash.STRUCTURE and 
+                BitArray[0] == 1 and  -- LAYER_Land
+                BitArray[3] == 1      -- LAYER_Water
+    end,
+    ["ability_deathaoe"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                if weapon.DisplayName and weapon.DisplayName ~= '' then
+                    if (weapon.DisplayName == 'Death Weapon' or 
+                        weapon.DisplayName == 'Death Nuke' or
+                        weapon.DisplayName == 'Collossus Death' or
+                        weapon.DisplayName == 'Megalith Death')
+                    or (weapon.DamageType == 'EMP' and weapon.DamageRadius > 1) then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_sacrifice"] = function (bp)
+        return DezimalToBinary(bp.General.CommandCaps)[16] == 1 -- RULEUCC_Sacrifice
+    end,
+    ["ability_engineeringsuite"] = function (bp)
+        if ((bp.CategoriesHash.ENGINEER or bp.CategoriesHash.ENGINEERSTATION) and bp.CategoriesHash.CONSTRUCTION) 
+        or (bp.CategoriesHash.ENGINEER and bp.CategoriesHash.POD) then
+            return true
+        end
+        return false
+    end,
+    ["ability_manuallaunch"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                if weapon.ManualFire then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_aa"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                if weapon.WeaponCategory ~= 'Kamikaze' then
+                    for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                        if (not weapon.TargetRestrictDisallow or not string.find( weapon.TargetRestrictDisallow, 'AIR' )) and
+                           (not weapon.TargetRestrictOnlyAllow or not string.find( weapon.TargetRestrictOnlyAllow, 'MISSILE' )) and
+                            string.find( TargetLayer, 'Air' ) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_stun"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for arg,Buff in weapon.Buffs or {} do
+                    if Buff.BuffType and Buff.BuffType == 'STUN' then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_carrier"] = function (bp)
+        return bp.CategoriesHash.CARRIER and
+               DezimalToBinary(bp.General.CommandCaps)[8] == 1 -- RULEUCC_Transport
+    end,
+    ["ability_factory"] = function (bp)
+        return bp.CategoriesHash.MOBILE and
+               bp.CategoriesHash.FACTORY and
+               bp.CategoriesHash.SHOWQUEUE
+    end,
+    ["ability_tacmissiledef"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                    if string.find( TargetLayer, 'Air' ) then
+                        if weapon.TargetRestrictOnlyAllow and 
+                           string.find(weapon.TargetRestrictOnlyAllow, 'TACTICAL' ) and 
+                           string.find(weapon.TargetRestrictOnlyAllow, 'MISSILE' ) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_stratmissiledef"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                    if string.find( TargetLayer, 'Air' ) then
+                        if weapon.TargetRestrictOnlyAllow and 
+                           string.find( weapon.TargetRestrictOnlyAllow, 'STRATEGIC' ) and 
+                           string.find( weapon.TargetRestrictOnlyAllow, 'MISSILE' ) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_torpedo"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                    if string.find( TargetLayer, 'Sub' ) then
+                        if weapon.TargetRestrictDisallow and string.find( weapon.TargetRestrictDisallow, 'HOVER' ) then
+                            if weapon.ProjectileId and not string.find( weapon.ProjectileId, 'depthcharge' ) then
+                                return true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_depthcharge"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                    if string.find( TargetLayer, 'Sub' ) then
+                        if weapon.ProjectileId and string.find( weapon.ProjectileId, 'depthcharge' ) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_torpedodef"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                for _,TargetLayer in weapon.FireTargetLayerCapsTable or {} do
+                    if weapon.TargetRestrictOnlyAllow and 
+                       weapon.RangeCategory == 'UWRC_Countermeasure' and 
+                       string.find( weapon.TargetRestrictOnlyAllow, 'TORPEDO' )  then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_upgradable"] = function (bp)
+        return bp.General.UpgradesTo and bp.General.UpgradesTo ~= ''
+    end,
+    ["ability_tacticalmissledeflect"] = function (bp)
+        return bp.CategoriesHash.ANTIMISSILE and bp.Defense.AntiMissile and type(bp.Defense.AntiMissile) == 'table'
+    end,
+    ["ability_cloak"] = function (bp)
+        return bp.Intel and bp.Intel.Cloak
+    end,
+    ["ability_transport"] = function (bp)
+        return bp.CategoriesHash.TRANSPORTATION and bp.General.Category and bp.Transport.TransportClass > 0
+    end,
+    ["ability_airstaging"] = function (bp)
+        return bp.CategoriesHash.AIRSTAGINGPLATFORM and not bp.CategoriesHash.CARRIER
+    end,
+    ["ability_submersible"] = function (bp)
+        return bp.CategoriesHash.SUBMERSIBLE
+    end,
+    ["ability_jamming"] = function (bp)
+        return bp.Intel.JamRadius and type(bp.Intel.JamRadius) == 'table' and bp.Intel.JamRadius.Max > 0 
+    end,
+    ["ability_suicideweapon"] = function (bp)
+        if bp.Weapon then
+            for _,weapon in bp.Weapon do
+                if weapon.WeaponCategory and weapon.WeaponCategory == 'Kamikaze' then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_repairs"] = function (bp)
+        return not bp.CategoriesHash.ENGINEER and DezimalToBinary(bp.General.CommandCaps)[6] == 1 -- RULEUCC_Repair
+    end,
+    ["ability_reclaim"] = function (bp)
+        return not bp.CategoriesHash.ENGINEER and DezimalToBinary(bp.General.CommandCaps)[20] == 1 -- RULEUCC_Reclaim
+    end,
+    ["ability_deploys"] = function (bp)
+        if bp.CategoriesHash.MOBILE and bp.Weapon then
+            for _,weapon in bp.Weapon do
+                if weapon.WeaponUnpackLocksMotion == true then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    ["ability_personalshield"] = function (bp)
+        if bp.Defense.Shield.PersonalShield == true
+        or bp.Defense.Shield.ShieldSize > 0 and bp.Defense.Shield.ShieldSize <= 3
+        or bp.Defense.Shield.PersonalBubble == true then
+            return true
+        end
+        return false
+    end,
+    ["ability_shielddome"] = function (bp)
+        return bp.Defense.Shield.ShieldSize > 3 and bp.Defense.Shield.PersonalShield ~= true 
+    end,
+    ["ability_personalstealth"] = function (bp)
+        return bp.Intel.RadarStealth == true and bp.Intel.RadarStealthField ~= true
+    end,
+    ["ability_stealthfield"] = function (bp)
+        return bp.Intel.RadarStealthField == true or bp.Intel.RadarStealthFieldRadius > 0
+    end,
+    ["ability_customizable"] = function (bp)
+        return table.getsize(bp.Enhancements) > 0
+    end,
+    ["ability_notcap"] = function (bp)
+        return bp.CategoriesHash.SUBCOMMANDER or bp.BlueprintId == 'uaa0310' 
+    end,
+    ["ability_massive"] = function (bp)
+        return bp.Display.MovementEffects.Land.Footfall.Damage.Amount > 0 and
+               bp.Display.MovementEffects.Land.Footfall.Damage.Radius > 0
+    end,
+    ["ability_teleport"] = function (bp)
+        return bp.CategoriesHash.TELEPORT and
+               DezimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
+    end,
+}
+local ReserveAbilities = {
+    ["Armed"] = function (bp)
+        return type(bp.Weapon) == 'table'
+    end,
+}
+function DezimalToBinary(String)
+    local number = tonumber(String)
+    local BitArray = {}
+    local cnt = 0
+    while (number > 0) do
+        local last = math.mod(number,2)
+        if(last == 1) then
+            BitArray[cnt] = 1
+        else
+            BitArray[cnt] = 0
+        end
+        number = (number-last)/2
+        cnt = cnt + 1
+    end
+    return BitArray
+end
+function ExtractAbilityFromString(ability)
+    local i = string.find(ability,">")
+    if i then
+        ability = string.sub(ability,6,i-1)
+    end
+    return ability
+end
+function ValidateUnitDescriptions(bp)
+    local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
+    local Description = LOC(UnitDescriptions[bp.BlueprintId]) or LOC(bp.Interface.Help.HelpText)
+    if Description then
+        return true
+    end
+    return false
+end
+function CreateDisplayAbilities(bp)
+    -- Without this we have to reload the game to get the new option if the user changed something.
+    options = Prefs.GetFromCurrentProfile('options')
+    
+    -- option Off(1): don't touch the Abilitiy array, option Medium(2): don't create a new array, if we have one inside the blueprint
+    if options.gui_show_AutoAbility < 2 or options.gui_show_AutoAbility < 3 and bp.Display.Abilities then
+        return bp.Display.Abilities
+    end
+
+    -- create the new Abilities array
+    local count = 0
+    local newAbilities = {}
+    for ability, matching in Abilities do
+        if matching(bp) then
+            count = count + 1
+            newAbilities[count] = '<LOC '..ability..'>'..LocalisationUS[ability]
+        end
+    end
+    -- stop here, if AutoAbility options are Off, Medium or Full.
+    if options.gui_show_AutoAbility < 4 then return newAbilities end
+    
+    -- option Advanced(4) merge bp.Abilities to the generated one
+    -- We only merge unknown abilities and cross fingers that the mod-author did it right :)
+    if type(bp.Display.Abilities) == "table" then
+        for _,ability in bp.Display.Abilities do
+            if not Abilities[ExtractAbilityFromString(ability)] then
+                count = count + 1
+                newAbilities[count] = ability
+            end
+        end
+    end
+    -- if we don't have an ability and the unit don't has a description, we add a Weapon ability
+    -- to display the tooltip for advanced unit-stats.
+    if not newAbilities[1] and not ValidateUnitDescriptions(bp) then
+        for ability, matching in ReserveAbilities do
+            if matching(bp) then
+                count = count + 1
+                newAbilities[count] = ability
+            end
+        end
+    end
+    return newAbilities
 end

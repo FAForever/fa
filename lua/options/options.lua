@@ -671,6 +671,21 @@ options = {
                     },
                 },
             },
+            
+            {
+                title = "<LOC OPTIONS_0247>Auto create Display Abilities",
+                key = 'gui_show_AutoAbility',
+                type = 'toggle',
+                default = 2,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 1 },
+                        {text = "<LOC _Medium>", key = 2 },
+                        {text = "<LOC _Full>", key = 3 },
+                        {text = "<LOC _Advanced>", key = 4 },
+                    },
+                },
+            },
         },
     },
     video = {
