@@ -790,6 +790,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
         description = "<LOC OPTIONS_0220>When on, the UI skin will change to match the faction you are playing",
     },
+    options_hotbuild_cycle_preview = {
+        title = "<LOC OPTIONS_0247>Enable Cycle Preview for Hotbuild",
+        description = "<LOC OPTIONS_0248>When on, you can cycle the Hotbuild preview",
+    },
     options_advanced_statistics = {
         title = "<LOC OPTIONS_0213>Advanced Statistics",
         description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
