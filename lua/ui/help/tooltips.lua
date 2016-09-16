@@ -2021,8 +2021,8 @@ Tooltips = {
     -- **********************
 
     options_gui_bigger_strat_build_icons = {
-        title = 'Bigger Strategic Build Icons',
-        description = 'Replaces the default strategic build icons with something more visible.',
+        title = '<LOC OPTIONS_0228>Bigger Strategic Build Icons',
+        description = '<LOC OPTIONS_0253>Replaces the default strategic build icons with something more visible.',
     },
     options_gui_template_rotator = {
         title = 'Template Rotation',
