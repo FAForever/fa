@@ -381,8 +381,8 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/type-amphibius.dds",
         Expressions.AMPHIBIOUS, nil)
     CreatePreset("SUBS", 
-        "<LOC restricted_units_info_.>Prevents all submersible units",
-        "<LOC restricted_units_data_.>No Submersible Units", 
+        "<LOC restricted_units_info_SUBS>Prevents all submersible units",
+        "<LOC restricted_units_data_SUBS>No Submersible Units", 
         "/textures/ui/common/icons/presets/type-subs.dds",
         Expressions.SUBS, nil)
     -- NUKES restrictions
