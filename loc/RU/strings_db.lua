@@ -7822,6 +7822,8 @@ OPTIONS_0245="Улучшенный сброс выбранных боевых е
 OPTIONS_0246="Показывать утилизированную материю"
 OPTIONS_0247="Enable Cycle Preview for Hotbuild"
 OPTIONS_0248="When on, you can cycle the Hotbuild preview"
+OPTIONS_0251="Cycle reset time"
+OPTIONS_0252="Time in milliseconds until hotbuild cycle will reset"
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
