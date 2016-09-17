@@ -429,7 +429,7 @@ options = {
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC OPTIONS_0254>Bigger Icons", key = 1 },
+                        {text = "<LOC OPTIONS_0254>Bigger icons", key = 1 },
                         {text = "<LOC OPTIONS_0255>Bigger icons with TechMarker", key = 2 },
                     },
                 },

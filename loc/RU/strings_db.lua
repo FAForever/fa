@@ -7823,7 +7823,7 @@ OPTIONS_0246="Показывать утилизированную материю
 OPTIONS_0247="Enable Cycle Preview for Hotbuild"
 OPTIONS_0248="When on, you can cycle the Hotbuild preview"
 OPTIONS_0253="Replaces the default strategic build icons with something more visible."
-OPTIONS_0254="Bigger Icons"
+OPTIONS_0254="Bigger icons"
 OPTIONS_0255="Bigger icons with TechMarker"
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
