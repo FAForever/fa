@@ -39,7 +39,6 @@ local WorldLabel = Class(Group) {
         self.Left:Set(0)
         self.Width:Set(25)
         self.Height:Set(25)
-        self:DisableHitTest()
         self:SetNeedsFrameUpdate(true)
     end,
 
@@ -75,6 +74,8 @@ function CreateReclaimLabel(view, r)
     label.text:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(label.text, label, 16)
     LayoutHelpers.AtVerticalCenterIn(label.text, label)
+
+    label:DisableHitTest(true)
 
     label.Update = function(self)
         -- delete label if reclaim is gone
