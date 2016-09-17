@@ -215,42 +215,29 @@ end
 function UpdateUnitCap(deadArmy)
     -- If we are asked to share out unit cap for the defeated army, do the following...
     local mode = ScenarioInfo.Options.ShareUnitCap
-
-    if(not mode or mode == 'none') then
-        return
-    end
+    if not mode or mode == 'none' then return end
 
     local totalCount = 0
     local aliveCount = 0
     local alive = {}
 
-    for k,brain in ArmyBrains do
-        local index = brain:GetArmyIndex()
-        local eligible
-
-        if(mode == 'all' or (mode == 'allies' and IsAlly(deadArmy, index))) then
-            eligible = true
-        else
-            eligible = false
-        end
-
-        if eligible then
+    for index, brain in ArmyBrains do
+        if (mode == 'all' or (mode == 'allies' and IsAlly(deadArmy, index))) and not ArmyIsCivilian(index) then
             if not brain:IsDefeated() then
+                brain.index = index
                 table.insert(alive, brain)
+                aliveCount = aliveCount + 1
             end
-
             totalCount = totalCount + 1
         end
     end
 
-    aliveCount = table.getsize(alive)
     if aliveCount > 0 then
         local initialCap = tonumber(ScenarioInfo.Options.UnitCap)
         local totalCap = totalCount * initialCap
         local newCap = math.floor(totalCap / aliveCount)
-
         for _, brain in alive do
-            SetArmyUnitCap(brain:GetArmyIndex(), newCap)
+            SetArmyUnitCap(brain.index, newCap)
         end
     end
 end
