@@ -100,6 +100,7 @@ Patch 3658 (August 29th, 2016)
 - Overhauled bomb-drop aim calculation code. It now takes the Y axis into account, and spaces multi-projectile drops properly. In theory, this should be the last word in bombers missing stupidly.
 - Improved AI base management in campaign scenarios
 - Sub dive toggle now prioritizes dive in mixed groups
+- ACUs start rotated at middle of map as default
 
 **Balance**
 - Light Assault Bots
