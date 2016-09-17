@@ -101,7 +101,7 @@ local modsTags = {
  UI       =  { key = 'UI', name = LOC('<LOC uiunitmanager_10>UI MODS'),   filtered = false,  color = 'FF21AEDE', }, -- #FF21AEDE UI mod
  GAME     =  { key = 'GAME', name = LOC('<LOC uiunitmanager_11>GAME MODS'), filtered = false, color = 'FFDE4521', }, -- #FFDE4521 game mod
  UNITS    =  { key = 'UNITS', name = LOC('<LOC uiunitmanager_12>UNITS'),    filtered = false, color = 'FFDED621', }, -- #FFDED621 units mod  
- DISABLED =  { key = 'DISABLED', name = LOC('<LOC uiunitmanager_13>DISABLED'), filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
+ DISABLED =  { key = 'DISABLED', name = LOC('<LOC uiunitmanager_13>BLACKLISTED'), filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
  LOCAL    =  { key = 'LOCAL', name = LOC('<LOC uiunitmanager_14>LOCAL'), filtered = false, color = 'FF696A6A', }, -- #FF696A6A T2 changes
 }
  
@@ -255,8 +255,8 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     position = position + 110
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
-        text = LOC('<LOC uiunitmanager_05>Filter Disabled Mods'), 
-        body = LOC('<LOC uiunitmanager_06>Toggle visibility of all disabled mods in above list of mods.') } )
+        text = LOC('<LOC uiunitmanager_05>Filter Blacklisted Mods'), 
+        body = LOC('<LOC uiunitmanager_06>Toggle visibility of blacklisted mods in above list of mods.') } )
     LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 15)
      
