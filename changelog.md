@@ -2,7 +2,7 @@ Patch 3660 (Upcoming)
 ============================
 **Lobby**
 - Fixed team number switching slots alongside a player
-- Added new feature: Kick Reasons. When kicking a player from your lobby, you get a new dialog. You may type in a reason for the kick to notify the player. If you blank it, or leave the message as presented, it will play the old message. 
+- Added new feature: Kick Reasons. When kicking a player from your lobby, you get a new dialog. You may type in a reason for the kick to notify the player. If you blank it, or leave the message as presented, it will play the old message.
 - Fixed Cheat and Build multipliers for AIs showing 1.0 - 1.9 two times
 - Fixed rating labels being shown on the minimap when teams are not set to 'Fixed'
 - Made it clearer that there's a search filter in the map selection
@@ -118,7 +118,7 @@ Patch 3658 (August 29th, 2016)
 - Selen
     - Reworked hiding ability into a button toggle:
        - When pressed, puts the unit in hide mode. The weapon is disabled,
-          all commands are removed from the unit, and it comes to a halt. 
+          all commands are removed from the unit, and it comes to a halt.
           Counter-intel Stealth and Cloak come online once it's stopped.
        - Selens in hide mode have lowered selection priority: They cannot
           be selected alongside other units.
@@ -134,7 +134,7 @@ Patch 3658 (August 29th, 2016)
    - Cybran
         - Health increased 130 -> 260
         - Damage increased 8 -> 16
-        - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+        - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA.
    - Aeon
         - Health increased 200 -> 360
@@ -262,12 +262,12 @@ Patch 3658 (August 29th, 2016)
         - Increased mass cost 800 -> 1100
         - Increased energy cost 3429 -> 5500
         - Decreased build time 4000 -> 3500
-        - Increased build power 120 -> 150 
+        - Increased build power 120 -> 150
 - Cybran T3 MAA
-    - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+    - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA
 - Cybran T2 Cruiser
-    - Removed AA/AG toggle. The weapon will now auto-toggle between modes 
+    - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA
     - Decreased AG toggle weapon damage 60 -> 40
     - Increased AG toggle weapon rate of fire 0.5 -> 1
@@ -392,18 +392,18 @@ Patch 3652 (May 2, 2016)
 - Enabled Pause button in replays
 - In Units Manager, added more preset restrictions (e.g. No T1 spam, No Snipes, No TMLs)
 - In Units Manager, separated some existing preset restrictions (e.g. game-enders, nukes) for better selection
-- In Units Manager, added custom restrictions for all FA units 
+- In Units Manager, added custom restrictions for all FA units
 - In Units Manager, added custom restrictions for modded units when mods are activated
 - In Units Manager, added mechanism for restricting units using preset restrictions and/or custom restrictions
 - In Units Manager, added grouping of units based on faction, type, purpose, and tech level
-- In Units Manager, added detailed tooltips with stats for weapons, defense, and eco for all units 
-- In Units Manager, added visualization of modded units using small purple icon with letter M 
+- In Units Manager, added detailed tooltips with stats for weapons, defense, and eco for all units
+- In Units Manager, added visualization of modded units using small purple icon with letter M
 - In Units Manager, improved description of preset restrictions
-- In Mods Manager, added filters for UI/Game/Disabled mods 
+- In Mods Manager, added filters for UI/Game/Disabled mods
 - In Mods Manager, improved sorting mods by their activation status and names
 - In Mods Manager, added cleanup of mod names with mismatching mod versions
 - In Mods Manager, added mod versions next to mod names
-- Added pre-loading and caching of blueprints for usage in the Units Manager 
+- Added pre-loading and caching of blueprints for usage in the Units Manager
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
@@ -412,7 +412,7 @@ Patch 3652 (May 2, 2016)
 - Slightly increased unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
 - Seraphim Experimental Nuke now deals damage to itself
 - Cybran drones no longer leave wreckage when killed
-- Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
+- Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map
 - Removed friendly fire on Atlantis AA
 - Locations of enemy civilian structures are now revealed at start of the game (lobby option)
 - Navy units now should respect their max-range better when having move-attack order
@@ -432,7 +432,7 @@ Patch 3652 (May 2, 2016)
 - Enemy civilians are now colored in a unique red color
 - Fixed bomb drop code and enabled it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
 - Allowed Aeon Aircraft Carrier to build Bombers and Gunships, same as the others.
-- Fixed restriction system on Sim side such that it cannot be compromised by UI mods 
+- Fixed restriction system on Sim side such that it cannot be compromised by UI mods
 - Fixed restriction system that prevented removing restrictions on already restricted units in scenario scripts
 
 **Bugs**
@@ -477,7 +477,7 @@ Patch 3652 (May 2, 2016)
 - Tech-level filter in debug window now works as intended
 - Log-spam from various known events heavily reduced
 - Lots of work adapting and improving AI behavior for coop gameplay (speed2)
-- Scale aeon build effects according to build progress 
+- Scale aeon build effects according to build progress
 - Show wreckage debris in reclaim beam
 
 **Contributors**
@@ -524,7 +524,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 - Hitbox: lasers can now hit SCUs more reliably
 - SCUs now leave a normal wreckage with 81% of their mass value when destroyed
 - A RAS preset for UEF, Cybran and Aeon is now available for production from the Quantum Gateways.
- 
+
  **Aeon SCU**
 
 - Reacton Cannon (Gun upgrade) energy cost: 36000 → 46200, build time: 5040 → 6048
@@ -558,7 +558,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 
 - Build time: 880 → 1050
 - Speed on water: 4.3 → 3
- 
+
  **Aeon (Blaze)**
 
 - Build time: 880 → 1050
@@ -578,7 +578,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 **Seraphim Tech 2 bot and Tech 3 Tank Changes**
 
  - We are carefully toning down both areas while keeping the idea behind it intact. Ilshavoh becomes weaker, and Othuum becomes stronger.
- - 
+ -
  **Ilshavoh**
 
 - Turret turn rate: 180°/s → 70°/s
@@ -617,7 +617,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
 
  **Aeon Frigates**
 
- - Will now be more effective vs hover, but not vs ships. 
+ - Will now be more effective vs hover, but not vs ships.
 
 - Hit points: 1800 → 1850
 - Damage per shot: 140 → 50
@@ -673,7 +673,7 @@ Increasing the energy cost of strategic bombers to avoid the ability to rush the
 **Other**
 
  **Quantum Gateway**
- 
+
 - We are reducing the adjacency bonus for mass fabricators next to Quantum Gates to a more normal level.
 - Tech 2 mass fabricator: 2.5% → 0.75%
 - Tech 3 mass fabricator: 15% → 2.25%
