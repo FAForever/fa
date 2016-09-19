@@ -132,7 +132,16 @@ DefaultProjectileWeapon = Class(Weapon) {
         if bp.FixBombTrajectory then
             local acc = CalculateBallisticAcceleration(self, proj)
             proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
+            
+            if bp.BombingLines > 1 then
+            self:CreateBombingLines()
+            end
         end
+    end,
+    
+    CreateBombingLines = function(self)
+    
+    
     end,
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
