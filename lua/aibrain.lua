@@ -650,10 +650,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- this part determiens the share condition
             if shareOption == "ShareAfterDeath" then -- Full Share
                 TransferOwnershipOfBorrowedUnits()
-            elseif shareOption == "TransferAfterDeath" then
-                TransferOwnershipOfBorrowedUnits()
-                TargetBrains = GetAlliesBrains()
-                TransferUnitsToHighestBrain(TargetBrains)
             elseif shareOption == "CivilianDeserter" then
                 TransferOwnershipOfBorrowedUnits()
                 TargetBrains = GetCiviliansBrains()

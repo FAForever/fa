@@ -387,11 +387,6 @@ globalOpts = {
                 key = 'ShareUntilDeath',
             },
             {
-                text = "<LOC lobui_0760>Transfer After Death",
-                help = "<LOC lobui_0761>All your units will be transfered to your ally with the highest score when you die.",
-                key = 'TransferAfterDeath',
-            },
-            {
                 text = "<LOC lobui_0762>Gain Control",
                 help = "<LOC lobui_0763>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
                 key = 'TransferToKiller',
