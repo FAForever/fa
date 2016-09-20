@@ -7827,6 +7827,7 @@ OPTIONS_0252="Time in milliseconds until hotbuild cycle will reset"
 OPTIONS_0253="Replaces the default strategic build icons with something more visible."
 OPTIONS_0254="Bigger icons"
 OPTIONS_0255="Bigger icons with TechMarker"
+OPTIONS_0259="Allows middle clicking idle engineer avatars to select all idle engineers on screen."
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"

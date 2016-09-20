@@ -2041,8 +2041,8 @@ Tooltips = {
         description = 'Allows factory build queues to be reordered with drag and drop.',
     },
     options_gui_idle_engineer_avatars = {
-        title = 'Middle Click Avatars',
-        description = 'Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
+        title = '<LOC OPTIONS_0232>Middle Click Avatars',
+        description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
         title = 'All Race Templates',
