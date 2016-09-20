@@ -581,7 +581,9 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     filterName.Height:Set(22)
     filterName:SetFont(UIUtil.bodyFont, 16)
     filterName:SetForegroundColor(UIUtil.fontColor)
-    filterName:ShowBackground(false)
+    filterName:ShowBackground(true)
+    filterName:SetBackgroundColor('77778888')
+    filterName:SetCaretColor('ffff9999')
     filterName:SetDropShadow(true)
     LayoutHelpers.Below(filterName, namefilterTitle)
 
