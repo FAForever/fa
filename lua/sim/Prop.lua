@@ -13,7 +13,8 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-local minimumLabelMass = 10
+RECLAIM_TIME_BASE = 5
+RECLAIMLABEL_MIN_MASS = 20
 
 Prop = Class(moho.prop_methods, Entity) {
 
@@ -197,7 +198,7 @@ Prop = Class(moho.prop_methods, Entity) {
     SetMaxReclaimValues = function(self, time, mass, energy)
         self.MaxMassReclaim = mass
         self.MaxEnergyReclaim = energy
-        self.TimeReclaim = time
+        self.TimeReclaim = time * RECLAIM_TIME_BASE
 
         self:UpdateReclaimLeft()
     end,
