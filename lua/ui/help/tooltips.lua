@@ -2037,8 +2037,8 @@ Tooltips = {
         description = 'Allows SCUs to be upgraded automatically or in a single click.',
     },
     options_gui_draggable_queue = {
-        title = 'Draggable Build Queue',
-        description = 'Allows factory build queues to be reordered with drag and drop.',
+        title = '<LOC OPTIONS_0231>Draggable Build Queue',
+        description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
     },
     options_gui_idle_engineer_avatars = {
         title = 'Middle Click Avatars',
