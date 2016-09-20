@@ -1868,9 +1868,9 @@ local function UpdateGame()
 
         local mapTooltip = {
             text = scenarioInfo.name,
-            body = '- Map version : '..TTips_map_version..'\n '..
-                   '- Max Players : '..TTips_army..' max'..'\n '..
-                   '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
+            body = '- '..LOC("<LOC lobui_0759>Map version")..' : '..TTips_map_version..'\n '..
+                   '- '..LOC("<LOC lobui_0760>Max Players")..' : '..TTips_army..' max'..'\n '..
+                   '- '..LOC("<LOC lobui_0761>Map Size")..' : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
         }
 
         Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)

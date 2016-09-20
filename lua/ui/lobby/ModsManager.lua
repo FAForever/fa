@@ -329,7 +329,7 @@ function CreateModsFilter(parent, tag)
 end
     
 local function UpdateModsCounters()
-    subtitle:SetText(LOCF("%d game mods and %d UI mods activated", numEnabledSimMods, numEnabledUIMods))
+    subtitle:SetText(LOCF("<LOC uimod_0027>%d game mods and %d UI mods activated", numEnabledSimMods, numEnabledUIMods))
 end
 
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
