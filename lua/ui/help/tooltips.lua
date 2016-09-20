@@ -2045,8 +2045,8 @@ Tooltips = {
         description = 'Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
-        title = 'All Race Templates',
-        description = 'Allows build templates to be used across all 4 factions.',
+        title = '<LOC OPTIONS_0233>All Race Templates',
+        description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
         title = 'Single Unit Selected Info',
