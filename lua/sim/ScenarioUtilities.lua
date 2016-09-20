@@ -322,7 +322,6 @@ function CreateSubGroup(tblNode, strArmy, strGroup, ...)
     return platoonList, tblResult, treeResult
 end
 
-
 ----[  CreateInitialArmyGroup                                                     ]--
 ----[                                                                             ]--
 function CreateInitialArmyGroup(strArmy, createCommander)
@@ -337,6 +336,17 @@ function CreateInitialArmyGroup(strArmy, createCommander)
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
                 cdrUnit:HideBone(0, true)
                 ForkThread(CommanderWarpDelay, cdrUnit, 3)
+            end
+
+            local rotateOpt = ScenarioInfo.Options['RotateACU']
+            if not rotateOpt or rotateOpt == 'On' then
+                cdrUnit:RotateTowardsMid()
+            elseif rotateOpt == 'Marker' then
+                local marker = GetMarker(strArmy) or {}
+                if marker['orientation'] then
+                    local o = EulerToQuaternion(unpack(marker['orientation']))
+                    cdrUnit:SetOrientation(o, true)
+                end
             end
         end
     end
