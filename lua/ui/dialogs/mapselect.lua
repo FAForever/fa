@@ -933,9 +933,9 @@ function SetDescription(scen)
     end
 
     if MapUtil.CheckMapHasMarkers(scen) then
-        description:AddItem("AI Markers: Yes")
+        description:AddItem(LOC("<LOC lobui_0757>AI Markers: Yes"))
     else
-        description:AddItem("AI Markers: No")
+        description:AddItem(LOC("<LOC lobui_0758>AI Markers: No"))
     end
 
     description:AddItem("")

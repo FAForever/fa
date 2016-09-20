@@ -12,12 +12,12 @@ local Dragger = import('/lua/maui/dragger.lua').Dragger
 
 local TooltipInfo = {
 	Combat = {
-		title = 'Combat Upgrade Path',
-		description = 'Upgrades all idle unupgraded SCUs along the combat path. Right click to configure (select an SCU first!).',
+		title = '<LOC SCUMAN_0001>Combat Upgrade Path',
+		description = '<LOC SCUMAN_0002>Upgrades all idle unupgraded SCUs along the combat path. Right click to configure (select an SCU first!).',
 	},
 	Engineer = {
-		title = 'Engineer Upgrade Path',
-		description = 'Upgrades all idle unupgraded SCUs along the engineer path. Right click to configure (select an SCU first!).',
+		title = '<LOC SCUMAN_0003>Engineer Upgrade Path',
+		description = '<LOC SCUMAN_0004>Upgrades all idle unupgraded SCUs along the engineer path. Right click to configure (select an SCU first!).',
 	},
 }
 	
