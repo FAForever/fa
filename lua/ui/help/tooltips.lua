@@ -2049,8 +2049,8 @@ Tooltips = {
         description = 'Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
-        title = 'Single Unit Selected Info',
-        description = 'Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
+        title = '<LOC OPTIONS_0234>Single Unit Selected Info',
+        description = '<LOC OPTIONS_0261>Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
     },
     options_gui_enhanced_unitrings = {
         title = 'Single Unit Selected Rings',
