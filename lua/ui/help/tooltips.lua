@@ -2053,8 +2053,8 @@ Tooltips = {
         description = 'Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
     },
     options_gui_enhanced_unitrings = {
-        title = 'Single Unit Selected Rings',
-        description = 'When a single unit is selected, show that units range rings.',
+        title = '<LOC OPTIONS_0235>Single Unit Selected Rings',
+        description = '<LOC OPTIONS_0262>When a single unit is selected, show that units range rings.',
     },
     options_gui_templates_factory = {
         title = 'Factory Build Queue Templates',
