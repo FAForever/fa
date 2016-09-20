@@ -203,6 +203,10 @@ TreeGroup = Class(Prop) {
     end,
 
     OnCollision = function(self, other, vec)
+        if IsUnit(other) and EntityCategoryContains(categories.ENGINEER-(categories.COMMAND+categories.SUBCOMMANDER), other) then
+            return false
+        end
+
         self:Breakup()
     end,
 
