@@ -2033,8 +2033,8 @@ Tooltips = {
         description = 'Allows build templates to be rotated with the middle mouse button.',
     },
     options_gui_scu_manager = {
-        title = 'SCU Manager',
-        description = 'Allows SCUs to be upgraded automatically or in a single click.',
+        title = '<LOC OPTIONS_0230>SCU Manager',
+        description = '<LOC OPTIONS_0257>Allows SCUs to be upgraded automatically or in a single click.',
     },
     options_gui_draggable_queue = {
         title = 'Draggable Build Queue',
