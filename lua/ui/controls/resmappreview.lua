@@ -234,6 +234,8 @@ ResourceMapPreview = Class(Group) {
 
         if hideColours then
             marker:SetColor("00777777")
+            self.ratingLabel[slot]:Hide()
+            self.ratingLabel[slot].isHidden = true
         else
             -- If spawns are fixed, show the colour/team of the person in this slot.
             if playerInfo then
@@ -242,6 +244,16 @@ ResourceMapPreview = Class(Group) {
             else
                 marker:Clear()
             end
+
+            -- Set text to rating, or name if AI, or empty if nil playerInfo (Emptying slot)
+            local text
+            if playerInfo.Human then
+                text = playerInfo.PL
+            else
+                text = playerInfo.PlayerName or ""
+            end
+
+            self.ratingLabel[slot]:SetText(text)
         end
 
         -- Set text to rating, or name if AI, or empty if nil playerInfo (Emptying slot)
