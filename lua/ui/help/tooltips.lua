@@ -2029,8 +2029,8 @@ Tooltips = {
         description = '<LOC OPTIONS_0253>Replaces the default strategic build icons with something more visible.',
     },
     options_gui_template_rotator = {
-        title = 'Template Rotation',
-        description = 'Allows build templates to be rotated with the middle mouse button.',
+        title = '<LOC OPTIONS_0229>Template Rotation',
+        description = '<LOC OPTIONS_0256>Allows build templates to be rotated with the middle mouse button.',
     },
     options_gui_scu_manager = {
         title = 'SCU Manager',
