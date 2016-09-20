@@ -255,16 +255,6 @@ ResourceMapPreview = Class(Group) {
 
             self.ratingLabel[slot]:SetText(text)
         end
-
-        -- Set text to rating, or name if AI, or empty if nil playerInfo (Emptying slot)
-        local text
-        if playerInfo.Human then
-            text = playerInfo.PL
-        else
-            text = playerInfo.PlayerName or ""
-        end
-
-        self.ratingLabel[slot]:SetText(text)
     end,
 
     OnDestroy = function(self)
