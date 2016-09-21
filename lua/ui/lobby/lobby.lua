@@ -869,6 +869,12 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.ratingText:SetText(playerInfo.PL)
     slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
 
+    -- dynamic tooltip to show rating and deviation for each player
+    local tooltipText = {}
+    tooltipText['text'] = "Rating"
+    tooltipText['body'] = LOCF("<LOC lobui_0762>Your Rating is %s +/- %s", playerInfo.PL, playerInfo.DEV)
+    slot.tooltiprating = Tooltip.AddControlTooltip(slot.ratingText, tooltipText)
+
     slot.numGamesText:Show()
     slot.numGamesText:SetText(playerInfo.NG)
 
@@ -2162,7 +2168,6 @@ function CreateSlotsUI(makeLabel)
         ratingText:SetColor('B9BFB9')
         ratingText:SetDropShadow(true)
         newSlot:AddChild(ratingText)
-        newSlot.tooltiprating = Tooltip.AddControlTooltip(ratingText, 'rating')
 
         -- NumGame
         local numGamesText = UIUtil.CreateText(newSlot, "", 14, 'Arial')

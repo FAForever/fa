@@ -7602,6 +7602,7 @@ lobui_0764="Civilian Desertion"
 lobui_0765="your units will be transferred to the Civilian AI, if there is one, when you die. Previously transferred units will stay where they are."
 lobui_0766="Defectors"
 lobui_0767="Your units will be transferred to the enemy with the highest score when you die. Previously transferred units will stay where they are."
+lobui_0768="Your rating is %s +/- %s"
 
 lobui_0592="Permetti osservatori"
 lobui_0593="Gli osservatori sono permessi dopo che il gioco e iniziato?"

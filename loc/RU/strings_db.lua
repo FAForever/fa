@@ -7778,6 +7778,7 @@ lobui_0764="Civilian Desertion"
 lobui_0765="your units will be transferred to the Civilian AI, if there is one, when you die. Previously transferred units will stay where they are."
 lobui_0766="Defectors"
 lobui_0767="Your units will be transferred to the enemy with the highest score when you die. Previously transferred units will stay where they are."
+lobui_0768="Your rating is %s +/- %s"
 
 # uimod_0010 in earlier but not sure if it should be changed
 uimod_0016="Включен игровой мод"
