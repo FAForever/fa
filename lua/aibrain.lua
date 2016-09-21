@@ -654,7 +654,7 @@ AIBrain = Class(moho.aibrain_methods) {
             else
                 TransferOwnershipOfBorrowedUnits(BrainCategories.Allies)
                 
-                if shareOption == "ShareAfterDeath" then -- Full Share
+                if shareOption == "FullShare" then -- Full Share
                     TransferUnitsToHighestBrain(BrainCategories.Allies)
                 elseif shareOption == "CivilianDeserter" then
                     TransferUnitsToBrain(BrainCategories.Civilians)
@@ -662,6 +662,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     TransferUnitsToKiller()
                 elseif shareOption == "Defectors" then
                     TransferUnitsToHighestBrain(BrainCategories.Enemies)
+                end
             end
 
             -- Kill all units left over

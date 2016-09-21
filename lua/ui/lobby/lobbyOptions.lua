@@ -378,27 +378,27 @@ globalOpts = {
         values = {
             {
                 text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>You can give units to your allies and they will not be destroyed when you die.",
-                key = 'ShareAfterDeath',
+                help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
+                key = 'FullShare',
             },
             {
                 text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>Destroy all the units you shared to your allies and send back the units your allies shared with you when you die.",
+                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
                 key = 'ShareUntilDeath',
             },
             {
                 text = "<LOC lobui_0762>Gain Control",
-                help = "<LOC lobui_0763>Units controlled by you are transferred to the control of your enemy. Units built by you and transferred to another player before death stay where they are.",
+                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer. Previously transferred units will stay where they are.",
                 key = 'TransferToKiller',
             },
             {
                 text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>All your units will be transfered to your enemy with the highest score when you die.",
+                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die. Previously transferred units will stay where they are.",
                 key = 'Defectors',
             },
             {
                 text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>After your dead all units will desert to civilians, given that civilian armies exist on the map, otherwise they will die.",
+                help = "<LOC lobui_0765>your units will be transferred to the Civilian AI, if there is one, when you die. Previously transferred units will stay where they are.",
                 key = 'CivilianDeserter',
             },
         },
