@@ -1103,20 +1103,6 @@ local function GetRandomFactionIndex(slotNumber)
     return randomfaction
 end
 
-local function AssignRandomFactions()
-    for index, player in gameInfo.PlayerOptions do
-        -- No random if there is only 1 option
-        if table.getn(GUI.slots[index].AvailableFactions) >= 2 then
-            local randomFactionID = table.getn(GUI.slots[index].AvailableFactions)
-            -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
-            -- the random faction ID if they have supcom
-            if player.Faction >= randomFactionID then
-                player.Faction = GetRandomFactionIndex(index)
-            end
-        end
-    end
-end
-
 -- Convert the local (slot dependend) faction indexes to the global faction indexes
 local function FixFactionIndexes()
     for index, player in gameInfo.PlayerOptions do
@@ -1545,19 +1531,28 @@ end
 
 local function AssignAINames()
     local aiNames = import('/lua/ui/lobby/aiNames.lua').ainames
+    local factions = FactionData.Factions
     local nameSlotsTaken = {}
+
     for index, faction in FactionData.Factions do
         nameSlotsTaken[index] = {}
     end
+
     for index, player in gameInfo.PlayerOptions do
         if not player.Human then
-            local playerFaction = player.Faction
-            local factionNames = aiNames[FactionData.Factions[playerFaction].Key]
+            local randomFactionId = table.getsize(FactionData.Factions)
+            local faction  = player.Faction
+
+            if faction >= randomFactionId then
+                faction = GetRandomFactionIndex()
+            end
+
+            local factionNames = aiNames[factions[faction].Key]
             local ranNum
             repeat
                 ranNum = math.random(1, table.getn(factionNames))
-            until nameSlotsTaken[playerFaction][ranNum] == nil
-            nameSlotsTaken[playerFaction][ranNum] = true
+            until nameSlotsTaken[faction][ranNum] == nil
+            nameSlotsTaken[faction][ranNum] = true
             player.PlayerName = factionNames[ranNum] .. " (" .. player.PlayerName .. ")"
         end
     end

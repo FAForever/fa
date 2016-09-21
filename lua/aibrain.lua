@@ -217,6 +217,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.PreBuilt = true
     end,
 
+    GetFactionIndex = function(self)
+        return self.realFaction or moho.aibrain_methods.GetFactionIndex(self)
+    end,
+
     HideFaction = function(self)
         if self.realFaction then return end
         self.realFaction = self:GetFactionIndex()
