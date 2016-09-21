@@ -548,6 +548,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
             local function RemovePlatoonHandleFromUnit(units)
+                if not SorianAI then return end
                 for _,unit in units do
                     if not unit.Dead then
                         if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
@@ -564,9 +565,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     for k,brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
-                            if SorianAI ~= nil then
-                                RemovePlatoonHandleFromUnit(units)
-                            end
+                            RemovePlatoonHandleFromUnit(units)
                             TransferUnitsOwnership(units, brain.index)
                             WaitSeconds(1)
                         end
@@ -583,9 +582,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 local KillerIndex = 0
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                 if units and table.getn(units) > 0 then
-                    if SorianAI ~= nil then
-                        RemovePlatoonHandleFromUnit(units)
-                    end
+                    RemovePlatoonHandleFromUnit(units)
                     if victoryOption == 'demoralization' then
                         KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.COM or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
@@ -598,9 +595,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
             local function ReturnBorrowedUnits()
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                if SorianAI ~= nil then
-                    RemovePlatoonHandleFromUnit(units)
-                end
+                RemovePlatoonHandleFromUnit(units)
                 local borrowed = {}
                 for index,unit in units do
                     local oldowner = unit.oldowner
