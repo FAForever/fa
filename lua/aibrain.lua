@@ -519,10 +519,6 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.BrainType == 'AI' then
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
         end
-        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-        if string.find(per, 'sorian') then
-            SUtils.GiveAwayMyCrap(self)
-        end
         ------end sorian AI bit
 
         SetArmyOutOfGame(self:GetArmyIndex())
@@ -531,57 +527,124 @@ AIBrain = Class(moho.aibrain_methods) {
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
-            local allies = {}
+            WaitSeconds(10) -- Wait for commander explosion, then transfer units.
             local selfIndex = self:GetArmyIndex()
-            WaitSeconds(10)
-            -- this part determiens the share condition
-            local shareOption = ScenarioInfo.Options.Share or "no"
-            -- "no" means full share
-            if shareOption == "no" then
-                -- this part determines who the allies are
+            local SorianAI = string.find(ScenarioInfo.ArmySetup[self.Name].AIPersonality, 'sorian')
+            local shareOption = ScenarioInfo.Options.Share
+            local victoryOption = ScenarioInfo.Options.Victory
+            local BrainCategories = {Enemies = {}, Civilians = {}}
+            local function TransferOwnershipOfBorrowedUnits()
                 for index, brain in ArmyBrains do
-                    brain.index = index
-                    brain.score = CalculateBrainScore(brain)
-                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
-                        table.insert(allies, brain)
-                    end
-                end
-                -- This part determines which ally has the highest score and transfers ownership of all units to him
-                if table.getn(allies) > 0 then
-                    table.sort(allies, function(a,b) return a.score > b.score end)
-                    for k,v in allies do
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                    if selfIndex ~= index and IsAlly(selfIndex, index) and not brain:IsDefeated() then
+                        local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                         if units and table.getn(units) > 0 then
-                            TransferUnitsOwnership(units, v.index)
+                            for _,unit in units do
+                                if unit.oldowner == selfIndex then
+                                    unit.oldowner = nil
+                                end
+                            end
                         end
                     end
                 end
-            -- "yes" means share until death
-            elseif shareOption == "yes" then
-                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+            end
+            local function RemovePlatoonHandleFromUnit(units)
+                for _,unit in units do
+                    if not unit.Dead then
+                        if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
+                            unit.PlatoonHandle:Stop()
+                            unit.PlatoonHandle:PlatoonDisbandNoAssign()
+                        end
+                        IssueStop({unit})
+                        IssueClearCommands({unit})
+                    end
+                end
+            end
+            local function TransferUnitsToBrain(brains)
+                if table.getn(brains) > 0 then
+                    for k,brain in brains do
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if units and table.getn(units) > 0 then
+                            if SorianAI ~= nil then
+                                RemovePlatoonHandleFromUnit(units)
+                            end
+                            TransferUnitsOwnership(units, brain.index)
+                            WaitSeconds(1)
+                        end
+                    end
+                end
+            end
+            local function TransferUnitsToHighestBrain(brains)
+                if table.getn(brains) > 0 then
+                    table.sort(brains, function(a,b) return a.score > b.score end)
+                    TransferUnitsToBrain(brains)
+                end
+            end
+            local function TransferUnitsToKiller()
+                local KillerIndex = 0
+                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                if units and table.getn(units) > 0 then
+                    if SorianAI ~= nil then
+                        RemovePlatoonHandleFromUnit(units)
+                    end
+                    if victoryOption == 'demoralization' then
+                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.COM or selfIndex
+                        TransferUnitsOwnership(units, KillerIndex)
+                    else
+                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.unit or selfIndex
+                        TransferUnitsOwnership(units, KillerIndex)
+                    end
+                end
+                WaitSeconds(1)
+            end
+            local function ReturnBorrowedUnits()
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                -- return borrowed units to their real owners
+                if SorianAI ~= nil then
+                    RemovePlatoonHandleFromUnit(units)
+                end
                 local borrowed = {}
                 for index,unit in units do
                     local oldowner = unit.oldowner
-                    if oldowner and oldowner ~= self:GetArmyIndex() then
-                        if not borrowed[oldowner] and not GetArmyBrain(oldowner):IsDefeated() then
+                    if oldowner and oldowner ~= self:GetArmyIndex() and not GetArmyBrain(oldowner):IsDefeated() then
+                        if not borrowed[oldowner] then
                             borrowed[oldowner] = {}
                         end
-
-                        if borrowed[oldowner] then
-                            table.insert(borrowed[unit.oldowner], unit)
-                        end
+                        table.insert(borrowed[unit.oldowner], unit)
                     end
                 end
+                for owner, unit in borrowed do
+                    TransferUnitsOwnership(unit, owner)
+                end
+                WaitSeconds(1)
+            end
 
-                for owner, units in borrowed do
-                    TransferUnitsOwnership(units, owner)
+            -- get all brains
+            for index, brain in ArmyBrains do
+                brain.index = index
+                brain.score = CalculateBrainScore(brain)
+                if ArmyIsCivilian(index) then
+                    table.insert(BrainCategories.Civilians, brain)
+                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) and not brain:IsDefeated() then
+                    table.insert(BrainCategories.Enemies, brain)
                 end
             end
 
-            WaitSeconds(0.1)
-
+            -- this part determiens the share condition
+            if shareOption == "ShareAfterDeath" then -- Full Share
+                TransferOwnershipOfBorrowedUnits()
+            elseif shareOption == "CivilianDeserter" then
+                TransferOwnershipOfBorrowedUnits()
+                TransferUnitsToBrain(BrainCategories.Civilians)
+            elseif shareOption == "TransferToKiller" then
+                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                TransferUnitsToKiller()
+            elseif shareOption == "Defectors" then
+                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                TransferUnitsToHighestBrain(BrainCategories.Enemies)
+            elseif shareOption == "ShareUntilDeath" then
+                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                ReturnBorrowedUnits()
+            end
+            -- Kill all units who left over.
             local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
             if tokill and table.getn(tokill) > 0 then
                 for index, unit in tokill do
@@ -610,7 +673,6 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         ------end Sorian AI bit 2
     end,
-
     OnVictory = function(self)
         self:SetResult("victory")
     end,
