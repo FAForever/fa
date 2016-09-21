@@ -1233,7 +1233,10 @@ Unit = Class(moho.unit_methods) {
 
         --Notify instigator of kill
         if instigator and IsUnit(instigator) then
+            ArmyBrains[self:GetArmy()]:SetUnitStat('LastKilled', "unit", instigator:GetArmy())
             instigator:OnKilledUnit(self)
+        else
+            ArmyBrains[self:GetArmy()]:SetUnitStat('LastKilled', "unit", self:GetArmy())
         end
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
