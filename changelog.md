@@ -3,6 +3,9 @@ Patch 3660 (Upcoming)
 **Lobby**
 - Fixed team number switching slots alongside a player
 - Added new feature: Kick Reasons. When kicking a player from your lobby, you get a new dialog. You may type in a reason for the kick to notify the player. If you blank it, or leave the message as presented, it will play the old message. 
+- Fixed Cheat and Build multipliers for AIs showing 1.0 - 1.9 two times
+- Fixed rating labels being shown on the minimap when teams are not set to 'Fixed'
+- Made it clearer that there's a search filter in the map selection
 
 **Coop**
 - Fixed cinematics playing in coop games
@@ -21,6 +24,8 @@ Patch 3660 (Upcoming)
 - Fixed units being able to fire at aircraft docked inside carriers, damaging the carrier
 - Fixed games not ending properly with AIs
 - Fixed Continental not fying to nukes (Again)
+- Fixed upgraded structures not being targetable via radar blip
+- Fixed shared unit cap taking civilian armies into account when sharing on player death
 
 **UI**
 - Fixed UEF Engineering station strategic icon not matching the gtech level
@@ -31,6 +36,10 @@ Patch 3660 (Upcoming)
 - Fixed the scroll button in ACU enhancements freezing the tooltip popup action
 - Added mod icon support for various UI elements
 - Added build mode support for SCU presets
+- Fixed a large number of tooltips not having proper localization
+- Added some tooltips to features previously missing them
+- Added ability to toggle reclaim labels. Set to Alt-R by default. You may have to bind this manually in the F1 menu.
+- Massively improved reclaim label implementation to remove lag when zooming or panning
 
 **Other**
 - Removed obsolete strategic icons and corrected file paths inside Hotstats module
