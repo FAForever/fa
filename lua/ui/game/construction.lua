@@ -2279,7 +2279,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                                 return NewBPID
                             end
                         end
-                        return false
+                        return BPID
                     end
 
                     for templateIndex, template in templates do
