@@ -2409,6 +2409,7 @@ function CreateUI(maxPlayers)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
     end
+    Tooltip.AddButtonTooltip(GUI.LobbyOptions, 'lobby_click_Settings')
 
     -- Logo
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
