@@ -7596,6 +7596,7 @@ lobui_0758="AI Markers: No"
 lobui_0759="Map version"
 lobui_0760="Max Players"
 lobui_0761="Map Size"
+lobui_0762="Your rating is %s +/- %s"
 
 lobui_0592="Permetti osservatori"
 lobui_0593="Gli osservatori sono permessi dopo che il gioco e iniziato?"

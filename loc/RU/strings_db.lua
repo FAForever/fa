@@ -7770,6 +7770,7 @@ lobui_0758="AI Markers: No"
 lobui_0759="Map version"
 lobui_0760="Max Players"
 lobui_0761="Map Size"
+lobui_0762="Your rating is %s +/- %s"
 
 # uimod_0010 in earlier but not sure if it should be changed
 uimod_0016="Включен игровой мод"
