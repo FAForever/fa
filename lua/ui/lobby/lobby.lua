@@ -1209,7 +1209,7 @@ end
 
 function autobalance_quality(players)
     local teams = nil
-    local quality = nil
+    local quality = 0
 
     for _, p in players do
         local i = p['player']
@@ -1225,7 +1225,7 @@ function autobalance_quality(players)
         teams:addPlayer(team, player)
     end
 
-    if teams then
+    if teams and table.getn(teams:getTeams()) > 1 then
         quality = Trueskill.computeQuality(teams)
     end
 
