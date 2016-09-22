@@ -872,7 +872,7 @@ function SetSlotInfo(slotNum, playerInfo)
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
     tooltipText['text'] = "Rating"
-    tooltipText['body'] = LOCF("<LOC lobui_0762>Your Rating is %s +/- %s", playerInfo.PL, playerInfo.DEV)
+    tooltipText['body'] = LOCF("<LOC lobui_0768>Your Rating is %s +/- %s", playerInfo.PL, playerInfo.DEV)
     slot.tooltiprating = Tooltip.AddControlTooltip(slot.ratingText, tooltipText)
 
     slot.numGamesText:Show()
@@ -947,7 +947,7 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.KinderCountry:Show()
         slot.KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..playerInfo.Country..'.dds'))
 
-        Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=CountryTooltips[playerInfo.Country]})
+        Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=LOC(CountryTooltips[playerInfo.Country])})
     end
 
     UpdateSlotBackground(slotNum)
@@ -4310,7 +4310,7 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
         if event.Type == 'MouseEnter' then
             local slot = slotNumber
             Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue,
-            body='0=Fastest, 450=Slowest'}, delay, true)
+            body=LOC('<LOC lobui_0322>0=Fastest, 450=Slowest')}, delay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end

@@ -6,7 +6,7 @@
 -- These codes retrieved from: http://www.worldatlas.com/aatlas/ctycodes.htm
 
 tooltip = {
-    world = "Country not found. Please contact the development team on the forums, or ask a moderator for help",
+    world = "<LOC lobui_0430>Country not found. Please contact the development team on the forums, or ask a moderator for help",
     xinnony = "Xinnony's flag!",
     a1 = "Anonymous Proxy",
     a2 = "Satellite Provider",
