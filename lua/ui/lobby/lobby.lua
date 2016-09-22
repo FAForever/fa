@@ -2841,8 +2841,8 @@ function CreateUI(maxPlayers)
     local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     GUI.loadButton = loadButton
     UIUtil.setVisible(loadButton, singlePlayer)
-    LayoutHelpers.LeftOf(loadButton, launchGameButton, 10)
-    LayoutHelpers.AtVerticalCenterIn(loadButton, launchGameButton)
+    LayoutHelpers.AtHorizontalCenterIn(loadButton, GUI.gameoptionsButton)
+    LayoutHelpers.Below(loadButton, GUI.gameoptionsButton, 9)
     loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
