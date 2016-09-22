@@ -254,7 +254,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 55,
     Transport = {
         AirClass = true,
-        TransportClass = 2,
+        TransportClass = 1,
     },
     Veteran = {
         Level1 = 6,
