@@ -981,6 +981,10 @@ Tooltips = {
         title = "<LOC lobui_0618>Large Preview",
         description = "<LOC lobui_0619>Click to show a large map preview showing all the mass and hydrocarbon spots",
     },
+    lobby_click_Settings = {
+        title = "<LOC lobui_0611>Lobby Settings",
+        description = "<LOC lobui_0612>Change your lobby background or chat font size.",
+    },
     aitype_sorian = {
         title = "<LOC sorian_0001>AI: Sorian",
         description = "<LOC sorian_0002>A balanced AI. Good for 20x20+ maps.",
