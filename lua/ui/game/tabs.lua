@@ -556,8 +556,8 @@ function BuildContent(contentID)
 
         local isRanked = sessionInfo.Options.Ranked
 
+        local i = 1
         for index, buttonData in menus[contentID][tableID] do
-            local i = index
             if not isRanked or not buttonData.hideWhenRanked then
                 contentGroup.Buttons[i] = BuildButton(buttonData)
                 if gameOver and buttonData.disableOnGameOver then
@@ -569,6 +569,7 @@ function BuildContent(contentID)
                 else
                     LayoutHelpers.Below(contentGroup.Buttons[i], contentGroup.Buttons[i-1])
                 end
+                i = i + 1
             end
         end
 
