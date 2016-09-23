@@ -8,11 +8,10 @@
 local SOhwalliStrategicBombProjectile = import('/lua/seraphimprojectiles.lua').SOhwalliStrategicBombProjectile
 
 SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile) {
-    Collisions = {},
     OnCreate = function(self)
+        self.Collisions = {}
         SOhwalliStrategicBombProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self:CollideEntity(true)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
@@ -22,11 +21,15 @@ SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile) {
 
     OnCollisionCheck = function(self, other)
         -- If not myself, not already been hit, and is Air, damage it and continue without colliding and exploding.
-        if other ~= self and not self.Collisions[other:GetEntityId()] and EntityCategoryContains(categories.AIR, other) then
+        local id = other:GetEntityId()
+        if self.Collisions[id] then
+            return false
+        elseif other ~= self and EntityCategoryContains(categories.AIR, other) then
             Damage(self:GetLauncher() or self, self:GetPosition(), other, self.DamageData.DamageAmount, 'Normal')
+            self.Collisions[id] = true
             return false
         end
-        
+
         return SOhwalliStrategicBombProjectile.OnCollisionCheck(self, other)
     end,
 }
