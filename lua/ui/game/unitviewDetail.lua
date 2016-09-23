@@ -130,6 +130,10 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     end
 
     if View.Description then
+        -- If SubCommander enhancement, then remove extension. (ual0301_Engineer --> ual0301)
+        if string.find( bpID, '0301_' ) then
+            bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1 )
+        end
         local tempDescID = bpID.."-"..iconID
         if UnitDescriptions[tempDescID] and not string.find(bp.Name, 'Remove') then
             local tempDesc = LOC(UnitDescriptions[tempDescID])
