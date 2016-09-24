@@ -180,6 +180,10 @@ URL0402 = Class(CWalkingLandUnit) {
     end,
 
     DeathThread = function(self)
+        local wep = self:GetWeapon(1)
+        for k,v in wep.Beams do
+            v.Beam:Disable()
+        end
         self:PlayUnitSound('Destroyed')
         local army = self:GetArmy()
 
