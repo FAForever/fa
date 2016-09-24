@@ -331,7 +331,8 @@ UnitBlueprint {
             },
             Icon = 'heo',
             Name = '<LOC enhancements_0064>Remove Heavy Plasma Refractor',
-            NewDamageRadius = -4,
+            NewDamageRadius = -2,
+            NewMaxRadius = 25,
             Prerequisite = 'HighExplosiveOrdnance',
             RemoveEnhancements = {
                 'HighExplosiveOrdnance',
