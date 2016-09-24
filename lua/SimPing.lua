@@ -56,9 +56,9 @@ end
 function DoCallbacks(data)
     for army, brain in ArmyBrains do
         if IsVisible(data, army) then
-            ArmyBrains[army]:DoPingCallbacks( data )
+            brain:DoPingCallbacks( data )
             if not SUtils.IsAIArmy(data.Owner) then
-                ArmyBrains[army]:DoAIPing( data )
+                brain:DoAIPing( data )
             end
         end
     end
