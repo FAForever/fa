@@ -347,7 +347,7 @@ globalOpts = {
             },
             {
                 text = "<LOC lobui_0554>All Maps",
-                help = "<LOC lobui_0555>Random map set",
+                help = "<LOC lobui_0557>Random map set",
                 key = 'All',
             },
         },
