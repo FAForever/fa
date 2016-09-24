@@ -4607,9 +4607,9 @@ function ShowLobbyOptionsDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
     end
     --
-    local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
+    local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)
-    Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
+    Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text=LOC('<LOC lobui_0402>Windowed mode'), body=LOC("<LOC lobui_0403>")})
     cbox_WindowedLobby.OnCheck = function(self, checked)
         local option
         if checked then
@@ -4621,9 +4621,9 @@ function ShowLobbyOptionsDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
+    local cbox_StretchBG = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0400>Stretch Background"))
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialogContent, 20, 68)
-    Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
+    Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text=LOC('<LOC lobui_0400>Stretch Background'), body=LOC("<LOC lobui_0401>")})
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
             Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'true')
