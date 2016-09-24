@@ -35,7 +35,7 @@ URL0402 = Class(CWalkingLandUnit) {
         LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
         Torpedo = Class(CANTorpedoLauncherWeapon) {},
     },
-    
+
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
         if not self.AnimationManipulator then
@@ -44,87 +44,87 @@ URL0402 = Class(CWalkingLandUnit) {
         end
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
     end,
-     
+
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
         if self.AnimationManipulator then
             self:SetUnSelectable(true)
             self.AnimationManipulator:SetRate(1)
-            
+
             self:ForkThread(function()
                 WaitSeconds(self.AnimationManipulator:GetAnimationDuration()*self.AnimationManipulator:GetRate())
                 self:SetUnSelectable(false)
                 self.AnimationManipulator:Destroy()
             end)
-        end        
+        end
         self:SetMaintenanceConsumptionActive()
     end,
 
-	OnLayerChange = function(self, new, old)
-		CWalkingLandUnit.OnLayerChange(self, new, old)
+    OnLayerChange = function(self, new, old)
+        CWalkingLandUnit.OnLayerChange(self, new, old)
         self:CreateUnitAmbientEffect(new)
         if new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
         else
             self:DisableUnitIntel('Layer', 'Sonar')
         end
-	end,
-	
+    end,
+
     AmbientExhaustBones = {
-		'Exhaust01',
-		'Exhaust02',
-		'Exhaust03',
-		'Exhaust06',
-		'Exhaust05',
-    },	
-    
+        'Exhaust01',
+        'Exhaust02',
+        'Exhaust03',
+        'Exhaust06',
+        'Exhaust05',
+    },
+
     AmbientLandExhaustEffects = {
-		'/effects/emitters/dirty_exhaust_smoke_02_emit.bp',
-		'/effects/emitters/dirty_exhaust_sparks_02_emit.bp',			
-	},
-	
+        '/effects/emitters/dirty_exhaust_smoke_02_emit.bp',
+        '/effects/emitters/dirty_exhaust_sparks_02_emit.bp',
+    },
+
     AmbientSeabedExhaustEffects = {
-		'/effects/emitters/underwater_vent_bubbles_02_emit.bp',			
-	},	
-	
-	CreateUnitAmbientEffect = function(self, layer)
-	    if( self.AmbientEffectThread ~= nil ) then
-	       self.AmbientEffectThread:Destroy()
-        end	 
+        '/effects/emitters/underwater_vent_bubbles_02_emit.bp',
+    },
+
+    CreateUnitAmbientEffect = function(self, layer)
+        if( self.AmbientEffectThread ~= nil ) then
+           self.AmbientEffectThread:Destroy()
+        end
         if self.AmbientExhaustEffectsBag then
             EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
-        end        
-        
+        end
+
         self.AmbientEffectThread = nil
-        self.AmbientExhaustEffectsBag = {} 
-	    if layer == 'Land' then
-	        self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
-	    elseif layer == 'Seabed' then
-	        local army = self:GetArmy()
-			for kE, vE in self.AmbientSeabedExhaustEffects do
-				for kB, vB in self.AmbientExhaustBones do
-					table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
-				end
-			end	        
-	    end          
-	end, 
-	
-	UnitLandAmbientEffectThread = function(self)
-		while not self:IsDead() do
-            local army = self:GetArmy()			
-			
-			for kE, vE in self.AmbientLandExhaustEffects do
-				for kB, vB in self.AmbientExhaustBones do
-					table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
-				end
-			end
-			
-			WaitSeconds(2)
-			EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
-							
-			WaitSeconds(utilities.GetRandomFloat(1,7))
-		end		
-	end,
+        self.AmbientExhaustEffectsBag = {}
+        if layer == 'Land' then
+            self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
+        elseif layer == 'Seabed' then
+            local army = self:GetArmy()
+            for kE, vE in self.AmbientSeabedExhaustEffects do
+                for kB, vB in self.AmbientExhaustBones do
+                    table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
+                end
+            end
+        end
+    end,
+
+    UnitLandAmbientEffectThread = function(self)
+        while not self:IsDead() do
+            local army = self:GetArmy()
+
+            for kE, vE in self.AmbientLandExhaustEffects do
+                for kB, vB in self.AmbientExhaustBones do
+                    table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
+                end
+            end
+
+            WaitSeconds(2)
+            EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
+
+            WaitSeconds(utilities.GetRandomFloat(1,7))
+        end
+    end,
 
     OnKilled = function(self, inst, type, okr)
         if self.AmbientExhaustEffectsBag then
@@ -151,7 +151,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
             local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
                 :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
-        end        
+        end
     end,
 
     CreateFirePlumes = function( self, army, bones, yBoneOffset )
@@ -160,13 +160,13 @@ URL0402 = Class(CWalkingLandUnit) {
         for k, vBone in bones do
             position = self:GetPosition(vBone)
             offset = utilities.GetDifferenceVector( position, basePosition )
-            velocity = utilities.GetDirectionVector( position, basePosition ) -- 
+            velocity = utilities.GetDirectionVector( position, basePosition ) --
             velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat( 0.0, 0.3)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
             proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
-            
+
             local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
             local lifetime = utilities.GetRandomFloat( 12, 22 )
@@ -196,7 +196,7 @@ URL0402 = Class(CWalkingLandUnit) {
         self:CreateExplosionDebris( army )
 
         WaitSeconds(1)
-        
+
         -- Create damage effects on turret bone
         CreateDeathExplosion( self, 'Center_Turret', 1.5)
         self:CreateDamageEffects( 'Center_Turret_B01', army )
@@ -215,8 +215,8 @@ URL0402 = Class(CWalkingLandUnit) {
         self:ShakeCamera(50, 5, 0, 1)
         CreateDeathExplosion( self, 'Left_Turret_Muzzle', 1)
         for k, v in EffectTemplate.FootFall01 do
-            CreateAttachedEmitter(self,'Center_Turret_Muzzle',army, v):ScaleEmitter(2)          
-            CreateAttachedEmitter(self,'Center_Turret_Muzzle',army, v):ScaleEmitter(2) 
+            CreateAttachedEmitter(self,'Center_Turret_Muzzle',army, v):ScaleEmitter(2)
+            CreateAttachedEmitter(self,'Center_Turret_Muzzle',army, v):ScaleEmitter(2)
         end
 
 
@@ -238,17 +238,17 @@ URL0402 = Class(CWalkingLandUnit) {
         self:CreateFirePlumes( army, {'Left_Projectile01'}, -1 )
         self:CreateDamageEffects( 'Right_Turret', army )
         WaitSeconds(0.5)
-        
+
         CreateDeathExplosion( self, 'Left_Leg0' .. Random(1,3) .. '_B0' .. Random(1,3), 0.25)
         self:CreateDamageEffects( 'Right_Leg01_B03', army )
         WaitSeconds(0.5)
         CreateDeathExplosion( self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris( army )
-        
+
         CreateDeathExplosion( self, 'Right_Leg0' .. Random(1,3) .. '_B0' .. Random(1,3), 0.25)
         self:CreateDamageEffects( 'Right_Projectile0' .. Random(1,2), army )
         WaitSeconds(0.5)
-        
+
         CreateDeathExplosion( self, 'Left_Leg0' .. Random(1,3) .. '_B0' .. Random(1,3), 0.25)
         CreateDeathExplosion( self, 'Left_Projectile01', 2 )
         self:CreateDamageEffects( 'Left_Leg03_B03', army )
