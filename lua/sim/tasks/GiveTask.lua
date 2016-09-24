@@ -6,7 +6,6 @@ local SpawnPing = import('/lua/SimPing.lua').SpawnPing
 
 local transferList =  {}
 GiveTask = Class(ScriptTask) {
-    transferList = {},
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
 
