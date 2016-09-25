@@ -114,7 +114,6 @@ UnitBlueprint {
         'CONSTRUCTION',
         'REPAIR',
         'RECLAIM',
-        'REBUILDER',
         'BUILTBYQUANTUMGATE',
         'PODSTAGINGPLATFORM',
         'ENGINEER',
