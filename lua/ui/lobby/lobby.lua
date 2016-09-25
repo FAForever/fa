@@ -2409,7 +2409,7 @@ function CreateUI(maxPlayers)
     GUI.ModFeaturedLabel:StreamText(modLabels[argv.initName] or "", 20)
 
     -- Lobby options panel
-    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Settings")
+    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', LOC("<LOC tooltipui0705>Settings"))
     LayoutHelpers.AtRightTopIn(GUI.LobbyOptions, GUI.panel, 44, 3)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
@@ -4633,7 +4633,7 @@ function ShowLobbyOptionsDialog()
         RefreshLobbyBackground()
     end
     -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 10)
 
@@ -4679,7 +4679,7 @@ function ShowPresetDialog()
     GUI.presetDialog = presetDialog
 
     -- Title
-    local titleText = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
+    local titleText = UIUtil.CreateText(dialogContent, LOC('<LOC tooltipui0694>Lobby Presets'), 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
     LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
 
@@ -4709,22 +4709,22 @@ function ShowPresetDialog()
     LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
 
     -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load")
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Load>Load")
     LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
     LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
     LoadButton:Disable()
 
     -- Create button. Occupies the same space as the load button, when available.
-    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create")
+    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Create>Create")
     LayoutHelpers.RightOf(CreateButton, LoadButton, 28)
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save")
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Save>Save")
     LayoutHelpers.RightOf(SaveButton, CreateButton, 28)
     SaveButton:Disable()
 
     -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete")
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Delete>Delete")
     LayoutHelpers.RightOf(DeleteButton, SaveButton, 28)
     DeleteButton:Disable()
 
@@ -4751,7 +4751,7 @@ function ShowPresetDialog()
             PresetList:OnClick(0)
         end
 
-        CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
+        CreateInputDialog(GUI, "<LOC tooltipui0704>Select name for new preset", dialogComplete)
     end
 
     SaveButton.OnClick = function(self)
@@ -4857,7 +4857,7 @@ function CreateHelpWindow()
     local textArea = TextArea(dialogContent, 400, 163)
     LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
     LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
-    textArea:SetText(import('/lua/ui/lobby/presetHelp.lua').helpText)
+    textArea:SetText(LOC("<LOC tooltipui0706>This dialog allows you to save a snapshot of the current game configuration and reload it later.\n\nOnce the game settings are as you want them, use the \"Create\" button on this dialog to store it. You can reload the stored configuration by selecting it and pressing the \"Load\" button.\n\nThe \"Save\" button will overwrite a selected existing preset with the current configuration."))
 
     -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")

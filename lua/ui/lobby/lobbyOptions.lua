@@ -342,12 +342,12 @@ globalOpts = {
             },
          {
                 text = "<LOC lobui_0553>Official Maps Only",
-                help = "<LOC lobui_0555>Random map set",
+                help = "<LOC lobui_0555>Select only official maps",
                 key = 'Official',
             },
             {
                 text = "<LOC lobui_0554>All Maps",
-                help = "<LOC lobui_0557>Random map set",
+                help = "<LOC lobui_0557>Select from all maps",
                 key = 'All',
             },
         },
