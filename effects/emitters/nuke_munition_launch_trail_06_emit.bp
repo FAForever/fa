@@ -11,7 +11,7 @@ EmitterBlueprint {
     AlignToBone = false,
     Flat = false,
     LODCutoff = -1.00,
-    EmitIfVisible = false,
+    EmitIfVisible = true,
     CatchupEmit = false,
     CreateIfVisible = false,
     SnapToWaterline = false,
