@@ -468,6 +468,14 @@ StructureUnit = Class(Unit) {
     end,
 
     OnKilled = function(self, instigator, type, overKillRatio)
+        local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
+        if scus[1] then
+            for _, u in scus do
+                u:SetFocusEntity(self)
+                self.Repairers[u:GetEntityId()] = u
+            end
+        end
+
         Unit.OnKilled(self, instigator, type, overKillRatio)
     end,
 
@@ -478,7 +486,8 @@ StructureUnit = Class(Unit) {
                 self.Repairers[id] = nil
             else
                 local focus = u:GetFocusUnit()
-                if focus == self and u:IsUnitState('Repairing') and not u:GetGuardedUnit() then -- not assist
+                if focus == self and ((u:IsUnitState('Repairing') and not u:GetGuardedUnit()) or
+                                      EntityCategoryContains(categories.SUBCOMMANDER, u)) then
                     table.insert(units, u)
                 end
             end
