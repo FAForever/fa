@@ -135,7 +135,6 @@ UnitBlueprint {
         'CONSTRUCTION',
         'REPAIR',
         'RECLAIM',
-        'REBUILDER',
         'BUILTBYQUANTUMGATE',
         'CAPTURE',
         'VISIBLETORECON',
