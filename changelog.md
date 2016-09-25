@@ -6,6 +6,9 @@ Patch 3660 (Upcoming)
 - Fixed Cheat and Build multipliers for AIs showing 1.0 - 1.9 two times
 - Fixed rating labels being shown on the minimap when teams are not set to 'Fixed'
 - Made it clearer that there's a search filter in the map selection
+- Added new unit share conditions for interesting new gameplay. "Full Share" and "Share Until Death" have been joined by "Gain Control", which gifts all your units to the player who killed you (Very interesting for FFA games), "Defectors", which is the opposite of Full Share, gifting your units to the highest scoring enemy, and "Civilian Desertion", which gifts your units to a neutral civilian AI, if there is one.
+- Improved the tooltip when hovering over your score in the lobby. It will now show a more detailed explanation including your rating deviation
+- Fixed the position of the load button in Skirmish mode when launching offline
 
 **Coop**
 - Fixed cinematics playing in coop games
@@ -26,6 +29,9 @@ Patch 3660 (Upcoming)
 - Fixed Continental not fying to nukes (Again)
 - Fixed upgraded structures not being targetable via radar blip
 - Fixed shared unit cap taking civilian armies into account when sharing on player death
+- Fixed UEF sACU AOE upgrade removal reducing the AOE too far
+- Fixed the Spiderbot's laser beam getting stuck on temporarily while the unit executed the death animation
+- Fixed the Cybran ACU wandering off long distance when told to assist various buildings with an enemy in the rough vicinity. It will still happen if the unit is much closer, but we should no longer have ACUs walking across the map to go kill themselves on enemy PD
 
 **UI**
 - Fixed UEF Engineering station strategic icon not matching the gtech level
@@ -40,6 +46,7 @@ Patch 3660 (Upcoming)
 - Added some tooltips to features previously missing them
 - Added ability to toggle reclaim labels. Set to Alt-R by default. You may have to bind this manually in the F1 menu.
 - Massively improved reclaim label implementation to remove lag when zooming or panning
+- Fixed a bug which caused the menu to block the top-left of the screen in ladder games
 
 **Other**
 - Removed obsolete strategic icons and corrected file paths inside Hotstats module
