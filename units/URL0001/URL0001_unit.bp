@@ -276,7 +276,7 @@ UnitBlueprint {
                     },
                 },
             },
-            PlayChargeFxAtDestination = false,
+            PlayChargeFxAtDestination = true,
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
             PlayTeleportInFx = true,
