@@ -40,6 +40,7 @@ UES0302 = Class(TSeaUnit) {
                 TAMPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
         },
+    },
 
         OnKilled = function(self)
             local wep1 = self:GetWeaponByLabel('HiroCannonFront')
@@ -68,6 +69,5 @@ UES0302 = Class(TSeaUnit) {
 
             TSeaUnit.OnKilled(self)
         end,
-    },
 }
 TypeClass = UES0302
