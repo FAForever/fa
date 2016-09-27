@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UES0307/UES0307_script.lua
-#**  Author(s):  Drew Staltman, Gordon Duclos, Greg Kohne
-#**
-#**  Summary  :  UEF Battleship Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+----------------------------------------------------------------------------
+--
+--  File     :  /cdimage/units/UES0307/UES0307_script.lua
+--  Author(s):  Drew Staltman, Gordon Duclos, Greg Kohne
+--
+--  Summary  :  UEF Battleship Script
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local WeaponsFile = import('/lua/terranweapons.lua')
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
@@ -40,7 +40,7 @@ UES0302 = Class(TSeaUnit) {
                 TAMPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
         },
-        
+
         OnKilled = function(self)
             local wep1 = self:GetWeaponByLabel('HiroCannonFront')
             local bp1 = wep1:GetBlueprint()
@@ -52,8 +52,8 @@ UES0302 = Class(TSeaUnit) {
             end
             for k, v in wep1.Beams do
                 v.Beam:Disable()
-            end     
-            
+            end
+
             local wep2 = self:GetWeaponByLabel('HiroCannonBack')
             local bp2 = wep2:GetBlueprint()
             if bp2.Audio.BeamStop then
@@ -65,9 +65,9 @@ UES0302 = Class(TSeaUnit) {
             for k, v in wep2.Beams do
                 v.Beam:Disable()
             end
-            
+
             TSeaUnit.OnKilled(self)
-        end,        
+        end,
     },
 }
 TypeClass = UES0302
