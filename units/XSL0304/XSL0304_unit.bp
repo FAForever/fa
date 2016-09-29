@@ -1,7 +1,6 @@
 UnitBlueprint {
     ResolvePath = true,
     AI = {
-        GuardScanRadius = 30,
         NeedUnpack = true,
     },
     Audio = {

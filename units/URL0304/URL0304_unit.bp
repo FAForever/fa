@@ -1,6 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 30,
         NeedUnpack = true,
     },
     Audio = {
