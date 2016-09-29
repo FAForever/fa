@@ -1562,10 +1562,19 @@ function UpdateAvailableSlots( numAvailStartSpots )
         return
     end
 
+    -- reopen slots in case the new map has more startpositions then the previous map.
+    if numOpenSlots < numAvailStartSpots then
+        for i = numOpenSlots + 1, numAvailStartSpots do
+            gameInfo.ClosedSlots[i] = nil
+            GUI.slots[i]:Show()
+            ClearSlotInfo(i)
+            DisableSlot(i)
+        end
+    end
     numOpenSlots = numAvailStartSpots
+
     for i = 1, numAvailStartSpots do
         if gameInfo.ClosedSlots[i] then
-            gameInfo.ClosedSlots[i] = nil
             GUI.slots[i]:Show()
             if not gameInfo.PlayerOptions[i] then
                 ClearSlotInfo(i)
