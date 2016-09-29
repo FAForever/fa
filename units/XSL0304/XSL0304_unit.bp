@@ -267,7 +267,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0.25,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 22,
+            MuzzleVelocity = 24,
             MuzzleVelocityReduceDistance = 85,
             ProjectileId = '/projectiles/SIFSuthanusArtilleryShell01/SIFSuthanusArtilleryShell01_proj.bp',
             ProjectilesPerOnFire = 1,

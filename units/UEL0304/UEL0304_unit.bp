@@ -240,7 +240,7 @@ UnitBlueprint {
             MinRadius = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 22,
+            MuzzleVelocity = 24,
             MuzzleVelocityReduceDistance = 85,
             ProjectileId = '/projectiles/TIFAntiMatterShells02/TIFAntiMatterShells02_proj.bp',
             ProjectileLifetime = 20,

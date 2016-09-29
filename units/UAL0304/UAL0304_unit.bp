@@ -227,7 +227,7 @@ UnitBlueprint {
             MinRadius = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 22,
+            MuzzleVelocity = 24,
             MuzzleVelocityReduceDistance = 85,
             ProjectileId = '/projectiles/AIFSonanceShell01/AIFSonanceShell01_proj.bp',
             ProjectilesPerOnFire = 1,
