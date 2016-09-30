@@ -7,22 +7,23 @@ local Button = import('/lua/maui/button.lua').Button
 local Text = import('/lua/maui/text.lua').Text
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-local score = import('/lua/ui/dialogs/score.lua')
 local scoreAccum = import('/lua/ui/game/scoreaccum.lua')
 local scoreData = scoreAccum.scoreData
 local scoreInterval = import('/lua/ui/game/scoreaccum.lua').scoreInterval
-
-page_active=false
-page_active_graph = false
-page_active_graph2 = false
-create_anime_graph=false
-create_anime_graph2=false
-graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
-bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
-bt_pos_top=160
-
 local gamemain = import('/lua/ui/game/gamemain.lua')
-local info_dialog = {   -- CHANGE THE TEXT IN DIALOG_TXT.LUA !!!!!
+
+local page_active=false
+local page_active_graph = false
+local page_active_graph2 = false
+local create_anime_graph=false
+local create_anime_graph2=false
+local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
+local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
+
+local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
+local chartInfoText = false
+
+local info_dialog = {
     {name="total units built", path={"general","built","count"},key=1},
     {name="units still alive", path={"general","currentunits","count"},key=2},
     {name="total energy in", path={"resources","energyin","total"},key=8},
@@ -30,11 +31,11 @@ local info_dialog = {   -- CHANGE THE TEXT IN DIALOG_TXT.LUA !!!!!
     {name="score", path={"general","score",false},key=5},
     {name="total kills", path={"general","kills","count"},key=6},
     {name="total lost", path={"general","lost","count"},key=7},
-    -- {name="energy all", path={"general","built","energy"},key=3},
+{name="energy all", path={"general","built","energy"},key=3},
     {name="energy rate", path={"resources","energyin","rate",fac_mul=10},key=59},
     {name="total energy out", path={"resources","energyout","total"},key=9},
     {name="total energy wasted", path={"resources","energyover",false},key=10},
-    -- {name="mass all", path={"general","built","mass"},key=4},
+{name="mass all", path={"general","built","mass"},key=4},
     {name="mass rate", path={"resources","massin","rate",fac_mul=10},key=59},
     {name="total mass out", path={"resources","massout","total"},key=12},
     {name="total mass wasted", path={"resources","massover",false},key=13},
@@ -53,15 +54,12 @@ local info_dialog = {   -- CHANGE THE TEXT IN DIALOG_TXT.LUA !!!!!
     { name= "units struct built", path={"units","structures","built"},key=26},
     {name= "units struct kills", path={"units","structures","kills"},key=27},
     {name= "units struct lost", path={"units","structures","lost"},key=28},
-    -- {name="units cdr built", path={"units","cdr","built"},key=29},
     {name="units cdr kills", path={"units","cdr","kills"},key=30},
     {name="units cdr lost", path={"units","cdr","lost"},key=31}
 }
 
 function mySkinnableFile(file)
-    -- Should be, but I have no idea where to place that file or what to do at all
-    -- return UIUtil.SkinnableFile(file)
-    return file
+    return UIUtil.SkinnableFile(file,true)
 end
 
 function modcontrols_trad(id)
@@ -87,11 +85,6 @@ function modcontrols_tooltips(parent,help_tips)
     end
 end
 
-local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
-
-local chartInfoText = false
-
---mySkinnableFile("/game/resources/mass_btn_up.dds")
 local histo={
     main_histo={
         [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="mass",
@@ -141,33 +134,30 @@ local histo={
         [4]={name="units built",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="xp",link="main_histo",
             data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="cdr"}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="xp"}}},
-        --[5]={name="units built",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds",label1="cdr",label2="",Tooltip="cdr",
         [6]={name="units built",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="struct",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="struct"} }}
     },
     kills_histo={
         [1]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="air",link="main_histo",
-                data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="air"}}},
+            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="air"}}},
         [2]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/land-icon.dds"),label1="land",label2="",Tooltip="land",link="main_histo",
-                data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="land"}}},
+            data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="land"}}},
         [3]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="naval",link="main_histo",
             data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="naval"}}},
         [4]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="xp",link="main_histo",
             data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="cdr"}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="xp"}}},
-        --[5]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds",label1="cdr",label2="",Tooltip="cdr",
         [6]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="struct",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="struct"} }}
     },
 }
 
 local main_graph={
-        [1]={name="score",path={"general","score",false}, index = 5},
-        [2]={name="mass",path={"resources","massin","total"}, index = 4},
-        [3]={name="energy",path={"resources","energyin","total"}, index = 3},
-        [4]={name="total_built",path={"general","built","count"}, index = 1},
-        [5]={name="total_kills",path={"general","kills","count"}, index = 6},
-        --{name="total_lost",path={"general","lost","count"}},
+    [1]={name="score",path={"general","score",false}, index = 5},
+    [2]={name="mass",path={"resources","massin","total"}, index = 4},
+    [3]={name="energy",path={"resources","energyin","total"}, index = 3},
+    [4]={name="total_built",path={"general","built","count"}, index = 1},
+    [5]={name="total_kills",path={"general","kills","count"}, index = 6},
 }
 
 function FillParentPreserveAspectRatioNoExpand(control, parent,offsetx,offsety)
@@ -201,7 +191,7 @@ end
 
 function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
     local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
-    LOG("Number of data found:",data_nbr)
+    --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     local data_histo=histo[name]
     local grp=Group(parent)
@@ -492,7 +482,7 @@ function return_value(periode,player,path)
         else val=scoreData.current[player][path[1]][path[2]][path[3]] end
     else
         if path[3]==nil or path[3]==false then val=scoreData.historical[periode][player][path[1]][path[2]]
-            else val=scoreData.historical[periode][player][path[1]][path[2]][path[3]] end
+        else val=scoreData.historical[periode][player][path[1]][path[2]][path[3]] end
     end
     if path.fac_mul != nil then val=val*path.fac_mul end
     if val==nil then val=-5 end
@@ -500,9 +490,9 @@ function return_value(periode,player,path)
 end
 
 function page_graph(parent)
-LOG("PAGE_GRAPH called")
+    --LOG("PAGE_GRAPH called")
     local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
-    LOG("Number of data found:",data_nbr)
+    --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     clean_view()
     page_active=Group(parent)
@@ -559,7 +549,7 @@ LOG("PAGE_GRAPH called")
             --LOG(repr(name))
             page_active_graph=create_graph(parent,tmp,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
             Title_score:SetText(modcontrols_trad(tmp_index))
-            LOG("-----------------------",tmp_index)
+            --LOG("-----------------------",tmp_index)
             return
         end
         i=i+1
@@ -569,7 +559,7 @@ end
 
 function page_bar(parent)
     local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
-    LOG("Number of data found:",data_nbr)
+    --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     clean_view()
     page_active=Group(parent)
@@ -598,7 +588,7 @@ end
 
 function page_dual(parent)
     local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
-    LOG("Number of data found:",data_nbr)
+    --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     page_active_graph=create_graph(parent,info_dialog[5].path,110,120,GetFrame(0).Right()-100,GetFrame(0).Bottom()/2-15)
     page_active_graph2=create_graph_bar(parent,"main_histo",90,GetFrame(0).Bottom()/2+40,GetFrame(0).Right()-100,GetFrame(0).Bottom()-110)
@@ -615,7 +605,7 @@ end
 -- xi,yi is the windows based on parent of the background
 function create_graph(parent,path,x1,y1,x2,y2)
     local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
-    LOG("Number of data found:",data_nbr)
+    --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     local player={} -- would be the name/color of the player in the left-top corner
     -- scoreInterval is the time between to data saved
@@ -681,12 +671,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
             if maxvalue<val then    maxvalue=val end
         end
     end
-    LOG(maxvalue)
+    --LOG(maxvalue)
     --arranging the highest value to be nice to see
     maxvalue=arrange(maxvalue*1.02)
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
-    LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
+    --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
     -- drawing the axies/quadrillage
     local j=1
     local quadrillage_horiz={}
@@ -754,10 +744,10 @@ function create_graph(parent,path,x1,y1,x2,y2)
         t=CurrentTime()
         WaitFrames(10)
         t1=CurrentTime()
-        LOG("------- calculating the timing of the frame")
-        LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
+        --LOG("------- calculating the timing of the frame")
+        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
         delta_refresh=(x2-x1)*(t1-t)/10*( (player_nbr+1)/4)
-        LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
+        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
         while periode<data_nbr do
             nbr=nbr+1
             periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
@@ -805,11 +795,11 @@ function create_graph(parent,path,x1,y1,x2,y2)
             graph[data.index][x2].Left:Set(x2)
             if data.y_factor != 0 then
                 val=return_value(math.floor((nbr-1)*inc_periode),data.index,path)
-                LOG("1st:",val)
+                --LOG("1st:",val)
                 ya=parent.Top() +y2 - val*factor
                 ya=graph[data.index][x-x1-size].Top()
                 local val=return_value(0,data.index,path)
-                LOG("2nd:",val)
+                --LOG("2nd:",val)
                 yb=parent.Top() +y2  - val*factor
                 if yb<y1 then yb=y1+2 end
                 if yb>y2 then yb=y2-2 end
@@ -820,7 +810,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 --else
                     graph[data.index][x2].Top:Set(parent.Top() +yb)
                 --end
-                LOG("x: ",x2,"  ya:",ya,"  yb:",yb)
+                --LOG("x: ",x2,"  ya:",ya,"  yb:",yb)
                 graph[data.index][x2].Right:Set( graph[data.index][x2].Left() +size )
                 graph[data.index][x2].Bottom:Set(parent.Top() +ya)
                 graph[data.index][x2]:SetSolidColor(data.color)
@@ -828,7 +818,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         end
         -- ========= end of the drawing of the graph
         t=CurrentTime()
-        LOG("total time:",t-t1)
+        --LOG("total time:",t-t1)
         -- display the max value
         local value_graph_label={}
         for index, dat in player do
@@ -905,10 +895,10 @@ end
         t=CurrentTime()
         WaitFrames(10)
         t1=CurrentTime()
-        LOG("------- calculating the timing of the frame")
-        LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
+        --LOG("------- calculating the timing of the frame")
+        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
         delta_refresh=(x2-x1)*(t1-t)/10*( (player_nbr+1)/4)
-        LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
+        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
         while periode<data_nbr do
             nbr=nbr+1
             periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
@@ -967,7 +957,7 @@ end
         end
         -- ========= end of the drawing of the graph
         t=CurrentTime()
-        LOG("total time:",t-t1)
+        --LOG("total time:",t-t1)
         local j=1
     local quadrillage_horiz2={}
     local nbr_quadrillage_horiz2=4 -- how many horizontal axies
@@ -1013,7 +1003,7 @@ end
 
 -- the starting function launch by the hook
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
-    LOG("called Set_graph...")
+    --LOG("called Set_graph...")
     scoreData = scoreAccum.scoreData
     standardScore:Hide()
     page_active=Group(dialog)
@@ -1099,7 +1089,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     graph_btn:SetCheck(true)
     page_graph(dialog)
     -- create first graph
-    --graph=create_graph(dialog,info.dialog[5].path,120,140,GetFrame(0).Right()-120,GetFrame(0).Bottom()-140)
+    -- graph=create_graph(dialog,info.dialog[5].path,120,140,GetFrame(0).Right()-120,GetFrame(0).Bottom()-140)
     local beta=Bitmap(dialog)
     beta:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/bt_sca.dds')))
     LayoutHelpers.AtRightTopIn(beta,GetFrame(0),99,67)
