@@ -26,7 +26,7 @@ Patch 3660 (Upcoming)
 - Fixed Salvation fire rate slowing at max adjacency instead of speeding up
 - Fixed units being able to fire at aircraft docked inside carriers, damaging the carrier
 - Fixed games not ending properly with AIs
-- Fixed Continental not fying to nukes (Again)
+- Fixed Continental not dying to nukes (Again)
 - Fixed upgraded structures not being targetable via radar blip
 - Fixed shared unit cap taking civilian armies into account when sharing on player death
 - Fixed UEF sACU AOE upgrade removal reducing the AOE too far
