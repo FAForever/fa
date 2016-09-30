@@ -257,7 +257,7 @@ options = {
                 },
             },
             {
-                title = "Assist Mex to Build Mass Storages",
+                title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
                 key = 'assist_mex',
                 type = 'toggle',
                 default = false,
