@@ -85,9 +85,9 @@ Callbacks.CapMex = function(data, units)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
     local pos = mex:GetPosition()
     local msid
-
+    local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
     for _, u in units do
-        msid = string.sub(u:GetBlueprint().BlueprintId, 0, 2) .. 'b1106'
+        local msid = LetterArray[u:GetBlueprint().General.FactionName]..'b1106'
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
         IssueBuildMobile({u}, Vector(pos.x+2, pos.y, pos.z), msid, {})
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z+2), msid, {})
