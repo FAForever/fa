@@ -87,7 +87,7 @@ Callbacks.CapMex = function(data, units)
     local msid
     local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
     for _, u in units do
-        local msid = LetterArray[u:GetBlueprint().General.FactionName]..'b1106'
+        msid = LetterArray[u:GetBlueprint().General.FactionName]..'b1106'
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
         IssueBuildMobile({u}, Vector(pos.x+2, pos.y, pos.z), msid, {})
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z+2), msid, {})
