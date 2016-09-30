@@ -7867,6 +7867,8 @@ OPTIONS_0269="Force rendering enemy lifebars. Disabled by default"
 OPTIONS_0270="Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default"
 OPTIONS_0271="Holding CTRL+SHIFT brings up an overlay showing the value of reclaimble objects on the map"
 OPTIONS_0272="Adjusts distance to which Zoom Pop zooms to."
+OPTIONS_0273="Assist Mex to Build Mass Storages"
+OPTIONS_0274="Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages."
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
