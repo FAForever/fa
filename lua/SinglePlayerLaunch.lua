@@ -88,7 +88,6 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
     sessionInfo.scenarioInfo.Options = {}
     sessionInfo.scenarioInfo.Options.FogOfWar = 'explored'
     sessionInfo.scenarioInfo.Options.Difficulty = difficulty
-    sessionInfo.scenarioInfo.Options.DoNotShareUnitCap = true
     sessionInfo.scenarioInfo.Options.Timeouts = -1
     sessionInfo.scenarioInfo.Options.GameSpeed = 'normal'
     sessionInfo.scenarioInfo.Options.FACampaignFaction = factions[faction].Key
@@ -125,7 +124,6 @@ local defaultOptions = {
     NoRushOption = 'Off',
     PrebuiltUnits = 'Off',
     Difficulty = 2,
-    DoNotShareUnitCap = true,
     Timeouts = -1,
     GameSpeed = 'normal',
     UnitCap = '500',
