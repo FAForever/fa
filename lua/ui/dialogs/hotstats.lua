@@ -24,51 +24,40 @@ local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
 local chartInfoText = false
 
 local info_dialog = {
-    {name="total units built", path={"general","built","count"},key=1},
-    {name="units still alive", path={"general","currentunits","count"},key=2},
-    {name="total energy in", path={"resources","energyin","total"},key=8},
-    {name="total mass in", path={"resources","massin","total"},key=11},
-    {name="score", path={"general","score",false},key=5},
-    {name="total kills", path={"general","kills","count"},key=6},
-    {name="total lost", path={"general","lost","count"},key=7},
-{name="energy all", path={"general","built","energy"},key=3},
-    {name="energy rate", path={"resources","energyin","rate",fac_mul=10},key=59},
-    {name="total energy out", path={"resources","energyout","total"},key=9},
-    {name="total energy wasted", path={"resources","energyover",false},key=10},
-{name="mass all", path={"general","built","mass"},key=4},
-    {name="mass rate", path={"resources","massin","rate",fac_mul=10},key=59},
-    {name="total mass out", path={"resources","massout","total"},key=12},
-    {name="total mass wasted", path={"resources","massover",false},key=13},
-    {name="units air built", path={"units","air","built"},key=14},
-    {name="units air kills", path={"units","air","kills"},key=15},
-    {name="units air lost", path={"units","air","lost"},key=16},
-    {name= "units land built", path={"units","land","built"},key=17},
-    {name="units land kills", path={"units","land","kills"},key=18},
-    {name="units land lost", path={"units","land","lost"},key=19},
-    {name= "units naval built", path={"units","naval","built"},key=20},
-    {name="units naval kills", path={"units","naval","kills"},key=21},
-    {name="units naval lost", path={"units","naval","lost"},key=22},
-    {name= "units xp built", path={"units","experimental","built"},key=23},
-    {name="units xp kills", path={"units","experimental","kills"},key=24},
-    {name= "units xp lost", path={"units","experimental","lost"},key=25},
-    { name= "units struct built", path={"units","structures","built"},key=26},
-    {name= "units struct kills", path={"units","structures","kills"},key=27},
-    {name= "units struct lost", path={"units","structures","lost"},key=28},
-    {name="units cdr kills", path={"units","cdr","kills"},key=30},
-    {name="units cdr lost", path={"units","cdr","lost"},key=31}
+    {name="<LOC SCORE_0079>Total Units Built", path={"general","built","count"},key=1},
+    {name="<LOC SCORE_0080>Units Still Alive", path={"general","currentunits","count"},key=2},
+    {name="<LOC SCORE_0081>Total Energy Produced", path={"resources","energyin","total"},key=8},
+    {name="<LOC SCORE_0082>Total Mass Produced", path={"resources","massin","total"},key=11},
+    {name="<LOC SCORE_0083>Score", path={"general","score",false},key=5},
+    {name="<LOC SCORE_0084>Total Kills", path={"general","kills","count"},key=6},
+    {name="<LOC SCORE_0085>Total Losses", path={"general","lost","count"},key=7},
+    {name="<LOC SCORE_0086>Energy Rate", path={"resources","energyin","rate",fac_mul=10},key=59},
+    {name="<LOC SCORE_0087>Total Energy Spent", path={"resources","energyout","total"},key=9},
+    {name="<LOC SCORE_0088>Total Energy Wasted", path={"resources","energyover",false},key=10},
+    {name="<LOC SCORE_0089>Mass Rate", path={"resources","massin","rate",fac_mul=10},key=59},
+    {name="<LOC SCORE_0090>Total Mass Spent", path={"resources","massout","total"},key=12},
+    {name="<LOC SCORE_0091>Total Mass Wasted", path={"resources","massover",false},key=13},
+    {name="<LOC SCORE_0092>Air Units Built", path={"units","air","built"},key=14},
+    {name="<LOC SCORE_0093>Air Units Killed", path={"units","air","kills"},key=15},
+    {name="<LOC SCORE_0094>Air Units Lost", path={"units","air","lost"},key=16},
+    {name="<LOC SCORE_0095>Land Units Built", path={"units","land","built"},key=17},
+    {name="<LOC SCORE_0096>Land Units Killed", path={"units","land","kills"},key=18},
+    {name="<LOC SCORE_0097>Land Units Lost", path={"units","land","lost"},key=19},
+    {name="<LOC SCORE_0098>Naval Units Built", path={"units","naval","built"},key=20},
+    {name="<LOC SCORE_0099>Naval Units Killed", path={"units","naval","kills"},key=21},
+    {name="<LOC SCORE_0100>Naval Units Lost", path={"units","naval","lost"},key=22},
+    {name="<LOC SCORE_0101>Experimentals Built", path={"units","experimental","built"},key=23},
+    {name="<LOC SCORE_0102>Experimentals Killed", path={"units","experimental","kills"},key=24},
+    {name="<LOC SCORE_0103>Experimentals Lost", path={"units","experimental","lost"},key=25},
+    {name="<LOC SCORE_0104>Structures Built", path={"units","structures","built"},key=26},
+    {name="<LOC SCORE_0105>Structures Killed", path={"units","structures","kills"},key=27},
+    {name="<LOC SCORE_0106>Structures Lost", path={"units","structures","lost"},key=28},
+    {name="<LOC SCORE_0107>ACUs Killed", path={"units","cdr","kills"},key=30},
+    {name="<LOC SCORE_0108>ACUs Lost", path={"units","cdr","lost"},key=31}
 }
 
 function mySkinnableFile(file)
     return UIUtil.SkinnableFile(file,true)
-end
-
-function modcontrols_trad(id)
-    text = import('/lua/ui/dialogs/dialog_txt.lua').trad(id)
-    if text then
-        return text
-    end
-    LOG("Translate ID not found: " .. id)
-    return id
 end
 
 function modcontrols_tooltips(parent,help_tips)
@@ -76,7 +65,7 @@ function modcontrols_tooltips(parent,help_tips)
         local oldHandleEvent = parent.HandleEvent
         parent.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                Tooltip.CreateMouseoverDisplay(self, modcontrols_trad(help_tips), .5) --, true)
+                Tooltip.CreateMouseoverDisplay(self, LOC(help_tips), .5) --, true)
             elseif event.Type == 'MouseExit' then
                 Tooltip.DestroyMouseoverDisplay()
             end
@@ -85,79 +74,92 @@ function modcontrols_tooltips(parent,help_tips)
     end
 end
 
+local histoText={
+    main_histo="<LOC SCORE_0115>Overview",
+    mass_histo="<LOC SCORE_0116>Mass details",
+    energy_histo="<LOC SCORE_0117>Energy details",
+    built_histo="<LOC SCORE_0118>Unit/Structure built details",
+    kills_histo="<LOC SCORE_0119>Unit/Structure kill details",
+    main_histo_btn="<LOC SCORE_0115>Overview",
+    mass_histo_btn="<LOC SCORE_0005>Mass",
+    energy_histo_btn="<LOC SCORE_0006>Energy",
+    built_histo_btn="<LOC SCORE_0120>Built Stats",
+    kills_histo_btn="<LOC SCORE_0121>Kill Stats",
+}
+
 local histo={
     main_histo={
-        [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="mass",
-            data={{name="mass incombe",icon="",path={"resources","massin","total"},color="green",Tooltip="Mass_incoming"},
-            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }},
-        [2]={name="energy",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/energy.dds"),label1="energy",link="energy_histo",Tooltip="energy",
-            data={{name="energy incombe",icon="",path={"resources","energyin","total"},color="orange",Tooltip="Energy_incoming"},
-            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }},
-        [3]={name="units built",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="built_units",
-            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="air"},
-            {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="land"},
-            {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="naval"},
-            {name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="xp"},
-            {name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="cdr"},
-            {name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="struct"} }},
-        [4]={name="units kills",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/kills.dds"),label1="kills",label2="",Tooltip="kills_units",link="kills_histo",
-            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="air"},
-            {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="land"},
-            {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="naval"},
-            {name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="xp"},
-            {name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="cdr"},
-            {name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="struct"} }},
+        [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="<LOC SCORE_0005>Mass",
+            data={{name="mass incombe",icon="",path={"resources","massin","total"},color="green",Tooltip="<LOC SCORE_0072>Mass earned during the game."},
+            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }},
+        [2]={name="energy",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/energy.dds"),label1="energy",link="energy_histo",Tooltip="<LOC SCORE_0006>Energy",
+            data={{name="energy incombe",icon="",path={"resources","energyin","total"},color="orange",Tooltip="<LOC SCORE_0075>Energy earned during the game."},
+            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }},
+        [3]={name="units built",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="<LOC SCORE_0078>Total units/structures built during the game.",
+            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."},
+            {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."},
+            {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."},
+            {name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."},
+            {name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."},
+            {name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }},
+        [4]={name="units kills",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/kills.dds"),label1="kills",label2="",Tooltip="<LOC SCORE_0077>Total units/structures killed during the game.",link="kills_histo",
+            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."},
+            {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."},
+            {name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."},
+            {name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."},
+            {name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="<LOC SCORE_0067>ACUs."},
+            {name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }},
     },
     mass_histo={
-        [1]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-in-icon.dds"),label1="in",label2="",Tooltip="Mass_incoming",link="main_histo",
-            data={{name="mass in",icon="",path={"resources","massin","total"},color="green",Tooltip="Mass_incoming"}}},
-        [2]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-out-icon.dds"),label1="out",label2="",Tooltip="Mass_outgoing",link="main_histo",
-            data={{name="mass out",icon="",path={"resources","massout","total"},color="5fdc5c",Tooltip="Mass_outgoing"} }},
-        [3]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-waste-icon.dds"),label1="wasted",label2="",Tooltip="Mass_wasted",link="main_histo",
-            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="Mass_wasted"} }}
+        [1]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-in-icon.dds"),label1="in",label2="",Tooltip="<LOC SCORE_0072>Mass earned during the game.",link="main_histo",
+            data={{name="mass in",icon="",path={"resources","massin","total"},color="green",Tooltip="<LOC SCORE_0072>Mass earned during the game."}}},
+        [2]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0073>Mass used during the game.",link="main_histo",
+            data={{name="mass out",icon="",path={"resources","massout","total"},color="5fdc5c",Tooltip="<LOC SCORE_0073>Mass used during the game."} }},
+        [3]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0071>Mass wasted during the game.",link="main_histo",
+            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }}
     },
     energy_histo={
-        [1]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-in-icon.dds"),label1="in",label2="",Tooltip="Energy_incoming",link="main_histo",
-            data={{name="energy in",icon="",path={"resources","energyin","total"},color="orange",Tooltip="Energy_incoming"}}},
-        [2]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-out-icon.dds"),label1="out",label2="",Tooltip="Energy_outgoing",link="main_histo",
-            data={{name="energy out",icon="",path={"resources","energyout","total"},color="dcb05c",Tooltip="Energy_outgoing"} }},
-        [3]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-waste-icon.dds"),label1="wasted",label2="",Tooltip="Energy_wasted",link="main_histo",
-            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="Energy_wasted"} }}
+        [1]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-in-icon.dds"),label1="in",label2="",Tooltip="<LOC SCORE_0075>Energy earned during the game.",link="main_histo",
+            data={{name="energy in",icon="",path={"resources","energyin","total"},color="orange",Tooltip="<LOC SCORE_0075>Energy earned during the game."}}},
+        [2]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0076>Energy used during the game.",link="main_histo",
+            data={{name="energy out",icon="",path={"resources","energyout","total"},color="dcb05c",Tooltip="<LOC SCORE_0076>Energy used during the game."} }},
+        [3]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0074>Energy wasted during the game.",link="main_histo",
+            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }}
     },
     built_histo={
-        [1]={name="units built",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="air",link="main_histo",
-            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="air"}}},
-        [2]={name="units built",icon=UIUtil.UIFile("/hotstats/score/land-icon.dds"),label1="land",label2="",Tooltip="land",link="main_histo",
-            data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="land"}}},
-        [3]={name="units built",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="naval",link="main_histo",
-            data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="naval"}}},
-        [4]={name="units built",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="xp",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="cdr"}},
-            data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="xp"}}},
-        [6]={name="units built",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="struct",link="main_histo",
-            data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="struct"} }}
+        [1]={name="units built",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="<LOC SCORE_0069>Air units.",link="main_histo",
+            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."}}},
+        [2]={name="units built",icon=UIUtil.UIFile("/hotstats/score/land-icon.dds"),label1="land",label2="",Tooltip="<LOC SCORE_0068>Land units.",link="main_histo",
+            data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."}}},
+        [3]={name="units built",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
+            data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
+        [4]={name="units built",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
+            data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [6]={name="units built",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
+            data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
     kills_histo={
-        [1]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="air",link="main_histo",
-            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="air"}}},
-        [2]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/land-icon.dds"),label1="land",label2="",Tooltip="land",link="main_histo",
-            data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="land"}}},
-        [3]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="naval",link="main_histo",
-            data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="naval"}}},
-        [4]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="xp",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="cdr"}},
-            data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="xp"}}},
-        [6]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="struct",link="main_histo",
-            data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="struct"} }}
+        [1]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="<LOC SCORE_0069>Air units.",link="main_histo",
+            data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","kills"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."}}},
+        [2]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/land-icon.dds"),label1="land",label2="",Tooltip="<LOC SCORE_0068>Land units.",link="main_histo",
+            data={{name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","kills"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."}}},
+        [3]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
+            data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
+        [4]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
+            data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [6]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
+            data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
 }
 
 local main_graph={
-    [1]={name="score",path={"general","score",false}, index = 5},
-    [2]={name="mass",path={"resources","massin","total"}, index = 4},
-    [3]={name="energy",path={"resources","energyin","total"}, index = 3},
-    [4]={name="total_built",path={"general","built","count"}, index = 1},
-    [5]={name="total_kills",path={"general","kills","count"}, index = 6},
+    [1]={name="<LOC SCORE_0083>Score",path={"general","score",false}, index = 5},
+    [2]={name="<LOC SCORE_0111>Mass in",path={"resources","massin","total"}, index = 4},
+    [3]={name="<LOC SCORE_0112>Energy in",path={"resources","energyin","total"}, index = 3},
+    [4]={name="<LOC SCORE_0113>Total built",path={"general","built","count"}, index = 1},
+    [5]={name="<LOC SCORE_0114>Total kills",path={"general","kills","count"}, index = 6},
 }
 
 function FillParentPreserveAspectRatioNoExpand(control, parent,offsetx,offsety)
@@ -182,7 +184,7 @@ function FillParentPreserveAspectRatioNoExpand(control, parent,offsetx,offsety)
 end
 
 function nodata()
-    local nodata=UIUtil.CreateText(GetFrame(0),modcontrols_trad("noData"), 22, UIUtil.titleFont)
+    local nodata=UIUtil.CreateText(GetFrame(0),LOC("<LOC SCORE_0062>No Score"), 22, UIUtil.titleFont)
     nodata:SetColor("white")
     Title_score:Hide()
     LayoutHelpers.AtCenterIn(nodata, GetFrame(0))
@@ -199,7 +201,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
     grp.Top:Set(0)
     grp.Right:Set(0)
     grp.Bottom:Set(0)
-    Title_score:SetText(modcontrols_trad(name))
+    Title_score:SetText(LOC(histoText[name]))
     page_active_graph2=grp
     local part_num_player=1
     local player={}
@@ -326,7 +328,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                 graphic[play.index][columns_num].icon_glow.Top:Set(value[columns_num].bottom+16/player_nbr_by_row)
                 graphic[play.index][columns_num].icon_glow.Left:Set(value[columns_num].left+columns_width/2-graphic[play.index][columns_num].icon.BitmapWidth()/2)
                 EffectHelpers.Pulse(graphic[play.index][columns_num].icon_glow,1,.5,1)
-                modcontrols_tooltips(graphic[play.index][columns_num].icon,"winner")
+                modcontrols_tooltips(graphic[play.index][columns_num].icon,"<LOC SCORE_0064>Winner")
             elseif (columns.icon != "" and columns.icon != nil) then
                 graphic[play.index][columns_num].icon = Bitmap(graphic[play.index][columns_num].grp)
                 graphic[play.index][columns_num].icon:SetTexture(columns.icon)
@@ -529,13 +531,13 @@ function page_graph(parent)
         self.path=info_dialog[index].path
         if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
         page_active_graph=create_graph(parent,info_dialog[index].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
-        Title_score:SetText(modcontrols_trad(info_dialog[index].name))
+        Title_score:SetText(LOC(info_dialog[index].name))
     end
     combo_graph.Key=2 -- here the defalut used value in key and in text
     combo_graph.text=graph_list[2]
     local i=0
     for name,data in main_graph do
-        local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', modcontrols_trad(data.name.."_btn"), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', LOC(data.name), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         local index = data.index
         --btn.Left:Set((math.min((x2-2*x1)/table.getsize(histo),200) )*i+x1)
         btn.Left:Set((((graph_pos.Right()-100)-btn.Width()*.5*(table.getsize(main_graph)))/(table.getsize(main_graph)+1)+btn.Width()*.5)*i+100)
@@ -548,7 +550,7 @@ function page_graph(parent)
             if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
             --LOG(repr(name))
             page_active_graph=create_graph(parent,tmp,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
-            Title_score:SetText(modcontrols_trad(tmp_index))
+            Title_score:SetText(LOC(tmp_index))
             --LOG("-----------------------",tmp_index)
             return
         end
@@ -570,7 +572,7 @@ function page_bar(parent)
     page_active_graph2=create_graph_bar(parent,"main_histo",bar_pos.Left(),bar_pos.Top(),bar_pos.Right(),bar_pos.Bottom())
     local i=0
     for name,data in histo do
-        local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', modcontrols_trad(name.."_btn"), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', LOC(histoText[name.."_btn"]), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         btn.Left:Set((((bar_pos.Right()-100)-btn.Width()*.5*(table.getsize(main_graph)))/(table.getsize(main_graph)+1)+btn.Width()*.5)*i+100)
         btn.Top:Set(bar_pos.Bottom()+15)
         EffectHelpers.ScaleTo(btn, .5, 0)
@@ -653,7 +655,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                     else
                         LayoutHelpers.RightOf(player[i].killIcon[index], player[i].killIcon[index-1])
                     end
-                    modcontrols_tooltips(player[i].killIcon[index],"cmd_kill")
+                    modcontrols_tooltips(player[i].killIcon[index],LOC("<LOC SCORE_0063>Number of ACU kills."))
                     player[i].killIcon[index].Depth:Set(bg.Depth()+500)
                 end
             end
@@ -1011,7 +1013,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     page_active.Top:Set(0)
     page_active.Right:Set(0)
     page_active.Bottom:Set(0)
-    standardBtn = CreateDialogTabs(dialog, modcontrols_trad("Standard"), "l")
+    standardBtn = CreateDialogTabs(dialog, LOC("<LOC SCORE_0110>Standard"), "l")
     LayoutHelpers.AtLeftIn(standardBtn, dialog, 44)
     standardBtn.Bottom:Set(dialog.Bottom() - 73)
     standardBtn.Depth:Set(dialog.Depth() + 100)
@@ -1029,10 +1031,10 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         end
     end
     -- main title
-    Title_score=UIUtil.CreateText(dialog,modcontrols_trad("Score"), 24, UIUtil.titleFont)
+    Title_score=UIUtil.CreateText(dialog,LOC("<LOC SCORE_0083>Score"), 24, UIUtil.titleFont)
     Title_score:SetColor("white")
     LayoutHelpers.AtLeftTopIn(Title_score, GetFrame(0), 100, 78)
-    bar_btn = CreateDialogTabs(dialog, modcontrols_trad("Chart"), "m")
+    bar_btn = CreateDialogTabs(dialog, LOC("<LOC SCORE_0109>Chart"), "m")
     LayoutHelpers.AtLeftIn(bar_btn, dialog, 185)
     bar_btn.Bottom:Set(dialog.Bottom() - 73)
     bar_btn:UseAlphaHitTest(false)
@@ -1049,7 +1051,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             dual_btn:SetCheck(false)
         end
     end
-    graph_btn = CreateDialogTabs(dialog, modcontrols_trad("Graph"), "m")
+    graph_btn = CreateDialogTabs(dialog, LOC("<LOC tooltipui0207>Graph"), "m")
     LayoutHelpers.AtLeftIn(graph_btn, dialog, 326)
     graph_btn.Bottom:Set(dialog.Bottom() - 73)
     graph_btn:UseAlphaHitTest(false)
@@ -1060,7 +1062,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         else
             page_graph(dialog)
             standardScore:Hide()
-            Title_score:SetText(modcontrols_trad("Score"))
+            Title_score:SetText(LOC("<LOC SCORE_0083>Score"))
             self:SetCheck(true)
             bar_btn:SetCheck(false)
             standardBtn:SetCheck(false)
@@ -1079,7 +1081,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             clean_view()
             page_dual(dialog)
             standardScore:Hide()
-            Title_score:SetText(modcontrols_trad("Score"))
+            Title_score:SetText(LOC("<LOC SCORE_0083>Score"))
             self:SetCheck(true)
             bar_btn:SetCheck(false)
             standardBtn:SetCheck(false)
