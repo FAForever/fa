@@ -833,17 +833,49 @@ end
 
 function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
-    local Delay = 0
+    local bp = ACU:GetBlueprint()
+    local bonesToHide = bp.WarpInEffect.HideBones
+    local delay = 0
 
-    if effect then
+    local function CreateEnhancements(unit, enhancements, delay)
+        if delay then
+            WaitSeconds(delay)
+        end
+
+        for k, enhancement in enhancements do
+            unit:CreateEnhancement(enhancement)
+        end
+    end
+
+    local function GateInEffect(unit, effect, bonesToHide)
         if effect == 'Gate' then
-            FakeGateInUnit(ACU)
+            delay = 0.75
+            ForkThread(FakeGateInUnit, unit, nil, bonesToHide)
         elseif effect == 'Warp' then
-            ACU:PlayCommanderWarpInEffect()
-            Delay = 2.2
+            delay = 2.1
+            unit:PlayCommanderWarpInEffect(bonesToHide)
         else
             WARN('*WARNING: Invalid effect type: ' .. effect .. '. Available types: Gate, Warp.')
         end
+    end
+    
+    if enhancements and effect then
+        -- Don't hide upgrade bones that we want add on the command unit
+        for _, enh in enhancements do
+            if bp.Enhancements[enh].ShowBones then
+                for _, bone in bp.Enhancements[enh].ShowBones do
+                    table.removeByValue(bonesToHide, bone)
+                end
+            end
+        end
+
+        GateInEffect(ACU, effect, bonesToHide)
+        -- Creating upgrades needs to be delayed until the effect plays, else the upgrade bone would show up before the rest of the unit
+        ForkThread(CreateEnhancements, ACU, enhancements, delay)
+    elseif enhancements then
+        CreateEnhancements(ACU, enhancements)
+    elseif effect then
+        GateInEffect(ACU, effect)
     end
 
     -- If true is passed as parameter then it uses default name.
@@ -851,20 +883,6 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
         ACU:SetCustomName(GetArmyBrain(brain).Nickname)
     elseif type(name) == 'string' then
         ACU:SetCustomName(name)
-    end
-
-    -- WarpIn effects hides extra enhancements bones on ACU so creating upgrades after it finnishes.
-    if enhancements then
-        ForkThread(function()
-            WaitSeconds(Delay)
-            if type(enhancements) == 'string' then
-                ACU:CreateEnhancement(upgrades)
-            elseif type(enhancements) == 'table' then
-                for k, enhancement in enhancements do
-                    ACU:CreateEnhancement(enhancement)
-                end
-            end
-        end)
     end
 
     if PauseAtDeath then
@@ -899,27 +917,10 @@ function FakeTeleportUnit(unit,killUnit)
     end
 end
 
-function FakeGateInUnit(unit, callbackFunction)
-    local faction
+function FakeGateInUnit(unit, callbackFunction, bonesToHide)
     local bp = unit:GetBlueprint()
 
-    if EntityCategoryContains( categories.COMMAND, unit ) then
-        for k,v in bp.Categories do
-            if v == 'UEF' then
-                faction = 1
-                break
-            elseif v == 'AEON' then
-                faction = 2
-                break
-            elseif v == 'CYBRAN' then
-                faction = 3
-                break
-            elseif v == 'SERAPHIM' then
-                faction = 4
-                break
-            end
-        end
-
+    if EntityCategoryContains( categories.COMMAND + categories.SUBCOMMANDER, unit ) then
         unit:HideBone(0, true)
         unit:SetUnSelectable(true)
         unit:SetBusy(true)
@@ -927,27 +928,15 @@ function FakeGateInUnit(unit, callbackFunction)
         unit:CreateProjectile( '/effects/entities/UnitTeleport03/UnitTeleport03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
         WaitSeconds(0.75)
 
-        if faction == 1 then
-            unit:SetMesh('/units/uel0001/UEL0001_PhaseShield_mesh', true)
-            unit:ShowBone(0, true)
-            unit:HideBone('Right_Upgrade', true)
-            unit:HideBone('Left_Upgrade', true)
-            unit:HideBone('Back_Upgrade_B01', true)
-        elseif faction == 2 then
-            unit:SetMesh('/units/ual0001/UAL0001_PhaseShield_mesh', true)
-            unit:ShowBone(0, true)
-            unit:HideBone('Back_Upgrade', true)
-        elseif faction == 3 then
-            unit:SetMesh('/units/url0001/URL0001_PhaseShield_mesh', true)
-            unit:ShowBone(0, true)
-            unit:HideBone('Back_Upgrade', true)
-            unit:HideBone('Right_Upgrade', true)
-        elseif faction == 4 then
-            unit:SetMesh('/units/xsl0001/XSL0001_PhaseShield_mesh', true)
-            unit:ShowBone(0, true)
-            unit:HideBone('Back_Upgrade', true)
-            unit:HideBone('Left_Upgrade', true)
-            unit:HideBone('Right_Upgrade', true)
+        local psm = bp.Display.WarpInEffect.PhaseShieldMesh
+        if psm then
+            unit:SetMesh(psm, true)
+        end
+
+        unit:ShowBone(0, true)
+
+        for _, v in bonesToHide or bp.Display.WarpInEffect.HideBones do
+            unit:HideBone(v, true)
         end
 
         unit:SetUnSelectable(false)
@@ -961,8 +950,10 @@ function FakeGateInUnit(unit, callbackFunction)
             end
         end
 
-        WaitSeconds(2)
-        unit:SetMesh(unit:GetBlueprint().Display.MeshBlueprint, true)
+        if psm then
+            WaitSeconds(2)
+            unit:SetMesh(bp.Display.MeshBlueprint, true)
+        end
     else
         LOG ('debug:non commander')
         unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
