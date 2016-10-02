@@ -13,6 +13,11 @@ UnitBlueprint {
             Cue = 'UEL0301_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        CommanderArrival = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0001_Gate_In',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         Construct = Sound {
             Bank = 'UEL',
             Cue = 'UEL0301_Construct_Start',

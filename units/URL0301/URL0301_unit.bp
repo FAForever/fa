@@ -16,6 +16,11 @@ UnitBlueprint {
             Cue = 'URL0301_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        CommanderArrival = Sound {
+            Bank = 'URL',
+            Cue = 'URL0001_Gate_In',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         Construct = Sound {
             Bank = 'URL',
             Cue = 'URL0301_Construct_Start',
