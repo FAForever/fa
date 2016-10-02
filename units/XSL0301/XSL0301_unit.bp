@@ -300,6 +300,12 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.05,
+        WarpInEffect = {
+            HideBones = {
+                'Back_Upgrade',
+            },
+            PhaseShieldMesh = '/units/xsl0301/XSL0301_PersonalShield_mesh',
+        },
     },
     Economy = {
         BuildCostEnergy = 25800,

@@ -252,6 +252,13 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.17,
+        WarpInEffect = {
+            HideBones = {
+                'Jetpack',
+                'SAM',
+            },
+            PhaseShieldMesh = '/units/uel0301/UEL0301_PersonalShield_mesh',
+        },
     },
     Economy = {
         BuildCostEnergy = 25200,
