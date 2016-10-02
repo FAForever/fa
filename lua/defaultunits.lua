@@ -15,7 +15,6 @@ local Util = import('utilities.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local EffectUtil = import('EffectUtilities.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
