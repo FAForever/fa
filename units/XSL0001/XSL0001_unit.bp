@@ -312,6 +312,13 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.05,
+        WarpInEffect = {
+            HideBones = {
+                'Back_Upgrade',
+                'Right_Upgrade',
+                'Left_Upgrade',
+            },
+        },
     },
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults

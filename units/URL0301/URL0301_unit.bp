@@ -248,6 +248,16 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.13,
+        WarpInEffect = {
+            HideBones = {
+                'AA_Gun',
+                'Power_Pack',
+                'Rez_Protocol',
+                'Torpedo',
+                'Turbine',
+            },
+            PhaseShieldMesh = '/units/url0301/URL0301_PhaseShield_mesh',
+        },
     },
     Economy = {
         BuildCostEnergy = 26400,

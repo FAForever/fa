@@ -294,6 +294,13 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.16,
+        WarpInEffect = {
+            HideBones = {
+                'Back_Upgrade',
+                'Right_Upgrade',
+            },
+            PhaseShieldMesh = '/units/url0001/URL0001_PhaseShield_mesh',
+        },
     },
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults

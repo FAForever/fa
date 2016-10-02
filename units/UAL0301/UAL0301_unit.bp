@@ -289,6 +289,12 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.13,
+        WarpInEffect = {
+            HideBones = {
+                'Turbine',
+            },
+            PhaseShieldMesh = '/units/ual0301/UAL0301_personalshield_mesh',
+        },
     },
     Economy = {
         BuildCostEnergy = 27100,
