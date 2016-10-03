@@ -42,6 +42,7 @@ local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -85,7 +86,6 @@ Callbacks.CapMex = function(data, units)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
     local pos = mex:GetPosition()
     local msid
-    local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
     for _, u in units do
         msid = LetterArray[u:GetBlueprint().General.FactionName]..'b1106'
         IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
