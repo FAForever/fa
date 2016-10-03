@@ -1345,7 +1345,7 @@ IsHumanUnit = function(self)
 
 end
 
-function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
+function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag)
     -- plays teleport effects for the given unit
     if not unit then
         return
@@ -1356,7 +1356,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     local faction = bp.General.FactionName
     local Yoffset = TeleportGetUnitYOffset(unit)
 
-    TeleportDestination = TeleportLocationToSurface( TeleportDestination )
+    TeleportDestination = TeleportLocationToSurface(TeleportDestination)
 
     if bp.Display.TeleportEffects.PlayChargeFxAtUnit ~= false then                            -- FX AT UNIT
 
@@ -1364,7 +1364,33 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         if faction == 'UEF' then                                                              -------- UEF --------
 
-            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01, EffectsBag)
+            -- unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge02, EffectsBag)
+            --original uef teleport effects
+            
+            -- we recycle the teleport in effects since they are way more epic, and add a modified steam effect as well.
+            unit.TeleportChargeBag = {}
+            local telefx = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
+            for k, v in telefx do
+                local fx = CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
+                fx:ScaleEmitter(0.75)
+                fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  -- to make effects cover entire height of unit
+                fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)  -- small initial rotation, will be faster as charging
+                table.insert(unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+            
+            local totalBones = unit:GetBoneCount() - 1
+            for k, v in EffectTemplate.UnitTeleportSteam01 do
+                for bone = 1, totalBones do
+                    local emitter = CreateAttachedEmitter(unit,bone,army, v):SetEmitterParam('Lifetime', 9999)
+                    -- adjust the lifetime so we always teleport before its done
+                    
+                    table.insert(unit.TeleportChargeBag, emitter) --add our fx to trash so they disappear when we stop teleport
+                    EffectsBag:Add(emitter)
+                end
+            end
+            
+            
 
         elseif faction == 'Cybran' then                                                       -------- CYBRAN --------
 
@@ -1387,6 +1413,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
         -- customized version of PlayUnitAmbientSound() from unit.lua to play sound at target destination
         local sound = 'TeleportChargingAtDestination'
         local sndEnt = false
+        unit.TeleportSoundChargeBag = {}
         if sound and bp.Audio[sound] then
             if not unit.AmbientSounds then
                 unit.AmbientSounds = {}
@@ -1395,7 +1422,8 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 sndEnt = Entity {}
                 unit.AmbientSounds[sound] = sndEnt
                 unit.Trash:Add(sndEnt)
-                Warp( sndEnt, TeleportDestination )  -- warping sound entity to destination so ambient sound plays there (and not at unit)
+                Warp(sndEnt, TeleportDestination)  -- warping sound entity to destination so ambient sound plays there (and not at unit)
+                table.insert(unit.TeleportSoundChargeBag, sndEnt) -- adding sound to trash so it actually goes away if we cancel/teleport
             end
             unit.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
         end
@@ -1406,28 +1434,28 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             Warp(TeleportDestFxEntity, TeleportDestination)
 
             unit.TeleportDestChargeBag = {}
-            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity(TeleportDestFxEntity, army,v):OffsetEmitter(0, Yoffset, 0)
+            local telefx = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
+            for k, v in telefx do
+                local fx = CreateEmitterAtEntity(TeleportDestFxEntity, army, v):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.75)
                 fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  -- to make effects cover entire height of unit
                 fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)  -- small initial rotation, will be faster as charging
-                table.insert( unit.TeleportDestChargeBag, fx)
+                table.insert(unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
 
         elseif faction == 'Cybran' then                                                       -------- CYBRAN --------
 
-            local pos = table.copy( TeleportDestination )
+            local pos = table.copy(TeleportDestination)
             pos[2] = pos[2] + Yoffset   -- make sure sphere isn't half in the ground
             local sphere = TeleportCreateCybranSphere(unit, pos, 0.01)
 
             unit.TeleportDestChargeBag = {}
-            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.CybranTeleportCharge02
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity( sphere, army, v )
+            local telefx = unit.TeleportChargeFxAtDestOverride or EffectTemplate.CybranTeleportCharge02
+            for k, v in telefx do
+                local fx = CreateEmitterAtEntity(sphere, army, v)
                 fx:ScaleEmitter(0.01 * unit.TeleportCybranSphereScale)
-                table.insert( unit.TeleportDestChargeBag, fx)
+                table.insert(unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
 
@@ -1435,14 +1463,14 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
             -- using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
-            Warp( TeleportDestFxEntity, TeleportDestination )
+            Warp(TeleportDestFxEntity, TeleportDestination)
 
             unit.TeleportDestChargeBag = {}
-            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.SeraphimTeleportCharge02
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, Yoffset, 0)
+            local telefx = unit.TeleportChargeFxAtDestOverride or EffectTemplate.SeraphimTeleportCharge02
+            for k, v in telefx do
+                local fx = CreateEmitterAtEntity(TeleportDestFxEntity, army, v):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.01)
-                table.insert( unit.TeleportDestChargeBag, fx)
+                table.insert(unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
 
@@ -1452,14 +1480,14 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
             -- using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
-            Warp( TeleportDestFxEntity, TeleportDestination )
+            Warp(TeleportDestFxEntity, TeleportDestination)
 
             unit.TeleportDestChargeBag = {}
-            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.GenericTeleportCharge02
-            for k, v in templ do
+            local telefx = unit.TeleportChargeFxAtDestOverride or EffectTemplate.GenericTeleportCharge02
+            for k, v in telefx do
                 local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.01)
-                table.insert( unit.TeleportDestChargeBag, fx)
+                table.insert(unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
 
@@ -1497,7 +1525,7 @@ function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     -- creates charge up effects at the unit
     local bp = unit:GetBlueprint()
     local army = unit:GetArmy()
-    local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or { Bone = 0, Offset = {0,0.25,0}, }
+    local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {Bone = 0, Offset = {0,0.25,0}, }
     local bone, ox, oy, oz
     local emitters = {}
     for _, value in bones do
@@ -1553,6 +1581,10 @@ function TeleportChargingProgress(unit, fraction)
             if unit.TeleportDestChargeBag then
                 local scale = 0.75 + (0.5 * math.max( fraction, 0.01 ))
                 for k, fx in unit.TeleportDestChargeBag do
+                    fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', -(25 + (100 * fraction)), (30 * fraction) )
+                    fx:ScaleEmitter(scale)
+                end
+                for k, fx in unit.TeleportChargeBag do
                     fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', -(25 + (100 * fraction)), (30 * fraction) )
                     fx:ScaleEmitter(scale)
                 end
@@ -1758,7 +1790,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
             DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
             local decalOrient = RandomFloat(0,2*math.pi)
-            CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_008_albedo', '', 'Albedo', 7, 7, 200, 300, army)
+            CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, army)
 
             local fn = function(unit)
 
@@ -1824,8 +1856,15 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 for k, v in EffectTemplate.SeraphimTeleportIn02 do
                     CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
                 end
+                
+                local totalBones = unit:GetBoneCount() - 1 --the steam effect is so epic everyone deserves it
+                for k, v in EffectTemplate.UnitTeleportSteam01 do
+                    for bone = 1, totalBones do
+                        CreateAttachedEmitter(unit,bone,army, v)
+                    end
+                end
             end
-
+            
             local thread = unit:ForkThread(fn)
             -- Don't add this thread to the effects bag or the unit might be manipulated into becoming invisible: thread is deleted before it
             -- can make the unit visible again.
@@ -1841,8 +1880,14 @@ function PlayTeleportInEffects(unit, EffectsBag)
             DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
             local decalOrient = RandomFloat(0,2*math.pi)
-            CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_006_albedo', '', 'Albedo', 9, 9, 200, 300, army)
-
+            CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, army)
+            
+            local totalBones = unit:GetBoneCount() - 1 --the steam effect is so epic everyone deserves it
+            for k, v in EffectTemplate.UnitTeleportSteam01 do
+                for bone = 1, totalBones do
+                    CreateAttachedEmitter(unit,bone,army, v)
+                end
+            end
         end
     end
 end
@@ -1861,6 +1906,17 @@ function DestroyTeleportChargingEffects(unit, EffectsBag)
         end
         unit.TeleportDestChargeBag = {}
     end
+    if unit.TeleportSoundChargeBag then -- emptying the sounds so they stop.
+        for keys,values in unit.TeleportSoundChargeBag do
+            values:Destroy()
+        end
+        if unit.AmbientSounds then
+            unit.AmbientSounds = {} --for some reason we couldnt simply add this to trash so empyting it like this
+        end
+        unit.TeleportSoundChargeBag = {}
+    end
+    
+    
     EffectsBag:Destroy()
 
     unit:StopUnitAmbientSound('TeleportChargingAtUnit')
