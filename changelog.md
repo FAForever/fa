@@ -19,10 +19,10 @@ Patch 3660 (Upcoming)
 
 **Gameplay**
 - Improved Selen toggle. It now behaves with no abilities by default, then when toggled on it hides and shows based on motion as before
-- Added dummy weapon to Aeon T2 Transport to allow LABs be targeted to specific enemies
+- Added dummy weapon to Aeon T2 Transport to allow LABs to be targeted to specific enemies
 - Allowed UEF T2 Transport to be given targets while landed on water
 - Enabled templates to be created with modded units as the primary unit
-- New feature: Delayed Give. Hold shift while giving a unit to another player to have it transfer once it finishes the command queue. Partiicularly useful when used with transports
+- New feature: Delayed Unit Transfer. Hold shift while giving a unit to another player to have it transfer once it finishes the command queue. Partiicularly useful when used with transports
 - New feature: You can now cap mass extractors with storage by right-clicking a T2 or T3 mex, or double-shift-right-clicking an upgrading T1 or T2 mex, with an Engineer
 - New feature: All ACUs now begin the game pointed towards the centre of the map, making things fairer between north and south on most maps
 - Greatly improved teleport visuals for all ACUs and sACUs. Some of these effects are only used in coop
@@ -38,7 +38,7 @@ Patch 3660 (Upcoming)
 - Fixed UEF sACU AOE upgrade removal reducing the AOE too far
 - Fixed the Spiderbot's laser beam getting stuck on temporarily while the unit executed the death animation
 - Fixed the Cybran ACU wandering off long distance when told to assist various buildings with an enemy in the rough vicinity. It will still happen if the unit is much closer, but we should no longer have ACUs walking across the map to go kill themselves on enemy PD
-- Fixed Seraphim ACU weapon trail showing when zoomed outside
+- Fixed Seraphim ACU weapon trail showing when zoomed out
 - Fixed Neptune Class weapon getting stuck on during death sequence
 - Fixed a large number of projectiles showing the trails through fog of war
 - Fixed T3 Mobile Artillery not quite being able to fire to the edge of their radius in some circumstances
@@ -46,7 +46,7 @@ Patch 3660 (Upcoming)
 - Fixed an error in timer resolution in coop mode
 
 **UI**
-- Fixed UEF Engineering station strategic icon not matching the gtech level
+- Fixed UEF Engineering station strategic icon not matching the tech level
 - Added missing strategic build icons used in "Bigger" mode
 - Fixed displayed abilities on several units
 - Fixed unit descriptions on support factories displaying for the wrong ones
