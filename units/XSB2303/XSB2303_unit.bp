@@ -247,6 +247,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 26.13,
+            MuzzleVelocityReduceDistance = 120,
             ProjectileId = '/projectiles/SIFZthuthaamArtilleryShell02/SIFZthuthaamArtilleryShell02_proj.bp',
             ProjectilesPerOnFire = 1,
             RackBones = {
@@ -280,7 +281,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Turret',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 90,   #80
+            TurretPitchRange = 90,
             TurretPitchSpeed = 6,
             TurretYaw = 0,
             TurretYawRange = 180,
