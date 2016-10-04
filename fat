@@ -8,6 +8,8 @@ UPSTREAM_URI="git://github.com/FAForever/fa.git"
 WORKTREE=".fat/repo"
 INIT_FILE=$(dirname $FA_PATH)/init_fat.lua
 
+PREFS_DIR="$LOCALAPPDATA/Gas Powered Games/Supreme Commander Forged Alliance/"
+
 declare -A FA_OPTIONS
 FA_OPTIONS=(
     [map]='scmp_009'
@@ -70,6 +72,22 @@ function create_init_file()
     envsubst <init_fat.template.lua >$INIT_FILE 
 }
 
+function add_debug_facilities()
+{
+    prefs_file=$PREFS_DIR/Game.prefs
+
+    if [[ ! -f "$prefs_file" ]]; then
+        echo "$prefs_file not found"
+        exit
+    fi
+
+    grep "enable_debug_facilities = true" "$prefs_file" >/dev/null
+    if [[ $? != 0 ]]; then
+        cp "$prefs_file" "$prefs_file.backup.fat"
+        printf "\ndebug = {\n    enable_debug_facilities = true\n}" >> "$prefs_file"
+    fi
+}
+
 FA_ARGS=()
 function set_fa_args {
     local retval="$1"
@@ -92,6 +110,7 @@ function start_fa {
         create_init_file
     fi
 
+    add_debug_facilities
     pushd $(dirname $FA_PATH)
     set_fa_args
     info "Launching FA..."
