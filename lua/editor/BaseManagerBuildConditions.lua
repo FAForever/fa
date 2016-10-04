@@ -262,7 +262,7 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
     for unitNum, unit in unitsBuilding do
         if not unit:IsDead() and unit:IsUnitState('Building') then
-            local buildingUnit = unit:GetUnitBeingBuilt()
+            local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit:IsDead() then
                 for catNum, buildeeCat in catTable do
                     local buildCat = ParseEntityCategory(buildeeCat)
@@ -365,7 +365,7 @@ function UnfinishedBuildingsCheck( aiBrain, baseName )
     local beingBuiltList = {}
     local buildingEngs = bManager.AIBrain:GetListOfUnits( categories.ENGINEER, false )
     for k,v in buildingEngs do
-        local buildingUnit = v:GetUnitBeingBuilt()
+        local buildingUnit = v.UnitBeingBuilt
         if buildingUnit and buildingUnit.UnitName then
             beingBuiltList[buildingUnit.UnitName] = true
         end
