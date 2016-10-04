@@ -68,11 +68,52 @@ UES0401 = Class(TSeaUnit) {
         elseif new == 'Top' then
             self:PlayAllOpenAnims(true)
         end
+        
+        if (new == 'Up' and old == 'Bottom') then --when starting to surface
+            self.WatchDepth = false
+        end
+        if (new == 'Bottom' and old == 'Down') then --when finished diving
+            self.WatchDepth = true
+            if not self.DiverThread then
+                self.DiverThread = self:ForkThread(self.DiveDepthThread)
+            end
+        end
+    end,
+
+    DiveDepthThread = function(self)
+        -- takes the given location, adjusts the Y value to the surface height on that location, with an offset
+        local Yoffset = 1.2 --the default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
+        -- 1.2 is for tempest to clear the torpedo tubes from most cases of ground clipping, keeping overall height minimal.
+        while self.WatchDepth == true do
+            local pos = self:GetPosition()
+            local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) --target depth, in this case the seabed
+            --local difference = pos[2] - math.max((seafloor + Yoffset), self.elevation) -- saved for later, sets depth to elevation in bp
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) --doesnt sink too much, just maneuveres the bed better.
+            self.SinkSlider:SetSpeed(1)
+            WARN(repr(self))
+            
+            self.SinkSlider:SetGoal(0, difference, 0)
+            WaitSeconds(1)
+        end
+        self.SinkSlider:SetGoal(0, 0, 0) --reset the slider while we are not watching depth
+        WaitFor(self.SinkSlider)-- we have to wait for it to finish before killing the thread or it stops
+        
+        KillThread(self.DiverThread)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         TSeaUnit.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
+        
+        if not self.SinkSlider then --setup the slider and get blueprint values
+            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) --create sink controller to overlay ontop of original collision detection
+            self.Trash:Add(self.SinkSlider)
+        end
+        
+        --local bp = self:GetBlueprint() -- saved for later, sets depth to elevation in bp
+        --self.elevation = bp.Physics.Elevation -- saved for later, sets depth to elevation in bp
+        self.WatchDepth = false
+        
     end,
 
     OnFailedToBuild = function(self)
