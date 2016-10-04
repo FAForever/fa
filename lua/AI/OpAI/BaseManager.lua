@@ -1040,7 +1040,7 @@ BaseManager = Class {
                 upgrading = false
                 if unit and not unit:IsDead() then
                     if not newUnit then
-                        newUnit = unit:GetUnitBeingBuilt()
+                        newUnit = unit.UnitBeingBuilt
                     end
                     upgrading = true
                 end

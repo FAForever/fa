@@ -408,7 +408,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     while aiBrain:PlatoonExists(singleEngineerPlatoon) do
 
         if not unitInstance then
-            unitInstance = engineer:GetUnitBeingBuilt()
+            unitInstance = engineer.UnitBeingBuilt
 
             if unitInstance then
                 -- Store the unit
@@ -597,7 +597,7 @@ function BaseManagerAssistThread( platoon )
                         if not constructionUnit:IsDead() and constructionUnit:IsUnitState('Building') then
 
                             -- Check to make sure unit being built is of proper category
-                            local buildingUnit = constructionUnit:GetUnitBeingBuilt()
+                            local buildingUnit = constructionUnit.UnitBeingBuilt
                             if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( buildCat, buildingUnit ) then
 
                                 -- If the unit building is a factory make sure its in the right PBM Location Type
@@ -835,11 +835,11 @@ function BaseManagerEngineerThread(platoon)
                             if not aiBrain:PlatoonExists(platoon) then
                                 return
                             end
-                            if not markedUnfinished and eng:GetUnitBeingBuilt() then
+                            if not markedUnfinished and eng.UnitBeingBuilt then
                                 baseManager.UnfinishedBuildings[unitName] = true
                             end
                             if not nameSet then
-                                local buildingUnit = eng:GetUnitBeingBuilt()
+                                local buildingUnit = eng.UnitBeingBuilt
                                 if unitName and buildingUnit and not buildingUnit:IsDead() then
                                     nameSet = true
                                     local armyIndex = aiBrain:GetArmyIndex()
@@ -930,7 +930,7 @@ function BuildUnfinishedStructures(platoon)
         local buildingEngs = aiBrain:GetListOfUnits( categories.ENGINEER, false )
         -- Find all engineers building structures
         for k,v in buildingEngs do
-            local buildingUnit = v:GetUnitBeingBuilt()
+            local buildingUnit = v.UnitBeingBuilt
             if buildingUnit and buildingUnit.UnitName then
                 beingBuiltList[buildingUnit.UnitName] = true
             end
