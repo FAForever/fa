@@ -16,6 +16,7 @@ Patch 3660 (Upcoming)
 - Fixed cinematics playing in coop games
 - Improved AI sACU usage
 - Fixed objective protection timer
+- Fixed information sent to the server for leaderboard purposes
 
 **Gameplay**
 - Improved Selen toggle. It now behaves with no abilities by default, then when toggled on it hides and shows based on motion as before
@@ -26,6 +27,8 @@ Patch 3660 (Upcoming)
 - New feature: You can now cap mass extractors with storage by right-clicking a T2 or T3 mex, or double-shift-right-clicking an upgrading T1 or T2 mex, with an Engineer
 - New feature: All ACUs now begin the game pointed towards the centre of the map, making things fairer between north and south on most maps
 - Greatly improved teleport visuals for all ACUs and sACUs. Some of these effects are only used in coop
+- T2 Artillery should more rarely shoot the floor in front of themselves in odd terrain situations
+- Fixed Mermaid being unable to be hit by Neptune and Seraphim Destroyer fire
 
 **Bugs**
 - Fixed units carried by UEF T2 Gunship from firing from inside a carrier
@@ -64,6 +67,16 @@ Patch 3660 (Upcoming)
 - Removed obsolete strategic icons and corrected file paths inside Hotstats module
 - Fixed custom FAF player colours conflicting with Steam launcher
 - Added German translation to FAF
+
+**Contributors**
+- Crotalus
+- Exotic-Retard
+- IceDreamer
+- Ithilis
+- Justify87
+- SlinkingAnt
+- Speed2
+- Uveso
 
 
 Hotfix Patch 3659 (September 12th, 2016)
