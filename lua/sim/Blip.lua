@@ -50,6 +50,9 @@ end
 
 Blip = Class(moho.blip_methods) {
     FlashIntel = function(self, army, new_unit)
+        if self.flashed then return end
+        self.flashed = true
+
         if not self:IsSeenEver(army) and (self:IsOnRadar(army) or self:IsOnSonar(army)) then
             -- Remove dead radar blip out of map so we don't reveal what's under it
             self:SetPosition(Vector(-100, 0, -100), true)
