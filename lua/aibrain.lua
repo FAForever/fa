@@ -618,15 +618,33 @@ AIBrain = Class(moho.aibrain_methods) {
                         if not borrowed[oldowner] then
                             borrowed[oldowner] = {}
                         end
-                        table.insert(borrowed[unit.oldowner], unit)
+                        table.insert(borrowed[oldowner], unit)
                     end
                 end
 
-                for owner, unit in borrowed do
-                    TransferUnitsOwnership(unit, owner)
+                for owner, units in borrowed do
+                    TransferUnitsOwnership(units, owner)
                 end
 
                 WaitSeconds(1)
+            end
+
+            -- Return units I gave away to my control. Mainly needed to stop EcoManager mods bypassing all this stuff with auto-give
+            local function GetBackUnits(brains)
+                local given = {}
+                for index, brain in brains do
+                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
+                    if units and table.getn(units) > 0 then
+                        for _,unit in units do
+                            if unit.oldowner == selfIndex then -- The unit was built by me
+                                table.insert(given, unit)
+                                unit.oldowner = nil
+                            end
+                        end
+                    end
+                end
+
+                TransferUnitsOwnership(given, selfIndex)
             end
 
             -- Sort brains out into mutually exclusive categories
@@ -649,14 +667,14 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- This part determines the share condition
             if shareOption == "ShareUntilDeath" then
-                KillSharedUnits(self:GetArmyIndex())
-                ReturnBorrowedUnits()
+                KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
+                ReturnBorrowedUnits() -- Give back things I was given by others
+            elseif shareOption == "FullShare" then
+                TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest score first
+                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
             else
-                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies)
-                
-                if shareOption == "FullShare" then -- Full Share
-                    TransferUnitsToHighestBrain(BrainCategories.Allies)
-                elseif shareOption == "CivilianDeserter" then
+                GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
+                if shareOption == "CivilianDeserter" then
                     TransferUnitsToBrain(BrainCategories.Civilians)
                 elseif shareOption == "TransferToKiller" then
                     TransferUnitsToKiller()
