@@ -13,53 +13,53 @@ AI = {
 	AIList = {
 		{
 			key = 'sorian',
-			name = "AI: Sorian AI",
+			name = "<LOC sorian_0001>AI: Sorian AI",
 		},
 		{
 			key = 'sorianrush',
-			name = "AI: Sorian AI Rush",
+			name = "<LOC sorian_0003>AI: Sorian AI Rush",
 		},
 		{
 			key = 'sorianair',
-			name = "AI: Sorian AI Air",
+			name = "<LOC sorian_0005>AI: Sorian AI Air",
 		},
 		{
 			key = 'sorianwater',
-			name = "AI: Sorian AI Water",
+			name = "<LOC sorian_0007>AI: Sorian AI Water",
 		},
 		{
 			key = 'sorianturtle',
-			name = "AI: Sorian AI Turtle",
+			name = "<LOC sorian_0009>AI: Sorian AI Turtle",
 		},
 		{
 			key = 'sorianadaptive',
-			name = "AI: Sorian AI Adaptive",
+			name = "<LOC sorian_0011>AI: Sorian AI Adaptive",
 		},
 	},
 	CheatAIList = {
 		{
 			key = 'soriancheat',
-			name = "AIx: Sorian AI",
+			name = "<LOC sorian_0025>AIx: Sorian AI",
 		},
 		{
 			key = 'sorianrushcheat',
-			name = "AIx: Sorian AI Rush",
+			name = "<LOC sorian_0026>AIx: Sorian AI Rush",
 		},
 		{
 			key = 'sorianaircheat',
-			name = "AIx: Sorian AI Air",
+			name = "<LOC sorian_0027>AIx: Sorian AI Air",
 		},
 		{
 			key = 'sorianwatercheat',
-			name = "AIx: Sorian AI Water",
+			name = "<LOC sorian_0028>AIx: Sorian AI Water",
 		},
 		{
 			key = 'sorianturtlecheat',
-			name = "AIx: Sorian AI Turtle",
+			name = "<LOC sorian_0029>AIx: Sorian AI Turtle",
 		},
 		{
 			key = 'sorianadaptivecheat',
-			name = "AIx: Sorian AI Adaptive",
+			name = "<LOC sorian_0030>AIx: Sorian AI Adaptive",
 		},
 	},
 }
