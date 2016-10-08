@@ -56,12 +56,14 @@ XSL0101 = Class(SWalkingLandUnit) {
                 self.CloakThread = ForkThread(function()
                     WaitSeconds(2)
 
-                    self:SetFireState(1)
-                    self:SetMaintenanceConsumptionActive()
-                    self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
-                    self:EnableUnitIntel('ToggleBit8', 'Cloak')
+                    if not self.Dead then
+                        self:SetFireState(1)
+                        self:SetMaintenanceConsumptionActive()
+                        self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
+                        self:EnableUnitIntel('ToggleBit8', 'Cloak')
 
-                    self.CloakThread = nil
+                        self.CloakThread = nil
+                    end
                 end)
             end
         end
