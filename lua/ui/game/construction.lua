@@ -1201,7 +1201,7 @@ function OnClickHandler(button, modifiers)
             end
         else
             local unitIndex = false
-            for index, unitStack in currentCommandQueue do
+            for index, unitStack in currentCommandQueue or {} do
                 if unitStack.id == item.id then
                     unitIndex = index
                 end
