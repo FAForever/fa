@@ -373,7 +373,7 @@ globalOpts = {
    {
         default = 2,
         label = "<LOC lobui_0740>Share Conditions",
-        help = "<LOC lobui_0741>Destroy or share units when you die",
+        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
         key = 'Share',
         values = {
             {
@@ -387,18 +387,18 @@ globalOpts = {
                 key = 'ShareUntilDeath',
             },
             {
-                text = "<LOC lobui_0762>Gain Control",
-                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer. Previously transferred units will stay where they are.",
+                text = "<LOC lobui_0762>Traitors",
+                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
                 key = 'TransferToKiller',
             },
             {
                 text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die. Previously transferred units will stay where they are.",
+                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
                 key = 'Defectors',
             },
             {
                 text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>your units will be transferred to the Civilian AI, if there is one, when you die. Previously transferred units will stay where they are.",
+                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
                 key = 'CivilianDeserter',
             },
         },

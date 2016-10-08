@@ -6,7 +6,7 @@ Patch 3660 (Upcoming)
 - Fixed Cheat and Build multipliers for AIs showing 1.0 - 1.9 two times
 - Fixed rating labels being shown on the minimap when teams are not set to 'Fixed'
 - Made it clearer that there's a search filter in the map selection
-- Added new unit share conditions for interesting new gameplay. "Full Share" and "Share Until Death" have been joined by "Gain Control", which gifts all your units to the player who killed you (Very interesting for FFA games), "Defectors", which is the opposite of Full Share, gifting your units to the highest scoring enemy, and "Civilian Desertion", which gifts your units to a neutral civilian AI, if there is one.
+- Added new unit share conditions for interesting new gameplay. "Full Share" and "Share Until Death" have been joined by "Traitors", which gifts all your units to the player who killed you (Very interesting for FFA games), "Defectors", which is the opposite of Full Share, gifting your units to the highest scoring enemy, and "Civilian Desertion", which gifts your units to a neutral civilian AI, if there is one.
 - Improved the tooltip when hovering over your score in the lobby. It will now show a more detailed explanation including your rating deviation
 - Fixed the position of the load button in Skirmish mode when launching offline
 - Fixed 'Odd vs Even' autoteam button for random faction being the same as the 'Top vs Bottom' 
