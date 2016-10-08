@@ -525,6 +525,8 @@ AIBrain = Class(moho.aibrain_methods) {
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
+            local shareOption = ScenarioInfo.Options.Share
+
             local function KillWalls()
                 -- Kill all walls while the ACU is blowing up
                 local tokill = self:GetListOfUnits(categories.WALL, false)
@@ -534,7 +536,10 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
-            ForkThread(KillWalls)
+
+            if shareOption ~= 'FullShare' then
+                ForkThread(KillWalls)
+            end
 
             WaitSeconds(10) -- Wait for commander explosion, then transfer units.
             local selfIndex = self:GetArmyIndex()
