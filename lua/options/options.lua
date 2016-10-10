@@ -275,7 +275,7 @@ options = {
         key = 'ui',
         items = {
             {
-                title = "<LOC OPTIONS_0006>Game Language",
+                title = "<LOC OPTIONS_0006>Language",
                 key = 'selectedlanguage',
                 type = 'toggle',
                 default = __language,

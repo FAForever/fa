@@ -720,7 +720,7 @@ Tooltips = {
     },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
-        description = "<LOC OPTIONS_0008>Select original or modded languages. Also changes voices if available. (needs game restart)",
+        description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
     },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
