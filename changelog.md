@@ -30,6 +30,7 @@ Patch 3660 (Upcoming)
 - Greatly improved teleport visuals for all ACUs and sACUs. Some of these effects are only used in coop
 - T2 Artillery should more rarely shoot the floor in front of themselves in odd terrain situations
 - Fixed Mermaid being unable to be hit by Neptune and Seraphim Destroyer fire
+- Share Until Death now kills your walls as well. All other modes leave them intact
 
 **Bugs**
 - Fixed units carried by UEF T2 Gunship from firing from inside a carrier
