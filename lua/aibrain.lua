@@ -537,7 +537,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-            if shareOption ~= 'FullShare' then
+            if shareOption == 'ShareUntilDeath' then
                 ForkThread(KillWalls)
             end
 
@@ -551,7 +551,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Used to have units which were transferred to allies noted permanently as belonging to the new player
             local function TransferOwnershipOfBorrowedUnits(brains)
                 for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
+                    local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                     if units and table.getn(units) > 0 then
                         for _,unit in units do
                             if unit.oldowner == selfIndex then
@@ -582,7 +582,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function TransferUnitsToBrain(brains)
                 if table.getn(brains) > 0 then
                     for k, brain in brains do
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.COMMAND, false)
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
 
                             RemovePlatoonHandleFromUnit(units)
@@ -605,7 +605,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Transfer units to the player who killed me
             local function TransferUnitsToKiller()
                 local KillerIndex = 0
-                local units = self:GetListOfUnits(categories.ALLUNITS - categories.COMMAND, false)
+                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                 if units and table.getn(units) > 0 then
 
                     RemovePlatoonHandleFromUnit(units)
@@ -623,7 +623,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Return units transferred during the game to me
             local function ReturnBorrowedUnits()
-                local units = self:GetListOfUnits(categories.ALLUNITS, false)
+                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
 
                 RemovePlatoonHandleFromUnit(units)
 
@@ -649,7 +649,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function GetBackUnits(brains)
                 local given = {}
                 for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
+                    local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                     if units and table.getn(units) > 0 then
                         for _,unit in units do
                             if unit.oldowner == selfIndex then -- The unit was built by me
@@ -682,25 +682,25 @@ AIBrain = Class(moho.aibrain_methods) {
             local KillSharedUnits = import('/lua/SimUtils.lua').KillSharedUnits
 
             -- This part determines the share condition
-            if shareOption == "ShareUntilDeath" then
+            if shareOption == 'ShareUntilDeath' then
                 KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
                 ReturnBorrowedUnits() -- Give back things I was given by others
-            elseif shareOption == "FullShare" then
+            elseif shareOption == 'FullShare' then
                 TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest score first
                 TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
             else
                 GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
-                if shareOption == "CivilianDeserter" then
+                if shareOption == 'CivilianDeserter' then
                     TransferUnitsToBrain(BrainCategories.Civilians)
-                elseif shareOption == "TransferToKiller" then
+                elseif shareOption == 'TransferToKiller' then
                     TransferUnitsToKiller()
-                elseif shareOption == "Defectors" then
+                elseif shareOption == 'Defectors' then
                     TransferUnitsToHighestBrain(BrainCategories.Enemies)
                 end
             end
 
             -- Kill all units left over
-            local tokill = self:GetListOfUnits(categories.ALLUNITS, false)
+            local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
             if tokill and table.getn(tokill) > 0 then
                 for index, unit in tokill do
                     unit:Kill()
