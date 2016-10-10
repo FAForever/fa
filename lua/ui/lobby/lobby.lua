@@ -1161,27 +1161,25 @@ local function autobalance_rr(players, teams)
     local teams = table.deepcopy(teams)
     local result = {}
 
-    local team_picks = {
-        {},
-        {1,2,  2,1,  2,1,  1,2,  1,2,  2,1},
-        {1,2,3,  3,2,1,  2,1,3,  2,3,1},
-        {1,2,3,4,  4,3,2,1,  3,1,4,2},
-    }
-
-    local picks = team_picks[table.getn(teams)]
-
-    if not picks or table.getsize(picks) == 0 then
-        return
+    local team_picks = {}
+    local i = 1
+    for team, slots in teams do
+        table.insert(team_picks, {team=team, sum=i})
+        i = i + 1
     end
 
-    i = 1
-    while table.getn(players) > 0 do
-        local player = table.remove(players, 1)
-        local team = table.remove(picks, 1)
-        local slot = table.remove(teams[team], 1)
-        if not player then break end
+    while table.getsize(players) > 0 do
+        for i, pick in team_picks do
+            local player = table.remove(players, 1)
+            if not player then break end
+            local slot = table.remove(teams[pick.team], 1)
+            if not slot then break end
+            pick.sum = pick.sum + i
 
-        table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
+            table.insert(result, {player=player.pos, rating=player.rating, team=pick.team, slot=slot})
+        end
+
+        table.sort(team_picks, function(a, b) return a.sum > b.sum end)
     end
 
     return result

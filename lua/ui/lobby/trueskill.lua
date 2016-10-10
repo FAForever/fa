@@ -446,6 +446,9 @@ function computeQuality(team)
     local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
     local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
     local middle = matrixAdd(aTa, aTSA)
+
+    if middle:getDeterminant() == 0 then return -1 end
+
     local middleInverse = matrixInvert(middle)
 
     local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
