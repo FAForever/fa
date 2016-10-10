@@ -7854,7 +7854,7 @@ aisettings_0108="Sets the randomization for the AI\'s TMLs making them miss more
 aisettings_0109="None"
 aisettings_0110="No Randomization"
 aisettings_0111="%s%% Randomization"
-aisettings_0119"AI Land Expansion Limit"
+aisettings_0119="AI Land Expansion Limit"
 aisettings_0120="Set the limit for the number of land expansions that each AI can have (will still be modified by the number of AIs)."
 aisettings_0121="None"
 aisettings_0122="No Land Expansions Allowed"
