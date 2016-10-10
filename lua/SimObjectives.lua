@@ -38,8 +38,12 @@ local SavedList = {}
 local playerArmy
 function GetPlayerArmy()
     if not playerArmy then
-        local brain = GetArmyBrain("Player")
-        playerArmy = brain:GetArmyIndex()
+        for _, v in ArmyBrains do
+            if v.BrainType == 'Human' then
+                playerArmy = v:GetArmyIndex()
+                break
+            end
+        end
     end
 
     return playerArmy
