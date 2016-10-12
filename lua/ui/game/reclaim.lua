@@ -10,8 +10,7 @@ local Reclaim = {}
 local NeedUpdate = false
 function UpdateReclaim(r)
     r.updated = true
-    Reclaim[r.id] = r.mass and r.mass >= 1 and r or nil
-    NeedUpdate = true
+    Reclaim[r.id] = r
 end
 
 local OldZoom
@@ -60,8 +59,6 @@ function CreateReclaimLabel(view, r)
     local pos = r.position
     local label = WorldLabel(view, Vector(pos[1], pos[2], pos[3]))
 
-    label.reclaim_id = r.id
-
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
     LayoutHelpers.AtLeftIn(label.mass, label)
@@ -76,40 +73,21 @@ function CreateReclaimLabel(view, r)
     LayoutHelpers.AtVerticalCenterIn(label.text, label)
 
     label:DisableHitTest(true)
-
     label.Update = function(self)
-        -- delete label if reclaim is gone
-        local reclaim = Reclaim[self.reclaim_id]
-        if not reclaim then
-            self.parent.ReclaimLabels[self.reclaim_id] = nil
-            self:Destroy()
-            return
-        end
-
         if self.parent:IsHidden() then return end
-
-        local pos
-        if not self.position.x then -- dynamic position, i.e. entity
-            pos = self.position:GetPosition()
-        else
-            pos = self.position
-        end
 
         local view = self.parent.view
         local proj = view:Project(pos)
-
         if not self.proj or self.proj.x ~= proj.x or self.proj.y ~= self.proj.y then
             LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
             self.proj = proj
         end
+    end
 
-        if reclaim.updated then
-            local mass = tostring(math.floor(0.5+reclaim.mass))
-            if mass ~= self.text:GetText() then
-                self.text:SetText(mass)
-            end
-
-            reclaim.updated = false
+    label.UpdateMass = function(self, r)
+        local mass = tostring(math.floor(0.5+r.mass))
+        if mass ~= self.text:GetText() then
+            self.text:SetText(mass)
         end
     end
 
@@ -120,22 +98,38 @@ end
 
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local n_visible = 0
 
     for id, r in Reclaim do
         local label = view.ReclaimGroup.ReclaimLabels[id]
-        if OnScreen(view, r.position) then
+
+        if not r.mass or r.mass < 1 then
+            if label then
+                label:Destroy()
+                view.ReclaimGroup.ReclaimLabels[id] = nil
+                label = nil
+            end
+            Reclaim[id] = nil
+        elseif OnScreen(view, r.position) then
             if not label then
                 label = CreateReclaimLabel(view.ReclaimGroup, r)
                 view.ReclaimGroup.ReclaimLabels[id] = label
+            else
+                label:Show()
+                n_visible = n_visible + 1
             end
-
-            label:Show()
         elseif label then
             label:Hide()
         end
+
+        if label and r.updated then
+            label:UpdateMass(r)
+            r.updated = false
+            NeedUpdate = true
+        end
     end
 
-    return view.ReclaimGroup.ReclaimLabels
+    return view.ReclaimGroup.ReclaimLabels, n_visible
 end
 
 local ReclaimThread
@@ -162,9 +156,11 @@ function InitReclaimGroup(view, camera)
         rgroup.ReclaimLabels = {}
 
         rgroup.OnFrame = function(self)
+            if not self.update then return end
             if SameZoom(camera) then
                 self:Show()
                 self:SetNeedsFrameUpdate(false)
+                self.update = false
             else
                 self:Hide()
             end
@@ -197,9 +193,10 @@ function ShowReclaimThread(watch_key)
         local doUpdate = NeedUpdate or not sameZoom
 
         if doUpdate then
-            local labels = UpdateLabels()
-            if not sameZoom and table.getsize(labels) > 1000 then
+            local labels, n_visible = UpdateLabels()
+            if not sameZoom and n_visible > 1000 then
                 view.ReclaimGroup:Hide()
+                view.ReclaimGroup.update = true
                 view.ReclaimGroup:SetNeedsFrameUpdate(true)
             end
             NeedUpdate = false
