@@ -4357,7 +4357,7 @@ lobui_0409="Map"
 lobui_0410="None"
 
 # Lobby changelog panel
-lobui_0412="What's new in Lobby?"
+lobui_0412="What's new to FAF?"
 
 lobui_0413="Country"
 

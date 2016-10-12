@@ -4894,6 +4894,10 @@ lobui_0393="ИИ: случайный"
 lobui_0394="Случайный выбор жульнического ИИ"
 lobui_0395="ИИ: Случайный"
 lobui_0396="Неизвестная команда: %s"
+
+# Lobby changelog panel
+lobui_0412="What's new to FAF?"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Сетевая игра"
 main_menu_0002="Вернуться в игру"

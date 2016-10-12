@@ -5126,7 +5126,7 @@ lobui_0409="Map"
 lobui_0410="None"
 
 # Lobby changelog panel
-lobui_0412="What's new in Lobby?"
+lobui_0412="What's new to FAF?"
 
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multijoueur local"
