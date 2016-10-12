@@ -216,7 +216,7 @@ local slotMenuStrings = {
     closed = "<LOC lobui_0221>Closed",
     occupy = "<LOC lobui_0222>Occupy",
     pm = "<LOC lobui_0223>Private Message",
-    remove_to_kik = "<LOC lobui_0428>Remove Player",
+    remove_to_kik = "<LOC lobui_0428>Kick Player",
     remove_to_observer = "<LOC lobui_0429>Move Player to Observer",
 }
 local slotMenuData = {

@@ -12,6 +12,7 @@ Patch 3660 (Upcoming)
 - Fixed 'Odd vs Even' autoteam button for random faction being the same as the 'Top vs Bottom' 
 - Fixed new players joining a lobby being unable to see closed slots as being closed
 - Fixed auto team settings not working for games with >8 players
+- Changed 'Remove Player' to 'Kick Player' for clarity
 
 **Coop**
 - Fixed cinematics playing in coop games
