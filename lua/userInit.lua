@@ -6,6 +6,12 @@
 -- Init our language from prefs. This applies to both front-end and session init; for
 -- the Sim init, the engine sets __language for us.
 __language = GetPreference('options_overrides.language', '')
+-- Build language select options
+__installedlanguages = DiskFindFiles("/loc/", '*strings_db.lua')
+for index, language in __installedlanguages do
+    language =  string.upper(string.gsub(language, ".*/(.*)/.*","%1"))
+    __installedlanguages[index] = {text = language, key = language}
+end
 
 -- Do global init
 doscript '/lua/globalInit.lua'
