@@ -1,4 +1,4 @@
-Patch 3660 (Upcoming)
+Patch 3660 (October 14th, 2016)
 ============================
 **Lobby**
 - Fixed team number switching slots alongside a player
