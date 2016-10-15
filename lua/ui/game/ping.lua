@@ -34,6 +34,9 @@ function DoPing(pingType)
     if army == -1 then
         return
     end
+
+    -- Owner as declared here is overridden sim-side to make sure UI mods can't exploit the system to see enemy pings.
+    -- While still vulnerable here, this Owner is only used to track MaxMarkers, so as long as it's consistent in this file, we're good.
     local data = {Owner = army, Type = pingType, Location = position, Type = pingType}
     data = table.merged(data, PingTypes[pingType])
     if data.Marker then
