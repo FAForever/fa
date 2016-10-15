@@ -17,11 +17,6 @@ function AnimatePingMesh(entity)
 end
 
 function SpawnPing(data)
-    if data.Owner < 1 then
-        WARN("SpawnPing: data.Owner cannot be less than 1")
-        return
-    end
-
     if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
         return
     elseif data.Marker and not PingMarkers[data.Owner] then
