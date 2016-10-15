@@ -12,7 +12,7 @@ function AnimatePingMesh(entity)
         local orien = entity:GetOrientation()
         entity:SetScale(MATH_Lerp(math.sin(time), -.5, 0.5, .3, .5))
         time = time + .3
-        WaitSeconds(.1)
+        WaitSeconds(.001)
     end
 end
 
@@ -29,7 +29,7 @@ function SpawnPing(data)
     else
         local Entity = import('/lua/sim/Entity.lua').Entity
         data.Location[2] = data.Location[2]+2
-        local pingSpec = {Owner = data.Owner - 1, Location = data.Location}
+        local pingSpec = {Owner = data.Owner, Location = data.Location}
         local ping = Entity(pingSpec)
         Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
         ping:SetVizToFocusPlayer('Always')
@@ -46,20 +46,14 @@ function SpawnPing(data)
     end
 
     SendData(data)
-    DoCallbacks(data)
-end
 
-function IsVisible(data, army)
-    return IsAlly(army, data.Owner) and (not data.To or data.To == army)
-end
-
-function DoCallbacks(data)
-    for army, brain in ArmyBrains do
-        if IsVisible(data, army) then
-            ArmyBrains[army]:DoPingCallbacks( data )
-            if not SUtils.IsAIArmy(data.Owner) then
-                ArmyBrains[army]:DoAIPing( data )
-            end
+    -- Callbacks to allied brains
+    for num,brain in ArmyBrains do
+        if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
+            ArmyBrains[num]:DoPingCallbacks( data )
+			if not SUtils.IsAIArmy(data.Owner + 1) then
+				ArmyBrains[num]:DoAIPing( data )
+			end
         end
     end
 end
@@ -84,7 +78,16 @@ function SpawnSpecialPing(data)
     end)
 
     SendData(data)
-    DoCallbacks(data)
+
+    -- Callbacks to allied brains
+    for num,brain in ArmyBrains do
+        if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
+            ArmyBrains[num]:DoPingCallbacks( data )
+			if not SUtils.IsAIArmy(data.Owner + 1) then
+				ArmyBrains[num]:DoAIPing( data )
+			end
+        end
+    end
 end
 
 function GetPingID(owner)
@@ -97,6 +100,7 @@ function GetPingID(owner)
 end
 
 function OnArmyDefeat(armyID)
+    armyID = armyID - 1
     if PingMarkers[armyID] then
         for i, v in PingMarkers[armyID] do
             UpdateMarker({Action = 'delete', ID = i, Owner = v.Spec.Owner})
@@ -111,11 +115,11 @@ function OnArmyChange()
     if not Sync.Ping then Sync.Ping = {} end
     table.insert(Sync.Ping, {Action = 'flush'})
     --Add All of the relevant marker data on the next sync
-    local army = GetFocusArmy()
-    if army ~= -1 then
+    local focus = GetFocusArmy()
+    if focus ~= -1 then
         ForkThread(function()
             for ownerID, pingTable in PingMarkers do
-                if IsAlly(ownerID, army) then
+                if IsAlly(ownerID+1, focus) then
                     for pingID, ping in pingTable do
                         ping.Renew = true
                         SendData(ping)
@@ -139,11 +143,11 @@ function UpdateMarker(data)
         elseif data.Action == 'rename' then
             PingMarkers[data.Owner][data.ID].Name = data.Name
         elseif data.Action == 'renew' then
-            local army = GetFocusArmy()
-            if army ~= -1 then
+            local focus = GetFocusArmy()
+            if focus ~= -1 then
                 ForkThread(function()
                     for ownerID, pingTable in PingMarkers do
-                        if IsAlly(ownerID, army) then
+                        if IsAlly(ownerID+1, focus) then
                             for pingID, ping in pingTable do
                                 ping.Renew = true
                                 SendData(ping)
@@ -159,9 +163,9 @@ function UpdateMarker(data)
 end
 
 function SendData(data)
-    local army = GetFocusArmy()
-    if army ~= -1 and IsVisible(data, army) then
-        Sync.Ping = Sync.Ping or {}
+    local focus = GetFocusArmy()
+    if focus ~= -1 and IsAlly(data.Owner+1, focus) then
+        if not Sync.Ping then Sync.Ping = {} end
         table.insert(Sync.Ping, data)
     end
 end

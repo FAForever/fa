@@ -46,7 +46,7 @@ GiveTask = Class(ScriptTask) {
                     Owner=self.Army,
                     To=to,
                     Ring='/game/marker/ring_yellow02-blur.dds',
-                    Sound='UI_Comm_SER_Out',
+                    Sound='UEF_Select_Radar',
                     Mesh='alert_marker',
                     ArrowColor='yellow',
                 }
