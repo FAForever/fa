@@ -29,7 +29,7 @@ function SpawnPing(data)
     else
         local Entity = import('/lua/sim/Entity.lua').Entity
         data.Location[2] = data.Location[2]+2
-        local pingSpec = {Owner = data.Owner, Location = data.Location}
+        local pingSpec = {Owner = data.Owner - 1, Location = data.Location}
         local ping = Entity(pingSpec)
         Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
         ping:SetVizToFocusPlayer('Always')
