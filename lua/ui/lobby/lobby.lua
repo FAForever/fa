@@ -1729,6 +1729,8 @@ local function TryLaunch(skipNoObserversCheck)
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
+        -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
+        -- check if rehosting still works for non-host players.
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
@@ -3818,6 +3820,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     end
                  end
 
+                SavePresetToName(LAST_GAME_PRESET_NAME)
                 lobbyComm:LaunchGame(info)
             elseif data.Type == 'ClearSlot' then
                 gameInfo.PlayerOptions[data.Slot] = nil
