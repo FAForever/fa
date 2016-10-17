@@ -4925,13 +4925,20 @@ function GetPresetFromSettings(presetName)
     cleanGameOptions.ClanTags = nil
     cleanGameOptions.Ratings = nil
 
+    -- Since PlayerOptions may only contain strings and ints, some added tables need to be removed before storing
+    local cleanPlayerOptions = table.copy(gameInfo.PlayerOptions)
+    cleanPlayerOptions.AsTable = nil
+    cleanPlayerOptions.isEmpty = nil
+    cleanPlayerOptions.pairs = nil
+    cleanPlayerOptions.print = nil
+
     return {
         Name = presetName,
         MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
         MapPath = gameInfo.GameOptions.ScenarioFile,
         GameOptions = cleanGameOptions,
         GameMods = gameInfo.GameMods,
-        PlayerOptions = gameInfo.PlayerOptions
+        PlayerOptions = cleanPlayerOptions
     }
 end
 
