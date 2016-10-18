@@ -116,29 +116,12 @@ local function CreateDialog(clients)
     LayoutHelpers.AtCenterIn(parent, GetFrame(0))
 
     function parent.Update(self, clients)
-		--local all_connected = nil
-		--for index, client in clients do
-			--if client.quiet > 1 and all_connected != false then
-				--all_connected = true
-				--LOG('>>> Connected ('..index..' - '..client.name..')')
-			--else
-				--all_connected = false
-				--LOG('>>> Unconnected ('..index..' - '..client.name..')')
-				--break
-			--end
-		--end
-		--if all_connected then
-			--LOG('>>> All_Connected : YES')
-		--else
-			--LOG('>>> All_Connected : NO')
-		--end
-		
 		for index, client in clients do
             local slot = slots[index]
 			local armiesInfo = GetArmiesTable().armiesTable
 			
             if client.connected then
-                if client.quiet < 5000 then--and armiesInfo[index].outOfGame == false then	-- IF client no lag and playing ...
+                if client.quiet < 5000 then	-- IF client no lag and playing ...
 					if canEject then
 						slot.eject:Disable()
 					end
@@ -204,19 +187,16 @@ end
 
 
 function Update()
-
     local needDialog = false
-
     local clients = GetSessionClients()
-
     local stillin = {}
-    for index,client in clients do
+    for index, client in clients do
         if client.connected then
-            table.insert(stillin,index)
+            table.insert(stillin, index)
         end
     end
 
-    for index,client in clients do
+    for index, client in clients do
         if client.quiet > 5000 then
             needDialog = true
         end
