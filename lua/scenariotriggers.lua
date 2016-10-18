@@ -441,6 +441,10 @@ function CreateUnitStopBeingBuiltTrigger( cb, unit )
     unit:AddUnitCallback( cb, 'OnStopBeingBuilt' )
 end
 
+function CreateUnitGivenTrigger( cb, unit )
+    unit:AddUnitCallback( cb, 'OnGiven' ) 
+end
+
 function VariableBoolCheckThread(cb, varName, value, name)
     if value then
         while not ScenarioInfo.VarTable[varName] do

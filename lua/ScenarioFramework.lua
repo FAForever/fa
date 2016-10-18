@@ -210,7 +210,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:ForkThread(self.DeathThread, overkillRatio , instigator)
 end
 
-function GiveUnitToArmy( unit, newArmyIndex )
+function GiveUnitToArmy( unit, newArmyIndex, triggerOnGiven )
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     local newBrain = ArmyBrains[newArmyIndex]
@@ -219,6 +219,11 @@ function GiveUnitToArmy( unit, newArmyIndex )
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(newArmyIndex, false)
     end
+    
+    if triggerOnGiven then
+        unit:OnGiven(newUnit)
+    end
+    
     return newUnit
 end
 

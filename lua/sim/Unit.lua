@@ -147,6 +147,7 @@ Unit = Class(moho.unit_methods) {
             OnFailedBeingCaptured = {},
             OnFailedToBuild = {},
             OnVeteran = {},
+            OnGiven = {},
             ProjectileDamaged = {},
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
@@ -890,6 +891,14 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+    end,
+    
+    OnGiven = function(self, newUnit)
+        self:DoUnitCallbacks( 'OnGiven', newUnit )
+    end,
+    
+    AddOnGivenCallback = function(self, fn)
+        self:AddUnitCallback(fn, 'OnGiven')
     end,
 
     -------------------------------------------------------------------------------------------
