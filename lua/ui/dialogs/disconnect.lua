@@ -190,14 +190,17 @@ function Update()
     local needDialog = false
     local clients = GetSessionClients()
     local stillin = {}
+
     for index, client in clients do
         if client.connected then
             table.insert(stillin, index)
         end
     end
 
+    local quietClients = {}
     for index, client in clients do
         if client.quiet > 5000 then
+            table.insert(quietClients, client.name)
             needDialog = true
         end
         if client.connected then
@@ -213,6 +216,12 @@ function Update()
 
     if needDialog then
         if not parent then
+            -- Log disconnections so that occurance can be tracked when watching a replay
+            WARN('Connection dialogue opening due to disconnection by players:')
+            for k, v in quietClients do
+                LOG(v)
+            end
+
             CreateDialog(clients)
         end
         parent:Update(clients)
