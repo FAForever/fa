@@ -2249,10 +2249,8 @@ ACUUnit = Class(CommandUnit) {
                     instigatorBrain:ReportScore()
                 end)
             end
-            ArmyBrains[self:GetArmy()].CommanderKilledBy = instigator:GetArmy()
-        else
-            ArmyBrains[self:GetArmy()].CommanderKilledBy = self:GetArmy()
         end
+        ArmyBrains[self:GetArmy()].CommanderKilledBy = (instigator or self):GetArmy()
     end,
 
     ResetRightArm = function(self)
