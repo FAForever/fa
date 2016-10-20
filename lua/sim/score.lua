@@ -215,29 +215,26 @@ end
 
 local observer = false
 function SyncScores()
-    observer = observer or GetFocusArmy() == -1
+    local my_army_index = GetFocusArmy()
+    observer = observer or my_army_index == -1
 
     local victory = import('/lua/victory.lua')
-
-    Sync.SendStats = victory.sendStats
-    if Sync.SendStats then
-        -- Reset the flag so that stats are only sent once.
-        -- Do it only when Sync.SendStats was set to true to prevent race conditions.
-        victory.sendStats = false
-    end
-
-    if observer or victory.gameOver or Sync.SendStats then
+    if observer or victory.gameOver then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
+        Sync.StatsToSend = Sync.Score
     else
-        local my_army = GetFocusArmy()
-
         for index, brain in ArmyBrains do
+            if brain.Result and not brain.StatsSent then
+                Sync.StatsToSend = table.deepcopy(scoreData.current)
+                brain.StatsSent = true
+            end
+
             Sync.Score[index] = {}
             Sync.Score[index].general = {}
 
-            if my_army == index then
+            if my_army_index == index then
                 Sync.Score[index].general.currentunits = {}
                 Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
                 Sync.Score[index].general.currentcap = {}

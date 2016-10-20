@@ -54,35 +54,35 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     AddUnitStat = function(self, unitId, statName, value)
-        if self.unitStats[unitId] == nil then
-            self.unitStats[unitId] = {}
+        if self.UnitStats[unitId] == nil then
+            self.UnitStats[unitId] = {}
         end
 
-        if self.unitStats[unitId][statName] == nil then
-            self.unitStats[unitId][statName] = value
+        if self.UnitStats[unitId][statName] == nil then
+            self.UnitStats[unitId][statName] = value
         else
-            self.unitStats[unitId][statName] = self.unitStats[unitId][statName] + value
+            self.UnitStats[unitId][statName] = self.UnitStats[unitId][statName] + value
         end
     end,
 
     SetUnitStat = function(self, unitId, statName, value)
-        if self.unitStats[unitId] == nil then
-            self.unitStats[unitId] = {}
+        if self.UnitStats[unitId] == nil then
+            self.UnitStats[unitId] = {}
         end
 
-        self.unitStats[unitId][statName] = value
+        self.UnitStats[unitId][statName] = value
     end,
 
     GetUnitStat = function(self, unitId, statName)
-        if self.unitStats[unitId] == nil or self.unitStats[unitId][statName] == nil then
+        if self.UnitStats[unitId] == nil or self.UnitStats[unitId][statName] == nil then
             return 0
         end
 
-        return self.unitStats[unitId][statName]
+        return self.UnitStats[unitId][statName]
     end,
 
     GetUnitStats = function(self)
-        return self.unitStats
+        return self.UnitStats
     end,
 
     OnCreateAI = function(self, planName)
@@ -142,7 +142,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
     CreateBrainShared = function(self,planName)
         self.Result = nil -- no-op, just to be explicit it starts as nil
-        self.unitStats = {}
+        self.StatsSent = false
+        self.UnitStats = {}
         self.Trash = TrashBag()
         local aiScenarioPlans = self:ImportScenarioArmyPlans(planName)
         if aiScenarioPlans then

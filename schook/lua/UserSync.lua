@@ -96,15 +96,16 @@ OnSync = function()
 
     for k,gameResult in Sync.GameResult do
         local armyIndex, result = unpack(gameResult)
+        LOG(string.format('Sending game result: %i %s', armyIndex, result))
         GpgNetSend('GameResult', armyIndex, result)
         import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
-    if Sync.SendStats then
-        local stats = {stats = Sync.Score }
-        local json = import('/lua/system/dkson.lua').json.encode(stats)
+    if Sync.StatsToSend then
+        local json = import('/lua/system/dkson.lua').json.encode({ stats = Sync.StatsToSend })
         LOG('Sending stats: '..json)
         GpgNetSend('JsonStats', json)
+        Sync.StatsToSend = nil
     end
 
     if Sync.PausedBy then
