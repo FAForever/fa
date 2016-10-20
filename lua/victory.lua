@@ -98,7 +98,9 @@ end
 function CallEndGame()
     gameOver = true
     ForkThread(function()
-        WaitSeconds(3)
+        WaitSeconds(2.9)
+        import('/lua/sim/score.lua').SyncScores()
+        WaitSeconds(0.1)
         EndGame()
     end)
 end
