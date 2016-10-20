@@ -611,10 +611,10 @@ AIBrain = Class(moho.aibrain_methods) {
                     RemovePlatoonHandleFromUnit(units)
 
                     if victoryOption == 'demoralization' then
-                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.COM or selfIndex
+                        KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
                     else
-                        KillerIndex = ArmyBrains[selfIndex].unitStats.LastKilled.unit or selfIndex
+                        KillerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
                     end
                 end
