@@ -100,7 +100,9 @@ function CallEndGame()
     gameOver = true
     sendStats = true
     ForkThread(function()
-        WaitSeconds(3)
+        WaitSeconds(2.9)
+        import('/lua/sim/score.lua').SyncScores()
+        WaitSeconds(0.1) -- Wait 1 tick so final score is synced to UI
         EndGame()
     end)
 end
