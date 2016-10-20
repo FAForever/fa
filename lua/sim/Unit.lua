@@ -876,7 +876,7 @@ Unit = Class(moho.unit_methods) {
             local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
 
             --The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
-            if table.getn(newUnits) ~= 1 then
+            if not table.empty(newUnits) and table.getn(newUnits) ~= 1 then
                 return
             end
             local newUnit
