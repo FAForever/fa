@@ -861,7 +861,7 @@ Unit = Class(moho.unit_methods) {
             local captorArmyIndex = captor:GetArmy()
             local captorBrain = false
 
-            --Ignore army cap during unit transfer in Campaign
+            -- Ignore army cap during unit transfer in Campaign
             if ScenarioInfo.CampaignMode then
                 captorBrain = captor:GetAIBrain()
                 SetIgnoreArmyUnitCap(captorArmyIndex, true)
@@ -871,22 +871,20 @@ Unit = Class(moho.unit_methods) {
                 SetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
 
-            --Fix captured units not retaining their data
+            -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex) or {}
 
-            --The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
-            if table.getn(newUnits) ~= 1 then
+            -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
+            -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
+            if table.empty(newUnits) or table.getn(newUnits) ~= 1 then
                 return
             end
-            local newUnit
-            for k, unit in newUnits do
-                newUnit = unit
-                break
-            end
+            
+            local newUnit = newUnits[1]
 
-            --Because the old unit is lost we cannot call a member function for newUnit callbacks
-            for k,cb in newUnitCallbacks do
+            -- Because the old unit is lost we cannot call a member function for newUnit callbacks
+            for k, cb in newUnitCallbacks do
                 if cb then
                     cb(newUnit, captor)
                 end
