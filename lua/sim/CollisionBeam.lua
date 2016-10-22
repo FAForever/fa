@@ -316,7 +316,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     GetCollideFriendly = function(self)
-        return self.DamageData.CollideFriendly
+        return self.CollideFriendly
     end,
 
     SetDamageTable = function(self)
@@ -330,6 +330,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self.DamageTable.DoTTime = weaponBlueprint.DoTTime
         self.DamageTable.DoTPulses = weaponBlueprint.DoTPulses
         self.DamageTable.Buffs = weaponBlueprint.Buffs
+        self.CollideFriendly = self.DamageData.CollideFriendly == true
     end,
 
     -- When this beam impacts with the target, do any buffs that have been passed to it.

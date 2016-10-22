@@ -29,8 +29,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
-
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
+        self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
     DoDamage = function(self, instigator, DamageData, targetEntity)
@@ -444,7 +444,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     GetCollideFriendly = function(self)
-        return self.DamageData.CollideFriendly
+        return self.CollideFriendly
     end,
 
     PassData = function(self, data)

@@ -1305,7 +1305,7 @@ Unit = Class(moho.unit_methods) {
         end
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if self:GetArmy() == other:GetArmy() then
-                return other:GetCollideFriendly()
+                return other.CollideFriendly
             end
         end
 
