@@ -281,7 +281,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-		-- if this unit category is on the weapon's do-not-collide list, skip!
+        if not firingWeapon.CollideFriendly and self:GetArmy() == firingWeapon.unit:GetArmy() then
+            return false
+        end
+
+        -- if this unit category is on the weapon's do-not-collide list, skip!
 		local weaponBP = firingWeapon:GetBlueprint()
 		if weaponBP.DoNotCollideList then
 			for k, v in pairs(weaponBP.DoNotCollideList) do
