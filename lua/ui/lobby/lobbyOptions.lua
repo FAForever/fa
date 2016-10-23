@@ -326,7 +326,7 @@ globalOpts = {
                 help = "<LOC lobui_0319>Rules not enforced",
                 key = 'Off',
             },
-            '5', '10', '15', '20', '30'
+            '5', '10', '20'
         },
     },
     {
