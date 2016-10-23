@@ -223,7 +223,11 @@ function SyncScores()
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
-        Sync.StatsToSend = Sync.Score
+        
+        -- We don't want to report full scores to server unless game over
+        if victory.gameOver then
+            Sync.StatsToSend = Sync.Score
+        end
     else
         for index, brain in ArmyBrains do
             if brain.Result and not brain.StatsSent then
