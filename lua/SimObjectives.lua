@@ -773,12 +773,15 @@ end
 -- # the area for what units are inside and look at the blueprints (and optionally
 -- # match the army, use -1 for don't care).
 -- #
+-- # New: Add a table with armies instead of a single ArmyIndex. ex: {'Army_1', 'Army_2', ...}
+-- # Use 'HumanPlayers' when you want to use all Human controlled armies.
+-- #
 -- # Target = {
 -- #   Requirements = {
--- #       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
--- #       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
+-- #       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>], [Armies=<armyTable>]},
+-- #       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>], [Armies=<armyTable>] },
 -- #       ...
--- #       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
+-- #       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>], [Armies=<armyTable>] },
 -- #   }
 -- # }
 -- #
@@ -810,10 +813,11 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
             for i, requirement in requirements do
                 local units = GetUnitsInRect(requirement.Rect)
                 local cnt = 0
+                local ArmiesList = CreateArmiesList(requirement.Armies)
                 if units then
                     for k, unit in units do
                         if not unit:IsDead() and not unit:IsBeingBuilt() then
-                            if not requirement.ArmyIndex or (requirement.ArmyIndex == unit:GetArmy()) then
+                            if not (requirement.ArmyIndex or requirement.Armies) or (requirement.ArmyIndex == unit:GetArmy()) or ArmiesList[unit:GetArmy()] then
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
@@ -878,6 +882,33 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
     ForkThread( WatchArea, Target.Requirements )
 
     return objective
+end
+
+function CreateArmiesList(armies)
+    if not armies then
+        return {}
+    end
+    
+    local armiesList = {}
+    for _,armyName in armies do
+        if type(armyName) ~= 'string' then
+            error('SimObjectives error: Armies in requirements need to be of type string, provided type: ' .. type(armyName))
+        end
+        if armyName == 'HumanPlayers' then
+            local tblArmy = ListArmies()
+            for iArmy, strArmy in pairs(tblArmy) do
+                if ScenarioInfo.ArmySetup[strArmy].Human then
+                    armiesList[ScenarioInfo.ArmySetup[strArmy].ArmyIndex] = true
+                end
+            end
+        elseif ScenarioInfo.ArmySetup[armyName] then
+            armiesList[ScenarioInfo.ArmySetup[armyName].ArmyIndex] = true
+        else
+            error('SimObjectives error: Army doesnt exist: ' .. armyName)
+        end
+    end
+    
+    return armiesList
 end
 
 -- #
