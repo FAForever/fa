@@ -1786,19 +1786,19 @@ function CheckPlatoonPathingEx( platoon, destPos )
 end
 
 
-function AIFindUnitRadiusThreat( aiBrain, alliance, priTable, position, radius, tMin, tMax, tRing )
+function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, tMin, tMax, tRing)
     local catTable = {}
     local unitTable = {}
     for k,v in priTable do
-        table.insert( catTable, ParseEntityCategory(v) )
-        table.insert( unitTable, {} )
+        table.insert(catTable, ParseEntityCategory(v))
+        table.insert(unitTable, {})
     end
 
-    local units = aiBrain:GetUnitsAroundPoint( categories.ALLUNITS, position, radius, alliance )
+    local units = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, radius, alliance) or {}
     for num, unit in units do
         for tNum, catType in catTable do
-            if EntityCategoryContains( catType, unit ) then
-                table.insert( unitTable[tNum], unit )
+            if EntityCategoryContains(catType, unit) then
+                table.insert(unitTable[tNum], unit)
                 break
             end
         end
@@ -1818,14 +1818,14 @@ function AIFindUnitRadiusThreat( aiBrain, alliance, priTable, position, radius, 
                 local useUnit = true
                 if checkThreat then
 					WaitSeconds(0.1)
-                    local threat = aiBrain:GetThreatAtPosition( unitPos, tRing, true )
-                    if not ( threat >= tMin and threat <= tMax ) then
+                    local threat = aiBrain:GetThreatAtPosition(unitPos, tRing, true)
+                    if not (threat >= tMin and threat <= tMax) then
                         useUnit = false
                     end
                 end
                 if useUnit then
-                    local tempDist = VDist2( unitPos[1], unitPos[3], position[1], position[3] )
-                    if tempDist < radius and ( not distance or tempDist < distance ) then
+                    local tempDist = VDist2(unitPos[1], unitPos[3], position[1], position[3])
+                    if tempDist < radius and (not distance or tempDist < distance) then
                         distance = tempDist
                         retUnit = unit
                     end
