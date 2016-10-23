@@ -1894,6 +1894,7 @@ local function UpdateGame()
     RefreshLargeMap()
 
     SetRuleTitleText(gameInfo.GameOptions.GameRules or "")
+    SetGameTitleText(gameInfo.GameOptions.Title or LOC("<LOC lobui_0427>FAF Game Lobby"))
 end
 
 --- Update the game quality display
@@ -2373,6 +2374,14 @@ function CreateUI(maxPlayers)
     GUI.titleText = makeLabel(LOC("<LOC lobui_0427>FAF Game Lobby"), 17)
     LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 5, 20)
 
+    if isHost then
+        GUI.titleText.HandleEvent = function(self, event)
+            if event.Type == 'ButtonPress' then
+                ShowTitleDialog()
+            end
+        end
+    end
+
     -- Rule Label
     local RuleLabel = TextArea(GUI.panel, 350, 34)
     GUI.RuleLabel = RuleLabel
@@ -2387,10 +2396,11 @@ function CreateUI(maxPlayers)
     else
         tmptext = LOC("<LOC lobui_0421>No rules")
     end
+
     RuleLabel:SetText(tmptext)
     if isHost then
         RuleLabel.OnClick = function(self)
-            ShowRuleDialog(RuleLabel)
+            ShowRuleDialog()
         end
     end
 
@@ -4125,10 +4135,6 @@ function SetGameOptions(options, ignoreRefresh)
                     end
                 end
             end
-        elseif key == "GameRules" then
-            -- Oh, the cargo-culting.
-            SetRuleTitleText(val)
-            GpgNetSend('GameOption', key, val)
         else
             GpgNetSend('GameOption', key, val)
         end
@@ -4464,6 +4470,20 @@ function SetSlotCPUBar(slot, playerInfo)
     end
 end
 
+function SetGameTitleText(title)
+    GUI.titleText:SetColor("B9BFB9")
+    GUI.titleText:SetText(title or LOC("<LOC lobui_0427>FAF Game Lobby"))
+end
+
+function ShowTitleDialog()
+    CreateInputDialog(GUI, "Game Title",
+        function(self, text)
+            SetGameOption("Title", text, true)
+            SetGameTitleText(text)
+        end, gameInfo.GameOptions.Title
+    )
+end
+
 -- Rule title
 function SetRuleTitleText(rule)
     GUI.RuleLabel:SetColors("B9BFB9")
@@ -4480,10 +4500,11 @@ function SetRuleTitleText(rule)
 end
 
 -- Show the rule change dialog.
-function ShowRuleDialog(RuleLabel)
+function ShowRuleDialog()
     CreateInputDialog(GUI, "Game Rules",
-        function(self, rules)
-            SetGameOption("GameRules", rules, true)
+        function(self, text)
+            SetGameOption("GameRules", text, true)
+            SetRuleTitleText(text)
         end
     )
 end
