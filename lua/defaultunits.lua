@@ -359,7 +359,6 @@ StructureUnit = Class(Unit) {
                 NotifyUpgrade(self, unitBuilding)
                 self:StopUpgradeEffects(unitBuilding)
                 self:PlayUnitSound('UpgradeEnd')
-                self:RefreshIntel(unitBuilding)
                 self:Destroy()
             end
         end,
@@ -432,28 +431,6 @@ StructureUnit = Class(Unit) {
 
     PlayActiveAnimation = function(self)
 
-    end,
-
-    -- Refresh intel on a destroyed / upgraded unit by setting vision on the actual blip.
-    -- The expired blip will actually be destroyed right after when the intel system notices it's no longer there
-    RefreshIntel = function(self, new_unit)
-        local unit_army = self:GetArmy()
-
-        for i, brain in ArmyBrains do
-            local army = brain:GetArmyIndex()
-
-            if army ~= unit_army and not IsAlly(army, unit_army) then
-                local blip = self:GetBlip(army)
-
-                if blip then
-                    blip:FlashIntel(army, new_unit)
-                end
-            end
-        end
-    end,
-
-    DestroyUnit = function(self, overkillRatio)
-        Unit.DestroyUnit(self, overkillRatio)
     end,
 
     -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
