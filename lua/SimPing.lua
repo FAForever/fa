@@ -17,29 +17,26 @@ function AnimatePingMesh(entity)
 end
 
 function SpawnPing(data)
-    -- Move ping owner decision sim side to block UI mod exploitation.
-    local army = GetFocusArmy()
-
-    if army < 1 then
-        WARN("SpawnPing: army cannot be less than 1")
+    if data.Owner < 1 then
+        WARN("SpawnPing: data.Owner cannot be less than 1")
         return
     end
 
-    if data.Marker and PingMarkers[army] and table.getsize(PingMarkers[army]) >= MaxPingMarkers then
+    if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
         return
-    elseif data.Marker and not PingMarkers[army] then
-        PingMarkers[army] = {}
+    elseif data.Marker and not PingMarkers[data.Owner] then
+        PingMarkers[data.Owner] = {}
     end
 
-    if data.Marker and GetPingID(army) then
-        data.ID = GetPingID(army)
-        PingMarkers[army][data.ID] = data
+    if data.Marker and GetPingID(data.Owner) then
+        data.ID = GetPingID(data.Owner)
+        PingMarkers[data.Owner][data.ID] = data
     else
         local Entity = import('/lua/sim/Entity.lua').Entity
         data.Location[2] = data.Location[2]+2
 
         -- Entity.Owner needs armyIndex - 1 internally, so here we actually needs to offset when creating a special ping entity
-        local pingSpec = {Owner = army - 1, Location = data.Location}
+        local pingSpec = {Owner = data.Owner - 1, Location = data.Location}
         local ping = Entity(pingSpec)
         Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
         ping:SetVizToFocusPlayer('Always')
@@ -55,8 +52,6 @@ function SpawnPing(data)
         end)
     end
 
-    data.Owner = army
-
     SendData(data)
     DoCallbacks(data)
 end
@@ -68,26 +63,19 @@ end
 function DoCallbacks(data)
     for army, brain in ArmyBrains do
         if IsVisible(data, army) then
-            brain:DoPingCallbacks(data)
+            brain:DoPingCallbacks( data )
             if not SUtils.IsAIArmy(data.Owner) then
-                brain:DoAIPing(data)
+                brain:DoAIPing( data )
             end
         end
     end
 end
 
 function SpawnSpecialPing(data)
-    -- This function is used to generate automatic nuke pings
+	--This function is used to generate automatic nuke pings
     local Entity = import('/lua/sim/Entity.lua').Entity
     data.Location[2] = data.Location[2]+2
-
-    -- Once again, the owner has been through the user layer. Set army in sim to avoid exploitation
-    local army = GetFocusArmy()
-    if data.Owner ~= army then
-        WARN('Nuke ping owner Sim/UI mismatch. Possible exploitation detected. Please investigate')
-    end
-
-    local pingSpec = {Owner = army - 1, Location = data.Location}
+    local pingSpec = {Owner = data.Owner, Location = data.Location}
     local ping = Entity(pingSpec)
     Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
     ping:SetVizToFocusPlayer('Always')
@@ -102,15 +90,13 @@ function SpawnSpecialPing(data)
         ping:Destroy()
     end)
 
-    data.Owner = army
-
     SendData(data)
     DoCallbacks(data)
 end
 
-function GetPingID(army)
+function GetPingID(owner)
     for i = 1, MaxPingMarkers do
-        if not PingMarkers[army][i] then
+        if not PingMarkers[owner][i] then
             return i
         end
     end
