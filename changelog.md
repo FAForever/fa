@@ -1,4 +1,4 @@
-Patch 3660 (October 14th, 2016)
+Patch 3660 (October 24th, 2016)
 ============================
 **Lobby**
 - Fixed team number switching slots alongside a player
@@ -13,6 +13,8 @@ Patch 3660 (October 14th, 2016)
 - Fixed new players joining a lobby being unable to see closed slots as being closed
 - Fixed auto team settings not working for games with >8 players
 - Changed 'Remove Player' to 'Kick Player' for clarity
+- Removed nonfunctional 15 and 30 minute no-rush options
+- Fixed the game crashing if you attempted to save a new preset
 
 **Coop**
 - Fixed cinematics playing in coop games
