@@ -6,21 +6,17 @@ local Prefs = import('/lua/user/prefs.lua')
 
 local Reclaim = {}
 
--- called from schook/lua/UserSync.lua
-local NeedUpdate = false
+-- called from /lua/UserSync.lua
 function UpdateReclaim(r)
     r.updated = true
     Reclaim[r.id] = r
 end
 
-local OldZoom
-function SameZoom(camera)
-    if not OldZoom or camera:GetZoom() == OldZoom then
-        return true
-    end
+local MAX_ON_SCREEN = 1000
 
-    return false
-end
+local ZoomHide = false
+local OldZoom
+local NumVisible = 0
 
 function OnScreen(view, pos)
     local proj = view:Project(Vector(pos[1], pos[2], pos[3]))
@@ -49,9 +45,7 @@ local WorldLabel = Class(Group) {
     end,
 
     OnFrame = function(self, delta)
-        if not self:IsHidden() then
-            self:Update()
-        end
+        self:Update()
     end
 }
 
@@ -74,14 +68,10 @@ function CreateReclaimLabel(view, r)
 
     label:DisableHitTest(true)
     label.Update = function(self)
-        if self.parent:IsHidden() then return end
-
         local view = self.parent.view
         local proj = view:Project(pos)
-        if not self.proj or self.proj.x ~= proj.x or self.proj.y ~= self.proj.y then
-            LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
-            self.proj = proj
-        end
+        LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
+        self.proj = {x=proj.x, y=proj.y}
     end
 
     label.UpdateMass = function(self, r)
@@ -116,8 +106,9 @@ function UpdateLabels()
                 view.ReclaimGroup.ReclaimLabels[id] = label
             else
                 label:Show()
-                n_visible = n_visible + 1
             end
+
+            n_visible = n_visible + 1
         elseif label then
             label:Hide()
         end
@@ -125,11 +116,12 @@ function UpdateLabels()
         if label and r.updated then
             label:UpdateMass(r)
             r.updated = false
-            NeedUpdate = true
         end
     end
 
-    return view.ReclaimGroup.ReclaimLabels, n_visible
+    NumVisible = n_visible
+
+    return view.ReclaimGroup.ReclaimLabels
 end
 
 local ReclaimThread
@@ -146,7 +138,7 @@ function ShowReclaim(show)
     end
 end
 
-function InitReclaimGroup(view, camera)
+function InitReclaimGroup(view)
     if not view.ReclaimGroup or IsDestroyed(view.ReclaimGroup) then
         local rgroup = Group(view)
         rgroup.view = view
@@ -155,19 +147,16 @@ function InitReclaimGroup(view, camera)
         rgroup:Show()
         rgroup.ReclaimLabels = {}
 
-        rgroup.OnFrame = function(self)
-            if not self.update then return end
-            if SameZoom(camera) then
-                self:Show()
-                self:SetNeedsFrameUpdate(false)
-                self.update = false
-            else
+        view.ReclaimGroup = rgroup
+
+        rgroup.OnFrame = function(self, delta)
+            if view.zoomed and NumVisible > MAX_ON_SCREEN then
+                ZoomHide = true
                 self:Hide()
             end
         end
 
-        view.ReclaimGroup = rgroup
-        NeedUpdate = true
+        rgroup:SetNeedsFrameUpdate(true)
     else
         view.ReclaimGroup:Show()
     end
@@ -176,33 +165,35 @@ end
 
 function ShowReclaimThread(watch_key)
     local i = 0
-    local camera = GetCamera("WorldCamera")
     local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local camera = GetCamera("WorldCamera")
 
-    InitReclaimGroup(view, camera)
-    OldZoom = nil
+    InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
         if not view or IsDestroyed(view) then
             view = import('/lua/ui/game/worldview.lua').viewLeft
             camera = GetCamera("WorldCamera")
-            InitReclaimGroup(view, camera)
+            InitReclaimGroup(view)
         end
 
-        local sameZoom = SameZoom(camera)
-        local doUpdate = NeedUpdate or not sameZoom
+        local labels = UpdateLabels()
 
-        if doUpdate then
-            local labels, n_visible = UpdateLabels()
-            if not sameZoom and n_visible > 1000 then
-                view.ReclaimGroup:Hide()
-                view.ReclaimGroup.update = true
-                view.ReclaimGroup:SetNeedsFrameUpdate(true)
+        if ZoomHide then
+            local zoom = camera:GetZoom()
+            if zoom == OldZoom then
+                ZoomHide = false
+            else
+                OldZoom = zoom
             end
-            NeedUpdate = false
         end
 
-        OldZoom = camera:GetZoom()
+        if not ZoomHide then
+            view.zoomed = false
+            view.ReclaimGroup:Show()
+            OldZoom = nil
+        end
+
         WaitSeconds(.1)
     end
 
