@@ -161,6 +161,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             GetCursor():Reset()
             self.LastCursor = nil
             self:ResetDecals()
+        elseif event.Type == 'WheelRotation' then
+            self.zoomed = true
         end
 
         return false
