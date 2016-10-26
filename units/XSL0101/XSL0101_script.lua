@@ -36,7 +36,7 @@ XSL0101 = Class(SWalkingLandUnit) {
             self.CloakThread = nil
         end
 
-        self:SetFireState(0)
+        self:SetWeaponEnabledByLabel('LaserTurret', true)
         self:SetMaintenanceConsumptionInactive()
         self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
         self:DisableUnitIntel('ToggleBit8', 'Cloak')
@@ -46,6 +46,7 @@ XSL0101 = Class(SWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetScriptBit('RULEUTC_CloakToggle', true)
+        self:RevealUnit()
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
@@ -57,7 +58,7 @@ XSL0101 = Class(SWalkingLandUnit) {
                     WaitSeconds(2)
 
                     if not self.Dead then
-                        self:SetFireState(1)
+                        self:SetWeaponEnabledByLabel('LaserTurret', false)
                         self:SetMaintenanceConsumptionActive()
                         self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
                         self:EnableUnitIntel('ToggleBit8', 'Cloak')
