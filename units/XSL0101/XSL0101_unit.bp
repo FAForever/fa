@@ -189,6 +189,7 @@ UnitBlueprint {
         RadarRadius = 40,
         RadarStealth = true,
         VisionRadius = 24,
+        StealthWaitTime = 1,
     },
     Interface = {
         HelpText = '<LOC xsl0101_help>Combat Scout',
