@@ -46,11 +46,11 @@ XSL0101 = Class(SWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetScriptBit('RULEUTC_CloakToggle', true)
-        self:RevealUnit()
+        self:OnMotionHorzEventChange('Stopped', nil) -- Special call to enable cloak on cheat-spawn (For maps etc)
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        if self.Sync.LowPriority then
+        if not old or self.Sync.LowPriority then
             -- If we stopped moving, hide
             if new == 'Stopped' then
                 -- We need to fork in order to use WaitSeconds
@@ -68,6 +68,9 @@ XSL0101 = Class(SWalkingLandUnit) {
                 end)
             end
         end
+        
+        -- Bail out from the special case call
+        if not old then return end
 
         -- If we begin moving, reveal ourselves
         if old == 'Stopped' then
