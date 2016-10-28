@@ -55,7 +55,7 @@ XSL0101 = Class(SWalkingLandUnit) {
             if new == 'Stopped' then
                 -- We need to fork in order to use WaitSeconds
                 self.CloakThread = ForkThread(function()
-                    WaitSeconds(2)
+                    WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
 
                     if not self.Dead then
                         self:SetWeaponEnabledByLabel('LaserTurret', false)
