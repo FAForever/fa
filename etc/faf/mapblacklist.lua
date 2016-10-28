@@ -1707,6 +1707,7 @@ MapBlacklist = {
     ['point_of_reach_ultimate.v0003'] = true,
     ['point_of_reach_ultimate.v0002'] = true,
     ['point_of_reach_ultimate.v0001'] = true,
+    ['hilly_plateau_ultimate.v0004'] = true,
     ['hilly_plateau_ultimate.v0003'] = true,
     ['hilly_plateau_ultimate.v0002'] = true,
     ['hilly_plateau_ultimate.v0001'] = true,
