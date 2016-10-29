@@ -515,15 +515,17 @@ UnitBlueprint {
             FiringTolerance = 360,
             Flare = {
                 Category = 'MISSILE',
-                Radius = 26,
+                Stack = true, --added special flag to trigger multi-sphere collision
+                OffsetMult = 1.33,
+                Radius = 15,
             },
             Label = 'AntiMissile1',
-            MaxRadius = 50,
+            MaxRadius = 20,
             MuzzleSalvoDelay = 2.3,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 15,
             ProjectileId = '/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp',
-            ProjectileLifetime = 6,
+            ProjectileLifetime = 3,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -545,7 +547,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = 'UWRC_Countermeasure',
-            RateOfFire = 0.25,
+            RateOfFire = 0.2,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
