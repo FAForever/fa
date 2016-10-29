@@ -5,6 +5,12 @@
 -- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ==========================================================================================
 
+FireState = {
+    RETURN_FIRE = 0,
+    HOLD_FIRE = 1,
+    GROUND_FIRE = 2,
+}
+
 VeteranDefault = {
     Level1 = 25,
     Level2 = 100,
