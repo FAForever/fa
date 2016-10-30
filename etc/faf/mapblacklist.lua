@@ -1728,4 +1728,7 @@ MapBlacklist = {
     ['africa_ultimate.v0001'] = true,
     ['fields_of_great_phoenix_ultimate.v0001'] = true,
     ['twin_rivers_ultimate.v0001'] = true,
+    ['setons_clutch_ultimate.v0003'] = true,
+    ['setons_clutch_ultimate.v0002'] = true,
+    ['setons_clutch_ultimate.v0001'] = true,
 }
