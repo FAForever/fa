@@ -2333,6 +2333,14 @@ Unit = Class(moho.unit_methods) {
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
                 self:DisableIntel(intel)
+
+                -- Handle the cloak FX timing
+                if intel == 'Cloak' then
+                    if disabler ~= 'NotInitialized' then
+                        self:UpdateCloakEffect(false)
+                    end
+                end
+
                 intDisabled = true
             end
             self.IntelDisables[intel][disabler] = true
@@ -2367,6 +2375,14 @@ Unit = Class(moho.unit_methods) {
                 self.IntelDisables[intel][disabler] = nil
                 if Set.Empty(self.IntelDisables[intel]) then
                     self:EnableIntel(intel)
+
+                    -- Handle the cloak FX timing
+                    if intel == 'Cloak' then
+                        if disabler ~= 'NotInitialized' then
+                            self:UpdateCloakEffect(true)
+                        end
+                    end
+
                     intEnabled = true
                 end
             end
@@ -2403,6 +2419,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnIntelDisabled = function(self)
+    end,
+
+    UpdateCloakEffect = function(self, cloaked)
+        if self and not self.Dead then
+            local bpDisplay = self:GetBlueprint().Display
+
+            if cloaked then
+                self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
+            else
+                self:SetMesh(bpDisplay.MeshBlueprint, true)
+            end
+        end
     end,
 
     ShouldWatchIntel = function(self)
