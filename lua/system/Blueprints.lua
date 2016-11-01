@@ -396,6 +396,38 @@ function HandleUnitWithBuildPresets(bps, all_bps)
     end
 end
 
+-- Assign shader and mesh for visual Cloaking FX
+function ExtractCloakMeshBlueprint(bp)
+    local meshid = bp.Display.MeshBlueprint
+    if not meshid then return end
+
+    local meshbp = original_blueprints.Mesh[meshid]
+    if not meshbp then return end
+
+    local shadernameE = 'ShieldCybran'
+    local shadernameA = 'ShieldAeon'
+    local shadernameC = 'ShieldCybran'
+    local shadernameS = 'ShieldAeon'
+
+    local cloakmeshbp = table.deepcopy(meshbp)
+    if cloakmeshbp.LODs then
+        for i, cat in bp.Categories do
+            if cat == 'UEF' or cat == 'CYBRAN' then
+                for i, lod in cloakmeshbp.LODs do
+                    lod.ShaderName = shadernameE
+                end
+            elseif cat == 'AEON' or cat == 'SERAPHIM' then
+                for i, lod in cloakmeshbp.LODs do
+                    lod.ShaderName = shadernameA
+                end
+            end
+        end
+    end
+    cloakmeshbp.BlueprintId = meshid .. '_cloak'
+    bp.Display.CloakMeshBlueprint = cloakmeshbp.BlueprintId
+    MeshBlueprint(cloakmeshbp)
+end
+
 -- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
 
@@ -405,6 +437,8 @@ function PreModBlueprints(all_bps)
     local cats = {}
 
     for _, bp in all_bps.Unit do
+    
+        ExtractCloakMeshBlueprint(bp)
 
         -- skip units without categories
         if not bp.Categories then
@@ -644,6 +678,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     end
 
 end
+
 -- Reload a single blueprint
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
