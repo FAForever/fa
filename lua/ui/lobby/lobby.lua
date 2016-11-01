@@ -190,6 +190,7 @@ local GUI = false
 local localPlayerID = false
 local gameInfo = false
 local pmDialog = false
+local lastKickMessage = Prefs.GetFromCurrentProfile('lastKickMessage') or ""
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
@@ -419,10 +420,11 @@ local function DoSlotBehavior(slot, key, name)
                 lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
 
                 -- Save message for next time
-                gameInfo.LastKickMessage = str
+                Prefs.SetToCurrentProfile('lastKickMessage', str)
+                lastKickMessage = str
             end
 
-            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, (gameInfo.LastKickMessage or "Reason (optional)"))
+            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, (lastKickMessage or "Reason (optional)"))
         else
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
