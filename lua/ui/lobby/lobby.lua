@@ -410,11 +410,7 @@ local function DoSlotBehavior(slot, key, name)
             local kickMessage = function(self, str)
                 local msg
 
-                if str == "" or str == "Reason (optional)" then
-                    msg = "\n Kicked by host"
-                else
-                    msg = "\n Kicked by host. \n Reason: " .. str
-                end
+                msg = "\n Kicked by host. \n Reason: " .. str
 
                 SendSystemMessage("lobui_0756", gameInfo.PlayerOptions[slot].PlayerName)
                 lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
@@ -424,7 +420,7 @@ local function DoSlotBehavior(slot, key, name)
                 lastKickMessage = str
             end
 
-            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, (lastKickMessage or "Reason (optional)"))
+            CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, lastKickMessage)
         else
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
