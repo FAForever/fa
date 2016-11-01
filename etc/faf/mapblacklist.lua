@@ -1662,6 +1662,7 @@ MapBlacklist = {
     ['zone control.v06'] = true,
     ['zorg_outpost.v0001'] = true,
     ['zorgvalleys'] = true,
+    ['wonder_open_ultimate.v0009'] = true,
     ['wonder_open_ultimate.v0008'] = true,
     ['wonder_open_ultimate.v0007'] = true,
     ['wonder_open_ultimate.v0006'] = true,
