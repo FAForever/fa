@@ -1686,6 +1686,7 @@ function DoTeleportInDamage(unit)
 end
 
 function CreateTeleSteamFX(unit)
+    local army = unit:GetArmy()
     local totalBones = unit:GetBoneCount() - 1
     for k, v in EffectTemplate.UnitTeleportSteam01 do
         for bone = 1, totalBones do
@@ -1732,7 +1733,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 unit:ShowEnhancementBones()
                 unit.TeleportFx_IsInvisible = false
 
-                unit:CreateTeleSteamFX()
+                CreateTeleSteamFX(unit)
             end
 
             local thread = unit:ForkThread(fn)
@@ -1771,7 +1772,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                     unit.TeleportCybranSphere = false
                 end
 
-                unit:CreateTeleSteamFX()
+                CreateTeleSteamFX(unit)
             end
 
             local thread = unit:ForkThread(fn)
@@ -1808,7 +1809,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                     CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
                 end
                 
-                unit:CreateTeleSteamFX()
+                CreateTeleSteamFX(unit)
             end
             
             local thread = unit:ForkThread(fn)
@@ -1822,7 +1823,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, army)
 
-            unit:CreateTeleSteamFX()
+            CreateTeleSteamFX(unit)
         end
     end
 end
