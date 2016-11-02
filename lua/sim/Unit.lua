@@ -122,7 +122,7 @@ Unit = Class(moho.unit_methods) {
             RadarStealthField = {NotInitialized=true},
             SonarStealthField = {NotInitialized=true},
             Cloak = {NotInitialized=true},
-            CloakField = {NotInitialized=true},
+            CloakField = {NotInitialized=true}, -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             Spoof = {NotInitialized=true},
             Jammer = {NotInitialized=true},
         }
@@ -512,7 +512,7 @@ Unit = Class(moho.unit_methods) {
             self:DisableUnitIntel('ToggleBit3', 'Sonar')
             self:DisableUnitIntel('ToggleBit3', 'Omni')
             self:DisableUnitIntel('ToggleBit3', 'Cloak')
-            self:DisableUnitIntel('ToggleBit3', 'CloakField')
+            self:DisableUnitIntel('ToggleBit3', 'CloakField') -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             self:DisableUnitIntel('ToggleBit3', 'Spoof')
             self:DisableUnitIntel('ToggleBit3', 'Jammer')
             self:DisableUnitIntel('ToggleBit3', 'Radar')
@@ -560,7 +560,7 @@ Unit = Class(moho.unit_methods) {
             self:EnableUnitIntel('ToggleBit3', 'Sonar')
             self:EnableUnitIntel('ToggleBit3', 'Omni')
             self:EnableUnitIntel('ToggleBit3', 'Cloak')
-            self:EnableUnitIntel('ToggleBit3', 'CloakField')
+            self:EnableUnitIntel('ToggleBit3', 'CloakField') -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             self:EnableUnitIntel('ToggleBit3', 'Spoof')
             self:EnableUnitIntel('ToggleBit3', 'Jammer')
         elseif bit == 4 then --Production toggle
