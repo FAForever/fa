@@ -7765,6 +7765,8 @@ lobui_0427="Вестибюль FAF"
 lobui_0428="Удалить игрока"
 lobui_0429="Сделать игрока наблюдателем"
 lobui_0430="Country not found. Please contact the development team on the forums, or ask a moderator for help"
+lobui_0431="Close spot - spawn mex"
+lobui_0432="Closed spot - spawn mex"
 
 lobui_0434="Распределять кол-во боевых ед-ц"
 lobui_0435="Распределение боевых единиц после смерти игрока"

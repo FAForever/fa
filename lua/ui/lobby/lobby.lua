@@ -218,6 +218,8 @@ local slotMenuStrings = {
     pm = "<LOC lobui_0223>Private Message",
     remove_to_kik = "<LOC lobui_0428>Kick Player",
     remove_to_observer = "<LOC lobui_0429>Move Player to Observer",
+    close_spawn_mex = "<LOC lobui_0431>Close - spawn mex",
+    closed_spawn_mex = "<LOC lobui_0432>Closed - spawn mex",
 }
 local slotMenuData = {
     open = {
@@ -258,17 +260,41 @@ local slotMenuData = {
     },
 }
 
+local function GetSlotMenuData()
+    if gameInfo.AdaptiveMap then
+        if not slotMenuData.closed_spawn_mex then
+            slotMenuData.closed_spawn_mex = {
+                                                    host = {
+                                                        'open',
+                                                        'close',
+                                                    },
+                                                    client = {
+                                                    },
+                                                }
+            table.insert(slotMenuData.open.host, 2, 'close_spawn_mex')
+            table.insert(slotMenuData.closed.host, 2, 'close_spawn_mex')
+        end
+    else
+        if slotMenuData.closed_spawn_mex then
+            slotMenuData.closed_spawn_mex = nil
+            table.remove(slotMenuData.open.host, 2)
+            table.remove(slotMenuData.closed.host, 2)
+        end
+    end
+    return slotMenuData
+end
+
 local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local keys = {}
     local strings = {}
     local tooltips = {}
 
-    if not slotMenuData[stateKey] then
+    if not GetSlotMenuData()[stateKey] then
         WARN("Invalid slot menu state selected: " .. stateKey)
         return nil
     end
 
-    if not slotMenuData[stateKey][hostKey] then
+    if not GetSlotMenuData()[stateKey][hostKey] then
         WARN("Invalid slot menu host key selected: " .. hostKey)
         return nil
     end
@@ -281,7 +307,7 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
         end
     end
 
-    for index, key in slotMenuData[stateKey][hostKey] do
+    for index, key in GetSlotMenuData()[stateKey][hostKey] do
         if key == 'ailist' then
             if slotNum then
                 for i = 1, numOpenSlots, 1 do
@@ -369,6 +395,8 @@ local function DoSlotBehavior(slot, key, name)
         HostUtils.SetSlotClosed(slot, false)
     elseif key == 'close' then
         HostUtils.SetSlotClosed(slot, true)
+    elseif key == 'close_spawn_mex' then
+        HostUtils.SetSlotClosedSpawnMex(slot)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
@@ -976,7 +1004,11 @@ function ClearSlotInfo(slotIndex)
 
     local stateKey
     local stateText
-    if gameInfo.ClosedSlots[slotIndex] then
+    if gameInfo.ClosedSlots[slotIndex] and gameInfo.SpawnMex[slotIndex] and gameInfo.AdaptiveMap then
+        stateKey = 'closed_spawn_mex'
+        stateText = slotMenuStrings.closed_spawn_mex
+    elseif gameInfo.ClosedSlots[slotIndex] then
+        gameInfo.SpawnMex[slotIndex] = false
         stateKey = 'closed'
         stateText = slotMenuStrings.closed
     else
@@ -1003,7 +1035,9 @@ function ClearSlotInfo(slotIndex)
     slot.name._text:SetFont('Arial Gras', 12)
     if stateKey == 'closed' then
         slot.name:SetTitleTextColor("Crimson")
-    else
+    elseif stateKey == 'closed_spawn_mex' then
+        slot.name:SetTitleTextColor("2c7f33") 
+    else 
         slot.name:SetTitleTextColor('B9BFB9')
     end
 
@@ -1557,6 +1591,13 @@ function UpdateAvailableSlots( numAvailStartSpots )
 
     -- if number of available slots has changed, update it
     if numOpenSlots == numAvailStartSpots then
+        -- Remove closed_spawn_mex if necessary
+        for i = 1, numAvailStartSpots do
+            if gameInfo.ClosedSlots[i] and gameInfo.SpawnMex[i] then
+                ClearSlotInfo(i)
+                gameInfo.SpawnMex[i] = nil
+            end
+        end
         return
     end
 
@@ -1564,6 +1605,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
     if numOpenSlots < numAvailStartSpots then
         for i = numOpenSlots + 1, numAvailStartSpots do
             gameInfo.ClosedSlots[i] = nil
+            gameInfo.SpawnMex[i] = nil
             GUI.slots[i]:Show()
             ClearSlotInfo(i)
             DisableSlot(i)
@@ -1726,6 +1768,12 @@ local function TryLaunch(skipNoObserversCheck)
         gameInfo.GameOptions['Ratings'] = allRatings
         gameInfo.GameOptions['ClanTags'] = clanTags
 
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        
+        if scenarioInfo.AdaptiveMap then 
+            gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
+        end
+
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
@@ -1735,8 +1783,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
@@ -1829,6 +1876,8 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
     end
+    
+    gameInfo.AdaptiveMap = scenarioInfo.AdaptiveMap
 
     local numPlayers = GetPlayerCount()
 
@@ -3359,6 +3408,9 @@ function RefreshMapPosition(mapCtrl, slotIndex)
     local marker = mapCtrl.startPositions[slotIndex]
     if marker then
         marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
+        if gameInfo.ClosedSlots[slotIndex] and gameInfo.SpawnMex[slotIndex] then
+            marker:SetClosedSpawnMex()
+        end
     end
 
     mapCtrl:UpdatePlayer(slotIndex, playerInfo, notFixed)
@@ -3508,7 +3560,17 @@ function ConfigureMapListeners(mapCtrl, scenario)
 
         if lobbyComm:IsHost() then
             marker.OnRightClick = function(self)
-                HostUtils.SetSlotClosed(slot, not gameInfo.ClosedSlots[slot])
+                if gameInfo.SpawnMex[slot] then
+                    HostUtils.SetSlotClosed(slot, false)
+                elseif gameInfo.ClosedSlots[slot] then
+                    if gameInfo.AdaptiveMap then
+                        HostUtils.SetSlotClosedSpawnMex(slot)
+                    else
+                        HostUtils.SetSlotClosed(slot, false)
+                    end
+                else
+                    HostUtils.SetSlotClosed(slot, true)
+                end
             end
         end
     end
@@ -3833,6 +3895,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
             elseif data.Type == 'SlotClosed' then
                 gameInfo.ClosedSlots[data.Slot] = data.Closed
+                gameInfo.SpawnMex[slot] = false
+                ClearSlotInfo(data.Slot)
+            elseif data.Type == 'SlotClosedSpawnMex' then
+                gameInfo.ClosedSlots[data.Slot] = data.Closed
+                gameInfo.SpawnMex[slot] = true
                 ClearSlotInfo(data.Slot)
             end
         end
@@ -5169,6 +5236,25 @@ function InitHostUtils()
             )
 
             gameInfo.ClosedSlots[slot] = closed
+            gameInfo.SpawnMex[slot] = false
+            ClearSlotInfo(slot)
+        end,
+
+        SetSlotClosedSpawnMex = function(slot)
+            -- Don't close an occupied slot.
+            if gameInfo.PlayerOptions[slot] then
+                return
+            end
+
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'SlotClosedSpawnMex',
+                    Slot = slot,
+                }
+            )
+
+            gameInfo.ClosedSlots[slot] = true
+            gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
         end,
 
