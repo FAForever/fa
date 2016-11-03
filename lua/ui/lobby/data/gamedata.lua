@@ -12,6 +12,7 @@ function CreateGameInfo(maxPlayerSlots, initialValues)
         PlayerOptions = WatchedValueArray(maxPlayerSlots),
         Observers = WatchedValueArray(maxPlayerSlots),
         ClosedSlots = initialValues.ClosedSlots or {},
+        SpawnMex = initialValues.SpawnMex or {},
         GameMods = initialValues.GameMods or {},
         AutoTeams = initialValues.AutoTeams or {}, -- Why isn't this part of GameOptions?
     }
@@ -58,6 +59,7 @@ function Flatten(gameInfo)
         PlayerOptions = deeplyFlatPlayerOptions,
         Observers = deeplyFlatObservers,
         ClosedSlots = gameInfo.ClosedSlots,
+        SpawnMex = gameInfo.SpawnMex,
         GameMods = gameInfo.GameMods,
         AutoTeams = gameInfo.AutoTeams,
     }
