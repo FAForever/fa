@@ -2178,8 +2178,8 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 467, 537, 607, 677, 749}
-    local COLUMN_WIDTHS = {20, 20, 45, 45, 229, 59, 59, 59, 62, 51}
+    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 395, 465, 535, 605, 677, 749}
+    local COLUMN_WIDTHS = {20, 20, 45, 45, 257, 59, 59, 59, 62, 62, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
@@ -2213,7 +2213,8 @@ function CreateSlotsUI(makeLabel)
     labelGroup:AddChild(teamLabel)
 
     if not singlePlayer then
-        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0419>Ping/CPU"), 14))
+        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0450>CPU"), 14))
+        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0451>Ping"), 14))
         labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0218>Ready"), 14))
     end
 
@@ -2255,8 +2256,8 @@ function CreateSlotsUI(makeLabel)
 
         -- Slot number
         local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
-        slotNumber.Width:Set(20)
-        slotNumber.Width:Set(16)
+        slotNumber.Width:Set(COLUMN_WIDTHS[1])
+        slotNumber.Height:Set(newSlot.Height)
         newSlot:AddChild(slotNumber)
         newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
 
@@ -2264,8 +2265,8 @@ function CreateSlotsUI(makeLabel)
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
         newSlot.KinderCountry = flag
-        flag.Width:Set(20)
-        flag.Height:Set(16)
+        flag.Width:Set(COLUMN_WIDTHS[2])
+        flag.Height:Set(newSlot.Height)
         newSlot:AddChild(flag)
 
         -- TODO: Factorise this boilerplate.
@@ -2289,7 +2290,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
         newSlot:AddChild(nameLabel)
-        nameLabel.Width:Set(326)
+        nameLabel.Width:Set(COLUMN_WIDTHS[5])
         -- left deal with name clicks
         nameLabel.OnEvent = defaultHandler
         nameLabel.OnClick = function(self, index, text)
@@ -2309,7 +2310,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.color = colorSelector
 
         newSlot:AddChild(colorSelector)
-        colorSelector.Width:Set(59)
+        colorSelector.Width:Set(COLUMN_WIDTHS[6])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
                 lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow } )
@@ -2342,7 +2343,7 @@ function CreateSlotsUI(makeLabel)
         local factionSelector = BitmapCombo(newSlot, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.faction = factionSelector
         newSlot:AddChild(factionSelector)
-        factionSelector.Width:Set(59)
+        factionSelector.Width:Set(COLUMN_WIDTHS[7])
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
@@ -2359,7 +2360,7 @@ function CreateSlotsUI(makeLabel)
         local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
-        teamSelector.Width:Set(59)
+        teamSelector.Width:Set(COLUMN_WIDTHS[8])
         teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
             SetPlayerOption(curRow, 'Team', index)
@@ -2368,22 +2369,45 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddComboTooltip(teamSelector, teamTooltips)
         teamSelector.OnEvent = defaultHandler
 
+        -- if not singlePlayer then
+        -- CPU
+        local barMax = 450
+        local barMin = 0
+        local CPUGroup = Group(newSlot)
+        newSlot.CPUGroup = CPUGroup
+        CPUGroup.Width:Set(COLUMN_WIDTHS[9])
+        CPUGroup.Height:Set(newSlot.Height)
+        newSlot:AddChild(CPUGroup)
+        local CPUSpeedBar = StatusBar(CPUGroup, barMin, barMax, false, false,
+        UIUtil.UIFile('/game/unit_bmp/bar_black_bmp.dds'),
+        UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.dds'),
+        true)
+        newSlot.CPUSpeedBar = CPUSpeedBar
+        LayoutHelpers.AtTopIn(CPUSpeedBar, CPUGroup, 7)
+        LayoutHelpers.AtLeftIn(CPUSpeedBar, CPUGroup, 0)
+        LayoutHelpers.AtRightIn(CPUSpeedBar, CPUGroup, 0)
+        CPU_AddControlTooltip(CPUSpeedBar, 0, curRow)
+        CPUSpeedBar.CPUActualValue = 450
+        CPUSpeedBar.barMax = barMax
+        
         -- Ping
+        barMax = 1000
+        barMin = 0
         local pingGroup = Group(newSlot)
         newSlot.pingGroup = pingGroup
-        pingGroup.Width:Set(62)
+        pingGroup.Width:Set(COLUMN_WIDTHS[10])
         pingGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(pingGroup)
-
-        local pingStatus = StatusBar(pingGroup, 0, 1000, false, false,
+        local pingStatus = StatusBar(pingGroup, barMin, barMax, false, false,
             UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
             UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'),
             true)
         newSlot.pingStatus = pingStatus
-        LayoutHelpers.AtTopIn(pingStatus, pingGroup, 5)
+        LayoutHelpers.AtTopIn(pingStatus, pingGroup, 7)
         LayoutHelpers.AtLeftIn(pingStatus, pingGroup, 0)
         LayoutHelpers.AtRightIn(pingStatus, pingGroup, 0)
-
+        Ping_AddControlTooltip(pingStatus, 0, curRow)
+        
         -- Ready Checkbox
         local readyBox = UIUtil.CreateCheckbox(newSlot, '/CHECKBOX/')
         newSlot.ready = readyBox
@@ -2397,6 +2421,7 @@ function CreateSlotsUI(makeLabel)
             end
             SetPlayerOption(curRow, 'Ready', checked)
         end
+        -- end 
 
         newSlot.HideControls = function()
             -- hide these to clear slot of visible data
@@ -2406,15 +2431,16 @@ function CreateSlotsUI(makeLabel)
             factionSelector:Hide()
             colorSelector:Hide()
             teamSelector:Hide()
+            CPUSpeedBar:Hide()
+            pingStatus:Hide()
             readyBox:Hide()
-            pingGroup:Hide()
         end
         newSlot.HideControls()
 
         if singlePlayer then
             -- TODO: Use of groups may allow this to be simplified...
             readyBox:Hide()
-            pingGroup:Hide()
+            CPUSpeedBar:Hide()
             pingStatus:Hide()
         end
 
@@ -3204,11 +3230,16 @@ function CreateUI(maxPlayers)
                     local peer = lobbyComm:GetPeer(player.OwnerID)
                     local ping = peer.ping
                     local connectionStatus = CalcConnectionStatus(peer)
+                    GUI.slots[slot].pingStatus.ConnectionStatus = connectionStatus
                     if ping then
-                        ping = math.floor(peer.ping)
+                        ping = math.floor(ping)
+                        GUI.slots[slot].pingStatus.PingActualValue = ping
                         GUI.slots[slot].pingStatus:SetValue(ping)
-                        UIUtil.setEnabled(GUI.slots[slot].pingStatus, ping >= 500)
-
+                        if ping > 500 then
+                            GUI.slots[slot].pingStatus:Show()
+                        else
+                            GUI.slots[slot].pingStatus:Hide()
+                        end
                         -- Set the ping bar to a colour representing the status of our connection.
                         GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
                     else
@@ -3385,7 +3416,7 @@ end
 --        These need to go away.
 function CalcConnectionStatus(peer)
     if peer.status ~= 'Established' then
-        return 1
+        return 3
     else
         if not wasConnected(peer.id) then
             local peerSlot = FindSlotForID(peer.id)
@@ -3410,7 +3441,7 @@ function CalcConnectionStatus(peer)
         end
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
-            return 2
+            return 1
         end
 
         local peers = lobbyComm:GetPeers()
@@ -3418,11 +3449,11 @@ function CalcConnectionStatus(peer)
             if v.id ~= peer.id and v.status == 'Established' then
                 if not table.find(peer.establishedPeers, v.id) then
                     -- they can't talk to someone we can talk to.
-                    return 2
+                    return 1
                 end
             end
         end
-        return 3
+        return 2
     end
 end
 
@@ -4360,9 +4391,65 @@ function RefreshLargeMap()
     ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo)
 end
 
+--------------------------------------------------
+--  Ping GUI Functions
+--------------------------------------------------
+
+local ConnectionStatusInfo = {
+    '<LOC lobui_0454>Player is not connected to someone',
+    '<LOC lobui_0455>Connected',
+    '<LOC lobui_0456>Not Connected',
+    '<LOC lobui_0457>No connection info available',
+}
+
+function Ping_AddControlTooltip(control, delay, slotNumber)
+    --This function creates the Ping tooltip for a slot along with necessary mouseover function.
+    --It is called during the UI creation.
+    --    control: The control to which the tooltip is to be added.
+    --    delay: Amount of time to delay before showing tooltip.  See Tooltip.CreateMouseoverDisplay for info.
+    --  slotNumber: The slot number associated with the control.
+    local pingText = function()
+        local pingInfo
+        if GUI.slots[slotNumber].pingStatus.PingActualValue then
+            pingInfo = GUI.slots[slotNumber].pingStatus.PingActualValue
+        else
+            pingInfo = LOC('<LOC lobui_0458>UnKnown')
+        end
+        return LOC('<LOC lobui_0452>Ping: ') .. pingInfo
+    end
+    local pingBody = function()
+        local conInfo
+        if GUI.slots[slotNumber].pingStatus.ConnectionStatus then
+            conInfo = GUI.slots[slotNumber].pingStatus.ConnectionStatus
+        else
+            conInfo = 4
+        end
+        return LOC('<LOC lobui_0453>Only shows when > 500') .. '\n\n' .. LOC(ConnectionStatusInfo[conInfo])
+    end
+    Lobby_AddControlTooltip(control, 
+                            delay, 
+                            slotNumber,
+                            pingText,
+                            pingBody)
+end
+
+function Lobby_AddControlTooltip(control, delay, slotNumber, displayText, displayBody)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            local slot = slotNumber
+            Tooltip.CreateMouseoverDisplay(self, {text= displayText(),
+            body=displayBody()}, delay, true)
+        elseif event.Type == 'MouseExit' then
+            Tooltip.DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+
 --CPU Status Bar Configuration
-local barMax = 450
-local barMin = 0
 local greenBarMax = 300
 local yellowBarMax = 375
 local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
@@ -4429,25 +4516,8 @@ end
 --  CPU GUI Functions
 --------------------------------------------------
 function CreateCPUMetricUI()
-    --This function handles creation of the CPU benchmark UI elements (statusbars, buttons, tooltips, etc)
-    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-    if not singlePlayer then
-        for i= 1, LobbyComm.maxPlayerSlots do
-            GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
-            UIUtil.UIFile('/game/unit_bmp/bar_black_bmp.dds'),
-            UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.dds'),
-            true)
-            LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 2)
-            LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
-            LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
-            CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
-            GUI.slots[i].CPUSpeedBar.CPUActualValue = 450
-
-        end
-
-        GUI.rerunBenchmark.OnClick = function(self, modifiers)
+    GUI.rerunBenchmark.OnClick = function(self, modifiers)
             ForkThread(function() UpdateBenchmark(true) end)
-        end
     end
 end
 
@@ -4457,19 +4527,23 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     --    control: The control to which the tooltip is to be added.
     --    delay: Amount of time to delay before showing tooltip.  See Tooltip.CreateMouseoverDisplay for info.
     --  slotNumber: The slot number associated with the control.
-    if not control.oldHandleEvent then
-        control.oldHandleEvent = control.HandleEvent
-    end
-    control.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
-            local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue,
-            body=LOC('<LOC lobui_0322>0=Fastest, 450=Slowest')}, delay, true)
-        elseif event.Type == 'MouseExit' then
-            Tooltip.DestroyMouseoverDisplay()
+    local CPUText = function()
+        local CPUInfo
+        if GUI.slots[slotNumber].CPUSpeedBar.CPUActualValue then
+            CPUInfo = GUI.slots[slotNumber].CPUSpeedBar.CPUActualValue
+        else
+            CPUInfo = LOC('<LOC lobui_0458>UnKnown')
         end
-        return self.oldHandleEvent(self, event)
+        return LOC('<LOC lobui_0459>CPU Rating: ') .. CPUInfo
     end
+    local CPUBody = function()
+        return LOC('<LOC lobui_0322>0=Fastest, 450=Slowest')
+    end
+    Lobby_AddControlTooltip(control, 
+                            delay, 
+                            slotNumber,
+                            CPUText,
+                            CPUBody)
 end
 
 --- Get the CPU benchmark score for the local machine.
@@ -4598,8 +4672,8 @@ function SetSlotCPUBar(slot, playerInfo)
                 -- This is to ensure that the bar is visible for very small values
 
                 -- Lock values to the largest possible result.
-                if b > barMax then
-                    b = barMax
+                if b > GUI.slots[slot].CPUSpeedBar.barMax then
+                    b = GUI.slots[slot].CPUSpeedBar.barMax
                 end
 
                 GUI.slots[slot].CPUSpeedBar:SetValue(b)
