@@ -509,9 +509,18 @@ function InitializeArmies()
                             ForkThread(function()
                                 WaitSeconds(.1)
                                 local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
+
+                                GetArmyBrain(e):SetupArmyIntelTrigger({
+                                    Category=categories.ALLUNITS,
+                                    Type='LOSNow',
+                                    Value=true,
+                                    OnceOnly=true,
+                                    TargetAIBrain=GetArmyBrain(a),
+                                    CallbackFunction=function()
+                                        SetAlliance(a, e, real_state)
+                                    end,
+                                })
                                 SetAlliance(a, e, 'Ally')
-                                WaitSeconds(1)
-                                SetAlliance(a, e, real_state)
                             end)
                         end
                     end
