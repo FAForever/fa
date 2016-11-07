@@ -71,7 +71,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 10,
         BuildCostMass = 2,
-        BuildTime = 10,
+        BuildTime = 20,
         RebuildBonusIds = {
             'ueb5101',
         },
