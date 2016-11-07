@@ -225,7 +225,10 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     end
     scoreScreenActive = true
 
-    SessionEndGame()
+    if not SessionIsMultiplayer() then
+        SessionEndGame()
+    end
+
     DisableWorldSounds()
     StopAllSounds()
     UpdateData()
