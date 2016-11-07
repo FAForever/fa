@@ -1591,7 +1591,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 
     -- if number of available slots has changed, update it
-    if numOpenSlots == numAvailStartSpots then
+    if gameInfo.firstUpdateAvailableSlotsDone and numOpenSlots == numAvailStartSpots then
         -- Remove closed_spawn_mex if necessary
         for i = 1, numAvailStartSpots do
             if gameInfo.ClosedSlots[i] and gameInfo.SpawnMex[i] then
@@ -1639,6 +1639,8 @@ function UpdateAvailableSlots( numAvailStartSpots )
         GUI.slots[i]:Hide()
         gameInfo.ClosedSlots[i] = true
     end
+    
+    gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
 local function TryLaunch(skipNoObserversCheck)
