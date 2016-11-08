@@ -170,3 +170,333 @@ SCX_UEF_Credits_VO = {
     },
   },
 }
+
+--------------------------------
+-- Operation ID: A_Intro_FMV
+--------------------------------
+
+FMV_Aeon_Intro_1 = {
+  captions = {
+    {
+       text = '<LOC A_Intro_FMV_Final_010_010>I cannot see...my path was once clear, but now it is cloudy. It is as if something...some entity...is blocking my sight.', duration = 278, offset = 20,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_020>I often wonder why the Seraphim blessed us with these gifts. The Way was meant to save humanity...yet we are still at war...', duration = 278, offset = 30,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_030>The UEF is near collapse. The Cybrans cannot stand against us. Victory is within our reach...yet I sense great danger. What price must we pay in order to triumph?', duration = 278, offset = 40,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_040>Princess?', duration = 278, offset = 56,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_050>Avatar-of-War Marxon is once again stirring up dissent. He demands \npersonal allegiance from those that serve under him. He seeks to marginalize you, Princess. Cast you as nothing more than a spiritual leader who is no longer fit to lead the Aeon Illuminate.\n', duration = 278, offset = 60,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_060>We must defeat the UEF before Marxon is able to wrest away full control from us.', duration = 278, offset = 81,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_070>If Marxon is victorious, it will lead to nothing but death. You must lead the Illuminate to victory.', duration = 278, offset = 87,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_080>I will need a champion...', duration = 278, offset = 97,
+    },
+    {
+       text = '<LOC A_Intro_FMV_Final_010_090>One will arrive. You must trust fate.', duration = 278, offset = 102,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: A_Outro_FMV
+--------------------------------
+
+FMV_Aeon_Credits = {
+  captions = {
+    {
+       text = '<LOC A_Outro_FMV_Credits_010_010>Black Sun\'s energy made me one with the Quantum realm. For the first time, my vision is perfectly clear. I see everything. Nothing escapes my sight. I am truly one with The Way. Humanity has been pulled back from the edge. The future is free from war, conflict and tyranny. My path now lies elsewhere. I must...explore what I have become. You are my Champion. You will care for those I leave behind.', duration = 82, offset = 4,
+    },
+  },
+}
+
+FMV_Aeon_Outro_1 = {
+  captions = {
+    {
+       text = '<LOC A_Outro_FMV_Final_010_010>Humanity has always turned to symbols to define its actions and beliefs.', duration = 163, offset = 1,
+    },
+    {
+       text = '<LOC A_Outro_FMV_Final_010_020>But too often the symbol corrupts the truth.', duration = 163, offset = 11,
+    },
+    {
+       text = '<LOC A_Outro_FMV_Final_010_030>In those cases, the symbol must be annihilated so that beliefs can be changed. So that people may be free.', duration = 163, offset = 21,
+    },
+    {
+       text = '<LOC A_Outro_FMV_Final_010_040>So that wars can end.', duration = 163, offset = 33,
+    },
+    {
+       text = '<LOC A_Outro_FMV_Final_010_050>It is time for this to end. There will be peace.', duration = 163, offset = 43,
+    },
+    {
+       text = '<LOC A_Outro_FMV_Final_010_060>You and your children are free. We will hunt you no longer.', duration = 163, offset = 50,
+    },
+  },
+}
+
+FMV_Aeon_Outro_2 = {
+  captions = {
+    {
+       text = '<LOC A_Outro_FMV_PostOutro_010_010>No...', duration = 20, offset = 6,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: CAM_FMV_Intro
+--------------------------------
+
+FMV_Campaign_Intro = {
+  captions = {
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_010>Space held such hope for humanity. A fresh start. A chance for old grievances to wither and die. Quantum Gate Networks let humanity push deeper and deeper into space.', duration = 357, offset = 4,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_020>Countless planets were colonized. Governed by the Earth Empire, humanity entered a Golden Age of peace and prosperity.', duration = 357, offset = 31,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_030>The pace quickened. A human brain was successfully joined with an artificial intelligence by Doctor Gustaf Brackman. The Symbionts were born.', duration = 357, offset = 45,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_040>Eventually, humanity\'s more base instincts took hold and the thread began to unravel.', duration = 357, offset = 57,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_050>The Symbionts demanded independence. The Earth Empire\'s response was a secret loyalty program that pacified anyone with an AI implant.', duration = 357, offset = 64,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_060>Dr. Brackman fled with his closest Symbionts and created the Cybran Nation. They would fight for their freedom.', duration = 357, offset = 75,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_070>An alien race called the Seraphim was discovered by human colonists. The Seraphim introduced the settlers to something called \"The Way\".', duration = 357, offset = 87,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_080>But despite those peaceful overtures, the aliens were attacked by xenophobic soldiers.', duration = 357, offset = 100,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_090>Soon, the Seraphim were no more. The Aeon Illuminate formed from the ashes. They would spread The Way and cleanse the galaxy of non-believers.', duration = 357, offset = 108,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_100>The Earth Empire collapsed. The galaxy fell into darkness and chaos. ', duration = 357, offset = 122,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_110>From the ruins rose the United Earth Federation. An old idea made new: unite the galaxy and restore order, no matter the cost.', duration = 357, offset = 128,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_120>The technology of destruction surged ahead. The Armored Command Unit made killing efficient. An army could be created anywhere, at any time. ', duration = 357, offset = 141,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_130>The Infinite War has raged for 1,000 years. Billions of lives have been lost. But now the actors are assembled. The final act is about to begin.', duration = 357, offset = 152,
+    },
+    {
+       text = '<LOC CAM_FMV_Intro_Final_010_140>It is time for the Infinite War to end.', duration = 357, offset = 167,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: C_Intro_FMV
+--------------------------------
+
+FMV_Cybran_Intro_1 = {
+  captions = {
+    {
+       text = '<LOC C_Intro_FMV_Final_010_010>You spend too much time in here alone, Doctor.\n', duration = 139, offset = 30,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_020>I must never forget why we\'re fighting.', duration = 139, offset = 33,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_030>Oh, yes. Thank you for coming, my boy. The situation is dire, oh yes. The UEF is now losing the Infinite War. QAI?', duration = 139, offset = 38,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_040>Projections indicate that the UEF will not survive the next major Aeon assault. The UEF will fall within 42 days.', duration = 139, offset = 54,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_050>The Aeon consider us abominations. If the UEF lose, the Aeon will turn on us and kill every Symbiont in the galaxy.', duration = 139, offset = 63,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_060>We have survived for the past thousand years by hiding, oh yes. Today that changes. Strategy, my boy, strategy must be employed. You are now the tip of our spear. You will free our enslaved brothers and sisters from the UEF.', duration = 139, offset = 73,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_070>The Commander is due to load in two minutes.', duration = 139, offset = 100,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_080>Forgive me, I do ramble. Be safe, my boy. Be safe.', duration = 139, offset = 104,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_090>Pre-Boarding checklist for Armored Command Unit completed. Prepare for pilot insertion.', duration = 139, offset = 118,
+    },
+    {
+       text = '<LOC C_Intro_FMV_Final_010_100>All systems operating within normal parameters. Releasing controls to the pilot.', duration = 139, offset = 131,
+    },
+  },
+}
+
+FMV_Cybran_Intro_2 = {
+  captions = {
+    {
+       text = '<LOC C_Intro_FMV_PostIntro_010_010>Gate is charged and ready. The Operation is a go!', duration = 29, offset = 14,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: C_Outro_FMV
+--------------------------------
+
+FMV_Cybran_Credits = {
+  captions = {
+    {
+       text = '<LOC C_Outro_FMV_Credits_010_010>Beginning recorded message: Brackman 6-1-9-b.', duration = 162, offset = 4,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Credits_010_020>Son, if you\'re receiving this message, then you have succeeded in destroying the Quantum Gate Network. Earth is yours. Make it a better place, a place where everyone is free. In a few years, the Gate Network will be rebuilt. Someone, probably Dostya, will contact you. My children, the Cybrans, will need a leader. That leader will be you, oh yes. As for me...I am tired. I have seen the entire Infinite War from beginning to end. Time to rest. Yes, time to rest. Forever. I cannot thank you enough for what you have done, bringing freedom to my children.  My son...my clone...be safe.', duration = 162, offset = 9,
+    },
+  },
+}
+
+FMV_Cybran_Outro_1 = {
+  captions = {
+    {
+       text = '<LOC C_Outro_FMV_Final_010_010>Status, QAI.', duration = 116, offset = 21,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_020>Symbiont Liberation Matrix uploading.', duration = 116, offset = 24,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_030>Initiating Quantum Gate Virus.', duration = 116, offset = 29,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_040>Damn you, Brackman!', duration = 116, offset = 40,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_050>What are they doing to the Gates! I need a full status report! Now!', duration = 116, offset = 46,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_060>Why aren\'t you doing anything! We\'ve got to stop this!', duration = 116, offset = 52,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_070>Loyalty programming erased. All Symbionts have been liberated. Quantum Gate overload imminent.', duration = 116, offset = 66,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_080>Gates destroyed. Initial quantum wake detected. Quantum travel impossible for 4.8 years.', duration = 116, offset = 78,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_090>It\'s finally over.', duration = 116, offset = 88,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_100>All Cybran Nodes have initiated Protocol TB26. They are totally isolated and protected. We have five years to plan and rebuild.', duration = 116, offset = 91,
+    },
+    {
+       text = '<LOC C_Outro_FMV_Final_010_110>My children are free... free at last...', duration = 116, offset = 104,
+    },
+  },
+}
+
+FMV_Cybran_Outro_2 = {
+  captions = {
+    {
+       text = '<LOC C_Outro_FMV_PostOutro_010_010>What is that sound? What are you doing?', duration = 20, offset = 4,
+    },
+    {
+       text = '<LOC C_Outro_FMV_PostOutro_010_020>They are coming.', duration = 20, offset = 8,
+    },
+    {
+       text = '<LOC C_Outro_FMV_PostOutro_010_030>Oh my god. What have you done?', duration = 20, offset = 11,
+    },
+    {
+       text = '<LOC C_Outro_FMV_PostOutro_010_040>Primary function completed.', duration = 20, offset = 15,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: E_Intro_FMV
+--------------------------------
+
+FMV_UEF_Intro_1 = {
+  captions = {
+    {
+       text = '<LOC E_Intro_FMV_Final_010_010>Mr. President', duration = 163, offset = 10,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_020>Our latest intel is pretty disturbing. How accurate is it?', duration = 163, offset = 12,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_030>Very. All hell has broken loose.', duration = 163, offset = 15,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_040>This couldn\'t be happening at a worse time.', duration = 163, offset = 17,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_050>With all due respect, sir, we\'re spread too thin. We\'re forced to defend hundreds of worlds while the Aeon and Cybrans can pick and choose where they attack. I recommend evacuating the outer planets and positioning our forces along a defensive perimeter. ', duration = 163, offset = 19,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_060>That wasn\'t an option a year ago, and it\'s not an option now. We will reclaim the systems lost to the Aeon and the Cybran, no matter the cost. What about Black Sun?', duration = 163, offset = 34,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_070>Barring any major setbacks, it will be operational within five weeks.', duration = 163, offset = 43,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_080>That weapon is the culmination of my presidency. I want you to personally oversee its final stages of development. Is that clear, General Clarke? ', duration = 163, offset = 47,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_090>Yes, sir. One final thing, Mr. President. A new group of Commanders is coming online, and one of them is quite remarkable. He\'s scheduled to gate immediately.', duration = 163, offset = 55,
+    },
+    {
+       text = '<LOC E_Intro_FMV_Final_010_100>Armored Command Unit systems final check complete. Prepare for pilot integration. Gate M7 is charged and ready, Lieutenant. Good hunting. EarthCom out.', duration = 163, offset = 68,
+    },
+  },
+}
+
+--------------------------------
+-- Operation ID: E_Outro_FMV
+--------------------------------
+
+FMV_UEF_Credits = {
+  captions = {
+    {
+       text = '<LOC E_Outro_FMV_Credits_010_010>Ladies and gentlemen of the Senate, I present the honorable President C. Allen Riley.', duration = 102, offset = 20,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Credits_010_020>Thirty years ago, I was a young Commander, excited at the prospect of joining the fight against the UEF\'s enemies. With each passing battle, however, the terrible death and destruction caused by the Infinite War seeped into my soul. I realized that this struggle had been going on for over 1,000 years. And I knew it had to end. Today, I stand before you with this news: The Infinite War is over! We are victorious!', duration = 102, offset = 32,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Credits_010_030>There is no question that this is both a great day for both the UEF and humanity. But as we take to the streets in celebration, I ask that each of you remember the valiant souls who gave their lives so that we might be here today. Keep the honor and humility of their actions close to your heart.', duration = 102, offset = 69,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Credits_010_040>The Infinite War is over. The UEF reigns supreme. Let there be peace. At long last, let there be peace.', duration = 102, offset = 90,
+    },
+  },
+}
+
+FMV_UEF_Outro_1 = {
+  captions = {
+    {
+       text = '<LOC E_Outro_FMV_Final_010_010>They\'re destroying our core worlds...we\'ve lost...', duration = 164, offset = 34,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Final_010_020>Forgive me, Princess.', duration = 164, offset = 45,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Final_010_030>The Aeon Illuminate is begging for peace, and I\'ve already spoken to Brackman. We\'ll need damage and readiness assessments ASAP.', duration = 164, offset = 60,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Final_010_040>Yes, sir.', duration = 164, offset = 67,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Final_010_050>We did it, General!', duration = 164, offset = 68,
+    },
+    {
+       text = '<LOC E_Outro_FMV_Final_010_060>No sir... he did.', duration = 164, offset = 69,
+    },
+  },
+}
