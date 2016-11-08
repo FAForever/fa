@@ -459,28 +459,25 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     end
     Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
 
+     -- Rehost button in case of failure
     if showCampaign and not operationVictoryTable.success then
-        bg.continueBtn.label:SetText(LOC('<LOC _Skip>Skip'))
-        bg.continueBtn.HandleEvent = bg.continueBtn.oldHandleEvent
-        Tooltip.AddButtonTooltip(bg.continueBtn, 'CampaignScore_Skip')
-        -- set controls that are global to the dialog
-        bg.restartBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Restart>Restart", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-    	LayoutHelpers.LeftOf(bg.restartBtn, bg.continueBtn, -40)
+        bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    	LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
     	bg.continueBtn:UseAlphaHitTest(false)
 
-    	bg.restartBtn.glow = Bitmap(bg.restartBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.restartBtn.glow, bg.restartBtn)
-    	bg.restartBtn.glow:SetAlpha(0)
-    	bg.restartBtn.glow:DisableHitTest()
+    	bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    	LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
+    	bg.rehostBtn.glow:SetAlpha(0)
+    	bg.rehostBtn.glow:DisableHitTest()
 
-        bg.restartBtn.pulse = Bitmap(bg.restartBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.restartBtn.pulse, bg.restartBtn)
-    	bg.restartBtn.pulse:DisableHitTest()
-    	bg.restartBtn.pulse:SetAlpha(.5)
+        bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    	LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
+    	bg.rehostBtn.pulse:DisableHitTest()
+    	bg.rehostBtn.pulse:SetAlpha(.5)
 
-        EffectHelpers.Pulse(bg.restartBtn.pulse, 2, .5, 1)
+        EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
 
-        bg.restartBtn.OnRolloverEvent = function(self, event)
+        bg.rehostBtn.OnRolloverEvent = function(self, event)
     	   	if event == 'enter' then
     			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
     			self.label:SetColor('black')
@@ -492,11 +489,12 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     		end
     	end
 
-        bg.restartBtn.OnClick = function(self, modifiers)
+        bg.rehostBtn.OnClick = function(self, modifiers)
             ConExecute("ren_Oblivion false")
-            RestartSession()
+            GpgNetSend('Rehost')
+            EscapeHandler.SafeQuit()
         end
-        Tooltip.AddButtonTooltip(bg.restartBtn, 'CampaignScore_Restart')
+        Tooltip.AddButtonTooltip(bg.rehostBtn, 'esc_rehost')
     end
 
     UIUtil.MakeInputModal(dialog, function() bg.continueBtn:OnClick() end, function() bg.continueBtn:OnClick() end)
