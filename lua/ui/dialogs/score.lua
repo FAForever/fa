@@ -423,7 +423,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     LayoutHelpers.AtTopIn(bg.title, bg, 28)
 
     -- set controls that are global to the dialog
-    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
 	LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
 	LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
 	bg.continueBtn:UseAlphaHitTest(false)
@@ -455,15 +455,9 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     bg.continueBtn.OnClick = function(self, modifiers)
 	    hotstats.clean_view()
         ConExecute("ren_Oblivion false")
-        if showCampaign then
-            operationVictoryTable.allPrimary = true
-            operationVictoryTable.allSecondary = true
-            CampaignManager.OperationVictory(operationVictoryTable, true)
-        end
-
         EscapeHandler.SafeQuit()
     end
-    Tooltip.AddButtonTooltip(bg.continueBtn, 'PostScore_Quit')
+    Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
 
     if showCampaign and not operationVictoryTable.success then
         bg.continueBtn.label:SetText(LOC('<LOC _Skip>Skip'))
