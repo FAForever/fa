@@ -1007,7 +1007,9 @@ end
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
     --LOG("called Set_graph...")
     scoreData = scoreAccum.scoreData
-    standardScore:Hide()
+    if not showCampaign then
+        standardScore:Hide()
+    end
     page_active=Group(dialog)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -1088,7 +1090,11 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             graph_btn:SetCheck(false)
         end
     end
-    graph_btn:SetCheck(true)
+    if showCampaign then
+        standardBtn:SetCheck(true)
+    else
+        graph_btn:SetCheck(true)
+    end
     page_graph(dialog)
     -- create first graph
     -- graph=create_graph(dialog,info.dialog[5].path,120,140,GetFrame(0).Right()-120,GetFrame(0).Bottom()-140)
