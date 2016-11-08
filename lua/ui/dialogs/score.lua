@@ -505,21 +505,19 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     elapsedTime = UIUtil.CreateText(bg, "", 16, UIUtil.bodyFont)
     LayoutHelpers.RightOf(elapsedTime, elapsedTimeLabel, 5)
 
-    bg.replayButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC uireplay_0003>", 14, 2)
-    LayoutHelpers.AtLeftIn(bg.replayButton, bg, 5)
-    LayoutHelpers.AtBottomIn(bg.replayButton, bg, 20)
-    bg.replayButton.OnClick = function(self, modifiers)
-        import('/lua/ui/dialogs/replay.lua').CreateDialog(bg, false, nil)
-    end
-    Tooltip.AddButtonTooltip(bg.replayButton, "PostScore_Replay")
+    -- Create a Feedback button with a link to the specified forum thread
     if showCampaign then
-        bg.replayButton:Disable()   -- no replays available in campaigns
-    end
-    if import('/lua/ui/game/gamemain.lua').IsSavedGame == true then
-        bg.replayButton:Disable()
-    end
-    if SessionIsReplay() then
-        bg.replayButton:Disable()
+        bg.feedbackButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC _Feedback>Post Feedback", 14, 2)
+        LayoutHelpers.AtLeftIn(bg.feedbackButton, bg, 5)
+        LayoutHelpers.AtBottomIn(bg.feedbackButton, bg, 20)
+        Tooltip.AddButtonTooltip(bg.feedbackButton, "CampaignScore_Feedback")
+        bg.feedbackButton.OnClick = function(self, modifiers)
+            OpenURL(operationVictoryTable.opData.feedbackURL)
+        end
+
+        if not operationVictoryTable.opData.feedbackURL then
+            bg.feedbackButton:Disable()
+        end
     end
 
     -- when a new page is selected, create the page and deal with the tab correctly

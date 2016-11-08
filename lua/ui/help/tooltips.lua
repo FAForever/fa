@@ -1445,6 +1445,10 @@ Tooltips = {
         title = "<LOC tooltipui0383>Restart",
         description = "<LOC tooltipui0384>Restart this Operation from the beginning",
     },
+    CampaignScore_Feedback = {
+        title = "<LOC tooltipui0707>Post Feedback",
+        description = "<LOC tooltipui0708>Open a forum thread about this mission",
+    },
 
     -- **********************
     -- ** MFD Strings
