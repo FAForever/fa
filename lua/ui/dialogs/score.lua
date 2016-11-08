@@ -585,11 +585,11 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             LayoutHelpers.AtLeftTopIn(playerText, gridBG, labelXPos.icon + 5, 12)   -- note this is at icon as there is none in the label
             playerText:SetText(LOC("<LOC _Player>"))
 
---            local teamText = MultiLineText(gridBG, UIUtil.titleFont, 16, UIUtil.fontColor)
---            teamText.Width:Set(80)
---            teamText.Height:Set(35)
---            LayoutHelpers.AtLeftTopIn(teamText, gridBG, labelXPos.team, 12)
---            teamText:SetText(LOC("<LOC _Team>"))
+            -- local teamText = MultiLineText(gridBG, UIUtil.titleFont, 16, UIUtil.fontColor)
+            -- teamText.Width:Set(80)
+            -- teamText.Height:Set(35)
+            -- LayoutHelpers.AtLeftTopIn(teamText, gridBG, labelXPos.team, 12)
+            -- teamText:SetText(LOC("<LOC _Team>"))
 
             local sortButtons = {}
             for index, colName in tabData.columns do
@@ -766,7 +766,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             curType = tabData.types[1].scoreKey
         elseif tabData.button == "campaign" then
             -- Set up campaign display
-            local opData = import('/maps/'..operationVictoryTable.opKey..'/'..operationVictoryTable.opKey..'_operation.lua').operationData
+            local opData = operationVictoryTable.opData
 
             local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
                 Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
@@ -774,19 +774,17 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
                 NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
 
-            local successKey = 'failure'
-            if operationVictoryTable.success then
-                successKey = 'success'
-            end
-
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)
             movieGroup.Height:Set(290)
             movieGroup.Width:Set(330)
 
-            local debriefData = opData.opDebriefingFailure[1]
-            if operationVictoryTable.success then
+            -- Set debriefing dialogue if it exists
+            local debriefData = {text = '<NO DATA AVAILABLE>', faction = 'NONE'}
+            if operationVictoryTable.success and opData.opDebriefingSuccess then
                 debriefData = opData.opDebriefingSuccess[1]
+            elseif not operationVictoryTable.success and opData.opDebriefingFailure then
+                debriefData = opData.opDebriefingFailure[1]
             end
 
             local opDebriefMovie = Movie(movieGroup)
@@ -794,33 +792,43 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             LayoutHelpers.AtHorizontalCenterIn(opDebriefMovie, movieGroup)
             opDebriefMovie.Height:Set(192)
             opDebriefMovie.Width:Set(192)
-            opDebriefMovie:Set('/movies/'..debriefData.vid)
+
+            local hasVideo = false
+            if debriefData.vid and GetMovieDuration('/movies/' .. debriefData.vid) ~= 0 then
+                hasVideo = true
+            end
+
+            if hasVideo then
+                opDebriefMovie:Set('/movies/'..debriefData.vid)
+            end
 
             local opDebriefBitmap = Bitmap(opDebriefMovie, UIUtil.UIFile(prefix[debriefData.faction].texture))
             LayoutHelpers.FillParent(opDebriefBitmap, opDebriefMovie)
             opDebriefBitmap.time = 0
             opDebriefBitmap.first = true
-            opDebriefBitmap.OnFrame = function(self, delta)
-                self.time = self.time + delta
-                if self.first then
-                    PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_In'}))
-                    self.first = false
+            if hasVideo then
+                opDebriefBitmap.OnFrame = function(self, delta)
+                    self.time = self.time + delta
+                    if self.first then
+                        PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_In'}))
+                        self.first = false
+                    end
+                    if self.time > 1 then
+                        self:Hide()
+                        self:SetNeedsFrameUpdate(false)
+                        opDebriefMovie:Play()
+                        bg.voHandle = PlayVoice(Sound({Cue = debriefData.cue, Bank = debriefData.bank}))
+                    end
                 end
-                if self.time > 1 then
-                    self:Hide()
-                    self:SetNeedsFrameUpdate(false)
-                    opDebriefMovie:Play()
-                    bg.voHandle = PlayVoice(Sound({Cue = debriefData.cue, Bank = debriefData.bank}))
+
+                opDebriefMovie.OnLoaded = function(self)
+                    opDebriefBitmap:SetNeedsFrameUpdate(true)
                 end
-            end
 
-            opDebriefMovie.OnLoaded = function(self)
-                opDebriefBitmap:SetNeedsFrameUpdate(true)
-            end
-
-            opDebriefMovie.OnFinished = function()
-                opDebriefBitmap:Show()
-                PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_Out'}))
+                opDebriefMovie.OnFinished = function()
+                    opDebriefBitmap:Show()
+                    PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_Out'}))
+                end
             end
 
             local movieBorder = Bitmap(opDebriefMovie, UIUtil.UIFile('/scx_menu/score-victory-defeat/video-frame_bmp.dds'))
