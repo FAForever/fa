@@ -28,15 +28,21 @@ end
 --   bool _allPrimary - true if all primary objectives completed, otherwise, false
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
 function EndOperation(_success, _allPrimary, _allSecondary)
+    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
+    local _opData = {}
+
+    if DiskGetFileInfo(opFile) then
+        _opData = import(opFile)
+    end
+
     Sync.OperationComplete = {
-        opKey = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.opKey or '',
         success = _success,
-        difficulty = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.difficulty or ScenarioInfo.Options.Difficulty,
+        difficulty = ScenarioInfo.Options.Difficulty,
         allPrimary = _allPrimary,
         allSecondary = _allSecondary,
-        campaignID = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
+        faction = ScenarioInfo.LocalFaction,
+        opData = _opData.operationData
     }
-    -- EndGame()
 end
 
 -- Pop up a dialog to ask the user what faction they want to play
