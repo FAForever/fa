@@ -165,37 +165,13 @@ end
 --  bool allSecondary - true if all secondary objectives completed, otherwise, false
 --  int factionVideo - Opt.  If present, display this factions end game video
 function OperationVictory(ovTable, skipDialog)
-    
     local resultText
     if ovTable.success == true then
         resultText = "<LOC CAMPMGR_0000>Operation completed"
     else
         resultText = "<LOC CAMPMGR_0001>Operation failed"
     end
-    
-    local cmpt = GetCampaignTable()
-    
-    local camp = ovTable.campaignID
-    if camp then
-        if not cmpt[camp] then
-            cmpt[camp] = {}
-        end
-        if not cmpt[camp][ovTable.opKey] then
-            cmpt[camp][ovTable.opKey] = {{}, {}, {}}
-        end
-        
-        if not cmpt[camp][ovTable.opKey][ovTable.difficulty] then
-            cmpt[camp][ovTable.opKey][ovTable.difficulty] = {}
-        end
-        
-        cmpt[camp][ovTable.opKey][ovTable.difficulty].allPrimary = ovTable.allPrimary
-        cmpt[camp][ovTable.opKey][ovTable.difficulty].allSecondary = ovTable.allSecondary
 
-        SetCampaignTable(cmpt)
-    else
-        WARN("OperationVictory: Operation ID not found - " .. ovTable.opKey)
-    end
-    
     if not skipDialog then
         SetFrontEndData('NextOpBriefing', GetNextOperation(camp, ovTable.opKey, ovTable.difficulty))
         import('/lua/ui/game/worldview.lua').UnlockInput()
