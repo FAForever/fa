@@ -173,27 +173,21 @@ function OperationVictory(ovTable, skipDialog)
     end
 
     if not skipDialog then
-        SetFrontEndData('NextOpBriefing', GetNextOperation(camp, ovTable.opKey, ovTable.difficulty))
         import('/lua/ui/game/worldview.lua').UnlockInput()
-        if not ovTable.factionVideo then
-            if ovTable.success then
-                PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
-            else
-                PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Fail'}))
-            end
-            UIUtil.ShowInfoDialog(
-                GetFrame(0),
-                resultText,
-                "<LOC _Ok>",
-                function() 
-                    import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable) 
-                end,
-                true)
+
+        if ovTable.success then
+            PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
         else
-            import('/lua/ui/game/missiontext.lua').PlayEndGameMovie(ovTable.factionVideo, function()
-                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable) 
-            end)
+            PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Fail'}))
         end
+        UIUtil.ShowInfoDialog(
+            GetFrame(0),
+            resultText,
+            "<LOC _Ok>",
+            function() 
+                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable) 
+            end,
+            true)
     end
 end
 
