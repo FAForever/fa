@@ -31,6 +31,31 @@ Patch 3662 (November 9th, 2016)
             - Energy cost increased 150000 -> 175000
             - Buildtime increased 1400 -> 2800
             - Energy production decreased 5400 -> 3400
+    - Aeon
+        - RAS upgrade
+            - Energy cost increased 150000 -> 175000
+            - Buildtime increased 1400 -> 2800
+            - Energy production decreased 2700 -> 1700
+        - ARAS upgrade
+            - Energy cost increased 150000 -> 175000
+            - Buildtime increased 1400 -> 2800
+            - Energy production decreased 5400 -> 3400
+        - Shield upgrade
+            - Energy cost decreased 93750 -> 35000
+            - Mass cost decreased 1500 -> 1000
+            - Buildtime decreased 1750 -> 1000
+            - Energy maintenance cost decreased 250/s -> 150/s
+            - Shield HP decreased 29000 -> 8000
+            - Shield recharge time decreased 160 -> 65
+            - Shield regen rate (Only while not under fire) decreased 37 -> 30
+        - Advanced Shield upgrade
+            - Energy cost decreased 1000000 -> 93750
+            - Mass cost decreased 4500 -> 1500
+            - Buildtime decreased 3500 -> 1750
+            - Energy maintenance cost decreased 500/s -> 250/s
+            - Shield HP decreased 44000 -> 29000
+            - Shield recharge time decreased 200 -> 160
+            - Shield regen rate (Only while not under fire) decreased 44 -> 37
     - UEF
         - RAS upgrade
             - Energy cost increased 150000 -> 175000
