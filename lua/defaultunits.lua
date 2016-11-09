@@ -1578,6 +1578,24 @@ MobileUnit = Class(Unit) {
        Unit.OnStopBeingBuilt(self,builder,layer)
        self:OnLayerChange(layer, 'None')
     end,
+
+    OnLayerChange = function(self, new, old)
+        Unit.OnLayerChange(self, new, old)
+
+        -- Do this after the default function so the engine-bug guard in unit.lua works
+        if self.transportDrop then
+            self.transportDrop = nil
+            self:SetImmobile(false)
+        end
+    end,
+
+    OnDetachedFromTransport = function(self, transport, bone)
+        Unit.OnDetachedFromTransport(self, transport, bone)
+
+         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        self:SetImmobile(true)
+        self.transportDrop = true
+    end,
 }
 
 --------------------------------------------------------------
