@@ -1,4 +1,4 @@
-Patch 3662 (Coming Soon)
+Patch 3662 (November 9th, 2016)
 ============================
 
 **Bugs**
