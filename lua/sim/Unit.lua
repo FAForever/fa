@@ -2335,9 +2335,9 @@ Unit = Class(moho.unit_methods) {
                 self:DisableIntel(intel)
 
                 -- Handle the cloak FX timing
-                if intel == 'Cloak' then
+                if intel == 'Cloak' or intel == 'CloakField' then
                     if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
-                        self:UpdateCloakEffect(false)
+                        self:UpdateCloakEffect(false, intel)
                     end
                 end
 
@@ -2346,7 +2346,7 @@ Unit = Class(moho.unit_methods) {
             self.IntelDisables[intel][disabler] = true
             return intDisabled
         end
-    
+
         local intDisabled = false
         
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change 
@@ -2363,6 +2363,7 @@ Unit = Class(moho.unit_methods) {
                 intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- beware of short-circuiting
             end
         end
+
         if intDisabled then
             self:OnIntelDisabled(disabler, intel)
         end
@@ -2377,9 +2378,9 @@ Unit = Class(moho.unit_methods) {
                     self:EnableIntel(intel)
 
                     -- Handle the cloak FX timing
-                    if intel == 'Cloak' then
+                    if intel == 'Cloak' or intel == 'CloakField' then
                         if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
-                            self:UpdateCloakEffect(true)
+                            self:UpdateCloakEffect(true, intel)
                         end
                     end
 
@@ -2388,9 +2389,9 @@ Unit = Class(moho.unit_methods) {
             end
             return intEnabled
         end
-    
+
         local intEnabled = false
-        
+
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
@@ -2421,15 +2422,63 @@ Unit = Class(moho.unit_methods) {
     OnIntelDisabled = function(self)
     end,
 
-    UpdateCloakEffect = function(self, cloaked)
+    UpdateCloakEffect = function(self, cloaked, intel)
+        -- When debugging cloak FX issues, remember that once a structure unit is seen by the enemy,
+        -- recloaking won't make it vanish again, and they'll see the new FX.
         if self and not self.Dead then
-            local bpDisplay = self:GetBlueprint().Display
+            if intel == 'Cloak' then
+                local bpDisplay = self:GetBlueprint().Display
 
-            if cloaked then
-                self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
-            else
-                self:SetMesh(bpDisplay.MeshBlueprint, true)
+                if cloaked then
+                    self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
+                else
+                    self:SetMesh(bpDisplay.MeshBlueprint, true)
+                end
+            elseif intel == 'CloakField' then
+                if self.CloakFieldWatcherThread then
+                    KillThread(self.CloakFieldWatcherThread)
+                    self.CloakFieldWatcherThread = nil
+                end
+
+                if cloaked then
+                    self.CloakFieldWatcherThread = self:ForkThread(self.CloakFieldWatcher)
+                end
             end
+        end
+    end,
+
+    CloakFieldWatcher = function(self)
+        if self and not self.Dead then
+            local bp = self:GetBlueprint()
+            local radius = bp.Intel.CloakFieldRadius - 2 -- Need to take off 2, because engine reasons
+            local brain = self:GetAIBrain()
+
+            while self and not self.Dead and self:IsIntelEnabled('CloakField') do
+                local pos = self:GetPosition()
+                local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, radius, 'Ally')
+
+                for _, unit in units do
+                    if unit and not unit.Dead and unit ~= self then
+                        if unit.CloakFXWatcherThread then
+                            KillThread(unit.CloakFXWatcherThread)
+                            unit.CloakFXWatcherThread = nil
+                        end
+
+                        unit:UpdateCloakEffect(true, 'Cloak') -- Turn on the FX for the unit
+                        unit.CloakFXWatcherThread = unit:ForkThread(unit.CloakFXWatcher)
+                    end
+                end
+
+                WaitTicks(5)
+            end
+        end
+    end,
+
+    CloakFXWatcher = function(self)
+        WaitTicks(5)
+
+        if self and not self.Dead then
+            self:UpdateCloakEffect(false, 'Cloak')
         end
     end,
 
@@ -2438,7 +2487,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
         local bpVal = self:GetBlueprint().Economy.MaintenanceConsumptionPerSecondEnergy
-        --Check enhancements
+        -- Check enhancements
         if not bpVal or bpVal <= 0 then
             local enh = self:GetBlueprint().Enhancements
             if enh then
