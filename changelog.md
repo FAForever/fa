@@ -1,3 +1,10 @@
+Patch 3663 (November 12th, 2016)
+============================
+**Bugs**
+- Fixed a small oversight which led to non-cloaked units getting the cloak FX in a power stall
+- Added cloak FX support for cloakfields (Mods only, FAF itself has no unit with this ability)
+
+
 Patch 3662 (November 9th, 2016)
 ============================
 
