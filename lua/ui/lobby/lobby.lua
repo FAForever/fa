@@ -1882,7 +1882,14 @@ local function TryLaunch(skipNoObserversCheck)
         end
 
         HostUtils.SendArmySettingsToServer()
-
+        
+        if scenarioInfo.RequiredMods then
+            for _,mod in scenarioInfo.RequiredMods do
+                gameInfo.GameMods[mod.uid] = true
+            end
+            lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+        end
+        
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
