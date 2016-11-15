@@ -563,7 +563,7 @@ function InitializeScenarioArmies()
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
             if tblData.faction ~= nil then
-                if ScenarioInfo.ArmySetup[strArmy].Human then
+                if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
                     SetArmyFactionIndex( strArmy, factionIndex - 1 )
                 else
