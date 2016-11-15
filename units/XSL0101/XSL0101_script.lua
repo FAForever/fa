@@ -60,6 +60,8 @@ XSL0101 = Class(SWalkingLandUnit) {
         if not self.Dead and self:GetFractionComplete() == 1 then
             WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
 
+            if self:IsMoving() then return end
+
             -- Ensure weapon state
             if self.Sync.LowPriority then
                 self:SetWeaponEnabledByLabel('LaserTurret', false)
