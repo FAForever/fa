@@ -275,6 +275,18 @@ options = {
         key = 'ui',
         items = {
             {
+                title = "<LOC OPTIONS_0006>Language",
+                key = 'selectedlanguage',
+                type = 'toggle',
+                default = __language,
+                set = function(key, value, startup)
+                    import('/lua/system/Localization.lua').language(value)
+                end,
+                custom = {
+                    states = __installedlanguages,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0151>Display Subtitles",
                 key = 'subtitles',
                 type = 'toggle',
