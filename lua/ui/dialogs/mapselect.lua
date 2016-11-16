@@ -650,10 +650,12 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     selectButton.OnClick = function(self, modifiers)
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+        ResetFilters()
     end
 
     cancelButton.OnClick = function(self, modifiers)
         exitBehavior()
+        ResetFilters()
     end
 
     mapList.OnKeySelect = OnMapChanged
@@ -710,6 +712,12 @@ function RefreshOptions(skipRefresh)
         end
     end
     if not skipRefresh then
+        -- Remove all info about advancedOptions in changedOptions
+        -- So we have a clean slate regarding the advanced options each map switch
+        for _,optionData in OptionSource[4].options do
+            changedOptions[optionData.key] = nil
+        end
+        
         OptionContainer:CalcVisible()
     end
 end
@@ -817,6 +825,21 @@ function SetupOptionsPanel(parent, curOptions)
     -- determines what controls should be visible or not
     OptionContainer.CalcVisible = function(self)
         local function SetTextLine(line, data, lineID)
+            local function UseSavedValue(data)
+                -- always use saved data when looking at currently hosted map
+                if string.lower(selectedScenario.file) == string.lower(curOptions.ScenarioFile) then
+                    return true
+                end
+                -- otherwise, don't use saved data for advanced options
+                local advancedOptions = OptionSource[4].options
+                for _,option in advancedOptions do
+                    if option.key == data.key then 
+                        return false
+                    end
+                end
+                -- use saved data for non-advanced options
+                return true
+            end
             if data.type == 'title' then
                 line.text:SetText(LOC(data.text))
                 line.text:SetFont(UIUtil.titleFont, 14, 3)
@@ -852,15 +875,18 @@ function SetupOptionsPanel(parent, curOptions)
                     line.combo.keyMap[key] = index
                     tooltipTable[index]={text=optData.label, body=LOCF(help, key)}
 
-                    if curOptions[optData.key] and key == curOptions[optData.key] then
+                    -- only use current settings of advanced options for current map
+                    if curOptions[optData.key] and key == curOptions[optData.key] and UseSavedValue(optData) then
                         defValue = index
                     end
                 end
-
+                -- use changed option values
                 if changedOptions[optData.key].index then
                     defValue = changedOptions[optData.key].index
-                else
-                    defValue = line.combo.keyMap[curOptions[optData.key]] or optData.default or 1
+                end
+                -- if not yet set and no changed option value, use default
+                if not defValue then
+                    defValue = optData.default or 1
                 end
                 --
                 if optData.default then realDefValue = optData.default end
