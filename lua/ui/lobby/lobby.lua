@@ -2584,6 +2584,17 @@ function CreateUI(maxPlayers)
                 else
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
+                    
+                    -- remove old 'Advanced options incase of new map
+                    if gameInfo.GameOptions.ScenarioFile and string.lower(selectedScenario.file) ~= string.lower(gameInfo.GameOptions.ScenarioFile) then
+                        local scenario = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                        if scenario.options then
+                            for _,value in scenario.options do
+                                gameInfo.GameOptions[value.key] = nil
+                            end
+                        end
+                    end
+                    
                     for optionKey, data in changedOptions do
                         options[optionKey] = data.value
                     end
