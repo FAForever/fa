@@ -1,5 +1,47 @@
+Patch 3664 (Upcoming)
+============================
+
+**Bugs**
+- Removed deploy ability tooltip from Aeon T3 Mobile Artillery
+- Fixed typos in two keybind descriptions
+- Fixed Selen cloak being enabled out of the factory while moving
+- Fixed civilians not always revealing for all players on map start
+- Fixed all AIs being set as UEF in coop
+- Fixed beam weapons sometimes colliding incorrectly with projectiles
+- Fixed sim slowdown when ordering mex cap with hunddreds of engineers
+
+**UI**
+- New feature: Main menu option is now available which will allow you to select your language from those available in FAF
+
+**Coop**
+- Fixed a whole bunch of videos
+- Fixed score screen so it works with coop
+- Added a Feedback button for easier reporting of issues
+- Giving units to an ally no longer breaks objectives
+- Allowed armies to participate properly in objective requirements
+
+**Lobby**
+- New feature: Ability to click on the game title to update it. With a future server update, this will then change in the client Find Games tab
+- New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
+- Improved lobby setting persistence interation with maps that introduce their own options
+
+**Other**
+- Added Tamazight translation to FAF
+
+**Contributors**
+- Arifi
+- CookieNoob
+- Crotalus
+- Exotic-Retard
+- IceDreamer
+- Speed2
+- TheKeyBlue
+- Uveso
+
+
 Patch 3663 (November 12th, 2016)
 ============================
+
 **Bugs**
 - Fixed a small oversight which led to non-cloaked units getting the cloak FX in a power stall
 - Added cloak FX support for cloakfields (Mods only, FAF itself has no unit with this ability)
