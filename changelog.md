@@ -46,6 +46,7 @@ Patch 3664 (Upcoming)
 - Added Tamazight translation to FAF
 - Improved a large number of Spanish translations
 - Updated maps blacklist
+- Fixed a shader error which cause water to render with jagged edges on some maps
 
 **Contributors**
 - Arifi

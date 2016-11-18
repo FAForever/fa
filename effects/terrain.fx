@@ -766,7 +766,7 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     float4 water = tex1D(WaterRampSampler,waterDepth);	
 	albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
 
-	return float4(albedo.rgb, 0);
+	return float4(albedo.rgb, 0.01f);
 }
 
 float4 TerrainGlowPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
