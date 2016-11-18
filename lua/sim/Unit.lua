@@ -2458,7 +2458,7 @@ Unit = Class(moho.unit_methods) {
                 local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, radius, 'Ally')
 
                 for _, unit in units do
-                    if unit and not unit.Dead and unit ~= self then
+                    if unit and not unit.Dead and not unit:IsIntelEnabled('Cloak') then
                         if unit.CloakFXWatcherThread then
                             KillThread(unit.CloakFXWatcherThread)
                             unit.CloakFXWatcherThread = nil
@@ -2476,8 +2476,7 @@ Unit = Class(moho.unit_methods) {
 
     CloakFXWatcher = function(self)
         WaitTicks(5)
-
-        if self and not self.Dead then
+        if self and not self.Dead and not self:IsIntelEnabled('Cloak') then
             self:UpdateCloakEffect(false, 'Cloak')
         end
     end,
