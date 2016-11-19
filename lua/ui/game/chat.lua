@@ -809,7 +809,7 @@ function ReceiveChatFromSim(sender, msg)
     local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)
     local tokey = ToStrings[msg.to].colorkey or ToStrings['private'].colorkey
     if msg.Observer then
-        towho = LOC("<LOC lobui_0592>to observers:")
+        towho = LOC("<LOC lobui_0692>to observers:")
         tokey = "link_color"
         if armyData.faction then
             armyData.faction = table.getn(FactionsIcon) - 1
