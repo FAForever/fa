@@ -2469,13 +2469,13 @@ Unit = Class(moho.unit_methods) {
                     end
                 end
 
-                WaitTicks(5)
+                WaitTicks(10)
             end
         end
     end,
 
     CloakFXWatcher = function(self)
-        WaitTicks(5)
+        WaitTicks(12)
         if self and not self.Dead and not self:IsIntelEnabled('Cloak') then
             self:UpdateCloakEffect(false, 'Cloak')
         end
