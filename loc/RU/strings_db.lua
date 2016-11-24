@@ -7824,6 +7824,7 @@ lobui_0611="Lobby Settings"
 lobui_0612="Change your lobby background or chat font size."
 lobui_0618="Large Preview"
 lobui_0619="Click to show a large map preview showing all the mass and hydrocarbon spots"
+lobui_0692="to observers"
 
 lobui_0727="Очки"
 lobui_0728="Показывать очки игроков во время игры"

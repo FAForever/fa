@@ -4364,6 +4364,7 @@ lobui_0410="None"
 lobui_0412="What's new to FAF?"
 
 lobui_0413="Country"
+lobui_0692="to observers"
 
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multiplayer LAN"
