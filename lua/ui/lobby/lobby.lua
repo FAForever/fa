@@ -43,6 +43,7 @@ local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
+local RequiredMods = import('/lua/ui/dialogs/requiredmods.lua')
 
 local IsSyncReplayServer = false
 
@@ -1918,6 +1919,14 @@ local function AlertHostMapMissing()
     end
 end
 
+local function AlertHostRequiredModMissing()
+    if lobbyComm:IsHost() then
+        HostUtils.PlayerMissingRequiredModAlert(localPlayerID)
+    else
+        lobbyComm:SendData(hostID, {Type = 'MissingRequiredMod', Id = localPlayerID})
+    end
+end
+
 -- Refresh (with a sledgehammer) all the items in the observer list.
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
@@ -1964,13 +1973,24 @@ local function UpdateGame()
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        local fine = true
 
         if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
+            if not RequiredMods.IsPlayable(scenarioInfo) then
+                fine = false
+                AlertHostRequiredModMissing()
+                RequiredMods.CreateInitialDialog(GUI, scenarioInfo)
+            end
+        else
+            fine = false
+            AlertHostMapMissing()
+        end
+        
+        if fine then
             GUI.mapView:SetScenario(scenarioInfo)
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
         else
-            AlertHostMapMissing()
             GUI.mapView:Clear()
         end
     end
@@ -4086,6 +4106,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostUtils.UpdateMods(data.SenderID, data.Name)
             elseif data.Type == 'MissingMap' then
                 HostUtils.PlayerMissingMapAlert(data.Id)
+            elseif data.Type == 'MissingRequiredMod' then
+                HostUtils.PlayerMissingRequiredModAlert(data.Id)
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
@@ -6025,8 +6047,8 @@ function InitHostUtils()
         AddAI = function(name, personality, slot)
             HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality))
         end,
-
-        PlayerMissingMapAlert = function(id)
+        
+        PlayerMissingAlert = function(id, systemMessage, logString)
             local slot = FindSlotForID(id)
             local name
             local needMessage = false
@@ -6048,16 +6070,22 @@ function InitHostUtils()
             end
 
             if needMessage then
-                -- %s is missing map %s.
-                SendSystemMessage("lobui_0330", name, gameInfo.GameOptions.ScenarioFile)
-                LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
+                SendSystemMessage(systemMessage, name, gameInfo.GameOptions.ScenarioFile)
+                LOG('>> '..name.. logString ..gameInfo.GameOptions.ScenarioFile)
                 if name == localPlayerName then
                     LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '.. UIUtil.defaultScenario)
                     SetGameOption('ScenarioFile', UIUtil.defaultScenario)
                 end
             end
         end,
-
+        
+        PlayerMissingMapAlert = function(id)
+            HostUtils.PlayerMissingAlert(id,"lobui_0330", ' is missing map ')
+        end,
+        PlayerMissingRequiredModAlert = function(id)
+            HostUtils.PlayerMissingAlert(id,"lobui_0334", ' is missing a required mod for map ')
+        end,
+        
         -- This function is needed because army numbers need to be calculated: armies are numbered incrementally in slot order.
         -- Call this function once just before game starts
         SendArmySettingsToServer = function()
