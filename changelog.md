@@ -24,9 +24,12 @@ Patch 3664 (Upcoming)
 - New feature: Ability to click on the game title to update it. With a future server update, this will then change in the client Find Games tab
 - New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
 - Improved lobby setting persistence interation with maps that introduce their own options
+- Corrected "to observers" tooltip occuring twice
+- Display mean rating in the rating tooltip, rather than minimum
 
 **Other**
 - Added Tamazight translation to FAF
+- Improved a large number of Spanish translations.
 
 **Contributors**
 - Arifi
