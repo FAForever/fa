@@ -1593,10 +1593,12 @@ function UpdateAvailableSlots( numAvailStartSpots )
     -- if number of available slots has changed, update it
     if numOpenSlots == numAvailStartSpots then
         -- Remove closed_spawn_mex if necessary
-        for i = 1, numAvailStartSpots do
-            if gameInfo.ClosedSlots[i] and gameInfo.SpawnMex[i] then
-                ClearSlotInfo(i)
-                gameInfo.SpawnMex[i] = nil
+        if not gameInfo.AdaptiveMap then
+            for i = 1, numAvailStartSpots do
+                if gameInfo.ClosedSlots[i] and gameInfo.SpawnMex[i] then
+                    ClearSlotInfo(i)
+                    gameInfo.SpawnMex[i] = nil
+                end
             end
         end
         return
@@ -3917,11 +3919,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
             elseif data.Type == 'SlotClosed' then
                 gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[slot] = false
+                gameInfo.SpawnMex[data.Slot] = false
                 ClearSlotInfo(data.Slot)
             elseif data.Type == 'SlotClosedSpawnMex' then
                 gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[slot] = true
+                gameInfo.SpawnMex[data.Slot] = true
                 ClearSlotInfo(data.Slot)
             end
         end
