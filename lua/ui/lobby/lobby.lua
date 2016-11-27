@@ -1639,7 +1639,8 @@ function UpdateAvailableSlots( numAvailStartSpots )
         end
         DisableSlot(i)
         GUI.slots[i]:Hide()
-        gameInfo.ClosedSlots[i] = nil
+        gameInfo.ClosedSlots[i] = true
+        gameInfo.SpawnMex[i] = nil
     end
 end
 
