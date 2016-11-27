@@ -8,10 +8,10 @@ Patch 3664 (Upcoming)
 - Fixed civilians not always revealing for all players on map start
 - Fixed all AIs being set as UEF in coop
 - Fixed beam weapons sometimes colliding incorrectly with projectiles
-- Fixed sim slowdown when ordering mex cap with hunddreds of engineers
+- Fixed sim slowdown when ordering mex cap with hundreds of engineers
 
 **UI**
-- New feature: Main menu option is now available which will allow you to select your language from those available in FAF
+- New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
 
 **Coop**
 - Fixed a whole bunch of videos
@@ -21,7 +21,7 @@ Patch 3664 (Upcoming)
 - Allowed armies to participate properly in objective requirements
 
 **Lobby**
-- New feature: Ability to click on the game title to update it. With a future server update, this will then change in the client Find Games tab
+- New feature: Ability to click on the game title to update it, both in the lobby, and in the client's Find Games tab
 - New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
 - Improved lobby setting persistence interation with maps that introduce their own options
 - Corrected "to observers" tooltip occuring twice
