@@ -683,6 +683,20 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "<LOC OPTIONS_0247>Confirm Self Destruct",
+                key = "confirm_self_destruct",
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "Only for ACU", key = 1},
+                        {text = "<LOC _On>", key = 2 },
+                    },
+                },
+            },
         },
     },
     video = {

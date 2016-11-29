@@ -94,6 +94,9 @@ Blacklist = {
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
 
+    -- Suicide Confirmation
+    ['BB236B78-CB23-4E78-8CD7-BA55AE987545'] = INTEGRATED,
+
     -- ==================================================================
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- ==================================================================
