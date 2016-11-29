@@ -5267,7 +5267,8 @@ function InitHostUtils()
                 {
                     Type = 'SlotClosed',
                     Slot = slot,
-                    Closed = closed
+                    Closed = closed,
+                    SpawnMex = false
                 }
             )
 
@@ -5286,6 +5287,8 @@ function InitHostUtils()
                 {
                     Type = 'SlotClosedSpawnMex',
                     Slot = slot,
+                    Closed = closed,
+                    SpawnMex = true
                 }
             )
 
