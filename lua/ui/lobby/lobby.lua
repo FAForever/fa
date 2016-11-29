@@ -3920,11 +3920,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
             elseif data.Type == 'SlotClosed' then
                 gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[data.Slot] = data.SpawnMex
+                gameInfo.SpawnMex[data.Slot] = false
                 ClearSlotInfo(data.Slot)
             elseif data.Type == 'SlotClosedSpawnMex' then
-                gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[data.Slot] = data.SpawnMex
+                gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
+                gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
                 ClearSlotInfo(data.Slot)
             end
         end
@@ -5267,8 +5267,7 @@ function InitHostUtils()
                 {
                     Type = 'SlotClosed',
                     Slot = slot,
-                    Closed = closed,
-                    SpawnMex = false
+                    Closed = closed
                 }
             )
 
@@ -5287,8 +5286,7 @@ function InitHostUtils()
                 {
                     Type = 'SlotClosedSpawnMex',
                     Slot = slot,
-                    Closed = closed,
-                    SpawnMex = true
+                    ClosedSpawnMex = true
                 }
             )
 
