@@ -15,6 +15,7 @@ exclusive = false
 ui_only = false
 conflicts = {}
 mountpoints = {
+    etc = "/etc",
     env = "/env",
     loc = '/loc',
     schook = '/schook',
