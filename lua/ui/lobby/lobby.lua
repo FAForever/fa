@@ -3923,8 +3923,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.SpawnMex[data.Slot] = false
                 ClearSlotInfo(data.Slot)
             elseif data.Type == 'SlotClosedSpawnMex' then
-                gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[data.Slot] = true
+                gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
+                gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
                 ClearSlotInfo(data.Slot)
             end
         end
@@ -5286,6 +5286,7 @@ function InitHostUtils()
                 {
                     Type = 'SlotClosedSpawnMex',
                     Slot = slot,
+                    ClosedSpawnMex = true
                 }
             )
 
