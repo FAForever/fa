@@ -36,6 +36,9 @@ XSL0101 = Class(SWalkingLandUnit) {
         if bit == 8 then
             self.Sync.LowPriority = true
             self:SetWeaponEnabledByLabel('LaserTurret', false)
+            if not self:IsMoving() then
+                self.CloakThread = self:ForkThread(self.HideUnit)
+            end
         else
             SWalkingLandUnit.OnScriptBitClear(self, bit)
         end
@@ -57,7 +60,7 @@ XSL0101 = Class(SWalkingLandUnit) {
     end,
 
     HideUnit = function(self)
-        if not self.Dead and self:GetFractionComplete() == 1 then
+        if not self.Dead and self:GetFractionComplete() == 1 and self.Sync.LowPriority then
             WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
 
             if self:IsMoving() then return end
