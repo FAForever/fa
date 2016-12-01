@@ -1159,7 +1159,7 @@ end
 function PlayReclaimEffects( reclaimer, reclaimed, BuildEffectBones, EffectsBag )
 	local army = reclaimer:GetArmy()
     local pos = reclaimed:GetPosition()
-    pos[2] = GetSurfaceHeight(pos[1], pos[3])
+    pos[2] = GetTerrainHeight(pos[1], pos[3])
 
     local beamEnd = Entity()
     EffectsBag:Add(beamEnd)
