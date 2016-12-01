@@ -886,6 +886,7 @@ end
 -- #
 -- # Target = {
 -- #       Army=<index>,
+-- #       Armies=[<string>,<string>, ...] --table of army names and HumanPlayers
 -- #       StatName=<name>,
 -- #       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
 -- #       Value=<value>,
@@ -898,19 +899,21 @@ end
 function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
-
-    local function WatchStat(statName, brain, compareFunc, value, category)
+    local armyBrainsList = MakeListFromTarget(Target)
+    
+    local function WatchStat(statName, aibrains, compareFunc, value, category)
         local oldVal
 
         while objective.Active do
             local result = false
             local testVal = 0
-
-            if category then
-                testVal = brain:GetBlueprintStat(statName, category)
-
-            else
-                testVal = brain:GetArmyStat(statName, value).Value
+            
+            for brain,_ in aibrains do 
+                if category then
+                    testVal = testVal + brain:GetBlueprintStat(statName, category)
+                else
+                    testVal = testVal + brain:GetArmyStat(statName, value).Value
+                end
             end
 
             if (Target.ShowProgress) then
@@ -936,7 +939,7 @@ function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
 
     local op = GetCompareFunc(Target.CompareOp)
     if op then
-        ForkThread( WatchStat, Target.StatName, GetArmyBrain(Target.Army), op, Target.Value, Target.Category )
+        ForkThread( WatchStat, Target.StatName, armyBrainsList, op, Target.Value, Target.Category )
     end
 
     objective.ManualResult = function(self, result)
@@ -952,6 +955,34 @@ function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
     end
 
     return objective
+end
+
+function MakeListFromTarget(Target)
+    local resultList = {}
+    if Target.Army then
+        resultList[GetArmyBrain(Target.Army)] = true
+    end
+    
+    if Target.Armies then
+        local tblArmy = ListArmies()
+        for _,armyName in Target.Armies do
+            if armyName == "HumanPlayers" then
+                for iArmy, strArmy in pairs(tblArmy) do
+                    if ScenarioInfo.ArmySetup[strArmy].Human then
+                        resultList[GetArmyBrain(iArmy)] = true
+                    end
+                end
+            else
+                for iArmy, strArmy in pairs(tblArmy) do
+                    if strArmy == armyName then
+                        resultList[GetArmyBrain(iArmy)] = true
+                    end
+                end
+            end
+            
+        end
+    end
+    return resultList
 end
 
 -- #
@@ -1009,17 +1040,20 @@ end
 function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
+    local armyBrainsList = MakeListFromTarget(Target)
 
-    local function WatchStat(statName, brain, category, compareFunc, value)
+    local function WatchStat(statName, aibrains, category, compareFunc, value)
         while objective.Active do
-            local unitsInCategory = brain:GetListOfUnits(category, false)
-            if unitsInCategory then
-                for k, unit in unitsInCategory do
-                    if compareFunc(unit:GetStat(statName, value).Value, value) then
-                        objective.Active = false
-                        objective:OnResult(true)
-                        UpdateObjective( Title, 'complete', 'complete', objective.Tag )
-                        return
+            for brain,_ in aibrains do
+                local unitsInCategory = brain:GetListOfUnits(category, false)
+                if unitsInCategory then
+                    for k, unit in unitsInCategory do
+                        if compareFunc(unit:GetStat(statName, value).Value, value) then
+                            objective.Active = false
+                            objective:OnResult(true)
+                            UpdateObjective( Title, 'complete', 'complete', objective.Tag )
+                            return
+                        end
                     end
                 end
             end
@@ -1029,7 +1063,7 @@ function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
 
     local op = GetCompareFunc(Target.CompareOp)
     if op then
-        ForkThread( WatchStat, Target.StatName, GetArmyBrain(Target.Army), Target.Category, op, Target.Value )
+        ForkThread( WatchStat, Target.StatName, armyBrainsList, Target.Category, op, Target.Value )
     end
 
     return objective
