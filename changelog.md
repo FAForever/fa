@@ -9,6 +9,7 @@ Patch 3664 (Upcoming)
 - Fixed all AIs being set as UEF in coop
 - Fixed beam weapons sometimes colliding incorrectly with projectiles
 - Fixed sim slowdown when ordering mex cap with hundreds of engineers
+- Fixed reclaim beam not penetrating water
 
 **UI**
 - New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
