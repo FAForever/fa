@@ -4,12 +4,13 @@ Patch 3664 (Upcoming)
 **Bugs**
 - Removed deploy ability tooltip from Aeon T3 Mobile Artillery
 - Fixed typos in two keybind descriptions
-- Fixed Selen cloak being enabled out of the factory while moving
+- Fixed Selen cloak being enabled out of the factory while moving, and further improved usability.
 - Fixed civilians not always revealing for all players on map start
 - Fixed all AIs being set as UEF in coop
 - Fixed beam weapons sometimes colliding incorrectly with projectiles
 - Fixed sim slowdown when ordering mex cap with hundreds of engineers
 - Fixed reclaim beam not penetrating water
+- Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone.
 
 **UI**
 - New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
@@ -26,7 +27,7 @@ Patch 3664 (Upcoming)
 - New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
 - Improved lobby setting persistence interation with maps that introduce their own options
 - Corrected "to observers" tooltip occuring twice
-- Display mean rating in the rating tooltip, rather than minimum
+- Display mean rating in the rating tooltip, rather than minimum. Also use playername in that tooltip.
 
 **Other**
 - Added Tamazight translation to FAF
