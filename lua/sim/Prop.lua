@@ -13,7 +13,7 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-RECLAIMLABEL_MIN_MASS = 20
+minimumLabelMass = 20
 
 Prop = Class(moho.prop_methods, Entity) {
 
@@ -120,16 +120,21 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     SyncMassLabel = function(self)
-        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            local data = {id = self:GetEntityId()}
+        local data = {id = self:GetEntityId()}
 
-            if self:BeenDestroyed() then
+        if self:BeenDestroyed() then
+            data.mass = 0
+        elseif self.MaxMassReclaim >= minimumLabelMass then
+            data.mass = self.MaxMassReclaim * self.ReclaimLeft
+
+            if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
                 data.mass = 0
             else
-                data.mass = self.MaxMassReclaim * self.ReclaimLeft
-                data.position = self:GetCachePosition()
+                data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
             end
+        end
 
+        if data.mass then
             table.insert(Sync.Reclaim, data)
         end
     end,
@@ -179,6 +184,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     -- This function mimics the engine's behavior when calculating what value is left of a prop
+    -- Called from OnDestroy, OnDamage, and OnCreate
     UpdateReclaimLeft = function(self)
         if not self:BeenDestroyed() then
             local max = self:GetMaxHealth()

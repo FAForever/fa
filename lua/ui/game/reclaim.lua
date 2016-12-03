@@ -8,9 +8,12 @@ local Reclaim = {}
 
 -- called from schook/lua/UserSync.lua
 local NeedUpdate = false
-function UpdateReclaim(r)
-    r.updated = true
-    Reclaim[r.id] = r
+local minimumLabelMass = 20
+
+-- Stores/updates a reclaim entity's data using EntityId as key
+function UpdateReclaim(data)
+    data.updated = true
+    Reclaim[data.id] = data
 end
 
 local OldZoom
@@ -97,13 +100,13 @@ function CreateReclaimLabel(view, r)
 end
 
 function UpdateLabels()
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
     local n_visible = 0
 
     for id, r in Reclaim do
-        local label = view.ReclaimGroup.ReclaimLabels[id]
+        local label = view.ReclaimGroup.ReclaimLabels[id] -- nil if not set yet
 
-        if not r.mass or r.mass < 1 then
+        if not r.mass or r.mass < minimumLabelMass then -- It's too small to display, remove from tables
             if label then
                 label:Destroy()
                 view.ReclaimGroup.ReclaimLabels[id] = nil
@@ -118,7 +121,7 @@ function UpdateLabels()
                 label:Show()
                 n_visible = n_visible + 1
             end
-        elseif label then
+        elseif label then -- Don't show labels off the screen
             label:Hide()
         end
 

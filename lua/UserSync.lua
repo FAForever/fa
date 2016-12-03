@@ -57,8 +57,9 @@ function OnSync()
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
-    for _, r in Sync.Reclaim or {} do
-        import('/lua/ui/game/reclaim.lua').UpdateReclaim(r)
+    -- Each sync, update the user-side data for any prop created, damaged, or destroyed
+    for _, data in Sync.Reclaim or {} do
+        import('/lua/ui/game/reclaim.lua').UpdateReclaim(data)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then
