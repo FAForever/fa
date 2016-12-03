@@ -11,9 +11,9 @@ local NeedUpdate = false
 local minimumLabelMass = 20
 
 -- Stores/updates a reclaim entity's data using EntityId as key
-function UpdateReclaim(data)
+function UpdateReclaim(id, data)
     data.updated = true
-    Reclaim[data.id] = data
+    Reclaim[id] = data
 end
 
 local OldZoom

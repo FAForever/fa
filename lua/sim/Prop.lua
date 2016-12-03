@@ -120,7 +120,8 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     SyncMassLabel = function(self)
-        local data = {id = self:GetEntityId()}
+        local data = {}
+        local id = self:GetEntityId()
 
         if self:BeenDestroyed() then
             data.mass = 0
@@ -134,8 +135,8 @@ Prop = Class(moho.prop_methods, Entity) {
             end
         end
 
-        if data.mass then
-            table.insert(Sync.Reclaim, data)
+        if data.mass and id then
+            Sync.Reclaim[id] = data
         end
     end,
 

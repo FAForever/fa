@@ -58,8 +58,8 @@ function OnSync()
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    for _, data in Sync.Reclaim or {} do
-        import('/lua/ui/game/reclaim.lua').UpdateReclaim(data)
+    for id, data in Sync.Reclaim or {} do
+        import('/lua/ui/game/reclaim.lua').UpdateReclaim(id, data)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then
