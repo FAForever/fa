@@ -39,6 +39,8 @@ Prop = Class(moho.prop_methods, Entity) {
             economy.ReclaimMassMax or 0,
             economy.ReclaimEnergyMax or 0
         )
+        -- flag to avoid bugs if something (like map script) screws around with MaxMassReclaim
+        self.HadReclaimLabel = false
 
         local pos = self:GetPosition()
         self.CachePosition = pos
@@ -119,13 +121,16 @@ Prop = Class(moho.prop_methods, Entity) {
         Entity.Destroy(self)
     end,
 
+
     SyncMassLabel = function(self)
         local data = {}
         local id = self:GetEntityId()
 
         if self:BeenDestroyed() then
             data.mass = 0
-        elseif self.MaxMassReclaim >= minimumLabelMass then
+        elseif self.MaxMassReclaim >= minimumLabelMass or self.HadReclaimLabel then
+            self.HadReclaimLabel = true
+
             data.mass = self.MaxMassReclaim * self.ReclaimLeft
 
             if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
