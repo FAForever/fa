@@ -901,7 +901,7 @@ function SetSlotInfo(slotNum, playerInfo)
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
     tooltipText['text'] = "Rating"
-    tooltipText['body'] = LOCF("<LOC lobui_0768>%s's TrueSkill Rating is %s +/- %s", playerInfo.PlayerName, math.round(playerInfo.MEAN), math.ceil(playerInfo.DEV))
+    tooltipText['body'] = LOCF("<LOC lobui_0768>%s's TrueSkill Rating is %s +/- %s", playerInfo.PlayerName, math.round(playerInfo.MEAN), math.ceil(playerInfo.DEV * 3))
     slot.tooltiprating = Tooltip.AddControlTooltip(slot.ratingText, tooltipText)
 
     slot.numGamesText:Show()
