@@ -31,6 +31,7 @@ Patch 3664 (Upcoming)
 - Improved lobby setting persistence interation with maps that introduce their own options
 - Corrected "to observers" tooltip occuring twice
 - Display mean rating in the rating tooltip, rather than minimum. Also use playername in that tooltip.
+- Fixed closed spots showing an empty box for newly joined players, breaking the lobby
 
 **Other**
 - Added Tamazight translation to FAF
