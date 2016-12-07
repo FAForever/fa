@@ -107,6 +107,9 @@ function UpdateLabels()
                 label = CreateReclaimLabel(view.ReclaimGroup, r)
                 view.ReclaimGroup.ReclaimLabels[id] = label
             else
+                local vector = Vector(r.position[1], r.position[2], r.position[3])
+                label:SetPosition(vector)
+                label:Update()
                 label:Show()
             end
 
