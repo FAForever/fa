@@ -7775,6 +7775,17 @@ lobui_0439="Распределять только между союзникам�
 lobui_0440="Все игроки"
 lobui_0441="Распределять между всеми игроками"
 
+lobui_0450="CPU"
+lobui_0451="Ping"
+lobui_0452="Ping: "
+lobui_0453="Only shows when > 500"
+lobui_0454="Player is not connected to someone"
+lobui_0455="Connected"
+lobui_0456="Not Connected"
+lobui_0457="No connection info available"
+lobui_0458="UnKnown"
+lobui_0459="CPU Rating: "
+
 lobui_0501="Случайная карта"
 lobui_0502="При нажатии будет выбрана случайная карта"
 lobui_0523="Настройки по умолчанию"
