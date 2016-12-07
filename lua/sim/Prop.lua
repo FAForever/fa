@@ -40,8 +40,16 @@ Prop = Class(moho.prop_methods, Entity) {
             economy.ReclaimEnergyMax or 0
         )
 
+        -- Correct to terrain, just to be sure
         local pos = self:GetPosition()
+        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+        if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
+            pos[2] = terrainAltitude
+            Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+        end
+
         self.CachePosition = pos
+
         local max = math.max(50, bp.Defense.MaxHealth)
         self:SetMaxHealth(max)
         self:SetHealth(self, max)
