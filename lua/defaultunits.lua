@@ -1752,18 +1752,18 @@ AirUnit = Class(MobileUnit) {
             end
         end
 
-        if(with == 'Water') then
+        if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact )
+            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
         end
-        self:ForkThread(self.DeathThread, self.OverKillRatio )
+        self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
-    CreateUnitAirDestructionEffects = function( self, scale )
+    CreateUnitAirDestructionEffects = function(self, scale)
         local army = self:GetArmy()
         local scale = explosion.GetAverageBoundingXZRadius(self)
-        explosion.CreateDefaultHitExplosion( self, scale)
-        if(self.ShowUnitDestructionDebris) then
+        explosion.CreateDefaultHitExplosion(self, scale)
+        if self.ShowUnitDestructionDebris then
             explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
         end
     end,
@@ -1776,7 +1776,7 @@ AirUnit = Class(MobileUnit) {
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
         if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
-            self.CreateUnitAirDestructionEffects( self, 1.0 )
+            self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
