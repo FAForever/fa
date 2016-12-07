@@ -85,19 +85,19 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Returns the cache position of the prop, since it doesn't move, it's a big optimization
+    -- Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
         return self.CachePosition or self:GetPosition()
     end,
 
-    --Sets if the unit can take damage.  val = true means it can take damage.
-    --val = false means it can't take damage
+    -- Sets if the unit can take damage.  val = true means it can take damage.
+    -- val = false means it can't take damage
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
 
-    --Sets if the unit can be killed.  val = true means it can be killed.
-    --val = false means it can't be killed
+    -- Sets if the unit can be killed.  val = true means it can be killed.
+    -- val = false means it can't be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
@@ -108,18 +108,18 @@ Prop = Class(moho.prop_methods, Entity) {
 
     OnKilled = function(self, instigator, type, exceessDamageRatio )
         if not self.CanBeKilled then return end
-        self:DoPropCallbacks( 'OnKilled' )
+        self:DoPropCallbacks('OnKilled')
         self:Destroy()
     end,
 
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
-        self.CreateReclaimEndEffects( entity, self )
+        self.CreateReclaimEndEffects(entity, self)
         self:Destroy()
     end,
 
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
     Destroy = function(self)
