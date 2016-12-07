@@ -214,7 +214,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Prop reclaiming
+    -- Prop reclaiming
     -- time = the greater of either time to reclaim mass or energy
     -- time to reclaim mass or energy is defined as:
     -- Mass Time =  mass reclaim value / buildrate of thing reclaiming it * BP set mass mult
@@ -243,19 +243,19 @@ Prop = Class(moho.prop_methods, Entity) {
     --
     SplitOnBonesByName = function(self, dirprefix)
         if not dirprefix then
-            -- default dirprefix to parent dir of our own blueprint
+            -- Default dirprefix to parent dir of our own blueprint
             dirprefix = self:GetBlueprint().BlueprintId
 
-            -- trim ".../groups/blah_prop.bp" to just ".../"
+            -- Trim ".../groups/blah_prop.bp" to just ".../"
             dirprefix = string.gsub(dirprefix, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
 
-        for ibone=1, self:GetBoneCount()-1 do
+        for ibone = 1, self:GetBoneCount() - 1 do
             local bone = self:GetBoneName(ibone)
 
-            -- construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
+            -- Construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
             local btrim = string.gsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
 
@@ -273,11 +273,10 @@ Prop = Class(moho.prop_methods, Entity) {
     PlayPropSound = function(self, sound)
         local bp = self:GetBlueprint().Audio
         if bp and bp[sound] then
-            --LOG( 'Playing ', sound )
             self:PlaySound(bp[sound])
             return true
         end
-        --LOG( 'Could not play ', sound )
+
         return false
     end,
 
@@ -286,18 +285,19 @@ Prop = Class(moho.prop_methods, Entity) {
     -- AmbientRumble defined, play that too
     PlayPropAmbientSound = function(self, sound)
         if sound == nil then
-            self:SetAmbientSound( nil, nil )
+            self:SetAmbientSound(nil, nil)
             return true
         else
             local bp = self:GetBlueprint().Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
-                    self:SetAmbientSound( bp[sound], bp.Audio['AmbientRumble'] )
+                    self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])
                 else
-                    self:SetAmbientSound( bp[sound], nil )
+                    self:SetAmbientSound(bp[sound], nil)
                 end
                 return true
             end
+
             return false
         end
     end,
