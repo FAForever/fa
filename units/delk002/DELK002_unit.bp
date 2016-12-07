@@ -1,5 +1,6 @@
 UnitBlueprint {
-    AI = {
+    AI = { -- this is important - it stops it at the correct range on attack move
+        GuardScanRadius = 35, --make this a bit more than the weapon range, it needs time to stop
         TargetBones = {
             'Turret',
         },
@@ -215,6 +216,37 @@ UnitBlueprint {
         Level5 = 75,
     },
     Weapon = {
+        { -- special dummy weapon to make the unit stop a certain distance away
+            AutoInitiateAttackCommand = false,
+            CannotAttackGround = false,
+            Damage = 0,
+            DamageFriendly = false,
+            DamageType = 'Normal',
+            DisplayName = 'Target Tracker',
+            FireTargetLayerCapsTable = { --what the unit will stop for - shields dont need to stop for air units
+                Land = 'Air|Land|Water',
+                Water = 'Air|Land|Water',
+            },
+            MaxRadius = 33, -- this is the range the unit will try to stop at. change GuardScanRadius as well.
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret', -- when moving to new unit, update these to something that exists on the unit
+                    },
+                    RackBone = 'Turret',
+                },
+            },
+            RateOfFire = 0.5,
+            ReTargetOnMiss = false,
+            TargetCheckInterval = 0.1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            Turreted = false,
+            SlavedToBody = false,
+            WeaponCategory = 'Missile',
+        },
         {
             AlwaysRecheckTarget = true,
             Audio = {
