@@ -1736,28 +1736,22 @@ AirUnit = Class(MobileUnit) {
         self:SetTurnMult(1)
     end,
 
-    OnImpact = function(self, with, other)
-        if self.DeathBounce then
-            return
-        end
-        self.DeathBounce = true
+    -- Planes need to crash. Therefore, disable OnImpact apart from when called by the attached crash projectile
+    OnImpact = function(self, with, calledFromProj)
+        if self.GroundImpacted or not calledFromProj then return end
 
-        -- Damage the area we have impacted with.
-        local bp = self:GetBlueprint()
-        local i = 1
-        local numWeapons = table.getn(bp.Weapon)
+        -- Only call this code once
+        self.GroundImpacted = true
 
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'DeathImpact') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
+        -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
+        local deathWep = self.deathWep -- Use a local copy for speed and easy reading
+        DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
         end
+
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -1765,6 +1759,7 @@ AirUnit = Class(MobileUnit) {
         local army = self:GetArmy()
         local scale = explosion.GetAverageBoundingXZRadius(self)
         explosion.CreateDefaultHitExplosion(self, scale)
+
         if self.ShowUnitDestructionDebris then
             explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
         end
@@ -1785,11 +1780,32 @@ AirUnit = Class(MobileUnit) {
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
             self:DisableShield()
+
+            -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
+            local bp = self:GetBlueprint()
+            local i = 1
+            for i, numweapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'DeathImpact' then
+                    self.deathWep = bp.Weapon[i]
+                    break
+                end
+            end
+
+            if not self.deathWep or self.deathWep == {} then
+                WARN('An Air unit with no death weapon, or with incorrect label has died!!')
+            else
+                self.DeathCrashDamage = self.deathWep.Damage
+            end
+
+            -- Create a projectile we'll use to interact with Shields
+            local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+            proj:Start(self, 0)
+            self.Trash:Add(proj)
+
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
         else
-            self.DeathBounce = 1
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
