@@ -257,6 +257,15 @@ Shield = Class(moho.shield_methods,Entity) {
             return false
         end
 
+        if EntityCategoryContains(categories.SHIELDCOLLIDE, other) then
+            if other.ShieldImpacted then
+                return false
+            else
+                other:OnImpact('Shield', self)
+                return false
+            end
+        end
+
         -- Allow strategic nuke missile to penetrate shields
         if EntityCategoryContains(categories.STRATEGIC, other) and
             EntityCategoryContains(categories.MISSILE, other) then
