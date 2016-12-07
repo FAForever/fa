@@ -12,6 +12,9 @@ Patch 3664 (Upcoming)
 - Fixed reclaim beam not penetrating water
 - Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone.
 
+**Gameplay**
+- Changed the ground weapon to be primary on Cybran switch-tech mobile AA units (T1, T3, Cruiser). This has no effect other than to allow attack-moving to work properly, stopping at the right range better.
+
 **UI**
 - New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
 
