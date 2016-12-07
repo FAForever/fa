@@ -6,7 +6,6 @@ Patch 3664 (Upcoming)
 - Fixed typos in two keybind descriptions
 - Fixed Selen cloak being enabled out of the factory while moving, and further improved usability.
 - Fixed civilians not always revealing for all players on map start
-- Fixed all AIs being set as UEF in coop
 - Fixed beam weapons sometimes colliding incorrectly with projectiles
 - Fixed sim slowdown when ordering mex cap with hundreds of engineers
 - Fixed reclaim beam not penetrating water
@@ -24,6 +23,7 @@ Patch 3664 (Upcoming)
 - Added a Feedback button for easier reporting of issues
 - Giving units to an ally no longer breaks objectives
 - Allowed armies to participate properly in objective requirements
+- Fixed all AIs being set as UEF in coop
 
 **Lobby**
 - New feature: Ability to click on the game title to update it, both in the lobby, and in the client's Find Games tab
