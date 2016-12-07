@@ -34,18 +34,23 @@ Prop = Class(moho.prop_methods, Entity) {
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
-        self:SetMaxReclaimValues(
-            economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
-            economy.ReclaimMassMax or 0,
-            economy.ReclaimEnergyMax or 0
-        )
+        local unitWreck = bp.UnitWreckage
+        if not unitWreck then -- This function is called from Wreckage.lua, don't call twice
+            self:SetMaxReclaimValues(
+                economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
+                economy.ReclaimMassMax or 0,
+                economy.ReclaimEnergyMax or 0
+            )
+        end
 
         -- Correct to terrain, just to be sure
         local pos = self:GetPosition()
-        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
-        if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
-            pos[2] = terrainAltitude
-            Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+        if unitWreck then
+            local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+            if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
+                pos[2] = terrainAltitude
+                Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+            end
         end
 
         self.CachePosition = pos
