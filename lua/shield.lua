@@ -252,14 +252,14 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     -- Return true to process this collision, false to ignore it.
-    OnCollisionCheck = function(self,other)
+    OnCollisionCheck = function(self, other)
         if other:GetArmy() == -1 then
             return false
         end
 
-        -- allow strategic nuke missile to penetrate shields
-        if EntityCategoryContains( categories.STRATEGIC, other ) and
-            EntityCategoryContains( categories.MISSILE, other ) then
+        -- Allow strategic nuke missile to penetrate shields
+        if EntityCategoryContains(categories.STRATEGIC, other) and
+            EntityCategoryContains(categories.MISSILE, other) then
             return false
         end
 
@@ -267,7 +267,7 @@ Shield = Class(moho.shield_methods,Entity) {
             return true
         end
 
-        return IsEnemy(self:GetArmy(),other:GetArmy())
+        return IsEnemy(self:GetArmy(), other:GetArmy())
     end,
 
     TurnOn = function(self)
