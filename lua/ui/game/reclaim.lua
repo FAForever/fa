@@ -5,7 +5,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local Reclaim = {}
-local minimumLabelMass = 20
+local minimumLabelMass = 1
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua

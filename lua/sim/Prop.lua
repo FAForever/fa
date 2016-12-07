@@ -13,7 +13,7 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-minimumLabelMass = 20
+minimumLabelMass = 1
 
 Prop = Class(moho.prop_methods, Entity) {
 
