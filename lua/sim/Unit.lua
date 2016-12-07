@@ -1495,8 +1495,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
-        explosion.CreateScalableUnitExplosion( self, overKillRatio )
+    CreateDestructionEffects = function(self, overKillRatio)
+        explosion.CreateScalableUnitExplosion(self, overKillRatio)
     end,
 
     DeathWeaponDamageThread = function( self , damageRadius, damage, damageType, damageFriendly)
@@ -1555,7 +1555,7 @@ Unit = Class(moho.unit_methods) {
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
 
-        --Create sinker projectile
+        -- Create sinker projectile
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
