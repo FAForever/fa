@@ -5,13 +5,28 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local Reclaim = {}
-local minimumLabelMass = 1
 
--- Stores/updates a reclaim entity's data using EntityId as key
+-- Stores/updates the list of reclaimable props using EntityId as key
 -- called from /lua/UserSync.lua
-function UpdateReclaim(id, data)
-    data.updated = true
-    Reclaim[id] = data
+function UpdateReclaim(synctable)
+    Reclaim = synctable.Alive -- Set the table to the latest sim state
+
+    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+    for id, bool in synctable.ToKill do
+        local label = view.ReclaimGroup.ReclaimLabels[id]
+        if label then -- There exists a label for this id. Kill it.
+            label:Destroy()
+            view.ReclaimGroup.ReclaimLabels[id] = nil
+            label = nil
+        end
+
+        if Reclaim[id] then
+            WARN('ERROR - The UI Reclaim table has an entry that should have been removed. Investigate')
+        end
+    end
+
+    SimCallback({Func = 'ResetToKill'})
+    --LOG(repr(Reclaim))
 end
 
 local MAX_ON_SCREEN = 1000
@@ -85,24 +100,14 @@ function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
     local n_visible = 0
 
-    for id, r in Reclaim do
+    for id, data in Reclaim do
         local label = view.ReclaimGroup.ReclaimLabels[id] -- nil if not set yet
 
-        if not r.mass or r.mass < minimumLabelMass then -- It's too small to display, remove from tables
-            if label then
-                label:Destroy()
-                view.ReclaimGroup.ReclaimLabels[id] = nil
-                label = nil
-            end
-            Reclaim[id] = nil
-        elseif OnScreen(view, r.position) then
-            if not label then
-                label = CreateReclaimLabel(view.ReclaimGroup, r)
+        if OnScreen(view, data.position) then -- Only create/show things that are on screen right now
+            if not label then -- Create and assign one
+                label = CreateReclaimLabel(view.ReclaimGroup, data, id)
                 view.ReclaimGroup.ReclaimLabels[id] = label
             else
-                local vector = Vector(r.position[1], r.position[2], r.position[3])
-                label:SetPosition(vector)
-                label:Update()
                 label:Show()
             end
 

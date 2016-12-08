@@ -43,6 +43,7 @@ local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
+local Prop = import('/lua/sim/Prop.lua')
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -120,6 +121,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
 Callbacks.SpawnPing = SimPing.SpawnPing
+
+Callbacks.ResetToKill = Prop.ResetToKill -- Reset reclaim label adjustment counter
 
 --Nuke Ping
 Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing

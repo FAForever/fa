@@ -13,7 +13,32 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-minimumLabelMass = 1
+minimumLabelMass = 1 -- Nothing with starting mass less than this ever gets into MassLabels
+
+-- The MassLabels table keeps track of all props and wrecks that should be displaying a label
+-- While the entity's value is above the minimum, it should be stored in Alive
+--      Alive = {id = {mass = int, position = table, AssociatedBP = str}}
+-- If a prop is killed, destroyed, or damaged to below the minimum, the entry is erased from Alive and ToKill[id] is set to true
+-- This entire table is sent via UserSync.lua and used by the UI.
+-- Everything in ToKill is checked for a label by the UI on activation. The label is deleted, and the UI callbacks to here to reset ToKill = {}
+MassLabels = {Alive = {}, ToKill = {}}
+
+DeleteEntry = function(id)
+    if MassLabels.Alive[id] then
+        MassLabels.Alive[id] = nil
+        MassLabels.ToKill[id] = true
+    end
+end
+
+-- Called from UI via SimCallbacks.lua
+ResetToKill = function()
+    MassLabels.ToKill = {}
+end
+
+-- Called from UserSync.lua to fetch the main table
+GetLabels = function()
+    return MassLabels
+end
 
 Prop = Class(moho.prop_methods, Entity) {
 
@@ -34,8 +59,8 @@ Prop = Class(moho.prop_methods, Entity) {
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
-        local unitWreck = bp.UnitWreckage
-        if not unitWreck then -- This function is called from Wreckage.lua, don't call twice
+        local unitWreck = bp.UnitWreckage -- Defined only in the default wreckage file used for all unit wrecks
+        if not unitWreck then -- This function is called from Wreckage.lua for dying units, and should only happen once
             self:SetMaxReclaimValues(
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
                 economy.ReclaimMassMax or 0,
@@ -113,6 +138,8 @@ Prop = Class(moho.prop_methods, Entity) {
 
     OnKilled = function(self, instigator, type, exceessDamageRatio )
         if not self.CanBeKilled then return end
+        self.Dead = true
+        self:UpdateReclaimLeft()
         self:DoPropCallbacks('OnKilled')
         self:Destroy()
     end,
@@ -136,26 +163,30 @@ Prop = Class(moho.prop_methods, Entity) {
         local data = {}
         local id = self:GetEntityId()
 
-        if self:BeenDestroyed() then
-            data.mass = 0
-        elseif self.MaxMassReclaim >= minimumLabelMass then
+        if self.Dead or self:BeenDestroyed() then
+            DeleteEntry(id)
+        elseif self.MaxMassReclaim >= minimumLabelMass then -- Only ever allow things above the threshold to make it anywhere near the UI
             data.mass = math.floor(0.5 + (self.MaxMassReclaim * self.ReclaimLeft))
 
             if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
-                data.mass = 0
-            else
-                data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
+                DeleteEntry(id)
+                data.mass = nil
             end
         end
 
-        if data.mass and id then
-            Sync.Reclaim[id] = data
+        if data.mass then
             data.mass = tostring(data.mass) -- Store as a string to save CPU time in UI
             data.AssociatedBP = self.AssociatedBP or 'NonWreckage' -- Set for wrecks in Wreckage as the unit BlueprintId
+            data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
+
+            MassLabels.Alive[id] = data
+            WARN('We just updated the MassLabels')
+            WARN(repr(MassLabels))
         end
     end,
 
     OnDestroy = function(self)
+        self.Dead = true
         self:UpdateReclaimLeft()
         self.Trash:Destroy()
     end,
@@ -200,7 +231,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     -- This function mimics the engine's behavior when calculating what value is left of a prop
-    -- Called from OnDestroy, OnDamage, and OnCreate
+    -- Called from OnDestroy, OnKilled, OnDamage, and OnCreate
     UpdateReclaimLeft = function(self)
         if not self:BeenDestroyed() then
             local max = self:GetMaxHealth()
