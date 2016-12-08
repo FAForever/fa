@@ -58,8 +58,10 @@ function OnSync()
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    for id, data in Sync.Reclaim or {} do
-        import('/lua/ui/game/reclaim.lua').UpdateReclaim(id, data)
+    if Sync.Reclaim then
+        Sync.Reclaim = import('/lua/sim/Prop.lua').GetLabels()
+        --LOG(repr(Sync.Reclaim))
+        import('/lua/ui/game/reclaim.lua').UpdateReclaim(Sync.Reclaim)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then
