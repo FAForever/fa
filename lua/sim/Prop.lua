@@ -139,7 +139,7 @@ Prop = Class(moho.prop_methods, Entity) {
         if self:BeenDestroyed() then
             data.mass = 0
         elseif self.MaxMassReclaim >= minimumLabelMass then
-            data.mass = self.MaxMassReclaim * self.ReclaimLeft
+            data.mass = math.floor(0.5 + (self.MaxMassReclaim * self.ReclaimLeft))
 
             if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
                 data.mass = 0
@@ -150,6 +150,8 @@ Prop = Class(moho.prop_methods, Entity) {
 
         if data.mass and id then
             Sync.Reclaim[id] = data
+            data.mass = tostring(data.mass) -- Store as a string to save CPU time in UI
+            data.AssociatedBP = self.AssociatedBP or 'NonWreckage' -- Set for wrecks in Wreckage as the unit BlueprintId
         end
     end,
 
