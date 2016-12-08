@@ -85,6 +85,10 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
+
+    -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
+    prop.AssociatedBP = bp.BlueprintId
+
     prop:SetOrientation(orientation, true)
 
     prop:SetScale(bp.Display.UniformScale)
@@ -101,9 +105,6 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
     if not bp.Wreckage.UseCustomMesh then
         prop:SetMesh(bp.Display.MeshBlueprintWrecked)
     end
-
-    -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
-    prop.AssociatedBP = bp.BlueprintId
 
     return prop
 end

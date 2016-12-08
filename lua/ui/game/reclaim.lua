@@ -51,8 +51,8 @@ local WorldLabel = Class(Group) {
     end
 }
 
-function CreateReclaimLabel(view, r)
-    local pos = r.position
+function CreateReclaimLabel(view, data, id)
+    local pos = data.position
     local label = WorldLabel(view, Vector(pos[1], pos[2], pos[3]))
 
     label.mass = Bitmap(label)
@@ -62,7 +62,7 @@ function CreateReclaimLabel(view, r)
     label.mass.Height:Set(14)
     label.mass.Width:Set(14)
 
-    label.text = UIUtil.CreateText(label, math.floor(0.5+r.mass), 10, UIUtil.bodyFont)
+    label.text = UIUtil.CreateText(label, pos[1] .. ' ' .. pos[3] .. ' ' .. id .. ' ' .. r.AssociatedBP, 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(label.text, label, 16)
@@ -74,13 +74,6 @@ function CreateReclaimLabel(view, r)
         local proj = view:Project(pos)
         LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
         self.proj = {x=proj.x, y=proj.y}
-    end
-
-    label.UpdateMass = function(self, r)
-        local mass = tostring(math.floor(0.5+r.mass))
-        if mass ~= self.text:GetText() then
-            self.text:SetText(mass)
-        end
     end
 
     label:Update()
@@ -118,9 +111,8 @@ function UpdateLabels()
             label:Hide()
         end
 
-        if label and r.updated then
-            label:UpdateMass(r)
-            r.updated = false
+        if data.mass ~= label.text:GetText() then
+            label.text:SetText(data.mass)
         end
     end
 
