@@ -76,7 +76,7 @@ function CreateReclaimLabel(view, data, id)
     label.mass.Height:Set(14)
     label.mass.Width:Set(14)
 
-    label.text = UIUtil.CreateText(label, pos[1] .. ' ' .. pos[3] .. ' ' .. id .. ' ' .. data.AssociatedBP, 10, UIUtil.bodyFont)
+    label.text = UIUtil.CreateText(label, data.mass, 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(label.text, label, 16)
@@ -115,9 +115,9 @@ function UpdateLabels()
             label:Hide()
         end
 
-        --if data.mass ~= label.text:GetText() then
-            --label.text:SetText(data.mass)
-        --end
+        if data.mass ~= label.text:GetText() then
+            label.text:SetText(data.mass)
+        end
     end
 
     NumVisible = n_visible
