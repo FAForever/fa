@@ -30,7 +30,7 @@ local WorldLabel = Class(Group) {
         Group.__init(self, parent)
         self.parent = parent
         self.proj = nil
-        if position then self:SetPosition(position) end
+        self:SetPosition(position)
 
         self.Top:Set(0)
         self.Left:Set(0)
@@ -43,7 +43,7 @@ local WorldLabel = Class(Group) {
     end,
 
     SetPosition = function(self, position)
-        self.position = position
+        self.position = position or {}
     end,
 
     OnFrame = function(self, delta)
@@ -76,11 +76,11 @@ function CreateReclaimLabel(view, r)
         self.proj = {x=proj.x, y=proj.y}
     end
 
-    label.UpdateMass = function(self, r)
+    label.UpdateReclaim = function(self, r)
         local mass = tostring(math.floor(0.5+r.mass))
-        if mass ~= self.text:GetText() then
-            self.text:SetText(mass)
-        end
+        self.text:SetText(mass)
+        -- Wrecks have static positions but the engine reuses entity IDs which could mean a label needs to be re-positioned
+        self:SetPosition(Vector(r.position[1], r.position[2], r.position[3]))
     end
 
     label:Update()
@@ -116,7 +116,7 @@ function UpdateLabels()
         end
 
         if label and r.updated then
-            label:UpdateMass(r)
+            label:UpdateReclaim(r)
             r.updated = false
         end
     end
