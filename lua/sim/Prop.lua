@@ -23,29 +23,18 @@ minimumLabelMass = 1 -- Nothing with starting mass less than this ever gets into
 -- Everything in ToKill is checked for a label by the UI on activation. The label is deleted, and the UI callbacks to here to reset ToKill = {}
 MassLabels = {Alive = {}, ToKill = {}}
 
-DeleteEntry = function(id)
-    if MassLabels.Alive[id] then
-        MassLabels.Alive[id] = nil
-        MassLabels.ToKill[id] = true
-    end
-end
-
 -- Called from UI via SimCallbacks.lua
 ResetToKill = function()
     MassLabels.ToKill = {}
 end
 
--- Called from UserSync.lua to fetch the main table
-GetLabels = function()
-    return MassLabels
-end
-
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self,spec)
+    __init = function(self, spec)
     end,
-    __post_init = function(self,spec)
+
+    __post_init = function(self, spec)
     end,
 
     OnCreate = function(self)
@@ -159,17 +148,26 @@ Prop = Class(moho.prop_methods, Entity) {
         Entity.Destroy(self)
     end,
 
+    DeleteEntry = function(id)
+        if MassLabels.Alive[id] then
+            MassLabels.Alive[id] = nil
+            MassLabels.ToKill[id] = true
+
+            Sync.Reclaim = MassLabels
+        end
+    end,
+
     SyncMassLabel = function(self)
         local data = {}
         local id = self:GetEntityId()
 
         if self.Dead or self:BeenDestroyed() then
-            DeleteEntry(id)
+            self.DeleteEntry(id)
         elseif self.MaxMassReclaim >= minimumLabelMass then -- Only ever allow things above the threshold to make it anywhere near the UI
             data.mass = math.floor(0.5 + (self.MaxMassReclaim * self.ReclaimLeft))
 
             if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
-                DeleteEntry(id)
+                self.DeleteEntry(id)
                 data.mass = nil
             end
         end
@@ -180,8 +178,11 @@ Prop = Class(moho.prop_methods, Entity) {
             data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
 
             MassLabels.Alive[id] = data
-            WARN('We just updated the MassLabels')
-            WARN(repr(MassLabels))
+            if MassLabels.ToKill[id] then -- Stupid ugly hack to fix an edge case where engine reuses UIDs for entities
+                MassLabels.ToKill[id] = nil
+            end
+
+            Sync.Reclaim = MassLabels
         end
     end,
 

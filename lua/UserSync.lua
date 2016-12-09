@@ -58,9 +58,7 @@ function OnSync()
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    if Sync.Reclaim then
-        Sync.Reclaim = import('/lua/sim/Prop.lua').GetLabels()
-        --LOG(repr(Sync.Reclaim))
+    if not table.empty(Sync.Reclaim) then
         import('/lua/ui/game/reclaim.lua').UpdateReclaim(Sync.Reclaim)
     end
 
