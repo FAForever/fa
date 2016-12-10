@@ -147,6 +147,7 @@ Unit = Class(moho.unit_methods) {
             OnFailedBeingCaptured = {},
             OnFailedToBuild = {},
             OnVeteran = {},
+            OnGiven = {},
             ProjectileDamaged = {},
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
@@ -891,6 +892,14 @@ Unit = Class(moho.unit_methods) {
             end
         end
     end,
+    
+    OnGiven = function(self, newUnit)
+        self:DoUnitCallbacks( 'OnGiven', newUnit )
+    end,
+    
+    AddOnGivenCallback = function(self, fn)
+        self:AddUnitCallback(fn, 'OnGiven')
+    end,
 
     -------------------------------------------------------------------------------------------
     -- ECONOMY
@@ -1305,7 +1314,7 @@ Unit = Class(moho.unit_methods) {
         end
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if self:GetArmy() == other:GetArmy() then
-                return other:GetCollideFriendly()
+                return other.CollideFriendly
             end
         end
 

@@ -718,6 +718,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
     },
+    options_selectedlanguage = {
+        title = "<LOC OPTIONS_0007>Language selection",
+        description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
+    },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
         description = "<LOC OPTIONS_0152>Toggles the display of subtitles during movies",
@@ -1440,6 +1444,10 @@ Tooltips = {
     CampaignScore_Restart = {
         title = "<LOC tooltipui0383>Restart",
         description = "<LOC tooltipui0384>Restart this Operation from the beginning",
+    },
+    CampaignScore_Feedback = {
+        title = "<LOC tooltipui0707>Post Feedback",
+        description = "<LOC tooltipui0708>Open a forum thread about this mission",
     },
 
     -- **********************

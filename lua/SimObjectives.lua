@@ -278,7 +278,7 @@ function Kill(Type, Complete, Title, Description, Target)
         UpdateObjective( Title, 'complete', resultStr, objective.Tag)
     end
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
         Target.killed = Target.killed + 1
 
         local progress = string.format('(%s/%s)', Target.killed, Target.total)
@@ -291,6 +291,14 @@ function Kill(Type, Complete, Title, Description, Target)
             objective:OnResult(true, unit)
         end
     end
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, ( Target.MarkUnits == nil ) or Target.MarkUnits )
+        CreateTriggers(newUnit, objective, true) -- reclaiming is same as killing for our purposes
+    end
 
     for k, unit in Target.Units do
         if not unit:IsDead() then
@@ -302,10 +310,9 @@ function Kill(Type, Complete, Title, Description, Target)
             if Target.FlashVisible then
                 FlashViz( unit )
             end
-            Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
-            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) --same as killing for our purposes
+            CreateTriggers(unit, objective, true) -- reclaiming is same as killing for our purposes
         else
-            OnUnitKilled(unit)
+            objective.OnUnitKilled(unit)
         end
     end
 
@@ -345,7 +352,7 @@ function Capture(Type, Complete, Title, Description, Target)
         UpdateObjective( Title, 'complete', resultStr, self.Tag )
     end
 
-    local function OnUnitCaptured(unit, captor)
+    objective.OnUnitCaptured = function(unit, captor)
         table.insert(returnUnits, unit)
         if not objective.Active then
             return
@@ -362,7 +369,7 @@ function Capture(Type, Complete, Title, Description, Target)
         end
     end
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
         if not objective.Active then
             return
         end
@@ -373,6 +380,14 @@ function Capture(Type, Complete, Title, Description, Target)
             UpdateObjective( Title, 'complete', 'failed', objective.Tag )
         end
     end
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, ( Target.MarkUnits == nil ) or Target.MarkUnits )
+        CreateTriggers(newUnit, objective, true) -- reclaiming is same as killing for our purposes
+    end
 
     for k, unit in Target.Units do
         if not unit:IsDead() then
@@ -381,17 +396,15 @@ function Capture(Type, Complete, Title, Description, Target)
                 local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
                 local arrow = ObjectiveArrow { AttachTo = unit }
             end
-
-            Triggers.CreateUnitCapturedTrigger(nil, OnUnitCaptured, unit)
-            Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
-            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) --same functionality as killed
+            
+            CreateTriggers(unit, objective, true) -- reclaiming is same as killing for our purposes
 
             if Target.FlashVisible then
                 FlashViz( unit )
             end
         else
             --treat as killed Matt 8.30.06
-            OnUnitKilled(unit)
+            objective.OnUnitKilled(unit)
         end
     end
 
@@ -426,7 +439,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
     -- keep track of captured units so subsequent kills dont get counted
     local captured = {}
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
+        if not objective.Active then
+            return
+        end
         for k, v in captured do
             if v == unit then
                 -- ignore units already captured
@@ -446,7 +462,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         end
     end
 
-    local function OnUnitCaptured(unit)
+    objective.OnUnitCaptured = function(unit)
+        if not objective.Active then
+            return
+        end
         table.insert(captured, unit)
         Target.killed_or_captured = Target.killed_or_captured + 1
         local progress = string.format('(%s/%s)', Target.killed_or_captured, Target.total)
@@ -460,7 +479,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
     end
 
 
-    local function OnUnitReclaimed(unit)
+    objective.OnUnitReclaimed = function(unit)
         if not objective.Active then
             return
         end
@@ -475,6 +494,20 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
             UpdateObjective( Title, 'complete', "complete", objective.Tag )
         end
     end
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        for _,cUnit in captured do
+            if cUnit == unit then
+                table.insert(captured, newUnit)
+                break
+            end
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, ( Target.MarkUnits == nil ) or Target.MarkUnits )
+        CreateTriggers(newUnit, objective)
+    end
 
     for k, unit in Target.Units do
         if not unit:IsDead() then
@@ -487,14 +520,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
             if Target.FlashVisible then
                 FlashViz( unit )
             end
-
-            -- note: you won't get an OnKilled after an OnCaptured because once
-            -- captured it's actually a new unit with no callback.
-            Triggers.CreateUnitCapturedTrigger(nil, OnUnitCaptured, unit)
-            Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
-            Triggers.CreateUnitReclaimedTrigger(OnUnitReclaimed, unit)
+            
+            CreateTriggers(unit, objective)
         else
-            OnUnitKilled(unit)
+            objective.OnUnitKilled(unit)
         end
     end
 
@@ -527,7 +556,7 @@ function Reclaim(Type, Complete, Title, Description, Target)
         UpdateObjective( Title, 'complete', resultStr, self.Tag )
     end
 
-    local function OnUnitReclaimed(unit)
+    objective.OnUnitReclaimed  = function(unit)
         if not objective.Active then
             return
         end
@@ -543,7 +572,10 @@ function Reclaim(Type, Complete, Title, Description, Target)
         end
     end
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
+        if not objective.Active then
+            return
+        end
         objective.Active = false
         objective:OnResult(false)
         UpdateObjective( Title, 'complete', 'failed', objective.Tag )
@@ -551,20 +583,26 @@ function Reclaim(Type, Complete, Title, Description, Target)
 
     -- If the unit is captured it can still be reclaimed to complete the
     -- objective, so track the new unit created on a capture.
-    local function OnUnitCaptured(newUnit, captor)
-        Triggers.CreateUnitCapturedTrigger(nil, OnUnitCaptured, newUnit)
-        Triggers.CreateUnitDeathTrigger(OnUnitKilled, newUnit)
-        Triggers.CreateUnitReclaimedTrigger(OnUnitReclaimed, newUnit)
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
-        local arrow = ObjectiveArrow { AttachTo = newUnit }
+    objective.OnUnitCaptured = function(newUnit, captor)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, nil, newUnit, true )
+        CreateTriggers(newUnit, objective)
+    end
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, true )
+        CreateTriggers(newUnit, objective)
     end
 
     for k, unit in Target.Units do
         local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
         local arrow = ObjectiveArrow { AttachTo = unit }
-        Triggers.CreateUnitCapturedTrigger(nil, OnUnitCaptured, unit )
-        Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit )
-        Triggers.CreateUnitReclaimedTrigger(OnUnitReclaimed, unit )
+        CreateTriggers(unit, objective)
     end
 
     local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
@@ -640,12 +678,17 @@ end
 function Locate(Type, Complete, Title, Description, Target)
     Target.located = 0
     Target.total = table.getn(Target.Units)
+    local isLocated = {}
 
     local image = GetActionIcon("locate")
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
 
-    local function OnUnitLocated(unit)
+    objective.OnUnitLocated = function(unit)
+        if isLocated[unit] or not objective.Active then
+            return
+        end
         Target.located = Target.located + 1
+        isLocated[unit] = true
         local progress = string.format('(%s/%s)', Target.located, Target.total)
         UpdateObjective( Title, 'Progress', progress, objective.Tag )
         objective:OnProgress(Target.located, Target.total)
@@ -655,17 +698,17 @@ function Locate(Type, Complete, Title, Description, Target)
             UpdateObjective( Title, 'complete', "complete", objective.Tag )
         end
     end
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if isLocated[unit] or not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, false )
+        isLocated[newUnit] = CreateIntelTriggers(newUnit, objective, isLocated[unit])
+    end
 
     for k, unit in Target.Units do
-        local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
-        IntelTrigger(OnUnitLocated,
-                    GetArmyBrain(GetPlayerArmy()),
-                    'LOSNow',
-                    unit,
-                    true,
-                    categories.ALLUNITS,
-                    true,
-                    unit:GetAIBrain() )
+        CreateIntelTriggers(unit, objective)
     end
 
     local progress = string.format('(%s/%s)', Target.located, Target.total)
@@ -742,7 +785,7 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
 
     local watchThread = ForkThread( WatchArea, Target.Units, rect )
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
         total = total - 1
         if objective.Active and total < numRequired then
             objective.Active = false
@@ -750,11 +793,18 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
             UpdateObjective( Title, 'complete', 'failed', objective.Tag)
             KillThread(watchThread)
         end
+    end    
+    
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, Target.MarkUnits )
+        CreateTriggers(newUnit, objective, true)
     end
 
-    for k, v in Target.Units do
-        Triggers.CreateUnitDeathTrigger(OnUnitKilled, v )
-        Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, v )
+    for k, unit in Target.Units do
+        CreateTriggers(unit, objective, true)
     end
 
     if (Target.ShowProgress) then
@@ -773,12 +823,15 @@ end
 -- # the area for what units are inside and look at the blueprints (and optionally
 -- # match the army, use -1 for don't care).
 -- #
+-- # New: Add a table with armies instead of a single ArmyIndex. ex: {'Army_1', 'Army_2', ...}
+-- # Use 'HumanPlayers' when you want to use all Human controlled armies.
+-- #
 -- # Target = {
 -- #   Requirements = {
--- #       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
--- #       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
+-- #       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>], [Armies=<armyTable>]},
+-- #       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>], [Armies=<armyTable>] },
 -- #       ...
--- #       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
+-- #       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>], [Armies=<armyTable>] },
 -- #   }
 -- # }
 -- #
@@ -810,10 +863,11 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
             for i, requirement in requirements do
                 local units = GetUnitsInRect(requirement.Rect)
                 local cnt = 0
+                local ArmiesList = CreateArmiesList(requirement.Armies)
                 if units then
                     for k, unit in units do
                         if not unit:IsDead() and not unit:IsBeingBuilt() then
-                            if not requirement.ArmyIndex or (requirement.ArmyIndex == unit:GetArmy()) then
+                            if not (requirement.ArmyIndex or requirement.Armies) or (requirement.ArmyIndex == unit:GetArmy()) or ArmiesList[unit:GetArmy()] then
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
@@ -878,6 +932,33 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
     ForkThread( WatchArea, Target.Requirements )
 
     return objective
+end
+
+function CreateArmiesList(armies)
+    if not armies then
+        return {}
+    end
+    
+    local armiesList = {}
+    for _,armyName in armies do
+        if type(armyName) ~= 'string' then
+            error('SimObjectives error: Armies in requirements need to be of type string, provided type: ' .. type(armyName))
+        end
+        if armyName == 'HumanPlayers' then
+            local tblArmy = ListArmies()
+            for iArmy, strArmy in pairs(tblArmy) do
+                if ScenarioInfo.ArmySetup[strArmy].Human then
+                    armiesList[ScenarioInfo.ArmySetup[strArmy].ArmyIndex] = true
+                end
+            end
+        elseif ScenarioInfo.ArmySetup[armyName] then
+            armiesList[ScenarioInfo.ArmySetup[armyName].ArmyIndex] = true
+        else
+            error('SimObjectives error: Army doesnt exist: ' .. armyName)
+        end
+    end
+    
+    return armiesList
 end
 
 -- #
@@ -1054,7 +1135,7 @@ function Protect(Type, Complete, Title, Description, Target)
     local numRequired = Target.NumRequired or total
     local timer = nil
 
-    local function OnUnitKilled(unit)
+    objective.OnUnitKilled = function(unit)
         if not objective.Active then
             return
         end
@@ -1080,6 +1161,14 @@ function Protect(Type, Complete, Title, Description, Target)
                 KillThread(timer)
             end
         end
+    end  
+
+    objective.OnUnitGiven = function(unit, newUnit)
+        if not objective.Active then
+            return
+        end
+        OnUnitGivenBase(objective, Target, unit, newUnit, false )
+        CreateTriggers(newUnit, objective, true)
     end
 
     local function onTick(newTime)
@@ -1117,9 +1206,8 @@ function Protect(Type, Complete, Title, Description, Target)
         )
     end
 
-    for k, v in Target.Units do
-        Triggers.CreateUnitDeathTrigger(OnUnitKilled, v )
-        Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, v )
+    for k, unit in Target.Units do
+        CreateTriggers(unit, objective, true)
     end
 
     if (Target.ShowProgress) then
@@ -1879,4 +1967,70 @@ end
 
 function CreateObjectiveDecal(x, z, w, h)
     return CreateDecal(Vector(x,0, z), 0, objectiveDecal, '', 'Water Albedo', w, h, DecalLOD, 0, 1, 0)
+end
+    
+function OnUnitGivenBase(objective, target, unit, newUnit, markUnits)
+    local index = -1
+    if unit then
+        for i,v in target.Units do
+            if v == unit then
+                index = i
+                break
+            end
+        end
+    end
+    if index > 0 then
+        table.remove(target.Units, index)
+    end
+    table.insert(target.Units, newUnit)
+    BasicUnitTarget(objective, newUnit, markUnits)
+end
+
+function BasicUnitTarget(objective, unit, markUnits)
+    objective:AddUnitTarget( unit )
+    if markUnits then
+        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local arrow = ObjectiveArrow { AttachTo = unit }
+        table.insert( objective.UnitMarkers, arrow )
+    end
+end
+    
+function CreateTriggers(unit, objective, useOnKilledWhenReclaimed)
+    if objective.OnUnitGiven then
+        Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
+    end
+    if objective.OnUnitCaptured then
+        Triggers.CreateUnitCapturedTrigger(nil, objective.OnUnitCaptured, unit)
+    end
+    if objective.OnUnitKilled then
+        Triggers.CreateUnitDeathTrigger(objective.OnUnitKilled, unit)
+    end
+    if objective.OnUnitReclaimed then
+        Triggers.CreateUnitReclaimedTrigger(objective.OnUnitReclaimed, unit)
+    end
+    if useOnKilledWhenReclaimed then
+        Triggers.CreateUnitReclaimedTrigger(objective.OnUnitKilled, unit)
+    end
+end
+    
+function CreateIntelTriggers(unit, objective, isAlreadyLocated)
+    local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
+    if objective.OnUnitGiven then
+        Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
+    end
+    if objective.OnUnitGiven then
+        if isAlreadyLocated then
+            return true
+        else
+            IntelTrigger(objective.OnUnitLocated,
+                        GetArmyBrain(GetPlayerArmy()),
+                        'LOSNow',
+                        unit,
+                        true,
+                        categories.ALLUNITS,
+                        true,
+                        unit:GetAIBrain() )
+            return false
+        end
+    end
 end

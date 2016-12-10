@@ -43,6 +43,7 @@ local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
+local Prop = import('/lua/sim/Prop.lua')
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -88,13 +89,23 @@ Callbacks.CapMex = function(data, units)
 
     local pos = mex:GetPosition()
     local msid
-    for _, u in units do
-        msid = LetterArray[u:GetBlueprint().General.FactionName]..'b1106'
-        IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z-2), msid, {})
-        IssueBuildMobile({u}, Vector(pos.x+2, pos.y, pos.z), msid, {})
-        IssueBuildMobile({u}, Vector(pos.x, pos.y, pos.z+2), msid, {})
-        IssueBuildMobile({u}, Vector(pos.x-2, pos.y, pos.z), msid, {})
+    local builder
+
+    for _, unit in units do
+        msid = LetterArray[unit:GetBlueprint().General.FactionName]..'b1106' -- The identity of the storage we'll build
+        if unit:CanBuild(msid) then
+            builder = unit
+            break
+        end
     end
+
+    if not builder then return end
+
+    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {})
+    IssueBuildMobile({builder}, Vector(pos.x+2, pos.y, pos.z), msid, {})
+    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z+2), msid, {})
+    IssueBuildMobile({builder}, Vector(pos.x-2, pos.y, pos.z), msid, {})
+    IssueGuard(units, builder)
 end
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
@@ -110,6 +121,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
 Callbacks.SpawnPing = SimPing.SpawnPing
+
+Callbacks.ResetToKill = Prop.ResetToKill -- Reset reclaim label adjustment counter
 
 --Nuke Ping
 Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing

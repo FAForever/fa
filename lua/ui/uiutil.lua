@@ -1099,3 +1099,19 @@ function CreateInputDialog(parent, title, listener, fallbackBox, str)
 
     return dialog
 end
+
+function CreateTextBox(parent)
+    local box = ItemList(parent)
+    box:SetFont(bodyFont, 14)
+    box:SetColors(bodyColor, "black",  highlightColor, "white")
+    CreateVertScrollbarFor(box)
+    return box
+end
+
+function SetTextBoxText(textBox, text)
+    textBox:DeleteAllItems()
+    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
+    for i, line in wrapped do
+        textBox:AddItem(line)
+    end 
+end

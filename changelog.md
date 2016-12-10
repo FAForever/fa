@@ -1,5 +1,57 @@
+Patch 3664 (Upcoming)
+============================
+
+**Bugs**
+- Removed deploy ability tooltip from Aeon T3 Mobile Artillery
+- Fixed typos in two keybind descriptions
+- Fixed Selen cloak being enabled out of the factory while moving, and further improved usability.
+- Fixed civilians not always revealing for all players on map start
+- Fixed beam weapons sometimes colliding incorrectly with projectiles
+- Fixed sim slowdown when ordering mex cap with hundreds of engineers
+- Fixed reclaim beam not penetrating water
+- Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone.
+
+**Gameplay**
+- Changed the ground weapon to be primary on Cybran switch-tech mobile AA units (T1, T3, Cruiser). This has no effect other than to allow attack-moving to work properly, stopping at the right range better.
+
+**UI**
+- New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
+
+**Coop**
+- Fixed a whole bunch of videos
+- Fixed score screen so it works with coop
+- Added a Feedback button for easier reporting of issues
+- Giving units to an ally no longer breaks objectives
+- Allowed armies to participate properly in objective requirements
+- Fixed all AIs being set as UEF in coop
+
+**Lobby**
+- New feature: Ability to click on the game title to update it, both in the lobby, and in the client's Find Games tab
+- New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
+- Improved lobby setting persistence interation with maps that introduce their own options
+- Corrected "to observers" tooltip occuring twice
+- Display mean rating in the rating tooltip, rather than minimum. Also use playername in that tooltip.
+- Fixed closed spots showing an empty box for newly joined players, breaking the lobby
+- Renamed 'Random' spawn option to 'Random - Unbalanced' for the sake of clarity
+
+**Other**
+- Added Tamazight translation to FAF
+- Improved a large number of Spanish translations.
+
+**Contributors**
+- Arifi
+- CookieNoob
+- Crotalus
+- Exotic-Retard
+- IceDreamer
+- Speed2
+- TheKeyBlue
+- Uveso
+
+
 Patch 3663 (November 12th, 2016)
 ============================
+
 **Bugs**
 - Fixed a small oversight which led to non-cloaked units getting the cloak FX in a power stall
 - Added cloak FX support for cloakfields (Mods only, FAF itself has no unit with this ability)

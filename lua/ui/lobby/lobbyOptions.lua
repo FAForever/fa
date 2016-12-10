@@ -20,7 +20,7 @@ teamOptions =
                 key = 'fixed',
             },
             {
-                text = "<LOC lobui_0090>Random",
+                text = "<LOC lobui_0090>Random - Unbalanced",
                 help = "<LOC lobui_0091>Spawn everyone in random locations",
                 key = 'random',
             },

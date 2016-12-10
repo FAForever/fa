@@ -169,6 +169,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         unit.IsBeingTransferred = false
+        
+        v:OnGiven(unit)
     end
     return newUnits
 end

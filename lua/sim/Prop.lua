@@ -13,14 +13,28 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-RECLAIMLABEL_MIN_MASS = 20
+minimumLabelMass = 1 -- Nothing with starting mass less than this ever gets into MassLabels
+
+-- The MassLabels table keeps track of all props and wrecks that should be displaying a label
+-- While the entity's value is above the minimum, it should be stored in Alive
+--      Alive = {id = {mass = int, position = table, AssociatedBP = str}}
+-- If a prop is killed, destroyed, or damaged to below the minimum, the entry is erased from Alive and ToKill[id] is set to true
+-- This entire table is sent via UserSync.lua and used by the UI.
+-- Everything in ToKill is checked for a label by the UI on activation. The label is deleted, and the UI callbacks to here to reset ToKill = {}
+MassLabels = {Alive = {}, ToKill = {}}
+
+-- Called from UI via SimCallbacks.lua
+ResetToKill = function()
+    MassLabels.ToKill = {}
+end
 
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self,spec)
+    __init = function(self, spec)
     end,
-    __post_init = function(self,spec)
+
+    __post_init = function(self, spec)
     end,
 
     OnCreate = function(self)
@@ -34,14 +48,27 @@ Prop = Class(moho.prop_methods, Entity) {
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
-        self:SetMaxReclaimValues(
-            economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
-            economy.ReclaimMassMax or 0,
-            economy.ReclaimEnergyMax or 0
-        )
+        local unitWreck = bp.UnitWreckage -- Defined only in the default wreckage file used for all unit wrecks
+        if not unitWreck then -- This function is called from Wreckage.lua for dying units, and should only happen once
+            self:SetMaxReclaimValues(
+                economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
+                economy.ReclaimMassMax or 0,
+                economy.ReclaimEnergyMax or 0
+            )
+        end
 
+        -- Correct to terrain, just to be sure
         local pos = self:GetPosition()
+        if unitWreck then
+            local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+            if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
+                pos[2] = terrainAltitude
+                Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+            end
+        end
+
         self.CachePosition = pos
+
         local max = math.max(50, bp.Defense.MaxHealth)
         self:SetMaxHealth(max)
         self:SetHealth(self, max)
@@ -77,19 +104,19 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Returns the cache position of the prop, since it doesn't move, it's a big optimization
+    -- Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
         return self.CachePosition or self:GetPosition()
     end,
 
-    --Sets if the unit can take damage.  val = true means it can take damage.
-    --val = false means it can't take damage
+    -- Sets if the unit can take damage.  val = true means it can take damage.
+    -- val = false means it can't take damage
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
 
-    --Sets if the unit can be killed.  val = true means it can be killed.
-    --val = false means it can't be killed
+    -- Sets if the unit can be killed.  val = true means it can be killed.
+    -- val = false means it can't be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
@@ -100,18 +127,20 @@ Prop = Class(moho.prop_methods, Entity) {
 
     OnKilled = function(self, instigator, type, exceessDamageRatio )
         if not self.CanBeKilled then return end
-        self:DoPropCallbacks( 'OnKilled' )
+        self.Dead = true
+        self:UpdateReclaimLeft()
+        self:DoPropCallbacks('OnKilled')
         self:Destroy()
     end,
 
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
-        self.CreateReclaimEndEffects( entity, self )
+        self.CreateReclaimEndEffects(entity, self)
         self:Destroy()
     end,
 
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
     Destroy = function(self)
@@ -119,22 +148,46 @@ Prop = Class(moho.prop_methods, Entity) {
         Entity.Destroy(self)
     end,
 
-    SyncMassLabel = function(self)
-        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            local data = {id = self:GetEntityId()}
+    DeleteEntry = function(id)
+        if MassLabels.Alive[id] then
+            MassLabels.Alive[id] = nil
+            MassLabels.ToKill[id] = true
 
-            if self:BeenDestroyed() then
-                data.mass = 0
-            else
-                data.mass = self.MaxMassReclaim * self.ReclaimLeft
-                data.position = self:GetCachePosition()
+            Sync.Reclaim = MassLabels
+        end
+    end,
+
+    SyncMassLabel = function(self)
+        local data = {}
+        local id = self:GetEntityId()
+
+        if self.Dead or self:BeenDestroyed() then
+            self.DeleteEntry(id)
+        elseif self.MaxMassReclaim >= minimumLabelMass then -- Only ever allow things above the threshold to make it anywhere near the UI
+            data.mass = math.floor(0.5 + (self.MaxMassReclaim * self.ReclaimLeft))
+
+            if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
+                self.DeleteEntry(id)
+                data.mass = nil
+            end
+        end
+
+        if data.mass then
+            data.mass = tostring(data.mass) -- Store as a string to save CPU time in UI
+            data.AssociatedBP = self.AssociatedBP or 'NonWreckage' -- Set for wrecks in Wreckage as the unit BlueprintId
+            data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
+
+            MassLabels.Alive[id] = data
+            if MassLabels.ToKill[id] then -- Stupid ugly hack to fix an edge case where engine reuses UIDs for entities
+                MassLabels.ToKill[id] = nil
             end
 
-            table.insert(Sync.Reclaim, data)
+            Sync.Reclaim = MassLabels
         end
     end,
 
     OnDestroy = function(self)
+        self.Dead = true
         self:UpdateReclaimLeft()
         self.Trash:Destroy()
     end,
@@ -179,6 +232,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     -- This function mimics the engine's behavior when calculating what value is left of a prop
+    -- Called from OnDestroy, OnKilled, OnDamage, and OnCreate
     UpdateReclaimLeft = function(self)
         if not self:BeenDestroyed() then
             local max = self:GetMaxHealth()
@@ -207,7 +261,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Prop reclaiming
+    -- Prop reclaiming
     -- time = the greater of either time to reclaim mass or energy
     -- time to reclaim mass or energy is defined as:
     -- Mass Time =  mass reclaim value / buildrate of thing reclaiming it * BP set mass mult
@@ -236,19 +290,19 @@ Prop = Class(moho.prop_methods, Entity) {
     --
     SplitOnBonesByName = function(self, dirprefix)
         if not dirprefix then
-            -- default dirprefix to parent dir of our own blueprint
+            -- Default dirprefix to parent dir of our own blueprint
             dirprefix = self:GetBlueprint().BlueprintId
 
-            -- trim ".../groups/blah_prop.bp" to just ".../"
+            -- Trim ".../groups/blah_prop.bp" to just ".../"
             dirprefix = string.gsub(dirprefix, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
 
-        for ibone=1, self:GetBoneCount()-1 do
+        for ibone = 1, self:GetBoneCount() - 1 do
             local bone = self:GetBoneName(ibone)
 
-            -- construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
+            -- Construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
             local btrim = string.gsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
 
@@ -266,11 +320,10 @@ Prop = Class(moho.prop_methods, Entity) {
     PlayPropSound = function(self, sound)
         local bp = self:GetBlueprint().Audio
         if bp and bp[sound] then
-            --LOG( 'Playing ', sound )
             self:PlaySound(bp[sound])
             return true
         end
-        --LOG( 'Could not play ', sound )
+
         return false
     end,
 
@@ -279,18 +332,19 @@ Prop = Class(moho.prop_methods, Entity) {
     -- AmbientRumble defined, play that too
     PlayPropAmbientSound = function(self, sound)
         if sound == nil then
-            self:SetAmbientSound( nil, nil )
+            self:SetAmbientSound(nil, nil)
             return true
         else
             local bp = self:GetBlueprint().Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
-                    self:SetAmbientSound( bp[sound], bp.Audio['AmbientRumble'] )
+                    self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])
                 else
-                    self:SetAmbientSound( bp[sound], nil )
+                    self:SetAmbientSound(bp[sound], nil)
                 end
                 return true
             end
+
             return false
         end
     end,
