@@ -68,8 +68,13 @@ function CreateReclaimLabel(view, r)
 
     label:DisableHitTest(true)
     label.Update = function(self)
-        local view = self.parent.view
+        if self.isHidden then
+            LayoutHelpers.AtLeftTopIn(self, self.parent, -200, -200)
+            self:SetNeedsFrameUpdate(false)
+            return
+        end
 
+        local view = self.parent.view
         local proj = view:Project(self.position)
         LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
         self.proj = {x=proj.x, y=proj.y}
@@ -105,15 +110,16 @@ function UpdateLabels()
             if not label then
                 label = CreateReclaimLabel(view.ReclaimGroup, r)
                 view.ReclaimGroup.ReclaimLabels[id] = label
-            else
-                label:Show()
+            elseif label.isHidden then
                 label:SetNeedsFrameUpdate(true)
+                label.isHidden = false
+                label:Show()
             end
 
             n_visible = n_visible + 1
-        elseif label then
+        elseif label and not label.isHidden then
+            label.isHidden = true
             label:Hide()
-            label:SetNeedsFrameUpdate(false)
         end
 
         if label and r.updated then
