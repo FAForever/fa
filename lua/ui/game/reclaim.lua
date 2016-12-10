@@ -71,7 +71,7 @@ function CreateReclaimLabel(view, r)
     label:DisableHitTest(true)
     label.Update = function(self)
         local view = self.parent.view
-        local proj = view:Project(pos)
+        local proj = view:Project(self.position)
         LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
         self.proj = {x=proj.x, y=proj.y}
     end
