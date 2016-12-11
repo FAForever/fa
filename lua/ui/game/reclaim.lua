@@ -139,6 +139,13 @@ local ReclaimThread
 function ShowReclaim(show)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
 
+    for id, r in Reclaim do
+        local label = view.ReclaimGroup.ReclaimLabels[id]
+        if label then
+            label:SetNeedsFrameUpdate(show)
+        end
+    end
+
     if show then
         view.ShowingReclaim = true
         if not view.ReclaimThread then
