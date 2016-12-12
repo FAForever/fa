@@ -18,6 +18,7 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
+local FireState = import('/lua/game.lua').FireState
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
@@ -1490,6 +1491,7 @@ MobileUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:updateBuildRestrictions()
+        self:SetFireState(FireState.GROUND_FIRE)
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
