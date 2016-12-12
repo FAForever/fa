@@ -36,10 +36,11 @@ Prop = Class(moho.prop_methods, Entity) {
         -- These values are used in world props like rocks / stones / trees
         local unitWreck = bp.UnitWreckage
         if not unitWreck then -- This function is called from Wreckage.lua, don't call twice
+            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 -- Set by some maps to reduce the value of starting non-wreck reclaim
             self:SetMaxReclaimValues(
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
-                economy.ReclaimMassMax or 0,
-                economy.ReclaimEnergyMax or 0
+                (economy.ReclaimMassMax * modifier) or 0,
+                (economy.ReclaimEnergyMax * modifier) or 0
             )
         end
 

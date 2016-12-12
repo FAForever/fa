@@ -33,6 +33,7 @@ Patch 3664 (Upcoming)
 - Display mean rating in the rating tooltip, rather than minimum. Also use playername in that tooltip.
 - Fixed closed spots showing an empty box for newly joined players, breaking the lobby
 - Renamed 'Random' spawn option to 'Random - Unbalanced' for the sake of clarity
+- Added ability for certain maps to modify the reclaim value of props
 
 **Other**
 - Added Tamazight translation to FAF
