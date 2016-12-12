@@ -7078,6 +7078,9 @@ lobui_0439="Share unitcap with allies only"
 lobui_0440="All"
 lobui_0441="Share unitcap with all players"
 
+lobui_0442="From %s"
+lobui_0443="To %s"
+
 lobui_0545="Random Map"
 lobui_0546="If enabled the game will selected a random map just before the game launch"
 lobui_0553="Official Maps Only"

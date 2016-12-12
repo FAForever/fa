@@ -1582,7 +1582,10 @@ function PrivateChat(targetID,text)
             }
             )
     end
-    AddChatText("<<"..localPlayerName..">> " .. text)
+    local targetName = FindNameForID(targetID)
+    if targetName then
+        AddChatText("<<"..LOCF("<LOC lobui_0443>To %s", targetName)..">> " .. text)
+    end
 end
 
 function UpdateAvailableSlots( numAvailStartSpots )
@@ -3744,7 +3747,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif data.Type == 'PublicChat' then
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
-            AddChatText("<<"..data.SenderName..">> "..data.Text)
+            AddChatText("<<"..LOCF("LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
         elseif data.Type == 'CPUBenchmark' then
             -- CPU benchmark code
             local benchmarks = {}

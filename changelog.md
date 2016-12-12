@@ -37,6 +37,7 @@ Patch 3664 (Upcoming)
 - Fixed closed spots showing an empty box for newly joined players, breaking the lobby
 - Renamed 'Random' spawn option to 'Random - Unbalanced' for the sake of clarity
 - Added ability for certain maps to modify the reclaim value of props
+- Private messages now show 'From' and 'To' to make communication clearer
 
 **Other**
 - Added Tamazight translation to FAF
