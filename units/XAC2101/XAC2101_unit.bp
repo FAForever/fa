@@ -10,14 +10,30 @@ UnitBlueprint {
             Cue = 'UAB_Destroy_Huge',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        Killed = Sound {
+            Bank = 'UALDestroy',
+            Cue = 'UAB_Destroy_Huge',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ShieldOff = Sound {
+            Bank = 'UAB',
+            Cue = 'UAB4301_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ShieldOn = Sound {
+            Bank = 'UAB',
+            Cue = 'UAB4301_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Structure',
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
+    BuildIconSortPriority = 160,
     Categories = {
-        'UEF',
+        'AEON',
         'STRUCTURE',
         'CIVILIAN',
         'SELECTABLE',
@@ -25,12 +41,17 @@ UnitBlueprint {
         'SHIELD',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'DEFENSE',
+        'OVERLAYDEFENSE',
+        'SORTDEFENSE',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,
     Defense = {
-        ArmorType = 'Normal',
+        AirThreatLevel = 0,
+        ArmorType = 'STRUCTURE',
+        EconomyThreatLevel = 42,
         Health = 12000,
         MaxHealth = 12000,
         RegenRate = 0,
@@ -48,9 +69,14 @@ UnitBlueprint {
             ShieldSize = 130,
             ShieldVerticalOffset = -40,
         },
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Description = '<LOC xac2101_desc>Aeon Palace',
     Display = {
+        Abilities = {
+            '<LOC ability_shielddome>Shield Dome',
+        },
         DamageEffects = {
             {
                 Bone = 0,
@@ -128,10 +154,23 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'UEF',
+        Icon = 'land',
+        OrderOverrides = {
+            RULEUTC_ShieldToggle = {
+                bitmapId = 'shield-dome',
+                helpText = 'toggle_shield_dome',
+            },
+        },
+        FactionName = 'AEON',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
+        ToggleCaps = {
+            RULEUTC_ShieldToggle = true,
+        },
         UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 20,
     },
     Interface = {
         HelpText = '<LOC xac2101_help>Aeon Palace',

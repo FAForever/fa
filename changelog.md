@@ -25,6 +25,7 @@ Patch 3664 (Upcoming)
 - Giving units to an ally no longer breaks objectives
 - Allowed armies to participate properly in objective requirements
 - Fixed all AIs being set as UEF in coop
+- Fixed Aeon Palace Shield breaking when given to an ally
 
 **Lobby**
 - New feature: Ability to click on the game title to update it, both in the lobby, and in the client's Find Games tab
