@@ -41,7 +41,8 @@ Patch 3664 (Upcoming)
 
 **Other**
 - Added Tamazight translation to FAF
-- Improved a large number of Spanish translations.
+- Improved a large number of Spanish translations
+- Updated maps blacklist
 
 **Contributors**
 - Arifi
