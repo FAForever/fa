@@ -178,6 +178,7 @@ function InitReclaimGroup(view)
             if view.zoomed and NumVisible > MAX_ON_SCREEN then
                 ZoomHide = true
                 self:Hide()
+                self:SetNeedsFrameUpdate(false)
             end
         end
 
