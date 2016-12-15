@@ -620,6 +620,7 @@ FactoryUnit = Class(StructureUnit) {
 
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
+        self:SetFireState(FireState.GROUND_FIRE)
     end,
 
     DestroyUnitBeingBuilt = function(self)
