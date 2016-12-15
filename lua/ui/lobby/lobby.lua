@@ -3747,7 +3747,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif data.Type == 'PublicChat' then
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
-            AddChatText("<<"..LOCF("LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
+            AddChatText("<<"..LOCF("<LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
         elseif data.Type == 'CPUBenchmark' then
             -- CPU benchmark code
             local benchmarks = {}
