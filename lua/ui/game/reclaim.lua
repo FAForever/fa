@@ -5,13 +5,27 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local Reclaim = {}
-local minimumLabelMass = 20
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
 function UpdateReclaim(id, data)
-    data.updated = true
-    Reclaim[id] = data
+    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+
+    if not data.mass then
+        if Reclaim[id] then -- We need to kill an existing label
+            local label = view.ReclaimGroup.ReclaimLabels[id] -- nil if not set yet
+
+            if label then
+                label:Destroy()
+                view.ReclaimGroup.ReclaimLabels[id] = nil
+                label = nil
+            end
+            Reclaim[id] = nil
+        end
+    else
+        data.updated = true
+        Reclaim[id] = data
+    end
 end
 
 local MAX_ON_SCREEN = 1000
@@ -101,14 +115,7 @@ function UpdateLabels()
     for id, r in Reclaim do
         local label = view.ReclaimGroup.ReclaimLabels[id] -- nil if not set yet
 
-        if not r.mass or r.mass < minimumLabelMass then -- It's too small to display, remove from tables
-            if label then
-                label:Destroy()
-                view.ReclaimGroup.ReclaimLabels[id] = nil
-                label = nil
-            end
-            Reclaim[id] = nil
-        elseif OnScreen(view, r.position) then
+        if OnScreen(view, r.position) then
             if not label then
                 label = CreateReclaimLabel(view.ReclaimGroup, r)
                 view.ReclaimGroup.ReclaimLabels[id] = label

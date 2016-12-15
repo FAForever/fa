@@ -137,19 +137,17 @@ Prop = Class(moho.prop_methods, Entity) {
         local data = {}
         local id = self:GetEntityId()
 
-        if self:BeenDestroyed() then
-            data.mass = 0
-        elseif self.MaxMassReclaim >= minimumLabelMass then
-            data.mass = self.MaxMassReclaim * self.ReclaimLeft
+        if self.MaxMassReclaim >= minimumLabelMass and not self:BeenDestroyed() then
+            local mass = self.MaxMassReclaim * self.ReclaimLeft
 
-            if data.mass < minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
-                data.mass = 0
-            else
-                data.position = self:GetCachePosition() -- Only give a position (for display) for props over the threshold
+            if mass >= minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
+                data.position = self:GetCachePosition()
+                data.mass = mass
+                self.hasLabel = true
             end
         end
 
-        if data.mass and id then
+        if (self.hasLabel or self:BeenDestroyed()) and id then
             Sync.Reclaim[id] = data
         end
     end,
