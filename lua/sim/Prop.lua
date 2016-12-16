@@ -13,7 +13,7 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-minimumLabelMass = 20
+minimumLabelMass = 1
 
 Prop = Class(moho.prop_methods, Entity) {
 
@@ -134,21 +134,28 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     SyncMassLabel = function(self)
-        local data = {}
-        local id = self:GetEntityId()
-
-        if self.MaxMassReclaim >= minimumLabelMass and not self:BeenDestroyed() then
-            local mass = self.MaxMassReclaim * self.ReclaimLeft
-
-            if mass >= minimumLabelMass then -- Damaged or partially reclaimed to less than the threshold
-                data.position = self:GetCachePosition()
-                data.mass = mass
-                self.hasLabel = true
-            end
+        if self.MaxMassReclaim < minimumLabelMass then
+            -- The prop has never been applicable for labels, ignore it
+            return
         end
 
-        if (self.hasLabel or self:BeenDestroyed()) and id then
-            Sync.Reclaim[id] = data
+        local mass = self.MaxMassReclaim * self.ReclaimLeft
+        if mass < minimumLabelMass and not self.hasLabel then
+            -- The prop doesn't have enough remaining mass and its label has already been removed
+            return
+        end
+
+        local data = {}
+        if not self:BeenDestroyed() and mass >= minimumLabelMass then
+            -- The prop is still around and has enough mass, update the label
+            data.mass = mass
+            data.position = self:GetCachePosition()
+            self.hasLabel = true
+            Sync.Reclaim[self:GetEntityId()] = data
+        else
+            -- The prop is no longer applicable for labels, but has an existing label which needs to be removed
+            self.hasLabel = false
+            Sync.Reclaim[self:GetEntityId()] = data
         end
     end,
 

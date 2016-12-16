@@ -1175,7 +1175,7 @@ end
 
 -- Gets unit blueprints by loading them from the game and given active sim mods
 local function GetBlueprints(activeMods, skipGameFiles)
-    TimerStart()
+    local timer = StartedTimer()
 
     -- Load original FA blueprints only once
     local loadedGameFiles = table.getsize(blueprints.Original) > 0
@@ -1227,7 +1227,7 @@ local function GetBlueprints(activeMods, skipGameFiles)
     info = info .. table.getsize(blueprints.Original) .. ' original, '
     info = info .. table.getsize(blueprints.Modified) .. ' modified), and '
     info = info .. table.getsize(blueprints.Skipped) .. ' skipped units'
-    info = info .. ' in ' .. TimerStop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
+    info = info .. ' in ' .. timer:Stop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
     Show('STATUS', info)
 
     return blueprints
