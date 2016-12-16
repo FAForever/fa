@@ -148,8 +148,15 @@ function ShowReclaim(show)
 
     for id, r in Reclaim do
         local label = view.ReclaimGroup.ReclaimLabels[id]
+
         if label then
-            label:SetNeedsFrameUpdate(show)
+            if not show then
+                label:Destroy()
+                view.ReclaimGroup.ReclaimLabels[id] = nil
+                label = nil
+            else
+                label:SetNeedsFrameUpdate(true) -- May have been turned off for a label in a previous showing
+            end
         end
     end
 
