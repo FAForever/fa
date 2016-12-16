@@ -106,7 +106,6 @@ function CreateReclaimLabel(view)
 end
 
 function UpdateLabels()
-    local totalTimer = StartedTimer()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
 
     local onScreenReclaimIndex = 1
@@ -115,7 +114,7 @@ function UpdateLabels()
     local offScreenReclaimIndex = 1
     local offScreenReclaims = {}
 
-    local filterTimer = StartedTimer()
+    -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
         r.onScreen = OnScreen(view, r.position)
         if r.onScreen then
@@ -126,13 +125,9 @@ function UpdateLabels()
             offScreenReclaimIndex = offScreenReclaimIndex + 1
         end
     end
-    filterTimer:Stop()
 
-    local sortTimer = StartedTimer()
     table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
-    sortTimer:Stop()
 
-    local updateTimer = StartedTimer()
     -- Create/Update as many reclaim labels as we need
     local labelIndex = 1
     for _, r in onScreenReclaims do
@@ -147,9 +142,7 @@ function UpdateLabels()
         label:DisplayReclaim(r)
         labelIndex = labelIndex + 1
     end
-    updateTimer:Stop()
 
-    local hideTimer = StartedTimer()
     -- Hide labels we didn't use
     for index = labelIndex, MAX_LABELS do
         local label = LabelPool[index]
@@ -157,13 +150,6 @@ function UpdateLabels()
             LabelPool[index]:Hide()
         end
     end
-    hideTimer:Stop()
-
-    LOG("Updated labels (Filter: "..filterTimer:ToString()
-        ..", Sort: "..sortTimer:ToString()
-        ..", Update: "..updateTimer:ToString()
-        ..", Hide: "..hideTimer:ToString()
-        ..", Total: "..totalTimer:Stop()..")")
 end
 
 local ReclaimThread
