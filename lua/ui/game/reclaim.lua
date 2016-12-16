@@ -6,7 +6,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Utils    = import('/lua/system/utils.lua')
 
 -- TODO: make this configurable by the user
-local MAX_LABELS = 5000
+local MAX_LABELS = 1000
 
 local Reclaim = {}
 local LabelPool = {}
