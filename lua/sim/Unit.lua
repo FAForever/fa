@@ -355,9 +355,9 @@ Unit = Class(moho.unit_methods) {
 
     --Updates build restrictions of any unit passed, used for support factories
     updateBuildRestrictions = function(self)
-        local faction = nil
-        local type = nil
-        local techlevel = nil
+        local faction = false
+        local type = false
+        local techlevel = false
 
         --Defines the unit's faction
         if EntityCategoryContains(categories.AEON, self) then
@@ -2918,9 +2918,9 @@ Unit = Class(moho.unit_methods) {
             bpTable = bpTable[layer].Footfall
             local effects = {}
             local scale = 1
-            local offset = nil
+            local offset
             local army = self:GetArmy()
-            local boneTable = nil
+            local boneTable
 
             if bpTable.Damage then
                 local bpDamage = bpTable.Damage
@@ -3051,7 +3051,7 @@ Unit = Class(moho.unit_methods) {
         local army = self:GetArmy()
         local pos = self:GetPosition()
         local effects = {}
-        local emit = nil
+        local emit
 
         for kBG, vTypeGroup in effectTypeGroups do
             if TerrainType then
