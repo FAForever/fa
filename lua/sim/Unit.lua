@@ -1479,7 +1479,7 @@ Unit = Class(moho.unit_methods) {
             HighPartLimit = Random( 1, HighDestructionParts)
             for i = 1, HighPartLimit do
                 self:ShowBone( self.DestructionPartsHighToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp',self.DestructionPartsHighToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp',self.DestructionPartsHighToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsHighToss[i],boneProj,-1,false)
             end
         end
@@ -1487,7 +1487,7 @@ Unit = Class(moho.unit_methods) {
             LowPartLimit = Random( 1, LowDestructionParts)
             for i = 1, LowPartLimit do
                 self:ShowBone( self.DestructionPartsLowToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsLowToss[i],boneProj,-1,false)
             end
         end
@@ -1495,7 +1495,7 @@ Unit = Class(moho.unit_methods) {
             ChassisPartLimit = Random( 1, ChassisDestructionParts)
             for i = 1, Random( 1, ChassisDestructionParts) do
                 self:ShowBone( self.DestructionPartsChassisToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp',self.DestructionPartsChassisToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp',self.DestructionPartsChassisToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsChassisToss[i],boneProj,-1,false)
             end
         end
@@ -1814,7 +1814,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRotation = function(self, angle)
-        qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        local qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
         self:SetOrientation({qx, qy, qz, qw}, true)
     end,
 
@@ -3362,6 +3362,7 @@ Unit = Class(moho.unit_methods) {
     GetSoundEntity = function(self, type)
         if not self.Sounds then self.Sounds = {} end
         if not self.Sounds[type] then
+            local sndEnt
             if self.SoundEntities[1] then
                 sndEnt = table.remove(self.SoundEntities, 1)
             else
