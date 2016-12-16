@@ -3,13 +3,12 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
-local Utils    = import('/lua/system/utils.lua')
 
 -- TODO: make this configurable by the user
-local MAX_LABELS = 1000
+local MAX_LABELS = 1000 -- The maximum number of labels created in a game session
 
-local Reclaim = {}
-local LabelPool = {}
+local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
+local LabelPool = {} -- Stores labels up too MAX_LABELS
 local OldZoom
 local OldPosition
 local ReclaimChanged = true
@@ -61,7 +60,6 @@ local WorldLabel = Class(Group) {
 function CreateReclaimLabel(view)
     local label = WorldLabel(view, Vector(0, 0, 0))
 
-    label.reclaimEntityId = nil
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
     LayoutHelpers.AtLeftIn(label.mass, label)
@@ -88,7 +86,6 @@ function CreateReclaimLabel(view)
     end
 
     label.DisplayReclaim = function(self, r)
-        self.reclaimEntityId = r.id
         if self:IsHidden() then
             self:Show()
         end
@@ -184,11 +181,6 @@ function ShowReclaimThread(watch_key)
     InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-        -- TODO it's impossible for "view" to be nil here. And where would it get destroyed?
-        if not view or IsDestroyed(view) then
-            view = import('/lua/ui/game/worldview.lua').viewLeft
-            InitReclaimGroup(view)
-        end
 
         local zoom = camera:GetZoom()
         local position = camera:GetFocusPosition()

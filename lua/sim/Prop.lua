@@ -73,7 +73,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     DoPropCallbacks = function(self, type, param)
         if self.EventCallbacks[type] then
-            for num,cb in self.EventCallbacks[type] do
+            for num, cb in self.EventCallbacks[type] do
                 cb(self, param)
             end
         end
@@ -108,7 +108,7 @@ Prop = Class(moho.prop_methods, Entity) {
         self.CanBeKilled = val
     end,
 
-    CheckCanBeKilled = function(self,other)
+    CheckCanBeKilled = function(self, other)
         return self.CanBeKilled
     end,
 

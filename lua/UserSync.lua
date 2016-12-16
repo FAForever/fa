@@ -49,7 +49,7 @@ function OnSync()
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
 
-    for id,v in Sync.ReleaseIds do
+    for id, v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
 
