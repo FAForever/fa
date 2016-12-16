@@ -352,7 +352,7 @@ end
 --- fn function applied to each value.
 function table.map(fn, t)
     if not t then return {} end -- prevents looping over nil table
-    r = {}
+    local r = {}
     for k,v in t do
         r[k] = fn(v)
     end
@@ -508,7 +508,7 @@ end
 function StringComma(value)
     local str = value or 0
     while true do  
-      str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      local str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end
