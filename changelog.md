@@ -9,14 +9,15 @@ Patch 3664 (Upcoming)
 - Fixed beam weapons sometimes colliding incorrectly with projectiles
 - Fixed sim slowdown when ordering mex cap with hundreds of engineers
 - Fixed reclaim beam not penetrating water
-- Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone.
+- Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone, as well as large performance improvement
 
 **Gameplay**
 - Changed the ground weapon to be primary on Cybran switch-tech mobile AA units (T1, T3, Cruiser). This has no effect other than to allow attack-moving to work properly, stopping at the right range better.
 - Ground fire is now set as the default firing state for all units
 
 **UI**
-- New feature: Main menu option is now available which will allow you to select your language from those available in FAF. Requires game restart.
+- New feature: Options setting is now available which will allow you to select your language from those available in FAF. Prompts for game restart.
+- New feature: Options setting is now available that lets you choose the maximum number of reclaim labels allowed on-screen. Higher values cause significant FPS slowdown while the overlay is active.
 
 **Coop**
 - Fixed a whole bunch of videos
@@ -25,7 +26,7 @@ Patch 3664 (Upcoming)
 - Giving units to an ally no longer breaks objectives
 - Allowed armies to participate properly in objective requirements
 - Fixed all AIs being set as UEF in coop
-- Fixed Aeon Palace Shield breaking when given to an ally
+- Fixed Aeon Palace Shield breaking when given to an ally, and rebalanced it a little
 - Fixed players other than the primary being unable to complete certain objectives
 
 **Lobby**
@@ -48,6 +49,7 @@ Patch 3664 (Upcoming)
 - Arifi
 - CookieNoob
 - Crotalus
+- Downlord
 - Exotic-Retard
 - IceDreamer
 - Speed2
