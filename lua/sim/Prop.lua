@@ -145,7 +145,6 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         local data = {}
-        data.id = self:GetEntityId()
         if not self:BeenDestroyed() and mass >= minimumLabelMass then
             -- The prop is still around and has enough mass, update the label
             data.mass = mass
@@ -156,7 +155,7 @@ Prop = Class(moho.prop_methods, Entity) {
             self.hasLabel = false
         end
 
-        table.insert(Sync.Reclaim, data)
+        Sync.Reclaim[self:GetEntityId()] = data
     end,
 
     OnDestroy = function(self)

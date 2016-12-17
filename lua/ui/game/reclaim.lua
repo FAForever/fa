@@ -16,12 +16,10 @@ local ReclaimChanged = true
 -- called from /lua/UserSync.lua
 function UpdateReclaim(syncTable)
     ReclaimChanged = true
-    for _, data in syncTable do
-        local id = data.id
+    for id, data in syncTable do
         if not data.mass then
             Reclaim[id] = nil
         else
-            data.id = nil -- Don't store it forever, we won't use it
             Reclaim[id] = data
         end
     end

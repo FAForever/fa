@@ -59,7 +59,7 @@ function OnSync()
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    if Sync.Reclaim[1] then
+    if not table.empty(Sync.Reclaim) then
         UpdateReclaim(Sync.Reclaim)
     end
 
