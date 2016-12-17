@@ -5,7 +5,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
-local MaxLabels = options.maximum_reclaim_count -- The maximum number of labels created in a game session
+local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
 local LabelPool = {} -- Stores labels up too MaxLabels
 local OldZoom
