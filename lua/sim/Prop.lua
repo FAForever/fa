@@ -12,10 +12,8 @@
 --
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
---local Prefs = import('/lua/user/prefs.lua')
---local options = Prefs.GetFromCurrentProfile('options')
 
-local minimumLabelMass = 10--options.minimum_reclaim_size
+local minimumLabelMass = 10
 
 Prop = Class(moho.prop_methods, Entity) {
 
