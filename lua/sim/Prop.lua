@@ -47,12 +47,10 @@ Prop = Class(moho.prop_methods, Entity) {
 
         -- Correct to terrain, just to be sure
         local pos = self:GetPosition()
-        if unitWreck then
-            local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
-            if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
-                pos[2] = terrainAltitude
-                Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
-            end
+        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+        if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
+            pos[2] = terrainAltitude
+            Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
         end
 
         self.CachePosition = pos
