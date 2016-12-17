@@ -6,7 +6,6 @@ local Prefs = import('/lua/user/prefs.lua')
 
 -- TODO: make this configurable by the user
 local MAX_LABELS = 1000 -- The maximum number of labels created in a game session
-
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
 local LabelPool = {} -- Stores labels up too MAX_LABELS
 local OldZoom
@@ -15,12 +14,16 @@ local ReclaimChanged = true
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
-function UpdateReclaim(id, data)
+function UpdateReclaim(syncTable)
     ReclaimChanged = true
-    if not data.mass then
-        Reclaim[id] = nil
-    else
-        Reclaim[id] = data
+    for _, data in syncTable do
+        local id = data.id
+        if not data.mass then
+            Reclaim[id] = nil
+        else
+            data.id = nil -- Don't store it forever, we won't use it
+            Reclaim[id] = data
+        end
     end
 end
 

@@ -18,9 +18,10 @@ minimumLabelMass = 10
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self,spec)
+    __init = function(self, spec)
     end,
-    __post_init = function(self,spec)
+
+    __post_init = function(self, spec)
     end,
 
     OnCreate = function(self)
@@ -146,17 +147,17 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         local data = {}
+        data.id = self:GetEntityId()
         if not self:BeenDestroyed() and mass >= minimumLabelMass then
             -- The prop is still around and has enough mass, update the label
             data.mass = mass
             data.position = self:GetCachePosition()
             self.hasLabel = true
-            Sync.Reclaim[self:GetEntityId()] = data
         else
             -- The prop is no longer applicable for labels, but has an existing label which needs to be removed
             self.hasLabel = false
-            Sync.Reclaim[self:GetEntityId()] = data
         end
+        table.insert(Sync.Reclaim, data)
     end,
 
     OnDestroy = function(self)

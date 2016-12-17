@@ -10,6 +10,7 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
+local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
     if Sync.RequestingExit then
@@ -58,8 +59,8 @@ function OnSync()
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    for id, data in Sync.Reclaim or {} do
-        import('/lua/ui/game/reclaim.lua').UpdateReclaim(id, data)
+    if Sync.Reclaim[1] then
+        UpdateReclaim(Sync.Reclaim)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then
