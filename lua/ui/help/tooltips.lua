@@ -810,6 +810,14 @@ Tooltips = {
         title = "<LOC OPTIONS_0213>Advanced Statistics",
         description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
     },
+    options_minimum_reclaim_size = {
+        title = "<LOC OPTIONS_0275>Minimum Reclaim Label Size",
+        description = "<LOC OPTIONS_0276>Props with values less than this will not show a label in the overlay",
+    },
+    options_maximum_reclaim_count = {
+        title = "<LOC OPTIONS_0277>Maximum Reclaim Label Count",
+        description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, no more than this many labels will be shown",
+    },
     -- **********************
     -- ** Lobby Strings
     -- **********************

@@ -695,6 +695,33 @@ options = {
                     },
                 },
             },
+            {
+                title = "<LOC OPTIONS_0275>Minimum Reclaim Label Size",
+                tip = "<LOC OPTIONS_0276>Props with values less than this will not show a label in the overlay",
+                key = 'minimum_reclaim_size',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 5,
+                    max = 50,
+                    inc = 5,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0277>Maximum Reclaim Label Count",
+                tip = "<LOC OPTIONS_0278>When showing the reclaim label overlay, no more than this many labels will be shown",
+                key = 'maximum_reclaim_count',
+                type = 'slider',
+                set = function(key, value, startup)
+                    import('/lua/ui/game/reclaim.lua').updateMaxLabels(value)
+                end,
+                default = 10,
+                custom = {
+                    min = 500,
+                    max = 5000,
+                    inc = 500,
+                },
+            },
         },
     },
     video = {

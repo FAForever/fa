@@ -3,11 +3,11 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
--- TODO: make this configurable by the user
-local MAX_LABELS = 1000 -- The maximum number of labels created in a game session
+local MaxLabels = options.maximum_reclaim_count -- The maximum number of labels created in a game session
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
-local LabelPool = {} -- Stores labels up too MAX_LABELS
+local LabelPool = {} -- Stores labels up too MaxLabels
 local OldZoom
 local OldPosition
 local ReclaimChanged = true
@@ -27,6 +27,14 @@ function UpdateReclaim(syncTable)
     end
 end
 
+function updateMaxLabels(value)
+    MaxLabels = value
+    ReclaimChanged = true
+    for index = MaxLabels + 1, table.getn(LabelPool) do
+        LabelPool[index]:Destroy()
+        LabelPool[index] = nil
+    end
+end
 
 function OnScreen(view, pos)
     local proj = view:Project(Vector(pos[1], pos[2], pos[3]))
@@ -131,7 +139,7 @@ function UpdateLabels()
     -- Create/Update as many reclaim labels as we need
     local labelIndex = 1
     for _, r in onScreenReclaims do
-        if labelIndex > MAX_LABELS then
+        if labelIndex > MaxLabels then
             break
         end
         if not LabelPool[labelIndex] then
@@ -144,7 +152,7 @@ function UpdateLabels()
     end
 
     -- Hide labels we didn't use
-    for index = labelIndex, MAX_LABELS do
+    for index = labelIndex, MaxLabels do
         local label = LabelPool[index]
         if label and not label:IsHidden() then
             LabelPool[index]:Hide()

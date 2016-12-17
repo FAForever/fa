@@ -12,8 +12,10 @@
 --
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
+--local Prefs = import('/lua/user/prefs.lua')
+--local options = Prefs.GetFromCurrentProfile('options')
 
-minimumLabelMass = 10
+local minimumLabelMass = 10--options.minimum_reclaim_size
 
 Prop = Class(moho.prop_methods, Entity) {
 
@@ -155,6 +157,7 @@ Prop = Class(moho.prop_methods, Entity) {
             -- The prop is no longer applicable for labels, but has an existing label which needs to be removed
             self.hasLabel = false
         end
+
         table.insert(Sync.Reclaim, data)
     end,
 
