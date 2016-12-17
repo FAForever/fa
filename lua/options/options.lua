@@ -683,19 +683,6 @@ options = {
                     },
                 },
             },
-
-            {
-                title = "<LOC OPTIONS_0246>Show reclaim mass with ctrl-shift",
-                key = 'gui_show_reclaim',
-                type = 'toggle',
-                default = 1,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
             {
                 title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
                 tip = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",

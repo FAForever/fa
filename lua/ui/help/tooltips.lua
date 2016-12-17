@@ -2112,10 +2112,6 @@ Tooltips = {
         title = '<LOC OPTIONS_0245>Improved Unit deselection',
         description = '<LOC OPTIONS_0270>Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
     },
-    options_gui_show_reclaim = {
-        title = '<LOC OPTIONS_0246>Show reclaim mass value',
-        description = '<LOC OPTIONS_0271>Holding CTRL+SHIFT brings up an overlay showing the value of reclaimble objects on the map',
-    },
     options_gui_zoom_pop_distance = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',

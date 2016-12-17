@@ -18,6 +18,7 @@ Patch 3664 (Upcoming)
 **UI**
 - New feature: Options setting is now available which will allow you to select your language from those available in FAF. Prompts for game restart.
 - New feature: Options setting is now available that lets you choose the maximum number of reclaim labels allowed on-screen. Higher values cause significant FPS slowdown while the overlay is active.
+- Removed Options toggle for reclaim overlay enable/disable. Simply unbinding it achieves the same thing.
 
 **Coop**
 - Fixed a whole bunch of videos

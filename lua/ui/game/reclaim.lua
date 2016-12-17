@@ -226,7 +226,7 @@ function OnCommandGraphShow(bool)
     local options = Prefs.GetFromCurrentProfile('options')
 
     CommandGraphActive = bool
-    if CommandGraphActive and options.gui_show_reclaim == 1 then
+    if CommandGraphActive then
         ForkThread(function()
             local keydown
             while CommandGraphActive do
