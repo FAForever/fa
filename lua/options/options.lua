@@ -278,6 +278,7 @@ options = {
                 title = "<LOC OPTIONS_0006>Language",
                 key = 'selectedlanguage',
                 type = 'toggle',
+                restart = true,
                 default = __language,
                 set = function(key, value, startup)
                     import('/lua/system/Localization.lua').language(value)
