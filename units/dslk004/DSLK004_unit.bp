@@ -1,7 +1,4 @@
 UnitBlueprint {
-    AI = { -- this is important - it stops it at the correct range on attack move
-        GuardScanRadius = 35, --make this a bit more than the weapon range, it needs time to stop
-    }, --30 would stop it just outside of acu range; deceiver stops eariler cos acu omni range is larger, and deceiver aoe is also larger
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -48,6 +45,7 @@ UnitBlueprint {
         'LAND',
         'TECH3',
         'ANTIAIR',
+        'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
