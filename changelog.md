@@ -15,6 +15,7 @@ Patch 3664 (Upcoming)
 **Gameplay**
 - Changed the ground weapon to be primary on Cybran switch-tech mobile AA units (T1, T3, Cruiser). This has no effect other than to allow attack-moving to work properly, stopping at the right range better.
 - Ground fire is now set as the default firing state for all units
+- Added a dummy weapon to units such as T2 Flak and Mobile Shields. This allows them to not run blindly in when a group of units is told to attack-move.
 
 **UI**
 - New feature: Options setting is now available which will allow you to select your language from those available in FAF. Prompts for game restart.
