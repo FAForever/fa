@@ -498,7 +498,8 @@ function PreModBlueprints(all_bps)
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
         local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
                        (cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER)) or
-                       (cats.STRUCTURE and (cats.DIRECTFIRE or cats.INDIRECTFIRE) and (cats.DEFENSE or cats.ARTILLERY))
+                       (cats.STRUCTURE and (cats.DIRECTFIRE or cats.INDIRECTFIRE) and (cats.DEFENSE or cats.ARTILLERY)) or 
+                       cats.DUMMYGSRWEAPON
                        )
 
         if modGSR then
