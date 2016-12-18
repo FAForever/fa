@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai.opai
+
 --#****************************************************************************
 --#**
 --#**  File     :  /lua/ai/OpAI/BaseManager.lua

@@ -1,3 +1,5 @@
+--- Utility functions for the Sorian AIs
+-- @submodule lua.ai
 #***************************************************************************
 #*
 #**  File     :  /lua/ai/AIAddBuilderTable.lua

@@ -1,3 +1,6 @@
+--- AI Builders related module
+-- @submodule lua.ai.aibuilders
+
 #****************************************************************************
 #**
 #**  File     :  /lua/AI/AIBuilders/ExpansionBuilders.lua

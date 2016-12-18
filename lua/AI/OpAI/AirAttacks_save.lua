@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai.opai
+
 --[[                                                                           ]]--
 --[[  Automatically generated code (do not edit)                               ]]--
 --[[                                                                           ]]--

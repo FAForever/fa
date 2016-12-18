@@ -1,0 +1,2 @@
+--- AI Platoon Templates
+-- @module lua.ai.platoontemplates

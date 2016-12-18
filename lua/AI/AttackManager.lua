@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai
+
 local Utilities = import('/lua/utilities.lua')
 
 -- ATTACK MANAGER SPEC

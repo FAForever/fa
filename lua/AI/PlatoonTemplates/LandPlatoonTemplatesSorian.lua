@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai.platoontemplates
+
 PlatoonTemplate {
     Name = 'LandAttackSorian',
     Plan = 'AttackForceAISorian',
