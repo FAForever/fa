@@ -1,7 +1,4 @@
 UnitBlueprint {
-    AI = { -- this is important - it stops it at the correct range on attack move
-        GuardScanRadius = 35, --make this a bit more than the weapon range, it needs time to stop
-    }, --30 would stop it just outside of acu range; deceiver stops eariler cos acu omni range is larger, and deceiver aoe is also larger
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -52,6 +49,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
+        'DUMMYGSRWEAPON',
     },
     Defense = {
         AirThreatLevel = 3,
@@ -197,17 +195,13 @@ UnitBlueprint {
     },
     Weapon = {
         { -- special dummy weapon to make the unit stop a certain distance away
-            AutoInitiateAttackCommand = false,
-            CannotAttackGround = false,
             Damage = 0,
             DamageFriendly = false,
-            DamageType = 'Normal',
-            DisplayName = 'Target Tracker',
-            FireTargetLayerCapsTable = { --what the unit will stop for - shields dont need to stop for air units
+            FireTargetLayerCapsTable = { --what the unit will stop for, flak stops for air as well
                 Land = 'Air|Land|Water',
                 Water = 'Air|Land|Water',
             },
-            MaxRadius = 33, -- this is the range the unit will try to stop at. change GuardScanRadius as well.
+            MaxRadius = 33,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -217,15 +211,14 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            ReTargetOnMiss = false,
-            TargetCheckInterval = 0.1,
+            TargetCheckInterval = 1,
             TargetPriorities = {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
+            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
-            WeaponCategory = 'Missile',
         },
         {
             AlwaysRecheckTarget = true,
