@@ -846,9 +846,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
 
-    ------------------------------------------------------------------------------------------------------------------------------------
-    ---- ---------- System for playing VOs to the Player ------------ ----
-    ------------------------------------------------------------------------------------------------------------------------------------
+    --
+    -- System for playing VOs to the Player
+    --
     VOSounds = {
         -- {timeout delay, default cue, observers}
         NuclearLaunchDetected =        {timeout=1,  bank=nil, obs=true},
