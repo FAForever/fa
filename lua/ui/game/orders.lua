@@ -71,6 +71,13 @@ local function CreateOrderGlow(parent)
     end     
 end
 
+local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local orderKeys = {}
+
+function setOrderKeys(orderKeys_)
+    orderKeys = orderKeys_
+end
+
 local function CreateAutoBuildEffect(parent)
     local glow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(glow, parent)
@@ -1004,7 +1011,12 @@ local function AddOrder(orderInfo, slot, batchMode)
     local row = math.ceil(slot / cols)
     local col = math.mod(slot - 1, cols) + 1
     controls.orderButtonGrid:DestroyItem(col, row, batchMode)
-    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)    
+    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)
+
+    -- Handle Hotbuild labels
+    if orderKeys[orderInfo.helpText] then
+        hotkeyLabel_addLabel(checkbox, checkbox, orderKeys[orderInfo.helpText])
+    end
 
     return checkbox
 end

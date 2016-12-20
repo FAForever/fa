@@ -38,6 +38,7 @@ local lastObserving
 
 -- Hotbuild stuff
 modifiersKeys = {}
+
 -- Adding modifiers shorcuts on the fly.
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
@@ -252,6 +253,9 @@ function CreateUI(isReplay)
     end
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
+
+    local hotkeyLabelsInit = import('/modules/hotkeylabels.lua').init
+    hotkeyLabelsInit()
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
@@ -462,12 +466,18 @@ end
 --      newSelection: What the selection is now
 --      added: Which units were added to the old selection
 --      removed: Which units where removed from the old selection
+
+local hotkeyLabelsOnSelectionChanged = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
+    
+    if not hotkeyLabelsOnSelectionChanged then
+        hotkeyLabelsOnSelectionChanged = import('/modules/hotkeylabels.lua').onSelectionChanged
+    end
 
-    -- Deselect Selens if necessary
+    -- Deselect Selens if necessary. Also do work on Hotbuild labels
     local changed = false -- Prevent recursion
     if newSelection and table.getn(newSelection) > 0 then
         newSelection, changed = DeselectSelens(newSelection)
@@ -478,8 +488,18 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             end)
             return
         end
+
+        -- This bit is for the Hotbuild labels
+        local upgradesTo = newSelection[1]:GetBlueprint().General.UpgradesTo
+        if upgradesTo then
+            if upgradesTo:len(upgradesTo) < 7 then
+                upgradesTo = nil
+            end
+        end
+        local isFactory = newSelection[1]:IsInCategory("FACTORY")
+        hotkeyLabelsOnSelectionChanged(upgradesTo, isFactory)
     end
-    
+
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
     local isOldSelection = table.equal(oldSelection, newSelection)
 

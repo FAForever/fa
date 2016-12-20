@@ -22,6 +22,7 @@ Patch 3664 (Upcoming)
 - New feature: Options setting is now available that lets you choose the maximum number of reclaim labels allowed on-screen. Higher values cause significant FPS slowdown while the overlay is active.
 - Removed Options toggle for reclaim overlay enable/disable. Simply unbinding it achieves the same thing.
 - Redefined the default key bindings for Hotbuild to match a widely used community standard. This won't affect people who have non-default bindings set.
+- New feature: Icons in the build and command menus for units will now show the keyboard shortcut assigned to them. Thanks to Brainwashed (AKA Washy/Myxir)!
 
 **Coop**
 - Fixed a whole bunch of videos
@@ -52,6 +53,7 @@ Patch 3664 (Upcoming)
 
 **Contributors**
 - Arifi
+- Brainwashed
 - CookieNoob
 - Crotalus
 - Downlord

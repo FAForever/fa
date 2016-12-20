@@ -55,6 +55,23 @@ local updateQueue = true --if false then queue won't update in the ui
 local modified = false --if false then buttonrelease will increase buildcount in queue
 local dragLock = false --to disable quick successive drags, which doubles the units in the queue
 
+-- locals for Keybind labels in build queue
+local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local idRelations = {}
+local upgradeKey = false
+local upgradesTo = false
+local allowOthers = true
+
+function setIdRelations(idRelations_, upgradeKey_)
+    idRelations = idRelations_
+    upgradeKey = upgradeKey_
+end
+
+function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
+    upgradesTo = upgradesTo_
+    allowOthers = allowOthers_
+end
+
 if options.gui_draggable_queue ~= 0 then
     --add gameparent handleevent for if the drag ends outside the queue window
     local gameParent = import('gamemain.lua').GetGameParent()
@@ -698,6 +715,9 @@ function CommonLogic()
         return btn
     end
 
+    local key = nil
+    local id = nil
+
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
@@ -816,10 +836,11 @@ function CommonLogic()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
         elseif type == 'item' then
+            local id = control.Data.id
             SetIconTextures(control)
-            control:SetNewTextures(GetBackgroundTextures(control.Data.id))
-            local _, down = GetBackgroundTextures(control.Data.id)
-            control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
+            control:SetNewTextures(GetBackgroundTextures(id))
+            local _, down = GetBackgroundTextures(id)
+            control.tooltipID = LOC(__blueprints[id].Description) or 'no description'
             control:SetOverrideTexture(down)
             control:DisableOverride()
             control.Height:Set(48)
@@ -830,7 +851,7 @@ function CommonLogic()
             control.BuildKey = nil
             if showBuildIcons then
                 local unitBuildKeys = BuildMode.GetUnitKeys(sortedOptions.selection[1]:GetBlueprint().BlueprintId, GetCurrentTechTab())
-                control.Count:SetText(unitBuildKeys[control.Data.id] or '')
+                control.Count:SetText(unitBuildKeys[id] or '')
                 control.Count:SetColor('ffff9000')
             else
                 control.Count:SetText('')
@@ -839,6 +860,15 @@ function CommonLogic()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
+
+            if id == upgradesTo and upgradeKey then
+                hotkeyLabel_addLabel(control, control.Icon, upgradeKey)
+            elseif allowOthers or upgradesTo == nil then
+                local key = idRelations[id]
+                if key then
+                    hotkeyLabel_addLabel(control, control.Icon, key)
+                end
+            end
         elseif type == 'unitstack' then
             SetIconTextures(control)
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
