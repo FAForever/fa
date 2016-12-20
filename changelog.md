@@ -10,6 +10,7 @@ Patch 3664 (Upcoming)
 - Fixed sim slowdown when ordering mex cap with hundreds of engineers
 - Fixed reclaim beam not penetrating water
 - Fixed some remaining issues with the Reclaim overlay: Shifting while zooming/panning, and 'ghost' labels for props that are gone, as well as large performance improvement
+- Fixed invalid prefs entries invalidating the game's share condition
 
 **Gameplay**
 - Changed the ground weapon to be primary on Cybran switch-tech mobile AA units (T1, T3, Cruiser). This has no effect other than to allow attack-moving to work properly, stopping at the right range better.
