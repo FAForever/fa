@@ -21,3 +21,25 @@ Please follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide) as
 much as possible.
 
 For file encoding, use UTF-8 and unix-style file endings in the repo (Set core.autocrlf).
+
+Documentation
+---------------
+
+We use [LDoc](https://stevedonovan.github.io/ldoc/) to generate the documentation to the Lua code. Please make sure that your code complies with the LDoc documentation style. Consult the [LDoc documentation](https://stevedonovan.github.io/ldoc/manual/doc.md.html) for details. 
+
+LDoc documentation comments can be started with _at least_ three hyphens `---` so please take care of faulty usage.
+
+**Example:** 
+
+```lua
+--- Displays given forename, surname and the age of 
+-- in the current window.
+-- @string forename The forename of the person.
+-- @string surname The surname of the person.
+-- @int age The age of the person.
+-- @return Returns the previous information {forname, surname, age}
+-- or 'nil' if no previous information was set.
+function DisplayPersonInformation (functionParameter)
+  -- Implementation
+end
+``` 
