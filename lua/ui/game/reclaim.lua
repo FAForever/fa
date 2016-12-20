@@ -86,6 +86,7 @@ function CreateReclaimLabel(view)
     label.OnHide = function(self, hidden)
         self:SetNeedsFrameUpdate(not hidden)
     end
+
     label.Update = function(self)
         local view = self.parent.view
         local proj = view:Project(self.position)
@@ -153,7 +154,7 @@ function UpdateLabels()
     for index = labelIndex, MaxLabels do
         local label = LabelPool[index]
         if label and not label:IsHidden() then
-            LabelPool[index]:Hide()
+            label:Hide()
         end
     end
 end
@@ -181,6 +182,8 @@ function InitReclaimGroup(view)
     else
         view.ReclaimGroup:Show()
     end
+
+    view.NewViewing = true
 end
 
 function ShowReclaimThread(watch_key)
@@ -190,10 +193,10 @@ function ShowReclaimThread(watch_key)
     InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-
         local zoom = camera:GetZoom()
         local position = camera:GetFocusPosition()
         if ReclaimChanged
+            or view.NewViewing
             or OldZoom ~= zoom
             or OldPosition[1] ~= position[1]
             or OldPosition[2] ~= position[2]
@@ -203,6 +206,8 @@ function ShowReclaimThread(watch_key)
                 OldPosition = position
                 ReclaimChanged = false
         end
+
+        view.NewViewing = false
 
         WaitSeconds(.1)
     end
