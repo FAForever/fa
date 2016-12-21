@@ -159,14 +159,54 @@ defaultKeyMap = {
 }
 
 debugKeyMap = {
+    ['Ctrl-Alt-P']          = 'debug_navpath',
     ['Alt-F2']              = 'debug_create_unit',
     ['Alt-T']               = 'debug_teleport',
+    ['Alt-A']               = 'debug_run_opponent_AI',
     ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
+
+    ['Ctrl-Alt-Comma']      = 'debug_graphics_fidelity_0',
+    ['Ctrl-Alt-Period']     = 'debug_graphics_fidelity_2',
+
+    ['Alt-F3']              = 'debug_scenario_method_f3',
+    ['Shift-F3']            = 'debug_scenario_method_shift_f3',
+    ['Ctrl-F3']             = 'debug_scenario_method_ctrl_f3',
+    ['Shift-F4']            = 'debug_scenario_method_shift_f4',
+    ['Ctrl-F4']             = 'debug_scenario_method_ctrl_f4',
+    ['Ctrl-Alt-F4']         = 'debug_scenario_method_ctrl_alt_f3',
+    ['Ctrl-Shift-F4']       = 'debug_scenario_method_f4',
+    ['Ctrl-Shift-F5']       = 'debug_scenario_method_f5',
+    ['Shift-F5']            = 'debug_scenario_method_shift_f5',
+    ['Ctrl-F5']             = 'debug_scenario_method_ctrl_f5',
+    ['Ctrl-Alt-F5']         = 'debug_scenario_method_ctrl_alt_f5',
+
+    ['Ctrl-Alt-Shift-F8']   = 'debug_campaign_instawin',
+    ['Shift-F6']            = 'debug_create_entity',
+    ['Shift-F7']            = 'debug_show_stats',
+    ['Shift-F8']            = 'debug_show_army_stats',
     ['F9']                  = 'debug_toggle_log_window',
+    ['Alt-F9']              = 'debug_open_lua_debugger',
+    ['Alt-F11']             = 'debug_show_frame_stats',
+    ['Ctrl-Alt-W']          = 'debug_render_wireframe',
+    ['Ctrl-Shift-W']        = 'debug_weapons',
+    ['Ctrl-Alt-O']          = 'debug_grid',
+    ['Alt-Q']               = 'debug_show_focus_ui_control',
+    ['Alt-W']               = 'debug_dump_focus_ui_control',
+    ['Alt-D']               = 'debug_dump_ui_controls',
+    ['Alt-V']               = 'debug_skeletons',
+    ['Alt-B']               = 'debug_bones',
+
+    ['Ctrl-Shift-X']        = 'debug_redo_console_command',
     ['Ctrl-Shift-C']        = 'debug_copy_units',
     ['Ctrl-Shift-V']        = 'debug_paste_units',
+
+    ['Alt-N']               = 'debug_nodamage',
+    ['Ctrl-Alt-E']          = 'debug_show_emmitter_window',
     ['Ctrl-Alt-Z']          = 'debug_sally_shears',
+    ['Ctrl-Shift-Alt-C']    = 'debug_collision',
+    ['Ctrl-Slash']          = 'debug_pause_single_step',
+    ['Ctrl-F10']            = 'debug_restart_session',
     ['Ctrl-Shift-F1']       = 'debug_toggle_pannels',
 }
 
