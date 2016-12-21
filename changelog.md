@@ -1,4 +1,4 @@
-Patch 3664 (Upcoming)
+Patch 3664 (December 21st, 2016)
 ============================
 ### Bugs
 - Removed deploy ability tooltip from Aeon T3 Mobile Artillery
