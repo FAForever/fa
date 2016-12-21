@@ -1841,5 +1841,17 @@ MapBlacklist = {
     ['diversity_ultimate.v0003'] = true,
     ['diversity_ultimate.v0002'] = true,
     ['diversity_ultimate.v0001'] = true,
-    
+    ['paradisebay.v0001'] = true,
+    ['paradisebay.v0002'] = true,
+    ['paradisebay.v0003'] = true,
+    ['paradisebay.v0004'] = true,
+    ['paradisebay.v0005'] = true,
+    ['paradisebay.v0006'] = true,
+    ['paradise_bay_v4.v0001'] = true,
+    ['paradise_bay_v4.v0002'] = true,
+    ['paradise_bay_v4.v0003'] = true,
+    ['paradise_bay_v4.v0004'] = true,
+    ['paradisebayv2.v0001'] = true,
+    ['paradisebayv2.v0002'] = true,
+    ['paradisebayv2.v0003'] = true,
 }
