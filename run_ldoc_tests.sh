@@ -48,7 +48,18 @@ cd $HOME
 mkdir ldoc-build # ldoc result
 
 echo "Starting LDoc .."
-ldoc -a -c fa/.ldoc/.cfg/config.ld -s fa/.ldoc/.cfg -d ldoc-build/ fa/
+ldoc_error="ldoc -a -c fa/.ldoc/.cfg/config.ld -s fa/.ldoc/.cfg -d ldoc-build/ fa/"
+
+# Ask LDoc first ..
+if [ $ldoc_error ]; then
+  echo "LDoc returned with error code: " $ldoc_error
+  exit 1
+fi
+
+if [ "$(ls -A ldoc-build)" ]; then
+  echo "ldoc-build/ appears to be empty. No documentation has been generated?"
+  exit 1
+fi
 
 
 # ################################################################
