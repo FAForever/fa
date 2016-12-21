@@ -1,3 +1,7 @@
+Hotfix Patch 3666 (December 21st, 2016)
+- The negative reaction of the community to the new Hotbuild bindings as defaults was severely underestimated. Attempting to reverse the change.
+
+
 Hotfix Patch 3665 (December 21st, 2016)
 ============================
 - Fixed a small error that cause the Unit Manager to hard crash
