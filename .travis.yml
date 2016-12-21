@@ -8,11 +8,6 @@ install:
  - sudo apt-get install lua5.2         # Install Lua 5.2
  - sudo apt-get install liblua5.2-dev  # Required for LDoc
 
- # Install luasocket, luafilesystem and ldoc
- - sudo luarocks install luasocket
- - sudo luarocks install luafilesystem
- - sudo luarocks install ldoc
- 
 before_script:
  - cd $TRAVIS_BUILD_DIR 
 

@@ -30,6 +30,11 @@ cd luarocks-2.4.1 # We're now in ~/luarocks-2.4.1
 
 ./configure; sudo make bootstrap
 
+# Now we can install luasocket, luafilesystem and ldoc
+sudo luarocks install luasocket
+sudo luarocks install luafilesystem
+sudo luarocks install ldoc
+
 cd $HOME
 
 ldoc -a -d ldoc-build/ fa/
