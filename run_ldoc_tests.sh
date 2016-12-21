@@ -37,7 +37,7 @@ sudo luarocks install ldoc
 
 cd $HOME
 
-ldoc -a -d ldoc-build/ fa/
+ldoc -a -c fa/.ldoc/.cfg/config.ld -s fa/.ldoc/.cfg -d ldoc-build/ fa/
 
 tree ldoc-build/ # Show me what you've got!
 
