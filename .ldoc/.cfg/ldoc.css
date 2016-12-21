@@ -8,7 +8,7 @@ version: 2.8.2r1
 html {
     color: #000;
     background: #FFF;
-	overflow: hidden;
+    overflow: hidden;
 }
 
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td {
@@ -150,22 +150,22 @@ table.index td { text-align: left; vertical-align: top; }
 }
 
 #navigation {
-	max-width: 320px;
-	position: absolute;
-	overflow: auto;
-	height: 100%;
+    max-width: 320px;
+    position: absolute;
+    overflow: auto;
+    height: 100%;
     float: left;
     vertical-align: top;
 }
 
 #content h2 {
-	margin-top: 60px;
+    margin-top: 60px;
 }
 
 #navigation h1 {
-	padding-left: 15px;
-	padding-bottom: 40px;
-	padding-top: 40px;
+    padding-left: 15px;
+    padding-bottom: 40px;
+    padding-top: 40px;
 }
 
 #navigation h2 {
@@ -175,7 +175,7 @@ table.index td { text-align: left; vertical-align: top; }
     text-align: left;
     padding:0.2em;
 
-	padding-left: 8px;
+    padding-left: 8px;
     border-bottom:1px solid #dddddd;
 }
 
@@ -183,7 +183,7 @@ table.index td { text-align: left; vertical-align: top; }
 {
     font-size:1em;
     list-style-type: none;
-	padding-left: 8px;
+    padding-left: 8px;
 }
 
 #navigation li {
@@ -197,20 +197,20 @@ table.index td { text-align: left; vertical-align: top; }
 }
 
 #content {
-	padding: 40px;
-	height: calc(100% - 80px);
-	width: 100%;
-	max-width: calc(100% - 400px);
-	
-	position: absolute;
-	overflow: auto;
-	margin-left: 320px;
+    padding: 40px;
+    height: calc(100% - 80px);
+    width: 100%;
+    max-width: calc(100% - 400px);
+    
+    position: absolute;
+    overflow: auto;
+    margin-left: 320px;
     float: left;
     background-color: #ffffff;
 }
 
 #about {
-	visibility: hidden;
+    visibility: hidden;
     clear: both;
     padding: 5px;
     border-top: 2px solid #cccccc;
@@ -266,9 +266,9 @@ table.module_list td.summary { width: 100%; }
 
 
 table.function_list {
-	margin-left: 15px;
-	margin-top: 25px;
-	margin-bottom: 25px;
+    margin-left: 15px;
+    margin-top: 25px;
+    margin-bottom: 25px;
     border-width: 1px;
     border-style: solid;
     border-color: #cccccc;
@@ -282,14 +282,14 @@ table.function_list td {
 }
 
 table.function_list td.name { 
-	padding: 10px;
-	background-color: #f0f0f0; 
-	min-width: 200px; 
+    padding: 10px;
+    background-color: #f0f0f0; 
+    min-width: 200px; 
 }
 
 table.function_list td.summary { 
-	padding: 15px;
-	width: 100%; 
+    padding: 15px;
+    width: 100%; 
 }
 
 ul.nowrap {
@@ -298,9 +298,9 @@ ul.nowrap {
 
 dl.table dt, dl.function dt {border-top: 1px solid #ccc; padding-top: 1em;}
 dl.table dd, dl.function dd {
-	font-family: courier;
-	padding-bottom: 1em; 
-	margin: 10px 0 0 20px;
+    font-family: courier;
+    padding-bottom: 1em; 
+    margin: 10px 0 0 20px;
 }
 dl.table h3, dl.function h3 {font-size: .95em;}
 
