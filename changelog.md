@@ -1,3 +1,8 @@
+Hotfix Patch 3665 (December 21st, 2016)
+============================
+- Fixed a small error that cause the Unit Manager to hard crash
+
+
 Patch 3664 (December 21st, 2016)
 ============================
 ### Bugs
