@@ -4,48 +4,18 @@ language: python
 env:
  - LUAC=luac5.2
 
-before_install:
- - echo "Before install .." 
- - HOME="$TRAVIS_BUILD_DIR/.." 
- - echo "HOME="$HOME 
- - echo "TRAVIS_BUILD_DIR="$TRAVIS_BUILD_DIR
-
 install:
- # Install Lua 5.2
- - sudo apt-get install lua5.2
- - sudo apt-get install liblua5.2-dev # Required for LDoc
- 
- - cd $HOME
- 
- # ################################################################
- # Setting up LDoc
- 
- - sudo apt-get install tree # Just to debug LDoc output 
- - mkdir ldoc-build # ldoc result
- 
- # Download & install luarocks
- - wget https://luarocks.org/releases/luarocks-2.4.1.tar.gz
- - tar zxpf luarocks-2.4.1.tar.gz
- 
- - cd luarocks-2.4.1 # We're now in ~/luarocks-2.4.1
- 
- - ./configure; sudo make bootstrap
- 
+ - sudo apt-get install lua5.2         # Install Lua 5.2
+ - sudo apt-get install liblua5.2-dev  # Required for LDoc
+
  # Install luasocket, luafilesystem and ldoc
  - sudo luarocks install luasocket
  - sudo luarocks install luafilesystem
  - sudo luarocks install ldoc
- 
- - cd $HOME 
- 
- # Run LDoc
- - ldoc -a -d ldoc-build/ fa/
- 
- # TODO: Deploy the content of ldoc-build
- - tree ldoc-build/ # Show me what you've got!
  
 before_script:
  - cd $TRAVIS_BUILD_DIR 
 
 script:
  - bash ./run_lua_tests.sh
+ - bash ./run_ldoc_tests.sh
