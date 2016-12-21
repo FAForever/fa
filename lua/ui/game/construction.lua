@@ -1752,6 +1752,8 @@ function CreateExtraControls(controlType)
     end
 end
 
+
+local insertIntoTableLowestTechFirst = import('/modules/selectionsort.lua').insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
@@ -1842,17 +1844,18 @@ function FormatData(unitData, type)
         CreateExtraControls('construction')
         SetSecondaryDisplay('buildQueue')
     elseif type == 'selection' then
-        local function SortFunc(unit1, unit2)
-            if unit1.id >= unit2.id then
-                return false
-            else
-                return true
-            end
-        end
+        local sortedUnits = {
+            [1] = {cat = "ALLUNITS", units = {}},
+            [2] = {cat = "LAND", units = {}},
+            [3] = {cat = "AIR", units = {}},
+            [4] = {cat = "NAVAL", units = {}},
+            [5] = {cat = "STRUCTURE", units = {}},
+            [6] = {cat = "SORTCONSTRUCTION", units = {}},
+        }
 
-        local sortedUnits = {}
         local lowFuelUnits = {}
         local idleConsUnits = {}
+
         for _, unit in unitData do
             local id = unit:GetBlueprint().BlueprintId
 
@@ -1867,28 +1870,48 @@ function FormatData(unitData, type)
                 end
                 table.insert(idleConsUnits[id], unit)
             else
-                if not sortedUnits[id] then
-                    sortedUnits[id] = {}
+                local cat = 0
+                for i, t in sortedUnits do
+                    if unit:IsInCategory(t.cat) then
+                        cat = i
+                    end
                 end
-                table.insert(sortedUnits[id], unit)
+
+                if not sortedUnits[cat].units[id] then
+                    sortedUnits[cat].units[id] = {}
+                end
+
+                table.insert(sortedUnits[cat].units[id], unit)
             end
         end
 
-        local displayUnits = true
-        if displayUnits then
-            for i, v in sortedUnits do
-                table.insert(retData, { type = 'unitstack', id = i, units = v })
+        local function insertSpacer(didPutUnits)
+            if didPutUnits then
+                table.insert(retData, { type = 'spacer' })
+                return not didPutUnits
             end
         end
-        for i, v in lowFuelUnits do
-            table.insert(retData, { type = 'unitstack', id = i, units = v, lowFuel = true })
-        end
-        for i, v in idleConsUnits do
-            table.insert(retData, { type = 'unitstack', id = i, units = v, idleCon = true })
+
+        -- Sort selected units into order and insert spaces
+        local didPutUnits = false
+        for _, t in sortedUnits do
+            didPutUnits = insertSpacer(didPutUnits)
+
+            retData, didPutUnits = insertIntoTableLowestTechFirst(t.units, retData, false, false)
         end
 
-        -- Sort unit types
-        table.sort(retData, SortFunc)
+        -- Split out low fuel
+        didPutUnits = insertSpacer(didPutUnits)
+        retData, didPutUnits = insertIntoTableLowestTechFirst(lowFuelUnits, retData, true, false)
+
+        -- Split out idle constructors
+        didPutUnits = insertSpacer(didPutUnits)
+        retData, didPutUnits = insertIntoTableLowestTechFirst(idleConsUnits, retData, false, true)
+
+        -- Remove trailing spacer if there is one
+        if retData[table.getn(retData)].type == 'spacer' then
+            table.remove(retData, table.getn(retData))
+        end
 
         CreateExtraControls('selection')
         SetSecondaryDisplay('attached')
