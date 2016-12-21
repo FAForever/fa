@@ -305,7 +305,7 @@ end
 --- e.g. table.inverse {foo='x', bar='x'} => possibly {x='bar'} or {x='foo'}
 function table.inverse(t)
     if not t then return {} end -- prevents looping over nil table
-    r = {}
+    local r = {}
     for k,v in t do
         r[v] = k
     end
@@ -508,7 +508,7 @@ end
 function StringComma(value)
     local str = value or 0
     while true do  
-      local str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end
