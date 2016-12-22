@@ -1,4 +1,10 @@
+Hotfix Patch 3667 (December 22nd, 2016)
+============================
+- Fixed a typo which was setting the default labels to show onscreen to 10 rather than 1000
+
+
 Hotfix Patch 3666 (December 21st, 2016)
+============================
 - The negative reaction of the community to the new Hotbuild bindings as defaults was severely underestimated. Attempting to reverse the change.
 
 
