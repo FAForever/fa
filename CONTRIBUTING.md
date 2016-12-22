@@ -39,7 +39,7 @@ LDoc documentation comments can be started with _at least_ three hyphens `---` s
 -- @int age The age of the person.
 -- @return Returns the previous information {forname, surname, age}
 -- or 'nil' if no previous information was set.
-function DisplayPersonInformation (functionParameter)
+function DisplayPersonInformation (forename, surename, age)
   -- Implementation
 end
 ``` 
