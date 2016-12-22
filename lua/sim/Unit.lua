@@ -122,7 +122,7 @@ Unit = Class(moho.unit_methods) {
             RadarStealthField = {NotInitialized=true},
             SonarStealthField = {NotInitialized=true},
             Cloak = {NotInitialized=true},
-            CloakField = {NotInitialized=true},
+            CloakField = {NotInitialized=true}, -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             Spoof = {NotInitialized=true},
             Jammer = {NotInitialized=true},
         }
@@ -147,6 +147,7 @@ Unit = Class(moho.unit_methods) {
             OnFailedBeingCaptured = {},
             OnFailedToBuild = {},
             OnVeteran = {},
+            OnGiven = {},
             ProjectileDamaged = {},
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
@@ -354,9 +355,9 @@ Unit = Class(moho.unit_methods) {
 
     --Updates build restrictions of any unit passed, used for support factories
     updateBuildRestrictions = function(self)
-        local faction = nil
-        local type = nil
-        local techlevel = nil
+        local faction = false
+        local type = false
+        local techlevel = false
 
         --Defines the unit's faction
         if EntityCategoryContains(categories.AEON, self) then
@@ -512,7 +513,7 @@ Unit = Class(moho.unit_methods) {
             self:DisableUnitIntel('ToggleBit3', 'Sonar')
             self:DisableUnitIntel('ToggleBit3', 'Omni')
             self:DisableUnitIntel('ToggleBit3', 'Cloak')
-            self:DisableUnitIntel('ToggleBit3', 'CloakField')
+            self:DisableUnitIntel('ToggleBit3', 'CloakField') -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             self:DisableUnitIntel('ToggleBit3', 'Spoof')
             self:DisableUnitIntel('ToggleBit3', 'Jammer')
             self:DisableUnitIntel('ToggleBit3', 'Radar')
@@ -560,7 +561,7 @@ Unit = Class(moho.unit_methods) {
             self:EnableUnitIntel('ToggleBit3', 'Sonar')
             self:EnableUnitIntel('ToggleBit3', 'Omni')
             self:EnableUnitIntel('ToggleBit3', 'Cloak')
-            self:EnableUnitIntel('ToggleBit3', 'CloakField')
+            self:EnableUnitIntel('ToggleBit3', 'CloakField') -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
             self:EnableUnitIntel('ToggleBit3', 'Spoof')
             self:EnableUnitIntel('ToggleBit3', 'Jammer')
         elseif bit == 4 then --Production toggle
@@ -890,6 +891,14 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+    end,
+    
+    OnGiven = function(self, newUnit)
+        self:DoUnitCallbacks( 'OnGiven', newUnit )
+    end,
+    
+    AddOnGivenCallback = function(self, fn)
+        self:AddUnitCallback(fn, 'OnGiven')
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1305,7 +1314,7 @@ Unit = Class(moho.unit_methods) {
         end
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if self:GetArmy() == other:GetArmy() then
-                return other:GetCollideFriendly()
+                return other.CollideFriendly
             end
         end
 
@@ -1470,7 +1479,7 @@ Unit = Class(moho.unit_methods) {
             HighPartLimit = Random( 1, HighDestructionParts)
             for i = 1, HighPartLimit do
                 self:ShowBone( self.DestructionPartsHighToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp',self.DestructionPartsHighToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp',self.DestructionPartsHighToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsHighToss[i],boneProj,-1,false)
             end
         end
@@ -1478,7 +1487,7 @@ Unit = Class(moho.unit_methods) {
             LowPartLimit = Random( 1, LowDestructionParts)
             for i = 1, LowPartLimit do
                 self:ShowBone( self.DestructionPartsLowToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsLowToss[i],boneProj,-1,false)
             end
         end
@@ -1486,7 +1495,7 @@ Unit = Class(moho.unit_methods) {
             ChassisPartLimit = Random( 1, ChassisDestructionParts)
             for i = 1, Random( 1, ChassisDestructionParts) do
                 self:ShowBone( self.DestructionPartsChassisToss[i], false )
-                boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp',self.DestructionPartsChassisToss[i])
+                local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp',self.DestructionPartsChassisToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsChassisToss[i],boneProj,-1,false)
             end
         end
@@ -1805,7 +1814,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRotation = function(self, angle)
-        qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        local qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
         self:SetOrientation({qx, qy, qz, qw}, true)
     end,
 
@@ -2333,12 +2342,20 @@ Unit = Class(moho.unit_methods) {
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
                 self:DisableIntel(intel)
+
+                -- Handle the cloak FX timing
+                if intel == 'Cloak' or intel == 'CloakField' then
+                    if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
+                        self:UpdateCloakEffect(false, intel)
+                    end
+                end
+
                 intDisabled = true
             end
             self.IntelDisables[intel][disabler] = true
             return intDisabled
         end
-    
+
         local intDisabled = false
         
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change 
@@ -2355,6 +2372,7 @@ Unit = Class(moho.unit_methods) {
                 intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- beware of short-circuiting
             end
         end
+
         if intDisabled then
             self:OnIntelDisabled(disabler, intel)
         end
@@ -2367,14 +2385,22 @@ Unit = Class(moho.unit_methods) {
                 self.IntelDisables[intel][disabler] = nil
                 if Set.Empty(self.IntelDisables[intel]) then
                     self:EnableIntel(intel)
+
+                    -- Handle the cloak FX timing
+                    if intel == 'Cloak' or intel == 'CloakField' then
+                        if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
+                            self:UpdateCloakEffect(true, intel)
+                        end
+                    end
+
                     intEnabled = true
                 end
             end
             return intEnabled
         end
-    
+
         local intEnabled = false
-        
+
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
@@ -2405,12 +2431,72 @@ Unit = Class(moho.unit_methods) {
     OnIntelDisabled = function(self)
     end,
 
+    UpdateCloakEffect = function(self, cloaked, intel)
+        -- When debugging cloak FX issues, remember that once a structure unit is seen by the enemy,
+        -- recloaking won't make it vanish again, and they'll see the new FX.
+        if self and not self.Dead then
+            if intel == 'Cloak' then
+                local bpDisplay = self:GetBlueprint().Display
+
+                if cloaked then
+                    self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
+                else
+                    self:SetMesh(bpDisplay.MeshBlueprint, true)
+                end
+            elseif intel == 'CloakField' then
+                if self.CloakFieldWatcherThread then
+                    KillThread(self.CloakFieldWatcherThread)
+                    self.CloakFieldWatcherThread = nil
+                end
+
+                if cloaked then
+                    self.CloakFieldWatcherThread = self:ForkThread(self.CloakFieldWatcher)
+                end
+            end
+        end
+    end,
+
+    CloakFieldWatcher = function(self)
+        if self and not self.Dead then
+            local bp = self:GetBlueprint()
+            local radius = bp.Intel.CloakFieldRadius - 2 -- Need to take off 2, because engine reasons
+            local brain = self:GetAIBrain()
+
+            while self and not self.Dead and self:IsIntelEnabled('CloakField') do
+                local pos = self:GetPosition()
+                local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, radius, 'Ally')
+
+                for _, unit in units do
+                    if unit and not unit.Dead and unit ~= self then
+                        if unit.CloakFXWatcherThread then
+                            KillThread(unit.CloakFXWatcherThread)
+                            unit.CloakFXWatcherThread = nil
+                        end
+
+                        unit:UpdateCloakEffect(true, 'Cloak') -- Turn on the FX for the unit
+                        unit.CloakFXWatcherThread = unit:ForkThread(unit.CloakFXWatcher)
+                    end
+                end
+
+                WaitTicks(5)
+            end
+        end
+    end,
+
+    CloakFXWatcher = function(self)
+        WaitTicks(5)
+
+        if self and not self.Dead then
+            self:UpdateCloakEffect(false, 'Cloak')
+        end
+    end,
+
     ShouldWatchIntel = function(self)
         if self:GetBlueprint().Intel.FreeIntel then
             return false
         end
         local bpVal = self:GetBlueprint().Economy.MaintenanceConsumptionPerSecondEnergy
-        --Check enhancements
+        -- Check enhancements
         if not bpVal or bpVal <= 0 then
             local enh = self:GetBlueprint().Enhancements
             if enh then
@@ -2832,9 +2918,9 @@ Unit = Class(moho.unit_methods) {
             bpTable = bpTable[layer].Footfall
             local effects = {}
             local scale = 1
-            local offset = nil
+            local offset
             local army = self:GetArmy()
-            local boneTable = nil
+            local boneTable
 
             if bpTable.Damage then
                 local bpDamage = bpTable.Damage
@@ -2965,7 +3051,7 @@ Unit = Class(moho.unit_methods) {
         local army = self:GetArmy()
         local pos = self:GetPosition()
         local effects = {}
-        local emit = nil
+        local emit
 
         for kBG, vTypeGroup in effectTypeGroups do
             if TerrainType then
@@ -3276,6 +3362,7 @@ Unit = Class(moho.unit_methods) {
     GetSoundEntity = function(self, type)
         if not self.Sounds then self.Sounds = {} end
         if not self.Sounds[type] then
+            local sndEnt
             if self.SoundEntities[1] then
                 sndEnt = table.remove(self.SoundEntities, 1)
             else

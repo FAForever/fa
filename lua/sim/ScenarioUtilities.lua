@@ -509,9 +509,18 @@ function InitializeArmies()
                             ForkThread(function()
                                 WaitSeconds(.1)
                                 local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
+
+                                GetArmyBrain(e):SetupArmyIntelTrigger({
+                                    Category=categories.ALLUNITS,
+                                    Type='LOSNow',
+                                    Value=true,
+                                    OnceOnly=true,
+                                    TargetAIBrain=GetArmyBrain(a),
+                                    CallbackFunction=function()
+                                        SetAlliance(a, e, real_state)
+                                    end,
+                                })
                                 SetAlliance(a, e, 'Ally')
-                                WaitSeconds(1)
-                                SetAlliance(a, e, real_state)
                             end)
                         end
                     end
@@ -554,7 +563,7 @@ function InitializeScenarioArmies()
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
             if tblData.faction ~= nil then
-                if ScenarioInfo.ArmySetup[strArmy].Human then
+                if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
                     SetArmyFactionIndex( strArmy, factionIndex - 1 )
                 else

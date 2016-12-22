@@ -13,14 +13,15 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-RECLAIMLABEL_MIN_MASS = 20
+local minimumLabelMass = 10
 
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self,spec)
+    __init = function(self, spec)
     end,
-    __post_init = function(self,spec)
+
+    __post_init = function(self, spec)
     end,
 
     OnCreate = function(self)
@@ -34,14 +35,26 @@ Prop = Class(moho.prop_methods, Entity) {
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
-        self:SetMaxReclaimValues(
-            economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
-            economy.ReclaimMassMax or 0,
-            economy.ReclaimEnergyMax or 0
-        )
+        local unitWreck = bp.UnitWreckage
+        if not unitWreck then -- This function is called from Wreckage.lua, don't call twice
+            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 -- Set by some maps to reduce the value of starting non-wreck reclaim
+            self:SetMaxReclaimValues(
+                economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
+                (economy.ReclaimMassMax * modifier) or 0,
+                (economy.ReclaimEnergyMax * modifier) or 0
+            )
+        end
 
+        -- Correct to terrain, just to be sure
         local pos = self:GetPosition()
+        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+        if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
+            pos[2] = terrainAltitude
+            Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+        end
+
         self.CachePosition = pos
+
         local max = math.max(50, bp.Defense.MaxHealth)
         self:SetMaxHealth(max)
         self:SetHealth(self, max)
@@ -59,7 +72,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     DoPropCallbacks = function(self, type, param)
         if self.EventCallbacks[type] then
-            for num,cb in self.EventCallbacks[type] do
+            for num, cb in self.EventCallbacks[type] do
                 cb(self, param)
             end
         end
@@ -77,41 +90,41 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Returns the cache position of the prop, since it doesn't move, it's a big optimization
+    -- Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
         return self.CachePosition or self:GetPosition()
     end,
 
-    --Sets if the unit can take damage.  val = true means it can take damage.
-    --val = false means it can't take damage
+    -- Sets if the unit can take damage.  val = true means it can take damage.
+    -- val = false means it can't take damage
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
 
-    --Sets if the unit can be killed.  val = true means it can be killed.
-    --val = false means it can't be killed
+    -- Sets if the unit can be killed.  val = true means it can be killed.
+    -- val = false means it can't be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
-    CheckCanBeKilled = function(self,other)
+    CheckCanBeKilled = function(self, other)
         return self.CanBeKilled
     end,
 
     OnKilled = function(self, instigator, type, exceessDamageRatio )
         if not self.CanBeKilled then return end
-        self:DoPropCallbacks( 'OnKilled' )
+        self:DoPropCallbacks('OnKilled')
         self:Destroy()
     end,
 
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
-        self.CreateReclaimEndEffects( entity, self )
+        self.CreateReclaimEndEffects(entity, self)
         self:Destroy()
     end,
 
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
     Destroy = function(self)
@@ -120,18 +133,29 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     SyncMassLabel = function(self)
-        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            local data = {id = self:GetEntityId()}
-
-            if self:BeenDestroyed() then
-                data.mass = 0
-            else
-                data.mass = self.MaxMassReclaim * self.ReclaimLeft
-                data.position = self:GetCachePosition()
-            end
-
-            table.insert(Sync.Reclaim, data)
+        if self.MaxMassReclaim < minimumLabelMass then
+            -- The prop has never been applicable for labels, ignore it
+            return
         end
+
+        local mass = self.MaxMassReclaim * self.ReclaimLeft
+        if mass < minimumLabelMass and not self.hasLabel then
+            -- The prop doesn't have enough remaining mass and its label has already been removed
+            return
+        end
+
+        local data = {}
+        if not self:BeenDestroyed() and mass >= minimumLabelMass then
+            -- The prop is still around and has enough mass, update the label
+            data.mass = mass
+            data.position = self:GetCachePosition()
+            self.hasLabel = true
+        else
+            -- The prop is no longer applicable for labels, but has an existing label which needs to be removed
+            self.hasLabel = false
+        end
+
+        Sync.Reclaim[self:GetEntityId()] = data
     end,
 
     OnDestroy = function(self)
@@ -179,6 +203,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     -- This function mimics the engine's behavior when calculating what value is left of a prop
+    -- Called from OnDestroy, OnDamage, and OnCreate
     UpdateReclaimLeft = function(self)
         if not self:BeenDestroyed() then
             local max = self:GetMaxHealth()
@@ -207,7 +232,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
     end,
 
-    --Prop reclaiming
+    -- Prop reclaiming
     -- time = the greater of either time to reclaim mass or energy
     -- time to reclaim mass or energy is defined as:
     -- Mass Time =  mass reclaim value / buildrate of thing reclaiming it * BP set mass mult
@@ -236,19 +261,19 @@ Prop = Class(moho.prop_methods, Entity) {
     --
     SplitOnBonesByName = function(self, dirprefix)
         if not dirprefix then
-            -- default dirprefix to parent dir of our own blueprint
+            -- Default dirprefix to parent dir of our own blueprint
             dirprefix = self:GetBlueprint().BlueprintId
 
-            -- trim ".../groups/blah_prop.bp" to just ".../"
+            -- Trim ".../groups/blah_prop.bp" to just ".../"
             dirprefix = string.gsub(dirprefix, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
 
-        for ibone=1, self:GetBoneCount()-1 do
+        for ibone = 1, self:GetBoneCount() - 1 do
             local bone = self:GetBoneName(ibone)
 
-            -- construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
+            -- Construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
             local btrim = string.gsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
 
@@ -266,11 +291,10 @@ Prop = Class(moho.prop_methods, Entity) {
     PlayPropSound = function(self, sound)
         local bp = self:GetBlueprint().Audio
         if bp and bp[sound] then
-            --LOG( 'Playing ', sound )
             self:PlaySound(bp[sound])
             return true
         end
-        --LOG( 'Could not play ', sound )
+
         return false
     end,
 
@@ -279,18 +303,19 @@ Prop = Class(moho.prop_methods, Entity) {
     -- AmbientRumble defined, play that too
     PlayPropAmbientSound = function(self, sound)
         if sound == nil then
-            self:SetAmbientSound( nil, nil )
+            self:SetAmbientSound(nil, nil)
             return true
         else
             local bp = self:GetBlueprint().Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
-                    self:SetAmbientSound( bp[sound], bp.Audio['AmbientRumble'] )
+                    self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])
                 else
-                    self:SetAmbientSound( bp[sound], nil )
+                    self:SetAmbientSound(bp[sound], nil)
                 end
                 return true
             end
+
             return false
         end
     end,

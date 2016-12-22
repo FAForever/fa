@@ -50,13 +50,14 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
+        'DUMMYGSRWEAPON',
     },
     Defense = {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 360,
-        MaxHealth = 360,
+        Health = 250,
+        MaxHealth = 250,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -206,6 +207,32 @@ UnitBlueprint {
         Level5 = 10,
     },
     Weapon = {
+        { -- special dummy weapon to make the unit stop a certain distance away
+            Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = { --what the unit will stop for, flak stops for air as well
+                Land = 'Air|Land|Water',
+                Water = 'Air|Land|Water',
+            },
+            MaxRadius = 28,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret', -- when moving to new unit, update these to something that exists on the unit
+                    },
+                    RackBone = 'Turret',
+                },
+            },
+            RateOfFire = 0.5,
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TrackingRadius = 1.2,
+            Turreted = false,
+            SlavedToBody = false,
+        },
         {
             AlwaysRecheckTarget = true,
             Audio = {
@@ -229,7 +256,7 @@ UnitBlueprint {
             FiringRandomness = 0.2,
             FiringTolerance = 0.5,
             Label = 'AAGun',
-            MaxRadius = 32,
+            MaxRadius = 35,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 45,

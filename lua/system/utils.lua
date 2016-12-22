@@ -305,7 +305,7 @@ end
 --- e.g. table.inverse {foo='x', bar='x'} => possibly {x='bar'} or {x='foo'}
 function table.inverse(t)
     if not t then return {} end -- prevents looping over nil table
-    r = {}
+    local r = {}
     for k,v in t do
         r[v] = k
     end
@@ -352,7 +352,7 @@ end
 --- fn function applied to each value.
 function table.map(fn, t)
     if not t then return {} end -- prevents looping over nil table
-    r = {}
+    local r = {}
     for k,v in t do
         r[k] = fn(v)
     end
@@ -577,18 +577,20 @@ function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
 end
 
-local timeStart = nil
---- Starts timer to check how long a process is taking, useful for optimization
-function TimerStart()
-    timeStart = CurrentTime() 
-end
-
---- Stops timer and returns how much time a process took from calling TimerStart()
-function TimerStop()
-    local timeStop = 0
-    if timeStart then 
-       timeStop  = CurrentTime() - timeStart 
-       timeStart = CurrentTime() -- reset time start
-    end 
-    return string.format("%0.3f seconds", timeStop)
+--- Creates a new, started timer
+function StartedTimer()
+    return {
+        startTime = CurrentTime(),
+        endTime = nil,
+        Stop = function(self)
+            self.endTime = CurrentTime()
+            return self:ToString()
+        end,
+        GetDuration = function(self)
+            return self.endTime - self.startTime
+        end,
+        ToString = function(self)
+            return string.format("%0.3fms", self:GetDuration() * 1000)
+        end
+    }
 end

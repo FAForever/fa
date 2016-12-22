@@ -42,6 +42,8 @@ Weapon = Class(moho.weapon_methods) {
             end
             self:ForkThread(self.AmmoThread, nuke, bp.InitialProjectileStorage)
         end
+
+        self.CollideFriendly = bp.CollideFriendly == true
     end,
 
     AmmoThread = function(self, nuke, amount)

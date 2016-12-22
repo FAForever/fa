@@ -60,6 +60,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYDEFENSE',
+        'DUMMYGSRWEAPON',
     },
     CollisionOffsetZ = 0.05,
     Defense = {
@@ -232,6 +233,34 @@ UnitBlueprint {
     StrategicIconSortPriority = 125,
     Transport = {
         TransportClass = 2,
+    },
+    Weapon = {
+        { -- special dummy weapon to make the unit stop a certain distance away
+            Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = { --what the unit will stop for
+                Land = 'Land|Water',
+                Water = 'Land|Water',
+            },
+            MaxRadius = 33,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret', -- when moving to new unit, update these to something that exists on the unit
+                    },
+                    RackBone = 'Turret',
+                },
+            },
+            RateOfFire = 0.5,
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TrackingRadius = 1.2,
+            Turreted = false,
+            SlavedToBody = false,
+        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

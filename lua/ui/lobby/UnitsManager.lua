@@ -267,7 +267,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN'))
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'AEON'))
 
-    TimerStart()
+    local timer = StartedTimer()
     presetsGrid = Grid(buttonGroup, cellSize, cellSize)
     presetsGrid.Top:Set(function() return buttonGroup.Top() + 6 end)
     presetsGrid.Left:Set(function() return buttonGroup.Left() + 4 end)
@@ -368,7 +368,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         UpdateRestrictionsStats()
     end
 
-    LOG('UnitsManager... created in '.. TimerStop())
+    LOG('UnitsManager... created in '.. timer:Stop())
 end
 
 function UpdateRestrictionsUI(newRestrictions)

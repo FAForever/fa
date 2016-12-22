@@ -319,7 +319,7 @@ Tooltips = {
     },
     xsl0101_toggle = {
         title = "<LOC xsl0101_toggle>Toggle Selection Priority",
-        description = "<LOC xsl0101_toggle_description>Toggles selection priority\nToggles Motion-Cloak ability",
+        description = "<LOC xsl0101_toggle_description>Toggles selection priority",
     },
 
     -- **********************
@@ -718,6 +718,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
     },
+    options_selectedlanguage = {
+        title = "<LOC OPTIONS_0007>Language selection",
+        description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
+    },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
         description = "<LOC OPTIONS_0152>Toggles the display of subtitles during movies",
@@ -805,6 +809,10 @@ Tooltips = {
     options_advanced_statistics = {
         title = "<LOC OPTIONS_0213>Advanced Statistics",
         description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
+    },
+    options_maximum_reclaim_count = {
+        title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
+        description = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
     },
     -- **********************
     -- ** Lobby Strings
@@ -1440,6 +1448,10 @@ Tooltips = {
     CampaignScore_Restart = {
         title = "<LOC tooltipui0383>Restart",
         description = "<LOC tooltipui0384>Restart this Operation from the beginning",
+    },
+    CampaignScore_Feedback = {
+        title = "<LOC tooltipui0707>Post Feedback",
+        description = "<LOC tooltipui0708>Open a forum thread about this mission",
     },
 
     -- **********************
@@ -2099,10 +2111,6 @@ Tooltips = {
     options_gui_improved_unit_deselection = {
         title = '<LOC OPTIONS_0245>Improved Unit deselection',
         description = '<LOC OPTIONS_0270>Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
-    },
-    options_gui_show_reclaim = {
-        title = '<LOC OPTIONS_0246>Show reclaim mass value',
-        description = '<LOC OPTIONS_0271>Holding CTRL+SHIFT brings up an overlay showing the value of reclaimble objects on the map',
     },
     options_gui_zoom_pop_distance = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',

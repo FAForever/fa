@@ -55,6 +55,23 @@ local updateQueue = true --if false then queue won't update in the ui
 local modified = false --if false then buttonrelease will increase buildcount in queue
 local dragLock = false --to disable quick successive drags, which doubles the units in the queue
 
+-- locals for Keybind labels in build queue
+local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local idRelations = {}
+local upgradeKey = false
+local upgradesTo = false
+local allowOthers = true
+
+function setIdRelations(idRelations_, upgradeKey_)
+    idRelations = idRelations_
+    upgradeKey = upgradeKey_
+end
+
+function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
+    upgradesTo = upgradesTo_
+    allowOthers = allowOthers_
+end
+
 if options.gui_draggable_queue ~= 0 then
     --add gameparent handleevent for if the drag ends outside the queue window
     local gameParent = import('gamemain.lua').GetGameParent()
@@ -698,6 +715,9 @@ function CommonLogic()
         return btn
     end
 
+    local key = nil
+    local id = nil
+
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
@@ -816,10 +836,11 @@ function CommonLogic()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
         elseif type == 'item' then
+            local id = control.Data.id
             SetIconTextures(control)
-            control:SetNewTextures(GetBackgroundTextures(control.Data.id))
-            local _, down = GetBackgroundTextures(control.Data.id)
-            control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
+            control:SetNewTextures(GetBackgroundTextures(id))
+            local _, down = GetBackgroundTextures(id)
+            control.tooltipID = LOC(__blueprints[id].Description) or 'no description'
             control:SetOverrideTexture(down)
             control:DisableOverride()
             control.Height:Set(48)
@@ -830,7 +851,7 @@ function CommonLogic()
             control.BuildKey = nil
             if showBuildIcons then
                 local unitBuildKeys = BuildMode.GetUnitKeys(sortedOptions.selection[1]:GetBlueprint().BlueprintId, GetCurrentTechTab())
-                control.Count:SetText(unitBuildKeys[control.Data.id] or '')
+                control.Count:SetText(unitBuildKeys[id] or '')
                 control.Count:SetColor('ffff9000')
             else
                 control.Count:SetText('')
@@ -839,6 +860,15 @@ function CommonLogic()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
+
+            if id == upgradesTo and upgradeKey then
+                hotkeyLabel_addLabel(control, control.Icon, upgradeKey)
+            elseif allowOthers or upgradesTo == nil then
+                local key = idRelations[id]
+                if key then
+                    hotkeyLabel_addLabel(control, control.Icon, key)
+                end
+            end
         elseif type == 'unitstack' then
             SetIconTextures(control)
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
@@ -1722,6 +1752,8 @@ function CreateExtraControls(controlType)
     end
 end
 
+
+local insertIntoTableLowestTechFirst = import('/modules/selectionsort.lua').insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
@@ -1812,17 +1844,18 @@ function FormatData(unitData, type)
         CreateExtraControls('construction')
         SetSecondaryDisplay('buildQueue')
     elseif type == 'selection' then
-        local function SortFunc(unit1, unit2)
-            if unit1.id >= unit2.id then
-                return false
-            else
-                return true
-            end
-        end
+        local sortedUnits = {
+            [1] = {cat = "ALLUNITS", units = {}},
+            [2] = {cat = "LAND", units = {}},
+            [3] = {cat = "AIR", units = {}},
+            [4] = {cat = "NAVAL", units = {}},
+            [5] = {cat = "STRUCTURE", units = {}},
+            [6] = {cat = "SORTCONSTRUCTION", units = {}},
+        }
 
-        local sortedUnits = {}
         local lowFuelUnits = {}
         local idleConsUnits = {}
+
         for _, unit in unitData do
             local id = unit:GetBlueprint().BlueprintId
 
@@ -1837,28 +1870,48 @@ function FormatData(unitData, type)
                 end
                 table.insert(idleConsUnits[id], unit)
             else
-                if not sortedUnits[id] then
-                    sortedUnits[id] = {}
+                local cat = 0
+                for i, t in sortedUnits do
+                    if unit:IsInCategory(t.cat) then
+                        cat = i
+                    end
                 end
-                table.insert(sortedUnits[id], unit)
+
+                if not sortedUnits[cat].units[id] then
+                    sortedUnits[cat].units[id] = {}
+                end
+
+                table.insert(sortedUnits[cat].units[id], unit)
             end
         end
 
-        local displayUnits = true
-        if displayUnits then
-            for i, v in sortedUnits do
-                table.insert(retData, { type = 'unitstack', id = i, units = v })
+        local function insertSpacer(didPutUnits)
+            if didPutUnits then
+                table.insert(retData, { type = 'spacer' })
+                return not didPutUnits
             end
         end
-        for i, v in lowFuelUnits do
-            table.insert(retData, { type = 'unitstack', id = i, units = v, lowFuel = true })
-        end
-        for i, v in idleConsUnits do
-            table.insert(retData, { type = 'unitstack', id = i, units = v, idleCon = true })
+
+        -- Sort selected units into order and insert spaces
+        local didPutUnits = false
+        for _, t in sortedUnits do
+            didPutUnits = insertSpacer(didPutUnits)
+
+            retData, didPutUnits = insertIntoTableLowestTechFirst(t.units, retData, false, false)
         end
 
-        -- Sort unit types
-        table.sort(retData, SortFunc)
+        -- Split out low fuel
+        didPutUnits = insertSpacer(didPutUnits)
+        retData, didPutUnits = insertIntoTableLowestTechFirst(lowFuelUnits, retData, true, false)
+
+        -- Split out idle constructors
+        didPutUnits = insertSpacer(didPutUnits)
+        retData, didPutUnits = insertIntoTableLowestTechFirst(idleConsUnits, retData, false, true)
+
+        -- Remove trailing spacer if there is one
+        if retData[table.getn(retData)].type == 'spacer' then
+            table.remove(retData, table.getn(retData))
+        end
 
         CreateExtraControls('selection')
         SetSecondaryDisplay('attached')

@@ -94,6 +94,13 @@ Blacklist = {
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
 
+    -- Selection Sort
+    ['cfe9131e-9324-4753-a9ca-46972127fe8c'] = INTEGRATED,
+    ['cfe9131e-9324-4753-a9ca-46972127fe8b'] = INTEGRATED,
+
+    -- Hotkey Labels
+    ['e338e34e-58da-11e6-8b77-86f30ca893d3'] = INTEGRATED,
+    
     -- ==================================================================
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- ==================================================================

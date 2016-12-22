@@ -154,12 +154,9 @@ ACUButton = Class(Group) {
     -- @param Should this UI element represent a closed slot?
     SetClosed = function(self, closed)
         -- Opening the slot is a simple matter of deleting the "X".
+        self:RemoveTextOverlay()
+        
         if not closed then
-            if self.textOverlay then
-                self.textOverlay:Destroy()
-                self.textOverlay = nil
-            end
-
             return
         end
 
@@ -168,13 +165,37 @@ ACUButton = Class(Group) {
         self:Clear()
 
         -- Put the little red "X" over the little ACU.
+        self:draw("Crimson","X")
+    end,
+
+    --- Set if the control should represent a "closed - spawn mex" slot. A closed - spawn mex slot is represented with a green
+    -- X drawn over the ACU icon
+    SetClosedSpawnMex = function(self)
+        self:RemoveTextOverlay()
+
+        -- Closing the slot requires clearing other data set on this button.
+        -- Remove any assigned colour and team.
+        self:Clear()
+
+        -- Put the little green "X" over the little ACU.
+        self:draw("2c7f33", "O")
+    end,
+    
+    draw = function(self, color, text)
         local textOverlay = Text(self)
-        textOverlay:SetFont(UIUtil.bodyFont, 14)
-        textOverlay:SetColor("Crimson")
-        textOverlay:SetText("X")
+        textOverlay:SetFont(UIUtil.bodyFont, 20)
+        textOverlay:SetColor(color)
+        textOverlay:SetText(text)
         LayoutHelpers.AtCenterIn(textOverlay, self)
 
         self.textOverlay = textOverlay
+    end,
+    
+    RemoveTextOverlay = function(self)
+        if self.textOverlay then
+            self.textOverlay:Destroy()
+            self.textOverlay = nil
+        end
     end,
 
     -- Override for events...

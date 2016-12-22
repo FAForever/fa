@@ -17,7 +17,6 @@ local Button = import('/lua/maui/button.lua').Button
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local TooltipInfo = import('/lua/ui/help/tooltips.lua')
 local Prefs = import('/lua/user/prefs.lua')
-local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
 local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
@@ -71,6 +70,13 @@ local function CreateOrderGlow(parent)
     end     
 end
 
+local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local orderKeys = {}
+
+function setOrderKeys(orderKeys_)
+    orderKeys = orderKeys_
+end
+
 local function CreateAutoBuildEffect(parent)
     local glow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(glow, parent)
@@ -110,16 +116,6 @@ function CreateMouseoverDisplay(parent, ID)
     
     local text = TooltipInfo['Tooltips'][ID]['title'] or ID
     local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
-    
-    if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
-        for i, v in Keymapping do
-            if v == TooltipInfo['Tooltips'][ID]['keyID'] then
-                local properkeyname = import('/lua/ui/dialogs/keybindings.lua').formatkeyname(i)
-                text = LOCF("%s (%s)", text, properkeyname)
-                break
-            end
-        end
-    end
     
     if not text or not desc then
         return
@@ -1004,7 +1000,12 @@ local function AddOrder(orderInfo, slot, batchMode)
     local row = math.ceil(slot / cols)
     local col = math.mod(slot - 1, cols) + 1
     controls.orderButtonGrid:DestroyItem(col, row, batchMode)
-    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)    
+    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)
+
+    -- Handle Hotbuild labels
+    if orderKeys[orderInfo.helpText] then
+        hotkeyLabel_addLabel(checkbox, checkbox, orderKeys[orderInfo.helpText])
+    end
 
     return checkbox
 end

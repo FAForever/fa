@@ -219,7 +219,6 @@ function UpdateData()
 end
 
 function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
-
     if midGame then
         ExitGame()
         return
@@ -227,7 +226,6 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     scoreScreenActive = true
 
     SessionEndGame()
-
     DisableWorldSounds()
     StopAllSounds()
     UpdateData()
@@ -235,131 +233,141 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
 
     if showCampaign then
-        Prefs.SetToCurrentProfile('last_faction', operationVictoryTable.campaignID)
+        Prefs.SetToCurrentProfile('last_faction', operationVictoryTable.faction)
         ConExecute("ren_Oblivion true")
-        if operationVictoryTable.opKey and operationVictoryTable.opKey ~= '' then
-            local opData = import('/maps/'..operationVictoryTable.opKey..'/'..operationVictoryTable.opKey..'_operation.lua').operationData
-            local successKey = 'failure'
-            if operationVictoryTable.success then
-                successKey = 'success'
-            end
-            if opData.opMovies.postOpMovies[successKey] then
-                GetCursor():Hide()
-                local subtitleThread = false
-                function DisplaySubtitles(textControl,captions)
-                    if subtitleThread then
-                        KillThread(subtitleThread)
-                    end
-                    subtitleThread = ForkThread(
-                        function()
-                            # Display subtitles
-                            local lastOff = 0
-                            for k,v in captions do
-                                WaitSeconds(v.offset - lastOff)
-                                textControl:DeleteAllItems()
-                                locText = LOC(v.text)
-                                local lines = WrapText(locText, textControl.Width(), function(text) return textControl:GetStringAdvance(text) end)
-                                for i,line in lines do
-                                    textControl:AddItem(line)
-                                end
-                                textControl:ScrollToBottom()
-                                lastOff = v.offset
-                            end
-                            subtitleThread = false
-                        end
-                    )
+        local successKey = 'failure'
+        if operationVictoryTable.success then
+            successKey = 'success'
+        end
+        if operationVictoryTable.opData.opMovies.postOpMovies[successKey] then
+            GetCursor():Hide()
+            local subtitleThread = false
+            function DisplaySubtitles(textControl,captions)
+                if subtitleThread then
+                    KillThread(subtitleThread)
                 end
+                subtitleThread = ForkThread(
+                    function()
+                        -- Display subtitles
+                        local lastOff = 0
+                        for k,v in captions do
+                            WaitSeconds(v.offset - lastOff)
+                            textControl:DeleteAllItems()
+                            locText = LOC(v.text)
+                            local lines = WrapText(locText, textControl.Width(), function(text) return textControl:GetStringAdvance(text) end)
+                            for i,line in lines do
+                                textControl:AddItem(line)
+                            end
+                            textControl:ScrollToBottom()
+                            lastOff = v.offset
+                        end
+                        subtitleThread = false
+                    end
+                )
+            end
+            
+            -- Pick a faction movie table of the default one
+            local movies = {}
+            if operationVictoryTable.opData.opMovies.postOpMovies.factionDependant then
+                movies = operationVictoryTable.opData.opMovies.postOpMovies[successKey][operationVictoryTable.faction]
+            else
+                movies = operationVictoryTable.opData.opMovies.postOpMovies[successKey]
+            end
 
-                local faction = operationVictoryTable.campaignID
-                local subtitleSource = import('/lua/ui/game/vo_fmv.lua')
-                local creditData = {
-                    uef = {vid = '/movies/Credits_UEF.sfd', sfx = 'X_FMV_UEF_Credits', voice = 'SCX_UEF_Credits_VO', subtitles = subtitleSource.SCX_UEF_Credits_VO.captions},
-                    cybran = {vid = '/movies/Credits_Cybran.sfd', sfx = 'X_FMV_Cybran_Credits', voice = 'SCX_Cybran_Credits_VO', subtitles = subtitleSource.SCX_Cybran_Credits_VO.captions},
-                    aeon = {vid = '/movies/Credits_Aeon.sfd', sfx = 'X_FMV_Aeon_Credits', voice = 'SCX_Aeon_Credits_VO', subtitles = subtitleSource.SCX_Aeon_Credits_VO.captions},
-                }
-                local movies = {
-                    {vid = '/movies/FMV_SCX_Outro.sfd', sfx = 'X_FMV_Outro', voice = 'SCX_Outro_VO'},
-                    creditData[faction],
-                    {vid = '/movies/FMV_SCX_Post_Outro.sfd', sfx = 'X_FMV_Post_Outro', voice = 'SCX_Post_Outro_VO', subtitles = subtitleSource.SCX_Post_Outro_VO.captions},
-                }
-                local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Campaign Movie ScreenGroup")
-                parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-                AddInputCapture(parent)
+            local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Campaign Movie ScreenGroup")
+            parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+            AddInputCapture(parent)
 
-                local background = Bitmap(parent)
-                LayoutHelpers.FillParent(background, parent)
-                background:SetSolidColor('black')
+            local background = Bitmap(parent)
+            LayoutHelpers.FillParent(background, parent)
+            background:SetSolidColor('black')
 
-                local textArea = ItemList(background)
-                textArea:SetFont(UIUtil.bodyFont, 13)
+            local textArea = ItemList(background)
+            textArea:SetFont(UIUtil.bodyFont, 13)
 
-                textArea:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor,  UIUtil.highlightColor)
+            textArea:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor,  UIUtil.highlightColor)
 
-                local movie = Movie(background)
-                LayoutHelpers.FillParentPreserveAspectRatio(movie, parent)
-                movie.curMovie = 1
+            local movie = Movie(background)
+            LayoutHelpers.FillParentPreserveAspectRatio(movie, parent)
+            movie.curMovie = 1
 
-                local height = 6 * textArea:GetRowHeight()
-                textArea.Height:Set( height )
-                textArea.Top:Set( function() return movie.Bottom() end )
-                textArea.Width:Set( function() return movie.Width() / 2 end )
-                LayoutHelpers.AtHorizontalCenterIn(textArea,parent)
-                textArea.Depth:Set(function() return movie.Depth() + 5 end)
+            local height = 6 * textArea:GetRowHeight()
+            textArea.Height:Set( height )
+            textArea.Top:Set( function() return movie.Bottom() end )
+            textArea.Width:Set( function() return movie.Width() / 2 end )
+            LayoutHelpers.AtHorizontalCenterIn(textArea,parent)
+            textArea.Depth:Set(function() return movie.Depth() + 5 end)
 
-                movie:DisableHitTest()    -- get clicks to parent group
+            movie:DisableHitTest()    -- get clicks to parent group
 
-                movie.OnLoaded = function(self)
-                    movie:Play()
-                    GetCursor():Hide()
-                    if Prefs.GetOption('subtitles') and movies[movie.curMovie].subtitles then
+            local subtitleSource = import('/lua/ui/game/vo_fmv.lua')
+            movie.OnLoaded = function(self)
+                movie:Play()
+                GetCursor():Hide()
+                if Prefs.GetOption('subtitles') and movies[movie.curMovie].subtitles then
+                    -- default is only for original campaign
+                    if movies[movie.curMovie].subtitles == 'default' then
+                        DisplaySubtitles(textArea, subtitleSource[movies[movie.curMovie].voice].captions)
+                    else
                         DisplaySubtitles(textArea, movies[movie.curMovie].subtitles)
                     end
                 end
-
-                local function LeaveMovie()
-                    if movies[movie.curMovie + 1] then
-                        movie.curMovie = movie.curMovie + 1
-                        movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = 'FMV_BG'} ),
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = 'X_FMV'} ))
-                    else
-                        GetCursor():Show()
-                        if subtitleThread then
-                            KillThread(subtitleThread)
-                            subtitleThread = false
-                        end
-                        RemoveInputCapture(parent)
-                        movie:Stop()
-                        parent:Destroy()
-                        CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
-                    end
-                end
-
-                parent.HandleEvent = function(self, event)
-                    -- cancel movie playback on mouse click or key hit
-                    if event.Type == "ButtonPress" or event.Type == "KeyDown" then
-                        if event.KeyCode then
-                            if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == UIUtil.VK_SPACE or event.KeyCode == 1  or event.KeyCode == 3 then
-                            else
-                                return true
-                            end
-                        end
-                        LeaveMovie()
-                        return true
-                    end
-                end
-
-                movie.OnFinished = function(self)
-                    LeaveMovie()
-                end
-
-                movie.curMovie = 0
-                LeaveMovie()
-            else
-                CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             end
+
+            local function LeaveMovie()
+                -- Plays all movies from the <movies> table, then creates score screen
+                if movies[movie.curMovie + 1] then
+                    movie.curMovie = movie.curMovie + 1
+                    -- Play sfx and voice sounds only if available
+                    if movies[movie.curMovie].sfx and movies[movie.curMovie].voice then
+                        movie:Set(movies[movie.curMovie].vid,
+                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ),
+                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                    elseif movies[movie.curMovie].sfx then
+                        movie:Set(movies[movie.curMovie].vid,
+                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ))
+                    elseif movies[movie.curMovie].voice then
+                        movie:Set(movies[movie.curMovie].vid,
+                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                    else
+                        movie:Set(movies[movie.curMovie].vid)
+                    end
+                else
+                    GetCursor():Show()
+                    if subtitleThread then
+                        KillThread(subtitleThread)
+                        subtitleThread = false
+                    end
+                    RemoveInputCapture(parent)
+                    movie:Stop()
+                    parent:Destroy()
+                    CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
+                end
+            end
+
+            parent.HandleEvent = function(self, event)
+                -- cancel movie playback on mouse click or key hit
+                if event.Type == "ButtonPress" or event.Type == "KeyDown" then
+                    if event.KeyCode then
+                        if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == UIUtil.VK_SPACE or event.KeyCode == 1  or event.KeyCode == 3 then
+                        else
+                            return true
+                        end
+                    end
+                    LeaveMovie()
+                    return true
+                end
+            end
+
+            movie.OnFinished = function(self)
+                LeaveMovie()
+            end
+
+            -- Playe the first movie
+            movie.curMovie = 0
+            LeaveMovie()
         else
-            CreateSkirmishScreen(victory, false, operationVictoryTable)
+            CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         end
     else
         CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
@@ -415,7 +423,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     LayoutHelpers.AtTopIn(bg.title, bg, 28)
 
     -- set controls that are global to the dialog
-    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
 	LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
 	LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
 	bg.continueBtn:UseAlphaHitTest(false)
@@ -447,38 +455,29 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     bg.continueBtn.OnClick = function(self, modifiers)
 	    hotstats.clean_view()
         ConExecute("ren_Oblivion false")
-        if showCampaign then
-            operationVictoryTable.allPrimary = true
-            operationVictoryTable.allSecondary = true
-            CampaignManager.OperationVictory(operationVictoryTable, true)
-        end
-
         EscapeHandler.SafeQuit()
     end
-    Tooltip.AddButtonTooltip(bg.continueBtn, 'PostScore_Quit')
+    Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
 
+     -- Rehost button in case of failure
     if showCampaign and not operationVictoryTable.success then
-        bg.continueBtn.label:SetText(LOC('<LOC _Skip>Skip'))
-        bg.continueBtn.HandleEvent = bg.continueBtn.oldHandleEvent
-        Tooltip.AddButtonTooltip(bg.continueBtn, 'CampaignScore_Skip')
-        -- set controls that are global to the dialog
-        bg.restartBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Restart>Restart", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-    	LayoutHelpers.LeftOf(bg.restartBtn, bg.continueBtn, -40)
+        bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    	LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
     	bg.continueBtn:UseAlphaHitTest(false)
 
-    	bg.restartBtn.glow = Bitmap(bg.restartBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.restartBtn.glow, bg.restartBtn)
-    	bg.restartBtn.glow:SetAlpha(0)
-    	bg.restartBtn.glow:DisableHitTest()
+    	bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    	LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
+    	bg.rehostBtn.glow:SetAlpha(0)
+    	bg.rehostBtn.glow:DisableHitTest()
 
-        bg.restartBtn.pulse = Bitmap(bg.restartBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.restartBtn.pulse, bg.restartBtn)
-    	bg.restartBtn.pulse:DisableHitTest()
-    	bg.restartBtn.pulse:SetAlpha(.5)
+        bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    	LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
+    	bg.rehostBtn.pulse:DisableHitTest()
+    	bg.rehostBtn.pulse:SetAlpha(.5)
 
-        EffectHelpers.Pulse(bg.restartBtn.pulse, 2, .5, 1)
+        EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
 
-        bg.restartBtn.OnRolloverEvent = function(self, event)
+        bg.rehostBtn.OnRolloverEvent = function(self, event)
     	   	if event == 'enter' then
     			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
     			self.label:SetColor('black')
@@ -490,11 +489,12 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     		end
     	end
 
-        bg.restartBtn.OnClick = function(self, modifiers)
+        bg.rehostBtn.OnClick = function(self, modifiers)
             ConExecute("ren_Oblivion false")
-            RestartSession()
+            GpgNetSend('Rehost')
+            EscapeHandler.SafeQuit()
         end
-        Tooltip.AddButtonTooltip(bg.restartBtn, 'CampaignScore_Restart')
+        Tooltip.AddButtonTooltip(bg.rehostBtn, 'esc_rehost')
     end
 
     UIUtil.MakeInputModal(dialog, function() bg.continueBtn:OnClick() end, function() bg.continueBtn:OnClick() end)
@@ -505,21 +505,19 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     elapsedTime = UIUtil.CreateText(bg, "", 16, UIUtil.bodyFont)
     LayoutHelpers.RightOf(elapsedTime, elapsedTimeLabel, 5)
 
-    bg.replayButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC uireplay_0003>", 14, 2)
-    LayoutHelpers.AtLeftIn(bg.replayButton, bg, 5)
-    LayoutHelpers.AtBottomIn(bg.replayButton, bg, 20)
-    bg.replayButton.OnClick = function(self, modifiers)
-        import('/lua/ui/dialogs/replay.lua').CreateDialog(bg, false, nil)
-    end
-    Tooltip.AddButtonTooltip(bg.replayButton, "PostScore_Replay")
+    -- Create a Feedback button with a link to the specified forum thread
     if showCampaign then
-        bg.replayButton:Disable()   -- no replays available in campaigns
-    end
-    if import('/lua/ui/game/gamemain.lua').IsSavedGame == true then
-        bg.replayButton:Disable()
-    end
-    if SessionIsReplay() then
-        bg.replayButton:Disable()
+        bg.feedbackButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC _Feedback>Post Feedback", 14, 2)
+        LayoutHelpers.AtLeftIn(bg.feedbackButton, bg, 5)
+        LayoutHelpers.AtBottomIn(bg.feedbackButton, bg, 20)
+        Tooltip.AddButtonTooltip(bg.feedbackButton, "CampaignScore_Feedback")
+        bg.feedbackButton.OnClick = function(self, modifiers)
+            OpenURL(operationVictoryTable.opData.feedbackURL)
+        end
+
+        if not operationVictoryTable.opData.feedbackURL then
+            bg.feedbackButton:Disable()
+        end
     end
 
     -- when a new page is selected, create the page and deal with the tab correctly
@@ -585,11 +583,11 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             LayoutHelpers.AtLeftTopIn(playerText, gridBG, labelXPos.icon + 5, 12)   -- note this is at icon as there is none in the label
             playerText:SetText(LOC("<LOC _Player>"))
 
---            local teamText = MultiLineText(gridBG, UIUtil.titleFont, 16, UIUtil.fontColor)
---            teamText.Width:Set(80)
---            teamText.Height:Set(35)
---            LayoutHelpers.AtLeftTopIn(teamText, gridBG, labelXPos.team, 12)
---            teamText:SetText(LOC("<LOC _Team>"))
+            -- local teamText = MultiLineText(gridBG, UIUtil.titleFont, 16, UIUtil.fontColor)
+            -- teamText.Width:Set(80)
+            -- teamText.Height:Set(35)
+            -- LayoutHelpers.AtLeftTopIn(teamText, gridBG, labelXPos.team, 12)
+            -- teamText:SetText(LOC("<LOC _Team>"))
 
             local sortButtons = {}
             for index, colName in tabData.columns do
@@ -766,7 +764,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             curType = tabData.types[1].scoreKey
         elseif tabData.button == "campaign" then
             -- Set up campaign display
-            local opData = import('/maps/'..operationVictoryTable.opKey..'/'..operationVictoryTable.opKey..'_operation.lua').operationData
+            local opData = operationVictoryTable.opData
 
             local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
                 Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
@@ -774,19 +772,17 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
                 NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
 
-            local successKey = 'failure'
-            if operationVictoryTable.success then
-                successKey = 'success'
-            end
-
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)
             movieGroup.Height:Set(290)
             movieGroup.Width:Set(330)
 
-            local debriefData = opData.opDebriefingFailure[1]
-            if operationVictoryTable.success then
+            -- Set debriefing dialogue if it exists
+            local debriefData = {text = '<NO DATA AVAILABLE>', faction = 'NONE'}
+            if operationVictoryTable.success and opData.opDebriefingSuccess then
                 debriefData = opData.opDebriefingSuccess[1]
+            elseif not operationVictoryTable.success and opData.opDebriefingFailure then
+                debriefData = opData.opDebriefingFailure[1]
             end
 
             local opDebriefMovie = Movie(movieGroup)
@@ -794,33 +790,43 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             LayoutHelpers.AtHorizontalCenterIn(opDebriefMovie, movieGroup)
             opDebriefMovie.Height:Set(192)
             opDebriefMovie.Width:Set(192)
-            opDebriefMovie:Set('/movies/'..debriefData.vid)
+
+            local hasVideo = false
+            if debriefData.vid and GetMovieDuration('/movies/' .. debriefData.vid) ~= 0 then
+                hasVideo = true
+            end
+
+            if hasVideo then
+                opDebriefMovie:Set('/movies/'..debriefData.vid)
+            end
 
             local opDebriefBitmap = Bitmap(opDebriefMovie, UIUtil.UIFile(prefix[debriefData.faction].texture))
             LayoutHelpers.FillParent(opDebriefBitmap, opDebriefMovie)
             opDebriefBitmap.time = 0
             opDebriefBitmap.first = true
-            opDebriefBitmap.OnFrame = function(self, delta)
-                self.time = self.time + delta
-                if self.first then
-                    PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_In'}))
-                    self.first = false
+            if hasVideo then
+                opDebriefBitmap.OnFrame = function(self, delta)
+                    self.time = self.time + delta
+                    if self.first then
+                        PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_In'}))
+                        self.first = false
+                    end
+                    if self.time > 1 then
+                        self:Hide()
+                        self:SetNeedsFrameUpdate(false)
+                        opDebriefMovie:Play()
+                        bg.voHandle = PlayVoice(Sound({Cue = debriefData.cue, Bank = debriefData.bank}))
+                    end
                 end
-                if self.time > 1 then
-                    self:Hide()
-                    self:SetNeedsFrameUpdate(false)
-                    opDebriefMovie:Play()
-                    bg.voHandle = PlayVoice(Sound({Cue = debriefData.cue, Bank = debriefData.bank}))
+
+                opDebriefMovie.OnLoaded = function(self)
+                    opDebriefBitmap:SetNeedsFrameUpdate(true)
                 end
-            end
 
-            opDebriefMovie.OnLoaded = function(self)
-                opDebriefBitmap:SetNeedsFrameUpdate(true)
-            end
-
-            opDebriefMovie.OnFinished = function()
-                opDebriefBitmap:Show()
-                PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_Out'}))
+                opDebriefMovie.OnFinished = function()
+                    opDebriefBitmap:Show()
+                    PlaySound(Sound({Bank='Interface', Cue=prefix[debriefData.faction].cue..'_Out'}))
+                end
             end
 
             local movieBorder = Bitmap(opDebriefMovie, UIUtil.UIFile('/scx_menu/score-victory-defeat/video-frame_bmp.dds'))

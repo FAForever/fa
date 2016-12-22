@@ -226,6 +226,10 @@ UEL0001 = Class(ACUUnit) {
                             Add = bp.NewHealth,
                             Mult = 1.0,
                         },
+                        Regen = {
+                            Add = bp.NewRegenRate,
+                            Mult = 1.0,
+                        },
                     },
                 }
             end
@@ -262,6 +266,10 @@ UEL0001 = Class(ACUUnit) {
                             Add = bp.NewHealth,
                             Mult = 1.0,
                         },
+                        Regen = {
+                            Add = bp.NewRegenRate,
+                            Mult = 1.0,
+                        },
                     },
                 }
             end
@@ -287,6 +295,10 @@ UEL0001 = Class(ACUUnit) {
                     Stacks = 'REPLACE',
                     Duration = -1,
                     Affects = {
+                        MaxHealth = {
+                            Add = bp.NewHealth,
+                            Mult = 1.0,
+                        },
                         Regen = {
                             Add = bp.NewRegenRate,
                             Mult = 1.0,

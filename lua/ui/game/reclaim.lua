@@ -3,23 +3,35 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
-local Reclaim = {}
+local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
+local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
+local LabelPool = {} -- Stores labels up too MaxLabels
+local OldZoom
+local OldPosition
+local ReclaimChanged = true
 
--- called from schook/lua/UserSync.lua
-local NeedUpdate = false
-function UpdateReclaim(r)
-    r.updated = true
-    Reclaim[r.id] = r
+-- Stores/updates a reclaim entity's data using EntityId as key
+-- called from /lua/UserSync.lua
+function UpdateReclaim(syncTable)
+    ReclaimChanged = true
+    for id, data in syncTable do
+        if not data.mass then
+            Reclaim[id] = nil
+        else
+            Reclaim[id] = data
+        end
+    end
 end
 
-local OldZoom
-function SameZoom(camera)
-    if not OldZoom or camera:GetZoom() == OldZoom then
-        return true
+function updateMaxLabels(value)
+    MaxLabels = value
+    ReclaimChanged = true
+    for index = MaxLabels + 1, table.getn(LabelPool) do
+        LabelPool[index]:Destroy()
+        LabelPool[index] = nil
     end
-
-    return false
 end
 
 function OnScreen(view, pos)
@@ -32,7 +44,7 @@ local WorldLabel = Class(Group) {
         Group.__init(self, parent)
         self.parent = parent
         self.proj = nil
-        if position then self:SetPosition(position) end
+        self:SetPosition(position)
 
         self.Top:Set(0)
         self.Left:Set(0)
@@ -45,19 +57,17 @@ local WorldLabel = Class(Group) {
     end,
 
     SetPosition = function(self, position)
-        self.position = position
+        self.position = position or {}
     end,
 
     OnFrame = function(self, delta)
-        if not self:IsHidden() then
-            self:Update()
-        end
+        self:Update()
     end
 }
 
-function CreateReclaimLabel(view, r)
-    local pos = r.position
-    local label = WorldLabel(view, Vector(pos[1], pos[2], pos[3]))
+-- Creates an empty reclaim label
+function CreateReclaimLabel(view)
+    local label = WorldLabel(view, Vector(0, 0, 0))
 
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
@@ -66,28 +76,34 @@ function CreateReclaimLabel(view, r)
     label.mass.Height:Set(14)
     label.mass.Width:Set(14)
 
-    label.text = UIUtil.CreateText(label, math.floor(0.5+r.mass), 10, UIUtil.bodyFont)
+    label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(label.text, label, 16)
     LayoutHelpers.AtVerticalCenterIn(label.text, label)
 
     label:DisableHitTest(true)
-    label.Update = function(self)
-        if self.parent:IsHidden() then return end
-
-        local view = self.parent.view
-        local proj = view:Project(pos)
-        if not self.proj or self.proj.x ~= proj.x or self.proj.y ~= self.proj.y then
-            LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
-            self.proj = proj
-        end
+    label.OnHide = function(self, hidden)
+        self:SetNeedsFrameUpdate(not hidden)
     end
 
-    label.UpdateMass = function(self, r)
-        local mass = tostring(math.floor(0.5+r.mass))
-        if mass ~= self.text:GetText() then
+    label.Update = function(self)
+        local view = self.parent.view
+        local proj = view:Project(self.position)
+        LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
+        self.proj = {x=proj.x, y=proj.y }
+
+    end
+
+    label.DisplayReclaim = function(self, r)
+        if self:IsHidden() then
+            self:Show()
+        end
+        self:SetPosition(r.position)
+        if r.mass ~= self.oldMass then
+            local mass = tostring(math.floor(0.5 + r.mass))
             self.text:SetText(mass)
+            self.oldMass = r.mass
         end
     end
 
@@ -97,112 +113,102 @@ function CreateReclaimLabel(view, r)
 end
 
 function UpdateLabels()
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-    local n_visible = 0
+    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
 
-    for id, r in Reclaim do
-        local label = view.ReclaimGroup.ReclaimLabels[id]
+    local onScreenReclaimIndex = 1
+    local onScreenReclaims = {}
 
-        if not r.mass or r.mass < 1 then
-            if label then
-                label:Destroy()
-                view.ReclaimGroup.ReclaimLabels[id] = nil
-                label = nil
-            end
-            Reclaim[id] = nil
-        elseif OnScreen(view, r.position) then
-            if not label then
-                label = CreateReclaimLabel(view.ReclaimGroup, r)
-                view.ReclaimGroup.ReclaimLabels[id] = label
-            else
-                label:Show()
-                n_visible = n_visible + 1
-            end
-        elseif label then
-            label:Hide()
-        end
+    local offScreenReclaimIndex = 1
+    local offScreenReclaims = {}
 
-        if label and r.updated then
-            label:UpdateMass(r)
-            r.updated = false
-            NeedUpdate = true
+    -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
+    for _, r in Reclaim do
+        r.onScreen = OnScreen(view, r.position)
+        if r.onScreen then
+            onScreenReclaims[onScreenReclaimIndex] = r
+            onScreenReclaimIndex = onScreenReclaimIndex + 1
+        else
+            offScreenReclaims[offScreenReclaimIndex] = r
+            offScreenReclaimIndex = offScreenReclaimIndex + 1
         end
     end
 
-    return view.ReclaimGroup.ReclaimLabels, n_visible
+    table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
+
+    -- Create/Update as many reclaim labels as we need
+    local labelIndex = 1
+    for _, r in onScreenReclaims do
+        if labelIndex > MaxLabels then
+            break
+        end
+        if not LabelPool[labelIndex] then
+            LabelPool[labelIndex] = CreateReclaimLabel(view.ReclaimGroup, r)
+        end
+
+        local label = LabelPool[labelIndex]
+        label:DisplayReclaim(r)
+        labelIndex = labelIndex + 1
+    end
+
+    -- Hide labels we didn't use
+    for index = labelIndex, MaxLabels do
+        local label = LabelPool[index]
+        if label and not label:IsHidden() then
+            label:Hide()
+        end
+    end
 end
 
 local ReclaimThread
 function ShowReclaim(show)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
+    view.ShowingReclaim = show
 
-    if show then
-        view.ShowingReclaim = true
-        if not view.ReclaimThread then
-            view.ReclaimThread = ForkThread(ShowReclaimThread)
-        end
-    else
-        view.ShowingReclaim = false
+    if show and not view.ReclaimThread then
+        view.ReclaimThread = ForkThread(ShowReclaimThread)
     end
 end
 
-function InitReclaimGroup(view, camera)
+function InitReclaimGroup(view)
     if not view.ReclaimGroup or IsDestroyed(view.ReclaimGroup) then
         local rgroup = Group(view)
         rgroup.view = view
         rgroup:DisableHitTest()
         LayoutHelpers.FillParent(rgroup, view)
         rgroup:Show()
-        rgroup.ReclaimLabels = {}
-
-        rgroup.OnFrame = function(self)
-            if not self.update then return end
-            if SameZoom(camera) then
-                self:Show()
-                self:SetNeedsFrameUpdate(false)
-                self.update = false
-            else
-                self:Hide()
-            end
-        end
 
         view.ReclaimGroup = rgroup
-        NeedUpdate = true
+        rgroup:SetNeedsFrameUpdate(true)
     else
         view.ReclaimGroup:Show()
     end
 
+    view.NewViewing = true
 end
 
 function ShowReclaimThread(watch_key)
-    local i = 0
-    local camera = GetCamera("WorldCamera")
     local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local camera = GetCamera("WorldCamera")
 
-    InitReclaimGroup(view, camera)
-    OldZoom = nil
+    InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-        if not view or IsDestroyed(view) then
-            view = import('/lua/ui/game/worldview.lua').viewLeft
-            camera = GetCamera("WorldCamera")
-            InitReclaimGroup(view, camera)
+        local zoom = camera:GetZoom()
+        local position = camera:GetFocusPosition()
+        if ReclaimChanged
+            or view.NewViewing
+            or OldZoom ~= zoom
+            or OldPosition[1] ~= position[1]
+            or OldPosition[2] ~= position[2]
+            or OldPosition[3] ~= position[3] then
+                UpdateLabels()
+                OldZoom = zoom
+                OldPosition = position
+                ReclaimChanged = false
         end
 
-        local sameZoom = SameZoom(camera)
-        local doUpdate = NeedUpdate or not sameZoom
+        view.NewViewing = false
 
-        if doUpdate then
-            local labels, n_visible = UpdateLabels()
-            if not sameZoom and n_visible > 1000 then
-                view.ReclaimGroup:Hide()
-                view.ReclaimGroup.update = true
-                view.ReclaimGroup:SetNeedsFrameUpdate(true)
-            end
-            NeedUpdate = false
-        end
-
-        OldZoom = camera:GetZoom()
         WaitSeconds(.1)
     end
 
@@ -225,7 +231,7 @@ function OnCommandGraphShow(bool)
     local options = Prefs.GetFromCurrentProfile('options')
 
     CommandGraphActive = bool
-    if CommandGraphActive and options.gui_show_reclaim == 1 then
+    if CommandGraphActive then
         ForkThread(function()
             local keydown
             while CommandGraphActive do

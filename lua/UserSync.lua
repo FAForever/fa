@@ -10,6 +10,7 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
+local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
     if Sync.RequestingExit then
@@ -49,7 +50,7 @@ function OnSync()
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
 
-    for id,v in Sync.ReleaseIds do
+    for id, v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
 
@@ -57,8 +58,9 @@ function OnSync()
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
-    for _, r in Sync.Reclaim or {} do
-        import('/lua/ui/game/reclaim.lua').UpdateReclaim(r)
+    -- Each sync, update the user-side data for any prop created, damaged, or destroyed
+    if not table.empty(Sync.Reclaim) then
+        UpdateReclaim(Sync.Reclaim)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then

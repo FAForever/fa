@@ -226,7 +226,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = false,
             Damage = 300,
-            DamageFriendly = false,
+            DamageFriendly = true,
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Long Range Cruise Missile',

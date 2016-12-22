@@ -29,8 +29,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
-
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
+        self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
     DoDamage = function(self, instigator, DamageData, targetEntity)
@@ -281,7 +281,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-		-- if this unit category is on the weapon's do-not-collide list, skip!
+        if not firingWeapon.CollideFriendly and self:GetArmy() == firingWeapon.unit:GetArmy() then
+            return false
+        end
+
+        -- if this unit category is on the weapon's do-not-collide list, skip!
 		local weaponBP = firingWeapon:GetBlueprint()
 		if weaponBP.DoNotCollideList then
 			for k, v in pairs(weaponBP.DoNotCollideList) do
@@ -444,7 +448,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     GetCollideFriendly = function(self)
-        return self.DamageData.CollideFriendly
+        return self.CollideFriendly
     end,
 
     PassData = function(self, data)

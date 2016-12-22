@@ -398,9 +398,6 @@ AIBrain = Class(moho.aibrain_methods) {
     --   val: true or false
     -- calls callback function with blip it saw.
 
-
-
-
     OnIntelChange = function(self, blip, reconType, val)
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
@@ -697,6 +694,10 @@ AIBrain = Class(moho.aibrain_methods) {
                     TransferUnitsToKiller()
                 elseif shareOption == 'Defectors' then
                     TransferUnitsToHighestBrain(BrainCategories.Enemies)
+                else -- Something went wrong in settings. Act like share until death to avoid abuse
+                    WARN('Invalid share condition was used for this game. Defaulting to killing all units')
+                    KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
+                    ReturnBorrowedUnits() -- Give back things I was given by other
                 end
             end
 
