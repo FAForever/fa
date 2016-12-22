@@ -691,7 +691,7 @@ options = {
                 set = function(key, value, startup)
                     import('/lua/ui/game/reclaim.lua').updateMaxLabels(value)
                 end,
-                default = 10,
+                default = 1000,
                 custom = {
                     min = 500,
                     max = 5000,
