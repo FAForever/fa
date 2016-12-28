@@ -1840,6 +1840,7 @@ BaseTransport = Class() {
     end,
 
     DetachCargo = function(self)
+        if self.Dead then return end --due to overkill damage this can get called when trans is hit after it dies and cause errors since it doesnt have any cargo
         local units = self:GetCargo()
         for k, v in units do
             if EntityCategoryContains(categories.TRANSPORTATION, v) then
@@ -1848,12 +1849,16 @@ BaseTransport = Class() {
                 end
             end
             v:DetachFrom()
+            v.falling = true --set flag to kill units on impact.
         end
     end
 }
 
 --- Base class for air transports.
 AirTransport = Class(AirUnit, BaseTransport) {
+
+    DestroyNoFallRandomChance = 1, --tbh i have no idea what this does
+    
     OnTransportAborted = function(self)
     end,
 
@@ -1876,6 +1881,11 @@ AirTransport = Class(AirUnit, BaseTransport) {
         for k, v in self:GetCargo() do
             v:OnStorageChange(loading)
         end
+    end,
+    
+    Kill = function(self, ...) --pure black magic thats called when the unit is killed. not on insta ctrl-k mind you
+        self:DetachCargo()
+        AirUnit.Kill(self, unpack(arg))
     end,
 }
 

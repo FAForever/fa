@@ -2778,6 +2778,12 @@ Unit = Class(moho.unit_methods) {
         if self.LayerChangeTrigger then
             self:LayerChangeTrigger(new, old)
         end
+        
+		--for units falling out of a dead transport - they are destined to die, so we kill them and leave the wreck.
+		if self.falling and (new == 'Land' or new == 'Water') and old == 'Air' then
+			self.falling = nil
+            self:Kill()
+		end
     end,
 
     OnMotionHorzEventChange = function( self, new, old )
