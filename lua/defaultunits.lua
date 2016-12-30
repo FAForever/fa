@@ -1864,8 +1864,8 @@ BaseTransport = Class() {
         local cargo = self:GetCargo()
         for _, unit in cargo do
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
-                for k, u in self:GetCargo() do
-                    u:Kill()
+                for k, subUnit in unit:GetCargo() do
+                    subUnit:Kill()
                 end
             end
             unit.killedInTransport = true
@@ -1888,6 +1888,10 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
+        local cargo = self:GetCargo() -- This code is reached after engine should have killed all the cargo. If there's anything left, detach it.
+        for _, unit in cargo or {} do
+            unit:DetachFrom()
+        end
 
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
