@@ -1537,6 +1537,11 @@ MobileUnit = Class(Unit) {
             self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiSurface')
         end
 
+        if self.killedInTransport then
+            overkillRatio = 0.5
+            self:DetachFrom()
+        end
+
         Unit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
@@ -1856,14 +1861,14 @@ BaseTransport = Class() {
     end,
 
     DetachCargo = function(self)
-        local units = self:GetCargo()
-        for k, v in units do
-            if EntityCategoryContains(categories.TRANSPORTATION, v) then
+        local cargo = self:GetCargo()
+        for _, unit in cargo do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
                 for k, u in self:GetCargo() do
                     u:Kill()
                 end
             end
-            v:DetachFrom()
+            unit.killedInTransport = true
         end
     end
 }
@@ -1883,8 +1888,13 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
+
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
+    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
         self:DetachCargo()
+        AirUnit.Kill(self, unpack(arg))
     end,
 
     OnStorageChange = function(self, loading)
