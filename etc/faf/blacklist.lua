@@ -10,6 +10,8 @@ local HARMFUL = "<LOC uimod_0026>Considered harmful"
 Blacklist = {
 -- Harmful --
     ['C707618F-D9B3-43CE-A181-1AC80D582078'] = HARMFUL, -- PWN Desync
+    ['EF3ADDB4-9D34-437F-B1C8-440DAF896802'] = HARMFUL, -- UI Mass Fab Manager FA by Goom (Causes UI lag because it uses polling rather than interrupts)
+    ['b2cde810-15d0-4bfa-af66-ec2d6ecd561d'] = HARMFUL, -- UI Idle Engineers by camelCase (Causes UI lag because it uses polling rather than interrupts)
 
     -- Auto-adjust netlag (causes desyncs due to interesting race conditions).
     ['9033139e-2701-4ac1-b330-ec984ebc23f9'] = HARMFUL,
@@ -17,6 +19,9 @@ Blacklist = {
     ['xxxx-NetLag-Experimental-v1'] = HARMFUL,
     ['xxxx-NetLag-Experimental-v2'] = HARMFUL,
     ['xxxx-NetLag-Experimental-v3'] = HARMFUL,
+
+-- Broken --
+    ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = BROKEN, -- Experimental Wars
 
 -- Obselete --
 
@@ -75,6 +80,8 @@ Blacklist = {
     ['ba3d087d-ceb7-495a-b606-3e1593750a5d'] = INTEGRATED,
     -- No Strategic Missile Launchers v1.0
     ['9-22b87a0-31c9-12dd-bd11-4583459c9a66'] = INTEGRATED,
+    -- No Mexes
+    ['58a524e0-8143-479a-b38f-4e4513b84cd8'] = INTEGRATED,
 
  -- Upgrade --
     -- Ally overflow (old, broken versions)
