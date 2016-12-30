@@ -276,16 +276,16 @@ StructureUnit = Class(Unit) {
         self.FxBlinkingLightsBag = {}
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
+    CreateDestructionEffects = function( self, overkillRatio )
         -- LOG( bp.General.FactionName, ' ', bp.General.UnitType,' avg. bounding radius = ', explosion.GetAverageBoundingXZRadius( self ) )
         -- LOG( 'CurrentLayer ', self:GetCurrentLayer())
 
         if( explosion.GetAverageBoundingXZRadius( self ) < 1.0 ) then
-            explosion.CreateScalableUnitExplosion( self, overKillRatio )
+            explosion.CreateScalableUnitExplosion( self, overkillRatio )
         else
             explosion.CreateTimedStuctureUnitExplosion( self )
             WaitSeconds( 0.5 )
-            explosion.CreateScalableUnitExplosion( self, overKillRatio )
+            explosion.CreateScalableUnitExplosion( self, overkillRatio )
         end
     end,
 
@@ -444,7 +444,7 @@ StructureUnit = Class(Unit) {
         self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
-    OnKilled = function(self, instigator, type, overKillRatio)
+    OnKilled = function(self, instigator, type, overkillRatio)
         local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
         if scus[1] then
             for _, u in scus do
@@ -453,7 +453,7 @@ StructureUnit = Class(Unit) {
             end
         end
 
-        Unit.OnKilled(self, instigator, type, overKillRatio)
+        Unit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     CheckRepairersForRebuild = function(self, wreckage)
