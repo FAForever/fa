@@ -1491,6 +1491,10 @@ local function AssignAutoTeams()
                 return 3
             end
         end
+    elseif gameInfo.GameOptions.AutoTeams == 'manual' then
+        getTeam = function(playerIndex)
+            return gameInfo.AutoTeams[playerIndex] or 1
+        end
     else
         return
     end
@@ -2614,6 +2618,11 @@ function CreateUI(maxPlayers)
                     HostUtils.UpdateMods()
                     SetGameOptions(options)
                 end
+                for optionKey, data in changedOptions do
+                    if optionKey == 'AutoTeams' then
+                        AssignAutoTeams()
+                    end
+                end
             end
 
             local function exitBehavior()
@@ -3431,7 +3440,7 @@ function RefreshMapPosition(mapCtrl, slotIndex)
 
     -- Evil autoteams voodoo.
     if gameInfo.GameOptions.AutoTeams and not gameInfo.AutoTeams[slotIndex] and lobbyComm:IsHost() then
-        gameInfo.AutoTeams[slotIndex] = 2
+        gameInfo.AutoTeams[slotIndex] = 1
     end
 
     -- The ACUButton instance representing this slot, if any.
@@ -3577,10 +3586,12 @@ function ConfigureMapListeners(mapCtrl, scenario)
                             lobbyComm:BroadcastData(
                                 {
                                     Type = 'AutoTeams',
-                                    Slots = slot,
+                                    Slot = slot,
                                     Team = gameInfo.AutoTeams[slot],
                                 }
                             )
+                            gameInfo.PlayerOptions[slot]['Team'] = gameInfo.AutoTeams[slot]
+                            SetSlotInfo(slot, gameInfo.PlayerOptions[slot])
                             UpdateGame()
                         end
                     end
@@ -3772,6 +3783,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             GUI.becomeObserver:Enable()
 
             SetPlayerOption(data.Slot, 'Ready', false)
+        elseif data.Type == 'AutoTeams' then
+            gameInfo.AutoTeams[data.Slot] = data.Team
+            gameInfo.PlayerOptions[data.Slot]['Team'] = data.Team
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+            UpdateGame()
         end
 
         if lobbyComm:IsHost() then
