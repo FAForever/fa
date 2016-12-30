@@ -140,10 +140,14 @@ mapFilters = {
             {text = "<LOC MAPSEL_0015>6", key = 6},
             {text = "<LOC MAPSEL_0016>7", key = 7},
             {text = "<LOC MAPSEL_0017>8", key = 8},
-            {text = "<LOC lobui_0714>9",  key = 9},
-            {text = "<LOC lobui_0715>10", key = 10},
-            {text = "<LOC lobui_0716>11", key = 11},
-            {text = "<LOC lobui_0717>12", key = 12},
+            {text = "<LOC MAPSEL_0040>9",  key = 9},
+            {text = "<LOC MAPSEL_0041>10", key = 10},
+            {text = "<LOC MAPSEL_0042>11", key = 11},
+            {text = "<LOC MAPSEL_0043>12", key = 12},
+            {text = "<LOC MAPSEL_0044>13", key = 13},
+            {text = "<LOC MAPSEL_0045>14", key = 14},
+            {text = "<LOC MAPSEL_0046>15", key = 15},
+            {text = "<LOC MAPSEL_0047>16", key = 16},
         },
         -- Builds specialised filtering closures for the given filter configuration.
         FilterFactory = {
