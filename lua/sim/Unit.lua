@@ -2742,6 +2742,13 @@ Unit = Class(moho.unit_methods) {
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
         if self.Dead then return end
+        
+		--for units falling out of a dead transport - they are destined to die, so we kill them and leave the wreck.
+		if self.falling and (new == 'Land' or new == 'Water' or new == 'Seabed' or new == 'Sub') and old == 'Air' then
+			self.falling = nil
+            self:Kill()
+            return --we kill the unit so no need to go through the function anymore
+		end
 
         for i = 1, self:GetWeaponCount() do
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
@@ -2778,12 +2785,6 @@ Unit = Class(moho.unit_methods) {
         if self.LayerChangeTrigger then
             self:LayerChangeTrigger(new, old)
         end
-        
-		--for units falling out of a dead transport - they are destined to die, so we kill them and leave the wreck.
-		if self.falling and (new == 'Land' or new == 'Water') and old == 'Air' then
-			self.falling = nil
-            self:Kill()
-		end
     end,
 
     OnMotionHorzEventChange = function( self, new, old )
