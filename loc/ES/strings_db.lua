@@ -8134,7 +8134,6 @@ xsc9010_desc="Cristal de bloqueo"
 xsc9010_help="Cristal de bloqueo"
 xsc9011_desc="Cristal de bloqueo"
 xsc9011_help="Cristal de bloqueo"
-<<<<<<< HEAD
 xsl0001_desc="Unidad de comando blindada"
 xsl0001_help="Unidad de comando blindada"
 xsl0101_desc="Explorador terrestre"
