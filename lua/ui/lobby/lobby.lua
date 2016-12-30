@@ -1154,6 +1154,7 @@ local function autobalance_bestworst(players, teams_arg)
             local team = t['team']
             local slots = t['slots']
             local slot = table.remove(slots, 1)
+            if not slot then continue end
             local player
 
             if best then
@@ -1193,6 +1194,7 @@ local function autobalance_avg(players, teams_arg)
             local team = t['team']
             local slots = t['slots']
             local slot = table.remove(slots, 1)
+            if not slot then continue end
             local player
             local player_key
 
@@ -1232,10 +1234,10 @@ local function autobalance_rr(players, teams)
 
     while table.getsize(players) > 0 do
         for i, pick in team_picks do
+            local slot = table.remove(teams[pick.team], 1)
+            if not slot then continue end
             local player = table.remove(players, 1)
             if not player then break end
-            local slot = table.remove(teams[pick.team], 1)
-            if not slot then break end
             pick.sum = pick.sum + i
 
             table.insert(result, {player=player.pos, rating=player.rating, team=pick.team, slot=slot})
@@ -1262,6 +1264,7 @@ local function autobalance_random(players, teams_arg)
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
+            if not slot then continue end
             local player = table.remove(players, 1)
 
             if not player then break end
