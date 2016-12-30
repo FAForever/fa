@@ -5672,8 +5672,8 @@ function InitHostUtils()
                 SendSystemMessage("lobui_0330", name, gameInfo.GameOptions.ScenarioFile)
                 LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
                 if name == localPlayerName then
-                    LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
-                    SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+                    LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '.. UIUtil.defaultScenario)
+                    SetGameOption('ScenarioFile', UIUtil.defaultScenario)
                 end
             end
         end,
