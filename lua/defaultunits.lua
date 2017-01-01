@@ -1919,7 +1919,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
         self.cargo = self:GetCargo()
-        for _, unit in self.cargo do
+        for _, unit in self.cargo or {} do
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
                 for k, subUnit in unit:GetCargo() do
                     subUnit:Kill()
@@ -1934,7 +1934,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
     KillCrashedCargo = function(self)
         if self:BeenDestroyed() then return end
 
-        for _, unit in self.cargo do
+        for _, unit in self.cargo or {} do
             unit:OnKilled(self, 'Normal', 0)
         end
     end,
