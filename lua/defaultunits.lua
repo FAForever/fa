@@ -2230,6 +2230,7 @@ ACUUnit = Class(CommandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        self.WeaponEnabled = {}
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -2269,18 +2270,66 @@ ACUUnit = Class(CommandUnit) {
 
     ResetRightArm = function(self)
         CommandUnit.ResetRightArm(self)
+
         self:SetWeaponEnabledByLabel('OverCharge', false)
+        self:SetWeaponEnabledByLabel('AutoOverCharge', false)
+
+        -- Ugly hack to re-initialise auto-OC once a task finishes
+        local wep = self:GetWeaponByLabel('AutoOverCharge')
+        wep:SetAutoOvercharge(wep.AutoMode)
     end,
 
     OnPrepareArmToBuild = function(self)
         CommandUnit.OnPrepareArmToBuild(self)
         self:SetWeaponEnabledByLabel('OverCharge', false)
+        self:SetWeaponEnabledByLabel('AutoOverCharge', false)
     end,
 
     GiveInitialResources = function(self)
         WaitTicks(2)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+    end,
+
+    BuildDisable = function(self)
+        while self:IsUnitState('Building') or self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') or
+                self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
+            WaitSeconds(0.5)
+        end
+
+        for label, enabled in self.WeaponEnabled do
+            if enabled then
+                self:SetWeaponEnabledByLabel(label, true, true)
+            end
+        end
+    end,
+
+    -- Store weapon status on upgrade. Ignore default and OC, which are dealt with elsewhere
+    SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
+        CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
+
+        -- Unless lockOut specified, updates the 'Permanent record' of whether a weapon is enabled. With it specified,
+        -- the changing of the weapon on/off state is more... temporary. For example, when building something.
+        if label ~= self.rightGunLabel and label ~= 'OverCharge' and label ~= 'AutoOverCharge' and not lockOut then
+            self.WeaponEnabled[label] = enable
+        end
+    end,
+
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+
+        -- Disable any active upgrade weapons
+        local fork = false
+        for label, enabled in self.WeaponEnabled do
+            if enabled then
+                self:SetWeaponEnabledByLabel(label, false, true)
+                fork = true
+            end
+        end
+
+        if fork then
+            self:ForkThread(self.BuildDisable)
+        end
     end,
 }
 
