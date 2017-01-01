@@ -978,10 +978,6 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
 
-        if self.AutoMode and not self.AutoEnable then
-            self:ForkThread(self.AutoEnable)
-        end
-
         self.enabled = false
     end,
 
