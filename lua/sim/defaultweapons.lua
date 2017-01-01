@@ -890,7 +890,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
             self:OnDisableWeapon()
-            WaitSeconds(1/self:GetBlueprint().RateOfFire)
+            WaitSeconds(1 / self:GetBlueprint().RateOfFire)
             self.unit:SetOverchargePaused(false)
             if self.AutoMode then
                 self:ForkThread(self.AutoEnable)
@@ -900,7 +900,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     AutoEnable = function(self)
         while not self:CanOvercharge() do
-             WaitSeconds(0.1)
+            WaitSeconds(0.1)
         end
 
         if self.AutoMode then
@@ -920,7 +920,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
                 KillThread(self.AutoThread)
                 self.AutoThread = nil
             end
-            if self:IsEnabled() then
+            if self.enabled then
                 self:OnDisableWeapon()
             end
         end
