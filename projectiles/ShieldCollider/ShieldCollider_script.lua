@@ -89,7 +89,12 @@ ShieldCollider = Class(Projectile) {
 
                 -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
                 self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
-
+                
+                if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then --bail if stuffs missing.
+                    WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
+                    return
+                end
+                
                 local initialDamage = self.Plane.DeathCrashDamage
                 local deathWep = self.Plane.deathWep
 
