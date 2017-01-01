@@ -1043,6 +1043,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/ADFOverCharge01/ADFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
