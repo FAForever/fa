@@ -1537,12 +1537,16 @@ MobileUnit = Class(Unit) {
             self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiSurface')
         end
 
+        -- This unit was in a transport
         if self.killedInTransport then
-            overkillRatio = 0.5
-            self:DetachFrom()
-        end
+            if instigator and IsUnit(instigator) then
+                instigator:OnKilledUnit(self)
+            end
 
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+            self.killedInTransport = false
+        else
+            Unit.OnKilled(self, instigator, type, overkillRatio)
+        end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -1860,7 +1864,10 @@ BaseTransport = Class() {
     DestroyedOnTransport = function(self)
     end,
 
+    -- Detaches cargo from a dying unit
     DetachCargo = function(self)
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+
         local cargo = self:GetCargo()
         for _, unit in cargo do
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
@@ -1868,9 +1875,9 @@ BaseTransport = Class() {
                     subUnit:Kill()
                 end
             end
-            unit.killedInTransport = true
+            unit:DetachFrom()
         end
-    end
+    end,
 }
 
 --- Base class for air transports.
@@ -1887,24 +1894,48 @@ AirTransport = Class(AirUnit, BaseTransport) {
         self.transData = {}
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local cargo = self:GetCargo() -- This code is reached after engine should have killed all the cargo. If there's anything left, detach it.
-        for _, unit in cargo or {} do
-            unit:DetachFrom()
-        end
-
-        AirUnit.OnKilled(self, instigator, type, overkillRatio)
+    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
+        self:FlagCargo()
+        AirUnit.Kill(self, unpack(arg))
     end,
 
-    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
-        self:DetachCargo()
-        AirUnit.Kill(self, unpack(arg))
+    -- Override OnImpact to kill all cargo
+    OnImpact = function(self, with, calledFromProj)
+        if self.GroundImpacted or not calledFromProj then return end
+
+        self:KillCrashedCargo()
+        AirUnit.OnImpact(self, with, calledFromProj)
     end,
 
     OnStorageChange = function(self, loading)
         AirUnit.OnStorageChange(self, loading)
         for k, v in self:GetCargo() do
             v:OnStorageChange(loading)
+        end
+    end,
+
+    -- Flags cargo that it's been killed while in a transport
+    FlagCargo = function(self)
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+
+        self.cargo = self:GetCargo()
+        for _, unit in self.cargo do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
+                for k, subUnit in unit:GetCargo() do
+                    subUnit:Kill()
+                end
+            end
+            if not EntityCategoryContains(categories.COMMAND, unit) then
+                unit.killedInTransport = true
+            end
+        end
+    end,
+
+    KillCrashedCargo = function(self)
+        if self:BeenDestroyed() then return end
+
+        for _, unit in self.cargo do
+            unit:OnKilled(self, 'Normal', 0)
         end
     end,
 }
