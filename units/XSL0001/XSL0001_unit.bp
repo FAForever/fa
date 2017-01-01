@@ -1063,6 +1063,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SDFChronatronCannon02/SDFChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
