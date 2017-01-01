@@ -1539,10 +1539,6 @@ MobileUnit = Class(Unit) {
 
         -- This unit was in a transport
         if self.killedInTransport then
-            if instigator and IsUnit(instigator) then
-                instigator:OnKilledUnit(self)
-            end
-
             self.killedInTransport = false
         else
             Unit.OnKilled(self, instigator, type, overkillRatio)
