@@ -1,3 +1,28 @@
+Patch 3668 (Upcoming)
+============================
+### Gameplay
+- New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
+
+### Lobby
+- Use default map from file. This allows coop, tutorials, and other mods to have an easier time
+- Fixed 'Random' faction using 'Random - Unbalanced' tooltip
+- Allow filtering of 13-16 player maps in map selection
+- Fixed 'Autoteams: Manual' resulting in all players being allied
+- Fixed autobalance functions crashing when used with uneven team numbers
+- Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
+- Allow factions to be restricted per slot
+
+### Other
+- Added some mods to Blacklist
+- Allowed hooking of schook files to help future patch mechanism
+
+### Contributors
+- Exotic-Retard
+- IceDreamer
+- Speed2
+- TheKeyBlue
+
+
 Hotfix Patch 3667 (December 22nd, 2016)
 ============================
 - Fixed a typo which was setting the default labels to show onscreen to 10 rather than 1000
