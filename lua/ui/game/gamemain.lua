@@ -41,7 +41,7 @@ local lastObserving
 -- Hotbuild stuff
 modifiersKeys = {}
 
--- Adding modifiers shorcuts on the fly.
+-- Adding modifiers shortcuts on the fly.
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
     if action["category"] == "hotbuilding" then
@@ -160,7 +160,7 @@ function CreateUI(isReplay)
     -- set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
 
-    -- update loc table with player's name
+    -- update localization table with player's name
     local focusarmy = GetFocusArmy()
     if focusarmy >= 1 then
         LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusarmy].nickname
@@ -270,7 +270,7 @@ function CreateUI(isReplay)
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
--- Lets find out max hz capability of adapter so we don't render unecessary frames, should help a bit with render thread at 100%
+-- Let's find out max Hz capability of adapter so we don't render unnecessary frames, should help a bit with render thread at 100%
 function AdjustFrameRate()
     if options.vsync == 1 then return end
 
@@ -473,11 +473,10 @@ end
 
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
---      oldSelection: What the selection was before
---      newSelection: What the selection is now
---      added: Which units were added to the old selection
---      removed: Which units where removed from the old selection
-
+-- @param oldSelection: What the selection was before
+-- @param newSelection: What the selection is now
+-- @param added: Which units were added to the old selection
+-- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
@@ -518,7 +517,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         if not isReplay then
             import('/lua/ui/game/orders.lua').SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
-        -- todo change the current command mode if no longer available? or set to nil?
+        -- TODO change the current command mode if no longer available? or set to nil?
         import('/lua/ui/game/construction.lua').OnSelection(buildableCategories,newSelection,isOldSelection)
     end
 
@@ -698,7 +697,7 @@ function HideGameUI(state)
     end
 end
 
--- Given a userunit that is adjacent to a given blueprint, does it yield a
+-- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
     -- fixme: todo
@@ -767,7 +766,7 @@ function NISMode(state)
         end
         worldView.viewLeft:EnableResourceRendering(preNISSettings.Resources)
         worldView.viewLeft:SetCartographic(preNISSettings.Cartographic)
-        -- Todo: Restore settings of overlays, lifebars properly
+        -- TODO: Restore settings of overlays, life-bars properly
         ConExecute('UI_RenderUnitBars true')
         ConExecute('UI_NisRenderIcons true')
         ConExecute('ren_SelectBoxes true')
