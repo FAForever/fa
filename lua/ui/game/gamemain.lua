@@ -29,9 +29,7 @@ local ordersControl = false
 local OnDestroyFuncs = {}
 
 local NISActive = false
-
 local isReplay = false
-
 local waitingDialog = false
 
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
@@ -71,9 +69,7 @@ end
 
 -- query this to see if the UI is hidden
 gameUIHidden = false
-
 PostScoreVideo = false
-
 IsSavedGame = false
 
 function KillWaitingDialog()
@@ -89,7 +85,6 @@ function SetLayout(layout)
     import('/lua/ui/game/multifunction.lua').SetLayout(layout)
     if not isReplay then
         import('/lua/ui/game/orders.lua').SetLayout(layout)
-
     end
     import('/lua/ui/game/avatars.lua').SetLayout()
     import('/lua/ui/game/unitview.lua').SetLayout(layout)
@@ -195,7 +190,7 @@ function CreateUI(isReplay)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
-        controls.ordersControl  = ordersControl
+        controls.ordersControl = ordersControl
     end
 
     import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
@@ -607,7 +602,7 @@ local _beatFunctions = {}
 -- @param throttle - specifies whether never to run a function more than 10 times per second 
 --                   to reduce UI load when speeding up sim / replay
 function AddBeatFunction(fn, throttle)
-    table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
+    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true})
 end
 
 -- Removes a function callback from calling on sim beats
