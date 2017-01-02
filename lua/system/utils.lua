@@ -351,15 +351,21 @@ function table.indexize(t)
     return r
 end
 
---- Converts a table to a new table with values as keys and values equal to true
+--- Converts a table to a new table with values as keys and values equal to true, duplicated table values are discarded
+--- @parma t    - specifies table with values for hashing
+--- @parma safe - optional boolean for safely hashing of table values by converting them first to strings which is lower method (defaults to false)
 --- it is useful for quickly looking up values in tables instead of looping over it 
---- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C' } => 
---             { [A] = true, [B] = true, [C] = true } 
-function table.hash(t)
+--- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } => 
+---            { [A] = true, [B] = true, [C] = true } 
+function table.hash(t, safe)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     for k, v in t do
-        r[v] = true
+        if safe then
+            r[tostring(v)] = true
+        else
+            r[v] = true
+        end
     end
     return r 
 end
@@ -484,13 +490,12 @@ function table.print(tbl, tblPrefix, printer)
     printer(tblPrefix.." }")
 end
 
---- Filter a table using a function.
---- @param t is a table to filter
---- @param fn is decision function to use to filter the table.
---- @return A new table containing every mapping from t for which fn function returns `true` when passed the value.
+--- Return filtered table containing every mapping from table for which fn function returns true when passed the value.
+--- @param t  - is a table to filter
+--- @param fn - is decision function to use to filter the table, defaults checking if a value is true or exists in table
 function table.filter(t, fn)
     local r = {}
-    if not fn then fn = function(v) return v end end  
+    if not fn then fn = function(v) return v end end
     for k, v in t do
         if fn(v) then
             r[k] = v
@@ -498,6 +503,7 @@ function table.filter(t, fn)
     end
     return r
 end
+
 --- Returns total count of values that match fn function or if values exist in table
 --- @param fn is optional filtering function that is applied to each value of the table
 function table.count(t, fn)
