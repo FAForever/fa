@@ -582,9 +582,8 @@ function OnResume()
     ResumedBy = nil
 end
 
--- Called immediately when the user hits the pause button. This only ever gets
--- called on the machine that initiated the pause (i.e. other network players
-                                                  -- won't call this)
+-- Called immediately when the user hits the pause button on the machine 
+-- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -603,12 +602,15 @@ end
 
 local _beatFunctions = {}
 
--- throttle means never run function more than 10 times per second to reduce
--- UI load when speeding up sim / replay
+-- Adds a function callback that will be called on sim beats
+-- @param fn       - specifies function callback
+-- @param throttle - specifies whether never to run a function more than 10 times per second 
+--                   to reduce UI load when speeding up sim / replay
 function AddBeatFunction(fn, throttle)
     table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
 end
 
+-- Removes a function callback from calling on sim beats
 function RemoveBeatFunction(fn)
     for i,v in _beatFunctions do
         if v.fn == fn then
@@ -618,7 +620,7 @@ function RemoveBeatFunction(fn)
     end
 end
 
--- this function is called whenever the sim beats
+-- Calls function callbacks that were added previously, whenever the sim beat occurs
 local last = 0
 function OnBeat()
     local rate = GetSimRate()
