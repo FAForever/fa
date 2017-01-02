@@ -533,14 +533,21 @@ local _beatFunctions = {}
 -- @param fn       - specifies function callback
 -- @param throttle - specifies whether never to run a function more than 10 times per second 
 --                   to reduce UI load when speeding up sim / replay
-function AddBeatFunction(fn, throttle)
-    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true})
+-- @param key      - specifies optional key used later for removing callbacks by a key 
+function AddBeatFunction(fn, throttle, key)
+    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
 end
 
 -- Removes a function callback from calling on sim beats
-function RemoveBeatFunction(fn)
+-- @param fn  - specifies function callback  
+-- @param key - specifies optional key associated with function callback
+function RemoveBeatFunction(fn, key)
     for i,v in _beatFunctions do
         if v.fn == fn then
+            table.remove(_beatFunctions, i)
+            break
+        end
+        if key and v.key == key then
             table.remove(_beatFunctions, i)
             break
         end
