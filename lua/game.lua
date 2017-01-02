@@ -239,11 +239,10 @@ local function GetUnitsUpgradable()
             bp.General.UpgradesFrom ~= '' and
             bp.General.UpgradesFrom ~= 'none' then
 
-            local cats = table.hash(bp.Categories)
-            if not cats['BUILTBYTIER1ENGINEER'] and
-               not cats['BUILTBYTIER2ENGINEER'] and
-               not cats['BUILTBYTIER3ENGINEER'] and
-               not cats['BUILTBYTIER3COMMANDER'] then
+            if not bp.CategoriesHash['BUILTBYTIER1ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER2ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER3ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER3COMMANDER'] then
 
                local unit = table.deepcopy(bp)
                unit.id = id -- Save id for a reference

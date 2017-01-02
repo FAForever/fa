@@ -1649,17 +1649,14 @@ function EndOperationCamera( unit, track )
     local faction = false
     if EntityCategoryContains( categories.COMMAND, unit ) then
         local bp = unit:GetBlueprint()
-        for k,v in bp.Categories do
-            if v == 'UEF' then
-                faction = 1
-                break
-            elseif v == 'AEON' then
-                faction = 2
-                break
-            elseif v == 'CYBRAN' then
-                faction = 3
-                break
-            end
+        if bp.CategoriesHash.UEF then
+            faction = 1
+        elseif bp.CategoriesHash.AEON then
+            faction = 2
+        elseif bp.CategoriesHash.CYBRAN then
+            faction = 3
+        elseif bp.CategoriesHash.SERAPHIM then
+            faction = 4
         end
     end
     ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), faction, track, unit ,false)
