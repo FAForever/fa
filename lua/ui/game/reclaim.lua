@@ -6,6 +6,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
 local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
+local MinAmount = options.minimum_reclaim_amount or 10
+
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
 local LabelPool = {} -- Stores labels up too MaxLabels
 local OldZoom
@@ -23,6 +25,11 @@ function UpdateReclaim(syncTable)
             Reclaim[id] = data
         end
     end
+end
+
+function updateMinAmount(value)
+    MinAmount = value
+    ReclaimChanged = true
 end
 
 function updateMaxLabels(value)
@@ -121,7 +128,7 @@ function UpdateLabels()
     -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
         r.onScreen = OnScreen(view, r.position)
-        if r.onScreen then
+        if r.onScreen and r.mass >= MinAmount then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
         end
