@@ -118,18 +118,12 @@ function UpdateLabels()
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
 
-    local offScreenReclaimIndex = 1
-    local offScreenReclaims = {}
-
     -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
         r.onScreen = OnScreen(view, r.position)
         if r.onScreen then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
-        else
-            offScreenReclaims[offScreenReclaimIndex] = r
-            offScreenReclaimIndex = offScreenReclaimIndex + 1
         end
     end
 
@@ -228,7 +222,6 @@ local CommandGraphActive = false
 function OnCommandGraphShow(bool)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
-    local options = Prefs.GetFromCurrentProfile('options')
 
     CommandGraphActive = bool
     if CommandGraphActive then
