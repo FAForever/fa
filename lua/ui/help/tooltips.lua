@@ -814,6 +814,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
         description = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
     },
+    options_minimum_reclaim_amount = {
+        title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
+        description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
+    },
     -- **********************
     -- ** Lobby Strings
     -- **********************
