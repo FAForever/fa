@@ -698,6 +698,21 @@ options = {
                     inc = 500,
                 },
             },
+            {
+                title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
+                tip = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
+                key = 'minimum_reclaim_amount',
+                type = 'slider',
+                set = function(key, value, startup)
+                    import('/lua/ui/game/reclaim.lua').updateMinAmount(value)
+                end,
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 300,
+                    inc = 10,
+                },
+            },
         },
     },
     video = {
