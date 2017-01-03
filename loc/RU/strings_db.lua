@@ -7967,6 +7967,8 @@ OPTIONS_0273="Assist Mex to Build Mass Storages"
 OPTIONS_0274="Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages."
 OPTIONS_0275="Maximum Reclaim Label Count"
 OPTIONS_0276="When showing the reclaim label overlay, no more than this many labels will be shown"
+OPTIONS_0277="Minimum Reclaim Label Amount"
+OPTIONS_0278="When showing the reclaim label overlay, items with mass values less than this won't be shown"
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
