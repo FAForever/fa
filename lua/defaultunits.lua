@@ -1779,7 +1779,10 @@ AirUnit = Class(MobileUnit) {
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
-        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
+
+        -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
+        -- It also wouldn't call this code, and hence the carge destruction. Awful!
+        if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
             self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
