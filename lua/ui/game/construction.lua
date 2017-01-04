@@ -2588,7 +2588,7 @@ function UpdateBuildList(newqueue, from)
         DecreaseBuildCountInQueue(i, oldQueue[i].count)
     end
     for i = from, table.getn(newqueue) do
-        blueprint = __blueprints[newqueue[i].id]
+        local blueprint = __blueprints[newqueue[i].id]
         if blueprint.General.UpgradesFrom == 'none' then
             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", newqueue[i].id, newqueue[i].count)
         else
@@ -2614,6 +2614,8 @@ function ButtonReleaseCallback()
         modified = false
         -- Mouse button released so end drag
         dragging = false
+
+        local first_modified_index
         if originalIndex <= index then
             first_modified_index = originalIndex
         else
