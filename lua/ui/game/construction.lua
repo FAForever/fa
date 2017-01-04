@@ -419,7 +419,7 @@ function CreateTabs(type)
             Tooltip.AddControlTooltip(controls.tabs[i].disabledGroup, 'construction_tab_' .. tab .. '_dis')
         end
         desiredTabs = table.getsize(constructionTabs)
-        defaultTabOrder = { t3 = 1, t2 = 2, t1 = 3 }
+        defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
