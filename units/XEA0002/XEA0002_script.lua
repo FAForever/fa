@@ -39,16 +39,19 @@ XEA0002 = Class(TAirUnit) {
 
     OpenState = State() {
         Main = function(self)
+            -- Create the animator to open the fins
             self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen01.sca')
             self.Trash:Add(self.OpenAnim)
+
+            -- Play the fist part of the animation
+            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen01.sca')
             WaitFor(self.OpenAnim)
-            
-            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca' )
-            
-            for k,v in self.HideBones do
+
+            -- Hide desired bones and play part two
+            for _, v in self.HideBones do
                 self:HideBone(v, true)
             end
+            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca')
         end,
     },
 
