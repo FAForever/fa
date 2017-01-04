@@ -947,7 +947,6 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
-            PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             ProjectilesPerOnFire = 1,
