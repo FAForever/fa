@@ -85,14 +85,14 @@ XEB2402 = Class(TAirFactoryUnit) {
     end,
     
     OnKilled = function(self, instigator, type, overkillRatio)
-        if self.Satellite and not self.Satellite:IsDead() and not self.Satellite.IsDying then
+        if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
             self.Satellite:Kill()
         end
         TAirFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
     
     OnDestroy = function(self)
-        if self.Satellite and not self.Satellite:IsDead() and not self.Satellite.IsDying then
+        if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
             self.Satellite:Destroy()
         end
         TAirFactoryUnit.OnDestroy(self)
