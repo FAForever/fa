@@ -635,20 +635,97 @@ function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
 end
 
---- Creates a new, started timer
-function StartedTimer()
+--- Creates timer for profiling task(s) and calculating time delta between consecutive function calls, e.g.
+--- local timer = CreateTimer()
+--- timer:Start() -- then execute some LUA code
+--- timer:Stop() 
+--- or
+--- timer:Start('task1') -- then execute task #1
+--- timer:Stop('task1') 
+--- timer:Start('task2') -- then execute task #2
+--- timer:Stop('task2') 
+function CreateTimer() 
     return {
-        startTime = CurrentTime(),
-        endTime = nil,
-        Stop = function(self)
-            self.endTime = CurrentTime()
-            return self:ToString()
+        tasks = {},
+        -- starts profiling timer for optional task name
+        Start = function(self, name, useLogging)
+            if name then useLogging = true end 
+            name = self:Verify(name) 
+            -- capture start time 
+            self.tasks[name].stop  = nil
+            self.tasks[name].start = CurrentTime()
+            self.tasks[name].calls = self.tasks[name].calls + 1
+            
+            if useLogging then
+                LOG('Timing task: ' ..  name .. ' started' )
+            end
         end,
-        GetDuration = function(self)
-            return self.endTime - self.startTime
+        -- stops profiling timer and calculates stats for optional task name
+        Stop = function(self, name, useLogging)
+            if name then useLogging = true end 
+            name = self:Verify(name)
+            -- capture stop time  
+            self.tasks[name].stop  = CurrentTime() 
+            self.tasks[name].time  = self.tasks[name].stop - self.tasks[name].start
+            self.tasks[name].total = self.tasks[name].total + self.tasks[name].time
+            -- track improvements between consecutive profiling of the same task
+            if self.tasks[name].last then
+               self.tasks[name].delta = self.tasks[name].last - self.tasks[name].time
+            end
+            -- save current time for comparing with the next task profiling 
+            self.tasks[name].last = self.tasks[name].time
+
+            if useLogging then
+                LOG('Timing task: ' ..  name ..' completed in ' ..  self:ToString(name))
+            end
+            return self:ToString(name)
         end,
-        ToString = function(self)
-            return string.format("%0.3fms", self:GetDuration() * 1000)
-        end
+        -- verifies if profiling timer has stats for optional task name
+        Verify = function(self, name)
+            if not name then name = 'default-task' end 
+            if not self.tasks[name] then
+                self.tasks[name] = {} 
+                self.tasks[name].start = nil
+                self.tasks[name].stop  = nil
+                self.tasks[name].delta = nil
+                self.tasks[name].last = nil
+                self.tasks[name].calls = 0
+                self.tasks[name].total = 0
+                self.tasks[name].time  = 0
+            end
+            return name
+        end,
+        -- gets stats for optional task name
+        GetStats = function(self, name)
+            name = self:Verify(name)
+            return self.tasks[name]
+        end,
+        -- gets time for optional task name
+        GetTime = function(self, name)
+            name = self:Verify(name)
+            if not self.tasks[name].start then
+                WARN( 'Timer cannot get time duration for not started task: ' ..  tostring(name) )
+            elseif not self.tasks[name].stop then
+                self:Stop(name)
+            end
+            return string.format("%0.3f seconds", self.tasks[name].time)
+        end, 
+        -- gets time delta between latest and previous profiling of named tasks
+        GetDelta = function(self, name)
+            name = self:Verify(name)
+            if not self.tasks[name].delta then
+                WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) ) 
+            end
+            return string.format("%0.3f seconds", self.tasks[name].delta)
+        end, 
+        -- converts stats for optional named task to string
+        ToString = function(self, name)
+            name = self:Verify(name)
+            local ret = self:GetTime(name)
+            if self.tasks[name].delta > 0 then
+                ret = ret .. ' with delta: ' .. self:GetDelta(name)
+            end
+            return ret
+         end
     }
 end
