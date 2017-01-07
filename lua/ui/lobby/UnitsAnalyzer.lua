@@ -1171,8 +1171,9 @@ function DidModsChanged()
 end
 
 -- Gets unit blueprints by loading them from the game and given active sim mods
-local function GetBlueprints(activeMods, skipGameFiles)
-    local timer = StartedTimer()
+function GetBlueprints(activeMods, skipGameFiles)
+    local timer = CreateTimer()
+    timer:Start()
 
     -- Load original FA blueprints only once
     local loadedGameFiles = table.getsize(blueprints.Original) > 0
@@ -1210,22 +1211,23 @@ local function GetBlueprints(activeMods, skipGameFiles)
                 CacheUnit(bp)
             end
         end
-        state = state .. ' loaded '
+        state = state .. ' loaded: '
     else
-        state = state .. ' cached '
+        state = state .. ' cached: '
     end
-    info = state.. table.getsize(projectiles.All) .. ' total ('
+    info = state .. table.getsize(projectiles.All) .. ' total ('
     info = info .. table.getsize(projectiles.Original) .. ' original, '
     info = info .. table.getsize(projectiles.Modified) .. ' modified), and '
     info = info .. table.getsize(projectiles.Skipped) .. ' skipped projectiles'
     Show('STATUS', info)
 
-    info = state.. table.getsize(blueprints.All) .. ' total ('
+    info = state .. table.getsize(blueprints.All) .. ' total ('
     info = info .. table.getsize(blueprints.Original) .. ' original, '
     info = info .. table.getsize(blueprints.Modified) .. ' modified), and '
     info = info .. table.getsize(blueprints.Skipped) .. ' skipped units'
-    info = info .. ' in ' .. timer:Stop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
+    info = info .. ' and skipped game files: ' .. tostring(skipGameFiles) ..')'
     Show('STATUS', info)
+    Show('STATUS', state .. 'in ' .. timer:Stop())
 
     return blueprints
 end
