@@ -25,16 +25,22 @@ presets.Data     = UnitsRestrictions.GetPresetsData()
 presets.Order    = UnitsRestrictions.GetPresetsOrder()
 
 local factions = {} 
-local unitsGrid = nil
-local presetsGrid = nil
 
--- Stores references to checkboxes for quick toggling of Presets and Units 
-local checkboxes = { Units = {}, Presets = {} }
-
--- Store current IDs of units restricted by Presets and Custom selection
+-- Stores all UI elements of the UnitsManager
+local GUI = {
+    bg = nil,
+    popup = nil,
+    title = nil,
+    stats = nil, 
+    unitsGrid = nil,
+    presetsGrid = nil,
+    -- stores references to checkboxes for quick toggling of Presets and Units 
+    checkboxes = { Units = {}, Presets = {} }
+}
+  
+-- Stores current IDs of units restricted by Presets and Custom selection
 local restrictions = { Custom = {}, Presets = {}, Stats = {} }
  
-local statsText = nil 
 local initFontSize = 13
 local unitFontSize = 0 -- Calculated when dialog is created
 local dialogMaxWidth = 1920  -- Used to determine scaling of icons/fonts
@@ -178,6 +184,7 @@ local sortBy = {
     },
 }
 
+local timer = CreateTimer()
 --==============================================================================
 -- Create a dialog allowing the user to select categories of unit to disable
 -- @param parent - Parent UI control to create the dialog inside.
@@ -189,8 +196,12 @@ local sortBy = {
 -- @param isHost If false, the control will be read-only.
 --==============================================================================
 function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
+
+    timer:Reset()
+    timer:Start('CreateUnitsManager', true)
+
     presets.Selected = {}
-    checkboxes = { Units = {}, Presets = {} }
+    GUI.checkboxes = { Units = {}, Presets = {} }
     restrictions = {}
     restrictions.Editable = isHost -- Editable only if hosting
     restrictions.Custom = {}
@@ -208,79 +219,91 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     unitFontSize = math.ceil(initFontSize * (dialogWidth / dialogMaxWidth))
     unitFontSize = math.max(unitFontSize, 8)
 
-    local dialogContent = Group(parent)
-    dialogContent.Width:Set(dialogWidth)
-    dialogContent.Height:Set(dialogHeight)
+    GUI.bg = Group(parent)
+    GUI.bg.Width:Set(dialogWidth)
+    GUI.bg.Height:Set(dialogHeight)
 
-    local popup = Popup(parent, dialogContent)
     function doCancel()
         OnCancel()
-        popup:Close()
+        GUI.popup:Close()
     end
+    GUI.popup = Popup(parent, GUI.bg)
+    GUI.popup.OnShadowClicked = doCancel
+    GUI.popup.OnEscapePressed = doCancel
 
-    popup.OnShadowClicked = doCancel
-    popup.OnEscapePressed = doCancel
-
-    local title = UIUtil.CreateText(dialogContent, "<LOC restricted_units_dlg_0000>Unit Manager", 20, UIUtil.titleFont)
-    LayoutHelpers.AtTopIn(title, dialogContent, 6)
-    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
-
-    statsText = UIUtil.CreateText(dialogContent, "", 14, UIUtil.bodyFont)
-    statsText:SetColor('ff8C8C8C')
-    LayoutHelpers.AtTopIn(statsText, dialogContent, 10)
-    LayoutHelpers.AtRightIn(statsText, dialogContent, 10)
-    Tooltip.AddControlTooltip(statsText, {
-        text = 'Current Restrictions',
-        body = 'Restrictions are set using Presets (first two rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
-            .. 'To minimize number of restrictions, first select custom restrictions and then preset restrictions.' })
-
-    local cancelBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
-    LayoutHelpers.AtBottomIn(cancelBtn, dialogContent, 5)
-    LayoutHelpers.AtHorizontalCenterIn(cancelBtn, dialogContent)
-
-    local okBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
-    okBtn.Left:Set(function() return cancelBtn.Left() - 120 end)
-    LayoutHelpers.AtBottomIn(okBtn, dialogContent, 5)
-
-    local resetBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Reset>")
-    resetBtn.Left:Set(function() return cancelBtn.Left() + 120 end)
-    LayoutHelpers.AtBottomIn(resetBtn, dialogContent, 5)
-    Tooltip.AddButtonTooltip(resetBtn, 'options_reset_all')
-
-    local buttonGroup = Group(dialogContent)
-    LayoutHelpers.AtLeftIn(buttonGroup, dialogContent, 6)
-    buttonGroup.Top:Set(function() return title.Bottom() - 2 end)
-    buttonGroup.Bottom:Set(resetBtn.Top)
-    buttonGroup.Width:Set(function() return dialogContent.Width() - 12 end)
-    buttonGroup:DisableHitTest()
+    timer:Start('CreateControls')
+    CreateControls(initial, OnOk, doCancel, isHost)
+    timer:Stop('CreateControls')
 
     if not isHost then
-        cancelBtn.label:SetText(LOC("<LOC _Close>"))
-        resetBtn:Hide()
-        okBtn:Hide()
+        GUI.cancelBtn.label:SetText(LOC("<LOC _Close>"))
+        GUI.resetBtn:Hide()
+        GUI.okBtn:Hide()
     end
 
-    factions = {} -- Reset factions
-    blueprints = import('/lua/ui/lobby/lobby.lua').GetBlueprintList()
+    factions = {} -- Reset factions 
+
+    timer:Start('GetBlueprints')
+    --blueprints = import('/lua/ui/lobby/lobby.lua').GetBlueprintList()
+    blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprints(Mods.GetGameMods(), false)
+    timer:Stop('GetBlueprints')
+     
+    timer:Start('GetUnitsGroups')
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'SERAPHIM'))
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'UEF'))
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN'))
     table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'AEON'))
+    timer:Stop('GetUnitsGroups')
+     
+    GUI.content = Group(GUI.bg)
+    LayoutHelpers.AtLeftIn(GUI.content, GUI.bg, 6)
+    GUI.content.Top:Set(function() return GUI.title.Bottom() - 2 end)
+    GUI.content.Bottom:Set(GUI.resetBtn.Top)
+    GUI.content.Width:Set(function() return GUI.bg.Width() - 12 end)
+    GUI.content:DisableHitTest()
 
-    local timer = StartedTimer()
-    presetsGrid = Grid(buttonGroup, cellSize, cellSize)
-    presetsGrid.Top:Set(function() return buttonGroup.Top() + 6 end)
-    presetsGrid.Left:Set(function() return buttonGroup.Left() + 4 end)
-    presetsGrid.Height:Set(function() return cellSize * 2 end)
-    presetsGrid.Width:Set(function() return buttonGroup.Width() - 4 end)
-    presetsGrid:DeleteAndDestroyAll(true) -- Clear grid
-    presetsGrid.rows = 2
-    presetsGrid.cols = cellMax
-    presetsGrid:AppendCols(presetsGrid.cols, true)
-    presetsGrid:AppendRows(presetsGrid.rows, true)
+    timer:Start('CreatePresetsGrid')
+    CreatePresetsGrid()
+    timer:Stop('CreatePresetsGrid')
+
+    timer:Start('CreateUnitsGrid')
+    CreateUnitsGrid()
+    timer:Stop('CreateUnitsGrid')
+    
+    GUI.scrollbar = UIUtil.CreateLobbyVertScrollbar(GUI.unitsGrid, -dialogScrollWidth)
+    if not GUI.unitsGrid:IsScrollable("Vert") then
+        GUI.scrollbar:Hide()
+    end
+    
+    timer:Start('UpdateRestrictions')
+    -- Set initial restrictions if there are any
+    if initial then
+        UpdateRestrictionsUI(initial)
+    end
+
+    UpdateRestrictionsStats()
+    timer:Stop('UpdateRestrictions')
+     
+    --timer:Print()
+    LOG('SortUnits completed in ' .. timer:GetTotal('SortUnits'))
+
+    timer:Stop('CreateUnitsManager', true)
+end
+
+-- Creates a grid with buttons representing all restriction presets defined in UnitsRestrictions.lua
+function CreatePresetsGrid()
+    GUI.presetsGrid = Grid(GUI.content, cellSize, cellSize)
+    GUI.presetsGrid.Top:Set(function() return GUI.content.Top() + 6 end)
+    GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + 4 end)
+    GUI.presetsGrid.Height:Set(function() return cellSize * 2 end)
+    GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - 4 end)
+    GUI.presetsGrid:DeleteAndDestroyAll(true) -- Clear grid
+    GUI.presetsGrid.rows = 2
+    GUI.presetsGrid.cols = cellMax
+    GUI.presetsGrid:AppendCols(GUI.presetsGrid.cols, true)
+    GUI.presetsGrid:AppendRows(GUI.presetsGrid.rows, true)
 
     local index = 0
-    local lastRow = 0
     local column = 1
     local row = 1
     for _, presetName in presets.Order do
@@ -290,36 +313,35 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
             row = math.floor(index / presets.PerRow) + 1
             column = math.mod(index, presets.PerRow) + 2
 
-            local icon = CreatePresetIcon(presetsGrid, preset.key)
-            CreateGridCell(presetsGrid, icon, column, row)
-        end
-
+            local icon = CreatePresetIcon(GUI.presetsGrid, preset.key)
+            CreateGridCell(GUI.presetsGrid, icon, column, row)
+        end 
         index = index + 1
     end
-
-    presetsGrid:EndBatch()
-    unitsGrid = Grid(buttonGroup, cellSize, cellSize)
-    unitsGrid.Top:Set(function() return presetsGrid.Bottom() + 6 end)
-    unitsGrid.Left:Set(function() return buttonGroup.Left() + 4 end)
-    unitsGrid.Bottom:Set(function() return buttonGroup.Bottom() - 2 end)
-    unitsGrid.Width:Set(function() return buttonGroup.Width() - 4 end)
-    unitsGrid:DeleteAndDestroyAll(true) -- Clear grid
-    unitsGrid.rows = 25
-    unitsGrid.cols = cellMax
-    unitsGrid:AppendCols(unitsGrid.cols, true)
-    unitsGrid:AppendRows(unitsGrid.rows, true)
-    unitsGrid.HandleEvent = function(self, event)
+    GUI.presetsGrid:EndBatch()
+end
+-- Creates a grid with buttons representing all original units and modded units (if game mods are enabled) 
+function CreateUnitsGrid()
+    GUI.unitsGrid = Grid(GUI.content, cellSize, cellSize)
+    GUI.unitsGrid.Top:Set(function() return GUI.presetsGrid.Bottom() + 6 end)
+    GUI.unitsGrid.Left:Set(function() return GUI.content.Left() + 4 end)
+    GUI.unitsGrid.Bottom:Set(function() return GUI.content.Bottom() - 2 end)
+    GUI.unitsGrid.Width:Set(function() return GUI.content.Width() - 4 end)
+    GUI.unitsGrid:DeleteAndDestroyAll(true) -- Clear grid
+    GUI.unitsGrid.rows = 25
+    GUI.unitsGrid.cols = cellMax
+    GUI.unitsGrid:AppendCols(GUI.unitsGrid.cols, true)
+    GUI.unitsGrid:AppendRows(GUI.unitsGrid.rows, true)
+    GUI.unitsGrid.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             local delta = event.WheelRotation > 0 and -1 or 1
             self:ScrollLines("Vert", delta)
             return true
         end
-
         return false
     end
-    local gridScrollbar = UIUtil.CreateLobbyVertScrollbar(unitsGrid, -dialogScrollWidth)
-
-    column = 1
+    
+    local column = 1
     for _, faction in factions do
         name = faction.Name
         column = CreateGridColumn(name, faction.Units.NAVAL, column, sortBy.TECH)
@@ -332,19 +354,40 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         column = CreateGridColumn(name, faction.Units.SCU, column,sortBy.UPGRADES)
         column = CreateGridColumn(name, faction.Units.ACU, column,sortBy.UPGRADES)
     end
-    unitsGrid:EndBatch()
-    if not unitsGrid:IsScrollable("Vert") then
-        gridScrollbar:Hide()
-    end
+    GUI.unitsGrid:EndBatch()
+end
 
-    -- Set initial restrictions if there are any
-    if initial then
-        UpdateRestrictionsUI(initial)
-    end
+function CreateControls(initial, OnOk, OnCancel, isHost)
+    
+    GUI.title = UIUtil.CreateText(GUI.bg, "<LOC restricted_units_dlg_0000>Unit Manager", 20, UIUtil.titleFont)
+    LayoutHelpers.AtTopIn(GUI.title, GUI.bg, 6)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.bg)
 
-    UpdateRestrictionsStats()
-    cancelBtn.OnClick = doCancel
-    okBtn.OnClick = function()
+    GUI.stats = UIUtil.CreateText(GUI.bg, "", 14, UIUtil.bodyFont)
+    GUI.stats:SetColor('ff8C8C8C') -- #ff8C8C8C
+    LayoutHelpers.AtTopIn(GUI.stats, GUI.bg, 10)
+    LayoutHelpers.AtRightIn(GUI.stats, GUI.bg, 10)
+    Tooltip.AddControlTooltip(GUI.stats, {
+        text = 'Current Restrictions',
+        body = 'Restrictions are set using Presets (first two rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
+            .. 'To minimize number of restrictions, first select custom restrictions and then preset restrictions.' })
+    
+    GUI.cancelBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Cancel>")
+    LayoutHelpers.AtBottomIn(GUI.cancelBtn, GUI.bg, 5)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.cancelBtn, GUI.bg)
+
+    GUI.okBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Ok>")
+    GUI.okBtn.Left:Set(function() return GUI.cancelBtn.Left() - 120 end)
+    LayoutHelpers.AtBottomIn(GUI.okBtn, GUI.bg, 5)
+
+    GUI.resetBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Reset>")
+    GUI.resetBtn.Left:Set(function() return GUI.cancelBtn.Left() + 120 end)
+    LayoutHelpers.AtBottomIn(GUI.resetBtn, GUI.bg, 5)
+    Tooltip.AddButtonTooltip(GUI.resetBtn, 'options_reset_all')
+
+    GUI.cancelBtn.OnClick = doCancel
+
+    GUI.okBtn.OnClick = function()
         local newRestrictions = {}
         -- Read current restrictions and pass them to game options
         for key, isChecked in presets.Selected do
@@ -359,33 +402,66 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         end
 
         OnOk(newRestrictions)
-        popup:Close()
+        GUI.popup:Close()
     end
 
-    resetBtn.OnClick = function()
+    GUI.resetBtn.OnClick = function()
         TogglePresetCheckboxes(false)
         ToggleUnitCheckboxes(false)
         UpdateRestrictionsStats()
     end
+    
+    GUI.controls = {}
+    table.insert(GUI.controls, GUI.title)
+    table.insert(GUI.controls, GUI.stats)
+    table.insert(GUI.controls, GUI.cancelBtn)
+    table.insert(GUI.controls, GUI.okBtn)
+    table.insert(GUI.controls, GUI.resetBtn)
 
-    LOG('UnitsManager... created in '.. timer:Stop())
 end
+
+-- Closes dialog and cleans up its UI elements
+function CloseDialog()
+    for id, control in GUI.controls or {} do
+        if control then 
+           control:Destroy()  
+        end 
+    end
+    GUI.controls = nil
+
+    for _, checkbox in GUI.checkboxes.Units do
+        if checkbox then 
+           checkbox:Destroy()  
+        end 
+    end
+    for _, checkbox in GUI.checkboxes.Presets do
+        if checkbox then 
+           checkbox:Destroy()  
+        end 
+    end
+    GUI.checkboxes = { Units = {}, Presets = {} }
+
+    if GUI.popup then
+       GUI.popup:Close()
+    end
+end
+
 
 function UpdateRestrictionsUI(newRestrictions)
     -- Order of updating restrictions is important and 
     -- custom restrictions must be set first
     -- then preset restrictions or state of checkboxes will be wrong 
     for _, restriction in newRestrictions do
-        if checkboxes.Units[restriction] then
+        if GUI.checkboxes.Units[restriction] then
             restrictions.Custom[restriction] = true
-            for _, chkbox in checkboxes.Units[restriction] do
+            for _, chkbox in GUI.checkboxes.Units[restriction] do
                 chkbox:SetCheck(true, false)
             end
         end
         if presets.Data[restriction] then
             presets.Selected[restriction] = true
-            if checkboxes.Presets[restriction] then
-               checkboxes.Presets[restriction]:SetCheck(true, false)
+            if GUI.checkboxes.Presets[restriction] then
+               GUI.checkboxes.Presets[restriction]:SetCheck(true, false)
             end
         end
     end
@@ -423,7 +499,7 @@ function UpdateRestrictionsStats()
     local info = restrictions.Stats.Total .. ' Restrictions = ' ..
                  restrictions.Stats.Custom .. ' Custom + ' ..
                  restrictions.Stats.Presets .. ' Presets (' .. restrictions.Stats.Units .. ')'
-    statsText:SetText(info)
+    GUI.stats:SetText(info)
 
     return restrictions.Stats
 end 
@@ -553,10 +629,10 @@ function CreateUnitIcon(parent, bp, faction)
 
     -- Some enhancements/units might be shared between factions so
     -- collect similar checkboxes in the same table using their ID as table key
-    if not checkboxes.Units[bp.ID] then
-        checkboxes.Units[bp.ID] = {}
+    if not GUI.checkboxes.Units[bp.ID] then
+        GUI.checkboxes.Units[bp.ID] = {}
     end
-    table.insert(checkboxes.Units[bp.ID], checkbox)
+    table.insert(GUI.checkboxes.Units[bp.ID], checkbox)
 
     control.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then 
@@ -597,8 +673,8 @@ function CreateUnitIcon(parent, bp, faction)
             end
 
             -- Update checkboxes with the same blueprint IDs, e.g. Teleporter
-            if checkboxes.Units[self.bp.ID] then
-                for _, chkbox in checkboxes.Units[self.bp.ID] do
+            if GUI.checkboxes.Units[self.bp.ID] then
+                for _, chkbox in GUI.checkboxes.Units[self.bp.ID] do
                     chkbox:HandleEvent(event)
                 end
             end
@@ -666,7 +742,7 @@ function CreatePresetIcon(parent, presetName)
     checkbox:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(checkbox, control)
     LayoutHelpers.AtHorizontalCenterIn(checkbox, control)
-    checkboxes.Presets[presetName] = checkbox
+    GUI.checkboxes.Presets[presetName] = checkbox
 
     local presetTooltip = {
         text = preset.name,
@@ -692,7 +768,7 @@ function CreatePresetIcon(parent, presetName)
             else
                presets.Selected[self.presetName] = true
             end
-            checkboxes.Presets[self.presetName]:HandleEvent(event)
+            GUI.checkboxes.Presets[self.presetName]:HandleEvent(event)
             ProcessRestrictions()
 
             return true
@@ -712,7 +788,7 @@ end
 function TogglePresetCheckboxes(isChecked)
     for name, _ in presets.Selected do
         presets.Selected[name] = isChecked
-        checkboxes.Presets[name]:SetCheck(isChecked)
+        GUI.checkboxes.Presets[name]:SetCheck(isChecked)
     end
 end
 
@@ -725,7 +801,7 @@ function ToggleUnitCheckboxes(isChecked)
         restrictions.Presets[ID] = isChecked
     end
 
-    for _, chkboxes in checkboxes.Units do
+    for _, chkboxes in GUI.checkboxes.Units do
         for __, chkbox in chkboxes do
             chkbox:SetCheck(isChecked)
         end
@@ -767,7 +843,7 @@ function ProcessRestrictions()
         end
     end
 
-    for bpID, chkboxes in checkboxes.Units do
+    for bpID, chkboxes in GUI.checkboxes.Units do
         local unit = blueprints.All[bpID]
         local isRestricted = false
 
@@ -809,11 +885,14 @@ function CreateGridColumn(faction, units, col, sortCategories, sortReversed)
     local unitsCount = table.getsize(units) or 0
     if unitsCount == 0 then return col end
 
+    timer:Start('SortUnits', false)
     local unitsSorted = SortUnits(units, sortCategories, sortReversed)
+    timer:Stop('SortUnits', false)
+
     local row = 1
     for unitID, unit in unitsSorted do
-        local unitIcon = CreateUnitIcon(unitsGrid, unit, faction)
-        CreateGridCell(unitsGrid, unitIcon, col, row)
+        local unitIcon = CreateUnitIcon(GUI.unitsGrid, unit, faction)
+        CreateGridCell(GUI.unitsGrid, unitIcon, col, row)
         row = row + 1
     end
     col = col + 1
