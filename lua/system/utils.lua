@@ -646,10 +646,12 @@ end
 --- timer:Stop('task2') 
 function CreateTimer() 
     return {
-        tasks = {},
+        tasks = {}, 
+        Reset = function(self)
+            self.tasks = {}
+        end,
         -- starts profiling timer for optional task name
         Start = function(self, name, useLogging)
-            if name then useLogging = true end 
             name = self:Verify(name) 
             -- capture start time 
             self.tasks[name].stop  = nil
@@ -662,7 +664,6 @@ function CreateTimer()
         end,
         -- stops profiling timer and calculates stats for optional task name
         Stop = function(self, name, useLogging)
-            if name then useLogging = true end 
             name = self:Verify(name)
             -- capture stop time  
             self.tasks[name].stop  = CurrentTime() 
@@ -685,10 +686,11 @@ function CreateTimer()
             if not name then name = 'default-task' end 
             if not self.tasks[name] then
                 self.tasks[name] = {} 
+                self.tasks[name].name  = name
                 self.tasks[name].start = nil
                 self.tasks[name].stop  = nil
                 self.tasks[name].delta = nil
-                self.tasks[name].last = nil
+                self.tasks[name].last  = nil
                 self.tasks[name].calls = 0
                 self.tasks[name].total = 0
                 self.tasks[name].time  = 0
@@ -703,29 +705,60 @@ function CreateTimer()
         -- gets time for optional task name
         GetTime = function(self, name)
             name = self:Verify(name)
+            local ret = ''
             if not self.tasks[name].start then
                 WARN( 'Timer cannot get time duration for not started task: ' ..  tostring(name) )
             elseif not self.tasks[name].stop then
-                self:Stop(name)
+                WARN( 'Timer cannot get time duration for not stopped task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].time)
             end
-            return string.format("%0.3f seconds", self.tasks[name].time)
+            return ret
         end, 
         -- gets time delta between latest and previous profiling of named tasks
         GetDelta = function(self, name)
             name = self:Verify(name)
+            local ret = ''
             if not self.tasks[name].delta then
-                WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) ) 
+                WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].delta)
             end
-            return string.format("%0.3f seconds", self.tasks[name].delta)
+            return ret
         end, 
-        -- converts stats for optional named task to string
+        -- gets time total of all profiling calls of named tasks
+        GetTotal = function(self, name)
+            name = self:Verify(name)
+            local ret = ''
+            if not self.tasks[name].start then
+                WARN( 'Timer cannot get time total for not started task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].total)
+            end
+            return ret
+        end,
+        -- converts profiling stats for optional named task to string
         ToString = function(self, name)
             name = self:Verify(name)
             local ret = self:GetTime(name)
             if self.tasks[name].delta > 0 then
-                ret = ret .. ' with delta: ' .. self:GetDelta(name)
+                ret = ret .. ', delta: ' .. self:GetDelta(name)
+            end
+            if self.tasks[name].calls > 1 then
+                ret = ret .. ', calls: ' .. tostring(self.tasks[name].calls)
+                ret = ret .. ', total: ' .. self:GetTotal(name)
             end
             return ret
+         end,
+        -- prints profiling stats of all tasks in increasing order of tasks 
+        -- @param key is optional sorting argument of tasks, e.g. 'stop', 'time', 'start'
+         Print = function(self, key) 
+            key = key or 'stop' 
+            local sorted = table.indexize(self.tasks)
+            sorted = table.sorted(sorted, sort_by(key)) 
+            for _, task in sorted do 
+                LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
+            end
          end
     }
 end
