@@ -6,14 +6,6 @@ local construction = import('/lua/ui/game/construction.lua')
 local orders = import('/lua/ui/game/orders.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
--- Stupid name mismatches in game.prefs and buildingtab.lua
-local special = {
-    ["defenses"] = "defense",
-    ["arty"] = "mobilearty",
-    ["engystations"] = "engystation",
-    ["mobileshields"] = "mobileshield"
-}
-
 -- Don't want to check these groups, they mess up some bindings
 local ignoreGroups = {
     "t3_armored_assault_bot",
@@ -151,8 +143,6 @@ function getKeyTables()
         end
     end
 
-    helpIdRelations = resolveExceptions(helpIdRelations)
-
     -- Match user pref keymap
     local savedPrefs = Prefs.GetFromCurrentProfile("UserKeyMap")
     for key, action in savedPrefs or {} do
@@ -207,7 +197,7 @@ function getKeyTables()
             if not group["textsize"] then
                 metagroup[id1] = nil
             end
-        end    
+        end
     end
 
     if upgradeKey then
@@ -218,21 +208,6 @@ function getKeyTables()
     end
 
     return idRelations, upgradeKey, orderKeys
-end
-
--- Some groups are excepted due to spelling mismatches
-function resolveExceptions(t)
-    -- Stupid exceptions
-    for id, group in t do
-        for sId, sGroup in special do
-            local g = group:lower(group)
-            if g == sId then
-                t[id] = sGroup
-            end
-        end
-    end
-
-    return t
 end
 
 -- Some groups get ignored
