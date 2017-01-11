@@ -43,6 +43,7 @@ local textSizes = {
     [3] = 14,
 }
 
+-- This table maps an action command to the tooltip of the button or buttons it corresponds to
 local orderDelegations = {
     attack =                {"attack"},
     shift_attack =          {"attack"},
@@ -133,12 +134,12 @@ function getKeyTables()
         end
     end
 
-    -- Go through buildingtab groups
+    -- Go through buildingtab groups to properly map IDs
     local changed = true
     while changed do
         changed = false
         for id, group in helpIdRelations do
-            if otherRelations[group] then
+            if otherRelations[group] then -- Check if the group contained more than just unit IDs
                 helpIdRelations[id] = otherRelations[group].lower(otherRelations[group])
                 changed = true
             end
@@ -147,35 +148,39 @@ function getKeyTables()
 
     -- Match user pref keymap
     local savedPrefs = Prefs.GetFromCurrentProfile("UserKeyMap")
-    for key, action in savedPrefs or {} do
-        local keyname, colour = getKeyUse(key)  -- returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
-        for id, action2 in helpIdRelations do
-            if action2 == action then -- If it's an action that's assigned to a key at all, link the id to the key
+    for keyCombo, action in savedPrefs or {} do
+        local baseKey, colour = getKeyUse(keyCombo)  -- Returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
+
+        -- Handle unit IDs
+        for id, group in helpIdRelations do
+            if group == action then -- If it's an action that's assigned to a key at all, link the id to the key
                 idRelations[id] = {
-                    ["key"] = keyname,
+                    ["key"] = baseKey,
                     ["colour"] = colour,
                 }
             end
         end
+
+        -- Handle orders
         if orderDelegations[action] then
             for _, o in orderDelegations[action] do
                 orderKeys[o] = {
-                    ["key"] = keyname,
+                    ["key"] = baseKey,
                     ["colour"] = colour,
                 }
             end
         end
+
+        -- Handle upgrades
         if action == "upgrades" then
             upgradeKey = {
-                ["key"] = keyname,
+                ["key"] = baseKey,
                 ["colour"] = colour,
             }
         end
     end
-    
-    orderKeys = table.merged(orderKeys, immutableOrderKeys)
-    
-    -- Rename signs
+
+    -- Rename signs for Unit ID list and orders
     for _, metagroup in {idRelations, orderKeys} do
         for id1, group in metagroup do
             if signs[group.key] then
@@ -184,6 +189,7 @@ function getKeyTables()
         end
     end
 
+    -- Handle signs for uupgrades seperately
     if upgradeKey then
         if signs[upgradeKey.key] then
             upgradeKey.key = signs[upgradeKey.key]
@@ -195,14 +201,17 @@ function getKeyTables()
         for id1, group in metagroup do
             group["textsize"] = textSizes[string.len(group.key)]
             if not group["textsize"] then
+                WARN('Not showing label for keybind ' .. group.key .. ' due to length')
                 metagroup[id1] = nil
             end
         end
     end
 
+    -- Handle textsize for upgrades seperately
     if upgradeKey then
         upgradeKey["textsize"] = textSizes[string.len(upgradeKey.key)]
         if not upgradeKey["textsize"] then
+            WARN('Not showing label for keybind ' .. group.key .. ' due to length')
             upgradeKey = nil
         end
     end
@@ -212,8 +221,8 @@ end
 
 -- Some groups get ignored
 function isToBeIgnored(name)
-    for _, iN in ignoreGroups do
-        if name == iN then
+    for _, group in ignoreGroups do
+        if name == group then
             return true
         end
     end
