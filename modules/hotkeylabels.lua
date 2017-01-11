@@ -122,7 +122,8 @@ function getKeyTables()
         if not isToBeIgnored(g) then
             for _, item in groupItems do
                 local i = item.lower(item)
-                if isBlueprintString(i) then
+
+                if __blueprints[i] then
                     helpIdRelations[i] = g
                 else
                     otherRelations[i] = g
@@ -240,17 +241,4 @@ function getKeyUse(key)
     end
 
     return true, key, colours[colour]
-end
-
--- Is the string passed in a unit blueprint
-function isBlueprintString(s)
-    if s:len(s) ~= 7 then
-        return false
-    end
-
-    if string.find(s, "...[0-9]+") then
-        return true
-    end
-
-    return false
 end
