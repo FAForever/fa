@@ -152,10 +152,10 @@ function CreateUI(isReplay)
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
-    -- set up our layout change function
+    -- Set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
 
-    -- update localization table with player's name
+    -- Update loc table with player's name
     local focusarmy = GetFocusArmy()
     if focusarmy >= 1 then
         LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusarmy].nickname
@@ -237,7 +237,6 @@ function CreateUI(isReplay)
     ConExecute('res_AfterPrefetchDelay 100')
     ConExecute('res_PrefetcherActivityDelay 1')
 
-    -- below added for FAF
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
@@ -247,7 +246,7 @@ function CreateUI(isReplay)
     else
         local clients = GetSessionClients()
         if table.getsize(clients) <= 1 then
-            -- no need for unnecessary lag when playing alone
+            -- No need for unnecessary lag when playing alone
             ConExecute('net_lag 0')
         end
     end

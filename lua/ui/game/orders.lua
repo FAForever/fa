@@ -66,6 +66,8 @@ local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
 local orderKeys = {}
 
 function setOrderKeys(orderKeys_)
+    WARN('Init calling in to orders.lua')
+    LOG(repr(orderKeys_))
     orderKeys = orderKeys_
 end
 
@@ -1013,6 +1015,8 @@ local function AddOrder(orderInfo, slot, batchMode)
 
     -- Handle Hotbuild labels
     if orderKeys[orderInfo.helpText] then
+        WARN('Doing orderKeys for keybind')
+        LOG(orderKeys[orderInfo.helpText].key)
         hotkeyLabel_addLabel(checkbox, checkbox, orderKeys[orderInfo.helpText])
     end
 
