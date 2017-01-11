@@ -1015,8 +1015,6 @@ local function AddOrder(orderInfo, slot, batchMode)
 
     -- Handle Hotbuild labels
     if orderKeys[orderInfo.helpText] then
-        WARN('Doing orderKeys for keybind')
-        LOG(orderKeys[orderInfo.helpText].key)
         hotkeyLabel_addLabel(checkbox, checkbox, orderKeys[orderInfo.helpText])
     end
 
