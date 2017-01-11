@@ -65,9 +65,6 @@ local upgradesTo = false
 local allowOthers = true
 
 function setIdRelations(idRelations_, upgradeKey_)
-    WARN('Construction.lua setIdRelations called from label init')
-    LOG(repr(idRelations_))
-    LOG(repr(upgradeKey_))
     idRelations = idRelations_
     upgradeKey = upgradeKey_
 end
