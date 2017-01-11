@@ -28,12 +28,12 @@ local signs = {
     ["Quote"] = "'",
 }
 
--- Which colour do we make the label?
+-- Which colour do we make the label? Shift is not taken into account here
 local colours = {
-    [0] = "ffffffff",    -- White, no modifier
-    [1] = "ff0088b2",    -- Blue, ctrl
-    [2] = "ff217a13",    -- Green, alt
-    [3] = "FFe80a0a",    -- Red, ctrl + alt
+    "ffffffff", -- White, no modifier
+    "fffafa00", -- Yellow, ctrl
+    "ffffbf80", -- Orange, alt
+    "FFe80a0a", -- Red, ctrl + alt
 }
 
 -- Depends on amount of characters in the key name
@@ -148,23 +148,21 @@ function getKeyTables()
     -- Match user pref keymap
     local savedPrefs = Prefs.GetFromCurrentProfile("UserKeyMap")
     for key, action in savedPrefs or {} do
-        local use, keyname, colour = getKeyUse(key)  -- returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
-        if use then
-            for id, action2 in helpIdRelations do
-                if action2 == action then -- If it's an action that's assigned to a key at all, link the id to the key
-                    idRelations[id] = {
-                        ["key"] = keyname,
-                        ["colour"] = colour,
-                    }
-                end
+        local keyname, colour = getKeyUse(key)  -- returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
+        for id, action2 in helpIdRelations do
+            if action2 == action then -- If it's an action that's assigned to a key at all, link the id to the key
+                idRelations[id] = {
+                    ["key"] = keyname,
+                    ["colour"] = colour,
+                }
             end
-            if orderDelegations[action] then
-                for _, o in orderDelegations[action] do
-                    orderKeys[o] = {
-                        ["key"] = keyname,
-                        ["colour"] = colour,
-                    }
-                end
+        end
+        if orderDelegations[action] then
+            for _, o in orderDelegations[action] do
+                orderKeys[o] = {
+                    ["key"] = keyname,
+                    ["colour"] = colour,
+                }
             end
         end
         if action == "upgrades" then
@@ -225,7 +223,7 @@ end
 
 -- Determine which modifier keys are present in the keybind string
 function getKeyUse(key)
-    local colour = 0
+    local colour = 1
     if string.find(key, "Shift*") then
         -- No colour change for shift
         key = key.gsub(key, "Shift.", "")
@@ -241,5 +239,5 @@ function getKeyUse(key)
         key = key.gsub(key, "Alt.", "")
     end
 
-    return true, key, colours[colour]
+    return key, colours[colour]
 end
