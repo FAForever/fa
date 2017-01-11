@@ -14,6 +14,8 @@ local ignoreGroups = {
     "t3_siege_tank"
 }
 
+-- Turn engine string reference to certain symbols into the actual symbol
+-- 'LeftBracket' isn't included because '[' looks ugly as sin in the overlay. It doesn't fit.
 local signs = {
     ["Comma"] = ",",
     ["Period"] = ".",
@@ -24,7 +26,6 @@ local signs = {
     ["NumStar"] = "*",
     ["NumSlash"] = "/",
     ["Quote"] = "'",
-    ["LeftBracket"] = " [",
 }
 
 -- Which colour do we make the label?
