@@ -1,16 +1,21 @@
+-- This file is called from gamemain.lua when a game launches
+-- It assigns unit IDs and order strings to the basic key (The key without modifiers) bound to them
+
 local bt = import('/modules/buildingtab.lua')
 local construction = import('/lua/ui/game/construction.lua')
 local orders = import('/lua/ui/game/orders.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
-local special = { -- Stupid name mismatches in game.prefs and buildingtab.lua
+-- Stupid name mismatches in game.prefs and buildingtab.lua
+local special = {
     ["defenses"] = "defense",
     ["arty"] = "mobilearty",
     ["engystations"] = "engystation",
     ["mobileshields"] = "mobileshield"
 }
 
-local ignoreGroups = { -- Don't want to check these groups, they mess up some bindings
+-- Don't want to check these groups, they mess up some bindings
+local ignoreGroups = {
     "t3_armored_assault_bot",
     "t3_siege_assault_bot",
     "t3_tank",
@@ -27,8 +32,10 @@ local signs = {
     ["NumStar"] = "*",
     ["NumSlash"] = "/",
     ["Quote"] = "'",
+    ["LeftBracket"] = " [",
 }
 
+-- Which colour do we make the label?
 local colours = {
     [0] = "ffffffff",    -- White, no modifier
     [1] = "ff0088b2",    -- Blue, ctrl
@@ -36,8 +43,8 @@ local colours = {
     [3] = "FFe80a0a",    -- Red, ctrl + alt
 }
 
+-- Depends on amount of characters in the key name
 local textSizes = {
-    -- Depends on amount of characters in the key name
     [1] = 18,
     [2] = 14,
     [3] = 14,
@@ -98,20 +105,14 @@ local orderDelegations = {
     scry_target =           {"scry_target"},
 }
 
-local immutableOrderKeys = {
-    attack_move =
-        {
-            ["key"] = 'RMB',
-            ["colour"] = colours[2],
-        }
-}
-
+-- Called from gamemain.lua
 function init()
     local idRelations, upgradeKey, orderKeys = getKeyTables()
     construction.setIdRelations(idRelations, upgradeKey)
     orders.setOrderKeys(orderKeys)
 end
 
+-- Called from onSelectionChanged in gamemain.lua
 function onSelectionChanged(upgradesTo, isFactory)
     construction.setUpgradeAndAllowing(upgradesTo, isFactory)
 end
@@ -120,11 +121,11 @@ function getKeyTables()
     local idRelations = {}
     local helpIdRelations = {}
     local otherRelations = {}
-    local upgradeKey = nil
+    local upgradeKey = false
     local orderKeys = {}
 
     -- Get them from the building tab
-    for groupName, groupItems in bt.buildingTab do
+    for groupName, groupItems in bt.buildingTab do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
         local g = groupName.lower(groupName)
         if not isToBeIgnored(g) then
             for _, item in groupItems do
@@ -155,10 +156,10 @@ function getKeyTables()
     -- Match user pref keymap
     local savedPrefs = Prefs.GetFromCurrentProfile("UserKeyMap")
     for key, action in savedPrefs or {} do
-        local use, keyname, colour = getKeyUse(key) 
+        local use, keyname, colour = getKeyUse(key)  -- returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
         if use then
             for id, action2 in helpIdRelations do
-                if action2 == action then
+                if action2 == action then -- If it's an action that's assigned to a key at all, link the id to the key
                     idRelations[id] = {
                         ["key"] = keyname,
                         ["colour"] = colour,
@@ -185,7 +186,7 @@ function getKeyTables()
     orderKeys = table.merged(orderKeys, immutableOrderKeys)
     
     -- Rename signs
-    for id0, metagroup in {idRelations, orderKeys} do
+    for _, metagroup in {idRelations, orderKeys} do
         for id1, group in metagroup do
             if signs[group.key] then
                 metagroup[id1].key = signs[group.key]
@@ -200,7 +201,7 @@ function getKeyTables()
     end
 
     -- Remove unused ones (too long)
-    for id0, metagroup in {idRelations, orderKeys} do
+    for _, metagroup in {idRelations, orderKeys} do
         for id1, group in metagroup do
             group["textsize"] = textSizes[string.len(group.key)]
             if not group["textsize"] then
@@ -219,6 +220,7 @@ function getKeyTables()
     return idRelations, upgradeKey, orderKeys
 end
 
+-- Some groups are excepted due to spelling mismatches
 function resolveExceptions(t)
     -- Stupid exceptions
     for id, group in t do
@@ -233,6 +235,7 @@ function resolveExceptions(t)
     return t
 end
 
+-- Some groups get ignored
 function isToBeIgnored(name)
     for _, iN in ignoreGroups do
         if name == iN then
@@ -243,6 +246,7 @@ function isToBeIgnored(name)
     return false
 end
 
+-- Determine which modifier keys are present in the keybind string
 function getKeyUse(key)
     local colour = 0
     if string.find(key, "Shift*") then
@@ -263,6 +267,7 @@ function getKeyUse(key)
     return true, key, colours[colour]
 end
 
+-- Is the string passed in a unit blueprint
 function isBlueprintString(s)
     if s:len(s) ~= 7 then
         return false

@@ -1,10 +1,9 @@
---*****************************************************************************
---* File: lua/ui/game/helptext.lua
---* Author: Ted Snook
---* Summary: Help Text Popup
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+-----------------------------------------------------------------
+-- File: lua/ui/game/helptext.lua
+-- Author: Ted Snook
+-- Summary: Help Text Popup
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -32,7 +31,7 @@ local function ResetKeyMap()
 end
 
 local function ConfirmNewKeyMap()
-    --add option to accept the changes to the key map?
+    -- TODO: Add option to accept the changes to the key map?
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
@@ -56,11 +55,11 @@ local function EditActionKey(parent, action, currentKey)
 
     local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
     LayoutHelpers.LeftOf(okButton, cancelButton, 145)
-    
+
     local helpText = UIUtil.CreateText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
-    
+
     local keyText = UIUtil.CreateText(dialogContent, formatkeyname(currentKey), 24)
     LayoutHelpers.AtTopIn(keyText, dialogContent, 40)
     LayoutHelpers.AtHorizontalCenterIn(keyText, dialogContent)
@@ -115,7 +114,7 @@ local function EditActionKey(parent, action, currentKey)
     end
 
     local function AssignKey()
-        -- check if key is already assigned to something else
+        -- Check if key is already assigned to something else
         local Keymapper = import('/lua/keymap/keymapper.lua')
 
         local function ClearShiftKey()
@@ -130,9 +129,9 @@ local function EditActionKey(parent, action, currentKey)
 
         local function MapKey()
             Keymapper.SetUserKeyMapping(currentKeyPattern, currentKey, action)
-            local cat = Keymapper.KeyCategory(currentKeyPattern, Keymapper.GetCurrentKeyMap(true), Keymapper.GetKeyActions())
+            local cat = Keymapper.KeyCategory(currentKeyPattern, Keymapper.GetCurrentKeyMap(), Keymapper.GetKeyActions())
             if cat and cat == "hotbuilding" then
-                if Keymapper.IsKeyInMap("Shift-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
+                if Keymapper.IsKeyInMap("Shift-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
                     UIUtil.QuickDialog(panel, "Shift-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
@@ -140,8 +139,7 @@ local function EditActionKey(parent, action, currentKey)
                         true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
-
-                if Keymapper.IsKeyInMap("Alt-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
+                if Keymapper.IsKeyInMap("Alt-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
                     UIUtil.QuickDialog(panel, "Alt-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
@@ -153,14 +151,13 @@ local function EditActionKey(parent, action, currentKey)
             keyTable = FormatData()
             keyContainer:CalcVisible()
         end
-        if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
+        if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
             UIUtil.QuickDialog(panel, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
                 nil, nil,
                 true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
-
         else
             MapKey()
         end
@@ -170,7 +167,6 @@ local function EditActionKey(parent, action, currentKey)
         AssignKey()
         keyPopup:Close()
     end
-
 end
 
 function CreateUI()
@@ -178,7 +174,7 @@ function CreateUI()
         return
     end
 
-    if panel then 
+    if panel then
         panel:Close()
         panel = false
         return
@@ -194,7 +190,7 @@ function CreateUI()
             end
         end
     end
-    
+
     local function UnbindCurrentSelection()
         local Keymapper = import('/lua/keymap/keymapper.lua')
         for k, v in keyTable do
@@ -220,7 +216,7 @@ function CreateUI()
     local title = UIUtil.CreateText(dialogContent, LOC("<LOC key_binding_0000>Key Bindings"), 22)
     LayoutHelpers.AtTopIn(title, dialogContent, 12)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
-    
+
     local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
     LayoutHelpers.AtBottomIn(closeButton, dialogContent, 9)
     LayoutHelpers.AtRightIn(closeButton, dialogContent, -2)
@@ -239,13 +235,13 @@ function CreateUI()
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
     end
-    
+
     local unbindKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0007>Unbind Key"))
     LayoutHelpers.LeftOf(unbindKeyButton, assignKeyButton, 27)
     unbindKeyButton.OnClick = function(self, modifiers)
         UnbindCurrentSelection()
     end
-    
+
     local resetButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Reset"))
     LayoutHelpers.LeftOf(resetButton, unbindKeyButton, 27)
     resetButton.OnClick = function(self, modifiers)
@@ -253,7 +249,7 @@ function CreateUI()
             "<LOC _Yes>", ResetKeyMap,
             "<LOC _No>", nil,
             nil, nil,
-            true, 
+            true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
@@ -269,12 +265,12 @@ function CreateUI()
     keyContainer.Height:Set(421)
     keyContainer.Width:Set(562)
     keyContainer.top = 0
-    
+
     LayoutHelpers.AtLeftTopIn(keyContainer, dialogContent, 10, 50)
     UIUtil.CreateLobbyVertScrollbar(keyContainer)
-    
+
     local keyEntries = {}
-    
+
     local function CreateElement(index)
         local entry = {}
         keyEntries[index] = entry
@@ -282,18 +278,18 @@ function CreateUI()
         entry.bg = Bitmap(keyContainer)
         entry.bg.Left:Set(keyContainer.Left)
         entry.bg.Right:Set(keyContainer.Right)
-        
+
         entry.key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
         entry.key:DisableHitTest()
-        
+
         entry.description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
         entry.description:DisableHitTest()
         entry.description:SetClipToWidth(true)
         -- this is not meant to be a lazy var function since the layout is static
         entry.description.Width:Set(entry.bg.Right() - entry.bg.Left() - 150)
-        
+
         entry.bg.Height:Set(function() return entry.key.Height() + 4 end)
-        
+
         LayoutHelpers.AtVerticalCenterIn(entry.key, entry.bg)
         LayoutHelpers.AtLeftIn(entry.description, entry.bg, 150)
         LayoutHelpers.AtVerticalCenterIn(entry.description, entry.bg)
@@ -308,10 +304,10 @@ function CreateUI()
                 end
                 if keyTable[self.dataIndex].type == 'entry' then
                     keyTable[self.dataIndex]._selected = true
-                end               
+                end
                 keyContainer:CalcVisible()
             end
-            
+
             if event.Type == 'ButtonPress' then
                 SelectLine()
                 return true
@@ -324,44 +320,43 @@ function CreateUI()
             return false
         end
     end
-    
+
     CreateElement(1)
     LayoutHelpers.AtTopIn(keyEntries[1].bg, keyContainer)
-        
+
     local index = 2
     while keyEntries[table.getsize(keyEntries)].bg.Top() + (2 * keyEntries[1].bg.Height()) < keyContainer.Bottom() do
         CreateElement(index)
         LayoutHelpers.Below(keyEntries[index].bg, keyEntries[index-1].bg)
         index = index + 1
     end
-    
+
     local numLines = function() return table.getsize(keyEntries) end
-    
+
     local function DataSize()
         return table.getn(keyTable)
     end
-    
-    -- called when the scrollbar for the control requires data to size itself
+
+    -- Called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
     -- aixs can be "Vert" or "Horz"
     keyContainer.GetScrollValues = function(self, axis)
         local size = DataSize()
-        --LOG(size, ":", self.top, ":", math.min(self.top + numLines, size))
         return 0, size, self.top, math.min(self.top + numLines(), size)
     end
 
-    -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    -- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
     keyContainer.ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.top + math.floor(delta))
     end
 
-    -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    -- Called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
     keyContainer.ScrollPages = function(self, axis, delta)
         self:ScrollSetTop(axis, self.top + math.floor(delta) * numLines())
     end
 
-    -- called when the scrollbar wants to set a new visible top line
+    -- Called when the scrollbar wants to set a new visible top line
     keyContainer.ScrollSetTop = function(self, axis, top)
         top = math.floor(top)
         if top == self.top then return end
@@ -370,11 +365,12 @@ function CreateUI()
         self:CalcVisible()
     end
 
-    -- called to determine if the control is scrollable on a particular access. Must return true or false.
+    -- Called to determine if the control is scrollable on a particular access. Must return true or false.
     keyContainer.IsScrollable = function(self, axis)
         return true
     end
-    -- determines what controls should be visible or not
+
+    -- Determines what controls should be visible or not
     keyContainer.CalcVisible = function(self)
         local function GetEntryColor(lineID, selected)
             if selected then
@@ -399,7 +395,6 @@ function CreateUI()
                 line.key:SetText('')
                 line.description:SetText('')
             else
-                --LayoutHelpers.AtLeftIn(line.key, line.bg)
                 line.key.Left:Set(function() return math.floor((line.bg.Left() + 70) - (line.key.Width() / 2)) end)
                 line.bg:SetSolidColor(GetEntryColor(lineID, data._selected))
                 line.key:SetText(LOC(data.keyDisp))
@@ -433,10 +428,9 @@ function CreateUI()
     keyContainer:CalcVisible()
 end
 
---TODO clean up the table names a bit to be more consistent?
+-- TODO clean up the table names a bit to be more consistent?
 function FormatData()
     local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions(true)
-
     local retkeys = {}
     local KeyData = {}
     local keyLookup = import('/lua/keymap/keymapper.lua').GetKeyLookup()
@@ -451,14 +445,12 @@ function FormatData()
                 retkeys[v.category] = {}
             end
             table.insert(retkeys[v.category], {id = v.order, desckey = k, key = keyForAction})
-
         end
     end
-    
+
     for i, v in retkeys do
         table.sort(v, function(val1, val2)
             if val1.id == val2.id then
-                
                 if keydesc[val1.desckey] and keydesc[val2.desckey] then
                     if keydesc[val1.desckey] >= keydesc[val2.desckey] then
                         return false
@@ -477,7 +469,7 @@ function FormatData()
             end
         end)
     end
-    
+
     local index = 1
     for i, v in retkeys do
         if index ~= 1 then
@@ -500,7 +492,7 @@ function formatkeyname(key)
     if not key then
         return ""
     end
-    
+
     local function LookupToken(token)
         if properKeyNames[token] then
             return LOC(properKeyNames[token])
