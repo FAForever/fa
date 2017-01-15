@@ -5650,10 +5650,9 @@ function InitHostUtils()
             end
         end,
 
-        -- Send slot settings to the server
-        SendSlotOptionsToServer = function(slotNum)
-            -- Differentiate humans and AIs for the server
-            local function SendSlotOption(playerInfo, key, value)
+        --- Send player settings to the server
+        SendPlayerSettingsToServer = function(slotNum)
+            local function SendPlayerOption(playerInfo, key, value)
                 if playerInfo.Human then
                     GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
                 else
@@ -5661,24 +5660,27 @@ function InitHostUtils()
                 end
             end
 
-            -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5,
-            -- 8 = slot8} if only three players were declared on an 8+ player map.
-            -- This has to be recalculated any time slots are touched in case the order shifted
-            local function SendArmyIndexesToServer()
-                local armyIndex = 1
+            -- This function is needed because army numbers need to be calculated: armies are numbered incrementally in slot order.
+            -- After every slot change, the army index needs to be recalculated for every slot.
+            -- FIXME: This could be done once when the game is launched instead of on every slot change.
+            local function SendArmySettingsToServer()
+                local armyIdx = 1
                 for slotNum, playerInfo in gameInfo.PlayerOptions:pairs() do
-                    SendSlotOption(playerInfo, 'Army', armyIndex)
-                    armyIndex = armyIndex + 1
+
+                    if playerInfo ~= nil then
+                        SendPlayerOption(playerInfo, 'Army', armyIdx)
+                        armyIdx = armyIdx + 1
+                    end
                 end
             end
 
             local playerInfo = gameInfo.PlayerOptions[slotNum]
-            SendSlotOption(playerInfo, 'Faction', playerInfo.Faction)
-            SendSlotOption(playerInfo, 'Color', playerInfo.PlayerColor)
-            SendSlotOption(playerInfo, 'Team', playerInfo.Team)
-            SendSlotOption(playerInfo, 'StartSpot', slotNum)
+            SendPlayerOption(playerInfo, 'Faction', playerInfo.Faction)
+            SendPlayerOption(playerInfo, 'Color', playerInfo.PlayerColor)
+            SendPlayerOption(playerInfo, 'Team', playerInfo.Team)
+            SendPlayerOption(playerInfo, 'StartSpot', slotNum)
 
-            SendArmyIndexesToServer()
+            SendArmySettingsToServer()
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.
