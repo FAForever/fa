@@ -723,6 +723,9 @@ function CreateTimer()
                 WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) )
             else 
                 ret = string.format("%0.3f seconds", self.tasks[name].delta)
+                if self.tasks[name].delta > 0 then
+                    ret = '+' .. ret 
+                end
             end
             return ret
         end, 
@@ -741,8 +744,8 @@ function CreateTimer()
         ToString = function(self, name)
             name = self:Verify(name)
             local ret = self:GetTime(name)
-            if self.tasks[name].delta > 0 then
-                ret = ret .. ', delta: ' .. self:GetDelta(name)
+            if self.tasks[name].delta then
+                ret = ret .. ', delta: ' .. self:GetDelta(name) 
             end
             if self.tasks[name].calls > 1 then
                 ret = ret .. ', calls: ' .. tostring(self.tasks[name].calls)
@@ -757,7 +760,9 @@ function CreateTimer()
             local sorted = table.indexize(self.tasks)
             sorted = table.sorted(sorted, sort_by(key)) 
             for _, task in sorted do 
-                LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
+                if task.stop then
+                    LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
+                end 
             end
          end
     }
