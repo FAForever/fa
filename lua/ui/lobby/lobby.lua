@@ -957,10 +957,6 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:Show()
     slot.team:SetItem(playerInfo.Team)
 
-    if isHost then
-        HostUtils.SendPlayerSettingsToServer(slotNum)
-    end
-
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
     slot.ready:SetCheck(playerInfo.Ready, true)
 
@@ -1319,7 +1315,6 @@ local function AssignRandomStartSpots()
             playerOptions.Team = r.team + 1
             playerOptions.StartSpot = r.slot
             gameInfo.PlayerOptions[r.slot] = playerOptions
-            HostUtils.SendPlayerSettingsToServer(r.slot)
         end
     end
 
@@ -1649,6 +1644,32 @@ function UpdateAvailableSlots( numAvailStartSpots )
     gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
+local function SendGameInfoToServer()
+    local armyIndex = 1
+
+    -- Use this function to send different messages for AI vs Human
+    local function SendPlayerOption(playerInfo, key, value)
+        if playerInfo.Human then
+            GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+        else
+            GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+        end
+    end
+
+    -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5, 8 = slot8}
+    -- if only three players were declared on an 8+ player map.
+    for slotNum, playerInfo in gameInfo.PlayerOptions do
+        SendPlayerOption(playerInfo, 'Faction', playerInfo.Faction)
+        SendPlayerOption(playerInfo, 'Color', playerInfo.PlayerColor)
+        SendPlayerOption(playerInfo, 'Team', playerInfo.Team)
+        SendPlayerOption(playerInfo, 'StartSpot', slotNum)
+        SendPlayerOption(playerInfo, 'Army', armyIndex)
+
+        -- Increment the index
+        armyIndex = armyIndex + 1
+    end
+end
+
 local function TryLaunch(skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
@@ -1782,6 +1803,9 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.AdaptiveMap then 
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
+
+        -- Broadcast our game settings to the server for stuff like rating calculation
+        SendGameInfoToServer()
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
@@ -5644,23 +5668,6 @@ function InitHostUtils()
                     SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
                 end
             end
-        end,
-
-        --- Send player settings to the server
-        SendPlayerSettingsToServer = function(slotNum)
-            local playerInfo = gameInfo.PlayerOptions[slotNum]
-            local sendPlayerOption = function(key, value)
-                if playerInfo.Human then
-                    GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
-                else
-                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
-                end
-            end
-            sendPlayerOption('Faction', playerInfo.Faction)
-            sendPlayerOption('Color', playerInfo.PlayerColor)
-            sendPlayerOption('Team', playerInfo.Team)
-            sendPlayerOption('StartSpot', slotNum)
-            sendPlayerOption('Army', slotNum)
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.

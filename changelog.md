@@ -1,3 +1,8 @@
+Patch 3668 (January 17th, 2017)
+============================
+- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end
+
+
 Hotfix Patch 3667 (December 22nd, 2016)
 ============================
 - Fixed a typo which was setting the default labels to show onscreen to 10 rather than 1000
