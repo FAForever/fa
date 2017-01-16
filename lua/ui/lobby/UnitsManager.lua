@@ -12,19 +12,22 @@ local Popup    = import('/lua/ui/controls/popups/popup.lua').Popup
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Bitmap   = import('/lua/maui/bitmap.lua').Bitmap
 local Grid     = import('/lua/maui/grid.lua').Grid 
+local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UnitsAnalyzer   = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local UnitsRestrictions = import('/lua/ui/lobby/UnitsRestrictions.lua')
 
-local blueprints = {} 
+-- Stores unit blueprints for all factions
+local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} } 
+
+-- Stores unit blueprints per faction
+local factions = {} 
 
 -- Stores info about preset restrictions 
 local presets = {}
 presets.PerRow   = 35 -- Determines number of presets' icons per row
 presets.Data     = UnitsRestrictions.GetPresetsData()
 presets.Order    = UnitsRestrictions.GetPresetsOrder()
-
-local factions = {} 
 
 -- Stores all UI elements of the UnitsManager
 local GUI = {
@@ -184,6 +187,7 @@ local sortBy = {
     },
 }
 
+local taskNotifier = import('/lua/ui/lobby/TaskNotifier.lua').Create()
 local timer = CreateTimer()
 --==============================================================================
 -- Create a dialog allowing the user to select categories of unit to disable
@@ -198,7 +202,7 @@ local timer = CreateTimer()
 function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
 
     timer:Reset()
-    timer:Start('CreateUnitsManager', true)
+    timer:Start('UnitsManager...CreateDialog', true)
 
     presets.Selected = {}
     GUI.checkboxes = { Units = {}, Presets = {} }
@@ -207,6 +211,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     restrictions.Custom = {}
     restrictions.Presets = {}
     restrictions.Stats = {}
+    restrictions.Initial = initial
 
     -- Scaling dialog size based on window size
     local dialogWidth = GetFrame(0).Width() - 40
@@ -225,14 +230,15 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
 
     function doCancel()
         OnCancel()
-        GUI.popup:Close()
+        CloseDialog()
     end
     GUI.popup = Popup(parent, GUI.bg)
     GUI.popup.OnShadowClicked = doCancel
     GUI.popup.OnEscapePressed = doCancel
 
+    
     timer:Start('CreateControls')
-    CreateControls(initial, OnOk, doCancel, isHost)
+    CreateControls(OnOk, doCancel, isHost)
     timer:Stop('CreateControls')
 
     if not isHost then
@@ -240,21 +246,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         GUI.resetBtn:Hide()
         GUI.okBtn:Hide()
     end
-
-    factions = {} -- Reset factions 
-
-    timer:Start('GetBlueprints')
-    --blueprints = import('/lua/ui/lobby/lobby.lua').GetBlueprintList()
-    blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprints(Mods.GetGameMods(), false)
-    timer:Stop('GetBlueprints')
-     
-    timer:Start('GetUnitsGroups')
-    table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'SERAPHIM'))
-    table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'UEF'))
-    table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN'))
-    table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'AEON'))
-    timer:Stop('GetUnitsGroups')
-     
+    
     GUI.content = Group(GUI.bg)
     LayoutHelpers.AtLeftIn(GUI.content, GUI.bg, 6)
     GUI.content.Top:Set(function() return GUI.title.Bottom() - 2 end)
@@ -262,32 +254,77 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     GUI.content.Width:Set(function() return GUI.bg.Width() - 12 end)
     GUI.content:DisableHitTest()
 
+    GUI.progressBar = StatusBar(GUI.bg, 0, 1, false, false, nil, nil, true)
+    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0 
+    GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds')) 
+    GUI.progressBar:SetValue(0)
+    GUI.progressBar.Height:Set(5)
+    GUI.progressBar.Left:Set(function() return GUI.bg.Left() + 30 end) 
+    GUI.progressBar.Right:Set(function() return GUI.bg.Right() - 30 end) 
+    LayoutHelpers.AtVerticalCenterIn(GUI.progressBar, GUI.bg)
+
+    GUI.progressTxt = UIUtil.CreateText(GUI.bg, "Blueprints Loading ... ", 16, UIUtil.titleFont)
+    GUI.progressTxt:SetColor('FFAEACAC') -- #FFAEACAC 
+    LayoutHelpers.Above(GUI.progressTxt, GUI.progressBar, 5)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.progressTxt, GUI.bg)
+
+    table.insert(GUI.controls, GUI.progressBar)
+    table.insert(GUI.controls, GUI.progressTxt)
+
+    taskNotifier:Reset()
+    taskNotifier.OnProgressCallback = OnBlueprintsProgress
+    taskNotifier.OnCompleteCallback = OnBlueprintsLoaded
+
+    import('/lua/ui/lobby/UnitsAnalyzer.lua').FetchBlueprints(Mods.GetGameMods(), false, taskNotifier)
+
+end
+
+function OnBlueprintsProgress(task)
+
+     if GUI.progressBar and taskNotifier then
+        GUI.progressBar:SetValue(taskNotifier.totalProgress)
+     end
+
+     if GUI.progressTxt and task and task.name then
+        GUI.progressTxt:SetText(task.name .. ' ...')
+     end
+end
+
+function OnBlueprintsLoaded()
+
+    GUI.progressBar:Hide()
+    GUI.progressTxt:Hide()
+
+    blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprintsList()
+    --TODO based on number of factions (including nomads) and main group of units:
+    -- calculate number of grids' columns
+    -- calculate size of grids' cells
+
     timer:Start('CreatePresetsGrid')
     CreatePresetsGrid()
-    timer:Stop('CreatePresetsGrid')
+    timer:Stop('CreatePresetsGrid',true)
 
-    timer:Start('CreateUnitsGrid')
-    CreateUnitsGrid()
-    timer:Stop('CreateUnitsGrid')
-    
-    GUI.scrollbar = UIUtil.CreateLobbyVertScrollbar(GUI.unitsGrid, -dialogScrollWidth)
-    if not GUI.unitsGrid:IsScrollable("Vert") then
-        GUI.scrollbar:Hide()
+    if table.getsize(blueprints.All) > 0 then
+        timer:Start('GetUnitsGroups')
+        factions = {} -- Reset factions 
+        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'SERAPHIM'))
+        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'UEF'))
+        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN'))
+        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'AEON'))
+        timer:Stop('GetUnitsGroups',true)
+
+        timer:Start('CreateUnitsGrid')
+        CreateUnitsGrid()
+        timer:Stop('CreateUnitsGrid',true)
     end
-    
-    timer:Start('UpdateRestrictions')
+
     -- Set initial restrictions if there are any
-    if initial then
-        UpdateRestrictionsUI(initial)
+    if restrictions.Initial then
+        UpdateRestrictionsUI()
     end
-
     UpdateRestrictionsStats()
-    timer:Stop('UpdateRestrictions')
-     
-    --timer:Print()
-    LOG('SortUnits completed in ' .. timer:GetTotal('SortUnits'))
 
-    timer:Stop('CreateUnitsManager', true)
+    timer:Stop('UnitsManager...CreateDialog', true)
 end
 
 -- Creates a grid with buttons representing all restriction presets defined in UnitsRestrictions.lua
@@ -355,9 +392,14 @@ function CreateUnitsGrid()
         column = CreateGridColumn(name, faction.Units.ACU, column,sortBy.UPGRADES)
     end
     GUI.unitsGrid:EndBatch()
+
+    GUI.scrollbar = UIUtil.CreateLobbyVertScrollbar(GUI.unitsGrid, -dialogScrollWidth)
+    if not GUI.unitsGrid:IsScrollable("Vert") then
+        GUI.scrollbar:Hide()
+    end
 end
 
-function CreateControls(initial, OnOk, OnCancel, isHost)
+function CreateControls(OnOk, OnCancel, isHost)
     
     GUI.title = UIUtil.CreateText(GUI.bg, "<LOC restricted_units_dlg_0000>Unit Manager", 20, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(GUI.title, GUI.bg, 6)
@@ -402,7 +444,7 @@ function CreateControls(initial, OnOk, OnCancel, isHost)
         end
 
         OnOk(newRestrictions)
-        GUI.popup:Close()
+        CloseDialog()
     end
 
     GUI.resetBtn.OnClick = function()
@@ -422,6 +464,10 @@ end
 
 -- Closes dialog and cleans up its UI elements
 function CloseDialog()
+
+    -- stop loading of blueprints in case they are still loading
+    import('/lua/ui/lobby/UnitsAnalyzer.lua').StopBlueprints()
+
     for id, control in GUI.controls or {} do
         if control then 
            control:Destroy()  
@@ -429,14 +475,14 @@ function CloseDialog()
     end
     GUI.controls = nil
 
-    for _, checkbox in GUI.checkboxes.Units do
+    for _, checkbox in GUI.checkboxes.Units or {} do
         if checkbox then 
-           checkbox:Destroy()  
+           checkbox = nil
         end 
     end
-    for _, checkbox in GUI.checkboxes.Presets do
+    for _, checkbox in GUI.checkboxes.Presets or {} do
         if checkbox then 
-           checkbox:Destroy()  
+           checkbox = nil
         end 
     end
     GUI.checkboxes = { Units = {}, Presets = {} }
@@ -447,11 +493,11 @@ function CloseDialog()
 end
 
 
-function UpdateRestrictionsUI(newRestrictions)
+function UpdateRestrictionsUI()
     -- Order of updating restrictions is important and 
     -- custom restrictions must be set first
     -- then preset restrictions or state of checkboxes will be wrong 
-    for _, restriction in newRestrictions do
+    for _, restriction in restrictions.Initial do
         if GUI.checkboxes.Units[restriction] then
             restrictions.Custom[restriction] = true
             for _, chkbox in GUI.checkboxes.Units[restriction] do

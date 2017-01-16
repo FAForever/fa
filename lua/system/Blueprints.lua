@@ -585,11 +585,17 @@ end
 --- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
 --- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
 --- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
+--- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true)  used in ModsManager.lua 
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true) used in UnitsAnalyzer.lua 
-function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration)
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua 
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua 
+function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
+
+    local task = 'Blueprints Loading... '
+    local progress = nil
+    local total = nil
+    local files = {}
 
     -- set default parameters if they are not provided  
     if not pattern then pattern = '*.bp' end
@@ -606,21 +612,40 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
 
     if not skipGameFiles then
         for i,dir in directories do
-            for k,file in DiskFindFiles(dir, pattern) do
+            task = 'Blueprints Loading: original files from ' .. dir .. ' directory'
+            files = DiskFindFiles(dir, pattern)
+            total = table.getsize(files)
+            LOG(task)
+
+            for k,file in files do
                 BlueprintLoaderUpdateProgress()
-                safecall("Blueprints Loading org file "..file, doscript, file)
+                -- update UnitManager UI via taskNotifier only if it exists
+                if taskNotifier then 
+                   taskNotifier:Update(task, total, k)
+                end
+                safecall(task .. ': ' .. file, doscript, file)
             end
         end
     end
+
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
     for i,mod in mods or {} do
         current_mod = mod -- used in UnitBlueprint()
-        for k,file in DiskFindFiles(mod.location, pattern) do
+        task = 'Blueprints Loading: modded files from "' .. mod.name .. '" mod'
+        files = DiskFindFiles(mod.location, pattern)
+        total = table.getsize(files)
+        LOG(task)
+
+        for k,file in files do
             BlueprintLoaderUpdateProgress()
-            safecall("Blueprints Loading mod file "..file, doscript, file)
+            -- update UnitManager UI via taskNotifier only if it exists
+            if taskNotifier then 
+               taskNotifier:Update(task, total, k)
+            end
+            safecall(task .. ': ' .. file, doscript, file)
         end
     end
     stats.UnitsMod = table.getsize(original_blueprints.Unit) - stats.UnitsOrg

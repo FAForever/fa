@@ -548,13 +548,6 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
 
-    -- fetch unit blueprints for the Unit Manager
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), false)
-end
-
-function GetBlueprintList()
-    -- return previously fetched blueprints
-    return UnitsAnalyzer.GetBlueprintsList()
 end
 
 -- A map from message types to functions that process particular message types.
@@ -2054,8 +2047,6 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         UpdateGame()
     end
-    -- Mods have changed, so fetch blueprints for selected game mods
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 function GetAvailableColor()
@@ -3623,8 +3614,6 @@ function UpdateClientModStatus(newHostSimMods)
     end
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
-    -- fetch blueprints for clients since the host has changed sim mods
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 -- LobbyComm Callbacks
