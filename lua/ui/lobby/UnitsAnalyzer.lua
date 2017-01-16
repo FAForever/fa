@@ -1170,18 +1170,19 @@ function DidModsChanged()
     return mods.Changed
 end
 
+local timer = CreateTimer()
 -- Gets unit blueprints by loading them from the game and given active sim mods
-function GetBlueprints(activeMods, skipGameFiles)
-    local timer = CreateTimer()
-    timer:Start()
+function GetBlueprints(activeMods, skipGameFiles, taskNotifier)
+    timer:Start('LoadBlueprints')
 
+    blueprints.Loaded = false
     -- Load original FA blueprints only once
     local loadedGameFiles = table.getsize(blueprints.Original) > 0
     if loadedGameFiles then
          skipGameFiles = true
     end
 
-    local state = 'blueprints...'
+    local state = 'LoadBlueprints...'
     Show('STATUS', state)
 
     if DidModsChanged() or not skipGameFiles then
@@ -1193,19 +1194,34 @@ function GetBlueprints(activeMods, skipGameFiles)
         projectiles.Modified = {}
         projectiles.Skipped = {}
 
+        if taskNotifier then
+            local filesCount = 0
+            -- calculate total updates based on number of files that Blueprints.lua will load
+            if not skipGameFiles then
+                filesCount = filesCount + table.getsize(DiskFindFiles('/projectiles', '*_proj.bp'))
+                filesCount = filesCount + table.getsize(DiskFindFiles('/units', '*_unit.bp'))
+            end
+            for i, mod in activeMods or {} do
+                filesCount = filesCount + table.getsize(DiskFindFiles(mod.location, '*_proj.bp'))
+                filesCount = filesCount + table.getsize(DiskFindFiles(mod.location, '*_unit.bp'))
+            end
+            taskNotifier.totalUpdates = filesCount
+        end
+
         -- allows execution of LoadBlueprints()
         doscript '/lua/system/Blueprints.lua'
 
         -- Loading projectiles first so that they can be used by units
         local dir = {'/projectiles'}
-        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true)
+        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true, taskNotifier)
         for _, bp in bps.Projectile do
             CacheProjectile(bp)
         end
+        --TODO combine both for loops 
 
         -- Loading units second so that they can use projectiles
         dir = {'/units'}
-        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true)
+        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true, taskNotifier)
         for _, bp in bps.Unit do
             if not string.find(bp.Source,'proj_') then
                 CacheUnit(bp)
@@ -1217,17 +1233,18 @@ function GetBlueprints(activeMods, skipGameFiles)
     end
     info = state .. table.getsize(projectiles.All) .. ' total ('
     info = info .. table.getsize(projectiles.Original) .. ' original, '
-    info = info .. table.getsize(projectiles.Modified) .. ' modified), and '
-    info = info .. table.getsize(projectiles.Skipped) .. ' skipped projectiles'
+    info = info .. table.getsize(projectiles.Modified) .. ' modified, and '
+    info = info .. table.getsize(projectiles.Skipped) .. ' skipped) projectiles'
     Show('STATUS', info)
 
     info = state .. table.getsize(blueprints.All) .. ' total ('
     info = info .. table.getsize(blueprints.Original) .. ' original, '
-    info = info .. table.getsize(blueprints.Modified) .. ' modified), and '
-    info = info .. table.getsize(blueprints.Skipped) .. ' skipped units'
-    info = info .. ' and skipped game files: ' .. tostring(skipGameFiles) ..')'
+    info = info .. table.getsize(blueprints.Modified) .. ' modified and '
+    info = info .. table.getsize(blueprints.Skipped) .. ' skipped) units'
     Show('STATUS', info)
-    Show('STATUS', state .. 'in ' .. timer:Stop())
+    Show('STATUS', state .. 'in ' .. timer:Stop('LoadBlueprints'))
+
+    blueprints.Loaded = true
 
     return blueprints
 end
@@ -1237,16 +1254,35 @@ function GetBlueprintsList()
     return blueprints
 end
 
+local fetchThread = nil
 -- Fetch asynchronously all unit blueprints from the game and given active sim mods
-function FetchBlueprints(activeMods, skipGameFiles)
+function FetchBlueprints(activeMods, skipGameFiles, taskNotifier)
     local bps = {}
-    ForkThread(function()
-        Show('STATUS', 'forking thread...')
-        bps = GetBlueprints(activeMods, skipGameFiles)
-        -- check if blueprints are loaded
-        while table.getsize(bps) == 0 do
-            WaitSeconds(0.25)
+
+    StopBlueprints()
+
+    fetchThread = ForkThread(function()
+        Show('STATUS', 'FetchBlueprints...')
+        timer:Start('FetchBlueprints')
+        local start = CurrentTime()
+        bps = GetBlueprints(activeMods, skipGameFiles, taskNotifier)
+        -- check if blueprints loading  is complete
+        while not blueprints.Loaded do 
+            Show('STATUS', 'FetchBlueprints... tick')
+            WaitSeconds(0.1)
         end
-        Show('STATUS', 'forking thread...done')
+        timer:Stop('FetchBlueprints', true)
+        Show('STATUS', 'FetchBlueprints...done')
+        fetchThread = nil
+        -- notify UnitManager UI about complete blueprint loading
+        if taskNotifier then 
+           taskNotifier:Complete() 
+        end
     end)
+end
+function StopBlueprints()
+    if fetchThread then
+        KillThread(fetchThread)
+        fetchThread = nil
+    end
 end
