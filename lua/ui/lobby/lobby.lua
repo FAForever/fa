@@ -957,6 +957,11 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:Show()
     slot.team:SetItem(playerInfo.Team)
 
+    -- Send team data to the server
+    if isHost then
+        SendPlayerOption(gameInfo.PlayerOptions[slotNum], 'Team', playerInfo.Team)
+    end
+
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
     slot.ready:SetCheck(playerInfo.Ready, true)
 
@@ -1315,6 +1320,9 @@ local function AssignRandomStartSpots()
             playerOptions.Team = r.team + 1
             playerOptions.StartSpot = r.slot
             gameInfo.PlayerOptions[r.slot] = playerOptions
+
+            -- Send team data to the server 
+            SendPlayerOption(gameInfo.PlayerOptions[r.slot], 'Team', playerInfo.Team)
         end
     end
 
@@ -1644,24 +1652,23 @@ function UpdateAvailableSlots( numAvailStartSpots )
     gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
+-- Use this function to send different messages for AI vs Human
+function SendPlayerOption(playerInfo, key, value)
+    if playerInfo.Human then
+        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+    else
+        GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+    end
+end
+
 local function SendGameInfoToServer()
     local armyIndex = 1
-
-    -- Use this function to send different messages for AI vs Human
-    local function SendPlayerOption(playerInfo, key, value)
-        if playerInfo.Human then
-            GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
-        else
-            GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
-        end
-    end
 
     -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5, 8 = slot8}
     -- if only three players were declared on an 8+ player map.
     for slotNum, playerInfo in gameInfo.PlayerOptions do
         SendPlayerOption(playerInfo, 'Faction', playerInfo.Faction)
         SendPlayerOption(playerInfo, 'Color', playerInfo.PlayerColor)
-        SendPlayerOption(playerInfo, 'Team', playerInfo.Team)
         SendPlayerOption(playerInfo, 'StartSpot', slotNum)
         SendPlayerOption(playerInfo, 'Army', armyIndex)
 
