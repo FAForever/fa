@@ -1,3 +1,13 @@
+Patch 3670 (January 17th, 2017)
+============================
+- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end#
+
+
+Patch 3669 (January 17th, 2017)
+============================
+- Reverted that last one for a bit to fix an idiot bug
+
+
 Patch 3668 (January 17th, 2017)
 ============================
 - Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end
