@@ -959,7 +959,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Send team data to the server
     if isHost then
-        SendPlayerOption(gameInfo.PlayerOptions[slotNum], 'Team', playerInfo.Team)
+        SendSlotOption(gameInfo.PlayerOptions[slotNum], 'Team', playerInfo.Team)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1322,7 +1322,7 @@ local function AssignRandomStartSpots()
             gameInfo.PlayerOptions[r.slot] = playerOptions
 
             -- Send team data to the server 
-            SendPlayerOption(gameInfo.PlayerOptions[r.slot], 'Team', playerInfo.Team)
+            SendSlotOption(gameInfo.PlayerOptions[r.slot], 'Team', playerInfo.Team)
         end
     end
 
@@ -1653,7 +1653,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
 end
 
 -- Use this function to send different messages for AI vs Human
-function SendPlayerOption(playerInfo, key, value)
+function SendSlotOption(playerInfo, key, value)
     if playerInfo.Human then
         GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
     else
@@ -1661,16 +1661,16 @@ function SendPlayerOption(playerInfo, key, value)
     end
 end
 
-local function SendGameInfoToServer()
+local function SendSlotInfoToServer()
     local armyIndex = 1
 
     -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5, 8 = slot8}
     -- if only three players were declared on an 8+ player map.
     for slotNum, playerInfo in gameInfo.PlayerOptions do
-        SendPlayerOption(playerInfo, 'Faction', playerInfo.Faction)
-        SendPlayerOption(playerInfo, 'Color', playerInfo.PlayerColor)
-        SendPlayerOption(playerInfo, 'StartSpot', slotNum)
-        SendPlayerOption(playerInfo, 'Army', armyIndex)
+        SendSlotOption(playerInfo, 'Faction', playerInfo.Faction)
+        SendSlotOption(playerInfo, 'Color', playerInfo.PlayerColor)
+        SendSlotOption(playerInfo, 'StartSpot', slotNum)
+        SendSlotOption(playerInfo, 'Army', armyIndex)
 
         -- Increment the index
         armyIndex = armyIndex + 1
@@ -1812,7 +1812,7 @@ local function TryLaunch(skipNoObserversCheck)
         end
 
         -- Broadcast our game settings to the server for stuff like rating calculation
-        SendGameInfoToServer()
+        SendSlotInfoToServer()
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
