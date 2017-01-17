@@ -959,7 +959,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Send team data to the server
     if isHost then
-        SendSlotOption(gameInfo.PlayerOptions[slotNum], 'Team', playerInfo.Team)
+        SendSlotOption(playerInfo, 'Team', playerInfo.Team)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1321,8 +1321,9 @@ local function AssignRandomStartSpots()
             playerOptions.StartSpot = r.slot
             gameInfo.PlayerOptions[r.slot] = playerOptions
 
-            -- Send team data to the server 
-            SendSlotOption(gameInfo.PlayerOptions[r.slot], 'Team', playerInfo.Team)
+            -- Send team data to the server
+            local playerInfo = gameInfo.PlayerOptions[r.slot]
+            SendSlotOption(playerInfo, 'Team', playerInfo.Team)
         end
     end
 
