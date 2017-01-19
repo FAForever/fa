@@ -1,3 +1,8 @@
+Patch 3671 (January 19th, 2017)
+============================
+- Fixed an unintentional bug with hosting games with an AI introduced with the rating bug fixes below
+
+
 Patch 3670 (January 17th, 2017)
 ============================
 - Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end#
