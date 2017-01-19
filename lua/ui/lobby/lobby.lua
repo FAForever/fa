@@ -968,7 +968,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Send team data to the server
     if isHost then
-        SendSlotOption(playerInfo, 'Team', playerInfo.Team)
+        HostUtils.SendSlotOptionsToServer(slotNum)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1352,7 +1352,7 @@ local function AssignRandomStartSpots()
 
             -- Send team data to the server
             local playerInfo = gameInfo.PlayerOptions[r.slot]
-            SendSlotOption(playerInfo, 'Team', playerInfo.Team)
+            HostUtils.SendSlotOptionsToServer(r.slot)
         end
     end
 
@@ -1754,31 +1754,6 @@ function UpdateAvailableSlots( numAvailStartSpots, scenario )
     gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
--- Use this function to send different messages for AI vs Human
-function SendSlotOption(playerInfo, key, value)
-    if playerInfo.Human then
-        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
-    else
-        GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
-    end
-end
-
-local function SendSlotInfoToServer()
-    local armyIndex = 1
-
-    -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5, 8 = slot8}
-    -- if only three players were declared on an 8+ player map.
-    for slotNum, playerInfo in gameInfo.PlayerOptions do
-        SendSlotOption(playerInfo, 'Faction', playerInfo.Faction)
-        SendSlotOption(playerInfo, 'Color', playerInfo.PlayerColor)
-        SendSlotOption(playerInfo, 'StartSpot', slotNum)
-        SendSlotOption(playerInfo, 'Army', armyIndex)
-
-        -- Increment the index
-        armyIndex = armyIndex + 1
-    end
-end
-
 local function TryLaunch(skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
@@ -1914,9 +1889,6 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.AdaptiveMap then 
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
-
-        -- Broadcast our game settings to the server for stuff like rating calculation
-        SendSlotInfoToServer()
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
@@ -5968,6 +5940,37 @@ function InitHostUtils()
                     SetGameOption('ScenarioFile', UIUtil.defaultScenario)
                 end
             end
+        end,
+
+        -- Send slot settings to the server
+        SendSlotOptionsToServer = function(slotNum)
+            -- Differentiate humans and AIs for the server
+            local function SendSlotOption(playerInfo, key, value)
+                if playerInfo.Human then
+                    GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+                else
+                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+                end
+            end
+
+            -- The PlayerOptions table is indexed by active slot. So it could be {1 = slot1, 5 = slot5,
+            -- 8 = slot8} if only three players were declared on an 8+ player map.
+            -- This has to be recalculated any time slots are touched in case the order shifted
+            local function SendArmyIndexesToServer()
+                local armyIndex = 1
+                for slotNum, playerInfo in gameInfo.PlayerOptions:pairs() do
+                    SendSlotOption(playerInfo, 'Army', armyIndex)
+                    armyIndex = armyIndex + 1
+                end
+            end
+
+            local playerInfo = gameInfo.PlayerOptions[slotNum]
+            SendSlotOption(playerInfo, 'Faction', playerInfo.Faction)
+            SendSlotOption(playerInfo, 'Color', playerInfo.PlayerColor)
+            SendSlotOption(playerInfo, 'Team', playerInfo.Team)
+            SendSlotOption(playerInfo, 'StartSpot', slotNum)
+
+            SendArmyIndexesToServer()
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.
