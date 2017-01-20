@@ -27,3 +27,6 @@ mountpoints = {
     textures = '/textures',
     units = '/units'
 }
+hooks = {
+    '/schook'
+}
