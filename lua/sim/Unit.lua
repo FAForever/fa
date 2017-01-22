@@ -791,6 +791,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartReclaim = function(self, target)
+        if self:IsUnitState('Patrolling') then
+            self.realBuildRate = self:GetBuildRate()
+            self:SetBuildRate(self.realBuildRate * 0.75)
+        end
+
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
@@ -802,13 +807,19 @@ Unit = Class(moho.unit_methods) {
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
         if guard then
-            IssueClearCommands({self})
-            IssueReclaim({self}, target)
-            IssueGuard({self}, guard)
+            local units = {self}
+            IssueClearCommands(units)
+            IssueReclaim(units, target)
+            IssueGuard(units, guard)
         end
     end,
 
     OnStopReclaim = function(self, target)
+        if self:IsUnitState('Patrolling') then
+            -- self.realBuildRate should always be set, but revert to bp value just in case
+            self:SetBuildRate(self.realBuildRate or self:GetBlueprint().Economy.BuildRate)
+        end
+
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')

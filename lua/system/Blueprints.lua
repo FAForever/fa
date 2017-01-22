@@ -506,7 +506,7 @@ function PreModBlueprints(all_bps)
             local br = nil
 
             if cats.ENGINEER and not cats.SUBCOMMANDER and not cats.COMMAND then
-                br = 26
+                br = bp.Economy.MaxBuildDistance or 10
             elseif cats.SCOUT then
                 br = 10
             elseif bp.Weapon then
