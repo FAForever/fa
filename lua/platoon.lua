@@ -2039,7 +2039,7 @@ Platoon = Class(moho.platoon_methods) {
         local cons = self.PlatoonData.Construction
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
 
-        local factionIndex = cons.FactionIndex or self:GetFactionIndex()
+        local factionIndex = cons.FactionIndex or aiBrain:GetFactionIndex()
 
         buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
         baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
@@ -6325,7 +6325,7 @@ Platoon = Class(sorianoldPlatoon) {
         local x,z = aiBrain:GetArmyStartPos()
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
 
-        local factionIndex = cons.FactionIndex or self:GetFactionIndex()
+        local factionIndex = cons.FactionIndex or aiBrain:GetFactionIndex()
 
         if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
         cons.NearMarkerType == 'Protected Experimental Construction') then
