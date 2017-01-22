@@ -183,7 +183,7 @@ function UpdateWindow(info)
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
         controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         controls.stratIcon:SetTexture('/textures/ui/common/game/strategicicons/icon_structure_generic_selected.dds')
-        for index = 1, 7 do
+        for index = 1, table.getn(controls.statGroups) do
             local i = index
             controls.statGroups[i].icon:Hide()
             if controls.statGroups[i].color then
@@ -236,7 +236,7 @@ function UpdateWindow(info)
             LayoutHelpers.AtTopIn(controls.name, controls.bg, 14)
             controls.name:SetFont(UIUtil.bodyFont, 10)
         end
-        for index = 1, 7 do
+        for index = 1, table.getn(statFuncs) do
             local i = index
             if statFuncs[i](info, bp) then
                 if i == 1 then
@@ -482,7 +482,7 @@ function CreateUI()
     controls.fuelBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.health = UIUtil.CreateText(controls.healthBar, '', 14, UIUtil.bodyFont)
     controls.statGroups = {}
-    for i = 1, 7 do
+    for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
         controls.statGroups[i].icon = Bitmap(controls.bg)
         controls.statGroups[i].value = UIUtil.CreateText(controls.statGroups[i].icon, '', 12, UIUtil.bodyFont)

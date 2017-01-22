@@ -385,12 +385,7 @@ function DisplayResources(bp, time, energy, mass)
     end
 
     -- Upkeep Group
-    local plusEnergyRate = bp.Economy.ProductionPerSecondEnergy or bp.ProductionPerSecondEnergy
-    local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
-    local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass
-    local negMassRate = bp.Economy.MaintenanceConsumptionPerSecondMass or bp.MaintenanceConsumptionPerSecondMass
-    local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
-    local upkeepMass = GetYield(negMassRate, plusMassRate)
+    local upkeepEnergy, upkeepMass = GetUpkeep(bp)
     local showUpkeep = false
     if upkeepEnergy ~= 0 or upkeepMass ~= 0 then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0002>Yield"))
@@ -420,6 +415,18 @@ function DisplayResources(bp, time, energy, mass)
     end
 
     return showUpkeep
+end
+
+function GetUpkeep(bp)
+    local plusEnergyRate = bp.Economy.ProductionPerSecondEnergy or bp.ProductionPerSecondEnergy
+    local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
+    local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass
+    local negMassRate = bp.Economy.MaintenanceConsumptionPerSecondMass or bp.MaintenanceConsumptionPerSecondMass
+    
+    local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
+    local upkeepMass = GetYield(negMassRate, plusMassRate)
+    
+    return upkeepEnergy, upkeepMass
 end
 
 function GetYield(consumption, production)
