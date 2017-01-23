@@ -981,9 +981,9 @@ function GetUnitsGroups(bps, factionName)
     faction.Units.NAVAL     = GetUnits(faction.Units.ALL, '(NAVAL - STRUCTURE - MOBILESONAR)')
     faction.Bases           = {}
     faction.Bases.ALL       = GetUnits(faction.Units.ALL, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..')')
-    faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD)')
+    faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD - DEFENSE)')
     faction.Bases.ECONOMIC  = GetUnits(faction.Bases.ALL, '(STRUCTURE * ECONOMIC)')
-    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
+    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
 
     faction.Bases.DEFENSES  = {}
     -- Collect not grouped units above tables into the DEFENSES table
