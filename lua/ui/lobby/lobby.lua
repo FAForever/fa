@@ -5664,7 +5664,7 @@ function InitHostUtils()
         -- Call this function once just before game starts
         SendArmySettingsToServer = function()
             local armyIdx = 1
-            for slotNum, playerInfo in gameInfo.PlayerOptions:pairs() do
+            for slotNum, playerInfo in gameInfo.PlayerOptions do
                 SendPlayerOption(playerInfo, 'Army', armyIdx)
                 armyIdx = armyIdx + 1
             end
