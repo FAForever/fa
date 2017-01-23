@@ -687,12 +687,26 @@ function GetUnitsCategories(bp, showAll)
                     category = 'ENERGY STORAGE'
                 elseif category == 'SUPPORTFACTORY' then
                     category = 'SUPPORT FACTORY'
+                elseif category == 'ENGINEERSTATION' then
+                    category = 'ENGINEER-STATION'
+                elseif category == 'COUNTERINTELLIGENCE' then
+                    category = 'COUNTER-INTELLIGENCE'
+                elseif category == 'INDIRECTFIRE' then
+                    category = 'INDIRECT-FIRE'
+                elseif category == 'DIRECTFIRE' then
+                    category = 'DIRECT-FIRE'
+                elseif category == 'OBRITALSYSTEM' then
+                    category = 'OBRITAL-SYSTEM'
+                elseif category == 'GROUNDATTACK' then
+                    category = 'GROUND-ATTACK'
                 end
                 -- Ensures name of enhancements are nicely formatted
                 if cached.Enhancements[category] then
                     category = 'UPGRADE ' .. StringSplitCamel(category)
                 end
-                if not CategoriesHidden[category] then
+                if not CategoriesHidden[category] and 
+                   not StringStarts(category, 'BUILTBY') and 
+                   not StringStarts(category, 'DUMMY') then
                     -- Ensures all categories have the same case
                     ret[string.upper(category)] = true
                 end
