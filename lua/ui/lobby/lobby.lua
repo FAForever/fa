@@ -959,7 +959,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Send team data to the server
     if isHost then
-        HostUtils.SendSlotOptionsToServer(slotNum)
+        HostUtils.SendPlayerSettingsToServer(slotNum)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1323,7 +1323,7 @@ local function AssignRandomStartSpots()
 
             -- Send team data to the server
             local playerInfo = gameInfo.PlayerOptions[r.slot]
-            HostUtils.SendSlotOptionsToServer(r.slot)
+            HostUtils.SendPlayerSettingsToServer(r.slot)
         end
     end
 
@@ -1786,6 +1786,8 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.AdaptiveMap then 
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
+
+        HostUtils.SendArmySettingsToServer()
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
@@ -5242,6 +5244,14 @@ function DoSlotSwap(slot1, slot2)
     SetSlotInfo(slot1, player2)
 end
 
+local function SendPlayerOption(playerInfo, key, value)
+    if playerInfo.Human then
+        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+    else
+        GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+    end
+end
+
 --- Create the HostUtils object, containing host-only functions. By not assigning this for non-host
 -- players, we ensure a hard crash should a non-host somehow end up trying to call them, simplifying
 -- debugging somewhat (as well as reducing the number of toplevel definitions a fair bit).
@@ -5650,37 +5660,23 @@ function InitHostUtils()
             end
         end,
 
+        -- This function is needed because army numbers need to be calculated: armies are numbered incrementally in slot order.
+        -- Call this function once just before game starts
+        SendArmySettingsToServer = function()
+            local armyIdx = 1
+            for slotNum, playerInfo in gameInfo.PlayerOptions:pairs() do
+                SendPlayerOption(playerInfo, 'Army', armyIdx)
+                armyIdx = armyIdx + 1
+            end
+        end,
+
         --- Send player settings to the server
         SendPlayerSettingsToServer = function(slotNum)
-            local function SendPlayerOption(playerInfo, key, value)
-                if playerInfo.Human then
-                    GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
-                else
-                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
-                end
-            end
-
-            -- This function is needed because army numbers need to be calculated: armies are numbered incrementally in slot order.
-            -- After every slot change, the army index needs to be recalculated for every slot.
-            -- FIXME: This could be done once when the game is launched instead of on every slot change.
-            local function SendArmySettingsToServer()
-                local armyIdx = 1
-                for slotNum, playerInfo in gameInfo.PlayerOptions:pairs() do
-
-                    if playerInfo ~= nil then
-                        SendPlayerOption(playerInfo, 'Army', armyIdx)
-                        armyIdx = armyIdx + 1
-                    end
-                end
-            end
-
             local playerInfo = gameInfo.PlayerOptions[slotNum]
             SendPlayerOption(playerInfo, 'Faction', playerInfo.Faction)
             SendPlayerOption(playerInfo, 'Color', playerInfo.PlayerColor)
             SendPlayerOption(playerInfo, 'Team', playerInfo.Team)
             SendPlayerOption(playerInfo, 'StartSpot', slotNum)
-
-            SendArmySettingsToServer()
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.
