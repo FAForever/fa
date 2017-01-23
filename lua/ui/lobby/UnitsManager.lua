@@ -1023,10 +1023,7 @@ end
 -- @param b - second blueprint
 -- @param sortCategories - table with sort categories
 -- @param sortReversed - optional boolean for sorting in revers of order specified in sortCategories
-function CompareUnitsOrder(a, b, sortCategories, sortReversed, depth, item)
-    if depth and depth > 15 then
-        return 0
-    end
+function CompareUnitsOrder(a, b, sortCategories, sortReversed)
 
     if table.getsize(sortCategories) == 0 then
         return 0
@@ -1049,17 +1046,15 @@ function CompareUnitsOrder(a, b, sortCategories, sortReversed, depth, item)
             orderB = orderIndex
             categoryB = category
         end
-    end
-    if (categoryA or categoryB) and categoryA == categoryB then
-        local target = categoryA or categoryB
-        if not depth then
-            depth = 1
-        else
-            depth = depth + 1
+        -- check if found unique order indexes
+        if orderA and orderB then
+            if orderA == orderB then
+                orderA = nil
+                orderB = nil
+            else
+                break
+            end
         end
-        local sortCopy = table.copy(sortCategories)
-        table.removeByValue(sortCopy, target)
-        return CompareUnitsOrder(a, b, sortCopy, sortReversed, depth, target)     
     end
 
     if orderA == orderB then
