@@ -198,12 +198,12 @@ CategoriesHidden  = {
 }
 
 Factions = {
-    ["AEON"] = 'FF238C00',
-    ["UEF"] = 'FF006CD9',
-    ["CYBRAN"] = 'FFB32D00',
-    ["SERAPHIM"] = 'FFFFBF00',
-    ["NOMADS"] = 'FFFF7200',
-    ["UNKNOWN"] = 'ff808080',
+    ["AEON"] = 'FF238C00',      --#FF238C00
+    ["UEF"] = 'FF006CD9',       --#FF006CD9
+    ["CYBRAN"] = 'FFB32D00',    --#FFB32D00
+    ["SERAPHIM"] = 'FFFFBF00',  --#FFFFBF00
+    ["NOMADS"] = 'FFFF7200',    --#FFFF7200
+    ["UNKNOWN"] = 'ff808080',   --#ff808080
 }
 
 -- Gets unit's color based on faction of given blueprint
@@ -213,25 +213,26 @@ end
 
 -- Gets unit's faction based on categories of given blueprint
 function GetUnitFaction(bp)
-    local faction = bp.General.FactionName
-    if faction then
-        faction = string.upper(faction)
-       return faction
-    else
-        if not bp.Merge then
-            Show('WARNING', bp.Info..' - missing bp.General.FactionName')
-        end
-        -- Using CategoriesHash to quickly find faction
-        for name, _ in Factions do
-            if bp.CategoriesHash[name] then
-                return name
-            end
-        end
-        if not bp.Merge then
-            Show('WARNING', bp.Info..' - missing FACTION in Categories')
+    local factionCategory = nil
+    local factionName = bp.General.FactionName
+    -- Using CategoriesHash to quickly find faction
+    for name, _ in Factions do
+        if bp.CategoriesHash[name] then
+            factionCategory =  name
+            break
         end
     end
-
+    -- validate if factionCategory and factionName are the same
+    if not factionCategory then
+        Show('WARNING', bp.Info..' - missing FACTION in bp.Categories')
+    elseif not factionName then 
+        Show('WARNING', bp.Info..' - missing bp.General.FactionName')
+    else
+        if factionCategory ~= string.upper(factionName) then
+            Show('WARNING', bp.Info..' - mismatch between ' .. factionCategory .. '  in bp.Categories and ' .. factionName .. ' in bp.General.FactionName')
+        end
+        return factionCategory
+    end 
     return 'UNKNOWN'
 end
 
