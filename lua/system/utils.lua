@@ -598,7 +598,14 @@ end
 function StringCapitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2) 
 end
-
+--- Check if a given string starts with specified string
+function StringStarts(str, startString)
+   return string.sub(str, 1, string.len(startString)) == startString
+end
+--- Check if a given string ends with specified string
+function StringEnds(str, endString)
+   return endString == '' or string.sub(str, -string.len(endString)) == endString
+end
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
