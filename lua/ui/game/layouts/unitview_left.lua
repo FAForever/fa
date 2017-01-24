@@ -6,13 +6,14 @@ local options = Prefs.GetFromCurrentProfile('options')
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 
 local iconPositions = {
-    [1] = {Left = 70, Top = 60},
-    [2] = {Left = 70, Top = 80},
+    [1] = {Left = 70, Top = 55},
+    [2] = {Left = 70, Top = 70},
     [3] = {Left = 190, Top = 60},
     [4] = {Left = 130, Top = 60},
     [5] = {Left = 130, Top = 80},
     [6] = {Left = 130, Top = 80},
-    [7] = {Left = 190, Top = 80}
+    [7] = {Left = 190, Top = 80},
+    [8] = {Left = 70, Top = 85},
 }
 local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/mass.dds'),
@@ -22,6 +23,7 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/missiles.dds'),
     UIUtil.UIFile('/game/unit_view_icons/shield.dds'),
     UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
+    UIUtil.UIFile('/game/unit_view_icons/build.dds'),
 }
     
 function SetLayout()
@@ -113,11 +115,9 @@ function SetLayout()
         controls.shieldBar.Height:Set(14)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
         controls.shieldBar.Height:Set(2)
-        LayoutHelpers.AtLeftTopIn(controls.statGroups[1].icon, controls.bg, 70, 55)
-        LayoutHelpers.RightOf(controls.statGroups[1].value, controls.statGroups[1].icon, 5)
-        LayoutHelpers.Below(controls.statGroups[2].icon, controls.statGroups[1].icon,0)
-        LayoutHelpers.RightOf(controls.statGroups[2].value, controls.statGroups[2].icon, 5)
-        LayoutHelpers.Below(controls.Buildrate, controls.statGroups[2].value,1)
+    else
+        LayoutHelpers.AtLeftTopIn(controls.statGroups[1].icon, controls.bg, 70, 60)
+        LayoutHelpers.AtLeftTopIn(controls.statGroups[2].icon, controls.bg, 70, 80)
     end
 end
 

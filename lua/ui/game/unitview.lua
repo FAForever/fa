@@ -176,6 +176,15 @@ local statFuncs = {
             return false
         end
     end,
+    function(info, bp)
+        if options.gui_detailed_unitview == 0 then
+            return false
+        end
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
+            return string.format("%d",math.floor(info.userUnit:GetBuildRate()))
+        end
+        return false
+    end,
 }
 
 function UpdateWindow(info)
@@ -409,7 +418,6 @@ function UpdateWindow(info)
     end
     if options.gui_detailed_unitview ~= 0 then
         if info.blueprintId ~= 'unknown' then
-            controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
@@ -441,13 +449,6 @@ function UpdateWindow(info)
                         end
                     end
                 end
-            end
-
-            if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-                controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
-                controls.Buildrate:Show()
-            else
-                controls.Buildrate:Hide()
             end
         end
     end
@@ -504,7 +505,6 @@ function CreateUI()
 
     if options.gui_detailed_unitview ~= 0 then
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
-        controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
     
     controls.bg.OnFrame = function(self, delta)
