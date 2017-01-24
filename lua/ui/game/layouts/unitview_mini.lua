@@ -109,9 +109,7 @@ function SetLayout()
         LayoutHelpers.AtLeftTopIn(controls.statGroups[1].icon, controls.bg, 70, 55)
         LayoutHelpers.RightOf(controls.statGroups[1].value, controls.statGroups[1].icon, 5)
         LayoutHelpers.Below(controls.statGroups[2].icon, controls.statGroups[1].icon,0)
-        -- LayoutHelpers.AtRightTopIn(controls.StorageMass, controls.bg, 145, 55)
         LayoutHelpers.RightOf(controls.statGroups[2].value, controls.statGroups[2].icon, 5)
-        -- LayoutHelpers.AtRightTopIn(controls.StorageEnergy, controls.bg, 145, 73)
         LayoutHelpers.Below(controls.Buildrate, controls.statGroups[2].value,1)
     end
 end
