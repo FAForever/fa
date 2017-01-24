@@ -216,7 +216,7 @@ local actions = {
         import('/lua/ui/dialogs/replay.lua').CreateDialog(GetFrame(0), true)
     end,
     EndSPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
             "<LOC _Yes>", EndGame,
             "<LOC _Save>", EndGameSaveWindow,
             "<LOC _No>", nil,
@@ -225,15 +225,15 @@ local actions = {
     end,
     EndMPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
-        "<LOC _Yes>", EndGame, 
+        "<LOC _Yes>", EndGame,
         "<LOC _No>", nil,
             nil, nil,
             true,
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     RestartGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?", 
-            "<LOC _Yes>", function() RestartSession() end, 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?",
+            "<LOC _Yes>", function() RestartSession() end,
             "<LOC _No>", nil,
             nil, nil,
             true,
@@ -249,25 +249,25 @@ local actions = {
     end,
     RestartReplay = function()
         local replayFilename = GetFrontEndData('replay_filename')
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?", 
-            "<LOC _Yes>", function() LaunchReplaySession(replayFilename) end, 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?",
+            "<LOC _Yes>", function() LaunchReplaySession(replayFilename) end,
             "<LOC _No>", nil)
     end,
     ExitSPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
             "<LOC _Yes>", function()
                 ExitApplication()
-            end, 
+            end,
             "<LOC _Save>", ExitGameSaveWindow,
             "<LOC _No>", nil,
             true,
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     ExitMPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
             "<LOC _Yes>", function()
                 EscapeHandler.SafeQuit()
-            end, 
+            end,
             "<LOC _No>", nil,
             nil, nil,
             true,
@@ -310,7 +310,7 @@ function EndGameSaveWindow()
             EndGame()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0), 
+    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
@@ -326,86 +326,81 @@ function ExitGameSaveWindow()
             ExitApplication()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0), 
+    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
-controls = {
-    parent = false,
-    bgBottomGlow = false,
-    bgTopGlow = false,
-    bgStretch = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
 
 function CreateStretchBar(parent, topPiece)
     local group = Group(parent)
     group.center = Bitmap(group)
     group.left = Bitmap(group)
     group.right = Bitmap(group)
-    
+
     LayoutHelpers.AtHorizontalCenterIn(group.center, group)
     LayoutHelpers.AtTopIn(group.center, group)
     LayoutHelpers.AtLeftIn(group.left, group)
     LayoutHelpers.AtTopIn(group.left, group)
     LayoutHelpers.AtRightIn(group.right, group)
     LayoutHelpers.AtTopIn(group.right, group)
-    
+
     if topPiece then
         group.centerLeft = Bitmap(group)
         group.centerLeft.Top:Set(function() return group.center.Top() + 8 end)
         group.centerLeft.Left:Set(group.left.Right)
         group.centerLeft.Right:Set(group.center.Left)
-        
+
         group.centerRight = Bitmap(group)
         group.centerRight.Top:Set(group.centerLeft.Top)
         group.centerRight.Left:Set(group.center.Right)
         group.centerRight.Right:Set(group.right.Left)
-        
+
         group.Width:Set(function() return group.right.Width() + group.left.Width() + group.center.Width() end)
     else
         group.center.Left:Set(group.left.Right)
         group.center.Right:Set(group.right.Left)
     end
-    
+
     group.Height:Set(function() return math.max(group.center.Height(), group.left.Height()) end)
-    
+
     group:DisableHitTest(true)
-    
+
     return group
 end
 
 function Create(parent)
     savedParent = parent
-    
+
     controls.parent = Group(savedParent)
     controls.parent.Depth:Set(100)
-    
+
     controls.bgTop = CreateStretchBar(controls.parent, true)
     controls.bgBottom = CreateStretchBar(controls.parent)
     controls.bgBottom.Width:Set(controls.bgTop.Width)
-    
+
     controls.collapseArrow = Checkbox(savedParent)
     Tooltip.AddCheckboxTooltip(controls.collapseArrow, 'menu_collapse')
-    
+
     controls.tabContainer = Group(controls.bgTop)
     controls.tabContainer:DisableHitTest()
-    
+
     local function CreateTab(data)
         local tab = Checkbox(controls.tabContainer)
         tab.Depth:Set(function() return controls.bgTop.Depth() + 10 end)
         tab.Data = data
         Tooltip.AddCheckboxTooltip(tab, data.tooltip)
-        
+
         if data.pause then
             tab.Glow = Bitmap(tab)
             LayoutHelpers.AtCenterIn(tab.Glow, tab)
             tab.Glow:DisableHitTest()
             tab.Glow:SetAlpha(0)
         end
-        
+
         return tab
     end
-    
+
     controls.tabs = {}
     for i, data in tabs do
         local index = i
@@ -414,7 +409,7 @@ function Create(parent)
             pauseBtn = controls.tabs[index]
         end
     end
-    
+
     SetLayout()
     CommonLogic()
 end
@@ -532,7 +527,7 @@ function BuildContent(contentID)
     local contentGroup = false
     if menus[contentID] then
         contentGroup = Group(controls.parent)
-        
+
         local function BuildButton(button)
             local btn = UIUtil.CreateButtonStd(contentGroup, '/game/medium-btn/medium', button.label, UIUtil.menuFontSize)
             btn.label:SetFont(UIUtil.factionFont, UIUtil.menuFontSize)
@@ -542,7 +537,7 @@ function BuildContent(contentID)
             LayoutHelpers.AtVerticalCenterIn(btn.label, btn, 4)
             return btn
         end
-        
+
         local tableID = 'singlePlayer'
         if HasCommandLineArg('/gpgnet') then
             tableID = 'gpgnet'
@@ -551,11 +546,10 @@ function BuildContent(contentID)
         elseif GameMain.GetReplayState() then
             tableID = 'replay'
         end
-        
+
         contentGroup.Buttons = {}
 
         local isRanked = sessionInfo.Options.Ranked
-
         local i = 1
         for index, buttonData in menus[contentID][tableID] do
             if not isRanked or not buttonData.hideWhenRanked then
@@ -580,9 +574,9 @@ function BuildContent(contentID)
         controls.bgTop.widthOffset = 30
         contentGroup = import('/lua/ui/game/'..contentID..'.lua').CreateContent(controls.parent)
     end
-    
+
     animationLock = true
-    
+
     contentGroup.Top:Set(function() return controls.bgTop.Bottom() + 20 end)
     LayoutHelpers.AtHorizontalCenterIn(contentGroup, controls.bgTop)
     contentGroup:SetAlpha(0, true)
@@ -594,9 +588,9 @@ function BuildContent(contentID)
         end
         self:SetAlpha(newAlpha, true)
     end
-    
+
     controls.contentGroup = contentGroup
-    
+
     CreateStretchBG()
     controls.bgTop:SetNeedsFrameUpdate(true)
     controls.bgTop.Time = 0
@@ -699,25 +693,25 @@ function CreateStretchBG()
     import(UIUtil.GetLayoutFilename('tabs')).LayoutStretchBG()
 end
 
-function DestroyStretchBG() 
+function DestroyStretchBG()
     controls.bgBottomLeftGlow:Destroy()
     controls.bgBottomLeftGlow = false
-    
+
     controls.bgTopLeftGlow:Destroy()
     controls.bgTopLeftGlow = false
-    
+
     controls.bgLeftStretch:Destroy()
     controls.bgLeftStretch = false
-    
+
     controls.bgBottomRightGlow:Destroy()
     controls.bgBottomRightGlow = false
-    
+
     controls.bgTopRightGlow:Destroy()
     controls.bgTopRightGlow = false
-    
+
     controls.bgRightStretch:Destroy()
     controls.bgRightStretch = false
-    
+
     controls.bgMidStretch:Destroy()
     controls.bgMidStretch = false
 end
@@ -732,7 +726,7 @@ function ToggleTab(tabID)
             break
         end
     end
-    if tabControl and not tabControl:IsDisabled() then  
+    if tabControl and not tabControl:IsDisabled() then
         tabControl:OnClick()
     end
 end
@@ -831,7 +825,7 @@ function ToggleGameInfo()
 		UIUtil.CreateLobbyVertScrollbar(PresetList)
 	------------
     -- Script --
-	
+
 	-- Configurations = { #Thermo 2vs2
 		-- standard = {
 			-- customprops = {pas regarder}
@@ -852,7 +846,7 @@ function ToggleGameInfo()
 			-- }
 		-- }
 	-- }
-	
+
 	-- Options = {
 		-- RestrictedCategories = {}
 		-- Ratings = {
@@ -860,7 +854,7 @@ function ToggleGameInfo()
 		-- }
 		-- ... tout les réglage d'option de scenario
 	-- }
-	
+
 	--  size = { #Thermo, taille de la carte
 		-- 1 : 512
 		-- 2 : 512
@@ -958,26 +952,26 @@ function CreateScreenGlow()
         pauseGlow.Bottom = Bitmap(pauseGlow.Top, UIUtil.SkinnableFile('/game/pause-indicator/bottom.dds'))
         pauseGlow.Center = Bitmap(pauseGlow.Top)
         pauseGlow.Center:SetSolidColor('55000000')
-        
+
         pauseGlow.Top.Top:Set(GetFrame(0).Top)
         pauseGlow.Top.Left:Set(GetFrame(0).Left)
         pauseGlow.Top.Right:Set(GetFrame(0).Right)
-        
+
         pauseGlow.Left.Top:Set(GetFrame(0).Top)
         pauseGlow.Left.Left:Set(GetFrame(0).Left)
         pauseGlow.Left.Bottom:Set(GetFrame(0).Bottom)
-        
+
         pauseGlow.Right.Top:Set(GetFrame(0).Top)
         pauseGlow.Right.Right:Set(GetFrame(0).Right)
         pauseGlow.Right.Bottom:Set(GetFrame(0).Bottom)
-        
+
         pauseGlow.Bottom.Left:Set(GetFrame(0).Left)
         pauseGlow.Bottom.Right:Set(GetFrame(0).Right)
         pauseGlow.Bottom.Bottom:Set(GetFrame(0).Bottom)
-        
+
         LayoutHelpers.FillParent(pauseGlow.Center, GetFrame(0))
         pauseGlow.Center.Depth:Set(function() return pauseGlow.Top.Depth() - 1 end)
-        
+
         pauseGlow.Top:DisableHitTest(true)
     end
     pauseGlow.Top:SetNeedsFrameUpdate(true)
@@ -1134,14 +1128,14 @@ function UpdateModeDisplay()
         controls.modeDisplay = Bitmap(controls.parent, UIUtil.SkinnableFile('/dialogs/time-units-tabs/energy_bmp.dds'))
         LayoutHelpers.Below(controls.modeDisplay, controls.bgBottom, -12)
         LayoutHelpers.AtHorizontalCenterIn(controls.modeDisplay, controls.bgBottom)
-        
+
         controls.modeDisplay.modes = Group(controls.modeDisplay)
         controls.modeDisplay.modes.Height:Set(1)
         local prevControl = false
         local width = 0
         for i, v in modes do
             local bg = Bitmap(controls.modeDisplay, UIUtil.SkinnableFile('/dialogs/time-units-tabs/panel-tracking_bmp_m.dds'))
-            
+
             if not v.callback then
                 bg.text = UIUtil.CreateText(bg, LOC(v.label), 18, UIUtil.bodyFont)
                 LayoutHelpers.AtLeftIn(bg.text, bg)
@@ -1153,10 +1147,10 @@ function UpdateModeDisplay()
                 LayoutHelpers.AtLeftIn(bg.btn, bg)
                 LayoutHelpers.AtVerticalCenterIn(bg.btn, bg, -3)
                 bg.btn.OnClick = v.callback
-                
+
                 bg.Width:Set(bg.btn.Width)
             end
-            
+
             if prevControl then
                 bg.seperator = Bitmap(bg, UIUtil.SkinnableFile('/dialogs/time-units-tabs/panel-tracking_bmp_d.dds'))
                 LayoutHelpers.LeftOf(bg.seperator, bg)
@@ -1178,7 +1172,7 @@ function UpdateModeDisplay()
         controls.modeDisplay.minCap.Top:Set(function() return controls.modeDisplay.modes.Top() - 3 end)
         controls.modeDisplay.maxCap.Left:Set(controls.modeDisplay.modes.Right)
         controls.modeDisplay.maxCap.Top:Set(controls.modeDisplay.minCap.Top)
-        
+
         controls.modeDisplay:DisableHitTest()
         controls.modeDisplay.minCap:DisableHitTest()
         controls.modeDisplay.maxCap:DisableHitTest()

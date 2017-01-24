@@ -9,9 +9,11 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
 
-View = false
+local controls = import('/lua/ui/controls.lua').Get()
+
+View = controls.View or false
+MapView = controls.MapView or false
 ViewState = "full"
-MapView = false
 
 local enhancementSlotNames =
 {
@@ -450,7 +452,9 @@ function SetupUnitViewLayout(parent)
         View = nil
     end
     MapView = parent
+    controls.MapView = MapView
     SetLayout()
+    controls.View = View
     View:Hide()
     View:DisableHitTest(true)
 end

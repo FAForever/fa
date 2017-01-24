@@ -40,13 +40,8 @@ local needsSquadLayoutPostNIS = false
 local preCreationQueue = {}
 local preCreationWaitThread = false
 
-controls = {
-    parent = false,
-    bg = false,
-    objItems = {},
-    tooltip = false,
-    movie = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.objItems = controls.objItems or {}
 
 function CreateUI(inParent)
     controls.parent = inParent
@@ -288,7 +283,7 @@ function UpdateObjectiveItems(skipAnnounce)
         group.icon.Height:Set(40)
         group.icon.Width:Set(40)
         group.icon:DisableHitTest()
-        
+
         group.icon.flash = Bitmap(group.icon, UIUtil.UIFile('/game/units_bmp/glow.dds'))
         group.icon.flash:SetAlpha(0)
         LayoutHelpers.AtCenterIn(group.icon.flash, group.icon)
@@ -311,7 +306,7 @@ function UpdateObjectiveItems(skipAnnounce)
             end
             self:SetAlpha(newAlpha)
         end
-        
+
         group.Height:Set(group.bg.Height)
         group.Width:Set(group.bg.Width)
         group.data = data
@@ -321,7 +316,7 @@ function UpdateObjectiveItems(skipAnnounce)
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Diplomacy_Open'}))
             elseif event.Type == 'MouseExit' then
                 DestroyTooltip()
-            elseif event.Type == 'ButtonPress' then 
+            elseif event.Type == 'ButtonPress' then
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
                 local targets = self.data.targets
                 local positions = self.data.unitPositions
@@ -803,7 +798,7 @@ function Contract()
     if not controls.bg then
         return
     end
-    if controls.tooltip then    
+    if controls.tooltip then
         DestroyTooltip()
     end
     preContractState = controls.bg:IsHidden()

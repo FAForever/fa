@@ -112,12 +112,8 @@ local activeTab = nil
 
 local showBuildIcons = false
 
-controls = {
-    minBG = false,
-    maxBG = false,
-    midBG = false,
-    tabs = {},
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.tabs = controls.tabs or {}
 
 local constructionTabs = { 't1', 't2', 't3', 't4', 'templates' }
 local nestedTabKey = {
@@ -1798,7 +1794,7 @@ function FormatData(unitData, type)
 
         -- get function for checking for restricted units
         local IsRestricted = import('/lua/game.lua').IsRestricted
-        
+
         -- This section adds the arrows in for a build icon which is an upgrade from the
         -- selected unit. If there is an upgrade chain, it will display them split by arrows.
         -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
@@ -1806,7 +1802,7 @@ function FormatData(unitData, type)
         -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
         local unitSelected = sortedOptions.selection[1]
         local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
-                
+
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
@@ -1814,16 +1810,16 @@ function FormatData(unitData, type)
                 if table.getn(retData) > 0 then
                     table.insert(retData, { type = 'spacer' })
                 end
-                
+
                 for index, unit in units do
                     -- show UI data/icons only for not restricted units
-                    
+
                     local restrict = false
                     if not IsRestricted(unit, GetFocusArmy()) then
-                        local bp = __blueprints[unit] 
+                        local bp = __blueprints[unit]
                         -- check if upgradeable structure
                         if isStructure and
-                                bp and bp.General and 
+                                bp and bp.General and
                                 bp.General.UpgradesFrom and
                                 bp.General.UpgradesFrom ~= 'none' then
 
