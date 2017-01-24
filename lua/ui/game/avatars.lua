@@ -612,7 +612,8 @@ function CreateIdleEngineerList(parent, units)
 
         for index, units in engineers do
             local i = index
-            if i == 3 and currentFaction ~= 1 then
+            -- ADDED SUPPORT FOR CUSTOM FACTIONS HAVING FIELD ENGINEERS
+            if i == 3 and (not Factions[currentFaction].IdleEngTextures or not Factions[currentFaction].IdleEngTextures.T2F) then
                 continue
             end
             if not self.icons[i] then
@@ -766,7 +767,7 @@ function AvatarUpdate()
     -- Find the faction key (1 - 4 valid. 5+ happen for Civilian, default to 4 to use Seraphim textures)
     -- armiesTable[GetFocusArmy()].faction returns 0 = UEF, 1 = Aeon, 2 = Cybran, 3 = Seraphim, 4 = Civilian Army, 5 = Civilian Neutral
     -- We want 1 - 4, with 4 max
-    currentFaction = math.min(GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1, 4)
+    currentFaction = math.min(GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1, table.getn(Factions))
     
     if avatars then
         for _, unit in avatars do
