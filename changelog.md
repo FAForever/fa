@@ -1,3 +1,8 @@
+Patch 3672 (January 24th, 2017)
+============================
+- Fixed non-default team balance option breaking the anti-rating-bug code
+
+
 Patch 3671 (January 19th, 2017)
 ============================
 - Fixed an unintentional bug with hosting games with an AI introduced with the rating bug fixes below
