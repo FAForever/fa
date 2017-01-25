@@ -2,6 +2,15 @@ Patch 3676 (Upcoming)
 ============================
 ### Gameplay
 - New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
+- Allow units in a transport which is shot down to leave wrecks at the crash site
+- Allow the Novax to build a new Satellite if the old one dies. This can only happen if it is impacted by a Nuke or ctrl-k'ed
+- Introduced code to slightly improve the way Tempest and Atlantis behave, particularly in being able to fire, in shallow waters
+
+### Bugs
+- Fixed ACU reclaiming while shooting
+- Fixed ACU building while shooting
+- Fixed Auto-Overcharge stopping working randomly until toggled
+- Fixed Auto-Overcharge firing while building
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -12,9 +21,19 @@ Patch 3676 (Upcoming)
 - Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
 - Allow factions to be restricted per slot
 
+### UI
+- Added new option to change the minimum reclaim label size shown in the overlay
+- Added new buildrate icon in the unit detail view
+
+### Balance
+- Increased Auto-Overcharge rate of fire from 3.3s to 5s
+
 ### Other
-- Added some mods to Blacklist
+- Added some mods to blacklist
+- Updated maps blacklist
 - Allowed hooking of schook files to help future patch mechanism
+- Allow hot-reloading of UI files with EnableDiskWatch
+- Introduced wider support for the addition of new factions into the game
 
 ### Contributors
 - Exotic-Retard
