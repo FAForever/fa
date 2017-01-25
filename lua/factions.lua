@@ -1,9 +1,116 @@
--- Note that the order here will determine the faction index
--- (it's the automatically assigned array index)
-Factions = {
+-- Call these in your scripts where you need them
+
+function GetFactions(AllowedMods)
+    -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
+    -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
+    --LOG('GetFactions()')
+    return GetCustomFactions(OrgFactions(), AllowedMods)
+end
+
+function GetNewFactionAINames()
+    -- gets a name for AI players
+    local ainames = {}
+    for f,_ in NewFactionAiData do
+        ainames[f] = NewFactionAiData[f].ainames or { 'nameless', }
+    end
+    return ainames
+end
+
+function GetNewFactionAIPlans(offset)
+    -- gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
+    -- that value + 1.
+    if table.getn(NewFactionAiData) < 1 then
+        local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
+    end
+    if not offset then
+        offset = 5  -- 5 for the 5 races
+    end
+    local aiplans = {}
+    offset = math.max(0, offset)
+    for f,_ in NewFactionAiData do
+        offset = offset + 1
+        aiplans[ offset ] = NewFactionAiData[f].AIPlansList or { '/lua/AI/aiarchetype-managerloader.lua', }
+    end
+    return aiplans
+end
+
+-- ----------------------------------------------------------------------------------------------------------------
+-- Don't touch these!
+
+NewFactionAiData = {}
+
+function GetCustomFactions(FactionsTable, AllowedMods)
+    if not FactionsTable or type(FactionsTable) ~= 'table' then
+        FactionsTable = {}
+    end
+    local FactionFiles = DiskFindFiles('/lua/CustomFactions', '*.lua')
+    --LOG('*DEBUG: Custom faction files found: '..repr(FactionFiles))
+    local SelectedMods = GetSelectedMods(AllowedMods)
+    for k, file in FactionFiles do
+
+        local FactionFile = import(file)
+        if rawget(FactionFile, 'Factions') then
+            WARN('File '..repr(file)..' contains a "Factions" variable. Please change it to "FactionList", the old variable is not used.')
+        end
+        if not rawget(FactionFile, 'FactionList') then
+            continue
+        end
+
+        for s, t in FactionFile.FactionList do
+            if type(t) == 'table' then
+                if t.ModsPrerequisite and (type(t.ModsPrerequisite) ~= 'table' or not TableHasKeys(SelectedMods, t.ModsPrerequisite)) then
+                    continue
+                end
+                t['IsCustomFaction'] = true
+                table.insert(FactionsTable, t)
+                NewFactionAiData[t.Key] = t.AI or {}
+            end
+        end
+    end
+    return FactionsTable
+end
+
+function GetSelectedMods(AllowedMods)
+    -- we need an array with it's keys being mod uids and the values being true. but this function can be called
+    -- while loading the game which means /lua/mods.lua.GetSelectedMods() doesn't work. In that case we look in
+    -- the global var __active_mods and get the mod uids from that table.
+    local mods = {}
+    if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
+        -- to detect if we're in the main menu or loading the game
+        mods = import('/lua/mods.lua').GetSelectedMods()
+    elseif _G['__active_mods'] and table.getn(_G['__active_mods']) > 0 then
+        for k, mod in __active_mods do
+            mods[mod.uid] = true
+        end
+    end
+    if AllowedMods then  -- AllowedMods -> table of mods keyed by mod id
+        local newmods = {}
+        for id,_ in mods do
+            if AllowedMods[id] then
+                newmods[id] = true
+            end
+        end
+        mods = newmods
+    end
+    return mods
+end
+
+function TableHasKeys(tbl, keys)
+    for _, k in keys do
+        if not tbl[k] then
+            return false
+        end
+    end
+    return true
+end
+
+function OrgFactions()
+    return {
     {
         Key = 'uef',
         Category = 'UEF',
+        FactionInUnitBp = 'UEF',
+        IsCustomFaction = false,
         DisplayName = "<LOC _UEF>UEF",
         SoundPrefix = 'UEF',
         InitialUnit = 'uel0001',
@@ -42,11 +149,20 @@ Factions = {
                 '/icons/units/ueb0303_icon.dds',
             },
         },
-    },
 
+        GAZ_UI_Info = {
+            BuildingIdPrefixes = {
+                'ueb',
+                'xeb',
+                'deb',
+            },
+        },
+    },
     {
         Key = 'aeon',
         Category = 'AEON',
+        FactionInUnitBp = 'Aeon',
+        IsCustomFaction = false,
         DisplayName = "<LOC _Aeon>Aeon",
         SoundPrefix = 'Aeon',
         InitialUnit = 'ual0001',
@@ -84,11 +200,20 @@ Factions = {
                 '/icons/units/uab0303_icon.dds',
             },
         },
-    },
 
+        GAZ_UI_Info = {
+            BuildingIdPrefixes = {
+                'uab',
+                'xab',
+                'dab',
+            },
+        },
+    },
     {
         Key = 'cybran',
         Category = 'CYBRAN',
+        FactionInUnitBp = 'Cybran',
+        IsCustomFaction = false,
         DisplayName = "<LOC _Cybran>Cybran",
         SoundPrefix = 'Cybran',
         InitialUnit = 'url0001',
@@ -126,11 +251,20 @@ Factions = {
                 '/icons/units/urb0303_icon.dds',
             },
         },
-    },
 
+        GAZ_UI_Info = {
+            BuildingIdPrefixes = {
+                'urb',
+                'xrb',
+                'drb',
+            },
+        },
+    },
     {
         Key = 'seraphim',
         Category = 'SERAPHIM',
+        FactionInUnitBp = 'Seraphim',
+        IsCustomFaction = false,
         DisplayName = "<LOC _Seraphim>Seraphim",
         SoundPrefix = 'Seraphim',
         InitialUnit = 'xsl0001',
@@ -168,8 +302,22 @@ Factions = {
                 '/icons/units/xsb0303_icon.dds',
             },
         },
+
+        GAZ_UI_Info = {
+            BuildingIdPrefixes = {
+                'xsb',
+                'usb',
+                'dsb',
+            },
+        },
     },
 }
+end
+
+-- ----------------------------------------------------------------------------------------------------------------
+-- Original faction variables
+
+Factions = GetFactions()
 
 -- map faction key to index, as this lookup is done frequently
 FactionIndexMap = {}
@@ -177,9 +325,10 @@ FactionIndexMap = {}
 -- file designator to faction key
 FactionDesToKey = {}
 
+FactionInUnitBpToKey = {}
+
 for index, value in Factions do
     FactionIndexMap[value.Key] = index
     FactionDesToKey[value.CampaignFileDesignator] = value.Key
+    FactionInUnitBpToKey[value.FactionInUnitBp] = index
 end
-
-
