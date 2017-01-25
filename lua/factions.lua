@@ -3,7 +3,6 @@
 function GetFactions(AllowedMods)
     -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
     -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
-    --LOG('GetFactions()')
     return GetCustomFactions(OrgFactions(), AllowedMods)
 end
 
@@ -44,7 +43,6 @@ function GetCustomFactions(FactionsTable, AllowedMods)
         FactionsTable = {}
     end
     local FactionFiles = DiskFindFiles('/lua/CustomFactions', '*.lua')
-    --LOG('*DEBUG: Custom faction files found: '..repr(FactionFiles))
     local SelectedMods = GetSelectedMods(AllowedMods)
     for k, file in FactionFiles do
 
