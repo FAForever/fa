@@ -133,6 +133,10 @@ local enhancementTooltips = {
     Back = 'construction_tab_enhancment_back',
 }
 
+-- First and second letter of blueprint ID for faction conversion
+local BPID_FirstLetterArray = { "%1", "x", "u", "b" }
+local BPID_SecondLetterArray = { ["Aeon"] = "a", ["UEF"] = "e", ["Cybran"] = "r", ["Seraphim"] = "s" }
+
 --
 -- Workaround for an apparent engine bug that appeared when engymod was deployed (by Rienzilla)
 --
@@ -2322,10 +2326,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                 if currentFaction then
                     sortedOptions.templates = {}
                     local function ConvertID(BPID)
-                        local FirstLetterArray = { "%1", "x", "u", "b" }
-                        local SecondLetterArray = { ["Aeon"] = "a", ["UEF"] = "e", ["Cybran"] = "r", ["Seraphim"] = "s" }
-                        local SecondLetter = SecondLetterArray[currentFaction]
-                        for _, FirstLetter in FirstLetterArray do
+                        local SecondLetter = BPID_SecondLetterArray[currentFaction]
+                        for _, FirstLetter in BPID_FirstLetterArray do
                             local NewBPID = string.gsub(BPID, "(%a)(%a)(%a)(%d+)",FirstLetter..SecondLetter.. "%3%4")
                         -- =local xsb1012 = string.gsub(ueb1012, "(u)(e)(b)(1012)",x..s.. "b1012")
                             if table.find(buildableUnits, NewBPID) then

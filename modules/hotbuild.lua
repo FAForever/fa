@@ -22,6 +22,14 @@ local cycleButtons = {}
 
 local modifiersKeys = {}
 
+-- Blueprint prefixes for faction coversion
+local bp_prefixes = {
+    ["AEON"]     = {"uab", "xab", "dab",},
+    ["UEF"]      = {"ueb", "xeb", "deb",},
+    ["CYBRAN"]   = {"urb", "xrb", "drb",},
+    ["SERAPHIM"] = {"xsb", "usb", "dsb",},
+}
+
 function initCycleButtons(values)
     local buttonH = 48
     local buttonW = 48
@@ -311,13 +319,7 @@ function buildActionTemplate(modifier)
     local currentFaction = selection[1]:GetBlueprint().General.FactionName
     if options.gui_all_race_templates ~= 0 and currentFaction then
         local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"]     = {"uab", "xab", "dab",},
-                ["UEF"]      = {"ueb", "xeb", "deb",},
-                ["CYBRAN"]   = {"urb", "xrb", "drb",},
-                ["SERAPHIM"] = {"xsb", "usb", "dsb",},
-            }
-            for _, prefix in prefixes[string.upper(currentFaction)] do
+            for _, prefix in bp_prefixes[string.upper(currentFaction)] do
                 if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
                     return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
                 end
