@@ -32,6 +32,8 @@ local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
 local Select = import('/lua/ui/game/selection.lua')
+local Factions = import('/lua/factions.lua').Factions
+local FactionInUnitBpToKey = import('/lua/factions.lua').FactionInUnitBpToKey
 
 local prevBuildables = false
 local prevSelection = false
@@ -2318,21 +2320,20 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
             if allMobile and templates and table.getsize(templates) > 0 then
-                local currentFaction = selection[1]:GetBlueprint().General.FactionName
+
+                local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+                local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
+
                 if currentFaction then
                     sortedOptions.templates = {}
                     local function ConvertID(BPID)
-                        local FirstLetterArray = { "%1", "x", "u", "b" }
-                        local SecondLetterArray = { ["Aeon"] = "a", ["UEF"] = "e", ["Cybran"] = "r", ["Seraphim"] = "s" }
-                        local SecondLetter = SecondLetterArray[currentFaction]
-                        for _, FirstLetter in FirstLetterArray do
-                            local NewBPID = string.gsub(BPID, "(%a)(%a)(%a)(%d+)",FirstLetter..SecondLetter.. "%3%4")
-                        -- =local xsb1012 = string.gsub(ueb1012, "(u)(e)(b)(1012)",x..s.. "b1012")
-                            if table.find(buildableUnits, NewBPID) then
-                                return NewBPID
+                        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
+                        for k, prefix in prefixes do
+                            if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
+                                return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
                             end
                         end
-                        return BPID
+                        return false
                     end
 
                     for templateIndex, template in templates do
