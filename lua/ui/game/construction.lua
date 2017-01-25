@@ -49,15 +49,15 @@ end
 local missingIcons = {}
 
 local dragging = false
-local index = nil --index of the item in the queue currently being dragged
-local originalIndex = false --original index of selected item (so that UpdateBuildQueue knows where to modify it from)
+local index = nil -- Index of the item in the queue currently being dragged
+local originalIndex = false -- Original index of selected item (so that UpdateBuildQueue knows where to modify it from)
 local oldQueue = {}
 local modifiedQueue = {}
-local updateQueue = true --if false then queue won't update in the ui
-local modified = false --if false then buttonrelease will increase buildcount in queue
-local dragLock = false --to disable quick successive drags, which doubles the units in the queue
+local updateQueue = true -- If false then queue won't update in the ui
+local modified = false -- If false then buttonrelease will increase buildcount in queue
+local dragLock = false -- To disable quick successive drags, which doubles the units in the queue
 
--- locals for Keybind labels in build queue
+-- Locals for Keybind labels in build queue
 local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
 local idRelations = {}
 local upgradeKey = false
@@ -75,7 +75,7 @@ function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
 end
 
 if options.gui_draggable_queue ~= 0 then
-    --add gameparent handleevent for if the drag ends outside the queue window
+    -- Add gameparent handleevent for if the drag ends outside the queue window
     local gameParent = import('gamemain.lua').GetGameParent()
     local oldGameParentHandleEvent = gameParent.HandleEvent
     gameParent.HandleEvent = function(self, event)
@@ -98,7 +98,7 @@ if options.gui_visible_template_names ~= 0 then
 end
 
 
--- these are external controls used for positioning, so don't add them to our local control table
+-- These are external controls used for positioning, so don't add them to our local control table
 controlClusterGroup = false
 mfdControl = false
 ordersControl = false
@@ -386,13 +386,13 @@ end
 function CreateTabs(type)
     local defaultTabOrder = {}
     local desiredTabs = 0
-    -- construction tab, this is called before fac templates have been added
+    -- Construction tab, this is called before fac templates have been added
     if type == 'construction' and allFactories and options.gui_templates_factory ~= 0 then
         -- nil value would cause refresh issues if templates tab is currently selected
         sortedOptions.templates = {}
 
-        -- prevent tab autoselection when in templates tab,
-        -- normally triggered when number of active tabs has changed (fac upgrade added/removed from queue)
+        -- Prevent tab autoselection when in templates tab,
+        -- Normally triggered when number of active tabs has changed (fac upgrade added/removed from queue)
         local templatesTab = GetTabByID('templates')
         if templatesTab and templatesTab:IsChecked() then
             local numActive = 0
@@ -897,7 +897,7 @@ function CommonLogic()
     if options.gui_bigger_strat_build_icons ~= 0 then
         local oldSecondary = controls.secondaryChoices.SetControlToType
         local oldPrimary = controls.choices.SetControlToType
-        -- norem add idle icon to buttons
+        -- Add idle icon to buttons
         local oldPrimaryCreate = controls.choices.CreateElement
         controls.choices.CreateElement = function()
             local btn = oldPrimaryCreate()
@@ -930,7 +930,7 @@ function CommonLogic()
     else -- If we dont have bigger strat icons selected, just do the idle icon
         local oldSecondary = controls.secondaryChoices.SetControlToType
         local oldPrimary = controls.choices.SetControlToType
-        -- norem add idle icon to buttons
+        -- Add idle icon to buttons
         local oldPrimaryCreate = controls.choices.CreateElement
         controls.choices.CreateElement = function()
             local btn = oldPrimaryCreate()
@@ -959,7 +959,7 @@ function CommonLogic()
         local oldPrimaryCreate = controls.choices.CreateElement
         controls.choices.CreateElement = function()
             local btn = oldPrimaryCreate()
-            -- creating the display area
+            -- Create the display area
             btn.Tmplnm = UIUtil.CreateText(btn.Icon, '', 11, UIUtil.bodyFont)
             btn.Tmplnm:SetColor('ffffff00')
             btn.Tmplnm:DisableHitTest()
@@ -974,7 +974,7 @@ function CommonLogic()
         end
         controls.choices.SetControlToType = function(control, type)
             oldPrimary(control, type)
-            -- the text
+            -- The text
             if type == 'templates' and 'templates' then
                 control.Tmplnm.Width:Set(48)
                 control.Tmplnm:SetText(string.sub(control.Data.template.name, cutA, cutB))
@@ -1012,11 +1012,11 @@ function OnRolloverHandler(button, state)
     if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
         if state == 'enter' then
             button.oldHandleEvent = button.HandleEvent
-            --if we have entered the button and are dragging something then we want to replace it with what we are dragging
+            -- If we have entered the button and are dragging something then we want to replace it with what we are dragging
             if dragging == true then
-                --move item from old location (index) to new location (this button's index)
+                -- Move item from old location (index) to new location (this button's index)
                 MoveItemInQueue(currentCommandQueue, index, item.position)
-                --since the currently selected button has now moved, update the index
+                -- Since the currently selected button has now moved, update the index
                 index = item.position
 
                 button.dragMarker = Bitmap(button, '/textures/ui/queuedragger.dds')
@@ -1033,7 +1033,7 @@ function OnRolloverHandler(button, state)
 
                     if event.Modifiers.Left then
                         if not dragLock then
-                            --left button pressed so start dragging procedure
+                            -- Left button pressed so start dragging procedure
                             dragging = true
                             index = item.position
                             originalIndex = index
@@ -1043,7 +1043,7 @@ function OnRolloverHandler(button, state)
                             self.dragMarker:DisableHitTest()
                             Effect.Pulse(self.dragMarker, 1.5, 0.6, 0.8)
 
-                            --copy un modified queue so that current build order is recorded (for deleting it)
+                            -- Copy un modified queue so that current build order is recorded (for deleting it)
                             oldQueue = table.copy(currentCommandQueue)
                         end
                     else
@@ -1052,7 +1052,7 @@ function OnRolloverHandler(button, state)
                     end
                 elseif event.Type == 'ButtonRelease' then
                     if dragging then
-                        --if queue has changed then update queue, else increase build count (like default)
+                        -- Iif queue has changed then update queue, else increase build count (like default)
                         if modified then
                             ButtonReleaseCallback()
                         else
@@ -1102,7 +1102,7 @@ function OnClickHandler(button, modifiers)
     local item = button.Data
 
     if options.gui_improved_unit_deselection ~= 0 then
-        --Improved unit deselection -ghaleon
+        -- Improved unit deselection -ghaleon
         if item.type == 'unitstack' then
             if modifiers.Right then
                 if modifiers.Shift or modifiers.Ctrl or (modifiers.Shift and modifiers.Ctrl) then -- we have one of our modifiers
@@ -1125,7 +1125,7 @@ function OnClickHandler(button, modifiers)
                         end
                     end
                     SelectUnits(selectionx)
-                else -- default right-click behavior
+                else -- Default right-click behavior
                     local selection = {}
                     for _, unit in sortedOptions.selection do
                         local found = false
@@ -1151,7 +1151,7 @@ function OnClickHandler(button, modifiers)
     if item.type == "templates" and allFactories then
 
         if modifiers.Right then
-            -- options menu
+            -- Options menu
             if button.OptionMenu then
                 button.OptionMenu:Destroy()
                 button.OptionMenu = nil
@@ -1165,7 +1165,7 @@ function OnClickHandler(button, modifiers)
                 end
             end
         else
-            -- add template to build queue
+            -- Add template to build queue
             for _, data in ipairs(item.template.templateData) do
                 local blueprint = __blueprints[data.id]
                 if blueprint.General.UpgradesFrom == 'none' then
@@ -1187,19 +1187,19 @@ function OnClickHandler(button, modifiers)
         end
 
         if modifiers.Left then
-            -- see if we are issuing an upgrade order
+            -- See if we are issuing an upgrade order
             if itembp.General.UpgradesFrom == 'none' then
                 performUpgrade = false
             else
                 for i, v in sortedOptions.selection do
-                    if v then -- its possible that your unit will have died by the time this gets to it
+                    if v then -- Its possible that your unit will have died by the time this gets to it
                         local unitBp = v:GetBlueprint()
                         if itembp.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
                         elseif itembp.General.UpgradesFrom == unitBp.General.UpgradesTo then
                             performUpgrade = true
                         elseif itembp.General.UpgradesFromBase ~= "none" then
-                            -- try testing against the base
+                            -- Try testing against the base
                             if itembp.General.UpgradesFromBase == unitBp.BlueprintId then
                                 performUpgrade = true
                             elseif itembp.General.UpgradesFromBase == unitBp.General.UpgradesFromBase then
@@ -1210,7 +1210,7 @@ function OnClickHandler(button, modifiers)
                 end
             end
 
-            -- hold alt to reset queue, same as hotbuild
+            -- Hold alt to reset queue, same as hotbuild
             if modifiers.Alt then
                 ResetOrderQueues(sortedOptions.selection)
             end
@@ -1219,10 +1219,10 @@ function OnClickHandler(button, modifiers)
                 IssueUpgradeOrders(sortedOptions.selection, item.id)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
-                    -- stationary means it needs to be placed, so go in to build mobile mode
+                    -- Stationary means it needs to be placed, so go in to build mobile mode
                     import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, { name = item.id })
                 else
-                    -- if the item to build can move, it must be built by a factory
+                    -- If the item to build can move, it must be built by a factory
                     -- TODO -what about mobile factories?
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
                 end
@@ -1794,7 +1794,7 @@ function FormatData(unitData, type)
 
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
-        -- get function for checking for restricted units
+        -- Get function for checking for restricted units
         local IsRestricted = import('/lua/game.lua').IsRestricted
 
         -- This section adds the arrows in for a build icon which is an upgrade from the
@@ -1814,12 +1814,12 @@ function FormatData(unitData, type)
                 end
 
                 for index, unit in units do
-                    -- show UI data/icons only for not restricted units
-
+                    -- Show UI data/icons only for not restricted units
+                    
                     local restrict = false
                     if not IsRestricted(unit, GetFocusArmy()) then
-                        local bp = __blueprints[unit]
-                        -- check if upgradeable structure
+                        local bp = __blueprints[unit] 
+                        -- Check if upgradeable structure
                         if isStructure and
                                 bp and bp.General and
                                 bp.General.UpgradesFrom and
@@ -1950,7 +1950,7 @@ function FormatData(unitData, type)
         local usedEnhancements = {}
         local restEnh = EnhanceCommon.GetRestricted()
 
-        -- filter enhancements based on restrictions
+        -- Filter enhancements based on restrictions
         for index, enhTable in unitData do
             if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
                 table.insert(filteredEnh, enhTable)
@@ -2028,7 +2028,7 @@ function FormatData(unitData, type)
 
 
     if type == 'templates' and allFactories then
-        -- replace Infinite queue by Create template
+        -- Replace Infinite queue with Create template
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
         if table.getsize(currentCommandQueue) > 0 then
             controls.extraBtn1:Enable()
@@ -2051,7 +2051,7 @@ function FormatData(unitData, type)
 end
 
 function SetSecondaryDisplay(type)
-    if updateQueue then --don't update the queue the tick after a buttonreleasecallback
+    if updateQueue then -- Don't update the queue the tick after a buttonreleasecallback
         local data = {}
         if type == 'buildQueue' then
             if currentCommandQueue and table.getn(currentCommandQueue) > 0 then
@@ -2089,7 +2089,7 @@ end
 
 function CheckForOrderQueue(newSelection)
     if table.getn(selection) == 1 then
-        -- render the command queue
+        -- Render the command queue
         if currentCommandQueue then
             SetQueueGrid(currentCommandQueue, selection)
         else
@@ -2288,7 +2288,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if table.getsize(selection) > 0 then
-        --repeated from original to access the local variables
+        -- Repeated from original to access the local variables
         local allSameUnit = true
         local bpID = false
         local allMobile = true
@@ -2306,12 +2306,12 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        --Upgrade multiple SCU at once
+        -- Upgrade multiple SCU at once
         if selection[1]:GetBlueprint().Enhancements and allSameUnit then
             controls.enhancementTab:Enable()
         end
 
-        --Allow all races to build other races templates
+        -- Allow all races to build other races templates
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
@@ -2358,7 +2358,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     end
                 end
 
-                --refresh the construction tab to show any new available templates
+                -- Refresh the construction tab to show any new available templates
                 if not isOldSelection then
                     if not controls.constructionTab:IsDisabled() then
                         controls.constructionTab:SetCheck(true)
@@ -2376,7 +2376,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
     end
 
-    -- add valid templates for selection
+    -- Add valid templates for selection
     if allFactories then
         sortedOptions.templates = {}
         local templates = TemplatesFactory.GetTemplates()
@@ -2387,12 +2387,12 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                 for index, entry in ipairs(template.templateData) do
                     if not table.find(buildableUnits, entry.id) then
                         valid = false
-                        -- allow templates containing factory upgrades & higher tech units
+                        -- Allow templates containing factory upgrades & higher tech units
                         if index > 1 then
                             for i = index - 1, 1, -1 do
                                 local blueprint = __blueprints[template.templateData[i].id]
                                 if blueprint.General.UpgradesFrom ~= 'none' then
-                                    -- previous entry is a (valid) upgrade
+                                    -- Previous entry is a (valid) upgrade
                                     valid = true
                                     break
                                 end
@@ -2408,7 +2408,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        -- templates tab enable & refresh
+        -- Templates tab enable & refresh
         local templatesTab = GetTabByID('templates')
         if templatesTab then
             templatesTab:Enable()
@@ -2455,7 +2455,7 @@ function SetupConstructionControl(parent, inMFDControl, inOrdersControl)
     return controls.constructionGroup
 end
 
--- given a tech level, sets that tech level, returns false if tech level not available
+-- Given a tech level, sets that tech level, returns false if tech level not available
 function SetCurrentTechTab(techLevel)
     if techLevel == 1 and GetTabByID('t1'):IsDisabled() then
         return false
@@ -2563,12 +2563,12 @@ function MoveItemInQueue(queue, indexfrom, indexto)
     modified = true
     local moveditem = queue[indexfrom]
     if indexfrom < indexto then
-        --take indexfrom out and shunt all indices from indexfrom to indexto up one
+        -- Take indexfrom out and shunt all indices from indexfrom to indexto up one
         for i = indexfrom, (indexto - 1) do
             queue[i] = queue[i + 1]
         end
     elseif indexfrom > indexto then
-        --take indexfrom out and shunt all indices from indexto to indexfrom down one
+        -- Take indexfrom out and shunt all indices from indexto to indexfrom down one
         for i = indexfrom, (indexto + 1), -1 do
             queue[i] = queue[i - 1]
         end
@@ -2576,14 +2576,14 @@ function MoveItemInQueue(queue, indexfrom, indexto)
     queue[indexto] = moveditem
     modifiedQueue = queue
     currentCommandQueue = queue
-    --update buttons in the UI
+    -- Update buttons in the UI
     SetSecondaryDisplay('buildQueue')
 end
 
 function UpdateBuildList(newqueue, from)
-    --The way this does this is UGLY but I can only find functions to remove things from the build queue and to add them at the end
-    --Thus the only way I can see to modify the build queue is to delete it back to the point it is modified from (the from argument) and then
-    --add the modified version back in. Unfortunately this causes a momentary 'skip' in the displayed build cue as it is deleted and replaced
+    -- The way this does this is UGLY but I can only find functions to remove things from the build queue and to add them at the end
+    -- Thus the only way I can see to modify the build queue is to delete it back to the point it is modified from (the from argument) and then
+    -- add the modified version back in. Unfortunately this causes a momentary 'skip' in the displayed build cue as it is deleted and replaced
 
     for i = table.getn(oldQueue), from, -1 do
         DecreaseBuildCountInQueue(i, oldQueue[i].count)
@@ -2607,22 +2607,22 @@ end
 function ButtonReleaseCallback()
     if dragging == true then
         PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
-        --don't update the queue next time round, to avoid a list of 0 builds
+        -- Don't update the queue next time round, to avoid a list of 0 builds
         updateQueue = false
-        --disable dragging until the queue is rebuilt
+        -- Disable dragging until the queue is rebuilt
         dragLock = true
-        --reset modified so buildcount increasing can be used again
+        -- Reset modified so buildcount increasing can be used again
         modified = false
-        --mouse button released so end drag
+        -- Mouse button released so end drag
         dragging = false
         if originalIndex <= index then
             first_modified_index = originalIndex
         else
             first_modified_index = index
         end
-        --on the release of the mouse button we want to update the ACTUAL build queue that the factory does. So far, only the UI has been changed,
+        -- On the release of the mouse button we want to update the ACTUAL build queue that the factory does. So far, only the UI has been changed,
         UpdateBuildList(modifiedQueue, first_modified_index)
-        --nothing is now selected
+        -- Nothing is now selected
         index = nil
     end
 end
