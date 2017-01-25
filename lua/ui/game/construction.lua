@@ -153,7 +153,6 @@ local enhancementTooltips = {
 local oldDecreaseBuildCountInQueue = DecreaseBuildCountInQueue
 function DecreaseBuildCountInQueue(unitIndex, count)
 
-    --   LOG("Called DecreaseBuildCountInQueue hook")
 
     -- FIXME: maybe add some sanity checking?
     local unitStack = currentCommandQueue[unitIndex]
@@ -174,7 +173,6 @@ function DecreaseBuildCountInQueue(unitIndex, count)
     end
 
     if not (tech3 and supportfactory) then
-        --LOG("DecreaseBuildCountInQueue: calling super()")
         oldDecreaseBuildCountInQueue(unitIndex, count)
     else
         LOG("Not canceling t3 support factory")
