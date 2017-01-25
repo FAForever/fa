@@ -8,7 +8,7 @@ function GetFactions(AllowedMods)
 end
 
 function GetNewFactionAINames()
-    -- gets a name for AI players
+    -- Gets a name for AI players
     local ainames = {}
     for f,_ in NewFactionAiData do
         ainames[f] = NewFactionAiData[f].ainames or { 'nameless', }
@@ -17,7 +17,7 @@ function GetNewFactionAINames()
 end
 
 function GetNewFactionAIPlans(offset)
-    -- gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
+    -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
     if table.getn(NewFactionAiData) < 1 then
         local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
@@ -71,12 +71,12 @@ function GetCustomFactions(FactionsTable, AllowedMods)
 end
 
 function GetSelectedMods(AllowedMods)
-    -- we need an array with it's keys being mod uids and the values being true. but this function can be called
+    -- We need an array with it's keys being mod uids and the values being true. but this function can be called
     -- while loading the game which means /lua/mods.lua.GetSelectedMods() doesn't work. In that case we look in
     -- the global var __active_mods and get the mod uids from that table.
     local mods = {}
     if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
-        -- to detect if we're in the main menu or loading the game
+        -- Detect if we're in the main menu or loading the game
         mods = import('/lua/mods.lua').GetSelectedMods()
     elseif _G['__active_mods'] and table.getn(_G['__active_mods']) > 0 then
         for k, mod in __active_mods do
@@ -323,10 +323,10 @@ end
 
 Factions = GetFactions()
 
--- map faction key to index, as this lookup is done frequently
+-- Map faction key to index, as this lookup is done frequently
 FactionIndexMap = {}
 
--- file designator to faction key
+-- File designator to faction key
 FactionDesToKey = {}
 
 FactionInUnitBpToKey = {}
