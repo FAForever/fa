@@ -176,6 +176,15 @@ local statFuncs = {
             return false
         end
     end,
+    function(info, bp)
+        if options.gui_detailed_unitview == 0 then
+            return false
+        end
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
+            return string.format("%d",math.floor(info.userUnit:GetBuildRate()))
+        end
+        return false
+    end,
 }
 
 function UpdateWindow(info)
@@ -183,7 +192,7 @@ function UpdateWindow(info)
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
         controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         controls.stratIcon:SetTexture('/textures/ui/common/game/strategicicons/icon_structure_generic_selected.dds')
-        for index = 1, 7 do
+        for index = 1, table.getn(controls.statGroups) do
             local i = index
             controls.statGroups[i].icon:Hide()
             if controls.statGroups[i].color then
@@ -236,7 +245,7 @@ function UpdateWindow(info)
             LayoutHelpers.AtTopIn(controls.name, controls.bg, 14)
             controls.name:SetFont(UIUtil.bodyFont, 10)
         end
-        for index = 1, 7 do
+        for index = 1, table.getn(statFuncs) do
             local i = index
             if statFuncs[i](info, bp) then
                 if i == 1 then
@@ -409,7 +418,6 @@ function UpdateWindow(info)
     end
     if options.gui_detailed_unitview ~= 0 then
         if info.blueprintId ~= 'unknown' then
-            controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
@@ -441,13 +449,6 @@ function UpdateWindow(info)
                         end
                     end
                 end
-            end
-
-            if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-                controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
-                controls.Buildrate:Show()
-            else
-                controls.Buildrate:Hide()
             end
         end
     end
@@ -482,7 +483,7 @@ function CreateUI()
     controls.fuelBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.health = UIUtil.CreateText(controls.healthBar, '', 14, UIUtil.bodyFont)
     controls.statGroups = {}
-    for i = 1, 7 do
+    for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
         controls.statGroups[i].icon = Bitmap(controls.bg)
         controls.statGroups[i].value = UIUtil.CreateText(controls.statGroups[i].icon, '', 12, UIUtil.bodyFont)
@@ -504,7 +505,6 @@ function CreateUI()
 
     if options.gui_detailed_unitview ~= 0 then
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
-        controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
     
     controls.bg.OnFrame = function(self, delta)
