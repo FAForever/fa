@@ -134,7 +134,7 @@ local enhancementTooltips = {
 }
 
 -- First and second letter of blueprint ID for faction conversion
-local BPID_FirstLetterArray = { "%1", "x", "u", "b" }
+local BPID_FirstLetterArray = { "%1", "x", "u", "b", "z" }
 local BPID_SecondLetterArray = { ["Aeon"] = "a", ["UEF"] = "e", ["Cybran"] = "r", ["Seraphim"] = "s" }
 
 --

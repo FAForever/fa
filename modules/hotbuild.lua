@@ -24,10 +24,10 @@ local modifiersKeys = {}
 
 -- Blueprint prefixes for faction coversion
 local bp_prefixes = {
-    ["AEON"]     = {"uab", "xab", "dab",},
-    ["UEF"]      = {"ueb", "xeb", "deb",},
-    ["CYBRAN"]   = {"urb", "xrb", "drb",},
-    ["SERAPHIM"] = {"xsb", "usb", "dsb",},
+    ["AEON"]     = {"uab", "xab", "dab", "zab",},
+    ["UEF"]      = {"ueb", "xeb", "deb", "zeb",},
+    ["CYBRAN"]   = {"urb", "xrb", "drb", "zrb",},
+    ["SERAPHIM"] = {"xsb", "usb", "dsb", "zsb",},
 }
 
 function initCycleButtons(values)
