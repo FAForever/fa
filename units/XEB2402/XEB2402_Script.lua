@@ -15,62 +15,81 @@ XEB2402 = Class(TAirFactoryUnit) {
     end,
 
     OpenState = State() {
+        Retract = function(self)
+            -- Retract cage
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
+            self.AnimManip:SetAnimationFraction(1)
+            self.AnimManip:SetRate(-1)
+            WaitFor(self.AnimManip)
+
+            -- Retract Arms
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
+            self.AnimManip:SetAnimationFraction(1)
+            self.AnimManip:SetRate(-1)
+            self:PlayUnitSound('MoveArms')
+            WaitFor(self.AnimManip)
+        end,
+
+        Extend = function(self)
+            -- Extend Arms
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
+            self.AnimManip:SetAnimationFraction(0)
+            self.AnimManip:SetRate(1)
+            self:PlayUnitSound('MoveArms')
+            WaitFor(self.AnimManip)
+
+            -- Make a satellite and launch
+            self:CreateSatellite()
+
+            -- Extend cage
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
+            self.AnimManip:SetAnimationFraction(0)
+            self.AnimManip:SetRate(1)
+            WaitFor(self.AnimManip)
+        end,
+
+        CreateSatellite = function(self)
+            -- Create Satellite, attach it to unit, play animation, release satellite
+            local location = self:GetPosition('Attachpoint01')
+            self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            self.Trash:Add(self.Satellite)
+            self.Satellite:AttachTo(self, 'Attachpoint01')
+
+            -- Create warning lights and other VFX
+            local army = self:GetArmy()
+            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
+            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.10, 1.90))
+            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.08, -0.5, 1.60))
+            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.04, -0.5, 1.60))
+            self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_01_emit.bp'):OffsetEmitter(0.7, -0.85, 0.35))
+            self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_02_emit.bp'):OffsetEmitter(-0.7, -0.85, 0.35))
+            self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam01', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.00))
+            self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam02', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.00))
+
+            -- Tell the satellite that we're its parent
+            self.Satellite.Parent = self
+        end,
+
         Main = function(self)
             -- If the unit has arrived with a new player via capture, it will already have a Satellite in the wild
             if not self.Satellite then
                 self.waitingForLaunch = true
-                -- Play arm opening animation
-                self.AnimManip = CreateAnimator(self)
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca')
-                self:PlayUnitSound('MoveArms')
-                WaitFor(self.AnimManip)
+
+                if not self.AnimManip then
+                    self.AnimManip = CreateAnimator(self)
+                end
                 self.Trash:Add(self.AnimManip)
 
-                -- Create Satellite, attach it to unit, play animation, release satellite
-                local location = self:GetPosition('Attachpoint01')
-                self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
-                self.Trash:Add(self.Satellite)
-                self.Satellite:AttachTo(self, 'Attachpoint01')
-
-                -- Create warning lights and other VFX
-                local army = self:GetArmy()
-                self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
-                self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.10, 1.90))
-                self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.08, -0.5, 1.60))
-                self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.04, -0.5, 1.60))
-                self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_01_emit.bp'):OffsetEmitter(0.7, -0.85, 0.35))
-                self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_02_emit.bp'):OffsetEmitter(-0.7, -0.85, 0.35))
-                self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam01', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
-                self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam02', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
-
-                -- Tell the satellite that we're its parent
-                self.Satellite.Parent = self
-
-                -- Play ejection animation
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
-                self:PlayUnitSound('LaunchSat')
-                WaitFor(self.AnimManip)
-                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
-                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
+                self:Extend()
 
                 -- Release unit
                 self.Satellite:DetachFrom()
                 self.Satellite:Open()
 
-                -- Reopen the cage and arms, to keep up the illusion
-                WaitSeconds(1.5)
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
-                self.AnimManip:SetAnimationFraction(1) -- These animations are one-way, so set them to 'Complete' status, then play in reverse
-                self.AnimManip:SetRate(-1)
-
-                WaitFor(self.AnimManip)
+                self:Retract()
 
                 self.waitingForLaunch = false
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
-                self.AnimManip:SetAnimationFraction(1)
-                self.AnimManip:SetRate(-1)
-                self:PlayUnitSound('MoveArms')
-                WaitFor(self.AnimManip)
+                IssueClearCommands({self})
             end
 
             ChangeState(self, self.IdleState)
