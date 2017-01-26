@@ -18,6 +18,7 @@ XEB2402 = Class(TAirFactoryUnit) {
         Main = function(self)
             -- If the unit has arrived with a new player via capture, it will already have a Satellite in the wild
             if not self.Satellite then
+                self.waitingForLaunch = true
                 -- Play arm opening animation
                 self.AnimManip = CreateAnimator(self)
                 self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca')
@@ -30,7 +31,6 @@ XEB2402 = Class(TAirFactoryUnit) {
                 self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
                 self.Trash:Add(self.Satellite)
                 self.Satellite:AttachTo(self, 'Attachpoint01')
-                self.haveOpenedOnce = true
 
                 -- Create warning lights and other VFX
                 local army = self:GetArmy()
@@ -65,6 +65,7 @@ XEB2402 = Class(TAirFactoryUnit) {
 
                 WaitFor(self.AnimManip)
 
+                self.waitingForLaunch = false
                 self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
                 self.AnimManip:SetAnimationFraction(1)
                 self.AnimManip:SetRate(-1)
@@ -78,15 +79,20 @@ XEB2402 = Class(TAirFactoryUnit) {
 
     -- Override OnStartBuild to cancel any and all commands if we already have a Satellite
     OnStartBuild = function(self, unitBeingBuilt, order)
-        if self.Satellite or not self.haveOpenedOnce then
+        if self.Satellite or self.waitingForLaunch then
             IssueStop({self})
-            IssueClearCommands({self})
+            IssueClearCommands({self}) -- This clears the State launch procedure for some reason, leading to the following hack
+
+            -- This is ugly but necessary. It will keep resetting the launch procedure if the player spams to build a Satellite before initial launch
+            -- It looks bad, but it's better than that player not getting a Satellite at all
+            if self.waitingForLaunch then
+                ChangeState(self, self.OpenState)
+            end
         else
             TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
     end,
 
-    -- We shouldn't have a satellite here. If we do, something is very wrong. Kill it, and warn
     OnStopBuild = function(self, unitBeingBuilt)
         -- It's a bit of a hack, but what we do is destroy what we just built, cancel commands, and use the normal launch sequence
         self:StopBuildingEffects(unitBeingBuilt)
@@ -94,8 +100,9 @@ XEB2402 = Class(TAirFactoryUnit) {
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
 
+        local complete = unitBeingBuilt:GetFractionComplete() == 1
         unitBeingBuilt:Destroy()
-        if not self.Satellite then
+        if complete and not self.Satellite and not self.waitingForLaunch then
             IssueStop({self})
             ChangeState(self, self.OpenState)
         end
