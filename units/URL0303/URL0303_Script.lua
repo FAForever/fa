@@ -18,7 +18,7 @@ local EMPDeathWeapon = Class(Weapon) {
         self:SetWeaponEnabled(false)
     end,
 
-    OnFire = function(self)
+    Fire = function(self)
         local blueprint = self:GetBlueprint()
         DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
                    blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
@@ -31,7 +31,7 @@ URL0303 = Class(CWalkingLandUnit) {
     Weapons = {
         Disintigrator = Class(CDFLaserDisintegratorWeapon) {},
         HeavyBolter = Class(CDFElectronBolterWeapon) {},
-        EMP = Class(EMPDeathWeapon) {},
+        DeathWeapon = Class(EMPDeathWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -44,11 +44,14 @@ URL0303 = Class(CWalkingLandUnit) {
             RedirectRateOfFire = bp.RedirectRateOfFire
         }
         self.Trash:Add(antiMissile)
-        self.UnitComplete = true
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local emp = self:GetWeaponByLabel('EMP')
+    DoDeathWeapon = function(self)
+        if self:IsBeingBuilt() then return end
+
+        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
+
+        -- Now handle our special buff and FX
         local bp
         for k, v in self:GetBlueprint().Buffs do
             if v.Add.OnDeath then
@@ -61,16 +64,8 @@ URL0303 = Class(CWalkingLandUnit) {
             self:AddBuff(bp)
         end
 
-        -- Otherwise, we should finish killing the unit
-        if self.UnitComplete then
-            -- Play EMP Effect
-            CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
-            -- Fire EMP weapon
-            emp:SetWeaponEnabled(true)
-            emp:OnFire()
-        end
-
-        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
+        -- Play EMP Effect
+        CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
 }
 
