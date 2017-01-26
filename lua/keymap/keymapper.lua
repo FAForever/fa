@@ -121,7 +121,7 @@ function ClearUserKeyMap()
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
 end
 
-function GetKeyActions(includeDebugKeys)
+function GetKeyActions()
     local ret = {}
 
     local keyActions = import('keyactions.lua').keyActions
@@ -156,9 +156,9 @@ function ClearUserKeyActions()
 end
 
 -- Returns keys mapped to actions
-function GetKeyMappings(includeDebugKeys)
+function GetKeyMappings()
     local currentKeyMap = GetCurrentKeyMap()
-    local keyActions = GetKeyActions(true)
+    local keyActions = GetKeyActions()
     local keyMap = {}
 
     -- Set up default mapping
