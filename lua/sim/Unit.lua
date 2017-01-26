@@ -1238,7 +1238,7 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
-        --Notify instigator of kill
+        -- Notify instigator of kill
         if instigator and IsUnit(instigator) then
             instigator:OnKilledUnit(self)
         end
@@ -1296,7 +1296,7 @@ Unit = Class(moho.unit_methods) {
         if self:IsBeingBuilt() then return end
         local bp = self:GetBlueprint()
         for k, v in bp.Weapon do
-            if(v.Label == 'DeathWeapon') then
+            if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
                     self:GetWeaponByLabel('DeathWeapon'):Fire()
@@ -1791,7 +1791,7 @@ Unit = Class(moho.unit_methods) {
         local wep
         for i = 1, self:GetWeaponCount() do
             wep = self:GetWeapon(i)
-            if (wep:GetBlueprint().Label == label) then
+            if wep:GetBlueprint().Label == label then
                 return wep
             end
         end
@@ -1867,7 +1867,7 @@ Unit = Class(moho.unit_methods) {
     OnStopBeingBuilt = function(self, builder, layer)
         local bp = self:GetBlueprint()
         self:EnableUnitIntel('NotInitialized', nil)
-        self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
+        self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self:GetCurrentLayer() == 'Water' then
             self:StartRocking()
