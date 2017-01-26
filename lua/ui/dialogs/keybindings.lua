@@ -25,7 +25,7 @@ local keyTable
 local function ResetKeyMap()
     IN_ClearKeyMap()
     import('/lua/keymap/keymapper.lua').ClearUserKeyMap()
-    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions(true))
+    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions())
     keyTable = FormatData()
     keyContainer:CalcVisible()
 end
@@ -430,7 +430,7 @@ end
 
 -- TODO clean up the table names a bit to be more consistent?
 function FormatData()
-    local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions(true)
+    local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions()
     local retkeys = {}
     local KeyData = {}
     local keyLookup = import('/lua/keymap/keymapper.lua').GetKeyLookup()
