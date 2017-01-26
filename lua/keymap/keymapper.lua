@@ -5,6 +5,9 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- This file is called on game start from gamemain.lua to fetch keybindings from prefs, or generate them from defaults
+-- It is also used by hotbuild.lua to fetch existing mappings
+
 local Prefs = import('/lua/user/prefs.lua')
 
 function GetDefaultKeyMap()
