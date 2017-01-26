@@ -57,8 +57,8 @@ local updateQueue = true -- If false then queue won't update in the ui
 local modified = false -- If false then buttonrelease will increase buildcount in queue
 local dragLock = false -- To disable quick successive drags, which doubles the units in the queue
 
--- Locals for Keybind labels in build queue
-local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+-- locals for Keybind labels in build queue
+local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
 local idRelations = {}
 local upgradeKey = false
 local upgradesTo = false
