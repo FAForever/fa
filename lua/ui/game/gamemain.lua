@@ -259,7 +259,7 @@ function CreateUI(isReplay)
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 
-    local hotkeyLabelsInit = import('/modules/hotkeylabels.lua').init
+    local hotkeyLabelsInit = import('/lua/keymap/hotkeylabels.lua').init
     hotkeyLabelsInit()
 end
 
@@ -478,7 +478,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     end
 
     if not hotkeyLabelsOnSelectionChanged then
-        hotkeyLabelsOnSelectionChanged = import('/modules/hotkeylabels.lua').onSelectionChanged
+        hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged
     end
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
