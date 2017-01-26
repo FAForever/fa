@@ -1,8 +1,10 @@
--- describes the common set of actions that will be bound to keys
+-- This file outlines the interaction between the 'command' (Bound to a key) and the behaviour of that command
 -- format is:
---  action - the console command to execute when the key is pressed
---  category - the category to list this action under in the key assign dialog
---  order - the sort order to list this action under its category
+--  key - The string referenced by a bound key
+--  action - The console command to execute when the key is pressed
+--  category - The category to list this action under in the key assign dialog
+--  order - The sort order to list this action under its category
+--  keyRepeat - A boolean flag that dictates when an action is one that can be held to extend its effect (eg - Zoom)
 
 keyActions = {
     ['escape'] = {action = 'UI_Lua import("/lua/ui/uimain.lua").EscapeHandler()',
