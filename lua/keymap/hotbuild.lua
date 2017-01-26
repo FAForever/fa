@@ -16,7 +16,7 @@ local Effect = import('/lua/maui/effecthelpers.lua')
 
 local upgradeTab = import('/modules/upgradeTab.lua').upgradeTab
 
-local buildingTab
+local unitkeygroups
 local cyclePos
 local cycleThread = false
 local cycleLastName
@@ -130,30 +130,30 @@ function resetCycle(commandMode, modeData)
 end
 
 -- Non state changing getters
-function getBuildingTab()
-    local btSource = import('/modules/buildingtab.lua').buildingTab
-    local buildingTab = {}
+function getUnitKeyGroups()
+    local btSource = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
+    local groups = {}
     for name, values in btSource do
-        buildingTab[name] = {}
+        groups[name] = {}
         for i, value in values do
             if nil ~= __blueprints[value] then
-                table.insert(buildingTab[name], value)
+                table.insert(groups[name], value)
             elseif nil ~= btSource[value] then
                 for i, realValue in btSource[value] do
                     if nil ~= __blueprints[realValue] then
-                        table.insert(buildingTab[name], realValue)
+                        table.insert(groups[name], realValue)
                     else
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
             elseif value == '_upgrade' or value == '_templates' then
-                table.insert(buildingTab[name], value)
+                table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
             end
         end
     end
-    return buildingTab
+    return groups
 end
 
 function addModifiers()
@@ -182,7 +182,7 @@ end
 
 -- Called from gamemain.lua
 function init()
-    buildingTab = getBuildingTab()
+    unitkeygroups = getUnitKeyGroups()
     initCycleMap()
     CommandMode.AddEndBehavior(resetCycle)
 end
@@ -210,7 +210,7 @@ end
 -- Some of the work here is redundant when cycle_preview is disabled
 function buildActionBuilding(name, modifier)
     local options = Prefs.GetFromCurrentProfile('options')
-    local allValues = buildingTab[name]
+    local allValues = unitkeygroups[name]
     local effectiveValues = {}
 
     if table.find(allValues, "_templates") then
@@ -454,7 +454,7 @@ function hideCycleMap()
 end
 
 function buildActionUnit(name, modifier)
-    local values = buildingTab[name]
+    local values = unitkeygroups[name]
 
     -- Try to delete old units except for the one currently in construction
     if modifier == 'Alt' then

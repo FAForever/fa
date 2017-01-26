@@ -1,7 +1,7 @@
 -- This file is called from gamemain.lua when a game launches
 -- It assigns unit IDs and order strings to the basic key (The key without modifiers) bound to them
 
-local bt = import('/modules/buildingtab.lua')
+local unitkeygroups = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
 local construction = import('/lua/ui/game/construction.lua')
 local orders = import('/lua/ui/game/orders.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -119,7 +119,7 @@ function getKeyTables()
     local orderKeys = {}
 
     -- Get them from the building tab
-    for groupName, groupItems in bt.buildingTab do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
+    for groupName, groupItems in unitkeygroups do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
         local g = groupName.lower(groupName)
         if not isToBeIgnored(g) then
             for _, item in groupItems do
@@ -134,7 +134,7 @@ function getKeyTables()
         end
     end
 
-    -- Go through buildingtab groups to properly map IDs
+    -- Go through unitkeygroups to properly map IDs
     local changed = true
     while changed do
         changed = false
