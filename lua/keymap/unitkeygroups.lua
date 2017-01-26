@@ -2,7 +2,7 @@
 -- It is a hardcoded list of keybind categories. It maps each category to a unit ID, either directly or indirectly
 -- TODO: Find a way to generate this table using categories or something enable mod compatibility
 
-buildingTab = {
+unitkeygroups = {
     ["Builders"] = {
         "Land_Factory",
         "Air_Factory",
