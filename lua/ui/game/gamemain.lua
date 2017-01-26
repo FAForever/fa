@@ -101,7 +101,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
-    import('/modules/hotbuild.lua').init()
+    import('/lua/keymap/hotbuild.lua').init()
     EnableWorldSounds()
     import('/lua/UserMusic.lua').StartPeaceMusic()
 
@@ -476,7 +476,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
-    
+
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import('/modules/hotkeylabels.lua').onSelectionChanged
     end
