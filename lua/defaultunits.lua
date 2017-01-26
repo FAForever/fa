@@ -1496,7 +1496,7 @@ MobileUnit = Class(Unit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        --Add unit's threat to our influence map
+        -- Add unit's threat to our influence map
         local threat = 5
         local decay = 0.1
         local currentLayer = self:GetCurrentLayer()
@@ -1941,6 +1941,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         if self:BeenDestroyed() then return end
 
         for _, unit in self.cargo or {} do
+            unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
             unit:OnKilled(self, 'Normal', 0)
         end
     end,
