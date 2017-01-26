@@ -62,7 +62,7 @@ local function CreateOrderGlow(parent)
     end
 end
 
-local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
 local orderKeys = {}
 
 function setOrderKeys(orderKeys_)
