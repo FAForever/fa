@@ -90,6 +90,10 @@ XEB2402 = Class(TAirFactoryUnit) {
     OnStopBuild = function(self, unitBeingBuilt)
         -- It's a bit of a hack, but what we do is destroy what we just built, cancel commands, and use the normal launch sequence
         self:StopBuildingEffects(unitBeingBuilt)
+        self:SetActiveConsumptionInactive()
+        self:StopUnitAmbientSound('ConstructLoop')
+        self:PlayUnitSound('ConstructStop')
+
         unitBeingBuilt:Destroy()
         if not self.Satellite then
             IssueStop({self})
