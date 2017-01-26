@@ -128,7 +128,7 @@ function GetKeyActions()
     local ret = {}
 
     local keyActions = import('keyactions.lua').keyActions
-    local debugKeyActions = import('keyactions.lua').debugKeyActions
+    local debugKeyActions = import('debugKeyActions.lua').debugKeyActions
 
     for k,v in keyActions do
         ret[k] = v
