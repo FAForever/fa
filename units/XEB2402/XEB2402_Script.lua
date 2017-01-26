@@ -51,9 +51,16 @@ XEB2402 = Class(TAirFactoryUnit) {
         CreateSatellite = function(self)
             -- Create Satellite, attach it to unit, play animation, release satellite
             local location = self:GetPosition('Attachpoint01')
-            self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+
+            if self.newSatellite then
+                self.Satellite = self.newSatellite
+                self.newSatellite = nil
+            else
+                self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                self.Satellite:AttachTo(self, 'Attachpoint01')
+            end
+
             self.Trash:Add(self.Satellite)
-            self.Satellite:AttachTo(self, 'Attachpoint01')
 
             -- Create warning lights and other VFX
             local army = self:GetArmy()
@@ -113,17 +120,17 @@ XEB2402 = Class(TAirFactoryUnit) {
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
-        -- It's a bit of a hack, but what we do is destroy what we just built, cancel commands, and use the normal launch sequence
         self:StopBuildingEffects(unitBeingBuilt)
         self:SetActiveConsumptionInactive()
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
 
-        local complete = unitBeingBuilt:GetFractionComplete() == 1
-        unitBeingBuilt:Destroy()
-        if complete and not self.Satellite and not self.waitingForLaunch then
+        if not unitBeingBuilt:IsBeingBuilt() and not self.Satellite and not self.waitingForLaunch then
             IssueStop({self})
+            self.newSatellite = unitBeingBuilt
             ChangeState(self, self.OpenState)
+        else
+            unitBeingBuilt:Destroy()
         end
     end,
 
