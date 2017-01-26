@@ -325,9 +325,6 @@ UnitBlueprint {
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
-
-            # HeadingArcCenter = 0,
-            # HeadingArcRange = 45,
             Label = 'HeavyBolter',
             LeadTarget = true,
             MaxRadius = 25,
