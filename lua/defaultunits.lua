@@ -1743,11 +1743,15 @@ AirUnit = Class(MobileUnit) {
         -- Damage the area we have impacted with.
         local bp = self:GetBlueprint()
         local i = 1
-        local numWeapons = table.getn(bp.Weapon)
 
         for i, numWeapons in bp.Weapon do
             if(bp.Weapon[i].Label == 'DeathImpact') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                local damage = (bp.Weapon[i].Damage - self.ShieldDamageAbsorbed)
+                --WARN(damage .. ' crash damage dealt to ground') -- since our shield collision subtracts damage, this may be nice to know how much is left
+                if damage > 0 then
+                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                end
+                
                 break
             end
         end
@@ -1783,6 +1787,33 @@ AirUnit = Class(MobileUnit) {
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
             self:DisableShield()
+            
+            self.ShieldDamageAbsorbed = 0 --we use this to work out how much damage to subtract from the deathimpact.
+            
+            local this = self --waiting for our projectile to collide with a shield or the ground, and then modifying deathweapon
+            self:EnableShieldCollision(
+                function()
+                    local bp = self:GetBlueprint()
+                    local i = 1
+                    
+                    for i, numWeapons in bp.Weapon do
+                        if(bp.Weapon[i].Label == 'DeathImpact') then
+                            --self.ShieldCollideMaxHealth is passed from the shield when our companion projectile hits it
+                            self.ShieldCollideMaxHealth = self.ShieldCollideMaxHealth or 0
+                            --this 0.2 there is just a multiplier i liked; can be lower or higher; whatever
+                            self.ShieldDamage = math.min(self.ShieldCollideMaxHealth*0.2, (bp.Weapon[i].Damage - self.ShieldDamageAbsorbed))
+                            --should never be below 0
+                            DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, self.ShieldDamage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                            self.ShieldDamageAbsorbed = self.ShieldDamageAbsorbed + self.ShieldDamage
+                            --WARN(self.ShieldDamageAbsorbed .. ' damage absorbed by shield') --very useful for testing shield absorb multipliers
+                            break
+                        end
+                    end
+                    
+                    self.CreateDestructionEffects( self, self.OverKillRatio) -- explosion on the shield, honestly this is cos the air version is shit.
+                end
+            )
+                
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
@@ -1790,6 +1821,18 @@ AirUnit = Class(MobileUnit) {
             self.DeathBounce = 1
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
+    end,
+    
+    EnableShieldCollision = function(self, callback)
+        local bone = 0
+
+        --Create companion projectile
+        local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', bone)
+        
+
+        -- start following our plane, attaching to a given bone and entity on shield collision
+        proj:Start(self, bone, callback)
+        self.Trash:Add(proj)
     end,
 }
 
