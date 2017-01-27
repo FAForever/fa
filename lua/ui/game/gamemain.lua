@@ -252,7 +252,7 @@ function CreateUI(isReplay)
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
-        import('/modules/console_commands.lua').Init()
+        import('/lua/ui/game/launchconsolecommands.lua').Init()
     end
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
