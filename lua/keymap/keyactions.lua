@@ -293,8 +293,6 @@ keyActions = {
         category = 'ui', order = 2,},
     ['show_network_stats'] = {action = 'ren_ShowNetworkStats',
         category = 'ui', order = 3,},
-    ['scu_upgrade_marker'] = {action = 'UI_Lua import("/modules/scumanager.lua").CreateMarker()',
-        category = 'user', order = 4,},
     ['toggle_shield'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Shield")',
         category = 'orders', order = 6,},
     ['toggle_weapon'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Weapon")',

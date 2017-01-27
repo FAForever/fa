@@ -2061,10 +2061,6 @@ Tooltips = {
         title = '<LOC OPTIONS_0229>Template Rotation',
         description = '<LOC OPTIONS_0256>Allows build templates to be rotated with the middle mouse button.',
     },
-    options_gui_scu_manager = {
-        title = '<LOC OPTIONS_0230>SCU Manager',
-        description = '<LOC OPTIONS_0257>Allows SCUs to be upgraded automatically or in a single click.',
-    },
     options_gui_draggable_queue = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',

@@ -251,8 +251,6 @@ function CreateUI(isReplay)
         end
     end
 
-    import('/modules/scumanager.lua').Init()
-
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
