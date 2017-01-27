@@ -474,19 +474,6 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0230>SCU Manager",
-                key = 'gui_scu_manager',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
                 title = "<LOC OPTIONS_0231>Draggable Build Queue",
                 key = 'gui_draggable_queue',
                 type = 'toggle',

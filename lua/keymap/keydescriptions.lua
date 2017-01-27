@@ -221,7 +221,6 @@ keyDescriptions = {
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
     ['show_enemy_life'] = '<LOC key_desc_0186>Show enemy life bars',
     ['show_network_stats'] = '<LOC key_desc_0187>Show network stats window',
-    ['scu_upgrade_marker'] = '<LOC key_desc_0188>Place SCU auto-upgrade marker',
     ['toggle_shield'] = '<LOC key_desc_0189>Toggle unit shield',
     ['toggle_weapon'] = '<LOC key_desc_0190>Toggle unit weapon',
     ['toggle_jamming'] = '<LOC key_desc_0191>Toggle unit jamming',

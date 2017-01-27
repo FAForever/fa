@@ -399,13 +399,6 @@ function UpdateWindow(info)
             controls.abilities:Hide()
         end
     end
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType:Hide()
-        if info.userUnit.SCUType then
-            controls.SCUType:SetTexture('/textures/ui/common/SCUManager/'..info.userUnit.SCUType..'_icon.dds')
-            controls.SCUType:Show()
-        end
-    end
     if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
         if info.blueprintId ~= 'unknown' then
@@ -523,13 +516,6 @@ function CreateUI()
             self:SetAlpha(0, true)
         end
     end
-
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType = Bitmap(controls.bg)
-        LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
-        LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
-    end
-
 end
 
 function OnSelection(units)
