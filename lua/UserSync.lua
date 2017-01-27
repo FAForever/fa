@@ -55,7 +55,7 @@ function OnSync()
     end
 
     if Sync.NukeLaunchData then
-		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
+		import('/lua/ui/game/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
@@ -80,7 +80,7 @@ function OnSync()
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(data)
         end
     end
-	
+
     if Sync.EnforceRating then
         GpgNetSend('EnforceRating')
     end
