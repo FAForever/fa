@@ -347,7 +347,7 @@ keyActions = {
         category = 'ui', order = 27,},
     ['toggle_tab_display'] = {action = 'UI_Lua import("/lua/ui/game/tabs.lua").ToggleTabDisplay()',
         category = 'ui', order = 28,},
-    ['zoom_pop'] = {action = 'UI_Lua import("/modules/zoompopper.lua").ToggleZoomPop()',
+    ['zoom_pop'] = {action = "UI_Lua import('lua/ui/game/zoompopper.lua').ToggleZoomPop()",
         category = 'camera', order = 29,},
     ['select_inview_idle_mex'] = {action = 'UI_SelectByCategory +inview +idle MASSEXTRACTION',
         category = 'selection', order = 30,},
