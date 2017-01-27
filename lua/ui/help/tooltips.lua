@@ -989,7 +989,7 @@ Tooltips = {
     lob_UnitCap_375 = {
         title = "<LOC lobui_0721>375",
         description = "<LOC lobui_0722>375 units per player may be in play",
-    },    
+    },
     lob_UnitCap_625 = {
         title = "<LOC lobui_0723>625",
         description = "<LOC lobui_0724>625 units per player may be in play",
@@ -997,7 +997,7 @@ Tooltips = {
     lob_UnitCap_875 = {
         title = "<LOC lobui_0725>875",
         description = "<LOC lobui_0726>875 units per player may be in play",
-    },    
+    },
     lob_click_LargeMapPreview = {
         title = "<LOC lobui_0618>Large Preview",
         description = "<LOC lobui_0619>Click to show a large map preview showing all the mass and hydrocarbon spots",
@@ -1074,7 +1074,7 @@ Tooltips = {
         title = '<LOC MAPSEL_0035>Hide Obsolete',
         description = '<LOC MAPSEL_0036>Hides maps which have been replaced by new versions',
     },
-    
+
     -- **********************
     -- ** Profile Strings
     -- **********************
@@ -1899,15 +1899,15 @@ Tooltips = {
     restricted_units_supportfactory = {
         title = "<LOC tooltipui0670>No Support Factories",
         description = "<LOC tooltipui0671>Prevents players from building fresh Support Factories, effectively disabling the 'Engiemod' changes"
-    },    
+    },
     restricted_units_t3mobileaa = {
         title = "<LOC tooltipui0672>No T3 Mobile Anti-Air",
         description = "<LOC tooltipui0673>Prevents players being able to build the new T3 MAA units"
-    },  
+    },
     restricted_units_wall = {
         title = "<LOC tooltipui0674>No Walls",
         description = "<LOC tooltipui0675>Prevents players being able to build Walls"
-    },      
+    },
     restricted_units_engineeringstation = {
         title = "<LOC tooltipui0676>No Engineering Stations",
         description = "<LOC tooltipui0677>Removes the Kennel and Hive"
@@ -1915,19 +1915,19 @@ Tooltips = {
     restricted_units_superarty = {
         title = "<LOC tooltipui0678>No Super-Artillery",
         description = "<LOC tooltipui0679>Removes Salvation, Mavor and Scathis"
-    }, 
+    },
     restricted_units_paragon = {
         title = "<LOC tooltipui0680>No Paragon",
         description = "<LOC tooltipui0681>Removes the Paragon, the Aeon Experimental Infinite Resource Generator"
-    }, 
+    },
     restricted_units_satellite = {
         title = "<LOC tooltipui0682>No Satellite",
         description = "<LOC tooltipui0683>Removes the UEF Novax Satellite"
-    }, 
+    },
     restricted_units_teleport = {
         title = "<LOC tooltipui0684>No Teleporting",
         description = "<LOC tooltipui0685>Removes the ability to upgrade ACUs and sACUs with Teleporters"
-    }, 
+    },
     restricted_units_billy = {
         title = "<LOC tooltipui0686>No Billy",
         description = "<LOC tooltipui0687>Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
@@ -1940,7 +1940,7 @@ Tooltips = {
         title = "<LOC tooltipui0694>Lobby Presets",
         description = "<LOC tooltipui0695>Save and load presets for game settings and maps"
     },
-    
+
     -- **********************
     -- ** Strategic overlay
     -- **********************
