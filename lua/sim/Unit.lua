@@ -3552,7 +3552,7 @@ Unit = Class(moho.unit_methods) {
             return
         end
 
-        --When adding debuffs we have to make sure that we check for permissions
+        -- When adding debuffs we have to make sure that we check for permissions
         local category = buffTable.TargetAllow and ParseEntityCategory(buffTable.TargetAllow) or categories.ALLUNITS
         if buffTable.TargetDisallow then
             category = category - ParseEntityCategory(buffTable.TargetDisallow)
@@ -3565,7 +3565,7 @@ Unit = Class(moho.unit_methods) {
                 --and collect all targets from that point
                 targets = self:GetAIBrain():GetUnitsAroundPoint(category, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
             else
-                --The buff will be applied to the unit only
+                -- The buff will be applied to the unit only
                 if EntityCategoryContains(category, self) then
                     targets = {self}
                 end
