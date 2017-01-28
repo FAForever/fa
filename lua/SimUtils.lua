@@ -235,7 +235,7 @@ function UpdateUnitCap(deadArmy)
     end
 
     if aliveCount > 0 then
-        local initialCap = tonumber(ScenarioInfo.Options.UnitCap)
+        local initialCap = GetArmyUnitCap(brain.index)
         local totalCap = totalCount * initialCap
         local newCap = math.floor(totalCap / aliveCount)
         for _, brain in alive do
