@@ -3561,9 +3561,8 @@ Unit = Class(moho.unit_methods) {
         if bt == 'STUN' then
             local targets
             if buffTable.Radius and buffTable.Radius > 0 then
-                --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
-                --and collect all targets from that point
-                targets = self:GetAIBrain():GetUnitsAroundPoint(category, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
+                -- If the radius is bigger than 0 then we will use the unit as the center of the stun blast
+                targets = utilities.GetTrueEnemyUnitsInSphere(self, PosEntity or self:GetPosition(), buffTable.Radius, category)
             else
                 -- The buff will be applied to the unit only
                 if EntityCategoryContains(category, self) then
@@ -3571,7 +3570,10 @@ Unit = Class(moho.unit_methods) {
                 end
             end
             for _, target in targets or {} do
-                target:SetStunned(buffTable.Duration or 1)
+                -- Exclude things currently flying around
+                if target:GetCurrentLayer() ~= 'Air' then
+                    target:SetStunned(buffTable.Duration or 1)
+                end
             end
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))

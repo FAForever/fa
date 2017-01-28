@@ -18,6 +18,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local y2 = position.y + radius
     local z2 = position.z + radius
     local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+
     -- Check for empty rectangle
     if not UnitsinRec then
         return UnitsinRec
@@ -33,6 +34,31 @@ function GetEnemyUnitsInSphere(unit, position, radius)
 
     return RadEntities
 end
+
+-- This function is like the one above, but filters out Allied units
+function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
+    local x1 = position.x - radius
+    local y1 = position.y - radius
+    local z1 = position.z - radius
+    local x2 = position.x + radius
+    local y2 = position.y + radius
+    local z2 = position.z + radius
+    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+
+    -- Check for empty rectangle
+    if not UnitsinRec then
+        return UnitsinRec
+    end
+
+    local RadEntities = {}
+    local unitArmy = unit:GetArmy()
+    for _, v in UnitsinRec do
+        local dist = VDist3(position, v:GetPosition())
+        local vArmy = v:GetArmy()
+        if unitArmy ~= vArmy and not IsAlly(unitArmy, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
+            table.insert(RadEntities, v)
+        end
+    end
 
     return RadEntities
 end
