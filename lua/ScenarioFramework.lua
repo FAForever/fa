@@ -219,13 +219,21 @@ end
 function GiveUnitToArmy( unit, newArmyIndex, triggerOnGiven )
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
+
+    unit.IsBeingTransferred = true
+
     local newBrain = ArmyBrains[newArmyIndex]
+
     SetIgnoreArmyUnitCap(newArmyIndex, true)
+    IgnoreRestrictions(true)
+
     local newUnit = ChangeUnitArmy(unit, newArmyIndex)
+
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(newArmyIndex, false)
     end
-    
+    IgnoreRestrictions(false)
+
     if triggerOnGiven then
         unit:OnGiven(newUnit)
     end
