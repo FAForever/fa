@@ -9,7 +9,7 @@ local destructingUnits = {}
 local controls = {}
 local countdownThreads = {}
 
-function ConfirmUnitDestruction()
+function ConfirmUnitDestruction(instant)
     if import('/lua/ui/campaign/campaignmanager.lua').campaignMode and table.getn(EntityCategoryFilterDown(categories.COMMAND, GetSelectedUnits())) > 0 then
         UIUtil.QuickDialog(GetFrame(0), '<LOC confirm_0001>You cannot self destruct during an operation!', '<LOC _Ok>', nil,
             nil, nil,
@@ -22,7 +22,7 @@ function ConfirmUnitDestruction()
             for _, unit in units do
                 table.insert(unitIds, unit:GetEntityId())
             end
-            SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy()}})
+            SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy(), noDelay = instant}})
         end
     end
 end
