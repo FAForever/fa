@@ -100,14 +100,18 @@ ShieldCollider = Class(Projectile) {
                 local initialDamage = self.Plane.DeathCrashDamage
                 local deathWep = self.Plane.deathWep
 
-                local mult = deathWep.DeathCrashShieldMult or 0.2
+                -- Calculate damage dealt, up to a maximum of 20% of the shield's maximum HP
+                local shieldDamageLimit = targetEntity:GetMaxHealth() * 0.2
+
+                local mult = deathWep.DeathCrashShieldMult or 1 -- Allow a unit to be designated as dealing less than normal damage to shields on crash
                 local damage = initialDamage * mult
 
                 -- Damage the impact site (The shield mainly)
-                DamageArea(self, self:GetPosition(), deathWep.DamageRadius, damage, deathWep.DamageType, deathWep.DamageFriendly)
+                local finalDamage = math.min(shieldDamageLimit, damage)
+                DamageArea(self, self:GetPosition(), deathWep.DamageRadius, finalDamage, deathWep.DamageType, deathWep.DamageFriendly)
 
                 -- Update the unit's remaining crash damage
-                self.Plane.DeathCrashDamage = initialDamage - damage
+                self.Plane.DeathCrashDamage = initialDamage - finalDamage
             end
         elseif targetType ~= 'Shield' then -- Don't go through here for non-bubble shield collisions
             self:Destroy()
