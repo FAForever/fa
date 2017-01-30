@@ -84,17 +84,19 @@ ShieldCollider = Class(Projectile) {
             if not self.ShieldImpacted then
                 self.ShieldImpacted = true -- Only impact once
 
-                Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
-                self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
+                if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
+                    Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+                    self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
 
-                -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
-                self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
-                
+                    -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
+                    self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
+                end
+
                 if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
                     WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
                     return
                 end
-                
+
                 local initialDamage = self.Plane.DeathCrashDamage
                 local deathWep = self.Plane.deathWep
 
