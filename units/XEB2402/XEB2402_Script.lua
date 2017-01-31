@@ -6,8 +6,7 @@
 -----------------------------------------------------------------
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
-XEB2402 = Class(TAirFactoryUnit) {   
-    DeathThreadDestructionWaitTime = 8,
+XEB2402 = Class(TAirFactoryUnit) {
 
     OnStopBeingBuilt = function(self)
         TAirFactoryUnit.OnStopBeingBuilt(self)
@@ -138,6 +137,9 @@ XEB2402 = Class(TAirFactoryUnit) {
         if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
             self.Satellite:Kill()
         end
+
+        self:SetActiveConsumptionInactive()
+        ChangeState(self, self.IdleState)
         TAirFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
