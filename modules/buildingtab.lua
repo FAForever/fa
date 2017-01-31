@@ -216,6 +216,7 @@ buildingTab = {
 "uel0401", -- Fatboy
 "ues0401", -- Atlantis
 "xeb2402", -- Novax
+"xea0002", -- Satellite
 "ueb2401", -- Mavor
 -- Sera
 "xsl0401", -- Ythotha
