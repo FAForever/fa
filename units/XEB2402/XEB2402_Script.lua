@@ -93,9 +93,9 @@ XEB2402 = Class(TAirFactoryUnit) {
                 self.Satellite:DetachFrom()
                 self.Satellite:Open()
 
+                self.waitingForLaunch = false
                 self:Retract()
 
-                self.waitingForLaunch = false
                 IssueClearCommands({self})
             end
 
