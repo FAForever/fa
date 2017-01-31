@@ -130,7 +130,7 @@ ShieldCollider = Class(Projectile) {
         local wx, wy, wz = unpack(VDiff(shield:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
 
         -- Convert our speed values from units per tick to units per second
-        vx = 10 * vx 
+        vx = 10 * vx
         vy = 10 * vy
         vz = 10 * vz
 
@@ -160,14 +160,14 @@ ShieldCollider = Class(Projectile) {
         -- StoppingPower also affects this, so the more ke we have, the less our velocity is changed, and so the less our coefficient is affected.
 
         -- Applying our bounce velocity
-        vx = -stoppingPower * wx * dotProduct + vx 
+        vx = -stoppingPower * wx * dotProduct + vx
         vy = -stoppingPower * wy * dotProduct + vy
         vz = -stoppingPower * wz * dotProduct + vz
 
         -- Sometimes absurd values pop up, probably due to rounding errors or something, so we prevent huge speeds here
-        vx = math.clamp(-7, vx, 7)
-        vy = math.clamp(-4, vy, 4) -- Less for y so we dont get planes flying into space
-        vz = math.clamp(-7, vz, 7)
+        vx = math.clamp(vx, -7, 7)
+        vy = math.clamp(vy, -4, 4) -- Less for y so we dont get planes flying into space
+        vz = math.clamp(vz, -7, 7)
 
         self:SetVelocity(forceScalar * vx, forceScalar * vy, forceScalar * vz)
     end,
