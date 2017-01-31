@@ -1757,9 +1757,20 @@ AirUnit = Class(MobileUnit) {
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            self.shallSink = true
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)
+    end,
+
+    ShallSink = function(self)
+        local layer = self:GetCurrentLayer()
+        local shallSink = (
+            self.shallSink or -- Only the case when a bounced plane hits water. Overrides the fact that the layer is 'Air'
+            ((layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
+            not EntityCategoryContains(categories.STRUCTURE, self))  -- Exclude structures
+        )
+        return shallSink
     end,
 
     CreateUnitAirDestructionEffects = function(self, scale)

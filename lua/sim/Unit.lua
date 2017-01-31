@@ -1584,14 +1584,21 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    DeathThread = function( self, overkillRatio, instigator)
+    ShallSink = function(self)
         local layer = self:GetCurrentLayer()
-        local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
             not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
         )
-        WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
+        return shallSink
+    end,
+
+    DeathThread = function(self, overkillRatio, instigator)
+        local isNaval = EntityCategoryContains(categories.NAVAL, self)
+        local shallSink = self:ShallSink()
+
+        WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
+
         self:DestroyAllDamageEffects()
         self:DestroyTopSpeedEffects()
         self:DestroyIdleEffects()
