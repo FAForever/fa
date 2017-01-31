@@ -1749,7 +1749,7 @@ AirUnit = Class(MobileUnit) {
         -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
         if not self.deathWep or not self.DeathCrashDamage then --bail if stuffs missing.
             WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
-        else
+        elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
         end
