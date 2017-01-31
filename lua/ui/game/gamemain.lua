@@ -24,7 +24,7 @@ local controlClusterGroup = controls.cluster
 local statusClusterGroup = controls.status
 local mapGroup = controls.map
 local mfdControl = controls.mfd
-local ordersControl = controls.orders
+local ordersControl = false
 
 local OnDestroyFuncs = {}
 
