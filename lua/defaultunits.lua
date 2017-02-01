@@ -1921,11 +1921,11 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     -- Override OnImpact to kill all cargo
-    OnImpact = function(self, with, calledFromProj)
-        if self.GroundImpacted or not calledFromProj then return end
+    OnImpact = function(self, with)
+        if self.GroundImpacted then return end
 
         self:KillCrashedCargo()
-        AirUnit.OnImpact(self, with, calledFromProj)
+        AirUnit.OnImpact(self, with)
     end,
 
     OnStorageChange = function(self, loading)
