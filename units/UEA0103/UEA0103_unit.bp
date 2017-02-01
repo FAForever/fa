@@ -239,7 +239,7 @@ UnitBlueprint {
     SelectionThickness = 0.54,
     SizeSphere = 1.6,
     SizeX = 1,
-    SizeY = 1,
+    SizeY = 0.2,
     SizeZ = 1,
     StrategicIconName = 'icon_bomber1_directfire',
     StrategicIconSortPriority = 75,

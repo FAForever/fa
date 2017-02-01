@@ -99,7 +99,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetY = -0.075,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -143,13 +142,6 @@ UnitBlueprint {
                 },
             },
         },
-
-        #    {
-        #        AlbedoName = 'uaa0203_lod1_albedo.dds',
-        #        LODCutoff = 215,
-        #        ShaderName = 'Aeon',
-        #        SpecularName = 'uaa0203_lod1_specteam.dds',
-        #    },
         PlaceholderMeshName = 'UXA0009',
         SpawnRandomRotation = true,
         UniformScale = 0.25,
@@ -220,9 +212,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.75,
     SelectionThickness = 0.37,
     SizeSphere = 1.6,
-    SizeX = 1,
-    SizeY = 0.5,
-    SizeZ = 1,
+    SizeX = 0.9,
+    SizeY = 0.6,
+    SizeZ = 0.9,
     StrategicIconName = 'icon_gunship2_directfire',
     StrategicIconSortPriority = 65,
     Transport = {

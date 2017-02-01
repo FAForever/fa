@@ -114,7 +114,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetZ = 0.3,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -259,7 +258,7 @@ UnitBlueprint {
     SizeSphere = 1.6,
     SizeX = 1,
     SizeY = 0.5,
-    SizeZ = 1,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_gunship2_directfire',
     StrategicIconSortPriority = 65,
     Transport = {
