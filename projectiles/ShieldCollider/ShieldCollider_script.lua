@@ -12,10 +12,10 @@ ShieldCollider = Class(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
-        self:SetVizToFocusPlayer('Always') -- Set to 'Always' to see a nice box
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Always')
-        self:SetVizToEnemies('Always')
+        self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
+        self:SetVizToAllies('Never')
+        self:SetVizToNeutrals('Never')
+        self:SetVizToEnemies('Never')
         self:SetStayUpright(false)
         self:SetCollision(true)
     end,
@@ -67,20 +67,18 @@ ShieldCollider = Class(Projectile) {
                 if not self.ShieldImpacted then
                     self.ShieldImpacted = true -- Only impact once
 
-                    if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
-                        local pos = self:GetPosition()
-                        local ground = GetTerrainHeight(pos[1], pos[3])
-                        if pos[2] > ground + 3 then
-                            Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
-                            self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
-                            self.Plane.Detector = CreateCollisionDetector(self.Plane)
-                            self.Plane.Detector:WatchBone(self.PlaneBone)
-                            self.Plane.Detector:EnableTerrainCheck(true)
-                            self.Plane.Detector:Enable()
+                    if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) and not
+                           EntityCategoryContains(categories.TRANSPORTATION, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
 
-                            -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
-                            self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
-                        end
+                        Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+                        self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
+                        self.Plane.Detector = CreateCollisionDetector(self.Plane)
+                        self.Plane.Detector:WatchBone(self.PlaneBone)
+                        self.Plane.Detector:EnableTerrainCheck(true)
+                        self.Plane.Detector:Enable()
+
+                        -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
+                        self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
                     end
 
                     if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
@@ -139,7 +137,7 @@ ShieldCollider = Class(Projectile) {
         local dotProduct = vx * wx + vy * wy + vz * wz
 
         local ke = 0.5 * volume * speed * speed -- Our kinetic energy, used to scale the stoppingpower
-        local stoppingPower = math.min(80 / ke, 2) -- 2 is a perfect bounce, 0 is unaffected velocity
+        local stoppingPower = math.min(50 / (ke * 0.5), 2) -- 2 is a perfect bounce, 0 is unaffected velocity
 
         local angleCos = 10 * dotProduct / (speed * shieldMag) -- We take our unit vectors and calculate the angle. That 10 is to convert speed back to its "proper" length
         angleCos = math.clamp(-1, angleCos, 1)
