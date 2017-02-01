@@ -12,10 +12,10 @@ ShieldCollider = Class(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
-        self:SetVizToFocusPlayer('Never') -- Set to always to see a nice box
-        self:SetVizToAllies('Never')
-        self:SetVizToNeutrals('Never')
-        self:SetVizToEnemies('Never')
+        self:SetVizToFocusPlayer('Always') -- Set to 'Always' to see a nice box
+        self:SetVizToAllies('Always')
+        self:SetVizToNeutrals('Always')
+        self:SetVizToEnemies('Always')
         self:SetStayUpright(false)
         self:SetCollision(true)
     end,
@@ -58,14 +58,11 @@ ShieldCollider = Class(Projectile) {
                 -- and the units centre is below it, then its below the ground and that can cause it to hit water instead.
                 -- All this is just to prevent that, because falling planes are stupid.
 
-                if self.Impacted then
-                    self:Destroy()
-                    if not self.Plane.GroundImpacted then
-                        self.Plane:OnImpact('Terrain')
-                    end
-                end
-                self.Impacted = true
                 self:SetVelocity(0, 0, 0)
+                if not self.Plane.GroundImpacted then
+                    self.Plane:OnImpact('Terrain')
+                end
+                self:Destroy()
             elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
                 if not self.ShieldImpacted then
                     self.ShieldImpacted = true -- Only impact once

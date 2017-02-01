@@ -1758,6 +1758,7 @@ AirUnit = Class(MobileUnit) {
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
+            self.colliderProj:Destroy()
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)
@@ -1825,6 +1826,7 @@ AirUnit = Class(MobileUnit) {
 
             -- Create a projectile we'll use to interact with Shields
             local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+            self.colliderProj = proj
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
