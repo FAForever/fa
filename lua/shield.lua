@@ -261,8 +261,10 @@ Shield = Class(moho.shield_methods,Entity) {
             if other.ShieldImpacted then
                 return false
             else
-                other:OnImpact('Shield', self)
-                return false
+                if other and not other:BeenDestroyed() then
+                    other:OnImpact('Shield', self)
+                    return false
+                end
             end
         end
 
