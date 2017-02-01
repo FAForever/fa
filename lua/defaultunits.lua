@@ -1740,14 +1740,14 @@ AirUnit = Class(MobileUnit) {
     end,
 
     -- Planes need to crash. Therefore, disable OnImpact apart from when called by the attached crash projectile
-    OnImpact = function(self, with, calledFromProj)
-        if self.GroundImpacted or not calledFromProj then return end
+    OnImpact = function(self, with)
+        if self.GroundImpacted then return end
 
         -- Only call this code once
         self.GroundImpacted = true
 
         -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
-        if not self.deathWep or not self.DeathCrashDamage then --bail if stuffs missing.
+        if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuffs missing.
             WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
@@ -1761,6 +1761,11 @@ AirUnit = Class(MobileUnit) {
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)
+    end,
+
+    -- ONLY works for Terrain, not Water
+    OnAnimTerrainCollision = function(self, bone, x, y, z)
+        self:OnImpact('Terrain')
     end,
 
     ShallSink = function(self)

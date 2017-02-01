@@ -52,69 +52,63 @@ ShieldCollider = Class(Projectile) {
 
     -- Destroy the sinking unit when it hits the ground.
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
-            -- Here it should be noted that bone 0 IS NOT what the ground checks for, so if you have a projectile at that bone
-            -- and the units centre is below it, then its below the ground and that can cause it to hit water instead.
-            -- All this is just to prevent that, because falling planes are stupid.
+        if self and not self:BeenDestroyed() and self.Plane and not self.Plane:BeenDestroyed() then
+            if targetType == 'Terrain' or targetType == 'Water' then
+                -- Here it should be noted that bone 0 IS NOT what the ground checks for, so if you have a projectile at that bone
+                -- and the units centre is below it, then its below the ground and that can cause it to hit water instead.
+                -- All this is just to prevent that, because falling planes are stupid.
 
-            if self.GroundImpacted then
-                WARN('ERROR: OnImpact has been called for a second time hitting the ground for a ShieldCollider proj. Investigate.')
-            end
-
-            self.GroundImpacted = true
-
-            -- Get position of impact and ground height
-            local pos = self:GetPosition()
-            local groundLevel = GetTerrainHeight(pos[1], pos[3])
-
-            -- Move attached plane to the surface at the impact point if it fell through
-            pos[2] = groundLevel
-            self:SetPosition(pos, true)
-            self.Plane:SetPosition(pos, true) -- Make sure the plane is above ground if its not
-            
-            self:SetVelocity(0, 0, 0) -- The plane is attached to our projectile, so that stops too
-            
-            self.Plane:OnImpact('Terrain', true) -- Tell the plane we hit land
-            self:Destroy()
-        elseif targetType == 'Water' then
-            self:DetachAll('anchor')
-            self.Plane:OnImpact('Water', true) -- Tell the plane we hit water
-            self:Destroy()
-        elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
-            if not self.ShieldImpacted then
-                self.ShieldImpacted = true -- Only impact once
-
-                if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
-                    Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
-                    self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
-
-                    -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
-                    self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
+                if self.Impacted then
+                    self:Destroy()
+                    if not self.Plane.GroundImpacted then
+                        self.Plane:OnImpact('Terrain')
+                    end
                 end
+                self.Impacted = true
+            elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
+                if not self.ShieldImpacted then
+                    self.ShieldImpacted = true -- Only impact once
 
-                if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
-                    WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
-                    return
+                    if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
+                        local pos = self:GetPosition()
+                        local ground = GetTerrainHeight(pos[1], pos[3])
+                        if pos[2] > ground + 3 then
+                            Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+                            self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
+                            self.Plane.Detector = CreateCollisionDetector(self.Plane)
+                            self.Plane.Detector:WatchBone(self.PlaneBone)
+                            self.Plane.Detector:EnableTerrainCheck(true)
+                            self.Plane.Detector:Enable()
+
+                            -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
+                            self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
+                        end
+                    end
+
+                    if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
+                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
+                        return
+                    end
+
+                    local initialDamage = self.Plane.DeathCrashDamage
+                    local deathWep = self.Plane.deathWep
+
+                    -- Calculate damage dealt, up to a maximum of 20% of the shield's maximum HP
+                    local shieldDamageLimit = targetEntity:GetMaxHealth() * 0.2
+
+                    local mult = deathWep.DeathCrashShieldMult or 1 -- Allow a unit to be designated as dealing less than normal damage to shields on crash
+                    local damage = initialDamage * mult
+
+                    -- Damage the shield
+                    local finalDamage = math.min(shieldDamageLimit, damage)
+                    targetEntity:ApplyDamage(self.Plane, finalDamage, self.shieldVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
+
+                    -- Update the unit's remaining crash damage
+                    self.Plane.DeathCrashDamage = initialDamage - finalDamage
                 end
-
-                local initialDamage = self.Plane.DeathCrashDamage
-                local deathWep = self.Plane.deathWep
-
-                -- Calculate damage dealt, up to a maximum of 20% of the shield's maximum HP
-                local shieldDamageLimit = targetEntity:GetMaxHealth() * 0.2
-
-                local mult = deathWep.DeathCrashShieldMult or 1 -- Allow a unit to be designated as dealing less than normal damage to shields on crash
-                local damage = initialDamage * mult
-
-                -- Damage the impact site (The shield mainly)
-                local finalDamage = math.min(shieldDamageLimit, damage)
-                DamageArea(self, self:GetPosition(), deathWep.DamageRadius, finalDamage, deathWep.DamageType, deathWep.DamageFriendly)
-
-                -- Update the unit's remaining crash damage
-                self.Plane.DeathCrashDamage = initialDamage - finalDamage
+            elseif targetType ~= 'Shield' then -- Don't go through here for non-bubble shield collisions
+                self:Destroy()
             end
-        elseif targetType ~= 'Shield' then -- Don't go through here for non-bubble shield collisions
-            self:Destroy()
         end
     end,
 
@@ -128,6 +122,7 @@ ShieldCollider = Class(Projectile) {
 
         local vx, vy, vz = self.Plane:GetVelocity() -- Current plane velocity
         local wx, wy, wz = unpack(VDiff(shield:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
+        self.shieldVector = {x = wx, y = wy, z = wz}
 
         -- Convert our speed values from units per tick to units per second
         vx = 10 * vx
