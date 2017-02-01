@@ -65,6 +65,7 @@ ShieldCollider = Class(Projectile) {
                     end
                 end
                 self.Impacted = true
+                self:SetVelocity(0, 0, 0)
             elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
                 if not self.ShieldImpacted then
                     self.ShieldImpacted = true -- Only impact once
