@@ -101,7 +101,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetY = 0.1,
+    CollisionOffsetZ = -1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -250,7 +250,7 @@ UnitBlueprint {
     SizeSphere = 1.6,
     SizeX = 1,
     SizeY = 0.5,
-    SizeZ = 1,
+    SizeZ = 1.3,
     StrategicIconName = 'icon_gunship2_directfire',
     StrategicIconSortPriority = 65,
     Transport = {

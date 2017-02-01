@@ -109,7 +109,6 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYRADAR',
     },
-    CollisionOffsetY = -0.5,
     Defense = {
         AirThreatLevel = 6,
         ArmorType = 'Light',
@@ -247,9 +246,9 @@ UnitBlueprint {
     SelectionSizeZ = 1.35,
     SelectionThickness = 0.29,
     SizeSphere = 1.6,
-    SizeX = 2,
-    SizeY = 1,
-    SizeZ = 3,
+    SizeX = 1.4,
+    SizeY = 0.3,
+    SizeZ = 2.2,
     StrategicIconName = 'icon_fighter2_directfire',
     StrategicIconSortPriority = 55,
     Transport = {
