@@ -224,17 +224,17 @@ Shield = Class(moho.shield_methods,Entity) {
     CreateImpactEffect = function(self, vector)
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity { Owner = self.Owner }
-        Warp( ImpactMesh, self:GetPosition())        
+        local ImpactMesh = Entity {Owner = self.Owner}
+        Warp(ImpactMesh, self:GetPosition())
 
         if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
-            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
+            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
         end
 
         for k, v in self.ImpactEffects do
-            CreateEmitterAtBone( ImpactMesh, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
+            CreateEmitterAtBone(ImpactMesh, -1, army, v):OffsetEmitter(0, 0, OffsetLength)
         end
 
         WaitSeconds(5)
