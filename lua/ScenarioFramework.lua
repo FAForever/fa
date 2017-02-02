@@ -35,6 +35,8 @@ function EndOperation(_success, _allPrimary, _allSecondary)
         _opData = import(opFile)
     end
 
+    import('/lua/victory.lua').CallEndGame() -- We need this here to populate the score screen
+
     Sync.OperationComplete = {
         success = _success,
         difficulty = ScenarioInfo.Options.Difficulty,
