@@ -37,14 +37,17 @@ function EndOperation(_success, _allPrimary, _allSecondary)
 
     import('/lua/victory.lua').CallEndGame() -- We need this here to populate the score screen
 
-    Sync.OperationComplete = {
-        success = _success,
-        difficulty = ScenarioInfo.Options.Difficulty,
-        allPrimary = _allPrimary,
-        allSecondary = _allSecondary,
-        faction = ScenarioInfo.LocalFaction,
-        opData = _opData.operationData
-    }
+    ForkThread(function()
+        WaitSeconds(3) -- Wait for the stats to be synced
+        Sync.OperationComplete = {
+            success = _success,
+            difficulty = ScenarioInfo.Options.Difficulty,
+            allPrimary = _allPrimary,
+            allSecondary = _allSecondary,
+            faction = ScenarioInfo.LocalFaction,
+            opData = _opData.operationData
+        }
+    end)
 end
 
 -- Pop up a dialog to ask the user what faction they want to play
