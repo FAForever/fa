@@ -415,8 +415,10 @@ end
 -- # Kill or Capture
 -- #   Kill or Capture units
 function KillOrCapture(Type, Complete, Title, Description, Target)
-    Target.killed_or_captured = 0
-    Target.total = table.getn(Target.Units)
+    local KilledOrCaptured = 0
+    local Total = table.getn(Target.Units)
+    local PercentRequired = Target.PercentRequired or 100
+    local NumRequired = math.ceil(Total * (PercentRequired / 100))
 
     local image = GetActionIcon('KillOrCapture')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -433,6 +435,16 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         UpdateObjective( Title, 'complete', resultStr, self.Tag )
     end
 
+    objective.UpdateProgress = function()
+        local progress
+        if Target.PercentProgress then
+            progress = string.format('(%s%%/%s%%)', math.floor(((Total - (Total - KilledOrCaptured)) / Total) * 100), PercentRequired)
+        elseif Target.ShowProgress == nil or Target.ShowProgress then
+            progress = string.format('(%s/%s)', KilledOrCaptured, NumRequired)
+        end
+        UpdateObjective( Title, 'Progress', progress, objective.Tag )
+    end
+
     -- keep track of captured units so subsequent kills dont get counted
     local captured = {}
 
@@ -447,12 +459,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
             end
         end
 
-
-        Target.killed_or_captured = Target.killed_or_captured + 1
-        local progress = string.format('(%s/%s)', Target.killed_or_captured, Target.total)
-        objective:OnProgress(Target.killed_or_captured, Target.total)
-        UpdateObjective( Title, 'Progress', progress, objective.Tag )
-        if Target.killed_or_captured == Target.total then
+        KilledOrCaptured = KilledOrCaptured + 1
+        objective:OnProgress(KilledOrCaptured, NumRequired)
+        objective:UpdateProgress()
+        if KilledOrCaptured == NumRequired then
             objective.Active = false
             objective:OnResult(true, unit)
             UpdateObjective( Title, 'complete', "complete", objective.Tag )
@@ -464,11 +474,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
             return
         end
         table.insert(captured, unit)
-        Target.killed_or_captured = Target.killed_or_captured + 1
-        local progress = string.format('(%s/%s)', Target.killed_or_captured, Target.total)
-        objective:OnProgress(Target.killed_or_captured, Target.total)
-        UpdateObjective( Title, 'Progress', progress, objective.Tag )
-        if Target.killed_or_captured == Target.total then
+        KilledOrCaptured = KilledOrCaptured + 1
+        objective:OnProgress(KilledOrCaptured, NumRequired)
+        objective:UpdateProgress()
+        if KilledOrCaptured == NumRequired then
             objective.Active = false
             objective:OnResult(true, unit)
             UpdateObjective( Title, 'complete', "complete", objective.Tag )
@@ -481,11 +490,10 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
             return
         end
 
-        Target.killed_or_captured = Target.killed_or_captured + 1
-        local progress = string.format('(%s/%s)', Target.killed_or_captured, Target.total)
-        objective:OnProgress(Target.killed_or_captured, Target.total)
-        UpdateObjective( Title, 'Progress', progress, objective.Tag )
-        if Target.killed_or_captured == Target.total then
+        KilledOrCaptured = KilledOrCaptured + 1
+        objective:OnProgress(KilledOrCaptured, NumRequired)
+        objective:UpdateProgress()
+        if KilledOrCaptured == NumRequired then
             objective.Active = false
             objective:OnResult(true, unit)
             UpdateObjective( Title, 'complete', "complete", objective.Tag )
@@ -524,8 +532,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         end
     end
 
-    local progress = string.format('(%s/%s)', Target.killed_or_captured, Target.total)
-    UpdateObjective( Title, 'Progress', progress, objective.Tag )
+    objective:UpdateProgress()
 
     return objective
 end
