@@ -201,7 +201,6 @@ end
 -- #   UserCallback is executed when all objectives in the list are complete
 -- #
 function CreateGroup( name, userCallback, numRequired )
-    LOG('Creating objective group ', name)
     local objectiveGroup =  {
         Name = name,
         Active = true,
@@ -215,7 +214,6 @@ function CreateGroup( name, userCallback, numRequired )
 
     local function OnResult(result)
         if not objectiveGroup.Active then
-            LOG('ObjectiveGroup ', objectiveGroup.Name,' is not active.')
             return
         end
 
@@ -224,7 +222,6 @@ function CreateGroup( name, userCallback, numRequired )
         end
 
         if objectiveGroup.NumRequired then
-            LOG('ObjectiveGroup ', objectiveGroup.Name,' Progress ', objectiveGroup.NumRequired, '/', objectiveGroup.NumCompleted)
             if objectiveGroup.NumCompleted < objectiveGroup.NumRequired then
                 return
             end
