@@ -1,5 +1,7 @@
 Patch 3674 (Upcoming)
 ============================
+http://content.faforever.com/patchnotes/3674.html
+
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
 - Allow factions to be restricted per slot
@@ -18,9 +20,17 @@ Patch 3674 (Upcoming)
 - Ythotha
     - Changed various aspects of the unit to make it easier to micro
     - UniformScale decreased 0.05 -> 0.042
-    - TurnRate increased 40 -> 70
+    - TurnRate increased 40 -> 60
     - SizeX decreased 3.5 -> 3.2
     - SizeY decreased 8.5 -> 7.5
+    - Eye weapon MaxRadius increased 45 -> 47
+    - Gatling arm weapon MaxRadius increased 45 -> 47
+    - Medium cannon weapon MaxRadius increased 45 -> 47
+    - AA
+        - MaxRadius increased 45 -> 47
+        - AOE increased 1.5 -> 4
+        - Can shoot at a slightly greater angle to eliminate blindspots',
+        - Added UseFiringSolutionInsteadOfAimBone = true for better AA performance',
     - Added ACU as higher priority target on the DeathBall
     - Various changes to weapon arcs and targeting angles
 - T1 Factories
