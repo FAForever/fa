@@ -1,4 +1,4 @@
-last_version = 3674
+last_version = 3675
 changelog = {
     {
         version = 3,
@@ -712,5 +712,13 @@ changelog = {
             '- TheKeyBlue',
             '- ZockyZock',
         }
+    },
+    {
+        version = 3675,
+        name = 'Game Version 3675',
+        description = {
+            '- Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on',
+        }
+    },
     }
 }

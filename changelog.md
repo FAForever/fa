@@ -1,4 +1,9 @@
-Patch 3674 (Upcoming)
+Patch 3675 (5th February, 2017)
+============================
+- Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on
+
+
+Patch 3674 (5th February, 2017)
 ============================
 http://content.faforever.com/patchnotes/3674.html
 
