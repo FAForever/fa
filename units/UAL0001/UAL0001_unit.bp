@@ -1105,7 +1105,7 @@ UnitBlueprint {
                     Duration = 3.5,
                     Radius = 35,
                     TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL,COMMAND',
+                    TargetDisallow = 'EXPERIMENTAL, COMMAND',
                 },
             },
             CanFireFromTransport = true,

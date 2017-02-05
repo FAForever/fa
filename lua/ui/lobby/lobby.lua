@@ -94,6 +94,8 @@ ConnectedWithProxy = {} -- by UID
 -- values are the colour values.
 availableColours = {}
 
+allAvailableFactionsList = {}
+
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedSimMods = {} -- Similar map for activated sim mods
 local selectedUIMods = {} -- Similar map for activated UI mods
@@ -421,6 +423,7 @@ local function DoSlotBehavior(slot, key, name)
                 )
             end
         end
+        UpdateFactionSelector()
     elseif key == 'pm' then
         if gameInfo.PlayerOptions[slot].Human then
             GUI.chatEdit:SetText(string.format("/whisper %s ", gameInfo.PlayerOptions[slot].PlayerName))
@@ -949,6 +952,12 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     slot.faction:Show()
+    
+    -- Check if faction is possible for that slot, if not set to random
+    -- For example: AIs always start with faction 5, so that needs to be adjusted to fit in slot.Faction
+    if table.getn(slot.AvailableFactions) < playerInfo.Faction then
+        playerInfo.Faction = table.getn(slot.AvailableFactions)
+    end
     slot.faction:SetItem(playerInfo.Faction)
 
     slot.color:Show()
@@ -1084,25 +1093,42 @@ local function GetPlayersNotReady()
     return notReady
 end
 
-local function GetRandomFactionIndex()
+local function GetRandomFactionIndex(slotNumber)
     local randomfaction = nil
     local counter = 50
     while counter > 0 do
         counter = (counter - 1)
-        randomfaction = math.random(1, table.getn(FactionData.Factions))
+        randomfaction = math.random(1, table.getn(GUI.slots[slotNumber].AvailableFactions) - 1)
     end
     return randomfaction
 end
 
 local function AssignRandomFactions()
-    local randomFactionID = table.getn(FactionData.Factions) + 1
     for index, player in gameInfo.PlayerOptions do
-        -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
-        -- the random faction ID if they have supcom
-        if player.Faction >= randomFactionID then
-            player.Faction = GetRandomFactionIndex()
+        -- No random if there is only 1 option
+        if table.getn(GUI.slots[index].AvailableFactions) >= 2 then
+            local randomFactionID = table.getn(GUI.slots[index].AvailableFactions)
+            -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
+            -- the random faction ID if they have supcom
+            if player.Faction >= randomFactionID then
+                player.Faction = GetRandomFactionIndex(index)
+            end
         end
     end
+end
+
+-- Convert the local (slot dependend) faction indexes to the global faction indexes
+local function FixFactionIndexes()
+    for index, player in gameInfo.PlayerOptions do
+        local playerFaction = GUI.slots[index].AvailableFactions[player.Faction]
+        for i,v in allAvailableFactionsList do
+            if v == playerFaction then
+                player.Faction = i
+                continue
+            end
+        end
+    end
+    
 end
 
 ---------------------------
@@ -1592,11 +1618,79 @@ function PrivateChat(targetID,text)
     end
 end
 
-function UpdateAvailableSlots( numAvailStartSpots )
+function UpdateAvailableSlots( numAvailStartSpots, scenario )
     if numAvailStartSpots > LobbyComm.maxPlayerSlots then
         WARN("Lobby requests " .. numAvailStartSpots .. " but there are only " .. LobbyComm.maxPlayerSlots .. " available")
     end
+    
+    for i = 1, numAvailStartSpots do
+        local availableFactionsForSpotI = FACTION_NAMES
+        if scenario.Configurations.standard.factions then
+            availableFactionsForSpotI = scenario.Configurations.standard.factions[i]
+        end
+        
+        local factionBmps = {}
+        local factionTooltips = {}
+        local factionList = {}
+        for index, factionKey in availableFactionsForSpotI do
+            for _, tbl in FactionData.Factions do
+                if factionKey == tbl.Key then
+                    factionBmps[index] = tbl.SmallIcon
+                    factionTooltips[index] = tbl.TooltipID
+                    factionList[index] = tbl.Key
+                    break
+                end
+            end
+        end
+        if table.getn(factionBmps) > 1 then 
+            table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
+            table.insert(factionTooltips, 'lob_random')
+            table.insert(factionList, 'random')
+        end
+        
+        local oldAvailableFactions = GUI.slots[i].AvailableFactions
+        GUI.slots[i].AvailableFactions = factionList
+        
+        local diff = table.getn(factionList) ~= table.getn(oldAvailableFactions)
+        for k = 1,table.getn(factionList) do
+            if oldAvailableFactions[k] ~= factionList[k] then
+                diff = true
+                break
+            end
+        end
+        if not diff then
+            continue
+        end
 
+        GUI.slots[i].faction:ChangeBitmapArray(factionBmps)
+        Tooltip.AddComboTooltip(GUI.slots[i].faction, factionTooltips)
+        
+        if gameInfo.PlayerOptions[i] then
+            local playerFactionIndex = table.getn(factionList)
+            for index,key in factionList do
+                if key == oldAvailableFactions[gameInfo.PlayerOptions[i].Faction] then
+                    playerFactionIndex = index
+                    break
+                end
+            end
+            if FindSlotForID(localPlayerID) == i then
+                local fact = factionList[playerFactionIndex]
+                for index,value in allAvailableFactionsList do
+                    if fact == value then
+                        GUI.factionSelector:SetSelected(index)
+                        break
+                    end
+                end
+            else
+                GUI.slots[i].faction:SetItem(playerFactionIndex)
+                SetPlayerOption(i, 'Faction', playerFactionIndex)
+                gameInfo.PlayerOptions[i].Faction = playerFactionIndex
+            end
+        end
+        
+        UpdateFactionSelector()
+    end
+    
     -- if number of available slots has changed, update it
     if gameInfo.firstUpdateAvailableSlotsDone and numOpenSlots == numAvailStartSpots then
         -- Remove closed_spawn_mex if necessary
@@ -1764,6 +1858,8 @@ local function TryLaunch(skipNoObserversCheck)
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
         AssignRandomFactions()
+        -- fix faction indexes
+        FixFactionIndexes()
         AssignRandomStartSpots()
         AssignAINames()
         local allRatings = {}
@@ -1890,6 +1986,11 @@ local function UpdateGame()
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
+        if notReady then
+            UpdateFactionSelector()
+        end
+    else
+        UIUtil.setEnabled(GUI.factionSelector, false)
     end
     
     gameInfo.AdaptiveMap = scenarioInfo.AdaptiveMap
@@ -1904,7 +2005,7 @@ local function UpdateGame()
         end
     end
 
-    UpdateAvailableSlots(numAvailStartSpots)
+    UpdateAvailableSlots(numAvailStartSpots, scenarioInfo)
 
     -- Update all slots.
     for i = 1, LobbyComm.maxPlayerSlots do
@@ -2299,21 +2400,32 @@ function CreateSlotsUI(makeLabel)
         -- builds the faction tables, and then adds random faction icon to the end
         local factionBmps = {}
         local factionTooltips = {}
+        local factionList = {}
         for index, tbl in FactionData.Factions do
             factionBmps[index] = tbl.SmallIcon
             factionTooltips[index] = tbl.TooltipID
+            factionList[index] = tbl.Key
         end
         table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
         table.insert(factionTooltips, 'lob_random')
-
+        table.insert(factionList, 'random')
+        allAvailableFactionsList = factionList
+        
         local factionSelector = BitmapCombo(newSlot, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.faction = factionSelector
+        newSlot.AvailableFactions = factionList
         newSlot:AddChild(factionSelector)
         factionSelector.Width:Set(59)
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
-                GUI.factionSelector:SetSelected(index)
+                local fact = GUI.slots[FindSlotForID(localPlayerID)].AvailableFactions[index]
+                for ind,value in allAvailableFactionsList do
+                    if fact == value then
+                        GUI.factionSelector:SetSelected(ind)
+                        break
+                    end
+                end
             end
 
             Tooltip.DestroyMouseoverDisplay()
@@ -4626,13 +4738,77 @@ function CreateUI_Faction_Selector(lastFaction)
     LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 20)
     factionSelector.OnChoose = function(self, targetFaction, key)
         local localSlot = FindSlotForID(localPlayerID)
+        local slotFactionIndex = GetSlotFactionIndex(targetFaction)
         Prefs.SetToCurrentProfile('LastFaction', targetFaction)
-        GUI.slots[localSlot].faction:SetItem(targetFaction)
-        SetPlayerOption(localSlot, 'Faction', targetFaction)
-        gameInfo.PlayerOptions[localSlot].Faction = targetFaction
+        GUI.slots[localSlot].faction:SetItem(slotFactionIndex)
+        SetPlayerOption(localSlot, 'Faction', slotFactionIndex)
+        gameInfo.PlayerOptions[localSlot].Faction = slotFactionIndex
 
         RefreshLobbyBackground(targetFaction)
         UIUtil.SetCurrentSkin(FACTION_NAMES[targetFaction])
+    end
+    
+    -- Only enable all buttons incase all the buttons are disabled, to avoid overriding partially disabling of the buttons
+    factionSelector.Enable = function(self)
+        for k, v in self.mButtons do
+            if v._controlState == "up" then
+                return
+            end
+        end
+        for k, v in self.mButtons do
+            v:Enable()
+        end
+    end
+    
+    factionSelector.SetCheck = function(self, index)
+        for i,button in self.mButtons do
+            if index ==i then
+                button:SetCheck(true)
+            else
+                button:SetCheck(false)
+            end
+        end
+        self.mCurSelection = index
+    end
+    
+    factionSelector.EnableSpecificButtons = function(self, specificButtons)
+        for i,button in self.mButtons do
+            if specificButtons[i] then
+                button:Enable()
+            else
+                button:Disable()
+            end
+        end
+    end
+end
+
+function UpdateFactionSelector()
+    local playerSlotID = FindSlotForID(localPlayerID)
+    local playerSlot = GUI.slots[playerSlotID] 
+    
+    local enabledList = {}
+    for index,button in GUI.factionSelector.mButtons do
+        enabledList[index] = false
+        for i,value in playerSlot.AvailableFactions do
+            if value == allAvailableFactionsList[index] then
+                if gameInfo.PlayerOptions[playerSlotID].Faction == i then
+                    GUI.factionSelector:SetCheck(index)
+                end
+                enabledList[index] = true
+                break
+            end
+        end
+    end
+    GUI.factionSelector:EnableSpecificButtons(enabledList)
+end
+
+function GetSlotFactionIndex( factionIndex )
+    local localSlot = GUI.slots[FindSlotForID(localPlayerID)]
+    local actualFaction = allAvailableFactionsList[factionIndex]
+    for index,value in localSlot.AvailableFactions do
+        if value == actualFaction then
+            return index
+        end
     end
 end
 
@@ -5236,12 +5412,29 @@ function DoSlotSwap(slot1, slot2)
     local team_bucket = player1.Team
     player1.Team = player2.Team
     player2.Team = team_bucket
-
+    
+    --Handle faction availability
+    KeepSameFactionOrRandom(slot1, slot2, player1)
+    KeepSameFactionOrRandom(slot2, slot1, player2)
+    
     gameInfo.PlayerOptions[slot2] = player1
     gameInfo.PlayerOptions[slot1] = player2
 
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
+    
+    UpdateFactionSelector()
+end
+
+function KeepSameFactionOrRandom(slotFrom, slotTo, player)
+    local playerFactionKey = GUI.slots[slotFrom].AvailableFactions[player.Faction]
+    --intialize to random, incase oldFaction isn't available
+    player.Faction = table.getn(GUI.slots[slotTo].AvailableFactions)
+    for index,faction in GUI.slots[slotTo].AvailableFactions do
+        if faction == playerFactionKey then
+            player.Faction = index
+        end
+    end
 end
 
 local function SendPlayerOption(playerInfo, key, value)
@@ -5420,6 +5613,8 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+            
+            UpdateFactionSelector()
         end,
 
         RemoveAI = function(slot)
@@ -5479,7 +5674,11 @@ function InitHostUtils()
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " already occupied")
                 return false
             end
-
+            
+            local player = gameInfo.PlayerOptions[currentSlot]
+            
+            KeepSameFactionOrRandom(currentSlot, requestedSlot, player)
+            
             gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
             gameInfo.PlayerOptions[currentSlot] = nil
             ClearSlotInfo(currentSlot)
@@ -5654,8 +5853,8 @@ function InitHostUtils()
                 SendSystemMessage("lobui_0330", name, gameInfo.GameOptions.ScenarioFile)
                 LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
                 if name == localPlayerName then
-                    LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
-                    SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+                    LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '.. UIUtil.defaultScenario)
+                    SetGameOption('ScenarioFile', UIUtil.defaultScenario)
                 end
             end
         end,

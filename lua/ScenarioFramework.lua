@@ -35,14 +35,19 @@ function EndOperation(_success, _allPrimary, _allSecondary)
         _opData = import(opFile)
     end
 
-    Sync.OperationComplete = {
-        success = _success,
-        difficulty = ScenarioInfo.Options.Difficulty,
-        allPrimary = _allPrimary,
-        allSecondary = _allSecondary,
-        faction = ScenarioInfo.LocalFaction,
-        opData = _opData.operationData
-    }
+    import('/lua/victory.lua').CallEndGame() -- We need this here to populate the score screen
+
+    ForkThread(function()
+        WaitSeconds(3) -- Wait for the stats to be synced
+        Sync.OperationComplete = {
+            success = _success,
+            difficulty = ScenarioInfo.Options.Difficulty,
+            allPrimary = _allPrimary,
+            allSecondary = _allSecondary,
+            faction = ScenarioInfo.LocalFaction,
+            opData = _opData.operationData
+        }
+    end)
 end
 
 -- Pop up a dialog to ask the user what faction they want to play
@@ -219,13 +224,21 @@ end
 function GiveUnitToArmy( unit, newArmyIndex, triggerOnGiven )
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
+
+    unit.IsBeingTransferred = true
+
     local newBrain = ArmyBrains[newArmyIndex]
+
     SetIgnoreArmyUnitCap(newArmyIndex, true)
+    IgnoreRestrictions(true)
+
     local newUnit = ChangeUnitArmy(unit, newArmyIndex)
+
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(newArmyIndex, false)
     end
-    
+    IgnoreRestrictions(false)
+
     if triggerOnGiven then
         unit:OnGiven(newUnit)
     end

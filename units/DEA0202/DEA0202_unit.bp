@@ -457,7 +457,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Napalm Carpet Bomb',
             DoTPulses = 15,
-            DoTTime = 4.2, -- 90 fire damage per bomb, Total fire damage = 1200
+            DoTTime = 6, -- 90 fire damage per bomb, Total fire damage = 1200
             FireTargetLayerCapsTable = {
                 Air = 'Land|Seabed|Water',
                 Land = 'Land|Seabed|Water',
@@ -466,7 +466,7 @@ UnitBlueprint {
             FiringRandomness = 0.1,
             FiringTolerance = 6,
             FixBombTrajectory = true,
-            InitialDamage = 30, -- Total impact damage = 600. Total overall damage = 1800
+            InitialDamage = 15, -- Total impact damage = 300. Total overall damage = 1500
             Label = 'Bomb',
             MaxRadius = 60,
             MuzzleSalvoDelay = 0.2,
