@@ -1,5 +1,5 @@
 -- ==========================================================================================
--- * File       : lua/modules/ui/lobby/UnitsManager.lua 
+-- * File       : lua/system/utils.lua 
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains global functions for working with tables and strings
 -- ==========================================================================================
@@ -237,24 +237,35 @@ function sort_down_by(field)
     end
 end
 
---- table.keys(t, [comp]) -- Return a list of the keys of t, sorted.
+--- table.keys(t, [comp], [skip]) returns a list of the keys of t, sorted.
 --- [comp] is an optional comparison function, defaulting to less-than.
-function table.keys(t, comp)
+--- [skip] is an optional boolean that specifies if sorting is needed, defaulting to true
+function table.keys(t, comp, skip)
     local r = {}
     if not t then return r end -- prevents looping over nil table
+    local n = 1
     for k,v in t do
-        table.insert(r,k)
+        r[n] = k -- faster than table.insert(r,k)
+        n = n + 1
     end
-    table.sort(r, comp)
+    if not skip then table.sort(r, comp) end
     return r
+end
+
+--- table.keysfast(t) returns a list of the keys of t, in unspecified order.
+--- this function is about 3 times faster than table.keys(t, [comp], [skip])
+function table.keysfast(t)
+    return table.keys(t, nil, true)
 end
 
 --- table.values(t) Return a list of the values of t, in unspecified order.
 function table.values(t)
     local r = {}
     if not t then return r end -- prevents looping over nil table
+    local n = 1
     for k,v in t do
-        table.insert(r,v)
+        r[n] = v -- faster than table.insert(r,v)
+        n = n + 1
     end
     return r
 end
@@ -316,36 +327,75 @@ end
 --- table.reverse {'one','two','three'} => {'three', 'two', 'one'}
 function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
-    local reversed = {}
+    local r = {}
     local items = table.indexize(t) -- convert from hash table
     local itemsCount = table.getsize(t)
     for k, v in ipairs(items) do
-        reversed[itemsCount + 1 - k] = v
+        r[itemsCount + 1 - k] = v
     end
-    return reversed
+    return r
 end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
 --- it is useful for preparing hash table before sorting its values
---- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
----                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
+--- table.indexize { [a] = 'one', [b] = 'two', [c] = 'three' } => 
+---                { [1] = 'one', [2] = 'two', [3] = 'three' } 
 function table.indexize(t)
     if not t then return {} end -- prevents looping over nil table
-    local indexized = {}
+    local r = {}
+    local n = 1
     for k, v in t do
-        table.insert(indexized, v)
+        r[n] = v -- faster than table.insert(r, v)
+        n = n + 1
     end
-    return indexized
+    return r
 end
 
---- Converts a table to a new table with values as keys and values equal to true
-function table.hash(t)
+--- Converts a table to a new table with values as keys and values equal to true, duplicated table values are discarded
+--- @parma t    - specifies table with values for hashing
+--- @parma safe - optional boolean for safely hashing of table values by converting them first to strings which is lower method (defaults to false)
+--- it is useful for quickly looking up values in tables instead of looping over it 
+--- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } => 
+---            { [A] = true, [B] = true, [C] = true } 
+function table.hash(t, safe)
     if not t then return {} end -- prevents looping over nil table
-    local lookup = {}
+    local r = {}
     for k, v in t do
-        lookup[tostring(v)] = true
+        if safe then
+            r[tostring(v)] = true
+        else
+            r[v] = true
+        end
     end
-    return lookup 
+    return r 
+end
+
+--- Converts a table to a new table with values as keys only if their values are true
+--- it is reverse logic of table.hash(t) 
+--- table.unhash { [A] = true, [B] = true, [C] = false }  => 
+--               { [1] = 'A',  [2] = 'B', }
+function table.unhash(t)
+    if not t then return {} end -- prevents looping over nil table
+    local r = {}
+    local n = 1
+    for k, v in t do
+        if v then
+            r[n] = k -- faster than table.insert(r, k)
+            n = n + 1
+        end
+    end
+    return r
+end
+
+--- Concatenate keys of hash table if their values equal to specified boolean value, defaults to true
+--- it is useful to check which keys are present or not in a hash table
+--- t = { [A] = true, [B] = true, [C] = false }
+--- table.hashkeys(t, true)  =>  { 'A', 'B' }
+--- table.hashkeys(t, false) =>  { 'C' }
+function table.hashkeys(t, value)
+    if value == nil then value = true end -- defaulting to true
+    local r = table.filter(t, function(v) return v == value end)
+    return table.keys(r)
 end
 
 --- table.map(fn,t) returns a table with the same keys as t but with
@@ -440,20 +490,27 @@ function table.print(tbl, tblPrefix, printer)
     printer(tblPrefix.." }")
 end
 
---- Filter a table using a function.
---- @param t Table to filter
---- @param filterFunc Decision function to use to filter the table.
---- @return A new table containing every mapping from t for which filterFunc 
---- returns `true` when passed the value.
-function table.filter(t, filterFunc)
-    local newTable = {}
+--- Return filtered table containing every mapping from table for which fn function returns true when passed the value.
+--- @param t  - is a table to filter
+--- @param fn - is decision function to use to filter the table, defaults checking if a value is true or exists in table
+function table.filter(t, fn)
+    local r = {}
+    if not fn then fn = function(v) return v end end
     for k, v in t do
-        if filterFunc(v) then
-            newTable[k] = v
+        if fn(v) then
+            r[k] = v
         end
     end
+    return r
+end
 
-    return newTable
+--- Returns total count of values that match fn function or if values exist in table
+--- @param fn is optional filtering function that is applied to each value of the table
+function table.count(t, fn)
+    if not t then return 0 end -- prevents looping over nil table
+    if not fn then fn = function(v) return v end end  
+    local r = table.filter(t, fn)
+    return table.getsize(r)
 end
 
 --- Returns a new table with unique values
@@ -461,10 +518,11 @@ function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}
     local ins = {}
-
+    local n = 0
     for k, v in t do
         if not ins[v] then
-            table.insert(unique, v)
+            n = n + 1
+            unique[n] = v -- faster than table.insert(unique, v)
             ins[v] = true
         end
     end
@@ -577,20 +635,135 @@ function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
 end
 
---- Creates a new, started timer
-function StartedTimer()
+--- Creates timer for profiling task(s) and calculating time delta between consecutive function calls, e.g.
+--- local timer = CreateTimer()
+--- timer:Start() -- then execute some LUA code
+--- timer:Stop() 
+--- or
+--- timer:Start('task1') -- then execute task #1
+--- timer:Stop('task1') 
+--- timer:Start('task2') -- then execute task #2
+--- timer:Stop('task2') 
+function CreateTimer() 
     return {
-        startTime = CurrentTime(),
-        endTime = nil,
-        Stop = function(self)
-            self.endTime = CurrentTime()
-            return self:ToString()
+        tasks = {}, 
+        Reset = function(self)
+            self.tasks = {}
         end,
-        GetDuration = function(self)
-            return self.endTime - self.startTime
+        -- starts profiling timer for optional task name
+        Start = function(self, name, useLogging)
+            name = self:Verify(name) 
+            -- capture start time 
+            self.tasks[name].stop  = nil
+            self.tasks[name].start = CurrentTime()
+            self.tasks[name].calls = self.tasks[name].calls + 1
+            
+            if useLogging then
+                LOG('Timing task: ' ..  name .. ' started' )
+            end
         end,
-        ToString = function(self)
-            return string.format("%0.3fms", self:GetDuration() * 1000)
-        end
+        -- stops profiling timer and calculates stats for optional task name
+        Stop = function(self, name, useLogging)
+            name = self:Verify(name)
+            -- capture stop time  
+            self.tasks[name].stop  = CurrentTime() 
+            self.tasks[name].time  = self.tasks[name].stop - self.tasks[name].start
+            self.tasks[name].total = self.tasks[name].total + self.tasks[name].time
+            -- track improvements between consecutive profiling of the same task
+            if self.tasks[name].last then
+               self.tasks[name].delta = self.tasks[name].last - self.tasks[name].time
+            end
+            -- save current time for comparing with the next task profiling 
+            self.tasks[name].last = self.tasks[name].time
+
+            if useLogging then
+                LOG('Timing task: ' ..  name ..' completed in ' ..  self:ToString(name))
+            end
+            return self:ToString(name)
+        end,
+        -- verifies if profiling timer has stats for optional task name
+        Verify = function(self, name)
+            if not name then name = 'default-task' end 
+            if not self.tasks[name] then
+                self.tasks[name] = {} 
+                self.tasks[name].name  = name
+                self.tasks[name].start = nil
+                self.tasks[name].stop  = nil
+                self.tasks[name].delta = nil
+                self.tasks[name].last  = nil
+                self.tasks[name].calls = 0
+                self.tasks[name].total = 0
+                self.tasks[name].time  = 0
+            end
+            return name
+        end,
+        -- gets stats for optional task name
+        GetStats = function(self, name)
+            name = self:Verify(name)
+            return self.tasks[name]
+        end,
+        -- gets time for optional task name
+        GetTime = function(self, name)
+            name = self:Verify(name)
+            local ret = ''
+            if not self.tasks[name].start then
+                WARN( 'Timer cannot get time duration for not started task: ' ..  tostring(name) )
+            elseif not self.tasks[name].stop then
+                WARN( 'Timer cannot get time duration for not stopped task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].time)
+            end
+            return ret
+        end, 
+        -- gets time delta between latest and previous profiling of named tasks
+        GetDelta = function(self, name)
+            name = self:Verify(name)
+            local ret = ''
+            if not self.tasks[name].delta then
+                WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].delta)
+                if self.tasks[name].delta > 0 then
+                    ret = '+' .. ret 
+                end
+            end
+            return ret
+        end, 
+        -- gets time total of all profiling calls of named tasks
+        GetTotal = function(self, name)
+            name = self:Verify(name)
+            local ret = ''
+            if not self.tasks[name].start then
+                WARN( 'Timer cannot get time total for not started task: ' ..  tostring(name) )
+            else 
+                ret = string.format("%0.3f seconds", self.tasks[name].total)
+            end
+            return ret
+        end,
+        -- converts profiling stats for optional named task to string
+        ToString = function(self, name)
+            name = self:Verify(name)
+            local ret = self:GetTime(name)
+            if self.tasks[name].delta then
+                ret = ret .. ', delta: ' .. self:GetDelta(name) 
+            end
+            if self.tasks[name].calls > 1 then
+                ret = ret .. ', calls: ' .. tostring(self.tasks[name].calls)
+                ret = ret .. ', total: ' .. self:GetTotal(name)
+            end
+            return ret
+         end,
+        -- prints profiling stats of all tasks in increasing order of tasks 
+        -- @param key is optional sorting argument of tasks, e.g. 'stop', 'time', 'start'
+         Print = function(self, key) 
+            key = key or 'stop' 
+            local sorted = table.indexize(self.tasks)
+            sorted = table.sorted(sorted, sort_by(key)) 
+            for _, task in sorted do 
+                if task.stop then
+                    LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
+                end 
+            end
+         end
     }
 end

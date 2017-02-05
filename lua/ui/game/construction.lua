@@ -161,15 +161,9 @@ function DecreaseBuildCountInQueue(unitIndex, count)
     local tech3 = false
     local supportfactory = false
 
-    if blueprint.Categories then
-        for i, v in ipairs(blueprint.Categories) do
-            if v == 'SUPPORTFACTORY' then
-                supportfactory = true
-            elseif v == 'TECH3' then
-                tech3 = true
-            end
-            if tech3 and supportfactory then break end
-        end
+    if blueprint.CategoriesHash then
+        tech3 = blueprint.CategoriesHash.TECH3
+        supportfactory = blueprint.CategoriesHash.SUPPORTFACTORY
     end
 
     if not (tech3 and supportfactory) then

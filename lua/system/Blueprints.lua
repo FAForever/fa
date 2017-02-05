@@ -84,7 +84,6 @@ local function GetSource()
     return DiskToLocal(there)
 end
 
-
 local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
@@ -177,7 +176,6 @@ function ExtractMeshBlueprint(bp)
     end
 end
 
-
 function ExtractWreckageBlueprint(bp)
     local meshid = bp.Display.MeshBlueprint
     if not meshid then return end
@@ -230,13 +228,11 @@ function ExtractBuildMeshBlueprint(bp)
     end
 end
 
-
 function MeshBlueprint(bp)
     -- fill in default values
     SetLongId(bp)
     StoreBlueprint('Mesh', bp)
 end
-
 
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
@@ -245,12 +241,10 @@ function UnitBlueprint(bp)
     StoreBlueprint('Unit', bp)
 end
 
-
 function PropBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Prop', bp)
 end
-
 
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
@@ -259,24 +253,20 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
-
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)
 end
-
 
 function EmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Emitter', bp)
 end
 
-
 function BeamBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Beam', bp)
 end
-
 
 function ExtractAllMeshBlueprints()
 
@@ -296,7 +286,6 @@ function ExtractAllMeshBlueprints()
     end
 end
 
-
 function RegisterAllBlueprints(blueprints)
 
     local function RegisterGroup(g, fun)
@@ -314,15 +303,17 @@ function RegisterAllBlueprints(blueprints)
     RegisterGroup(blueprints.Beam, RegisterBeamBlueprint)
 end
 
-
 -- Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
 -- after building SCU.
 function HandleUnitWithBuildPresets(bps, all_bps)
 
-    local sortCats = { 'SORTOTHER', 'SORTINTEL', 'SORTSTRATEGIC', 'SORTDEFENSE', 'SORTECONOMY', 'SORTCONSTRUCTION', }
+    -- hashing sort categories for quick lookup 
+    local sortCategories = { ['SORTOTHER'] = true, ['SORTINTEL'] = true, ['SORTSTRATEGIC'] = true, ['SORTDEFENSE'] = true, ['SORTECONOMY'] = true, ['SORTCONSTRUCTION'] = true, }
+
     local tempBp = {}
 
     for k, bp in bps do
+
         for name, preset in bp.EnhancementPresets do
             -- start with clean copy of the original unit BP
             tempBp = table.deepcopy(bp)
@@ -345,7 +336,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
                         t = t + (tempBp.Enhancements[enh].BuildTime or 0)
                         -- HUSSAR added name of the enhancement so that preset units cannot be built 
                         -- if they have restricted enhancement(s)
-                        table.insert(tempBp.Categories, enh) -- do not change case of enhancements
+                        bp.CategoriesHash[enh] = true -- hashing without changing case of enhancements
                     else
                         WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
                     end
@@ -365,12 +356,12 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 
             -- Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
-                if table.find(sortCats, preset.SortCategory) or preset.SortCategory == 'None' then
-                    for _, v in sortCats do
-                        table.removeByValue(tempBp.Categories, v)
+                if sortCategories[preset.SortCategory] or preset.SortCategory == 'None' then
+                    for k, v in sortCategories do
+                        tempBp.CategoriesHash[k] = false
                     end
                     if preset.SortCategory ~= 'None' then
-                        table.insert(tempBp.Categories, preset.SortCategory)
+                        tempBp.CategoriesHash[preset.SortCategory] = true
                     end
                 end
             end
@@ -382,14 +373,14 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
-            table.insert(tempBp.Categories, 'ISPREENHANCEDUNIT')
-
+            tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
             -- clean up some data that's not needed anymore
-            table.removeByValue(tempBp.Categories, 'USEBUILDPRESETS')
+            tempBp.CategoriesHash['USEBUILDPRESETS'] = false
             tempBp.EnhancementPresets = nil
+            -- synchronizing Categories with CategoriesHash for compatibility 
+            tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
             table.insert(all_bps.Unit, tempBp )
-            --LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
 
             BlueprintLoaderUpdateProgress()
         end
@@ -434,8 +425,6 @@ function PreModBlueprints(all_bps)
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
-    local cats = {}
-
     for _, bp in all_bps.Unit do
     
         ExtractCloakMeshBlueprint(bp)
@@ -445,35 +434,32 @@ function PreModBlueprints(all_bps)
             continue
         end
 
+        -- saving Categories as a hash table for later usage by sim/ui functions 
+        bp.CategoriesHash = table.hash(bp.Categories)
+
         -- adding or deleting categories on the fly
         if bp.DelCategories then
             for k, v in bp.DelCategories do
-                table.removeByValue( bp.Categories, v )
+                bp.CategoriesHash[v] = false -- quickly removing category
             end
             bp.DelCategories = nil
         end
         if bp.AddCategories then
             for k, v in bp.AddCategories do
-                table.insert( bp.Categories, v )
+                bp.CategoriesHash[v] = true -- quickly adding category
             end
             bp.AddCategories = nil
         end
 
-        -- find out what categories the unit has and allow easy reference
-        cats = {}
-        for k, cat in bp.Categories do
-            cats[cat] = true
-        end
-
-        if cats.ENGINEER then -- show build range overlay for engineers
+        if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not cats.OVERLAYMISC and not cats.POD then -- Exclude Build Drones
-                table.insert(bp.Categories, 'OVERLAYMISC')
+            if not bp.CategoriesHash.OVERLAYMISC and not bp.CategoriesHash.POD then -- Exclude Build Drones
+                bp.CategoriesHash.OVERLAYMISC = true
             end
         end
 
-        if cats.NAVAL and not bp.Wreckage then
+        if bp.CategoriesHash.NAVAL and not bp.Wreckage then
             -- Add naval wreckage
             --LOG("Adding wreckage information to ", bp.Description)
             bp.Wreckage = {
@@ -497,17 +483,17 @@ function PreModBlueprints(all_bps)
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
         local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
-                       (cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER)) or
-                       (cats.STRUCTURE and (cats.DIRECTFIRE or cats.INDIRECTFIRE) and (cats.DEFENSE or cats.ARTILLERY)) or 
-                       cats.DUMMYGSRWEAPON
+                       (bp.CategoriesHash.MOBILE and (bp.CategoriesHash.LAND or bp.CategoriesHash.NAVAL) and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE or bp.CategoriesHash.ENGINEER)) or
+                       (bp.CategoriesHash.STRUCTURE and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE) and (bp.CategoriesHash.DEFENSE or bp.CategoriesHash.ARTILLERY)) or 
+                       bp.CategoriesHash.DUMMYGSRWEAPON
                        )
 
         if modGSR then
             local br = nil
 
-            if cats.ENGINEER and not cats.SUBCOMMANDER and not cats.COMMAND then
+            if bp.CategoriesHash.ENGINEER and not bp.CategoriesHash.SUBCOMMANDER and not bp.CategoriesHash.COMMAND then
                 br = 26
-            elseif cats.SCOUT then
+            elseif bp.CategoriesHash.SCOUT then
                 br = 10
             elseif bp.Weapon then
                 local range = 0
@@ -544,6 +530,8 @@ function PreModBlueprints(all_bps)
                 end
             end
         end
+        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility 
+        bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
     end
@@ -557,24 +545,20 @@ function PostModBlueprints(all_bps)
 
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
-
     local preset_bps = {}
-    local cats = {}
 
     for _, bp in all_bps.Unit do
-
         -- skip units without categories
         if not bp.Categories then
             continue
         end
 
-        -- find out what categories the unit has and allow easy reference
-        cats = {}
-        for k, cat in bp.Categories do
-            cats[cat] = true
+        -- check if blueprint was changed in ModBlueprints(all_bps)  
+        if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
+           bp.CategoriesHash = table.hash(bp.Categories)
         end
 
-        if cats.USEBUILDPRESETS then
+        if bp.CategoriesHash.USEBUILDPRESETS then
             -- HUSSAR adding logic for finding issues in enhancements table
             local issues = {}
             if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
@@ -589,10 +573,8 @@ function PostModBlueprints(all_bps)
                 WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
-
         BlueprintLoaderUpdateProgress()
     end
-
     HandleUnitWithBuildPresets(preset_bps, all_bps)
 end
 -----------------------------------------------------------------------------------------------
@@ -603,11 +585,17 @@ end
 --- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
 --- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
 --- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
+--- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true)  used in ModsManager.lua 
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true) used in UnitsAnalyzer.lua 
-function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration)
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua 
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua 
+function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
+
+    local task = 'Blueprints Loading... '
+    local progress = nil
+    local total = nil
+    local files = {}
 
     -- set default parameters if they are not provided  
     if not pattern then pattern = '*.bp' end
@@ -624,21 +612,40 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
 
     if not skipGameFiles then
         for i,dir in directories do
-            for k,file in DiskFindFiles(dir, pattern) do
+            task = 'Blueprints Loading: original files from ' .. dir .. ' directory'
+            files = DiskFindFiles(dir, pattern)
+            total = table.getsize(files)
+            LOG(task)
+
+            for k,file in files do
                 BlueprintLoaderUpdateProgress()
-                safecall("Blueprints Loading org file "..file, doscript, file)
+                -- update UnitManager UI via taskNotifier only if it exists
+                if taskNotifier then 
+                   taskNotifier:Update(task, total, k)
+                end
+                safecall(task .. ': ' .. file, doscript, file)
             end
         end
     end
+
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
     for i,mod in mods or {} do
         current_mod = mod -- used in UnitBlueprint()
-        for k,file in DiskFindFiles(mod.location, pattern) do
+        task = 'Blueprints Loading: modded files from "' .. mod.name .. '" mod'
+        files = DiskFindFiles(mod.location, pattern)
+        total = table.getsize(files)
+        LOG(task)
+
+        for k,file in files do
             BlueprintLoaderUpdateProgress()
-            safecall("Blueprints Loading mod file "..file, doscript, file)
+            -- update UnitManager UI via taskNotifier only if it exists
+            if taskNotifier then 
+               taskNotifier:Update(task, total, k)
+            end
+            safecall(task .. ': ' .. file, doscript, file)
         end
     end
     stats.UnitsMod = table.getsize(original_blueprints.Unit) - stats.UnitsOrg
@@ -677,7 +684,6 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     else
         return original_blueprints
     end
-
 end
 
 -- Reload a single blueprint
