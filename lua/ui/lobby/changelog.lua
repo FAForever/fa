@@ -720,5 +720,4 @@ changelog = {
             '- Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on',
         }
     },
-    }
 }
