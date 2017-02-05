@@ -235,8 +235,8 @@ function UpdateUnitCap(deadArmy)
     end
 
     if aliveCount > 0 then
-        local initialCap = GetArmyUnitCap(brain.index)
-        local totalCap = totalCount * initialCap
+        local currentCap = GetArmyUnitCap(alive[1].index) -- First time, this is the initial army cap, but it will update each time this function runs
+        local totalCap = (aliveCount + 1) * currentCap -- Total cap for the team/game. Uses aliveCount to take account of currentCap updating
         local newCap = math.floor(totalCap / aliveCount)
         for _, brain in alive do
             SetArmyUnitCap(brain.index, newCap)
