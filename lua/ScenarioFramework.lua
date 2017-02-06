@@ -181,9 +181,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     end
 
     if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
-        --Handle ships that can walk on land...
-        --TODO: Uncomment once we have a sound for URS0201 for this case
-        --self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
+        self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
     end
