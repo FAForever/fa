@@ -13,7 +13,6 @@ local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local SimCamera = import('/lua/SimCamera.lua').SimCamera
 local Cinematics = import('/lua/cinematics.lua')
 local SimUIVars = import('/lua/sim/SimUIState.lua')
-local Utilities = import('/lua/Utilities.lua') -- enabled so we can hide strat icons during NISs
 
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
@@ -1627,12 +1626,6 @@ function EndOperationSafety( units )
     ScenarioInfo.OpEnded = true
     ResetUITimer() -- turn off any timer going (per Ted)
 
---    if ScenarioInfo.MapData.Decals then
---        for k,v in ScenarioInfo.MapData.Decals do
---            v:Destroy()
---        end
---    end
-
     for k,v in ArmyBrains do
         for subk, subv in ArmyBrains do
             if not IsAlly( k, subk ) then
@@ -1840,10 +1833,6 @@ function OperationNISCameraThread( unitInfo, camInfo )
     if not ScenarioInfo.NIS or camInfo.overrideCam then
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
 
---        Utilities.UserConRequest('UI_RenderIcons false') -- turn strat icons off
---        Utilities.UserConRequest('UI_RenderUnitBars false') -- turn lifebars off
---        Utilities.UserConRequest('UI_RenResources false') -- turn deposit icons off
-
         local position, heading, vizmarker
         -- Setup camera information
         if camInfo.markerCam then
@@ -1910,10 +1899,6 @@ function OperationNISCameraThread( unitInfo, camInfo )
             end
             UnlockInput()
             Sync.NISMode = 'off'
-
---            Utilities.UserConRequest('UI_RenderIcons true') -- turn strat icons back on
---            Utilities.UserConRequest('UI_RenderUnitBars true') -- turn lifebars back on
---            Utilities.UserConRequest('UI_RenResources true') -- turn deposit icons back on
 
             ScenarioInfo.NIS = false
         -- Otherwise just unlock input, allowing them to click on the "Ok" button on the "Operation ended" box
