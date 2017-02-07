@@ -11,6 +11,8 @@ Patch 3678 (Upcoming)
 - Fixed ACU building while shooting
 - Fixed Auto-Overcharge stopping working randomly until toggled
 - Fixed Auto-Overcharge firing while building
+- Fixed SML hitboxes so some are no longer immune to T2 PGen explosions
+- Increased Beetle hitbox size and declared new targetbones to stop everything missing it if it strafes
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -18,6 +20,7 @@ Patch 3678 (Upcoming)
 - Fixed 'Autoteams: Manual' resulting in all players being allied
 - Fixed autobalance functions crashing when used with uneven team numbers
 - Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
+- Observers are now kicked before checking connection issues when Allow Observers is false. This means they will no longer stall game launch if one or more have a connection issue.
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
@@ -29,6 +32,9 @@ Patch 3678 (Upcoming)
 - Added some mods to blacklist
 - Allowed hooking of schook files to help future patch mechanism
 - Allow hot-reloading of UI files with EnableDiskWatch
+- Uncapped max framerate for people with monitor refresh rates >100
+- Fixed desync in COOP
+- Allow Salem death sound on land in COOP
 
 ### Contributors
 - Exotic-Retard
