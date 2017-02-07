@@ -281,7 +281,7 @@ function AdjustFrameRate()
         local data = utils.StringSplit(options.primary_adapter, ',')
         local hz = tonumber(data[3])
         if hz then
-            fps = math.max(60, math.min(100, hz))
+            fps = math.max(60, hz)
         end
     end
 
