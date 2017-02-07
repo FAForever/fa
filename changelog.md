@@ -13,27 +13,22 @@ Patch 3676 (Upcoming)
 - Fixed Auto-Overcharge firing while building
 
 ### Lobby
-- Use default map from file. This allows coop, tutorials, and other mods to have an easier time
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
 - Allow filtering of 13-16 player maps in map selection
 - Fixed 'Autoteams: Manual' resulting in all players being allied
 - Fixed autobalance functions crashing when used with uneven team numbers
 - Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
-- Allow factions to be restricted per slot
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
-- Added new buildrate icon in the unit detail view
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
 
 ### Other
 - Added some mods to blacklist
-- Updated maps blacklist
 - Allowed hooking of schook files to help future patch mechanism
 - Allow hot-reloading of UI files with EnableDiskWatch
-- Introduced wider support for the addition of new factions into the game
 
 ### Contributors
 - Exotic-Retard
