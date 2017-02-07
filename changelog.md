@@ -24,6 +24,7 @@ Patch 3676 (Upcoming)
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
+- Enabled the STOP button for shields which can be upgraded
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
