@@ -60,7 +60,7 @@ ShieldCollider = Class(Projectile) {
 
                 self:SetVelocity(0, 0, 0)
                 if not self.Plane.GroundImpacted then
-                    self.Plane:OnImpact('Terrain')
+                    self.Plane:OnImpact(targetType)
                 end
                 self:Destroy()
             elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
