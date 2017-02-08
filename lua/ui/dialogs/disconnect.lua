@@ -97,13 +97,15 @@ local function CreateDialog(clients)
     end
 
     local canEject = false
-    local ForceEject = false
+    local canEjectTime = 45
+    local forceEject = false
+    local forceEjectTime = 180
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta
-        if self.time > 180 then
-            ForceEject = true
-        elseif self.time > 45 then
+        if self.time > forceEjectTime then
+            forceEject = true
+        elseif self.time > canEjectTime then
             canEject = true
         end
     end
@@ -128,7 +130,7 @@ local function CreateDialog(clients)
                     slot.ping:SetColor('FFbadbdb')
                     slot.quiet:SetColor('FFbadbdb')
                 else -- Someone is lagging
-                    if ForceEject then -- Lag has been going on for more than forceEjectTime
+                    if forceEject then -- Lag has been going on for more than forceEjectTime
                         EjectSessionClient(index)
                         slot.eject:Disable()
                         slot.eject:Hide()
