@@ -2764,17 +2764,17 @@ Unit = Class(moho.unit_methods) {
         end
         
         -- All units want normal vision!
-        if (old == 'None') then
+        if old == 'None' then
             self:EnableIntel('Vision')
         end
 
-        if( new == 'Land' ) then
+        if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
             self:PlayUnitAmbientSound('AmbientMoveLand')
-        elseif(( new == 'Water' ) or ( new == 'Seabed' )) then
+        elseif new == 'Water' or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
             self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif ( new == 'Sub' ) then
+        elseif new == 'Sub' then
             self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
@@ -2782,7 +2782,7 @@ Unit = Class(moho.unit_methods) {
         if not self.Footfalls and bpTable[new].Footfall then
             self.Footfalls = self:CreateFootFallManipulators( bpTable[new].Footfall )
         end
-        self:CreateLayerChangeEffects( new, old )
+        self:CreateLayerChangeEffects(new, old)
 
         -- Trigger the re-worded stuff that used to be inherited, no longer because of the engine bug above.
         if self.LayerChangeTrigger then
@@ -2790,21 +2790,21 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnMotionHorzEventChange = function( self, new, old )
+    OnMotionHorzEventChange = function(self, new, old)
         if self.Dead then
             return
         end
         local layer = self:GetCurrentLayer()
 
-        if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
+        if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
             end
 
-            --Initiate the unit's ambient movement sound
-            --Note that there is not currently an 'Air' version, and that
-            --AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
+            -- Initiate the unit's ambient movement sound
+            -- Note that there is not currently an 'Air' version, and that
+            -- AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
             if not (
                 ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
                 (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
@@ -2817,33 +2817,34 @@ Unit = Class(moho.unit_methods) {
             self:StopRocking()
         end
 
-        if ((new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed')) then
+        if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
             end
 
-            --Units in the water will rock back and forth a bit
+            -- Units in the water will rock back and forth a bit
             if layer == 'Water' then
                 self:StartRocking()
             end
         end
 
-        if( new == 'Stopped' or new == 'Stopping' ) then
-            --Stop ambient sounds
-            self:StopUnitAmbientSound( 'AmbientMove' )
-            self:StopUnitAmbientSound( 'AmbientMoveWater' )
-            self:StopUnitAmbientSound( 'AmbientMoveSub' )
-            self:StopUnitAmbientSound( 'AmbientMoveLand' )
+        if new == 'Stopped' or new == 'Stopping' then
+            -- Stop ambient sounds
+            self:StopUnitAmbientSound('AmbientMove')
+            self:StopUnitAmbientSound('AmbientMoveWater')
+            self:StopUnitAmbientSound('AmbientMoveSub')
+            self:StopUnitAmbientSound('AmbientMoveLand')
         end
 
         if self.MovementEffectsExist then
-            self:UpdateMovementEffectsOnMotionEventChange( new, old )
+            self:UpdateMovementEffectsOnMotionEventChange(new, old)
         end
 
         if old == 'Stopped' then
             self:DoOnHorizontalStartMoveCallbacks()
         end
+
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
             wep:OnMotionHorzEventChange(new, old)
