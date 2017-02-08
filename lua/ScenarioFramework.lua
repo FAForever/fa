@@ -1742,6 +1742,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
         -- local rectangle = ScenarioInfo.MapData.PlayableRect
         -- import('/lua/SimSync.lua').SyncPlayableRect(  Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4]) )
         cam:RevertRotation()
+        cam:UseSystemClock()
         -- cam:Reset()
         UnlockInput()
     end
@@ -1770,6 +1771,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         cam:MoveToMarker(marker, blendtime)
         WaitSeconds(holdtime)
         cam:RevertRotation()
+        cam:UseSystemClock()
         UnlockInput()
         ScenarioInfo.NIS = false
     end
@@ -1896,6 +1898,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
                 cam:RevertRotation()
             end
             UnlockInput()
+            cam:UseSystemClock()
             Sync.NISMode = 'off'
 
             ScenarioInfo.NIS = false
