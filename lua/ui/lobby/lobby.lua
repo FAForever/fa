@@ -4323,7 +4323,10 @@ end
 
 function SetPlayerOptions(slot, options, ignoreRefresh)
     if not IsLocallyOwned(slot) and not lobbyComm:IsHost() then
-        WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
+        WARN("Hey you can't set a player option on a slot you don't own:")
+        for key, val in options do
+            WARN("(slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
+        end
         return
     end
 
