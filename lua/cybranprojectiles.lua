@@ -226,6 +226,12 @@ CArtilleryProjectile = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.CArtilleryHit01,
     FxImpactLand = EffectTemplate.CArtilleryHit01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
@@ -238,6 +244,12 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactProp = EffectTemplate.CProtonArtilleryHit01,    
     FxImpactLand = EffectTemplate.CProtonArtilleryHit01,
     FxImpactUnderWater = {},
+
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------

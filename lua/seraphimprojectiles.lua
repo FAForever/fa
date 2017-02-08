@@ -264,6 +264,12 @@ SZthuthaamArtilleryShell = Class(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.SZthuthaamArtilleryProjectileFXTrails,
     PolyTrails = EffectTemplate.SZthuthaamArtilleryProjectilePolyTrails, 
     PolyTrailOffset = {0,0},
+
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -280,6 +286,12 @@ SSuthanusArtilleryShell = Class(EmitterProjectile) {
     FxImpactUnit = EffectTemplate.SRifterArtilleryHit,    
     FxTrails = EffectTemplate.SRifterArtilleryProjectileFxTrails,
     PolyTrail = EffectTemplate.SRifterArtilleryProjectilePolyTrail,
+
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -297,6 +309,12 @@ SSuthanusMobileArtilleryShell = Class(SinglePolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SRifterMobileArtilleryHit,    
     FxTrails = EffectTemplate.SRifterMobileArtilleryProjectileFxTrails,
     PolyTrail = EffectTemplate.SRifterArtilleryProjectilePolyTrail,
+
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -312,7 +330,7 @@ SThunthoArtilleryShell = Class(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SThunderStormCannonHit,    
     FxTrails = EffectTemplate.SThunderStormCannonProjectileTrails,
     PolyTrails = EffectTemplate.SThunderStormCannonProjectilePolyTrails,
-    PolyTrailOffset = {0,0},    
+    PolyTrailOffset = {0,0},  
 }
 
 
@@ -353,7 +371,7 @@ SShleoAACannon = Class(EmitterProjectile) {
         for k, v in PolytrailGroup do
             CreateTrail(self, -1, army, v )
         end
-    end,    
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -565,6 +583,12 @@ SZhanaseeBombProjectile = Class(EmitterProjectile) {
     FxImpactAirUnit = EffectTemplate.SZhanaseeBombHit01,
     FxImpactLand = EffectTemplate.SZhanaseeBombHit01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -662,6 +686,12 @@ SDFExperimentalPhasonProjectile = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.SDFExperimentalPhasonProjHit01,
     FxImpactLand = EffectTemplate.SDFExperimentalPhasonProjHit01,
     FxImpactWater = EffectTemplate.SDFExperimentalPhasonProjHit01,
+
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) {
@@ -670,6 +700,12 @@ SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.SDFSinnutheWeaponHit,
     FxImpactLand = EffectTemplate.SDFSinnutheWeaponHit,
     FxImpactWater = EffectTemplate.SDFSinnutheWeaponHit,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 SDFAireauProjectile = Class(MultiPolyTrailProjectile) {
