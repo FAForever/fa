@@ -125,7 +125,7 @@ UnitBlueprint {
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
+            RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildTactical = true,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = true,
