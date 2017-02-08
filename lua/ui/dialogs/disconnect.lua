@@ -97,7 +97,7 @@ local function CreateDialog(clients)
     end
 
     local canEject = false
-    local canEjectTime = 45
+    local canEjectTime = 90
     local forceEject = false
     local forceEjectTime = 180
 
