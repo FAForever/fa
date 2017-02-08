@@ -1608,6 +1608,11 @@ Unit = Class(moho.unit_methods) {
         self:DestroyBeamExhaust()
         self:DestroyAllBuildEffects()
 
+        -- Stop any motion sounds we may have
+        self:StopUnitAmbientSound('AmbientMove')
+        self:StopUnitAmbientSound('AmbientMoveLand')
+        self:StopUnitAmbientSound('AmbientMoveWater')
+
         -- BOOM!
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
