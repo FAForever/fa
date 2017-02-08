@@ -1299,3 +1299,42 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
         myProjectile:PassDamageData(self:GetDamageTable())
     end,
 }
+
+-- This weapon class exists to be dual-inherited by weapons on TML and SML
+ManualLaunchWeapon = Class(DefaultProjectileWeapon) {
+    IdleState = State(DefaultProjectileWeapon.IdleState) {
+        -- We need to hook in here because sometimes the weapon attempts to bypass the OnFire check
+        OnGotTarget = function(self)
+            if self.unit:GetFireState() == 1 then -- 1 == Holding fire
+                return
+            else
+                DefaultProjectileWeapon.IdleState.OnGotTarget(self)
+            end
+        end,
+
+        OnFire = function(self)
+            if self.unit:GetFireState() == 1 then -- 1 == Holding fire
+                if not self.delayThread then
+                    self.delayThread = ForkThread(self.DelayFire, self)
+                    self.unit.Trash:Add(self.delayThread)
+                end
+            else
+                if self.delayThread then
+                    KillThread(self.delayThread)
+                    self.delayThread = nil
+                end
+
+                DefaultProjectileWeapon.IdleState.OnFire(self)
+            end
+        end,
+
+        -- Use a thread to delay firing until we're back in action
+        DelayFire = function(self)
+            while self.unit:GetFireState() == 1 do
+                WaitTicks(1)
+            end
+
+            self:OnFire()
+        end,
+    },
+}

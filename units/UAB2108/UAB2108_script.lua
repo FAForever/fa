@@ -7,10 +7,11 @@
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local ACruiseMissileWeapon = import('/lua/aeonweapons.lua').ACruiseMissileWeapon
+local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 UAB2108 = Class(AStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(ACruiseMissileWeapon) {},
+        CruiseMissile = Class(ACruiseMissileWeapon, ManualLaunchWeapon) {},
     },
 }
 
