@@ -1459,7 +1459,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         --Create some ambient wreckage smoke
-        --explosion.CreateWreckageEffects(self,prop)
+        explosion.CreateWreckageEffects(self,prop)
 
         return prop
     end,
@@ -1607,12 +1607,12 @@ Unit = Class(moho.unit_methods) {
 
         -- BOOM!
         if self.PlayDestructionEffects then
-            --self:CreateDestructionEffects(overkillRatio)
+            self:CreateDestructionEffects(overkillRatio)
         end
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            --self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
         if shallSink then
