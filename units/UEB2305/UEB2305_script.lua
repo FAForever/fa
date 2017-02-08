@@ -7,10 +7,11 @@
 
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 local TIFStrategicMissileWeapon = import('/lua/terranweapons.lua').TIFStrategicMissileWeapon
+local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 UEB2305 = Class(TStructureUnit) {
     Weapons = {
-        NukeMissiles = Class(TIFStrategicMissileWeapon) {},
+        NukeMissiles = Class(TIFStrategicMissileWeapon, ManualLaunchWeapon) {},
     },
 }
 
