@@ -1658,6 +1658,19 @@ function ToggleUnitPause()
 end
 
 function CreateExtraControls(controlType)
+    local SetupPauseButton = function()
+        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
+        controls.extraBtn2.OnCheck = function(self, checked)
+            SetPaused(sortedOptions.selection, checked)
+        end
+        if pauseEnabled then
+            controls.extraBtn2:Enable()
+        else
+            controls.extraBtn2:Disable()
+        end
+        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+    end
+
     if controlType == 'construction' or controlType == 'templates' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
         controls.extraBtn1.OnClick = function(self, modifiers)
@@ -1691,17 +1704,8 @@ function CreateExtraControls(controlType)
         else
             controls.extraBtn1:Disable()
         end
-
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        
+        SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
         local validForTemplate = true
@@ -1732,16 +1736,9 @@ function CreateExtraControls(controlType)
         else
             controls.extraBtn1:Disable()
         end
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        SetupPauseButton()
+    elseif controlType == 'enhancement' then
+        SetupPauseButton()
     else
         controls.extraBtn1:Disable()
         controls.extraBtn2:Disable()
