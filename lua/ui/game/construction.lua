@@ -462,6 +462,8 @@ function CreateTabs(type)
             desiredTabs = table.getsize(enhancements.Slots)
         end
         defaultTabOrder = { Back = 1, LCH = 2, RCH = 3 }
+    elseif type == 'selection' then
+        activeTab = nil
     end
     while table.getsize(controls.tabs) > desiredTabs do
         controls.tabs[table.getsize(controls.tabs)]:Destroy()
