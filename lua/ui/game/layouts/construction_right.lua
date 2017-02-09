@@ -449,19 +449,9 @@ function OnTabChangeLayout(type)
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OffTexture)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
-        end
-        controls.extraBtn2.icon:Show()
-        controls.extraBtn2.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
-        controls.extraBtn2.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
-        if controls.extraBtn2:IsDisabled() then
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OffTexture)
-        else
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OnTexture)
-        end
-        
+        end        
         controls.choices.Top:Set(function() return controls.minBG.Top() + 31 end)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
-        LayoutHelpers.Below(controls.extraBtn2, controls.extraBtn1, 1)
     elseif type == 'selection' then
         controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/template_on.dds')
         controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/template_off.dds')
@@ -470,27 +460,15 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
-        controls.extraBtn2.icon:Show()
-        controls.extraBtn2.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
-        controls.extraBtn2.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
-        if controls.extraBtn2:IsDisabled() then
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OffTexture)
-        else
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OnTexture)
-        end
         controls.choices.Top:Set(function() return controls.minBG.Top() + 4 end)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 8, 4)
-        LayoutHelpers.Below(controls.extraBtn2, controls.extraBtn1, 1)
         controls.choices.Left:Set(function() return controls.minBG.Left() + 83 end)
         controls.choices.Right:Set(function() return controls.maxBG.Right() - 49 end)
     else
         controls.choices.Top:Set(function() return controls.minBG.Top() + 31 end)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
-        LayoutHelpers.Below(controls.extraBtn2, controls.extraBtn1, 1)
         controls.extraBtn1.icon:Hide()
-        controls.extraBtn2.icon:Hide()
         controls.extraBtn1.icon:SetSolidColor('00000000')
-        controls.extraBtn2.icon:SetSolidColor('00000000')
     end
 end
 
