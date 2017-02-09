@@ -420,14 +420,6 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
-        controls.extraBtn2.icon:Show()
-        controls.extraBtn2.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
-        controls.extraBtn2.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
-        if controls.extraBtn2:IsDisabled() then
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OffTexture)
-        else
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OnTexture)
-        end
         
     elseif type == 'selection' then
         controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/template_on.dds')
@@ -437,19 +429,9 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
-        controls.extraBtn2.icon:Show()
-        controls.extraBtn2.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
-        controls.extraBtn2.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
-        if controls.extraBtn2:IsDisabled() then
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OffTexture)
-        else
-            controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OnTexture)
-        end
     else
         controls.extraBtn1.icon:Hide()
-        controls.extraBtn2.icon:Hide()
         controls.extraBtn1.icon:SetSolidColor('00000000')
-        controls.extraBtn2.icon:SetSolidColor('00000000')
     end
 end
 
