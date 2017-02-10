@@ -62,7 +62,7 @@ URS0201 = Class(CSeaUnit) {
 
         -- Can only be built in water so transformthread only needs to be run
         -- when actually changing layer or when spawned on land
-        if old != 'None' or new == 'Land' then
+        if old ~= 'None' or new == 'Land' then
             if self.AT1 then
                 self.AT1:Destroy()
             end
@@ -108,7 +108,7 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
-        if self:GetCurrentLayer() != 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.WaterAnimationDeath
@@ -117,7 +117,7 @@ URS0201 = Class(CSeaUnit) {
     end,
     
      DeathThread = function(self, overkillRatio)
-        if self:GetCurrentLayer() != 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' then
             self:PlayUnitSound('Destroyed')
             local army = self:GetArmy()
             if self.PlayDestructionEffects then
