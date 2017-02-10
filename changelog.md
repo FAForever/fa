@@ -5,6 +5,9 @@ Patch 3676 (Upcoming)
 - Allow units in a transport which is shot down to leave wrecks at the crash site
 - Allow the Novax to build a new Satellite if the old one dies. This can only happen if it is impacted by a Nuke or ctrl-k'ed
 - Introduced code to slightly improve the way Tempest and Atlantis behave, particularly in being able to fire, in shallow waters
+- Enabled fire states on TML and SML structures
+- Increased reconnect timeout from 45 to 90 seconds to better allow router reboots
+- HARMS now sinks to a greater depth on completion
 
 ### Bugs
 - Fixed ACU reclaiming while shooting
@@ -13,6 +16,9 @@ Patch 3676 (Upcoming)
 - Fixed Auto-Overcharge firing while building
 - Fixed SML hitboxes so some are no longer immune to T2 PGen explosions
 - Increased Beetle hitbox size and declared new targetbones to stop everything missing it if it strafes
+- Fixed two move-while-building exploits
+- Gave Force damage to several AOE weapons so they now kill trees properly
+- Fixed ambient movement sounds continuing to play for sinking units
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -25,6 +31,9 @@ Patch 3676 (Upcoming)
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
 - Enabled the STOP button for shields which can be upgraded
+- Removed the tech level tick from Mass Storage strategic icon to match energy storage
+- Fixed hotkey labels not moving properly when scrolling the build menu
+- Pause button is now visible and active in the Enhancements and Selection tabs
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
