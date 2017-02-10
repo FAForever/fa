@@ -664,7 +664,8 @@ DefaultProjectileWeapon = Class(Weapon) {
 
                             -- Generate UI notification for automatic nuke ping
                             local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
-                            Sync.NukeLaunchData = launchData
+                            if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
+                            table.insert(Sync.NukeLaunchData, launchData)
                             self.unit:RemoveNukeSiloAmmo(1)
                         else
                             self.unit:RemoveTacticalSiloAmmo(1)
