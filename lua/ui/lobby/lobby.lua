@@ -1690,7 +1690,6 @@ function UpdateAvailableSlots( numAvailStartSpots, scenario )
                 end
             else
                 GUI.slots[i].faction:SetItem(playerFactionIndex)
-                SetPlayerOption(i, 'Faction', playerFactionIndex)
                 gameInfo.PlayerOptions[i].Faction = playerFactionIndex
             end
         end
