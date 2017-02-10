@@ -350,6 +350,18 @@ function CreateUI()
     controls.enhancementTab = CreateTab(controls.constructionGroup, nil, OnTabCheck)
     controls.enhancementTab.ID = 'enhancement'
     Tooltip.AddCheckboxTooltip(controls.enhancementTab, 'construction_tab_enhancement')
+
+    -- We need this section so that Hotkey labels are kept properly in line with the elements they are attached to, which are reused rather than recreated
+    oldChoicesCalcVisible = controls.choices.CalcVisible
+    controls.choices.CalcVisible = function(self)
+        for i, item in self.Items do
+            if item.hotbuildKeyBg then
+                item.hotbuildKeyBg:Destroy()
+                item.hotbuildKeyText:Destroy()
+            end
+        end
+        oldChoicesCalcVisible(self)
+    end
 end
 
 function OnTabCheck(self, checked)
