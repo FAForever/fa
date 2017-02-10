@@ -207,7 +207,7 @@ UnitBlueprint {
     SizeX = 0.8,
     SizeY = 0.75,
     SizeZ = 0.6,
-    StrategicIconName = 'icon_structure1_mass',
+    StrategicIconName = 'icon_structure_mass',
     StrategicIconSortPriority = 250,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
