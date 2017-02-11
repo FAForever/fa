@@ -1,23 +1,18 @@
-﻿-- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/XSL0301/XSL0301_script.lua
--- **  Author(s):  Jessica St. Croix, Gordon Duclos
--- **
--- **  Summary  :  Seraphim Sub Commander Script
--- **
--- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+﻿-----------------------------------------------------------------
+-- File     :  /cdimage/units/XSL0301/XSL0301_script.lua
+-- Author(s):  Jessica St. Croix, Gordon Duclos
+-- Summary  :  Seraphim Sub Commander Script
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local AWeapons = import('/lua/aeonweapons.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local Buff = import('/lua/sim/Buff.lua')
-
+local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
 
 XSL0301 = Class(CommandUnit) {
     Weapons = {
@@ -40,15 +35,14 @@ XSL0301 = Class(CommandUnit) {
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        -- self:HideBone('Turbine', true)
         self:HideBone('Back_Upgrade', true)
         self:SetupBuildBones()
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)
@@ -104,7 +98,7 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         -- Overcharge
         elseif enh == 'Overcharge' then
-              self:AddCommandCap('RULEUCC_Overcharge')
+            self:AddCommandCap('RULEUCC_Overcharge')
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
         elseif enh == 'OverchargeRemove' then
@@ -132,8 +126,8 @@ XSL0301 = Class(CommandUnit) {
             end
             Buff.ApplyBuff(self, 'SeraphimSCUBuildRate')
         elseif enh == 'EngineeringThroughputRemove' then
-            if Buff.HasBuff( self, 'SeraphimSCUBuildRate' ) then
-                Buff.RemoveBuff( self, 'SeraphimSCUBuildRate' )
+            if Buff.HasBuff(self, 'SeraphimSCUBuildRate') then
+                Buff.RemoveBuff(self, 'SeraphimSCUBuildRate')
             end
         -- Damage Stabilization
         elseif enh == 'DamageStabilization' then
@@ -156,13 +150,13 @@ XSL0301 = Class(CommandUnit) {
                     },
                 }
             end
-            if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
-                Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
+            if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
+                Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
             Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
           elseif enh == 'DamageStabilizationRemove' then
-            if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
-                Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
+            if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
+                Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
         -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
