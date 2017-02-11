@@ -9,12 +9,13 @@ local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local WeaponFile = import('/lua/aeonweapons.lua')
 local AIFMissileTacticalSerpentineWeapon = WeaponFile.AIFMissileTacticalSerpentineWeapon
 local AIFQuantumWarhead = WeaponFile.AIFQuantumWarhead
+local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 UAS0304 = Class(ASubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
         CruiseMissiles = Class(AIFMissileTacticalSerpentineWeapon) {},
-        NukeMissiles = Class(AIFQuantumWarhead) {},
+        NukeMissiles = Class(AIFQuantumWarhead, ManualLaunchWeapon) {},
     },
 }
 

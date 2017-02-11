@@ -13,6 +13,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
+local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 XSL0301 = Class(CommandUnit) {
     Weapons = {
@@ -20,7 +21,7 @@ XSL0301 = Class(CommandUnit) {
         DeathWeapon = Class(SCUDeathWeapon) {},
         OverCharge = Class(SDFOverChargeWeapon) {},
         AutoOverCharge = Class(SDFOverChargeWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        Missile = Class(SIFLaanseTacticalMissileLauncher, ManualLaunchWeapon) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
