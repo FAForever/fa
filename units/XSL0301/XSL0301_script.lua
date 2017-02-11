@@ -51,29 +51,6 @@ XSL0301 = Class(CommandUnit) {
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
-            -- WHY IS THIS UNUSED. WHAT HAVE YOU DONE ZEP.
-            WarpInEffectThread = function(self)
-                self:PlayUnitSound('CommanderArrival')
-                self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2.1)
-                self:ShowBone(0, true)
-                self:HideBone('Back_Upgrade', true)
-                self:HideBone('Right_Upgrade', true)
-                self:HideBone('Left_Upgrade', true)
-                self:SetUnSelectable(false)
-                self:SetBusy(false)
-                self:SetBlockCommandQueue(false)
-
-                local totalBones = self:GetBoneCount() - 1
-                local army = self:GetArmy()
-                for k, v in EffectTemplate.UnitTeleportSteam01 do
-                    for bone = 1, totalBones do
-                        CreateAttachedEmitter(self,bone,army, v)
-                    end
-                end
-
-                WaitSeconds(6)
-            end,
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
