@@ -9,10 +9,11 @@ local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
+local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 XSB2401 = Class(SStructureUnit) {
     Weapons = {
-        ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {
+        ExperimentalNuke = Class(SIFExperimentalStrategicMissile, ManualLaunchWeapon) {
             OnWeaponFired = function(self)
                 self.unit:ForkThread(self.unit.HideMissile)
             end,
