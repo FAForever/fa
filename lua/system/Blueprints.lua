@@ -336,7 +336,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
                         t = t + (tempBp.Enhancements[enh].BuildTime or 0)
                         -- HUSSAR added name of the enhancement so that preset units cannot be built 
                         -- if they have restricted enhancement(s)
-                        bp.CategoriesHash[enh] = true -- hashing without changing case of enhancements
+                        tempBp.CategoriesHash[enh] = true -- hashing without changing case of enhancements
                     else
                         WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
                     end
@@ -440,13 +440,13 @@ function PreModBlueprints(all_bps)
         -- adding or deleting categories on the fly
         if bp.DelCategories then
             for k, v in bp.DelCategories do
-                bp.CategoriesHash[v] = false -- quickly removing category
+                bp.CategoriesHash[v] = false
             end
             bp.DelCategories = nil
         end
         if bp.AddCategories then
             for k, v in bp.AddCategories do
-                bp.CategoriesHash[v] = true -- quickly adding category
+                bp.CategoriesHash[v] = true
             end
             bp.AddCategories = nil
         end
@@ -454,7 +454,7 @@ function PreModBlueprints(all_bps)
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not bp.CategoriesHash.OVERLAYMISC and not bp.CategoriesHash.POD then -- Exclude Build Drones
+            if not bp.CategoriesHash.POD then -- excluding Build Drones
                 bp.CategoriesHash.OVERLAYMISC = true
             end
         end
