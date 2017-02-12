@@ -237,10 +237,12 @@ function sort_down_by(field)
     end
 end
 
---- table.keys(t, [comp], [skip]) returns a list of the keys of t, sorted.
---- [comp] is an optional comparison function, defaulting to less-than.
---- [skip] is an optional boolean that specifies if sorting is needed, defaulting to true
-function table.keys(t, comp, skip)
+--- table.keys(t, [comp]) returns a list of the keys of t, sorted.
+--- [comp] is an optional comparison function, defaulting to less-than, e.g.
+-- table.keys(t) -- returns keys in increasing order (low performance with large tables)
+-- table.keys(t, function(a, b) return a > b end) -- returns keys in decreasing order (low performance with large tables)
+-- table.keys(t, false) -- returns keys without comparing/sorting (better performance with large tables)
+function table.keys(t, comp)
     local r = {}
     if not t then return r end -- prevents looping over nil table
     local n = 1
@@ -248,14 +250,8 @@ function table.keys(t, comp, skip)
         r[n] = k -- faster than table.insert(r,k)
         n = n + 1
     end
-    if not skip then table.sort(r, comp) end
+    if comp ~= false then table.sort(r, comp) end
     return r
-end
-
---- table.keysfast(t) returns a list of the keys of t, in unspecified order.
---- this function is about 3 times faster than table.keys(t, [comp], [skip])
-function table.keysfast(t)
-    return table.keys(t, nil, true)
 end
 
 --- table.values(t) Return a list of the values of t, in unspecified order.
@@ -352,16 +348,14 @@ function table.indexize(t)
 end
 
 --- Converts a table to a new table with values as keys and values equal to true, duplicated table values are discarded
---- @parma t    - specifies table with values for hashing
---- @parma safe - optional boolean for safely hashing of table values by converting them first to strings which is lower method (defaults to false)
---- it is useful for quickly looking up values in tables instead of looping over it 
+--- it is useful for quickly looking up values in tables instead of looping over them
 --- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } => 
 ---            { [A] = true, [B] = true, [C] = true } 
-function table.hash(t, safe)
+function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     for k, v in t do
-        if safe then
+        if type(v) ~= "string" and type(v) ~= 'number' then
             r[tostring(v)] = true
         else
             r[v] = true
@@ -513,7 +507,7 @@ function table.count(t, fn)
     return table.getsize(r)
 end
 
---- Returns a new table with unique values
+--- Returns a new table with unique values stored using numeric keys and it does not preserve keys of the original table
 function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}
