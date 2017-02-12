@@ -71,7 +71,7 @@ Expressions = {
     -- unfortunate, some units must be restricted using their IDs unless their categories are updated with a new TML category
     TMLNAVAL    = "(NUKE * SUBMERSIBLE) + xss0303 + xss0202 + xas0306 + ues0202", -- SERA Carrier + AEON Missile Ship + UEF Cruiser
     TMLDEF      = "(STRUCTURE * TECH2 * ANTIMISSILE)",
-    TMLBASE     = "(STRUCTURE * TECH2 * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
+    TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM) - ARTILLERY", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
 
     -- added exclusion of engineers and structures because they are restricted by other presets 
