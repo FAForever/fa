@@ -12,7 +12,7 @@ local bpIndex = 1
 local cached = { Images = {}, Tooltips = {}, Enhancements = {} }
 
 -- Stores blueprints of units and extracted enhancements
--- Similar to Sim's __blueprints but accessible on UI/lobby side
+-- Similar to Sim's __blueprints but accessible only in UnitsManager
 local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 local projectiles = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 
@@ -21,6 +21,7 @@ local logsTypes = {
     ["WARNING"] = true,  -- Recommend to keep it always true
     ["CACHING"] = false, -- Enable only for debugging
     ["PARSING"] = false, -- Enable only for debugging
+    ["DEBUG"] = false, -- Enable only for debugging
     ["STATUS"] = true,
 }
 
@@ -46,6 +47,7 @@ CategoriesAllowed  = {
 CategoriesSkipped  = {
     ["HOLOGRAM"] = true,
     ["CIVILIAN"] = true,
+    ["BENIGN"] = true, -- some non-buildable units
     ["OPERATION"] = true,
     ["FERRYBEACON"] = true,
     ["NOFORMATION"] = true,
@@ -88,6 +90,7 @@ CategoriesSkipped  = {
 -- Blueprints with these categories will be hidden in tooltips
 CategoriesHidden  = {
     ["NUKESUB"] = true,
+    ["SPECIALLOWPRI"] = true,
     ["DESTROYER"] = true,
     ["T2SUBMARINE"] = true,
     ["NAVALCARRIER"] = true,
@@ -198,27 +201,32 @@ CategoriesHidden  = {
 }
 
 Factions = {
-    ["AEON"] = 'FF238C00',      --#FF238C00
-    ["UEF"] = 'FF006CD9',       --#FF006CD9
-    ["CYBRAN"] = 'FFB32D00',    --#FFB32D00
-    ["SERAPHIM"] = 'FFFFBF00',  --#FFFFBF00
-    ["NOMADS"] = 'FFFF7200',    --#FFFF7200
-    ["UNKNOWN"] = 'ff808080',   --#ff808080
+    { Name = 'AEON',     Color = 'FF238C00' }, --#FF238C00
+    { Name = 'UEF',      Color = 'FF006CD9' }, --#FF006CD9
+    { Name = 'CYBRAN',   Color = 'FFB32D00' }, --#FFB32D00
+    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, --#FFFFBF00
+    { Name = 'NOMADS',   Color = 'FFFF7200' }, --#FFFF7200
+    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, --#FFD619CE
 }
 
 -- Gets unit's color based on faction of given blueprint
 function GetUnitColor(bp)
-    return Factions[bp.Faction] or Factions['UNKNOWN']
+    for _, faction in Factions do
+        if faction.Name == bp.Faction then
+            return faction.Color
+        end
+    end
+    return 'FFD619CE'
 end
 
 -- Gets unit's faction based on categories of given blueprint
 function GetUnitFaction(bp)
     local factionCategory = nil
     local factionName = bp.General.FactionName
-    -- Using CategoriesHash to quickly find faction
-    for name, _ in Factions do
-        if bp.CategoriesHash[name] then
-            factionCategory =  name
+
+    for _, faction in Factions do
+        if bp.CategoriesHash[faction.Name] then
+            factionCategory = faction.Name
             break
         end
     end
@@ -955,9 +963,10 @@ function GetUnits(bps, expression)
 end
 
 -- Groups units based on their categories
-function GetUnitsGroups(bps, factionName)
+-- @param bps is table with blueprints
+-- @param faction is table with { Name = 'FACTION' }
+function GetUnitsGroups(bps, faction)
     -- NOTE these unit groupings are for visualization purpose only
-
     local TECH4ARTY = '(EXPERIMENTAL * ARTILLERY - FACTORY - LAND)' -- mobile factory (FATBOY)
     -- xrl0002 Crab Egg (Engineer)
     -- xrl0003 Crab Egg (Brick)
@@ -968,41 +977,46 @@ function GetUnitsGroups(bps, factionName)
     -- Including crab eggs with factories so they are not confused with actual units built from crab eggs
     local FACTORIES = '((FACTORY * STRUCTURE) + ' .. CRABEGG .. ')'
 
-    local faction = {}
-    faction.Name = factionName
-    faction.Blueprints      = GetUnits(bps, factionName)
+    if table.getsize(faction.Blueprints) == 0 then
+        faction.Blueprints = GetUnits(bps, faction.Name)
+    end
     faction.Units = {}
     -- Grouping ACU/SCU upgrades in separate tables because they have different cost/stats
-    faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER')
-    faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND')
-    faction.Units.ALL       = GetUnits(bps, '('..factionName..' - UPGRADE - COMMAND - SUBCOMMANDER)' )
-    faction.Units.AIR       = GetUnits(faction.Units.ALL, '(AIR - STRUCTURE - POD - SATELLITE)')
-    faction.Units.LAND      = GetUnits(faction.Units.ALL, '(LAND  - STRUCTURE - ENGINEER - POD - '..TECH4ARTY..')')
-    faction.Units.NAVAL     = GetUnits(faction.Units.ALL, '(NAVAL - STRUCTURE - MOBILESONAR)')
-    faction.Bases           = {}
-    faction.Bases.ALL       = GetUnits(faction.Units.ALL, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..')')
-    faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD - DEFENSE)')
-    faction.Bases.ECONOMIC  = GetUnits(faction.Bases.ALL, '(STRUCTURE * ECONOMIC)')
-    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
-
-    faction.Bases.DEFENSES  = {}
-    -- Collect not grouped units above tables into the DEFENSES table
+    faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER - CIVILIAN')
+    faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND - CIVILIAN')
+    local mobileUnits       = GetUnits(faction.Blueprints, '('..faction.Name..' - UPGRADE - COMMAND - SUBCOMMANDER - STRUCTURE - CIVILIAN)' )
+    faction.Units.AIR       = GetUnits(mobileUnits, '(AIR - POD - SATELLITE)')
+    faction.Units.LAND      = GetUnits(mobileUnits, '(LAND - ENGINEER - POD - '..TECH4ARTY..')')
+    faction.Units.NAVAL     = GetUnits(mobileUnits, '(NAVAL - MOBILESONAR)')
+    local buildings         = GetUnits(faction.Blueprints, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..' - CIVILIAN)')
+    faction.Units.FACTORIES = GetUnits(buildings, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD - DEFENSE)')
+    faction.Units.ECONOMIC  = GetUnits(buildings, '(STRUCTURE * ECONOMIC)')
+    faction.Units.SUPPORT   = GetUnits(buildings, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
+    faction.Units.CIVILIAN  = GetUnits(faction.Blueprints, 'CIVILIAN')
+    
+    faction.Units.DEFENSES  = {}
+    -- Collect not grouped units from above tables into the DEFENSES table
     -- This way we don't miss showing un-grouped units
     for ID, bp in faction.Blueprints do
         if not faction.Units.ACU[ID] and
            not faction.Units.SCU[ID] and
-
            not faction.Units.AIR[ID] and
            not faction.Units.LAND[ID] and
            not faction.Units.NAVAL[ID] and
-           not faction.Bases.FACTORIES[ID] and
-           not faction.Bases.ECONOMIC[ID] and
-           not faction.Bases.SUPPORT[ID] then
+           not faction.Units.FACTORIES[ID] and
+           not faction.Units.ECONOMIC[ID] and
+           not faction.Units.SUPPORT[ID] and
+           not faction.Units.CIVILIAN[ID] then
 
-           faction.Bases.DEFENSES[ID] = bp
+           faction.Units.DEFENSES[ID] = bp
         end
     end
 
+    if logsTypes.DEBUG then
+        for group, units in faction.Units do 
+            LOG('UnitsAnalyzer '..faction.Name..' faction has ' .. table.getsize(units)..' ' .. group .. ' units')
+        end
+    end
     return faction
 end
 

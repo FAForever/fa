@@ -48,12 +48,18 @@ local initFontSize = 13
 local unitFontSize = 0 -- Calculated when dialog is created
 local dialogMaxWidth = 1920  -- Used to determine scaling of icons/fonts
 local dialogMaxHeight = 1200 -- Used to determine scaling of icons/fonts
+local dialogWidth  = 0
+local dialogHeight = 0
 local dialogScrollWidth = 15
-local factionsCount = 4  -- TODO increase when NOMADS added to FAF
+local factionsCount  = 0 -- Calculated when unit blueprints are loaded
 local factionsGroups = 9 -- e.g. NAVAL, AIR, LAND, FACTORIES, ECO, SUPPORT, DEFENCES, COMMANDSER, enhancements
-local cellMax  = (factionsCount * factionsGroups) + 1 
-local cellSize = 0 -- Calculated when dialog is created
-
+-- Defines order of faction units/icons counted from left to right, new factions are automatically appended to the right
+local factionsOrder  = { SERAPHIM = 1, UEF = 2, CYBRAN = 3, AEON = 4, NOMADS = 5}
+local cellMax  = 0 -- Calculated when unit blueprints are loaded
+local cellSize = 0
+local cellSpace = 0
+local gridWidth  = 0
+local gridMargin = 0
 -- This table contains blueprint's categories or IDs for ordering units in grid columns, e.g. 
 -- Units matching first entry will be placed as first item in a column
 -- If two units match the first entry then the next entry is used for comparing
@@ -130,6 +136,7 @@ local sortBy = {
         'OPTICS',
         'COUNTERINTELLIGENCE',
         'WALL',
+        'HEAVYWALL',
         'SHIELD',
     },
     UPGRADES = { 
@@ -214,15 +221,8 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     restrictions.Initial = initial
 
     -- Scaling dialog size based on window size
-    local dialogWidth = GetFrame(0).Width() - 40
-    local dialogHeight = GetFrame(0).Height() - 40
-    dialogWidth  = math.min(dialogWidth, dialogMaxWidth)
-    dialogHeight = math.min(dialogHeight, dialogMaxHeight)
-    -- Scale cell size by ratio of dialog size and make space for scroll bar
-    cellSize = math.ceil((dialogWidth - dialogScrollWidth - 10) / cellMax)
-    -- Scale font size by ratio of dialog size
-    unitFontSize = math.ceil(initFontSize * (dialogWidth / dialogMaxWidth))
-    unitFontSize = math.max(unitFontSize, 8)
+    dialogWidth = GetFrame(0).Width() - 40
+    dialogHeight = GetFrame(0).Height() - 40
 
     GUI.bg = Group(parent)
     GUI.bg.Width:Set(dialogWidth)
@@ -296,26 +296,59 @@ function OnBlueprintsLoaded()
     GUI.progressTxt:Hide()
 
     blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprintsList()
-    --TODO based on number of factions (including nomads) and main group of units:
-    -- calculate number of grids' columns
-    -- calculate size of grids' cells
+    local blueprintsCount = table.getsize(blueprints.All)
 
-    timer:Start('CreatePresetsGrid')
-    CreatePresetsGrid()
-    timer:Stop('CreatePresetsGrid',true)
+    if blueprintsCount > 0 then
+        timer:Start('UnitsManager...UnitsGroupping')
+        factions = {} -- reset factions blueprints
+        -- find all factions without assuming there are only 4 factions (nomads support)
+        for k, bp in blueprints.All do
+            if bp.Faction then
+               if not factions[bp.Faction] then
+                    factions[bp.Faction] = {}
+                    factions[bp.Faction].Name = bp.Faction
+                    factions[bp.Faction].Blueprints = {}
+                    if not factionsOrder[bp.Faction] then 
+                         factionsOrder[bp.Faction] = table.getsize(factionsOrder) + 1
+                    end
+               end
+               table.insert(factions[bp.Faction].Blueprints, bp)
+            end
+        end
+        factionsCount = table.getsize(factions)
+        -- group units based on type and calculate number of grid columns
+        cellMax = 0
+        for name, faction in factions do
+            UnitsAnalyzer.GetUnitsGroups(faction.Blueprints, faction)
+            for group, units in faction.Units do 
+                if table.getsize(units) > 0 then
+                    cellMax = cellMax + 1
+                elseif group ~= 'CIVILIAN' then
+                    WARN('UnitsManager detected '..name..' faction without any '..group..' units')
+                end
+            end
+        end
+        timer:Stop('UnitsManager...UnitsGroupping',true)
 
-    if table.getsize(blueprints.All) > 0 then
-        timer:Start('GetUnitsGroups')
-        factions = {} -- Reset factions 
-        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'SERAPHIM'))
-        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'UEF'))
-        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'CYBRAN'))
-        table.insert(factions, UnitsAnalyzer.GetUnitsGroups(blueprints.All, 'AEON'))
-        timer:Stop('GetUnitsGroups',true)
+        -- scale cell size by dialog size and make space for scroll bar
+        cellSpace = dialogWidth - dialogScrollWidth - 20
+        cellSize = math.floor(cellSpace / cellMax) 
+        cellSize = math.min(cellSize, 55) 
+        -- calculate grid size and margin to ensure grids are centered
+        gridWidth = cellSize * cellMax
+        gridMargin = (cellSpace - gridWidth) / 2
+        gridMargin = math.max(gridMargin, 4)
+        -- scale font size by ratio of grid size and max dialog size
+        unitFontSize = math.ceil(initFontSize * (gridWidth / dialogMaxWidth))
+        unitFontSize = math.max(unitFontSize, 8)
 
-        timer:Start('CreateUnitsGrid')
+        timer:Start('UnitsManager...CreatePresetsGrid')
+        CreatePresetsGrid()
+        timer:Stop('UnitsManager...CreatePresetsGrid', true)
+
+        timer:Start('UnitsManager...CreateUnitsGrid')
         CreateUnitsGrid()
-        timer:Stop('CreateUnitsGrid',true)
+        timer:Stop('UnitsManager...CreateUnitsGrid',true)
     end
 
     -- Set initial restrictions if there are any
@@ -329,16 +362,11 @@ end
 
 -- Creates a grid with buttons representing all restriction presets defined in UnitsRestrictions.lua
 function CreatePresetsGrid()
-    GUI.presetsGrid = Grid(GUI.content, cellSize, cellSize)
+    GUI.presetsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 2)
     GUI.presetsGrid.Top:Set(function() return GUI.content.Top() + 6 end)
-    GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + 4 end)
+    GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
     GUI.presetsGrid.Height:Set(function() return cellSize * 2 end)
-    GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - 4 end)
-    GUI.presetsGrid:DeleteAndDestroyAll(true) -- Clear grid
-    GUI.presetsGrid.rows = 2
-    GUI.presetsGrid.cols = cellMax
-    GUI.presetsGrid:AppendCols(GUI.presetsGrid.cols, true)
-    GUI.presetsGrid:AppendRows(GUI.presetsGrid.rows, true)
+    GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     local index = 0
     local column = 1
@@ -359,16 +387,12 @@ function CreatePresetsGrid()
 end
 -- Creates a grid with buttons representing all original units and modded units (if game mods are enabled) 
 function CreateUnitsGrid()
-    GUI.unitsGrid = Grid(GUI.content, cellSize, cellSize)
+    GUI.unitsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 25)
     GUI.unitsGrid.Top:Set(function() return GUI.presetsGrid.Bottom() + 6 end)
-    GUI.unitsGrid.Left:Set(function() return GUI.content.Left() + 4 end)
+    GUI.unitsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
     GUI.unitsGrid.Bottom:Set(function() return GUI.content.Bottom() - 2 end)
-    GUI.unitsGrid.Width:Set(function() return GUI.content.Width() - 4 end)
-    GUI.unitsGrid:DeleteAndDestroyAll(true) -- Clear grid
-    GUI.unitsGrid.rows = 25
-    GUI.unitsGrid.cols = cellMax
-    GUI.unitsGrid:AppendCols(GUI.unitsGrid.cols, true)
-    GUI.unitsGrid:AppendRows(GUI.unitsGrid.rows, true)
+    GUI.unitsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
+
     GUI.unitsGrid.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             local delta = event.WheelRotation > 0 and -1 or 1
@@ -379,15 +403,17 @@ function CreateUnitsGrid()
     end
     
     local column = 1
-    for _, faction in factions do
-        name = faction.Name
+    local order = table.inverse(factionsOrder)
+    for order, name in order do
+        local faction = factions[name]
         column = CreateGridColumn(name, faction.Units.NAVAL, column, sortBy.TECH)
         column = CreateGridColumn(name, faction.Units.AIR, column, sortBy.TECH)
         column = CreateGridColumn(name, faction.Units.LAND, column, sortBy.TECH)
-        column = CreateGridColumn(name, faction.Bases.FACTORIES, column, sortBy.ENGINEERING)
-        column = CreateGridColumn(name, faction.Bases.ECONOMIC, column, sortBy.ECO, true)
-        column = CreateGridColumn(name, faction.Bases.SUPPORT, column,sortBy.SUPPORT)
-        column = CreateGridColumn(name, faction.Bases.DEFENSES, column,sortBy.WEAPON)
+        column = CreateGridColumn(name, faction.Units.FACTORIES, column, sortBy.ENGINEERING)
+        column = CreateGridColumn(name, faction.Units.ECONOMIC, column, sortBy.ECO, true)
+        column = CreateGridColumn(name, faction.Units.SUPPORT, column,sortBy.SUPPORT)
+        column = CreateGridColumn(name, faction.Units.DEFENSES, column,sortBy.WEAPON)
+        column = CreateGridColumn(name, faction.Units.CIVILIAN, column,sortBy.TECH)
         column = CreateGridColumn(name, faction.Units.SCU, column,sortBy.UPGRADES)
         column = CreateGridColumn(name, faction.Units.ACU, column,sortBy.UPGRADES)
     end
@@ -622,7 +648,7 @@ function CreateUnitIcon(parent, bp, faction)
     LayoutHelpers.AtLeftTopIn(modText, control, modPosition, modPosition - 3)
 
     if bp.Mod then
-        modFill:SetSolidColor('ffAA00FF')
+        modFill:SetSolidColor('ffAA00FF')-- #ffAA00FF'
         modText:SetText('M')
         modText:SetColor('ffffffff')
     end
@@ -637,10 +663,10 @@ function CreateUnitIcon(parent, bp, faction)
 
     if bp.Type == 'UPGRADE' or
        bp.CategoriesHash.ISPREENHANCEDUNIT then
-        colors.TextChecked = 'ffffffff'
-        colors.TextUncheck = 'ffffffff'
-        colors.FillChecked = 'ad575757'
-        colors.FillUncheck = '003e3d3d'
+        colors.TextChecked = 'ffffffff'  -- #ffffffff'
+        colors.TextUncheck = 'ffffffff'  -- #ffffffff'
+        colors.FillChecked = 'ad575757'  -- #ad575757'
+        colors.FillUncheck = '003e3d3d'  -- #003e3d3d'
 
         checkbox.selector = overlay
         checkbox.Height:Set(cellSize)
@@ -656,10 +682,10 @@ function CreateUnitIcon(parent, bp, faction)
             LayoutHelpers.AtLeftTopIn(techUI, control, 2, 2)
         end
     else
-        colors.TextChecked = 'ffC0C0C0'
-        colors.TextUncheck = 'ff000000'
-        colors.FillChecked = 'ff575757'
-        colors.FillUncheck = bp.Color or 'ff524A3E'
+        colors.TextChecked = 'ffC0C0C0' --#ffC0C0C0
+        colors.TextUncheck = 'ff000000' --#ff000000
+        colors.FillChecked = 'ff575757' --#ff575757
+        colors.FillUncheck = bp.Color or 'ff524A3E' --#ff524A3E
 
         fill:SetSolidColor(colors.FillUncheck)
         techUI:SetColor(colors.TextUncheck)
@@ -968,7 +994,7 @@ function CreateGridCell(targetGrid, icon, col, row)
     else
         targetGrid:SetItem(icon, col, row, true)
     end
-
+    targetGrid.icons = targetGrid.icons + 1
     targetGrid.cells = targetGrid.rows * targetGrid.cols
 end
 
@@ -976,17 +1002,16 @@ function CreateGrid(parent, cellSize, cellSize, cols, rows)
     local grid = Grid(parent, cellSize, cellSize)
     grid.rows = 0
     grid.cols = 0
+    grid.icons = 0
 
     if cols > 0 then
-        grid.rows = cols
+        grid.cols = cols
         grid:AppendCols(grid.cols, true)
-        LOG('adding cols '.. grid.cols.. ' - '.. cols)
     end
 
     if rows > 0 then
         grid.rows = rows
         grid:AppendRows(grid.rows, true)
-        LOG('adding rows '.. grid.rows.. ' - '.. rows)
     end
     grid.cells = grid.rows * grid.cols
 
