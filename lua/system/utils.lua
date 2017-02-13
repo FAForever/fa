@@ -381,7 +381,7 @@ function table.unhash(t)
     return r
 end
 
---- Concatenate keys of hash table if their values equal to specified boolean value, defaults to true
+--- Gets keys of hash table if their values equal to specified boolean value, defaults to true
 --- it is useful to check which keys are present or not in a hash table
 --- t = { [A] = true, [B] = true, [C] = false }
 --- table.hashkeys(t, true)  =>  { 'A', 'B' }
