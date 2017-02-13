@@ -677,59 +677,57 @@ end
 -- Returns unit's categories that should not be hidden in tooltips
 function GetUnitsCategories(bp, showAll)
     local ret = {}
-    if bp.CategoriesHash then
-
-        if showAll then
-            ret = bp.CategoriesHash
-        else
-            for key, val in bp.CategoriesHash do
-                local category = key
-                -- Ensure categories are nicely formatted
-                if category == 'MASSPRODUCTION' then
-                    category = 'MASS PRODUCTION'
-                elseif category == 'MASSSTORAGE' then
-                    category = 'MASS STORAGE'
-                elseif category == 'ENERGYPRODUCTION' then
-                    category = 'ENERGY PRODUCTION'
-                elseif category == 'ENERGYSTORAGE' then
-                    category = 'ENERGY STORAGE'
-                elseif category == 'SUPPORTFACTORY' then
-                    category = 'SUPPORT FACTORY'
-                elseif category == 'ENGINEERSTATION' then
-                    category = 'ENGINEER-STATION'
-                elseif category == 'COUNTERINTELLIGENCE' then
-                    category = 'COUNTER-INTELLIGENCE'
-                elseif category == 'INDIRECTFIRE' then
-                    category = 'INDIRECT-FIRE'
-                elseif category == 'DIRECTFIRE' then
-                    category = 'DIRECT-FIRE'
-                elseif category == 'OBRITALSYSTEM' then
-                    category = 'OBRITAL-SYSTEM'
-                elseif category == 'GROUNDATTACK' then
-                    category = 'GROUND-ATTACK'
-                end
-                -- Ensures name of enhancements are nicely formatted
-                if cached.Enhancements[category] then
-                    category = 'UPGRADE ' .. StringSplitCamel(category)
-                end
-                if not CategoriesHidden[category] and 
-                   not StringStarts(category, 'BUILTBY') and 
-                   not StringStarts(category, 'DUMMY') then
-                    -- Ensures all categories have the same case
-                    ret[string.upper(category)] = true
-                end
+    
+    if showAll then
+        ret = bp.CategoriesHash
+    else
+        for key, val in bp.CategoriesHash do
+            local category = key
+            -- Ensure categories are nicely formatted
+            if category == 'MASSPRODUCTION' then
+                category = 'MASS PRODUCTION'
+            elseif category == 'MASSSTORAGE' then
+                category = 'MASS STORAGE'
+            elseif category == 'ENERGYPRODUCTION' then
+                category = 'ENERGY PRODUCTION'
+            elseif category == 'ENERGYSTORAGE' then
+                category = 'ENERGY STORAGE'
+            elseif category == 'SUPPORTFACTORY' then
+                category = 'SUPPORT FACTORY'
+            elseif category == 'ENGINEERSTATION' then
+                category = 'ENGINEER-STATION'
+            elseif category == 'COUNTERINTELLIGENCE' then
+                category = 'COUNTER-INTELLIGENCE'
+            elseif category == 'INDIRECTFIRE' then
+                category = 'INDIRECT-FIRE'
+            elseif category == 'DIRECTFIRE' then
+                category = 'DIRECT-FIRE'
+            elseif category == 'OBRITALSYSTEM' then
+                category = 'OBRITAL-SYSTEM'
+            elseif category == 'GROUNDATTACK' then
+                category = 'GROUND-ATTACK'
+            end
+            -- Ensures name of enhancements are nicely formatted
+            if cached.Enhancements[category] then
+                category = 'UPGRADE ' .. StringSplitCamel(category)
+            end
+            if not CategoriesHidden[category] and 
+               not StringStarts(category, 'BUILTBY') and 
+               not StringStarts(category, 'DUMMY') then
+                -- Ensures all categories have the same case
+                ret[string.upper(category)] = true
             end
         end
+    end
 
-        -- Help showing difference between Support and HQ factories
-        if bp.CategoriesHash['FACTORY'] and
-           bp.CategoriesHash['STRUCTURE'] and 
-           not bp.CategoriesHash['TECH1'] and -- T1 factories are the same
-           not bp.CategoriesHash['GATE'] then  
-            ret['FACTORY'] = false -- hiding FACTORY* duplicate
-            if not bp.CategoriesHash['SUPPORTFACTORY']  then
-               ret['HQ FACTORY'] = true
-            end
+    -- Help showing difference between Support and HQ factories
+    if bp.CategoriesHash['FACTORY'] and
+       bp.CategoriesHash['STRUCTURE'] and 
+       not bp.CategoriesHash['TECH1'] and -- T1 factories are the same
+       not bp.CategoriesHash['GATE'] then  
+        ret['FACTORY'] = false -- hiding FACTORY* duplicate
+        if not bp.CategoriesHash['SUPPORTFACTORY']  then
+           ret['HQ FACTORY'] = true
         end
     end
 
@@ -1085,10 +1083,6 @@ local function CacheProjectile(bp)
 
     -- Converting categories to hash table for quick lookup
     if  bp.Categories then
-        --local categories = {}
-        --for _, category in bp.Categories do
-        --    categories[category] = true
-        --end
         bp.CategoriesHash = table.hash(bp.Categories) 
     end
 
@@ -1246,7 +1240,6 @@ function GetBlueprints(activeMods, skipGameFiles, taskNotifier)
         for _, bp in bps.Projectile do
             CacheProjectile(bp)
         end
-        --TODO combine both for loops 
 
         -- Loading units second so that they can use projectiles
         dir = {'/units'}
