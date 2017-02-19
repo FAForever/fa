@@ -974,6 +974,8 @@ function GetUnitsGroups(bps, faction)
     local CRABEGG = 'xrl0002 + xrl0003 + xrl0004 + xrl0005 + drlk005'
     -- Including crab eggs with factories so they are not confused with actual units built from crab eggs
     local FACTORIES = '((FACTORY * STRUCTURE) + ' .. CRABEGG .. ')'
+    local ENGINEERS = '(ENGINEER - COMMAND - SUBCOMMANDER - UPGRADE)'
+    local DRONES = '(POD - UPGRADE)'
 
     if table.getsize(faction.Blueprints) == 0 then
         faction.Blueprints = GetUnits(bps, faction.Name)
@@ -987,7 +989,7 @@ function GetUnitsGroups(bps, faction)
     faction.Units.LAND      = GetUnits(mobileUnits, '(LAND - ENGINEER - POD - '..TECH4ARTY..')')
     faction.Units.NAVAL     = GetUnits(mobileUnits, '(NAVAL - MOBILESONAR)')
     local buildings         = GetUnits(faction.Blueprints, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..' - CIVILIAN)')
-    faction.Units.FACTORIES = GetUnits(buildings, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD - DEFENSE)')
+    faction.Units.CONSTRUCT = GetUnits(faction.Blueprints, '('..FACTORIES..' + '..ENGINEERS..' + ENGINEERSTATION + '..DRONES..' - DEFENSE)')
     faction.Units.ECONOMIC  = GetUnits(buildings, '(STRUCTURE * ECONOMIC)')
     faction.Units.SUPPORT   = GetUnits(buildings, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
     faction.Units.CIVILIAN  = GetUnits(faction.Blueprints, 'CIVILIAN')
@@ -1001,7 +1003,7 @@ function GetUnitsGroups(bps, faction)
            not faction.Units.AIR[ID] and
            not faction.Units.LAND[ID] and
            not faction.Units.NAVAL[ID] and
-           not faction.Units.FACTORIES[ID] and
+           not faction.Units.CONSTRUCT[ID] and
            not faction.Units.ECONOMIC[ID] and
            not faction.Units.SUPPORT[ID] and
            not faction.Units.CIVILIAN[ID] then
