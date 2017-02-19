@@ -33,7 +33,7 @@ Expressions = {
 -- 4. Try using blueprint's categories and enhancement names:  "(SUBCOMMANDER * ResourceAllocation) - SCUs with RAS preset
 -- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
 
--- NOTE that categories must be in upper case and blueprint IDs should be in lower case
+-- NOTE that categories must be in UPPER case, blueprint IDs in lower case, and enhancement names in CamelCase
 -- both categories and blueprint IDs can be used together or individually but 
 -- they need to be separated by the following operation symbols:
 -- '*'  Intersection = CATEGORY1 and CATEGORY2 and ID1 and ID2 
@@ -76,8 +76,8 @@ Expressions = {
 
     -- added exclusion of engineers and structures because they are restricted by other presets 
     LAND        = "(LAND - ENGINEER - STRUCTURE)",  
-    -- added restriction of AA structures because they are not needed when all air units are out
-    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD - SATELLITE))",  
+    -- added restriction of AA structures because they are not needed when all air units are restricted
+    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD - SATELLITE) + (LAND * ANTIAIR - DIRECTFIRE) + (TECH3 * NAVAL * CARRIER * AIRSTAGINGPLATFORM))",  
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
     NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (SONAR * TECH3))",  
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",  
