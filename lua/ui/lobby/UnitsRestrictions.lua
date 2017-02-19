@@ -79,12 +79,12 @@ Expressions = {
     -- added restriction of AA structures because they are not needed when all air units are restricted
     AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD - SATELLITE) + (LAND * ANTIAIR - DIRECTFIRE) + (TECH3 * NAVAL * CARRIER * AIRSTAGINGPLATFORM))",  
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
-    NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (SONAR * TECH3))",  
+    NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",  
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",  
     AMPHIBIOUS  = "(AMPHIBIOUS)", -- requires adding AMPHIBIOUS category to appropriate units, e.g. Monkey Lord, CYBRIAN T2 Destroyer
     SUBS        = "(NAVAL * SUBMERSIBLE)",  
 
-    DEF_LAND    = "(STRUCTURE * (DIRECTFIRE + WALL))",
+    DEF_LAND    = "(STRUCTURE * DIRECTFIRE)",
     DEF_AIR     = "(STRUCTURE * ANTIAIR)",
     DEF_NAVY    = "(STRUCTURE * ANTINAVY)",
     DEF_SHIELD  = "(STRUCTURE * SHIELD)",  
@@ -132,10 +132,10 @@ Expressions = {
 
     SUPCOMS      = "(SUBCOMMANDER + GATE)",
     RASCOMS      = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)" 
-    TMLCOMS      = "(SUBCOMMANDER * Missile)",              -- TML SCU PRESET xsl0301_missile
+    TMLCOMS      = "(SUBCOMMANDER * (Missile + RightRocket + LeftRocket))", -- TML SCU PRESET xsl0301_missile
     TELECOMS     = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
 
-    INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR",
+    INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR - DEFENSE",
     INTELOPTICS  = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301", 
     INTELSONAR   = "(STRUCTURE * SONAR) + MOBILESONAR",
     INTELCOUNTER = "(STRUCTURE * COUNTERINTELLIGENCE)",
@@ -154,7 +154,11 @@ local enhancements = {
     TMLPACK = { "Missile", 
                 "MissileRemove", 
                 "TacticalMissile", 
-                "TacticalMissileRemove"},
+                "TacticalMissileRemove",
+                "RightRocket",
+                "RightRocketRemove",
+                "LeftRocket",
+                "LeftRocketRemove"},
     DRONES =  { "LeftPod",          -- ACU Engineering Drone C-D1  
                 "LeftPodRemove",    -- ACU Engineering Drone C-D1  
                 "RightPod",         -- ACU Engineering Drone C-D2 

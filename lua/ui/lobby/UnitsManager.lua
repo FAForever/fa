@@ -73,7 +73,6 @@ local sortBy = {
         'ORBITALSYSTEM',
         'SATELLITE',
         -- Additional sorting
-        'BOT',
         'DIRECTFIRE',
         'ANTIAIR',
         'TRANSPORTATION',
@@ -82,6 +81,7 @@ local sortBy = {
         'SUBMERSIBLE',
         'INDIRECTFIRE',
         'ARTILLERY',
+        'BOT',
     },
     -- Order blueprints first by their WEAPON categories and then TECH level
     WEAPON = {
@@ -135,9 +135,9 @@ local sortBy = {
         'OMNI',
         'OPTICS',
         'COUNTERINTELLIGENCE',
+        'SHIELD',
         'WALL',
         'HEAVYWALL',
-        'SHIELD',
     },
     UPGRADES = { 
         'COMMAND',
