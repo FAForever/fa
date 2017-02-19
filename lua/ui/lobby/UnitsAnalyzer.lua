@@ -47,7 +47,6 @@ CategoriesAllowed  = {
 CategoriesSkipped  = {
     ["HOLOGRAM"] = true,
     ["CIVILIAN"] = true,
-    ["BENIGN"] = true, -- some non-buildable units
     ["OPERATION"] = true,
     ["FERRYBEACON"] = true,
     ["NOFORMATION"] = true,
