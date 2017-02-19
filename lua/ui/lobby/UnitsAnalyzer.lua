@@ -975,6 +975,7 @@ function GetUnitsGroups(bps, faction)
     local FACTORIES = '((FACTORY * STRUCTURE) + ' .. CRABEGG .. ')'
     local ENGINEERS = '(ENGINEER - COMMAND - SUBCOMMANDER - UPGRADE)'
     local DRONES = '(POD - UPGRADE)'
+    local DEFENSES = '(ANTINAVY + DIRECTFIRE + ARTILLERY + ANTIAIR + MINE + ORBITALSYSTEM + SATELLITE + NUKE)'
 
     if table.getsize(faction.Blueprints) == 0 then
         faction.Blueprints = GetUnits(bps, faction.Name)
@@ -990,10 +991,10 @@ function GetUnitsGroups(bps, faction)
     local buildings         = GetUnits(faction.Blueprints, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..' - CIVILIAN)')
     faction.Units.CONSTRUCT = GetUnits(faction.Blueprints, '('..FACTORIES..' + '..ENGINEERS..' + ENGINEERSTATION + '..DRONES..' - DEFENSE)')
     faction.Units.ECONOMIC  = GetUnits(buildings, '(STRUCTURE * ECONOMIC)')
-    faction.Units.SUPPORT   = GetUnits(buildings, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
-    faction.Units.CIVILIAN  = GetUnits(faction.Blueprints, 'CIVILIAN')
+    faction.Units.SUPPORT   = GetUnits(buildings, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ' ..DEFENSES..')')
+    faction.Units.CIVILIAN  = GetUnits(faction.Blueprints, '(CIVILIAN - ' ..DEFENSES..')')
     
-    faction.Units.DEFENSES  = {}
+    faction.Units.DEFENSES  = GetUnits(buildings, DEFENSES)
     -- Collect not grouped units from above tables into the DEFENSES table
     -- This way we don't miss showing un-grouped units
     for ID, bp in faction.Blueprints do
@@ -1005,7 +1006,8 @@ function GetUnitsGroups(bps, faction)
            not faction.Units.CONSTRUCT[ID] and
            not faction.Units.ECONOMIC[ID] and
            not faction.Units.SUPPORT[ID] and
-           not faction.Units.CIVILIAN[ID] then
+           not faction.Units.CIVILIAN[ID] and
+           not faction.Units.DEFENSES[ID] then
 
            faction.Units.DEFENSES[ID] = bp
         end
