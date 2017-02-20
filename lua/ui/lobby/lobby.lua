@@ -1681,13 +1681,12 @@ function UpdateAvailableSlots( numAvailStartSpots, scenario )
                         break
                     end
                 end
+                UpdateFactionSelector()
             else
                 GUI.slots[i].faction:SetItem(playerFactionIndex)
                 gameInfo.PlayerOptions[i].Faction = playerFactionIndex
             end
         end
-        
-        UpdateFactionSelector()
     end
     
     -- if number of available slots has changed, update it
@@ -4009,12 +4008,14 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
                 PossiblyAnnounceGameFull()
             elseif data.Type == 'SlotMove' then
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 ClearSlotInfo(data.OldSlot)
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'SwapPlayers' then
                 DoSlotSwap(data.Slot1, data.Slot2)
             elseif data.Type == 'ObserverAdded' then
@@ -4025,6 +4026,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 refreshObserverList()
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'ConvertPlayerToObserver' then
                 gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
                 gameInfo.PlayerOptions[data.OldSlot] = nil
@@ -4858,9 +4860,19 @@ function CreateUI_Faction_Selector(lastFaction)
     end
 end
 
+function UpdateFactionSelectorForPlayer(playerInfo)
+    if playerInfo.OwnerID == localPlayerID then
+        UpdateFactionSelector()
+    end
+end
+
 function UpdateFactionSelector()
     local playerSlotID = FindSlotForID(localPlayerID)
     local playerSlot = GUI.slots[playerSlotID] 
+    if not playerSlot or not playerSlot.AvailableFactions then
+        UIUtil.setEnabled(GUI.factionSelector, false)
+        return
+    end
     
     local enabledList = {}
     for index,button in GUI.factionSelector.mButtons do
@@ -5499,7 +5511,8 @@ function DoSlotSwap(slot1, slot2)
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
     
-    UpdateFactionSelector()
+    UpdateFactionSelectorForPlayer(player1)
+    UpdateFactionSelectorForPlayer(player2)
 end
 
 function KeepSameFactionOrRandom(slotFrom, slotTo, player)
@@ -5690,7 +5703,7 @@ function InitHostUtils()
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
             
-            UpdateFactionSelector()
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
         end,
 
         RemoveAI = function(slot)
