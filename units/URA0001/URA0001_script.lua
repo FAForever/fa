@@ -26,7 +26,18 @@ URA0001 = Class(CAirUnit) {
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop({self})  -- You can't reclaim!
+        IssueStop({self}) -- You can't reclaim!
+    end,
+
+    -- Removed all collider related stuff
+    OnImpact = function(self, with)
+        if with == 'Water' then
+            self:PlayUnitSound('AirUnitWaterImpact')
+            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            self.shallSink = true
+        end
+
+        self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
