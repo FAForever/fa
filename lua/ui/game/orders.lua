@@ -150,6 +150,10 @@ end
 local orderCheckboxMap = false
 local currentSelection = false
 
+function GetCurrentSelection()
+    return currentSelection
+end
+
 -- helper function to create order bitmaps
 -- note, your bitmaps must be in /game/orders/ and have the standard button naming convention
 local function GetOrderBitmapNames(bitmapId)
@@ -1044,7 +1048,13 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                     if ability.Active ~= false then
                         table.insert(availableOrders, abilityIndex)
                         standardOrdersTable[abilityIndex] = table.merged(ability, import('/lua/abilitydefinition.lua').abilities[abilityIndex])
-                        standardOrdersTable[abilityIndex].behavior = AbilityButtonBehavior
+                        if not standardOrdersTable[abilityIndex].behavior then
+                            standardOrdersTable[abilityIndex].behavior = AbilityButtonBehavior
+                        end
+                        
+                        if standardOrdersTable[abilityIndex].AbilityRequirement and not standardOrdersTable[abilityIndex].AbilityRequirement(unit) then
+                            standardOrdersTable[abilityIndex] = nil
+                        end
                     end
                 end
             end
