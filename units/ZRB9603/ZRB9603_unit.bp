@@ -70,7 +70,7 @@ UnitBlueprint {
         EconomyThreatLevel = 35,
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 15,
+        RegenRate = 30,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
