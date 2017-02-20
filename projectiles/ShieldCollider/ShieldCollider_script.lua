@@ -67,9 +67,9 @@ ShieldCollider = Class(Projectile) {
                 if not self.ShieldImpacted then
                     self.ShieldImpacted = true -- Only impact once
 
-                    if not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) and not
-                           EntityCategoryContains(categories.TRANSPORTATION, self.Plane) then -- Exclude Experimentals from momentum system, but not damage
 
+                    local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
+                    if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
                         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
                         self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
                         self.Plane.Detector = CreateCollisionDetector(self.Plane)
