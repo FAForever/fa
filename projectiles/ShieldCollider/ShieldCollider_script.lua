@@ -102,6 +102,11 @@ ShieldCollider = Class(Projectile) {
                     local finalDamage = math.min(shieldDamageLimit, damage)
                     targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
 
+                    -- Play an impact effect, but only if not bouncing
+                    if not self.Plane.Detector then
+                        self.Plane:CreateDestructionEffects(self, self.OverKillRatio)
+                    end
+
                     -- Update the unit's remaining crash damage
                     self.Plane.DeathCrashDamage = initialDamage - finalDamage
                 end
