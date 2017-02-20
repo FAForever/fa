@@ -67,6 +67,9 @@ ShieldCollider = Class(Projectile) {
                 if not self.ShieldImpacted then
                     self.ShieldImpacted = true -- Only impact once
 
+                    -- Find the vector to the impact location, used for the impact ripple FX
+                    local wx, wy, wz = unpack(VDiff(targetEntity:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
+                    local shieldImpactVector = {x = wx, y = wy, z = wz}
 
                     local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
                     if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
@@ -78,7 +81,7 @@ ShieldCollider = Class(Projectile) {
                         self.Plane.Detector:Enable()
 
                         -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
-                        self:ShieldBounce(targetEntity) -- Calculate the appropriate change of velocity
+                        self:ShieldBounce(targetEntity, shieldImpactVector) -- Calculate the appropriate change of velocity
                     end
 
                     if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
@@ -97,7 +100,7 @@ ShieldCollider = Class(Projectile) {
 
                     -- Damage the shield
                     local finalDamage = math.min(shieldDamageLimit, damage)
-                    targetEntity:ApplyDamage(self.Plane, finalDamage, self.shieldVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
+                    targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
 
                     -- Update the unit's remaining crash damage
                     self.Plane.DeathCrashDamage = initialDamage - finalDamage
@@ -109,7 +112,7 @@ ShieldCollider = Class(Projectile) {
     end,
 
     -- Lets do some maths that will make the units bounce off shields
-    ShieldBounce = function(self, shield)
+    ShieldBounce = function(self, shield, vector)
         local bp = self.Plane:GetBlueprint()
         local volume = bp.SizeX * bp.SizeY * bp.SizeZ -- We will use this to *guess* how much force to apply
 
@@ -117,8 +120,7 @@ ShieldCollider = Class(Projectile) {
         self:SetLocalAngularVelocity(spin, spin, spin) -- Ideally I would just set this to whatever the plane had but I dont know how
 
         local vx, vy, vz = self.Plane:GetVelocity() -- Current plane velocity
-        local wx, wy, wz = unpack(VDiff(shield:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
-        self.shieldVector = {x = wx, y = wy, z = wz}
+        local wx, wy, wz = vector.x, vector.y, vector.z
 
         -- Convert our speed values from units per tick to units per second
         vx = 10 * vx
