@@ -4032,6 +4032,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 ClearSlotInfo(data.OldSlot)
                 refreshObserverList()
+                UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
             elseif data.Type == 'SetColor' then
                 SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
