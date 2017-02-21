@@ -24,6 +24,7 @@ local Set = import('/lua/system/setutils.lua')
 
 -- TODO: We should really introduce a veterancy module at some point.
 -- XP gained for killing various unit types.
+local WALL_XP = 0.1
 local STRUCTURE_XP = 1
 local TECH1_XP = 1
 local TECH2_XP = 3
@@ -1273,7 +1274,9 @@ Unit = Class(moho.unit_methods) {
 
         -- Assign XP according to the category of unit killed.
         -- TODO: We can very possibly do this more cheaply and clearly by using RTTI on unitKilled?
-        if EntityCategoryContains(categories.STRUCTURE, unitKilled) then
+        if EntityCategoryContains(categories.WALL, unitKilled) then
+            self:AddXP(WALL_XP)
+        elseif EntityCategoryContains(categories.STRUCTURE, unitKilled) then
             self:AddXP(STRUCTURE_XP)
         elseif EntityCategoryContains(categories.TECH1, unitKilled) then
             self:AddXP(TECH1_XP)
