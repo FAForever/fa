@@ -1066,11 +1066,7 @@ local function CreateCommonOrders(availableOrders, init)
     end
 end
 
--- creates the buttons for the alt orders, placing them as possible
-local function CreateAltOrders(availableOrders, availableToggles, units)
--- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
--- to determine where they go by using preferred slots
-
+function AddAbilityButtons(standardOrdersTable, availableOrders, units)
     --Look for units in the selection that have special ability buttons
     --If any are found, add the ability information to the standard order table
     if units and categories.ABILITYBUTTON and EntityCategoryFilterDown(categories.ABILITYBUTTON, units) then
@@ -1087,6 +1083,14 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
         end
     end
+end
+
+-- creates the buttons for the alt orders, placing them as possible
+local function CreateAltOrders(availableOrders, availableToggles, units)
+-- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
+-- to determine where they go by using preferred slots
+    AddAbilityButtons(standardOrdersTable, availableOrders, units)
+
     local assitingUnitList = {}
     local podUnits = {}
     if table.getn(units) > 0 and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
