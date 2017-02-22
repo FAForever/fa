@@ -293,7 +293,7 @@ StructureUnit = Class(Unit) {
     OnStartBuild = function(self, unitBeingBuilt, order )
         -- check for death loop
         if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
-            return 
+            return
         end
         self.UnitBeingBuilt = unitBeingBuilt
 
@@ -1739,7 +1739,7 @@ AirUnit = Class(MobileUnit) {
         self:SetTurnMult(1)
     end,
 
-    -- Planes need to crash. Therefore, disable OnImpact apart from when called by the attached crash projectile
+    -- Planes need to crash. Called by engine or by ShieldCollider projectile on collision with ground or water
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
 
@@ -1761,6 +1761,7 @@ AirUnit = Class(MobileUnit) {
             self.colliderProj:Destroy()
         end
 
+        self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -1854,7 +1855,7 @@ BaseTransport = Class() {
                 unit.attachmentBone = i
             end
         end
-        
+
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -2271,7 +2272,7 @@ CommandUnit = Class(WalkingLandUnit) {
 
         self:ShowBone(0, true)
         self:SetUnSelectable(false)
-        self:SetBusy(false)        
+        self:SetBusy(false)
         self:SetBlockCommandQueue(false)
 
         for _, v in bones or bp.Display.WarpInEffect.HideBones do
