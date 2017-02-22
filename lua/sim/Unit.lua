@@ -205,13 +205,13 @@ Unit = Class(moho.unit_methods) {
 
         --Set up veterancy
         self.xp = 0
-        --self.Sync.xp = self.xp
         self.VeteranLevel = 0
 
         self.debris_Vector = Vector( 0, 0, 0 )
 
+        local bp = self:GetBlueprint()
         --Define Economic modifications
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = bp.Economy
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetConsumptionPerSecondMass(bpEcon.MaintenanceConsumptionPerSecondMass or 0)
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -226,13 +226,13 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        local bpVision = self:GetBlueprint().Intel.VisionRadius
+        local bpVision = bp.Intel.VisionRadius
         self:SetIntelRadius('Vision', bpVision or 0)
 
         self:SetCanTakeDamage(true)
         self:SetCanBeKilled(true)
 
-        local bpDeathAnim = self:GetBlueprint().Display.AnimationDeath
+        local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and table.getn(bpDeathAnim) > 0 then
             self.PlayDeathAnimation = true
         end
@@ -251,7 +251,6 @@ Unit = Class(moho.unit_methods) {
 
         self.Dead = false
 
-        local bp = self:GetBlueprint()
         self:InitBuffFields()
         self:OnCreated()
 
