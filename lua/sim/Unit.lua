@@ -1205,12 +1205,12 @@ Unit = Class(moho.unit_methods) {
         return self.CanBeKilled
     end,
 
-    --On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self:GetCurrentLayer()
         self.Dead = true
 
-        --Units killed while being invisible because they're teleporting should show when they're killed
+        -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
             self:ShowBone(0, true)
             self:ShowEnhancementBones()
@@ -1220,7 +1220,7 @@ Unit = Class(moho.unit_methods) {
         if layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         elseif layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
-            --Handle ships that can walk on land
+            -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
             self:PlayUnitSound('Killed')
@@ -1231,7 +1231,7 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = true
         end
 
-        self:DoUnitCallbacks( 'OnKilled' )
+        self:DoUnitCallbacks('OnKilled')
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
@@ -1254,12 +1254,12 @@ Unit = Class(moho.unit_methods) {
         ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
     end,
 
-    --Argument val is true or false. False = cannot be killed
+    -- Argument val is true or false. False = cannot be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
-    --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    -- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
         -- No XP for friendly fire...
         if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
