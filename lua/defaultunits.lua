@@ -19,6 +19,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
+local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
@@ -1742,6 +1743,11 @@ AirUnit = Class(MobileUnit) {
     -- Planes need to crash. Called by engine or by ShieldCollider projectile on collision with ground or water
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
+
+        -- Immediately destroy units outside the map
+        if not ScenarioFramework.IsUnitInPlayableArea(self) then
+            self:Destroy()
+        end
 
         -- Only call this code once
         self.GroundImpacted = true
