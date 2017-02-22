@@ -1599,6 +1599,18 @@ function SendSystemMessage(id, ...)
     PrintSystemMessage(id, arg)
 end
 
+function SendPersonalSystemMessage(targetID, id, ...)
+    if targetID ~= localPlayerID then
+        local data = {
+            Type = "SystemMessage",
+            Id = id,
+            Args = arg
+        }
+
+        lobbyComm:SendData(targetID, data)
+    end
+end
+
 function PublicChat(text)
     lobbyComm:BroadcastData(
         {
@@ -5661,8 +5673,8 @@ function InitHostUtils()
                     end
 
                     -- There are no AIs and no slots, so break out with a message
-                    if toPlayerSlot < 1 then
-                        SendSystemMessage("lobui_0608")
+                    if toPlayerSlot < 1 and gameInfo.Observers[fromObserverSlot] then
+                        SendPersonalSystemMessage(gameInfo.Observers[fromObserverSlot].OwnerID, "lobui_0608")
                         return
                     end
                 end
