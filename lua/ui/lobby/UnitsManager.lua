@@ -129,7 +129,6 @@ local sortBy = {
         'HYDROCARBON',
     },
     SUPPORT = { 
-        'AIRSTAGINGPLATFORM',
         'SONAR',
         'RADAR',
         'OMNI',
@@ -138,6 +137,7 @@ local sortBy = {
         'SHIELD',
         'WALL',
         'HEAVYWALL',
+        'AIRSTAGINGPLATFORM',
     },
     UPGRADES = { 
         'COMMAND',
@@ -362,25 +362,32 @@ end
 
 -- Creates a grid with buttons representing all restriction presets defined in UnitsRestrictions.lua
 function CreatePresetsGrid()
-    GUI.presetsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 2)
+    local rowMax = 4
+    GUI.presetsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, rowMax)
     GUI.presetsGrid.Top:Set(function() return GUI.content.Top() + 6 end)
     GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
-    GUI.presetsGrid.Height:Set(function() return cellSize * 2 end)
+    GUI.presetsGrid.Height:Set(function() return cellSize * rowMax end)
     GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     local index = 0
-    local column = 1
+    local col = 1
     local row = 1
     for _, presetName in presets.Order do
         local preset = presets.Data[presetName]
+
         if presetName ~= "" and preset then
-
-            row = math.floor(index / presets.PerRow) + 1
-            column = math.mod(index, presets.PerRow) + 2
-
             local icon = CreatePresetIcon(GUI.presetsGrid, preset.key)
-            CreateGridCell(GUI.presetsGrid, icon, column, row)
+            CreateGridCell(GUI.presetsGrid, icon, col, row)
+            row = row + 1
+        else
+            row = 1
+            col = col + 1
         end 
+
+        if row > rowMax then
+           row = 1
+           col = col + 1
+        end
         index = index + 1
     end
     GUI.presetsGrid:EndBatch()
