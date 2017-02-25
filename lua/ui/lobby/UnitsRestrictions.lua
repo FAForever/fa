@@ -804,6 +804,5 @@ end
 function GetPresetsOrder()
     -- ensure restriction presets are generated before accessing order 
     GetPresetsData()
-    -- table.insert(presetsOrder, "NOMADS") -- uncomment for NOMADS support 
     return presetsOrder
 end
