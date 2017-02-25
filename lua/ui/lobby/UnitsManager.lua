@@ -370,23 +370,23 @@ function CreatePresetsGrid()
     GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     local index = 0
-    local col = 1
+    local column = 1
     local row = 1
     for _, presetName in presets.Order do
         local preset = presets.Data[presetName]
 
         if presetName ~= "" and preset then
             local icon = CreatePresetIcon(GUI.presetsGrid, preset.key)
-            CreateGridCell(GUI.presetsGrid, icon, col, row)
+            CreateGridCell(GUI.presetsGrid, icon, column, row)
             row = row + 1
         else
             row = 1
-            col = col + 1
+            column = column + 1
         end 
 
         if row > rowMax then
            row = 1
-           col = col + 1
+           column = column + 1
         end
         index = index + 1
     end
