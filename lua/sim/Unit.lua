@@ -1258,7 +1258,7 @@ Unit = Class(moho.unit_methods) {
         self.CanBeKilled = val
     end,
 
-    -- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
         -- No XP for friendly fire...
         if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
