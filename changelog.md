@@ -1,3 +1,42 @@
+Patch 3676 (Upcoming)
+============================
+### Gameplay
+- New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
+- Allow units in a transport which is shot down to leave wrecks at the crash site
+- Allow the Novax to build a new Satellite if the old one dies. This can only happen if it is impacted by a Nuke or ctrl-k'ed
+- Introduced code to slightly improve the way Tempest and Atlantis behave, particularly in being able to fire, in shallow waters
+
+### Bugs
+- Fixed ACU reclaiming while shooting
+- Fixed ACU building while shooting
+- Fixed Auto-Overcharge stopping working randomly until toggled
+- Fixed Auto-Overcharge firing while building
+
+### Lobby
+- Fixed 'Random' faction using 'Random - Unbalanced' tooltip
+- Allow filtering of 13-16 player maps in map selection
+- Fixed 'Autoteams: Manual' resulting in all players being allied
+- Fixed autobalance functions crashing when used with uneven team numbers
+- Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
+
+### UI
+- Added new option to change the minimum reclaim label size shown in the overlay
+
+### Balance
+- Increased Auto-Overcharge rate of fire from 3.3s to 5s
+
+### Other
+- Added some mods to blacklist
+- Allowed hooking of schook files to help future patch mechanism
+- Allow hot-reloading of UI files with EnableDiskWatch
+
+### Contributors
+- Exotic-Retard
+- IceDreamer
+- Speed2
+- TheKeyBlue
+
+
 Patch 3675 (5th February, 2017)
 ============================
 - Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on

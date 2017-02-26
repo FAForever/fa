@@ -575,6 +575,18 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 360,
         },
+        {
+            AboveWaterTargetsOnly = true,
+            Damage = 25,
+            DamageFriendly = true,
+            DamageRadius = 1,
+            DamageType = 'Normal',
+            DisplayName = 'Air Crash',
+            DummyWeapon = true,
+            FiringTolerance = 2,
+            Label = 'DeathImpact',
+            WeaponCategory = 'Death',
+        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

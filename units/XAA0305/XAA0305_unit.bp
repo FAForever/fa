@@ -100,7 +100,6 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYANTIAIR',
     },
-    CollisionOffsetY = -0.075,
     Defense = {
         AirThreatLevel = 22,
         ArmorType = 'Light',
@@ -223,9 +222,9 @@ UnitBlueprint {
     SelectionSizeZ = 1.2,
     SelectionThickness = 0.48,
     SizeSphere = 1.6,
-    SizeX = 1,
-    SizeY = 0.5,
-    SizeZ = 1,
+    SizeX = 1.8,
+    SizeY = 1,
+    SizeZ = 1.6,
     StrategicIconName = 'icon_gunship3_antiair',
     StrategicIconSortPriority = 65,
     Transport = {
