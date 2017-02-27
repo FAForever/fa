@@ -1,0 +1,1 @@
+This folder and its content are here to aid documentation of engine and lua functions. Added in FAF
