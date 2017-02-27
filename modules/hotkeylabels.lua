@@ -31,8 +31,8 @@ local signs = {
 
 local colours = {
     [0] = "ffffffff",    -- White, no modifier
-    [1] = "fffafa00",    -- Yellow, ctrl
-    [2] = "ffffbf80",    -- Orange, alt
+    [1] = "ff0088b2",    -- Blue, ctrl
+    [2] = "ff217a13",    -- Green, alt
     [3] = "FFe80a0a",    -- Red, ctrl + alt
 }
 
