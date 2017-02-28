@@ -416,6 +416,7 @@ local function AbilityButtonBehavior(self, modifiers)
             name="RULEUCC_Script", 
             AbilityName=self._script,
             TaskName=self._script,
+            cursor = self._cursor,
         }
         CM.StartCommandMode("order", modeData)
     end
@@ -1058,6 +1059,16 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
         end
     end
+    if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
+        for _, availOrder in availableOrders do
+            if availOrder == 'RULEUCC_RetaliateToggle' or EntityCategoryFilterDown(categories.ENGINEER, units) then
+                table.insert(availableOrders, 'AttackMove')
+                standardOrdersTable['AttackMove'] = import('/lua/abilitydefinition.lua').abilities['AttackMove']
+                standardOrdersTable['AttackMove'].behavior = AbilityButtonBehavior
+                break
+            end
+        end
+    end
     local assitingUnitList = {}
     local podUnits = {}
     if table.getn(units) > 0 and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
@@ -1174,6 +1185,10 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             
             if standardOrdersTable[availOrder].script then
                 orderCheckbox._script = standardOrdersTable[availOrder].script
+            end
+            
+            if standardOrdersTable[availOrder].cursor then
+                orderCheckbox._cursor = standardOrdersTable[availOrder].cursor
             end
             
             if assitingUnitList[availOrder] then

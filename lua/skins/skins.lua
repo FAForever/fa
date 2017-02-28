@@ -157,6 +157,7 @@ skins = {
             N_S = {'/textures/ui/common/game/cursors/n_s.dds', 15, 15},
             W_E = {'/textures/ui/common/game/cursors/w_e.dds', 15, 15},
             MOVE_WINDOW = {'/textures/ui/common/game/cursors/move_window.dds', 15, 15},
+            ATTACK_MOVE = {'/textures/ui/common/game/cursors/attack_move.dds', 15, 15},
         },
     },
 }

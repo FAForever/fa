@@ -21,6 +21,11 @@ Tooltips = {
         description = "",
         keyID = "attack",
     },
+    attack_move = {
+        title = "<LOC tooltipui0003>Attack Move",
+        description = "Move units toward target while engaging all enemies they encounter. Alt + RMB",
+        keyID = "attackmove",
+    },
     patrol = {
         title = "<LOC tooltipui0004>Patrol",
         description = "",

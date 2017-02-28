@@ -209,6 +209,26 @@ function OnCommandIssued(command)
             local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
         end
+    elseif command.CommandType == 'Script' and command.LuaParams.TaskName == 'AttackMove' then
+        local view = import('/lua/ui/game/worldview.lua').viewLeft
+        local avgPoint = {0,0}
+        for _,unit in command.Units do
+            avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
+            avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
+        end
+        avgPoint[1] = avgPoint[1] / table.getn(command.Units)
+        avgPoint[2] = avgPoint[2] / table.getn(command.Units)
+        
+        avgPoint[1] = command.Target.Position[1] - avgPoint[1]
+        avgPoint[2] = command.Target.Position[3] - avgPoint[2]
+        
+        local rotation = math.atan(avgPoint[1]/avgPoint[2])
+        rotation = rotation * 180 / math.pi
+        if avgPoint[2] < 0 then 
+            rotation = rotation + 180
+        end
+        local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}
+        SimCallback(cb, true)
 	else	
 		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
 			AddCommandFeedbackBlip({
