@@ -53,6 +53,9 @@ CommandGraphParams = {
 
     UNITCOMMAND_AggressiveMove = {
         inherit_from = 'default_AttackColors',
+        orderline_texture = '/textures/ui/common/game/orderline/orderline_arrow02.dds',
+        orderline_anim_rate = 0.25,
+        orderline_uv_aspect_ratio = 0.2,
         waypoint_texture = '/textures/ui/common/game/waypoints/attack_move_btn_up.dds',
         arrowhead_texture = '/textures/ui/common/game/orderline/orderline_arrow04.dds',
     },
