@@ -192,7 +192,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                 local availableOrders,_,_ = GetUnitCommandData(units)
                 for _, availOrder in availableOrders do
                     if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
-                        or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
+                        or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0
+                        or table.getn(EntityCategoryFilterDown(categories.FACTORY + categories.STRUCTURE, units)) > 0 then
                         self.Cursor = {UIUtil.GetCursor('ATTACK_MOVE')}
                         break
                     end
