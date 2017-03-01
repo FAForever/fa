@@ -2,10 +2,10 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local numSlots = 12
-local firstAltSlot = 7
+local numSlots = 15
+local firstAltSlot = 8
 local vertRows = 3
-local horzRows = 4
+local horzRows = 5
 local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 

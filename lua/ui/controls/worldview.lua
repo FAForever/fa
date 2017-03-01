@@ -181,7 +181,14 @@ WorldView = Class(moho.UIWorldView, Control) {
 
         if not command_mode then -- no current command command_mode
             local units = GetSelectedUnits()
-            if IsKeyDown(18) and units and table.getn(units) > 0 then
+            local order = self:GetRightMouseButtonOrder()
+            if self:HasHighlightCommand() then
+                if self:ShowConvertToPatrolCursor() then
+                    self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
+                else
+                    self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
+                end
+            elseif (not order or order == 'RULEUCC_Move') and IsKeyDown(18) and units and table.getn(units) > 0 then
                 local availableOrders,_,_ = GetUnitCommandData(units)
                 for _, availOrder in availableOrders do
                     if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
@@ -190,14 +197,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                         break
                     end
                 end
-            elseif self:HasHighlightCommand() then
-                if self:ShowConvertToPatrolCursor() then
-                    self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
-                else
-                    self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
-                end
             else
-                local order = self:GetRightMouseButtonOrder()
                 -- Don't show the move cursor as a right mouse button hightlight state
                 if order and order ~= 'RULEUCC_Move' then
                     self.Cursor = {UIUtil.GetCursor(order)}
