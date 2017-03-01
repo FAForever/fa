@@ -37,8 +37,8 @@ local glowThread = false
 
 -- these variables control the number of slots available for orders
 -- though they are fixed, the code is written so they could easily be made soft
-local numSlots = 12
-local firstAltSlot = 7
+local numSlots = 14
+local firstAltSlot = 8
 local vertRows = 3
 local horzRows = 4
 local vertCols = numSlots/vertRows
@@ -406,6 +406,20 @@ local function CheckReverseSemantics(scriptBit)
     end
     
     return false
+end
+
+local function AttackMoveBehavior(self, modifiers)
+    if self:IsChecked() then
+        import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+    else
+        local modeData = {
+            name="RULEUCC_Script", 
+            AbilityName='AttackMove',
+            TaskName='AttackMove',
+            cursor = 'ATTACK_MOVE',
+        }
+        import('/lua/ui/game/commandmode.lua').StartCommandMode("order", modeData)
+    end
 end
 
 local function AbilityButtonBehavior(self, modifiers)
@@ -827,42 +841,43 @@ end
 -- extraInfo is used for storing any extra information required in setting up the button
 local defaultOrdersTable = {
     -- Common rules
-    RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 1,  behavior = StandardOrderBehavior,},
-    RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 2,  behavior = StandardOrderBehavior, },
-    RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
-    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = StopOrderBehavior, },
-    RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 5,  behavior = StandardOrderBehavior, },
-    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction},
+    AttackMove = {                  helpText = "attack_move",   bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior, },
+    RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior,},
+    RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
+    RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior, },
+    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior, },
+    RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior, },
+    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
-    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
-    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
-    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
-    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 7,  behavior = StandardOrderBehavior},
-    RULEUCC_Transport = {           helpText = "transport",     bitmapId = 'unload',                preferredSlot = 8,  behavior = StandardOrderBehavior, },
-    RULEUCC_Nuke = {                helpText = "fire_nuke",     bitmapId = 'launch-nuke',           preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
-    RULEUCC_Tactical = {            helpText = "fire_tactical", bitmapId = 'launch-tactical',       preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
-    RULEUCC_Teleport = {            helpText = "teleport",      bitmapId = 'teleport',              preferredSlot = 9,  behavior = StandardOrderBehavior, },
-    RULEUCC_Ferry = {               helpText = "ferry",         bitmapId = 'ferry',                 preferredSlot = 9,  behavior = StandardOrderBehavior, },
-    RULEUCC_Sacrifice = {           helpText = "sacrifice",     bitmapId = 'sacrifice',             preferredSlot = 9,  behavior = StandardOrderBehavior,},
-    RULEUCC_Dive = {                helpText = "dive",          bitmapId = 'dive',                  preferredSlot = 10, behavior = DiveOrderBehavior, initialStateFunc = DiveInitFunction,},   
-    RULEUCC_Reclaim = {             helpText = "reclaim",       bitmapId = 'reclaim',               preferredSlot = 10, behavior = StandardOrderBehavior, },
-    RULEUCC_Capture = {             helpText = "capture",       bitmapId = 'convert',               preferredSlot = 11, behavior = StandardOrderBehavior,},
-    RULEUCC_Repair = {              helpText = "repair",        bitmapId = 'repair',                preferredSlot = 12, behavior = StandardOrderBehavior,},
-    RULEUCC_Dock = {                helpText = "dock",          bitmapId = 'dock',                  preferredSlot = 12, behavior = DockOrderBehavior,},
+    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
+    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 8,  behavior = StandardOrderBehavior},
+    RULEUCC_Transport = {           helpText = "transport",     bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior, },
+    RULEUCC_Nuke = {                helpText = "fire_nuke",     bitmapId = 'launch-nuke',           preferredSlot = 10,  behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
+    RULEUCC_Tactical = {            helpText = "fire_tactical", bitmapId = 'launch-tactical',       preferredSlot = 10,  behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
+    RULEUCC_Teleport = {            helpText = "teleport",      bitmapId = 'teleport',              preferredSlot = 10,  behavior = StandardOrderBehavior, },
+    RULEUCC_Ferry = {               helpText = "ferry",         bitmapId = 'ferry',                 preferredSlot = 10,  behavior = StandardOrderBehavior, },
+    RULEUCC_Sacrifice = {           helpText = "sacrifice",     bitmapId = 'sacrifice',             preferredSlot = 10,  behavior = StandardOrderBehavior,},
+    RULEUCC_Dive = {                helpText = "dive",          bitmapId = 'dive',                  preferredSlot = 11, behavior = DiveOrderBehavior, initialStateFunc = DiveInitFunction,},   
+    RULEUCC_Reclaim = {             helpText = "reclaim",       bitmapId = 'reclaim',               preferredSlot = 12, behavior = StandardOrderBehavior, },
+    RULEUCC_Capture = {             helpText = "capture",       bitmapId = 'convert',               preferredSlot = 13, behavior = StandardOrderBehavior,},
+    RULEUCC_Repair = {              helpText = "repair",        bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior,},
+    RULEUCC_Dock = {                helpText = "dock",          bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior,},
     
-    DroneL = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 11, behavior = DroneBehavior,initialStateFunc = DroneInit,},
-    DroneR = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 11, behavior = DroneBehavior,initialStateFunc = DroneInit,},
+    DroneL = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 13, behavior = DroneBehavior,initialStateFunc = DroneInit,},
+    DroneR = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 13, behavior = DroneBehavior,initialStateFunc = DroneInit,},
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 7,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0,},
-    RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 7,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1,},    
-    RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2,},
-    RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3,},
-    RULEUTC_ProductionToggle = {    helpText = "toggle_production", bitmapId = 'production',            preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 4,},
-    RULEUTC_StealthToggle = {       helpText = "toggle_stealth",    bitmapId = 'stealth',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 5,},
-    RULEUTC_GenericToggle = {       helpText = "toggle_generic",    bitmapId = 'production',            preferredSlot = 10, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 6,},
-    RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7,},
-    RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8,},
+    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0,},
+    RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1,},    
+    RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2,},
+    RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3,},
+    RULEUTC_ProductionToggle = {    helpText = "toggle_production", bitmapId = 'production',            preferredSlot = 10,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 4,},
+    RULEUTC_StealthToggle = {       helpText = "toggle_stealth",    bitmapId = 'stealth',               preferredSlot = 10,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 5,},
+    RULEUTC_GenericToggle = {       helpText = "toggle_generic",    bitmapId = 'production',            preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 6,},
+    RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7,},
+    RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8,},
 }
 
 local standardOrdersTable = nil
@@ -880,6 +895,7 @@ local commonOrders = {
     RULEUCC_Stop = true,
     RULEUCC_Guard = true, 
     RULEUCC_RetaliateToggle = true, 
+    AttackMove = true,
 }
 
 --[[
@@ -1029,11 +1045,23 @@ local function CreateCommonOrders(availableOrders, init)
         orderCheckboxMap[key] = orderCheckbox
     end
     
+    
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
         if commonOrders[availOrder] then
             local ck = orderCheckboxMap[availOrder]
             ck:Enable()
+        end
+    end
+    
+    local units = currentSelection
+    if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
+        for _, availOrder in availableOrders do
+            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
+                    or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
+                orderCheckboxMap['AttackMove']:Enable()
+                break
+            end
         end
     end
 end
@@ -1056,17 +1084,6 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                         standardOrdersTable[abilityIndex].behavior = AbilityButtonBehavior
                     end
                 end
-            end
-        end
-    end
-    if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
-        for _, availOrder in availableOrders do
-            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
-                    or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
-                table.insert(availableOrders, 'AttackMove')
-                standardOrdersTable['AttackMove'] = import('/lua/abilitydefinition.lua').abilities['AttackMove']
-                standardOrdersTable['AttackMove'].behavior = AbilityButtonBehavior
-                break
             end
         end
     end
