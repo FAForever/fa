@@ -180,7 +180,17 @@ WorldView = Class(moho.UIWorldView, Control) {
         local command_mode, command_data = unpack(import('/lua/ui/game/commandmode.lua').GetCommandMode())
 
         if not command_mode then -- no current command command_mode
-            if self:HasHighlightCommand() then
+            local units = GetSelectedUnits()
+            if IsKeyDown(18) and units and table.getn(units) > 0 then
+                local availableOrders,_,_ = GetUnitCommandData(units)
+                for _, availOrder in availableOrders do
+                    if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
+                        or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
+                        self.Cursor = {UIUtil.GetCursor('ATTACK_MOVE')}
+                        break
+                    end
+                end
+            elseif self:HasHighlightCommand() then
                 if self:ShowConvertToPatrolCursor() then
                     self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
                 else
