@@ -2038,9 +2038,9 @@ ConstructionUnit = Class(MobileUnit) {
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
-        MobileUnit.OnStopBuild(self, unitBeingBuilt)
+        MobileUnit.OnStopBuild(self,unitBeingBuilt)
         if self.Upgrading then
-            NotifyUpgrade(self, unitBeingBuilt)
+            NotifyUpgrade(self,unitBeingBuilt)
             self:Destroy()
         end
         self.UnitBeingBuilt = nil
@@ -2052,14 +2052,6 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(-1)
         end
         self.BuildingUnit = false
-
-        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
-    end,
-
-    OnFailedToBuild = function(self)
-        MobileUnit.OnFailedToBuild(self)
-
-        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
     end,
 
     WaitForBuildAnimation = function(self, enable)
@@ -2074,15 +2066,14 @@ ConstructionUnit = Class(MobileUnit) {
     OnPrepareArmToBuild = function(self)
         MobileUnit.OnPrepareArmToBuild(self)
 
+        -- LOG( 'OnPrepareArmToBuild' )
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
+                ForkThread( self.WaitForBuildAnimation, self, true )
             end
         end
-
-        self:SetImmobile(true) -- Needed to fix a bug where the engine wouldn't correctly report a failed order, leading to move-building
     end,
 
     OnStopBuilderTracking = function(self)
@@ -2157,8 +2148,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
-        self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
-        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
+        self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
 
     OnFailedToBuild = function(self)
@@ -2193,7 +2183,6 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(20)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
-        self:SetImmobile(true) -- Needed to fix a bug where the engine wouldn't correctly report a failed order, leading to move-building
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
