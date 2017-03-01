@@ -237,5 +237,4 @@ Callbacks.AttackMove = function(data, units)
         IssueClearCommands(units)
     end
     IssueFormAggressiveMove(units, data.Target,'AttackFormation' , data.Rotation)
-    
 end

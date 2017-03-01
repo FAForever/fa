@@ -1061,7 +1061,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
     if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
-            if availOrder == 'RULEUCC_RetaliateToggle' or EntityCategoryFilterDown(categories.ENGINEER, units) then
+            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
+                    or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
                 table.insert(availableOrders, 'AttackMove')
                 standardOrdersTable['AttackMove'] = import('/lua/abilitydefinition.lua').abilities['AttackMove']
                 standardOrdersTable['AttackMove'].behavior = AbilityButtonBehavior
