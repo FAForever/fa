@@ -22,8 +22,8 @@ Tooltips = {
         keyID = "attack",
     },
     attack_move = {
-        title = "<LOC tooltipui0003>Attack Move",
-        description = "Move units toward target while engaging all enemies they encounter. Alt + RMB",
+        title = "<LOC tooltipui0010>Attack Move",
+        description = "<LOC tooltipui0011>Move units toward target while engaging all enemies they encounter. Engineers will reclaim everything along the way instead. Factories can't use this button but you can use the shortcut instead : Alt + RMB",
         keyID = "attackmove",
     },
     patrol = {
