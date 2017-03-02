@@ -6,7 +6,11 @@ function addLabel(control, parent, key)
     control.hotbuildKeyBg = Bitmap(parent)
     control.hotbuildKeyBg.Depth:Set(99)
     control.hotbuildKeyBg.Height:Set(20)
-    control.hotbuildKeyBg.Width:Set(20)
+    if string.len(key.key) <= 2 then
+        control.hotbuildKeyBg.Width:Set(20)
+    else
+        control.hotbuildKeyBg.Width:Set(30)
+    end
     LayoutHelpers.AtRightTopIn(control.hotbuildKeyBg, parent, 0, parent.Height() - 20)
     control.hotbuildKeyBg:SetTexture('/textures/ui/bg.png')
     control.hotbuildKeyBg:DisableHitTest()
