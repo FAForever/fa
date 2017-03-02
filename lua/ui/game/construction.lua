@@ -2115,6 +2115,11 @@ function RefreshUI()
 end
 
 function OnSelection(buildableCategories, selection, isOldSelection)
+    if table.empty(selection) then
+        sortedOptions.selection = {}
+        return
+    end
+    
     if options.gui_templates_factory ~= 0 then
         if table.empty(selection) then
             allFactories = false
