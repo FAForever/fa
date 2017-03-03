@@ -61,6 +61,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
     end
+    local fromBrain = GetArmyBrain(units[1]:GetArmy())
 
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
 
@@ -172,6 +173,16 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         
         v:OnGiven(unit)
     end
+    
+    if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
+        for _,aiBrain in {fromBrain, toBrain} do
+            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+            for _, victim in buildRestrictionVictims do
+                victim:updateBuildRestrictions()
+            end
+        end
+    end
+    
     return newUnits
 end
 
