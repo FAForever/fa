@@ -2812,7 +2812,61 @@ function CreateUI(maxPlayers)
     )
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
-
+    LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
+    
+    GUI.chatPanel.top = 0
+    GUI.chatPanel.GetScrollValues = function(self, axis)
+        local size = GUI.chatDisplay:GetItemCount()
+        return 0, size, self.top, math.min(self.top + 13, size)
+    end
+    
+    GUI.chatPanel.ScrollLines = function(self, axis, delta)
+        self:ScrollSetTop(axis, self.top + math.floor(delta))
+    end
+    GUI.chatPanel.ScrollPages = function(self, axis, delta)
+        self:ScrollSetTop(axis, self.top + math.floor(delta) * 13)
+    end
+    GUI.chatPanel.ScrollSetTop = function(self, axis, top)
+        local oldTop = self.top
+        top = math.floor(top)
+        if top == self.top then return end
+        local size = GUI.chatDisplay:GetItemCount()
+        self.top = math.max(math.min(size - 13, top), 0)
+        if oldTop > self.top then
+            GUI.chatDisplay:ShowItem(self.top)
+        else
+            GUI.chatDisplay:ShowItem(self.top+12)
+        end
+        if self.top >= GUI.chatDisplay:GetItemCount() - 14 then
+            GUI.newMessageArrow:Disable()
+        end
+    end
+    GUI.chatPanel.HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            local lines = 1
+            if event.WheelRotation > 0 then
+                lines = -1
+            end
+            self:ScrollLines(nil, lines)
+        end
+    end
+    GUI.chatPanel.IsScrollable = function(self, axis)
+        return true
+    end
+    
+    local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
+    GUI.newMessageArrow = newMessageArrow
+    -- newMessageArrow:SetTexture('/textures/ui/common/FACTIONSELECTOR/aeon/d_up.dds')
+    LayoutHelpers.AtBottomIn(newMessageArrow, GUI.chatDisplay, 5)
+    LayoutHelpers.AtRightIn(newMessageArrow, GUI.chatDisplay, 5)
+    LayoutHelpers.DepthOverParent(newMessageArrow, GUI.chatDisplay, 5)
+    newMessageArrow.Width:Set(25)
+    newMessageArrow.Height:Set(25)
+    GUI.newMessageArrow.OnClick = function(this, modifiers)
+        GUI.chatPanel:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount()-13)
+    end
+    GUI.newMessageArrow:Disable()
+    
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
@@ -2832,8 +2886,8 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:SetDropShadow(true)
     GUI.chatEdit:AcquireFocus()
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, 1, 24, -1)
-
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatPanel, -15, -2, 0)
+    
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
         if charcode == UIUtil.VK_TAB then
@@ -3581,7 +3635,12 @@ function AddChatText(text)
     end
 
     GUI.chatDisplay:AppendLine(text)
-    GUI.chatDisplay:ScrollToBottom()
+    
+    if GUI.chatPanel.top >= GUI.chatDisplay:GetItemCount()-14 then
+        GUI.chatPanel:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount()-13)
+    else
+        GUI.newMessageArrow:Enable()
+    end
 end
 
 --- Update a slot display in a single map control.
