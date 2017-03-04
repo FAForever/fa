@@ -40,6 +40,7 @@ local textSizes = {
     -- Depends on amount of characters in the key name
     [1] = 18,
     [2] = 14,
+    [3] = 14,
 }
 
 local orderDelegations = {
@@ -95,6 +96,14 @@ local orderDelegations = {
     toggle_intel =          {"toggle_radar", "toggle_sonar", "toggle_omni"},
     toggle_scrying =        {"toggle_scrying"},
     scry_target =           {"scry_target"},
+}
+
+local immutableOrderKeys = {
+    attack_move =
+        {
+            ["key"] = 'RMB',
+            ["colour"] = colours[2],
+        }
 }
 
 function init()
@@ -172,7 +181,9 @@ function getKeyTables()
             }
         end
     end
-
+    
+    orderKeys = table.merged(orderKeys, immutableOrderKeys)
+    
     -- Rename signs
     for id0, metagroup in {idRelations, orderKeys} do
         for id1, group in metagroup do

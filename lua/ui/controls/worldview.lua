@@ -179,15 +179,27 @@ WorldView = Class(moho.UIWorldView, Control) {
         local oldCursor = self.Cursor
         local command_mode, command_data = unpack(import('/lua/ui/game/commandmode.lua').GetCommandMode())
 
-        if not command_mode then -- no current command command_mode
+        if not command_mode then
+            local units = GetSelectedUnits()
+            local order = self:GetRightMouseButtonOrder()
             if self:HasHighlightCommand() then
                 if self:ShowConvertToPatrolCursor() then
                     self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
                 else
                     self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
                 end
+            elseif (not order or order == 'RULEUCC_Move') and IsKeyDown(18) and units and table.getn(units) > 0 then
+                local availableOrders,_,_ = GetUnitCommandData(units)
+                for _, availOrder in availableOrders do
+                    if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
+                        or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0
+                        or table.getn(EntityCategoryFilterDown(categories.FACTORY, units)) > 0 then
+
+                        self.Cursor = {UIUtil.GetCursor('ATTACK_MOVE')}
+                        break
+                    end
+                end
             else
-                local order = self:GetRightMouseButtonOrder()
                 -- Don't show the move cursor as a right mouse button hightlight state
                 if order and order ~= 'RULEUCC_Move' then
                     self.Cursor = {UIUtil.GetCursor(order)}

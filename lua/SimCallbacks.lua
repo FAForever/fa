@@ -231,3 +231,10 @@ function IsInvalidAssist(unit, target)
         return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
+
+Callbacks.AttackMove = function(data, units)
+    if data.Clear then
+        IssueClearCommands(units)
+    end
+    IssueAggressiveMove(units, data.Target)
+end
