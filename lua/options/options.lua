@@ -260,7 +260,7 @@ options = {
                 title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
                 key = 'assist_mex',
                 type = 'toggle',
-                default = false,
+                default = true,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = false},
