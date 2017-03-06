@@ -4193,7 +4193,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         end
 
         -- The key, LastScenario, is referred to from GPG code we don't hook.
-        self.desiredScenario = self.desiredScenario or Prefs.GetFromCurrentProfile("LastScenario")
+        local scenarioInfo = MapUtil.LoadScenario(Prefs.GetFromCurrentProfile("LastScenario"))
+        if scenarioInfo and scenarioInfo.type == UIUtil.requiredType then
+            self.desiredScenario = Prefs.GetFromCurrentProfile("LastScenario")
+        else
+            self.desiredScenario = UIUtil.defaultScenario
+        end
         if self.desiredScenario and self.desiredScenario ~= "" then
             SetGameOption('ScenarioFile', self.desiredScenario, true)
         end
