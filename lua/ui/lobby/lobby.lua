@@ -3904,6 +3904,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..LOCF("<LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
         elseif data.Type == 'CPUBenchmark' then
             -- CPU benchmark code
+            local newInfo = false
+            if data.PlayerName and CPU_Benchmarks[data.PlayerName] ~= data.Result then
+                newInfo = true
+            end
+            
             local benchmarks = {}
             if data.PlayerName then
                 benchmarks[data.PlayerName] = data.Result
@@ -3920,6 +3925,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 else
                     refreshObserverList()
                 end
+            end
+            
+            -- Host broadcasts new CPU benchmark information to give the info to clients that are not directly connected to data.PlayerName yet.
+            if lobbyComm:IsHost() and newInfo then
+                lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
             end
         elseif data.Type == 'SetPlayerNotReady' then
             EnableSlot(data.Slot)
