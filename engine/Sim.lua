@@ -1,868 +1,975 @@
 ---Module: Sim
 -- @module Sim
 
----
---  AddBuildRestriction(army,category) - Add a category to the restricted list
+--- Restrict the army from building the unit category.
+-- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- @param army Army's index.
+-- @param category Unit category.
 function AddBuildRestriction(army, category)
 end
 
----
---  army
-function ArmyGetHandicap()
+--- TODO.
+-- @param army Army's index.
+function ArmyGetHandicap(army)
 end
 
----
---  army
-function ArmyInitializePrebuiltUnits()
+--- TODO.
+-- @param army Army's index.
+function ArmyInitializePrebuiltUnits(army)
 end
 
----
---  ArmyIsCivilian(army)
+--- Return true if the indicated army is civilian.
+-- @param army Army's index.
 function ArmyIsCivilian(army)
 end
 
----
---  ArmyIsOutOfGame(army) -- return true iff the indicated army has been defeated.
+--- Return true if the indicated army has been defeated.
+-- @param army Army's index.
 function ArmyIsOutOfGame(army)
 end
 
----
---  AttachBeamEntityToEntity(self, bone, other, bone, army, blueprint)
-function AttachBeamEntityToEntity(self,  bone,  other,  bone,  army,  blueprint)
+--- TODO.
+function AttachBeamEntityToEntity(self, bone, other, bone, army, blueprint)
 end
 
----
---  AttachBeamToEntity(emitter, entity, tobone, army )
-function AttachBeamToEntity(emitter,  entity,  tobone,  army)
+--- TODO.
+-- @param army Army's index.
+function AttachBeamToEntity(emitter, entity, tobone, army)
 end
 
----
---  AudioSetLanguage(name)
-function AudioSetLanguage(name)
+--- Sets language for playing voices.
+-- Available languages are in '/gamedata/loc'.
+-- Game currently defaults on 'us' language if the localized voices don't exists.
+-- @param language String of the language shortcut, example: 'us'.
+function AudioSetLanguage(language)
 end
 
----
---  ChangeUnitArmy(unit,armyIndex) Change a unit's army
-function ChangeUnitArmy(unit, armyIndex)
+--- Change a unit's army, return the new unit.
+-- @param unit Unit to be given.
+-- @param army Army's index to recieve the unit.
+function ChangeUnitArmy(unit, army)
 end
 
----
---  Return true iff cheats are enabledLogs the cheat attempt no matter what.
+--- Return true if cheats are enabled.
+-- Logs the cheat attempt no matter what.
 function CheatsEnabled()
 end
 
----
---  CoordinateAttacks
+--- TODO.
 function CoordinateAttacks()
 end
 
----
---  CreateAimController(weapon, label, turretBone, [barrelBone], [muzzleBone])
-function CreateAimController(weapon,  label,  turretBone,  [barrelBone],  [muzzleBone])
+--- TODO.
+function CreateAimController(weapon, label, turretBone, [barrelBone], [muzzleBone])
 end
 
----
---  CreateAnimator(unit) -- create a manipulator for playing animations
+--- Create a manipulator for playing animations.
 function CreateAnimator(unit)
 end
 
----
---  CreateAttachedBeam(entity, bone, army, length, thickness, texture_filename)
-function CreateAttachedBeam(entity,  bone,  army,  length,  thickness,  texture_filename)
+--- TODO.
+function CreateAttachedBeam(entity, bone, army, length, thickness, texture_filename)
 end
 
----
---  CreateAttachedEmitter(entity, bone, army, emitter_blueprint)
-function CreateAttachedEmitter(entity,  bone,  army,  emitter_blueprint)
+--- TODO.
+function CreateAttachedEmitter(entity, bone, army, emitter_blueprint)
 end
 
----
---  emitter = CreateBeamEmitter(blueprint,army)
+--- TODO.
 function CreateBeamEmitter(blueprint, army)
 end
 
----
---  emitter = CreateBeamEmitterOnEntity(entity, tobone, army, blueprint )
-function CreateBeamEmitterOnEntity(entity,  tobone,  army,  blueprint)
+--- TODO.
+function CreateBeamEmitterOnEntity(entity, tobone, army, blueprint)
 end
 
----
---  CreateBeamEntityToEntity(entity, bone, other, bone, army, blueprint)
-function CreateBeamEntityToEntity(entity,  bone,  other,  bone,  army,  blueprint)
+--- TODO.
+function CreateBeamEntityToEntity(entity, bone, other, bone, army, blueprint)
 end
 
----
---  CreateBeamToEntityBone(entity, bone, other, bone, army, thickness, texture_filename)
-function CreateBeamToEntityBone(entity,  bone,  other,  bone,  army,  thickness,  texture_filename)
+--- TODO.
+function CreateBeamToEntityBone(entity, bone, other, bone, army, thickness, texture_filename)
 end
 
----
---  CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
-function CreateBuilderArmController(unit, turretBone,  [barrelBone],  [aimBone])
+--- TODO.
+function CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
 end
 
----
---  CreateCollisionDetector(unit) -- create a collision detection manipulator
+--- Create a collision detection manipulator
+-- TODO.
 function CreateCollisionDetector(unit)
 end
 
----
---  handle = CreateDecal(position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army, fidelity)
-function CreateDecal(position,  heading,  textureName1,  textureName2,  type,  sizeX,  sizeZ,  lodParam,  duration,  army,  fidelity)
+--- Creates a decal with supplied parametrs.
+-- This decal is visible to all armies.
+-- @param position Table with position {x, y, z}.
+-- @param heading Table with orientation {x, y, z}.
+-- @param textureName1 TODO.
+-- @param textureName2 TODO.
+-- @param type TODO.
+-- @param sizeX Size on x axis in game units.
+-- @param sizeZ Size on y axisin game units.
+-- @param lodParam Distance in game units before the decals disappear.
+-- @param duration Life time of the decal in seconds, 0 for infinite.
+-- @param army Owner's army's index.
+-- @param fidelity TODO.
+-- @return The created decal.
+function CreateDecal(position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army, fidelity)
 end
 
----
---  event = CreateEconomyEvent(unit, energy, mass, timeInSeconds)
-function CreateEconomyEvent(unit,  energy,  mass,  timeInSeconds)
+--- TODO.
+-- INFO: event = CreateEconomyEvent(unit, energy, mass, timeInSeconds).
+function CreateEconomyEvent(unit, energy, mass, timeInSeconds)
 end
 
----
---  CreateEmitterAtBone(entity, bone, army, emitter_blueprint)
-function CreateEmitterAtBone(entity,  bone,  army,  emitter_blueprint)
+--- TODO.
+function CreateEmitterAtBone(entity, bone, army, emitter_blueprint)
 end
 
----
---  CreateEmitterAtEntity(entity,army,emitter_bp_name)
+--- TODO.
 function CreateEmitterAtEntity(entity, army, emitter_bp_name)
 end
 
----
---  CreateEmitterOnEntity(entity,army,emitter_bp_name)
+--- TODO.
 function CreateEmitterOnEntity(entity, army, emitter_bp_name)
 end
 
----
---  CreateFootPlantController(unit, footBone, kneeBone, hipBone, [straightLegs], [maxFootFall])
-function CreateFootPlantController(unit,  footBone,  kneeBone,  hipBone,  [straightLegs],  [maxFootFall])
+--- TODO.
+function CreateFootPlantController(unit, footBone, kneeBone, hipBone, [straightLegs], [maxFootFall])
 end
 
----
---  CreateInitialArmyUnit(armyName, initialUnitName
-function CreateInitialArmyUnit()
+--- Spawns initial unit for the given army.
+-- @param armyName String, army's name.
+-- @param initialUnitName String, unit blueprint name, example: 'uel0001'.
+-- @return The created unit.
+function CreateInitialArmyUnit(armyName, initialUnitName)
 end
 
----
---  CreateLightParticle(entity, bone, army, size, lifetime, textureName, rampName)
-function CreateLightParticle(entity,  bone,  army,  size,  lifetime,  textureName,  rampName)
+--- TODO.
+function CreateLightParticle(entity, bone, army, size, lifetime, textureName, rampName)
 end
 
----
---  CreateLightParticle(entity, bone, army, size, lifetime, textureName, rampName)
-function CreateLightParticleIntel()
+--- TODO.
+function CreateLightParticleIntel(entity, bone, army, size, lifetime, textureName, rampName)
 end
 
----
---  CreateProp(location,prop_blueprint_id)
+--- Spawns a prop.
+-- Orientation is set by the prop's model.
+-- For more control over the orientation use CreatePropHPR.
+-- @param location Table with position {x, y, z}.
+-- @param prop_blueprint_id Blueprint ID of the prop to spawn, example: 'CrysCrystal01_prop'.
+-- @return The spawned prop.
 function CreateProp(location, prop_blueprint_id)
 end
 
----
---  blueprint, x, y, z, heading, pitch, roll
-function CreatePropHPR()
+--- Spawns a prop.
+-- Additional control to set orientation of the prop.
+-- @param blueprint Full path to the prop's blueprint.
+-- @param x Position on x axis.
+-- @param y Position on y axis.
+-- @param z Position on z axis.
+-- @param heading TODO.
+-- @param pitch TODO.
+-- @param roll TODO.
+-- @return The spawned prop.
+function CreatePropHPR(blueprint, x, y, z, heading, pitch, roll)
 end
 
----
---  type, x, y, z, size
-function CreateResourceDeposit()
+--- Spawn Mass and Hydro points on the map.
+-- @param type Type of the resource to create, either 'Mass' or 'Hydrocarbon'.
+-- @param x Position on x axis.
+-- @param y Position on y axis.
+-- @param z Position on z axis.
+-- @param size Size in game units, 1 for Mass, 3 for Hydro.
+function CreateResourceDeposit(type, x, y, z, size)
 end
 
----
---  manip = CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
-function CreateRotator(unit,  bone,  axis,  [goal],  [speed],  [accel],  [goalspeed])
+--- TODO.
+-- INFO: manip = CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed]).
+function CreateRotator()
 end
 
----
---  manip = CreateSlaver(unit, dest_bone, src_bone)Create a manipulator which copies the motion of src_bone onto dst_bone.Priority matters! Only manipulators which come before the slave manipulator will be copied.
-function CreateSlaver(unit,  dest_bone,  src_bone)
+--- Create a manipulator which copies the motion of src_bone onto dst_bone.
+-- Priority matters! Only manipulators which come before the slave manipulator will be copied.
+-- INFO: manip = CreateSlaver(unit, dest_bone, src_bone)
+-- TODO.
+function CreateSlaver(unit, dest_bone, src_bone)
 end
 
----
---  CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed, [world_space]]])
-function CreateSlider(unit,  bone,  [goal_x,  goal_y,  goal_z,  [speed,  [world_space]]])
+--- TODO.
+-- CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed, [world_space]]]).
+function CreateSlider()
 end
 
----
---  CreateSplat(position, heading, textureName, sizeX, sizeZ, lodParam, duration, army, fidelity)
-function CreateSplat(position,  heading,  textureName,  sizeX,  sizeZ,  lodParam,  duration,  army,  fidelity)
+--- TODO.
+function CreateSplat(position, heading, textureName, sizeX, sizeZ, lodParam, duration, army, fidelity)
 end
 
----
---  CreateSplatOnBone(boneName, offset, textureName, sizeX, sizeZ, lodParam, duration, army)Add a splat to the game at an entity bone position and heading.
-function CreateSplatOnBone(boneName,  offset,  textureName,  sizeX,  sizeZ,  lodParam,  duration,  army)
+--- Add a splat to the game at an entity bone position and heading.
+-- TODO.
+function CreateSplatOnBone(boneName, offset, textureName, sizeX, sizeZ, lodParam, duration, army)
 end
 
----
---  CreateStorageManip(unit, bone, resouceName, minX, minY, minZ, maxX, maxY, maxZ)
-function CreateStorageManip(unit,  bone,  resouceName,  minX,  minY,  minZ,  maxX,  maxY,  maxZ)
+--- TODO.
+function CreateStorageManip(unit, bone, resouceName, minX, minY, minZ, maxX, maxY, maxZ)
 end
 
----
---  CreateThrustController(unit, label, thrustBone)
-function CreateThrustController(unit,  label,  thrustBone)
+--- TODO.
+function CreateThrustController(unit, label, thrustBone)
 end
 
----
---  CreateTrail(entity, bone, army, trail_blueprint)
-function CreateTrail(entity,  bone,  army,  trail_blueprint)
+--- TODO.
+function CreateTrail(entity, bone, army, trail_blueprint)
 end
 
----
---  blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer]
-function CreateUnit()
+--- TODO.
+function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
 end
 
----
---  blueprint, army, layer, x, z, heading
-function CreateUnit2()
+--- TODO.
+function CreateUnit2(blueprint, army, layer, x, z, heading)
 end
 
----
---  blueprint, army, x, y, z, pitch, yaw, roll
-function CreateUnitHPR()
+--- TODO.
+function CreateUnitHPR(blueprint, army, x, y, z, pitch, yaw, roll)
 end
 
----
---  Damage(instigator, target, amount, damageType)
-function Damage(instigator,  target,  amount,  damageType)
+--- TODO.
+function Damage(instigator, target, amount, damageType)
 end
 
----
---  DamageArea(instigator,location,radius,amount,damageType,damageFriendly,[damageSelf])
+--- TODO.
 function DamageArea(instigator, location, radius, amount, damageType, damageFriendly, [damageSelf])
 end
 
----
---  DamageRing(instigator,location,minRadius,maxRadius,amount,damageType,damageFriendly,[damageSelf])
+--- TODO.
 function DamageRing(instigator, location, minRadius, maxRadius, amount, damageType, damageFriendly, [damageSelf])
 end
 
----
---  Get DEBUG info for UI selection
+--- Get DEBUG info for UI selection.
+-- TODO.
 function DebugGetSelection()
 end
 
----
---  Draw a 3d circle at a with size s and color c
+--- Draw a 3d circle at a with size s and color c.
+-- TODO.
 function DrawCircle()
 end
 
----
---  Draw a 3d line from a to b with color c
+--- Draw a 3d line from a to b with color c.
+-- TODO.
 function DrawLine()
 end
 
----
---  Draw a 3d line from a to b with color c with a circle at the end of the target line
+--- Draw a 3d line from a to b with color c with a circle at the endof the target line.
+-- TODO.
 function DrawLinePop()
 end
 
----
---  bool = EconomyEventIsDone(event)
+--- TODO.
+-- bool = EconomyEventIsDone(event).
 function EconomyEventIsDone(event)
 end
 
----
---  Signal the end of the game.:Acts like a permanent pause.
+--- Signal the end of the game.
+-- Acts like a permanent pause.
 function EndGame()
 end
 
----
---  See if a unit category contains this unit
-function EntityCategoryContains()
+--- Returns true if a unit category contains this unit.
+-- @param category Unit category.
+-- @unit Unit fo check for category.
+function EntityCategoryContains(category, unit)
 end
 
----
---  Count how many units fit the specified category
-function EntityCategoryCount()
+--- Count how many units fit the specified category.
+-- @param category Unit category.
+-- @tblUnits Table containing units, same as group of units.
+-- @return Number.
+function EntityCategoryCount(category, tblUnits)
 end
 
----
---  Count how many units fit the specified category around a position
+--- Count how many units fit the specified category around a position.
+-- TODO Ideas: (cytegory, position).
+-- @return Number.
 function EntityCategoryCountAroundPosition()
 end
 
----
---  Filter a list of units to only those found in the category
-function EntityCategoryFilterDown()
+--- Filter a list of units to only those found in the category.
+-- @param category Unit category.
+-- @tblUnits Table containing units, same as group of units.
+-- @return Filtered list of units.
+function EntityCategoryFilterDown(category, tblUnits)
 end
 
----
---  FlattenRect(x, z, sizex, sizez, elevation)
-function FlattenMapRect()
+--- Changes elevation of the map in the desired area.
+-- Used mainly for spawning buildings, so they don't float in air.
+-- @param x Starting point on x axis in game units.
+-- @param z Starting point on z axis in game units.
+-- @param sizex Size on x axis in game units.
+-- @param sizez Size on z axis in game units.
+-- @param elevation Target elevation in game units.
+function FlattenMapRect(x, z, sizex, sizez, elevation)
 end
 
----
---  FlushIntelInRect( minX, minZ, maxX, maxZ )
-function FlushIntelInRect(minX,  minZ,  maxX,  maxZ)
+--- Deletes sscouted icons from the target area.
+-- If the area is in a radar range, it will switch back to default unscouted icons.
+function FlushIntelInRect(minX, minZ, maxX, maxZ)
 end
 
----
---  army
-function GenerateArmyStart()
+--- TODO.
+function GenerateArmyStart(strArmy)
 end
 
----
---  rotation = GenerateRandomOrientation()
+--- TODO.
+-- INFO: rotation = GenerateRandomOrientation()
 function GenerateRandomOrientation()
 end
 
----
---  army
-function GetArmyBrain()
+--- Returns an army brain given the brain's name.
+function GetArmyBrain(strArmy)
 end
 
----
---  army
-function GetArmyUnitCap()
+--- Returns current army's unit capacity.
+function GetArmyUnitCap(strArmy)
 end
 
----
---  army
-function GetArmyUnitCostTotal()
+--- TODO.
+function GetArmyUnitCostTotal(strArmy)
 end
 
----
---  blueprint = GetBlueprint(entity)
+--- Returns entity's blueprint.
+-- Can be used as local bp = entity:GetBlueprint().
 function GetBlueprint(entity)
 end
 
----
---  Return the (1 based) index of the current command source.
+--- Return the (1 based) index of the current command source.
+-- TODO.
 function GetCurrentCommandSource()
 end
 
----
---  Return the enitities inside the given rectangle
-function GetEntitiesInRect()
+--- Return the enitities inside the given rectangle.
+-- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+function GetEntitiesInRect(rectangle)
 end
 
----
---  Get entity by entity id
-function GetEntityById()
+--- Get entity by entity id.
+-- This ID is unique for each entity.
+function GetEntityById(id)
 end
 
----
---  GetFocusArmy()
+--- Returns the index of local army.
 function GetFocusArmy()
 end
 
----
---  Get the current game time in ticks. The game time is the simulation time, that stops when the game is paused.
+--- Get the current game time in ticks.
+-- The game time is the simulation time, that stops when the game is paused.
 function GetGameTick()
 end
 
----
---  Get the current game time in seconds. The game time is the simulation time, that stops when the game is paused.
+--- Get the current game time in seconds.
+-- The game time is the simulation time, that stops when the game is paused.
 function GetGameTimeSeconds()
 end
 
----
---  sizeX, sizeZ = GetMapSize()
+--- Returns map size.
+-- @return sizeX, sizeZ.
 function GetMapSize()
 end
-
----
---  Return the reclamable things inside the given rectangle
-function GetReclaimablesInRect()
+     
+--- Return the reclamable things inside the given rectangle.
+-- That includes props, units, wreckages.
+-- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+function GetReclaimablesInRect(rectangle)
 end
 
----
---  type = GetSurfaceHeight(x,z)
-function GetSurfaceHeight(x, z)
+--- Returns surface elevation at given position.
+-- Takes water into count.
+-- @param x Position on x axis.
+-- @param z Position on x axis.
+function GetSurfaceHeight(x z)
 end
 
----
---  float GetSystemTimeSecondsOnlyForProfileUse() - returns System time in seconds
+--- Returns System time in seconds.
+-- INFO: float GetSystemTimeSecondsOnlyForProfileUse().
+-- TODO.
 function GetSystemTimeSecondsOnlyForProfileUse()
 end
 
----
---  type = GetTerrainHeight(x,z)
-function GetTerrainHeight(x, z)
+--- Returns elevation at given position.
+-- Ignores water surface.
+-- @param x Position on x axis.
+-- @param z Position on x axis.
+function GetTerrainHeight(x z)
 end
 
----
---  type = GetTerrainType(x,z)
-function GetTerrainType(x, z)
+--- Returns terrain type at given position.
+-- INFO: type = GetTerrainType(x,z).
+-- @param x Position on x axis.
+-- @param z Position on z axis.
+function GetTerrainType(x z)
 end
 
----
---  type = GetTerrainTypeOffset(x,z)
-function GetTerrainTypeOffset(x, z)
+--- TODO.
+-- INFO: type = GetTerrainTypeOffset(x,z).
+function GetTerrainTypeOffset(x z)
 end
 
----
---  blueprint = GetUnitBlueprintByName(bpName)
+--- Returns unit's blueprint given the blueprint's name.
+-- Example: 'ueb0101'.
+-- @param bpName Unit's blueprint name.
 function GetUnitBlueprintByName(bpName)
 end
 
----
---  Get entity by entity id
-function GetUnitById()
+--- Returns unit by unique entity id.
+-- This ID is unique for each entity.
+function GetUnitById(id)
 end
 
----
---  Return the units inside the given rectangle
-function GetUnitsInRect()
+--- Return a table with units inside the given rectangle.
+-- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+function GetUnitsInRect(rectangle)
 end
 
----
---  HasLocalizedVO(language)
+--- Returns true if the language for playing voices exists.
+-- Available languages are in '/gamedata/loc'.
+-- Game currently defaults on 'us' language if the localized voices don't exists.
+-- @param language String of the language shortcut, example: 'us'.
 function HasLocalizedVO(language)
 end
 
----
---  army
-function InitializeArmyAI()
+--- Starts the AI on given army.
+function InitializeArmyAI(strArmy)
 end
 
----
---  IsAlly(army1,army2)
+--- Returns true if army2 is allied with army1.
+-- @param army1 Army's index.
+-- @param army2 Army's index.
 function IsAlly(army1, army2)
 end
 
----
---  Blip = IsBlip(entity)
+--- TODO.
+-- INFO: Blip = IsBlip(entity).
 function IsBlip(entity)
 end
 
----
---  CollisionBeam = IsCollisionBeam(entity)
+--- TODO.
+-- INFO: CollisionBeam = IsCollisionBeam(entity).
 function IsCollisionBeam(entity)
 end
 
----
---  IsCommandDone
-function IsCommandDone()
+--- Returns true if given command is finished.
+-- @param cmd Unit's command crated for example by IssueMove().
+function IsCommandDone(cmd)
 end
 
----
---  IsEnemy(army1,army2)
+--- Returns true if army2 is enemy to army1.
+-- @param army1 Army's index.
+-- @param army2 Army's index.
 function IsEnemy(army1, army2)
 end
 
----
---  bool = IsEntity(object)
+--- Returns true if the given object is a Entity.
 function IsEntity(object)
 end
 
----
---  Return true if the game is over (i.e. EndGame() has been called).
+--- Return true if the game is over.
+-- i.e. EndGame() has been called.
 function IsGameOver()
 end
 
----
---  IsNeutral(army1,army2)
+--- Returns true if army2 is neutral to army1.
+-- @param army1 Army's index.
+-- @param army2 Army's index.
 function IsNeutral(army1, army2)
 end
 
----
---  Projectile = IsProjectile(entity)
+--- Returns true if the target entity is a projectile.
 function IsProjectile(entity)
 end
 
----
---  Prop = IsProp(entity)
+--- Returns true if the target entity is a prop.
 function IsProp(entity)
 end
 
----
---  Unit = IsUnit(entity)
+--- Returns true if the target entity is a unit.
 function IsUnit(entity)
 end
 
----
---  IssueAggressiveMove
-function IssueAggressiveMove()
+--- Orders group of units to attack move to target position.
+-- @param tblUnits Table containing units, same as group of units.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueAggressiveMove(tblUnits, position)
 end
 
----
---  IssueAttack
-function IssueAttack()
+--- Orders group of units to attack the target unit.
+-- @param tblUnits Table containing units, same as group of units.
+-- @param target Unit to attack.
+-- @return Returns the issued command.
+function IssueAttack(tblUnits, target)
 end
 
----
---  IssueBuildFactory
-function IssueBuildFactory()
+--- Orders a group of factories to build units.
+-- Works on mobile factories like Fatboy as well.
+-- @param tblUnits Table containing factories.
+-- @param blueprintID ID of the unit to build, example: 'uel0103'.
+-- @param count How many units to build.
+-- @return Returns the issued command.
+function IssueBuildFactory(tblUnits, blueprintID, count)
 end
 
----
---  IssueBuildMobile
-function IssueBuildMobile()
+--- Orders a group of engineers to build a unit at target position.
+-- Example: IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {}).
+-- @param tblUnits Table containing engineers.
+-- @param position Table with position {x, y, z}.
+-- @param blueprintID ID of the unit to build, example: 'ueb0103'.
+-- @param table Unknown TODO.
+-- @return Returns the issued command.
+function IssueBuildMobile(tblUnits, position, blueprintID, table)
 end
 
----
---  IssueCapture
-function IssueCapture()
+--- Orders a group of engineers to capture the target unit.
+-- @param tblUnits Table containing engineers.
+-- @param target Unit to capture.
+-- @return Returns the issued command.
+function IssueCapture(tblUnits, target)
 end
 
----
---  IssueClearCommands
-function IssueClearCommands()
+--- Clears all commands of given units.
+-- That includes build queue as well.
+-- @param tblUnits Table containing units.
+function IssueClearCommands(tblUnits)
 end
 
----
---  IssueClearFactoryCommands
-function IssueClearFactoryCommands()
+--- Clears factory command without affecting current build queue.
+-- Used to change rally point while the factories are building units.
+-- @param tblUnits Table containing factories.
+function IssueClearFactoryCommands(tblUnits)
 end
 
----
---  IssueDestroySelf
-function IssueDestroySelf()
+--- Orders unit to destroy itself.
+-- This doesn't leave wreckage.
+-- @param tblUnits Table containing units.
+function IssueDestroySelf(tblUnits)
 end
 
----
---  IssueDive
-function IssueDive()
+--- Orders a group of unit to dive.
+-- Surfaces the unit if they are already under water.
+-- @param tblUnits Table containing units.
+function IssueDive(tblUnits)
 end
 
----
---  IssueFactoryAssist
-function IssueFactoryAssist()
+--- Orders a group of factories to assisnt a target factory.
+-- @param tblUnits Table containing factories.
+-- @param target Factory to assist.
+-- @return Returns the issued command.
+function IssueFactoryAssist(tblUnits, target)
 end
 
----
---  IssueFactoryRallyPoint
-function IssueFactoryRallyPoint()
+--- Sets a factory rally point.
+-- Doesn't remove the current one, use IssueClearCommands for that.
+-- @param position Table with position {x, y, z}.
+function IssueFactoryRallyPoint(tblUnits, position)
 end
 
----
---  IssueFerry
-function IssueFerry()
+--- TODO.
+function IssueFerry(tblUnits, position)
 end
 
----
---  IssueFormAggressiveMove
-function IssueFormAggressiveMove()
+--- Orders group of units to attack move in formation to target position.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
+-- @param number Unknown TODO.
+-- @return Returns the issued command.
+function IssueFormAggressiveMove(tblUnits, position, formation, number)
 end
 
----
---  IssueFormAttack
-function IssueFormAttack()
+--- Orders group of units to attack the target unit.
+-- Moves to the unit in a formation.
+-- @param tblUnits Table containing units.
+-- @param target Unit to attack.
+-- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
+-- @param number Unknown TODO.
+-- @return Returns the issued command.
+function IssueFormAttack(tblUnits, target, formation, number)
 end
 
----
---  IssueFormMove
-function IssueFormMove()
+--- Oders group of units to move in formation to target position.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
+-- @param number Unknown TODO.
+-- @return Returns the issued command.
+function IssueFormMove(tblUnits, position, formation, number)
 end
 
----
---  IssueFormPatrol
-function IssueFormPatrol()
+--- Oders group of units to patrol in formation on target position.
+-- Call this at least twice for two different positions to have any meaning.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
+-- @param number Unknown TODO.
+-- @return Returns the issued command.
+function IssueFormPatrol(tblUnits, position, formation, number)
 end
 
----
---  IssueGuard
-function IssueGuard()
+--- Orders group of unit to assist the target unit.
+-- @param tblUnits Table containing units.
+-- @param target Unit to assist.
+-- @return Returns the issued command.
+function IssueGuard(tblUnits, target)
 end
 
----
---  IssueKillSelf
-function IssueKillSelf()
+--- Orders group of units to self-destruct.
+-- Thisl leaves wreckages.
+-- @param tblUnits Table containing units.
+function IssueKillSelf(tblUnits)
 end
 
----
---  IssueMove
-function IssueMove()
+--- Oders group of units to move to target position.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueMove(tblUnits, position)
 end
 
----
---  IssueMoveOffFactory
-function IssueMoveOffFactory()
+--- Orders group of units to move off factory.
+-- This is used to move units out of factories when they are finished.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueMoveOffFactory(tblUnits, position)
 end
 
----
---  IssueNuke
-function IssueNuke()
+--- Launches a nuke at target position.
+-- @param tblUnits Table containing Nuke Launchers.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueNuke(tblUnits, position)
 end
 
----
---  IssueOverCharge
-function IssueOverCharge()
+--- Orders unit to fire OverCharge weapon at the target.
+-- @param tblUnits Table containing units.
+-- @param target Unit to OC.
+function IssueOverCharge(tblUnits, target)
 end
 
----
---  IssuePatrol
-function IssuePatrol()
+--- Oders group of units to patrol on target position.
+-- Call this at least twice for two different positions to have any meaning.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssuePatrol(tblUnits, position)
 end
 
----
---  IssuePause
-function IssuePause()
+--- Pauses the unit.
+-- @param unit Unit to pause.
+function IssuePause(unit)
 end
 
----
---  IssueReclaim
-function IssueReclaim()
+--- Orders group of units to reclaim the target entity.
+-- @param tblUnits Table containing units.
+-- @param target Unit or prop to reclaim.
+-- @return Returns the issued command.
+function IssueReclaim(tblUnits, target)
 end
 
----
---  IssueRepair
-function IssueRepair()
+--- Orders group of units to repair the target unit.
+-- @param tblUnits Table containing units.
+-- @param target Unit to repair.
+-- @return Returns the issued command.
+function IssueRepair(tblUnits, target)
 end
 
----
---  IssueSacrifice
-function IssueSacrifice()
+--- Orders group of unit to use Sacrifice on target unit.
+-- @param tblUnits Table containing units that can use sacrifice.
+-- @param target Unit to to sacrifice into.
+-- TODO This is untested.
+-- @return Returns the issued command.
+function IssueSacrifice(tblUnits, target)
 end
 
----
---  IssueScript
-function IssueScript()
+--- Orders group of unit to do scripted task.
+-- Currently used for ACU/sACU upgrading. Valid enhancement names are in the unut's blueprint or here http://wiki.faforever.com/index.php?title=Mission_Scripting#Enhancements .
+-- @param tblUnits Table containing units.
+-- @param oder Working format example: {TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering"}.
+-- @return Returns the issued command.
+function IssueScript(tblUnits, order)
 end
 
----
---  IssueSiloBuildNuke
+--- TODO.
 function IssueSiloBuildNuke()
 end
 
----
---  IssueSiloBuildTactical
+--- TODO.
 function IssueSiloBuildTactical()
 end
 
----
---  IssueStop
-function IssueStop()
+--- Order group of units to stop.
+-- @param tblUnits Table containing units.
+function IssueStop(tblUnits)
 end
 
----
---  IssueTactical
-function IssueTactical()
+--- Orders group of units to fire a tactical missile at target or location.
+-- @param tblUnits Table containing missle launchers.
+-- @param target Unit to fire at or table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueTactical(tblUnits, target)
 end
 
----
---  IssueTeleport
-function IssueTeleport()
+--- Orders group of units to teleport to target position.
+-- @param tblUnits Table containing units.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueTeleport(tblUnits, position)
 end
 
----
---  IssueTeleportToBeacon
+--- TODO.
 function IssueTeleportToBeacon()
 end
 
----
---  IssueTransportLoad
-function IssueTransportLoad()
+--- Orders group of units to load into the transport.
+-- @param tblUnits Table containing units.
+-- @param transport Transport unit to load into.
+-- @return Returns the issued command.
+function IssueTransportLoad(tblUnits, transport)
 end
 
----
---  IssueTransportUnload
-function IssueTransportUnload()
+--- Orders group of transports to drop units at target position.
+-- @param tblUnits Table containing transports.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueTransportUnload(tblUnits, position)
 end
 
----
---  IssueTransportUnloadSpecific
-function IssueTransportUnloadSpecific()
+--- Orders group of transports to drop specific units at target position.
+-- TODO: Working but dropping everything.
+-- @param tblUnits Table containing transports.
+-- @param category TODO: This function doesn't bug out if second param is category but it drops everything.
+-- @param position Table with position {x, y, z}.
+-- @return Returns the issued command.
+function IssueTransportUnloadSpecific(tblUnits, category, position)
 end
 
----
---  IssueUpgrade
-function IssueUpgrade()
+--- Orders group of units to upgrade.
+-- Used for factories, radars, etc.
+-- @param tblUnits Table containing units.
+-- @param blueprintID ID of the blueprint to upgrade to.
+-- @return Returns the issued command.
+function IssueUpgrade(tblUnits, blueprintID)
 end
 
----
---  ScriptTask.LUnitMove(self,target)
+--- TODO.
+-- INFO: ScriptTask.LUnitMove(self, target)
 function LUnitMove(self, target)
 end
 
----
---  ScriptTask.LUnitMoveNear(self,target,range)
+--- TODO.
+-- INFO: ScriptTask.LUnitMoveNear(self,target,range)
 function LUnitMoveNear(self, target, range)
 end
 
----
--- 
+--- TODO.
 function ListArmies()
 end
 
----
---  MetaImpact(instigator,location,fMaxRadius,iAmount,affectsCategory,[damageFriendly])
+--- TODO.
 function MetaImpact(instigator, location, fMaxRadius, iAmount, affectsCategory, [damageFriendly])
 end
 
----
---  NotifyUpgrade(from,to)
+--- TODO.
 function NotifyUpgrade(from, to)
 end
 
----
---  Return true if the current command source is authorized to mess with the given army.:Or if cheats are enabled.
+--- Return true if the current command source is authorized to mess with the given army.
+-- Or if cheats are enabled.
+-- TODO.
 function OkayToMessWithArmy()
 end
 
----
---  parse a string to generate a new entity category
-function ParseEntityCategory()
+--- Parse a string to generate a new entity category.
+-- @param strCategory Example: 'ual0101'.
+-- @return Returns generated category, example: categories.ual0101 .
+function ParseEntityCategory(strCategory)
 end
 
----
---  handle = PlayLoop(self,sndParams)
+--- TODO.
+-- INFO: handle = PlayLoop(self,sndParams)
 function PlayLoop(self, sndParams)
 end
 
----
---  Random([[min,] max])
-function Random([[min, ] max])
+--- TODO.
+-- INFO: Random([[min,] max])
+function Random()
 end
 
----
---  RemoveBuildRestriction(army,category) - Remove a category from the restricted list
+--- Unrestrict the army from building the unit category.
+-- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- @param army Army's index.
+-- @param category Unit category.
 function RemoveBuildRestriction(army, category)
 end
 
----
---  RemoveEconomyEvent(unit, event)
-function RemoveEconomyEvent(unit,  event)
+--- TODO.
+function RemoveEconomyEvent(unit, event)
 end
 
----
---  unit = SelectedUnit() -- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
+--- unit = SelectedUnit() -- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
+-- TODO.
 function SelectedUnit()
 end
 
----
---  SetAlliance(army1,army2,<Neutral|Enemy|Ally>)
-function SetAlliance(army1, army2, <Neutral|Enemy|Ally>)
+--- Set alliances between armies.
+-- @param army1 Army's index.
+-- @param army2 Army's index.
+-- @param alliance Can be 'Neutral', 'Enemy', 'Ally'.
+function SetAlliance(army1, army2, alliance)
 end
 
----
---  SetAllianceOneWay(army1,army2,<Neutral|Enemy|Ally>)
-function SetAllianceOneWay(army1, army2, <Neutral|Enemy|Ally>)
+--- Set alliances from army1 to army2.
+-- @param army1 Army's index.
+-- @param army2 Army's index.
+-- @param alliance Can be 'Neutral', 'Enemy', 'Ally'.
+function SetAllianceOneWay(army1, army2, alliance)
 end
 
----
---  SetAlliedVictory(army,bool)
-function SetAlliedVictory(army, bool)
+--- TODO.
+function SetAlliedVictory()
 end
 
----
---  SetArmyAIPersonality(army,personality)
+--- TODO.
 function SetArmyAIPersonality(army, personality)
 end
 
----
---  SetArmyColor(army,r,g,b)
+--- Set army's color using RGB values.
+-- @param army Army's index.
+-- @param r Number 0-255.
+-- @param g Number 0-255.
+-- @param b Number 0-255.
 function SetArmyColor(army, r, g, b)
 end
 
----
---  SetArmyColorIndex(army,index)
+--- TODO.
 function SetArmyColorIndex(army, index)
 end
 
----
---  army, mass, energy
-function SetArmyEconomy()
+--- TODO.
+function SetArmyEconomy(army, mass, energy)
 end
 
----
---  SetArmyFactionIndex(army,index)
+--- TODO.
 function SetArmyFactionIndex(army, index)
 end
 
----
---  SetArmyOutOfGame(army) -- indicate that the supplied army has been defeated.
+--- Indicate that the supplied army has been defeated.
+-- @param army Army's index.
 function SetArmyOutOfGame(army)
 end
 
----
---  army, plans
-function SetArmyPlans()
+--- TODO.
+function SetArmyPlans(army, plans)
 end
 
----
---  SetArmyColor(army, bool) - determines if the user should be able to see the army score
-function SetArmyShowScore()
+--- Determines if the user should be able to see the army score.
+-- @param army Army's index.
+-- @param bool true/false.
+function SetArmyShowScore(army, bool)
 end
 
----
---  army, x, z
-function SetArmyStart()
+--- Set the arty starting position.
+-- @param army Army's index.
+function SetArmyStart(army, x, z)
 end
 
----
---  Set the army index for which to sync army stats (-1 for none)
+--- Set the army index for which to sync army stats (-1 for none) .
+-- TODO
 function SetArmyStatsSyncArmy()
 end
 
----
---  army, unitCap
-function SetArmyUnitCap()
+--- Sets maximum number of units army can build.
+-- @param army Army's index.
+-- @param unitCap Number, the new unit cap.
+function SetArmyUnitCap(army, unitCap)
 end
 
----
---  army, flag
-function SetIgnoreArmyUnitCap()
+--- Sets army to ignore max unit capacity.
+-- @param army Army's index.
+-- @param flag true/false.
+function SetIgnoreArmyUnitCap(army, flag)
 end
 
----
---  army, flag
-function SetIgnorePlayableRect()
+--- Sets army to ignore playable reclangle.
+-- Units can move outside of restricted area.
+-- Used in campaign for offmap attacks.
+-- @param army Army's index.
+-- @param flag true/false
+function SetIgnorePlayableRect(army, flag)
 end
 
----
---  SetPlayableRect( minX, minZ, maxX, maxZ )
-function SetPlayableRect(minX,  minZ,  maxX,  maxZ)
+--- Set playable rectangle.
+function SetPlayableRect(minX, minZ, maxX, maxZ)
 end
 
----
---  SetTerrainType(x,z,type)
+--- Changes terrain type at given position.
+-- @param x Position on x axis.
+-- @param z Position on z axis.
+-- @param type Terrain type to change to.
 function SetTerrainType(x, z, type)
 end
 
----
---  SetTerrainType(rect,type)
-function SetTerrainTypeRect()
+--- Changes terrain type in given rectangle.
+-- @paran rect Map area created by function Rect(x0, z0, x1, z1).
+-- @param type Terrain type to change to.
+function SetTerrainTypeRect(rect, type)
 end
 
----
--- 
+--- TODO.
 function ShouldCreateInitialArmyUnits()
 end
 
----
---  SimConExecute('command string') -- Perform a console command
-function SimConExecute('command string')
+--- Perform a console command.
+-- SimConExecute('command string').
+function SimConExecute(commandString)
 end
 
----
---  SplitProp(original, blueprint_name) -- split a prop into multiple child props, one per bone; returns all the created props
-function SplitProp(original,  blueprint_name)
+--- Split a prop into multiple child props, one per bone.
+-- @return Returns all the created props.
+-- TODO.
+function SplitProp(original, blueprint_name)
 end
 
----
---  StopLoop(self,handle)
+--- TODO.
 function StopLoop(self, handle)
 end
 
----
---  Request that we submit xml army stats to gpg.net.
+--- Request that we submit xml army stats to gpg.net. 
+-- TODO.
 function SubmitXMLArmyStats()
-end
+end 
 
----
---  TryCopyPose(unitFrom,entityTo,bCopyWorldTransform)
+--- TODO.
 function TryCopyPose(unitFrom, entityTo, bCopyWorldTransform)
 end
 
----
---  Warp( unit, location, [orientation] )
-function Warp(unit,  location,  [orientation])
+--- Instanly moves entity to target location.
+-- @param entity Entity to teleport.
+-- @param location Table with position {x, y, z}.
+-- @param orientation Target orientation, optimal parameter.
+function Warp(entity, location, orientation)
 end
 
----
---  _c_CreateEntity(spec)
+--- TODO.
 function _c_CreateEntity(spec)
 end
 
----
---  _c_CreateShield(spec)
+--- TODO.
 function _c_CreateShield(spec)
 end
 
----
---  Print a log message
+--- Print a log message 
+-- TODO
 function print()
 end
 
