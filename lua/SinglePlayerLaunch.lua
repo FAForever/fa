@@ -244,7 +244,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
 
     sessionInfo = { }
     sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
-    sessionInfo.createReplay = false
+    sessionInfo.createReplay = true
     sessionInfo.scenarioInfo = scenario
     sessionInfo.teamInfo = {}
     sessionInfo.scenarioMods = import('/lua/mods.lua').GetCampaignMods(scenario)
