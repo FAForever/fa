@@ -1,4 +1,4 @@
-# logic and defaults for launching non-skirmish sessions
+-- Logic and defaults for launching non-skirmish sessions
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtils = import('/lua/ui/maputil.lua')
 
@@ -38,7 +38,7 @@ function VerifyScenarioConfiguration(scenarioInfo)
         error("VerifyScenarioConfiguration - scenarios require the standard team configuration")
     end
 
-    if scenarioInfo.Configurations.standard.teams[1].name != 'FFA' then
+    if scenarioInfo.Configurations.standard.teams[1].name ~= 'FFA' then
         error("VerifyScenarioConfiguration - scenarios require all teams be set up as FFA")
     end
     
@@ -49,7 +49,7 @@ end
 
 
 
-# note that the map name must include the full path, it won't try to guess the path based on name
+-- Note that the map name must include the full path, it won't try to guess the path based on name
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
     local factions = import('/lua/factions.lua').Factions
     local faction = inFaction or 1
