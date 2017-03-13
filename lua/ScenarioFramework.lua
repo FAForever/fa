@@ -941,17 +941,7 @@ end
 function FakeGateInUnit(unit, callbackFunction, bonesToHide)
     local bp = unit:GetBlueprint()
 
-    if EntityCategoryContains( categories.COMMAND, unit ) then
-        if bp.CategoriesHash.UEF then
-            faction = 1
-        elseif bp.CategoriesHash.AEON then
-            faction = 2
-        elseif bp.CategoriesHash.CYBRAN then
-            faction = 3
-        elseif bp.CategoriesHash.SERAPHIM then
-            faction = 4
-        end
-
+    if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
         unit:HideBone(0, true)
         unit:SetUnSelectable(true)
         unit:SetBusy(true)
