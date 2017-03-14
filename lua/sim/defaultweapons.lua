@@ -881,8 +881,20 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         return self.unit:GetAIBrain():GetEconomyStored('ENERGY') >= self.EnergyRequired
     end,
 
+    -- Can we use the OC weapon?
     CanOvercharge = function(self)
-        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not self.unit:IsUnitState('Enhancing') and not self.unit:IsUnitState('Building')
+        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not
+            self:UnitOccupied() and not
+            self.unit:IsUnitState('Enhancing') and not
+            self.unit:IsUnitState('Upgrading')
+    end,
+
+    -- Returns true if the unit is doing something that shouldn't allow any weapon fire
+    UnitOccupied = function(self)
+        return (self.unit:IsUnitState('Upgrading') and not self.unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
+            self.unit:IsUnitState('Building') or
+            self.unit:IsUnitState('Repairing') or
+            self.unit:IsUnitState('Reclaiming')
     end,
 
     -- The Overcharge cool-down function
@@ -890,17 +902,17 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
             self:OnDisableWeapon()
-            WaitSeconds(1/self:GetBlueprint().RateOfFire)
+            WaitSeconds(1 / self:GetBlueprint().RateOfFire)
             self.unit:SetOverchargePaused(false)
             if self.AutoMode then
-                self:ForkThread(self.AutoEnable)
+                self.AutoThread = self:ForkThread(self.AutoEnable)
             end
         end
     end,
 
     AutoEnable = function(self)
         while not self:CanOvercharge() do
-             WaitSeconds(0.1)
+            WaitSeconds(0.1)
         end
 
         if self.AutoMode then
@@ -912,15 +924,13 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AutoMode = auto
 
         if self.AutoMode then
-            if not self.AutoThread then
-                self.AutoThread = self:ForkThread(self.AutoEnable)
-            end
+            self.AutoThread = self:ForkThread(self.AutoEnable)
         else
             if self.AutoThread then
                 KillThread(self.AutoThread)
                 self.AutoThread = nil
             end
-            if self:IsEnabled() then
+            if self.enabled then
                 self:OnDisableWeapon()
             end
         end
@@ -971,16 +981,17 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     OnDisableWeapon = function(self)
         if self.unit:BeenDestroyed() then return end
         self:SetWeaponEnabled(false)
-        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, true)
+
+        -- Only allow it to turn on the primary weapon if the unit is ready
+        if not self:UnitOccupied() then
+            self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, true)
+        end
+
         self.unit:BuildManipulatorSetEnabled(false)
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
-
-        if self.AutoMode and not self.AutoEnable then
-            self:ForkThread(self.AutoEnable)
-        end
 
         self.enabled = false
     end,

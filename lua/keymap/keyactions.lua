@@ -256,7 +256,7 @@ keyActions = {
         category = 'orders', order = 31,},
     ['mode'] = {action =  'UI_Lua import("/lua/ui/game/orders.lua").CycleRetaliateStateUp()',  
         category = 'orders', order = 32,}, #cut?
-    ['suicide'] = {action =  'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction()',  
+    ['suicide'] = {action =  'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(false)',
         category = 'orders', order = 29,},
     ['spreadattack'] = {action =  'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
         category = 'orders', order = 33,},
@@ -353,7 +353,8 @@ keyActions = {
     ['Render_Unit_Bars'] = {action = 'ui_RenderUnitBars', category = 'ui', order = 57,},
     ['Render_Icons'] = {action = 'ui_RenderIcons', category = 'ui', order = 58,},
     ['Always_Render_Strategic_Icons'] = {action = 'ui_AlwaysRenderStrategicIcons', category = 'ui', order = 59,},
-    ['Kill_Selected_Units'] = {action = 'KillSelectedUnits', category = 'orders', order = 60,},
+    ['Kill_Selected_Units'] = {action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true)',
+        category = 'orders', order = 60,},
     ['Kill_All'] = {action = 'KillAll', category = 'orders', order = 61,},
     ['Show_Bandwidth_Usage'] = {action = 'ren_ShowBandwidthUsage', category = 'ui', order = 62,},
     ['Execute_Paste_Buffer'] = {action = 'ExecutePasteBuffer', category = 'ui', order = 63,},

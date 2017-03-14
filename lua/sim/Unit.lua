@@ -1239,7 +1239,7 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
-        --Notify instigator of kill
+        -- Notify instigator of kill
         if instigator and IsUnit(instigator) then
             instigator:OnKilledUnit(self)
         end
@@ -1299,7 +1299,7 @@ Unit = Class(moho.unit_methods) {
         if self:IsBeingBuilt() then return end
         local bp = self:GetBlueprint()
         for k, v in bp.Weapon do
-            if(v.Label == 'DeathWeapon') then
+            if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
                     self:GetWeaponByLabel('DeathWeapon'):Fire()
@@ -1504,8 +1504,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
-        explosion.CreateScalableUnitExplosion( self, overKillRatio )
+    CreateDestructionEffects = function(self, overKillRatio)
+        explosion.CreateScalableUnitExplosion(self, overKillRatio)
     end,
 
     DeathWeaponDamageThread = function( self , damageRadius, damage, damageType, damageFriendly)
@@ -1564,7 +1564,7 @@ Unit = Class(moho.unit_methods) {
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
 
-        --Create sinker projectile
+        -- Create sinker projectile
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
@@ -1587,14 +1587,21 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    DeathThread = function( self, overkillRatio, instigator)
+    ShallSink = function(self)
         local layer = self:GetCurrentLayer()
-        local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
             not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
         )
-        WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
+        return shallSink
+    end,
+
+    DeathThread = function(self, overkillRatio, instigator)
+        local isNaval = EntityCategoryContains(categories.NAVAL, self)
+        local shallSink = self:ShallSink()
+
+        WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
+
         self:DestroyAllDamageEffects()
         self:DestroyTopSpeedEffects()
         self:DestroyIdleEffects()
@@ -1794,7 +1801,7 @@ Unit = Class(moho.unit_methods) {
         local wep
         for i = 1, self:GetWeaponCount() do
             wep = self:GetWeapon(i)
-            if (wep:GetBlueprint().Label == label) then
+            if wep:GetBlueprint().Label == label then
                 return wep
             end
         end
@@ -1870,7 +1877,7 @@ Unit = Class(moho.unit_methods) {
     OnStopBeingBuilt = function(self, builder, layer)
         local bp = self:GetBlueprint()
         self:EnableUnitIntel('NotInitialized', nil)
-        self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
+        self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self:GetCurrentLayer() == 'Water' then
             self:StartRocking()
