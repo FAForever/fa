@@ -1,7 +1,7 @@
 local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 
 -- This table stores last acceleration and numbers of bombs left in a cluster bomb run, as well as the original target
--- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>, target = {pos=<target location>, vel=<target velocity>}}
+-- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>, entity=<entity>}
 local bomb_data = {}
 
 CalculateBallisticAcceleration = function(weapon, projectile)
@@ -16,23 +16,25 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- Get projectile position and velocity
     -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
     local proj = {pos=projectile:GetPosition(), vel=VMult(Vector(launcher:GetVelocity()), 10)}
-    local entity = launcher:GetTargetEntity()
+
+    local entity
+    if bomb_data[id] == nil then -- Set entity for the first bomb of a run only, when data is not yet created
+        entity = launcher:GetTargetEntity()
+    else
+        entity = bomb_data[id].entity
+    end
 
     local target
-    if bomb_data[id] == nil then -- Set target for the first bomb of a run only, when data is not yet created
-        if entity and IsUnit(entity) then
-            -- target is a entity
-            target = {pos=entity:GetPosition(), vel=VMult(Vector(entity:GetVelocity()), 10)}
-        else
-            -- target is something else i.e. attack ground
-            target = {pos=weapon:GetCurrentTargetPos(), vel=Vector(0, 0, 0)}
-        end
+    if entity and (IsUnit(entity) or bomb_data[id].entity) then
+        -- target is a entity
+        target = {pos=entity:GetPosition(), vel=VMult(Vector(entity:GetVelocity()), 10)}
     else
-        target = bomb_data[id].Target
+        -- target is something else i.e. attack ground
+        target = {pos=weapon:GetCurrentTargetPos(), vel=Vector(0, 0, 0)}
     end
 
     if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
-        bomb_data[id] = {acc = 4.75, n_left = MuzzleSalvoSize, target = target}
+        bomb_data[id] = {acc = 4.75, n_left = MuzzleSalvoSize, entity = entity}
     end
 
     if not target.pos then -- target no longer alive
