@@ -207,6 +207,20 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
         end
         return projectile
     end,
+
+    -- This function creates the projectile, and happens when the unit is trying to fire
+    -- Called from inside RackSalvoFiringState
+    CreateProjectileAtMuzzle = function(self, muzzle)
+        -- Adapt this function to keep the correct target lock during carpet bombing
+        local BallisticsList = import('/lua/sim/CalcBallisticAcceleration.lua').bomb_data
+        local id = self.unit:GetEntityId()
+        local data = BallisticsList[id]
+        if data and data.usestore then -- We are repeating, and have lost our original target
+            self:SetTargetGround(data.targetpos)
+        end
+
+        DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+    end,
 }
 
 TIFSmallYieldNuclearBombWeapon = Class(DefaultProjectileWeapon) {
