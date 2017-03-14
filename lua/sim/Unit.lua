@@ -1453,6 +1453,9 @@ Unit = Class(moho.unit_methods) {
         energy = energy * overkillMultiplier * self:GetFractionComplete()
         time = time * overkillMultiplier
 
+        -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
+        local time  = time * 2
+
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time)
 
         -- Attempt to copy our animation pose to the prop. Only works if
