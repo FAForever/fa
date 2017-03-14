@@ -1,8 +1,8 @@
 local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 
--- This table stores last acceleration and numbers of bombs left in a cluster bomb run
--- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>}
-local bomb_data = {}
+-- This table stores last acceleration and numbers of bombs left in a cluster bomb run, as well as the original target
+-- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>, targetpos=<original_targetpos>}
+bomb_data = {}
 
 CalculateBallisticAcceleration = function(weapon, projectile)
     local bp = weapon:GetBlueprint()
@@ -13,16 +13,12 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     if not launcher then return acc end
     local id = launcher:GetEntityId()
 
-    if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
-        bomb_data[id] = {acc=4.75, n_left=MuzzleSalvoSize}
-    end
-
     -- Get projectile position and velocity
     -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
     local proj = {pos=projectile:GetPosition(), vel=VMult(Vector(launcher:GetVelocity()), 10)}
     local entity = launcher:GetTargetEntity()
-    local target
 
+    local target
     if entity and IsUnit(entity) then
         -- target is a entity
         target = {pos=entity:GetPosition(), vel=VMult(Vector(entity:GetVelocity()), 10)}
@@ -31,16 +27,24 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         target = {pos=weapon:GetCurrentTargetPos(), vel=Vector(0, 0, 0)}
     end
 
-    if not target.pos then -- target no longer alive
-        if bomb_data[id] then
+    if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
+        bomb_data[id] = {acc = 4.75, n_left = MuzzleSalvoSize, targetpos = target.pos}
+    end
+
+    local mydata = bomb_data[id]
+    
+    if not target.pos or mydata.usestore then
+        if mydata then
             -- use same acceleration as last bomb
-            acc = bomb_data[id].acc
-            bomb_data[id].n_left = bomb_data[id].n_left - 1
-            if bomb_data[id].n_left < 1 then
+            acc = mydata.acc
+            mydata.n_left = mydata.n_left - 1
+            mydata.usestore = true -- Signal that we've lost our target to lock in these settings
+
+            if mydata.n_left < 1 then
                 bomb_data[id] = nil
             end
         end
-
+        
         return acc
     end
 
