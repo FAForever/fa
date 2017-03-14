@@ -417,13 +417,13 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         BlastAttack = {
-            AdditionalDamage = 400,
-            BuildCostEnergy = 300000,
-            BuildCostMass = 3500,
+            AdditionalDamage = 750,
+            BuildCostEnergy = 270000,
+            BuildCostMass = 4800,
             BuildTime = 4200,
             Icon = 'cba',
             Name = '<LOC enhancements_0129>Refracting Chronotron Amplifier',
-            NewDamageRadius = 2,
+            NewDamageRadius = 2.7,
             ShowBones = {
                 'Left_Upgrade',
             },
