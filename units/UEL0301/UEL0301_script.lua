@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
@@ -79,6 +80,38 @@ UEL0301 = Class(CommandUnit) {
         else
             self:CreateEnhancement('PodRemove')
         end
+    end,
+
+    PlayCommanderWarpInEffect = function(self)
+        self:HideBone(0, true)
+        self:SetUnSelectable(true)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:ForkThread(self.WarpInEffectThread)
+    end,
+
+    WarpInEffectThread = function(self)
+        self:PlayUnitSound('CommanderArrival')
+        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(2.1)
+        self:SetMesh('/units/uel0301/UEL0301_PersonalShield_mesh', true)
+        self:ShowBone(0, true)
+        self:SetUnSelectable(false)
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:HideBone('Jetpack', true)
+        self:HideBone('SAM', true)
+        
+        local totalBones = self:GetBoneCount() - 1
+        local army = self:GetArmy()
+        for k, v in EffectTemplate.UnitTeleportSteam01 do
+            for bone = 1, totalBones do
+                CreateAttachedEmitter(self,bone,army, v)
+            end
+        end
+
+        WaitSeconds(6)
+        self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,
 
     CreateEnhancement = function(self, enh)

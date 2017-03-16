@@ -10,6 +10,7 @@
 local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
 local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
@@ -72,6 +73,41 @@ URL0301 = Class(CCommandUnit) {
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
+    end,
+
+    PlayCommanderWarpInEffect = function(self)
+        self:HideBone(0, true)
+        self:SetUnSelectable(true)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:ForkThread(self.WarpInEffectThread)
+    end,
+
+    WarpInEffectThread = function(self)
+        self:PlayUnitSound('CommanderArrival')
+        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(2.1)
+        self:SetMesh('/units/url0301/URL0301_PhaseShield_mesh', true)
+        self:ShowBone(0, true)
+        self:SetUnSelectable(false)
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:HideBone('AA_Gun', true)
+        self:HideBone('Power_Pack', true)
+        self:HideBone('Rez_Protocol', true)
+        self:HideBone('Torpedo', true)
+        self:HideBone('Turbine', true)
+        
+        local totalBones = self:GetBoneCount() - 1
+        local army = self:GetArmy()
+        for k, v in EffectTemplate.UnitTeleportSteam01 do
+            for bone = 1, totalBones do
+                CreateAttachedEmitter(self,bone,army, v)
+            end
+        end
+
+        WaitSeconds(6)
+        self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,
 
     -- ************

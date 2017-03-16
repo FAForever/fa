@@ -18,6 +18,7 @@ local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 XSL0301 = Class(CommandUnit) {
     Weapons = {
@@ -51,35 +52,43 @@ XSL0301 = Class(CommandUnit) {
         EffectUtil.CreateSeraphimUnitEngineerBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,
 
+    PlayCommanderWarpInEffect = function(self)
+        self:HideBone(0, true)
+        self:SetUnSelectable(true)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:ForkThread(self.WarpInEffectThread)
+    end,
+
+    WarpInEffectThread = function(self)
+        self:PlayUnitSound('CommanderArrival')
+        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(2.1)
+        self:SetMesh('/units/xsl0301/XSL0301_PersonalShield_mesh', true)
+        self:ShowBone(0, true)
+        self:SetUnSelectable(false)
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:HideBone('Back_Upgrade', true)
+        
+        local totalBones = self:GetBoneCount() - 1
+        local army = self:GetArmy()
+        for k, v in EffectTemplate.UnitTeleportSteam01 do
+            for bone = 1, totalBones do
+                CreateAttachedEmitter(self,bone,army, v)
+            end
+        end
+
+        WaitSeconds(6)
+        self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
+    end,
+
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
-            -- WHY IS THIS UNUSED. WHAT HAVE YOU DONE ZEP.
-            WarpInEffectThread = function(self)
-                self:PlayUnitSound('CommanderArrival')
-                self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2.1)
-                self:ShowBone(0, true)
-                self:HideBone('Back_Upgrade', true)
-                self:HideBone('Right_Upgrade', true)
-                self:HideBone('Left_Upgrade', true)
-                self:SetUnSelectable(false)
-                self:SetBusy(false)
-                self:SetBlockCommandQueue(false)
-
-                local totalBones = self:GetBoneCount() - 1
-                local army = self:GetArmy()
-                for k, v in EffectTemplate.UnitTeleportSteam01 do
-                    for bone = 1, totalBones do
-                        CreateAttachedEmitter(self,bone,army, v)
-                    end
-                end
-
-                WaitSeconds(6)
-            end,
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
