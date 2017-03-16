@@ -1440,9 +1440,9 @@ Unit_Description_0017="Creates an Engineering Drone which act as a flying Engine
 Unit_Description_0018="Creates a protective Personal Shield around the SACU. Requires energy to run."
 Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield which protects friendly units inside it. Requires additional energy to run. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
-Unit_Description_0021="Increases SACU's resource generation to 10 mass per second and 1000 energy per second."
+Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems."
-Unit_Description_0023="Primary weapon now fires 2.5 times as fast."
+Unit_Description_0023="Primary weapon now fires 1.82 times as fast."
 Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range."
 
 -- UEF -- Land Units
@@ -1584,7 +1584,7 @@ Unit_Description_0116="Personal Cloaking further hiding the ACU from optical sen
 Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units."
 Unit_Description_0118="Increases main cannon range."
 Unit_Description_0119="Adds an anti-air SAM weapon system."
-Unit_Description_0120="Increases SACU's resource generation to 10 mass per second and 1000 energy per second."
+Unit_Description_0120="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0121="Massively increases SACU build speed."
 Unit_Description_0122="Massively increases the rate at which the SACU repairs its armour."
 Unit_Description_0123="Personal Stealth hiding the SACU from radar. Countered by omni sensors. Costs energy to run."
@@ -1732,7 +1732,7 @@ Unit_Description_0166="Adds Teleportation capability. Requires considerable ener
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
 Unit_Description_0168="Massively increases SACU build-power."
-Unit_Description_0169="Increases SACU's resource generation to 10 mass per second and 1000 energy per second."
+Unit_Description_0169="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
 Unit_Description_0172="Greatly increases Personal Shield HP. Requires energy to run."
