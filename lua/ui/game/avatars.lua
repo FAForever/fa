@@ -22,11 +22,8 @@ local Factions = import('/lua/factions.lua').Factions
 local options = Prefs.GetFromCurrentProfile('options')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 
-controls = {
-    avatars = {},
-    idleEngineers = false,
-    idleFactories = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.avatars = controls.avatars or {}
 
 local recievingBeatUpdate = false
 local currentFaction = GetArmiesTable().armiesTable[GetFocusArmy()].faction
@@ -814,7 +811,7 @@ function AvatarUpdate()
         end
     end
 
-    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories)) > 0 then
+    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) > 0 then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
         else
@@ -839,7 +836,7 @@ function AvatarUpdate()
     local buttons = import('/modules/scumanager.lua').buttonGroup
     if options.gui_scu_manager == 0 then
         buttons:Hide()
-    else 
+    else
         buttons:Show()
         buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
         buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)

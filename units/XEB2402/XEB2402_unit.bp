@@ -1,5 +1,15 @@
 UnitBlueprint {
     Audio = {
+        Construct = Sound {
+            Bank = 'UEB',
+            Cue = 'UEB0302_Construct_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ConstructLoop = Sound {
+            Bank = 'UEB',
+            Cue = 'UEB0302_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         DeathExplosion = Sound {
             Bank = 'UELDestroy',
             Cue = 'UEB_Destroy_Lrg_PreDestroy',
@@ -20,29 +30,36 @@ UnitBlueprint {
             Cue = 'XEB2402_Activate',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        DoneBeingBuilt = Sound {
+            Bank = 'UEB',
+            Cue = 'UEB0302_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
-            Cue = 'UEF_Select_Structure',
+            Cue = 'UEF_Select_Factory',
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
     Categories = {
         'PRODUCTFA',
+        'SELECTABLE',
+        'BUILTBYTIER3ENGINEER',
+        'BUILTBYTIER3COMMANDER',
         'UEF',
         'STRUCTURE',
-        'BUILTBYTIER3COMMANDER',
-        'BUILTBYTIER3ENGINEER',
+        'AIR',
         'EXPERIMENTAL',
-        'ORBITALSYSTEM',
-        'SELECTABLE',
-        'LAND',
+        'CONSTRUCTION',
+        'FACTORY',
+        'DRAGBUILD',
+        'CONSTRUCTIONSORTDOWN',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'DRAGBUILD',
+        'SHOWQUEUE',
+        'SORTCONSTRUCTION',
+        'ORBITALSYSTEM',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -75,6 +92,7 @@ UnitBlueprint {
                 OffsetZ = 0.25,
             },
         },
+        BuildAttachBone = 'Attachpoint01',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -113,7 +131,11 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 400000,
         BuildCostMass = 28000,
+        BuildRate = 300,
         BuildTime = 25000,
+        BuildableCategory = {
+            'SATELLITE',
+        },
         RebuildBonusIds = {
             'xeb2402',
         },
@@ -123,6 +145,12 @@ UnitBlueprint {
         SizeZ = 6,
     },
     General = {
+        BuildBones = {
+            BuildEffectBones = {
+                'ConstuctBeam01', -- No, this is not spelled incorrectly...
+                'ConstuctBeam02',
+            },
+        },
         Category = 'Defense',
         Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
@@ -133,12 +161,14 @@ UnitBlueprint {
             RULEUCC_Move = false,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = false,
+            RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
+            RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
+        ConstructionBar = true,
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,

@@ -276,16 +276,16 @@ StructureUnit = Class(Unit) {
         self.FxBlinkingLightsBag = {}
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
+    CreateDestructionEffects = function( self, overkillRatio )
         -- LOG( bp.General.FactionName, ' ', bp.General.UnitType,' avg. bounding radius = ', explosion.GetAverageBoundingXZRadius( self ) )
         -- LOG( 'CurrentLayer ', self:GetCurrentLayer())
 
         if( explosion.GetAverageBoundingXZRadius( self ) < 1.0 ) then
-            explosion.CreateScalableUnitExplosion( self, overKillRatio )
+            explosion.CreateScalableUnitExplosion( self, overkillRatio )
         else
             explosion.CreateTimedStuctureUnitExplosion( self )
             WaitSeconds( 0.5 )
-            explosion.CreateScalableUnitExplosion( self, overKillRatio )
+            explosion.CreateScalableUnitExplosion( self, overkillRatio )
         end
     end,
 
@@ -444,7 +444,7 @@ StructureUnit = Class(Unit) {
         self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
-    OnKilled = function(self, instigator, type, overKillRatio)
+    OnKilled = function(self, instigator, type, overkillRatio)
         local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
         if scus[1] then
             for _, u in scus do
@@ -453,7 +453,7 @@ StructureUnit = Class(Unit) {
             end
         end
 
-        Unit.OnKilled(self, instigator, type, overKillRatio)
+        Unit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     CheckRepairersForRebuild = function(self, wreckage)
@@ -1370,7 +1370,7 @@ SonarUnit = Class(StructureUnit) {
 
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            emit = CreateAttachedEmitter(self,vBone,army,vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            local emit = CreateAttachedEmitter(self,vBone,army,vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
                                 emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
                             end
@@ -1496,7 +1496,7 @@ MobileUnit = Class(Unit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        --Add unit's threat to our influence map
+        -- Add unit's threat to our influence map
         local threat = 5
         local decay = 0.1
         local currentLayer = self:GetCurrentLayer()
@@ -1537,7 +1537,12 @@ MobileUnit = Class(Unit) {
             self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiSurface')
         end
 
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+        -- This unit was in a transport
+        if self.killedInTransport then
+            self.killedInTransport = false
+        else
+            Unit.OnKilled(self, instigator, type, overkillRatio)
+        end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -1734,36 +1739,52 @@ AirUnit = Class(MobileUnit) {
         self:SetTurnMult(1)
     end,
 
-    OnImpact = function(self, with, other)
-        if self.DeathBounce then
-            return
-        end
-        self.DeathBounce = true
+    -- Planes need to crash. Therefore, disable OnImpact apart from when called by the attached crash projectile
+    OnImpact = function(self, with)
+        if self.GroundImpacted then return end
 
-        -- Damage the area we have impacted with.
-        local bp = self:GetBlueprint()
-        local i = 1
-        local numWeapons = table.getn(bp.Weapon)
+        -- Only call this code once
+        self.GroundImpacted = true
 
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'DeathImpact') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
+        -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
+        if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuffs missing.
+            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
+        elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
+            local deathWep = self.deathWep -- Use a local copy for speed and easy reading
+            DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
         end
 
-        if(with == 'Water') then
+        if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact )
+            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            self.shallSink = true
+            self.colliderProj:Destroy()
         end
-        self:ForkThread(self.DeathThread, self.OverKillRatio )
+
+        self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
-    CreateUnitAirDestructionEffects = function( self, scale )
+    -- ONLY works for Terrain, not Water
+    OnAnimTerrainCollision = function(self, bone, x, y, z)
+        self:OnImpact('Terrain')
+    end,
+
+    ShallSink = function(self)
+        local layer = self:GetCurrentLayer()
+        local shallSink = (
+            self.shallSink or -- Only the case when a bounced plane hits water. Overrides the fact that the layer is 'Air'
+            ((layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
+            not EntityCategoryContains(categories.STRUCTURE, self))  -- Exclude structures
+        )
+        return shallSink
+    end,
+
+    CreateUnitAirDestructionEffects = function(self, scale)
         local army = self:GetArmy()
         local scale = explosion.GetAverageBoundingXZRadius(self)
-        explosion.CreateDefaultHitExplosion( self, scale)
-        if(self.ShowUnitDestructionDebris) then
+        explosion.CreateDefaultHitExplosion(self, scale)
+
+        if self.ShowUnitDestructionDebris then
             explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
         end
     end,
@@ -1775,19 +1796,44 @@ AirUnit = Class(MobileUnit) {
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
-        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
-            self.CreateUnitAirDestructionEffects( self, 1.0 )
+
+        -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
+        -- It also wouldn't call this code, and hence the carge destruction. Awful!
+        if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
+            self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
             self:DisableShield()
+
+            -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
+            local bp = self:GetBlueprint()
+            local i = 1
+            for i, numweapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'DeathImpact' then
+                    self.deathWep = bp.Weapon[i]
+                    break
+                end
+            end
+
+            if not self.deathWep or self.deathWep == {} then
+                WARN('An Air unit with no death weapon, or with incorrect label has died!!')
+            else
+                self.DeathCrashDamage = self.deathWep.Damage
+            end
+
+            -- Create a projectile we'll use to interact with Shields
+            local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+            self.colliderProj = proj
+            proj:Start(self, 0)
+            self.Trash:Add(proj)
+
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
         else
-            self.DeathBounce = 1
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
@@ -1839,17 +1885,20 @@ BaseTransport = Class() {
     DestroyedOnTransport = function(self)
     end,
 
+    -- Detaches cargo from a dying unit
     DetachCargo = function(self)
-        local units = self:GetCargo()
-        for k, v in units do
-            if EntityCategoryContains(categories.TRANSPORTATION, v) then
-                for k, u in self:GetCargo() do
-                    u:Kill()
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+
+        local cargo = self:GetCargo()
+        for _, unit in cargo do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
+                for k, subUnit in unit:GetCargo() do
+                    subUnit:Kill()
                 end
             end
-            v:DetachFrom()
+            unit:DetachFrom()
         end
-    end
+    end,
 }
 
 --- Base class for air transports.
@@ -1866,15 +1915,52 @@ AirTransport = Class(AirUnit, BaseTransport) {
         self.transData = {}
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        AirUnit.OnKilled(self, instigator, type, overkillRatio)
-        self:DetachCargo()
+    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
+        self:FlagCargo()
+        AirUnit.Kill(self, unpack(arg))
+    end,
+
+    -- Override OnImpact to kill all cargo
+    OnImpact = function(self, with)
+        if self.GroundImpacted then return end
+
+        self:KillCrashedCargo()
+        AirUnit.OnImpact(self, with)
     end,
 
     OnStorageChange = function(self, loading)
         AirUnit.OnStorageChange(self, loading)
         for k, v in self:GetCargo() do
             v:OnStorageChange(loading)
+        end
+    end,
+
+    -- Flags cargo that it's been killed while in a transport
+    FlagCargo = function(self)
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+
+        self.cargo = {}
+        local cargo = self:GetCargo()
+        for _, unit in cargo or {} do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
+                local unitCargo = unit:GetCargo()
+                for k, subUnit in unitCargo do
+                    subUnit:Kill()
+                end
+            end
+            if not EntityCategoryContains(categories.COMMAND, unit) then
+                unit.killedInTransport = true
+                table.insert(self.cargo, unit)
+            end
+        end
+    end,
+
+    KillCrashedCargo = function(self)
+        if self:BeenDestroyed() then return end
+
+        for _, unit in self.cargo or {} do
+            unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
+            unit:OnKilled(self, 'Normal', 0)
         end
     end,
 }
@@ -2214,6 +2300,7 @@ ACUUnit = Class(CommandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        self.WeaponEnabled = {}
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -2253,18 +2340,66 @@ ACUUnit = Class(CommandUnit) {
 
     ResetRightArm = function(self)
         CommandUnit.ResetRightArm(self)
+
         self:SetWeaponEnabledByLabel('OverCharge', false)
+        self:SetWeaponEnabledByLabel('AutoOverCharge', false)
+
+        -- Ugly hack to re-initialise auto-OC once a task finishes
+        local wep = self:GetWeaponByLabel('AutoOverCharge')
+        wep:SetAutoOvercharge(wep.AutoMode)
     end,
 
     OnPrepareArmToBuild = function(self)
         CommandUnit.OnPrepareArmToBuild(self)
         self:SetWeaponEnabledByLabel('OverCharge', false)
+        self:SetWeaponEnabledByLabel('AutoOverCharge', false)
     end,
 
     GiveInitialResources = function(self)
         WaitTicks(2)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+    end,
+
+    BuildDisable = function(self)
+        while self:IsUnitState('Building') or self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') or
+                self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
+            WaitSeconds(0.5)
+        end
+
+        for label, enabled in self.WeaponEnabled do
+            if enabled then
+                self:SetWeaponEnabledByLabel(label, true, true)
+            end
+        end
+    end,
+
+    -- Store weapon status on upgrade. Ignore default and OC, which are dealt with elsewhere
+    SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
+        CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
+
+        -- Unless lockOut specified, updates the 'Permanent record' of whether a weapon is enabled. With it specified,
+        -- the changing of the weapon on/off state is more... temporary. For example, when building something.
+        if label ~= self.rightGunLabel and label ~= 'OverCharge' and label ~= 'AutoOverCharge' and not lockOut then
+            self.WeaponEnabled[label] = enable
+        end
+    end,
+
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+
+        -- Disable any active upgrade weapons
+        local fork = false
+        for label, enabled in self.WeaponEnabled do
+            if enabled then
+                self:SetWeaponEnabledByLabel(label, false, true)
+                fork = true
+            end
+        end
+
+        if fork then
+            self:ForkThread(self.BuildDisable)
+        end
     end,
 }
 

@@ -46,12 +46,8 @@ for option, value in defOptions do
     end
 end
 
-GUI = {
-    bg = false,
-    chatLines = {},
-    chatContainer = false,
-    config = false,
-}
+GUI = import('/lua/ui/controls.lua').Get()
+GUI.chatLines = GUI.chatLines or {}
 
 local FactionsIcon = {}
 local Factions = import('/lua/factions.lua').Factions
@@ -374,11 +370,11 @@ function SetupChatScroll()
         local curEntry = 1
         local curTop = 1
         local tempsize = 0
-        
+
         if GUI.bg:IsHidden() then
             tempTop = math.max(DataSize() - numLines()+1, 1)
         end
-        
+
         for i, v in chatHistory do
             if IsValidEntry(v) then
                 if tempsize + table.getsize(v.wrappedtext) < tempTop then
@@ -456,19 +452,19 @@ function SetupChatScroll()
                 end
 
                 line.EntryID = curEntry
-                
+
                 if GUI.bg:IsHidden() then
-                
+
                     line.curHistory = chatHistory[curEntry]
                     if line.curHistory.new or line.curHistory.time == nil then
                         line.curHistory.time = 0
                     end
-                    
+
                     if line.curHistory.time < ChatOptions.fade_time then
                         line:Show()
 
                         UIUtil.setVisible(line.lineStickybg, ChatOptions.feed_background)
-                        
+
                         if line.name:GetText() == '' then
                             line.teamColor:Hide()
                         end
@@ -495,7 +491,7 @@ function SetupChatScroll()
                         end
                         line:SetNeedsFrameUpdate(true)
                     end
-                    
+
                 end
             else
                 line.name:Disable()
@@ -876,7 +872,7 @@ function ToggleChat()
         GUI.bg:Hide()
         GUI.chatEdit.edit:AbandonFocus()
         GUI.bg:SetNeedsFrameUpdate(false)
-        
+
         if ChatOptions.feed_persist then
             GUI.chatContainer:CalcVisible()
         else

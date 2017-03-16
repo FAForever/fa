@@ -21,15 +21,7 @@ local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 
-controls =
-{
-    mouseoverDisplay = false,
-    orderButtonGrid = false,
-    bg = false,
-    orderGlow = false,
-    controlClusterGroup = false,
-    mfdControl = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
 
 -- positioning controls, don't belong to file
 local layoutVar = false
@@ -67,7 +59,7 @@ local function CreateOrderGlow(parent)
             incriment = false
         end
         controls.orderGlow:SetAlpha(alpha)
-    end     
+    end
 end
 
 local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
@@ -100,8 +92,8 @@ local function CreateAutoBuildEffect(parent)
             self.incriment = false
         end
         self:SetAlpha(self.alpha)
-    end   
-    return glow  
+    end
+    return glow
 end
 
 function CreateMouseoverDisplay(parent, ID)
@@ -109,14 +101,14 @@ function CreateMouseoverDisplay(parent, ID)
         controls.mouseoverDisplay:Destroy()
         controls.mouseoverDisplay = false
     end
-    
+
     if not Prefs.GetOption('tooltips') then return end
-    
+
     local createDelay = Prefs.GetOption('tooltip_delay') or 0
-    
+
     local text = TooltipInfo['Tooltips'][ID]['title'] or ID
     local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
-    
+
     if not text or not desc then
         return
     end
@@ -131,7 +123,7 @@ function CreateMouseoverDisplay(parent, ID)
     else
         LayoutHelpers.AtHorizontalCenterIn(controls.mouseoverDisplay, parent)
     end
-    
+
     local alpha = 0.0
     controls.mouseoverDisplay:SetAlpha(alpha, true)
     local mdThread = ForkThread(function()
@@ -144,7 +136,7 @@ function CreateMouseoverDisplay(parent, ID)
     end)
 
     controls.mouseoverDisplay.OnDestroy = function(self)
-        KillThread(mdThread)  
+        KillThread(mdThread)
     end
 end
 
@@ -165,7 +157,7 @@ local function GetOrderBitmapNames(bitmapId)
         LOG("Error - nil bitmap passed to GetOrderBitmapNames")
         bitmapId = "basic-empty"    -- TODO do I really want to default it?
     end
-    
+
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
     return UIUtil.SkinnableFile(button_prefix .. "up.dds", true)
         ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
@@ -340,7 +332,7 @@ local function DiveInitFunction(control, unitList)
                 return true
             end
         end
-    end 
+    end
 
     if not control.mixedModeIcon then
         control.mixedModeIcon = Bitmap(control.autoModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
@@ -404,7 +396,7 @@ local function CheckReverseSemantics(scriptBit)
     if scriptBit == 0 then -- shields
         return true
     end
-    
+
     return false
 end
 
@@ -427,7 +419,7 @@ local function AbilityButtonBehavior(self, modifiers)
         CM.EndCommandMode(true)
     else
         local modeData = {
-            name="RULEUCC_Script", 
+            name="RULEUCC_Script",
             AbilityName=self._script,
             TaskName=self._script,
             cursor = self._cursor,
@@ -509,7 +501,7 @@ local retaliateStateInfo = {
 
 local function CreateBorder(parent)
     local border = {}
-    
+
     border.tl = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ul.dds'))
     border.tm = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_horz_um.dds'))
     border.tr = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ur.dds'))
@@ -518,45 +510,45 @@ local function CreateBorder(parent)
     border.bl = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ll.dds'))
     border.bm = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lm.dds'))
     border.br = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lr.dds'))
-    
+
     border.tl.Bottom:Set(parent.Top)
     border.tl.Right:Set(parent.Left)
-    
+
     border.bl.Top:Set(parent.Bottom)
     border.bl.Right:Set(parent.Left)
-    
+
     border.tr.Bottom:Set(parent.Top)
     border.tr.Left:Set(parent.Right)
-    
+
     border.br.Top:Set(parent.Bottom)
     border.br.Left:Set(parent.Right)
-    
+
     border.tm.Bottom:Set(parent.Top)
     border.tm.Left:Set(parent.Left)
     border.tm.Right:Set(parent.Right)
-    
+
     border.bm.Top:Set(parent.Bottom)
     border.bm.Left:Set(parent.Left)
     border.bm.Right:Set(parent.Right)
-    
+
     border.ml.Top:Set(parent.Top)
     border.ml.Bottom:Set(parent.Bottom)
     border.ml.Right:Set(parent.Left)
-    
+
     border.mr.Top:Set(parent.Top)
     border.mr.Bottom:Set(parent.Bottom)
     border.mr.Left:Set(parent.Right)
-    
+
     return border
 end
 
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
-    
+
     bg.border = CreateBorder(bg)
-    
+
     bg:DisableHitTest(true)
-    
+
     local function CreateButton(index, info)
         local btn = Checkbox(bg, GetOrderBitmapNames(info.bitmap))
         btn.info = info
@@ -577,7 +569,7 @@ local function CreateFirestatePopup(parent, selected)
         end
         return btn
     end
-    
+
     local i = 1
     bg.buttons = {}
     for index, state in retaliateStateInfo do
@@ -592,16 +584,16 @@ local function CreateFirestatePopup(parent, selected)
             i = i + 1
         end
     end
-    
+
     bg.Height:Set(function() return table.getsize(bg.buttons) * bg.buttons[1].Height() end)
     bg.Width:Set(bg.buttons[1].Width)
-    
+
     if UIUtil.currentLayout == 'left' then
         LayoutHelpers.RightOf(bg, parent, 40)
     else
         LayoutHelpers.Above(bg, parent, 20)
     end
-    
+
     return bg
 end
 
@@ -627,9 +619,9 @@ local function RetaliateOrderBehavior(self, modifiers)
                 self._popup = nil
             end
         end
-        
+
         UIMain.AddOnMouseClickedFunc(CollapsePopup)
-        
+
         self._popup.OnDestroy = function(self)
             UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
             Checkbox.OnDestroy(self)
@@ -744,7 +736,7 @@ local function OverchargeInit(control, unitList)
                 return true
             end
         end
-    end 
+    end
 
     if not control.mixedModeIcon then
         control.mixedModeIcon = Bitmap(control.autoModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
@@ -813,11 +805,11 @@ local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
     if not unit or unit:IsDead() then return end
     local weapon = FindOCWeapon(unit:GetBlueprint())
-    if not weapon then 
+    if not weapon then
         self:SetNeedsFrameUpdate(false)
         return
     end
-   
+
     local econData = GetEconomyTotals()
     if econData["stored"]["ENERGY"] >= weapon.EnergyRequired and not unit:IsOverchargePaused() then
         if self:IsDisabled() then
@@ -904,7 +896,7 @@ Returns checkbox if you need to add any data to the structure
 
 The orderInfo format is:
 {
-    helpText = <string>,    -- 
+    helpText = <string>,    --
     bitmapId = <string>,    -- the id used to construct the bitmap name (see GetOrderBitmapNames above)
     disabled = <bool>,      -- if true, button will start disabled
     behavior = <function>,  -- function(self, modifiers) this is the checkbox OnClick behavior
@@ -917,18 +909,18 @@ OnClick callback is called, self._data will contain this info.
 
 local function AddOrder(orderInfo, slot, batchMode)
     batchMode = batchMode or false
-    
+
     local checkbox = Checkbox(controls.orderButtonGrid, GetOrderBitmapNames(orderInfo.bitmapId))
 
     -- set the info in to the data member for retrieval
     checkbox._data = orderInfo
-    
+
     -- set up initial help text
     checkbox._curHelpText = orderInfo.helpText
 
     -- set up click handler
     checkbox.OnClick = orderInfo.behavior
-    
+
     if orderInfo.onframe then
         checkbox.EnableEffect = Bitmap(checkbox, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
         LayoutHelpers.AtCenterIn(checkbox.EnableEffect, checkbox)
@@ -970,7 +962,7 @@ local function AddOrder(orderInfo, slot, batchMode)
             Checkbox.OnDisable(self)
         end
     end
-    
+
     if orderInfo.ButtonTextFunc then
         checkbox.buttonText = UIUtil.CreateText(checkbox, '', 18, UIUtil.bodyFont)
         checkbox.buttonText:SetText(orderInfo.ButtonTextFunc(checkbox))
@@ -1039,13 +1031,12 @@ local function CreateCommonOrders(availableOrders, init)
         if not init and orderInfo.initialStateFunc then
             orderInfo.initialStateFunc(orderCheckbox, currentSelection)
         end
-        
+
         orderCheckbox:Disable()
-      
+
         orderCheckboxMap[key] = orderCheckbox
     end
-    
-    
+
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
         if commonOrders[availOrder] then
@@ -1111,13 +1102,13 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             assitingUnitList['DroneR'] = assistingUnits[2]
         end
     end
-    
+
     -- determine what slots to put alt orders
     -- we first want a table of slots we want to fill, and what orders want to fill them
     local desiredSlot = {}
     local usedSpecials = {}
     for index, availOrder in availableOrders do
-        if standardOrdersTable[availOrder] then 
+        if standardOrdersTable[availOrder] then
             local preferredSlot = standardOrdersTable[availOrder].preferredSlot
             if not desiredSlot[preferredSlot] then
                 desiredSlot[preferredSlot] = {}
@@ -1132,7 +1123,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 
     for index, availToggle in availableToggles do
-        if standardOrdersTable[availToggle] then 
+        if standardOrdersTable[availToggle] then
             local preferredSlot = standardOrdersTable[availToggle].preferredSlot
             if not desiredSlot[preferredSlot] then
                 desiredSlot[preferredSlot] = {}
@@ -1155,7 +1146,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- now go through that table and determine what doesn't fit and look for slots that are empty
     -- since this is only alt orders, just deal with slots 7-12
     local orderInSlot = {}
-    
+
     -- go through first time and add all the first entries to their preferred slot
     for slot = firstAltSlot,numSlots do
         if desiredSlot[slot] then
@@ -1191,7 +1182,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         slotForOrder[order] = slot
     end
     --LOG(repr(availableOrders), repr(orderInSlot), repr(slotForOrder))
-    
+
     -- create the alt order buttons
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
@@ -1200,19 +1191,19 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
 
             orderCheckbox._order = availOrder
-            
+
             if standardOrdersTable[availOrder].script then
                 orderCheckbox._script = standardOrdersTable[availOrder].script
             end
-            
+
             if standardOrdersTable[availOrder].cursor then
                 orderCheckbox._cursor = standardOrdersTable[availOrder].cursor
             end
-            
+
             if assitingUnitList[availOrder] then
                 orderCheckbox._unit = assitingUnitList[availOrder]
             end
-            
+
             if podUnits[availOrder] then
                 orderCheckbox._pod = podUnits[availOrder]
             end
@@ -1232,11 +1223,11 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availToggle], true)
 
             orderCheckbox._order = availToggle
-            
+
             if standardOrdersTable[availToggle].script then
                 orderCheckbox._script = standardOrdersTable[availToggle].script
             end
-            
+
             if assitingUnitList[availToggle] then
                 orderCheckbox._unit = assitingUnitList[availToggle]
             end
@@ -1250,7 +1241,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 end
 
--- called by gamemain when new orders are available, 
+-- called by gamemain when new orders are available,
 function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     -- save new selection
     -- LOG('available orders: ', repr(availableOrders))
@@ -1261,7 +1252,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
 
     -- create our copy of orders table
     standardOrdersTable = table.deepcopy(defaultOrdersTable)
-    
+
     -- look in blueprints for any icon or tooltip overrides
     -- note that if multiple overrides are found for the same order, then the default is used
     -- the syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
@@ -1272,9 +1263,9 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     --         helpText = 'toggle_custom',
     --     },
     --  },
-    -- 
+    --
     local orderDiffs
-    
+
     for index, unit in newSelection do
         local overrideTable = unit:GetBlueprint().General.OrderOverrides
         if overrideTable then
@@ -1291,7 +1282,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
             end
         end
     end
-    
+
     -- apply overrides
     if orderDiffs ~= nil then
         for orderKey, override in orderDiffs do
@@ -1305,9 +1296,9 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
             end
         end
     end
-    
+
     CreateCommonOrders(availableOrders)
-    
+
     local numValidOrders = 0
     for i, v in availableOrders do
         if standardOrdersTable[v] then
@@ -1319,11 +1310,11 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
             numValidOrders = numValidOrders + 1
         end
     end
-    
+
     if numValidOrders <= 12 then
         CreateAltOrders(availableOrders, availableToggles, currentSelection)
     end
-    
+
     controls.orderButtonGrid:EndBatch()
     if table.getn(currentSelection) == 0 and controls.bg.Mini then
         controls.bg.Mini(true)
@@ -1411,7 +1402,7 @@ function SetupOrdersControl(parent, mfd)
             end
         end
     )
-    
+
     return controls.bg
 end
 

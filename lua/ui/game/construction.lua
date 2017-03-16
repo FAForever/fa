@@ -114,12 +114,8 @@ local activeTab = nil
 
 local showBuildIcons = false
 
-controls = {
-    minBG = false,
-    maxBG = false,
-    midBG = false,
-    tabs = {},
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.tabs = controls.tabs or {}
 
 local constructionTabs = { 't1', 't2', 't3', 't4', 'templates' }
 local nestedTabKey = {
@@ -419,7 +415,7 @@ function CreateTabs(type)
             Tooltip.AddControlTooltip(controls.tabs[i].disabledGroup, 'construction_tab_' .. tab .. '_dis')
         end
         desiredTabs = table.getsize(constructionTabs)
-        defaultTabOrder = { t3 = 1, t2 = 2, t1 = 3 }
+        defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
@@ -1798,7 +1794,7 @@ function FormatData(unitData, type)
 
         -- Get function for checking for restricted units
         local IsRestricted = import('/lua/game.lua').IsRestricted
-        
+
         -- This section adds the arrows in for a build icon which is an upgrade from the
         -- selected unit. If there is an upgrade chain, it will display them split by arrows.
         -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
@@ -1806,7 +1802,7 @@ function FormatData(unitData, type)
         -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
         local unitSelected = sortedOptions.selection[1]
         local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
-                
+
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
@@ -1814,7 +1810,7 @@ function FormatData(unitData, type)
                 if table.getn(retData) > 0 then
                     table.insert(retData, { type = 'spacer' })
                 end
-                
+
                 for index, unit in units do
                     -- Show UI data/icons only for not restricted units
                     local restrict = false
@@ -1822,7 +1818,7 @@ function FormatData(unitData, type)
                         local bp = __blueprints[unit] 
                         -- Check if upgradeable structure
                         if isStructure and
-                                bp and bp.General and 
+                                bp and bp.General and
                                 bp.General.UpgradesFrom and
                                 bp.General.UpgradesFrom ~= 'none' then
 
@@ -2591,7 +2587,7 @@ function UpdateBuildList(newqueue, from)
         DecreaseBuildCountInQueue(i, oldQueue[i].count)
     end
     for i = from, table.getn(newqueue) do
-        blueprint = __blueprints[newqueue[i].id]
+        local blueprint = __blueprints[newqueue[i].id]
         if blueprint.General.UpgradesFrom == 'none' then
             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", newqueue[i].id, newqueue[i].count)
         else
@@ -2617,6 +2613,8 @@ function ButtonReleaseCallback()
         modified = false
         -- Mouse button released so end drag
         dragging = false
+
+        local first_modified_index
         if originalIndex <= index then
             first_modified_index = originalIndex
         else

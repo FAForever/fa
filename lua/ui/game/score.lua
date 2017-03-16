@@ -21,7 +21,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-controls = {}
+controls = import('/lua/ui/controls.lua').Get()
+
 savedParent = false
 local observerLine = false
 
@@ -455,7 +456,7 @@ function _OnBeat()
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         currentScores = false -- dont render score UI until next score update
     end
-    
+
     if observerLine then
         if GetFocusArmy() == -1 then
             observerLine.name:SetColor('ffff7f00')
