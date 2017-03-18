@@ -807,6 +807,8 @@ changelog = {
             '**Other**',
             '- Fixed a bug where Janus bombs would retarget half-way through a drop',
             '- Fixed a bug where split trees from groups were worth less than they should have been',
+            '- Updated some tooltips',
+            '- Various coop fixes',
             '',
             '**Balance**',
             '- Janus',
