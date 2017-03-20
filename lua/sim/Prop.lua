@@ -1,23 +1,17 @@
---****************************************************************************
---**
---**  File     :  /lua/sim/Prop.lua
---**  Author(s):
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
---
--- The base Prop lua class
---
+------------------------------------------------------------------
+--  File     :  /lua/sim/Prop.lua
+--  Author(s):
+--  Summary  :
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local minimumLabelMass = 10
 
 Prop = Class(moho.prop_methods, Entity) {
-
-    -- Do not call the base class __init and __post_init, we already have a c++ object
+    -- Do not call the base class __init and __post_init, we already have a c + + object
     __init = function(self, spec)
     end,
 
@@ -64,7 +58,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     AddPropCallback = function(self, fn, type)
         if not fn then
-            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
+            error(' * ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
         table.insert(self.EventCallbacks[type], fn)
@@ -111,7 +105,7 @@ Prop = Class(moho.prop_methods, Entity) {
         return self.CanBeKilled
     end,
 
-    OnKilled = function(self, instigator, type, exceessDamageRatio )
+    OnKilled = function(self, instigator, type, exceessDamageRatio)
         if not self.CanBeKilled then return end
         self:DoPropCallbacks('OnKilled')
         self:Destroy()
@@ -244,7 +238,6 @@ Prop = Class(moho.prop_methods, Entity) {
         return time, self.MaxEnergyReclaim, self.MaxMassReclaim
     end,
 
-    --
     -- Split this prop into multiple sub-props, placing one at each of our bone locations.
     -- The child prop names are taken from the names of the bones of this prop.
     --
@@ -258,7 +251,6 @@ Prop = Class(moho.prop_methods, Entity) {
     --
     -- You can pass an optional 'dirprefix' arg saying where to look for the child props.
     -- If not given, it defaults to one directory up from this prop's blueprint location.
-    --
     SplitOnBonesByName = function(self, dirprefix)
         if not dirprefix then
             -- Default dirprefix to parent dir of our own blueprint
@@ -287,7 +279,6 @@ Prop = Class(moho.prop_methods, Entity) {
         return newprops
     end,
 
-
     PlayPropSound = function(self, sound)
         local bp = self:GetBlueprint().Audio
         if bp and bp[sound] then
@@ -297,7 +288,6 @@ Prop = Class(moho.prop_methods, Entity) {
 
         return false
     end,
-
 
     -- Play the specified ambient sound for the unit, and if it has
     -- AmbientRumble defined, play that too
