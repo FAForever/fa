@@ -2052,6 +2052,13 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(-1)
         end
         self.BuildingUnit = false
+
+        self:SetImmobile(false)
+    end,
+
+    OnFailedToBuild = function(self)
+        MobileUnit.OnFailedToBuild(self)
+        self:SetImmobile(false)
     end,
 
     WaitForBuildAnimation = function(self, enable)
@@ -2073,6 +2080,15 @@ ConstructionUnit = Class(MobileUnit) {
                 ForkThread( self.WaitForBuildAnimation, self, true )
             end
         end
+
+        -- This is an extremely ugly hack to get around an engine bug. If you have used a command such as OC or repair on an illegal
+        -- target (An allied unit, or something at full HP, for example) while moving, the engine is tricked into a state where
+        -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
+        -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
+        if self:IsMoving() then
+            self:SetImmobile(true)
+            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+        end
     end,
 
     OnStopBuilderTracking = function(self)
@@ -2082,6 +2098,7 @@ ConstructionUnit = Class(MobileUnit) {
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
             self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
+            self:SetImmobile(false)
         end
     end,
 }
@@ -2148,6 +2165,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(0)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
         self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
+        self:SetImmobile(false)
     end,
 
     OnFailedToBuild = function(self)
@@ -2182,6 +2200,15 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(20)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
+
+        -- This is an extremely ugly hack to get around an engine bug. If you have used a command such as OC or repair on an illegal
+        -- target (An allied unit, or something at full HP, for example) while moving, the engine is tricked into a state where
+        -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
+        -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
+        if self:IsMoving() then
+            self:SetImmobile(true)
+            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+        end
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
