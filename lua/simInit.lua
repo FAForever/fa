@@ -31,9 +31,56 @@ end
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
+function ShuffleStartPositions()
+    local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
+    local teams = {}
+    local armies = {}
+    local t, marker
+
+    for name, army in ScenarioInfo.ArmySetup do
+        if not army.Civilian then
+            marker = markers[name]
+            if marker and marker.position then
+                t = teams[army.Team]
+                if not t then
+                    t = {starts={}, names={}}
+                    teams[army.Team] = t
+                end
+                table.insert(t.starts, marker.position)
+                table.insert(t.names, name)
+            end
+        end
+    end
+
+    local pos
+    for _, t in teams do
+        if t.starts[1] then
+            t.starts = table.shuffle(t.starts)
+            for _, name in t.names do
+                pos = table.remove(t.starts, 1)
+                ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers[name].position = pos
+            end
+        end
+    end
+end
+
+function AssignRandomFactions()
+    local n_factions = table.getsize(import('/lua/factions.lua').Factions)
+
+    for name, army in ScenarioInfo.ArmySetup do
+        if not army.Civilian then
+            if army.Faction > n_factions then
+                army.Faction = Random(1, n_factions)
+                army.RandomFaction = true
+            end
+        end
+    end
+end
+
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+    AssignRandomFactions()
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
@@ -45,7 +92,7 @@ function SetupSession()
     ScenarioInfo.PlatoonHandles = {}
     ScenarioInfo.UnitGroups = {}
     ScenarioInfo.UnitNames = {}
-    
+
     ScenarioInfo.VarTable = {}
     ScenarioInfo.OSPlatoonCounter = {}
     ScenarioInfo.BuilderTable = { Air = {}, Land = {}, Sea = {}, Gate = {} }
@@ -53,7 +100,7 @@ function SetupSession()
     ScenarioInfo.MapData = { PathingTable = { Amphibious = {}, Water = {}, Land = {}, }, IslandData = {} }
 
     -- ScenarioInfo.Env is the environment that the save file and scenario script file
-    -- are loaded into. We set it up here with some default functions that can be accessed 
+    -- are loaded into. We set it up here with some default functions that can be accessed
     -- from the scenario script.
     ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
 
@@ -65,12 +112,12 @@ function SetupSession()
         table.print(restrictions, 'RestrictedCategories')
         local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
         for index, restriction in restrictions do
-            
-            local preset = presets[restriction]
-            if not preset then -- custom restriction  
-                LOG('restriction.custom: "'.. restriction ..'"') 
 
-                -- using hash table because it is faster to check for restrictions later in game    
+            local preset = presets[restriction]
+            if not preset then -- custom restriction
+                LOG('restriction.custom: "'.. restriction ..'"')
+
+                -- using hash table because it is faster to check for restrictions later in game
                 enhRestrictions[restriction] = true
 
                 if buildRestrictions then
@@ -78,15 +125,15 @@ function SetupSession()
                 else
                     buildRestrictions = "(" .. restriction .. ")"
                 end
-            else -- preset restriction  
+            else -- preset restriction
                 if preset.categories then
-                    LOG('restriction.preset "'.. preset.categories .. '"') 
+                    LOG('restriction.preset "'.. preset.categories .. '"')
                     if buildRestrictions then
                         buildRestrictions = buildRestrictions .. " + (" .. preset.categories .. ")"
                     else
                         buildRestrictions = "(" .. preset.categories .. ")"
                     end
-                end 
+                end
                 if preset.enhancements then
                     LOG('restriction.enhancement "'.. restriction .. '"')
                     table.print(preset.enhancements, 'restriction.enhancements ')
@@ -99,7 +146,7 @@ function SetupSession()
     end
 
     if buildRestrictions then
-        LOG('restriction.build '.. buildRestrictions) 
+        LOG('restriction.build '.. buildRestrictions)
         buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
         -- add global build restrictions for all armies
         import('/lua/game.lua').AddRestriction(buildRestrictions)
@@ -120,7 +167,13 @@ function SetupSession()
 
     Scenario = ScenarioInfo.Env.Scenario
 
-    LOG('Loading script file: ',ScenarioInfo.script)
+    local spawn = ScenarioInfo.Options.TeamSpawn
+    if spawn and table.find({'random', 'balanced', 'balanced_flex'}, spawn) then
+        -- prevents players from knowing start positions at start
+        ShuffleStartPositions()
+    end
+
+    LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
     ResetSyncTable()
@@ -195,7 +248,7 @@ function BeginSession()
             ArmyBrains[index].RequestingAlliedVictory = true
         end
     end
-    
+
     -- Create any effect markers on map
     local markers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers()
     local Entity = import('/lua/sim/Entity.lua').Entity
@@ -204,9 +257,9 @@ function BeginSession()
         for k, v in markers do
             if v.type == 'Effect' then
                 local EffectMarkerEntity = Entity()
-                Warp( EffectMarkerEntity, v.position )   
-                EffectMarkerEntity:SetOrientation(OrientFromDir(v.orientation), true)   
-                for k, v in EffectTemplate [v.EffectTemplate] do        
+                Warp( EffectMarkerEntity, v.position )
+                EffectMarkerEntity:SetOrientation(OrientFromDir(v.orientation), true)
+                for k, v in EffectTemplate [v.EffectTemplate] do
                     CreateEmitterAtBone(EffectMarkerEntity,-2,-1,v):ScaleEmitter(v.scale or 1):OffsetEmitter(v.offset.x or 0, v.offset.y or 0, v.offset.z or 0)
                 end
             end

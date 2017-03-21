@@ -44,6 +44,8 @@ local Points = {
 }
 
 AIBrain = Class(moho.aibrain_methods) {
+    -- unit:GetArmy() so why brain:GetArmyIndex() ?!
+    GetArmy = moho.aibrain_methods.GetArmyIndex,
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
@@ -213,6 +215,22 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    GetFactionIndex = function(self)
+        return self.realFaction or moho.aibrain_methods.GetFactionIndex(self)
+    end,
+
+    HideFaction = function(self)
+        if self.realFaction then return end
+        self.realFaction = self:GetFactionIndex()
+        SetArmyFactionIndex(self.Name, 4)
+    end,
+
+    RevealFaction = function(self)
+        if not self.realFaction then return end
+        SetArmyFactionIndex(self.Name, self.realFaction-1)
+        self.realFaction = nil
     end,
 
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -410,6 +428,11 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
+        end
+
+        if self.realFaction and reconType == 'LOSNow' and val == true and
+            not IsAlly(blip:GetArmy(), self:GetArmy()) and GetGameTick() > 20 then
+            self:RevealFaction()
         end
     end,
 
