@@ -5,9 +5,10 @@ Patch 3678 (Upcoming)
 - Allow units in a transport which is shot down to leave wrecks at the crash site
 - Allow the Novax to build a new Satellite if the old one dies. This can only happen if it is impacted by a Nuke or ctrl-k'ed
 - Introduced code to slightly improve the way Tempest and Atlantis behave, particularly in being able to fire, in shallow waters
-- Enabled fire states on TML and SML structures
+- Enabled fire states on TML and SML structures and units. This allows you to command multiple launchers to fire simultaneously at multiple targets
 - Increased reconnect timeout from 45 to 90 seconds to better allow router reboots
 - HARMS now sinks to a greater depth on completion
+- Assist-Mex-To-Cap is now on by default
 
 ### Bugs
 - Fixed ACU reclaiming while shooting
@@ -19,6 +20,10 @@ Patch 3678 (Upcoming)
 - Fixed two move-while-building exploits
 - Gave Force damage to several AOE weapons so they now kill trees properly
 - Fixed ambient movement sounds continuing to play for sinking units
+- Fixed air units occasionally granting infinite intel at the crash site
+- Fixed unit restrictions not updating correctly when HQs are transferred between players
+- Fixed ancient bug which didn't deselect factory units properly, leading to accidental pausing of those units
+- Fixed the 'Select Onscreen Land/Air/Navy' hotkey also selecting the factories of that type
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -27,6 +32,11 @@ Patch 3678 (Upcoming)
 - Fixed autobalance functions crashing when used with uneven team numbers
 - Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
 - Observers are now kicked before checking connection issues when Allow Observers is false. This means they will no longer stall game launch if one or more have a connection issue.
+- Improved performance of Unit Manager, as well as layout, tooltips, and some icons
+- Fixed faction selector panel not updating properly
+- Removed ability for people to spam the lobby chat with the observer button
+- Fixed several cases of CPU rating not being broadcast properly
+- Added a 'New Message' button to the lobby which jumps to bottom of chat, and disabled the chat auto-hopping to bottom with every new message, if you have scrolled up
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
@@ -34,6 +44,8 @@ Patch 3678 (Upcoming)
 - Removed the tech level tick from Mass Storage strategic icon to match energy storage
 - Fixed hotkey labels not moving properly when scrolling the build menu
 - Pause button is now visible and active in the Enhancements and Selection tabs
+- Allowed multiple nuke pings to display simultaneously
+- Corrected several incorrect tooltips on SCUs
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
