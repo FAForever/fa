@@ -2066,7 +2066,6 @@ ConstructionUnit = Class(MobileUnit) {
     OnPrepareArmToBuild = function(self)
         MobileUnit.OnPrepareArmToBuild(self)
 
-        -- LOG( 'OnPrepareArmToBuild' )
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
