@@ -6,6 +6,8 @@
 -----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
+local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
@@ -29,12 +31,16 @@ URA0001 = Class(CAirUnit) {
         IssueStop({self}) -- You can't reclaim!
     end,
 
+    -- We never want to waste effort sinking these
+    ShallSink = function(self)
+        return false
+    end,
+
     -- Removed all collider related stuff
     OnImpact = function(self, with)
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
-            self.shallSink = true
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)
