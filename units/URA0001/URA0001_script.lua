@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
+local EffectUtil = import('EffectUtilities.lua')
 
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
