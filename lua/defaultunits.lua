@@ -1805,7 +1805,7 @@ AirUnit = Class(MobileUnit) {
         -- stupid check.
 
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
-        -- It also wouldn't call this code, and hence the carge destruction. Awful!
+        -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
             self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
