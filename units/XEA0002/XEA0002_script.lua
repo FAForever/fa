@@ -28,7 +28,11 @@ XEA0002 = Class(TAirUnit) {
         end
 
         self.IsDying = true
-        self.Parent.Satellite = nil -- Notify our parent we just died
+
+        -- If our parent exists, notify that we just died
+        if self.Parent then
+            self.Parent.Satellite = nil
+        end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)        
     end,
