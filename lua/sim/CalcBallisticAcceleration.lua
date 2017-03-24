@@ -41,7 +41,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
             mydata.usestore = true -- Signal that we've lost our target to lock in these settings
 
             if mydata.n_left < 1 then
-                mydata = nil
+                bomb_data[id] = nil
             end
         end
         
