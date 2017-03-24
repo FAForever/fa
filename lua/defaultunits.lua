@@ -1768,6 +1768,7 @@ AirUnit = Class(MobileUnit) {
         end
 
         self:DisableUnitIntel('Killed')
+        self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
