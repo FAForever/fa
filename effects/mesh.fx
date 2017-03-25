@@ -5,7 +5,7 @@
 ///
 /// Summary  :  Effect file for mesh rendering.
 ///
-/// Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+/// Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////
@@ -2217,6 +2217,57 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
 	return float4( color.rgb, alpha );
+}
+
+/// NomadNormalMappedPS
+///
+/// Lighting using normal maps
+float4 NomadNormalMappedPS( NORMALMAPPED_VERTEX vertex, 
+                       uniform bool maskAlbedo, 
+                       uniform bool glow, 
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable, 
+                       uniform int alphaFunc, 
+                       uniform int alphaRef ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+        
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    
+    if ( maskAlbedo )
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
+
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+#ifdef DIRECT3D10
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+#endif
+    
+    //increasing the alpha creates more glow
+    alpha = alpha * 1.5;
+
+    //subtracting the alpha from the color cancels out the oversaturation created when the glowy parts of the frame are blurred and added to the frame
+    color.rgb = color.rgb - (float3(alpha, alpha, alpha) * 0.4);
+
+    return float4( color.rgb, alpha );
 }
 
 /// New UEF PS
@@ -7281,7 +7332,7 @@ technique NomadUnit_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(
+        PixelShader = compile ps_2_a NomadNormalMappedPS(
 		    true,  // mask albedo
 			true,  // glow
 			true,  // hi def shadows
@@ -7308,7 +7359,7 @@ technique NomadUnit_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
     }
 }
 
@@ -7349,7 +7400,7 @@ technique NomadUnitStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(
+        PixelShader = compile ps_2_a NomadNormalMappedPS(
 		    true,  // mask albedo
 			true,  // glow
 			true,  // hi def shadows
@@ -7384,7 +7435,7 @@ technique NomadUnitStunned_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -7436,7 +7487,7 @@ technique NomadPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -7465,7 +7516,7 @@ technique NomadPowerArmor_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -7525,7 +7576,7 @@ technique NomadPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -7554,7 +7605,7 @@ technique NomadPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
