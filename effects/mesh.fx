@@ -7332,7 +7332,7 @@ technique NomadUnit_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(
+        PixelShader = compile ps_2_a NormalMappedPS(
 		    true,  // mask albedo
 			true,  // glow
 			true,  // hi def shadows
@@ -7343,9 +7343,56 @@ technique NomadUnit_HighFidelity
     }
 }
 
+technique NomadUnit2_HighFidelity
+<
+    string abstractTechnique = "NomadUnit2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadNormalMappedPS(
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
+    }
+}
+
 technique NomadUnit_MedFidelity
 <
     string abstractTechnique = "NomadUnit";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+    }
+}
+
+technique NomadUnit2_MedFidelity
+<
+    string abstractTechnique = "NomadUnit2";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7384,6 +7431,27 @@ technique NomadUnit_LowFidelity
     }
 }
 
+technique NomadUnit2_LowFidelity
+<
+    string abstractTechnique = "NomadUnit2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
 technique NomadUnitStunned_HighFidelity
 <
     string abstractTechnique = "NomadUnitStunned";
@@ -7400,7 +7468,7 @@ technique NomadUnitStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(
+        PixelShader = compile ps_2_a NormalMappedPS(
 		    true,  // mask albedo
 			true,  // glow
 			true,  // hi def shadows
@@ -7419,9 +7487,72 @@ technique NomadUnitStunned_HighFidelity
     }
 }
 
+technique NomadUnit2Stunned_HighFidelity
+<
+    string abstractTechnique = "NomadUnit2Stunned";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadNormalMappedPS(
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
 technique NomadUnitStunned_MedFidelity
 <
     string abstractTechnique = "NomadUnitStunned";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique NomadUnit2Stunned_MedFidelity
+<
+    string abstractTechnique = "NomadUnit2Stunned";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7487,6 +7618,35 @@ technique NomadPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+    }
+}
+
+technique NomadPowerArmor2_HighFidelity
+<
+    string abstractTechnique = "NomadPowerArmor2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a NomadNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
@@ -7502,6 +7662,35 @@ technique NomadPowerArmor_HighFidelity
 technique NomadPowerArmor_MedFidelity
 <
     string abstractTechnique = "NomadPowerArmor";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+    }
+}
+
+technique NomadPowerArmor2_MedFidelity
+<
+    string abstractTechnique = "NomadPowerArmor2";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicShield";
@@ -7557,11 +7746,69 @@ technique NomadPowerArmor_LowFidelity
     }
 }
 
+technique NomadPowerArmor2_LowFidelity
+<
+    string abstractTechnique = "NomadPowerArmor2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+    }
+}
+
 /// Nomad personal shield
 ///
 technique NomadPhaseShield_HighFidelity
 <
     string abstractTechnique = "NomadPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+    }
+}
+
+technique NomadPhaseShield2_HighFidelity
+<
+    string abstractTechnique = "NomadPhaseShield2";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicShield";
@@ -7605,6 +7852,35 @@ technique NomadPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+    }
+}
+
+technique NomadPhaseShield2_MedFidelity
+<
+    string abstractTechnique = "NomadPhaseShield2";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
@@ -7620,6 +7896,35 @@ technique NomadPhaseShield_MedFidelity
 technique NomadPhaseShield_LowFidelity
 <
     string abstractTechnique = "NomadPhaseShield";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+    }
+}
+
+technique NomadPhaseShield2_LowFidelity
+<
+    string abstractTechnique = "NomadPhaseShield2";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicShield";
