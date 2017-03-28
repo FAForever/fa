@@ -1,4 +1,4 @@
-Patch 3678 (Upcoming)
+Patch 3680 (Upcoming)
 ============================
 ### Gameplay
 - New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
@@ -59,8 +59,13 @@ Patch 3678 (Upcoming)
 - Allow Salem death sound on land in COOP
 
 ### Contributors
+- CookieNoob
+- Crotalus
+- Duk3Luk3
 - Exotic-Retard
+- Hussar
 - IceDreamer
+- PhilipJFry
 - Speed2
 - TheKeyBlue
 
