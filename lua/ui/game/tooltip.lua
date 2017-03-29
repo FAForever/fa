@@ -20,7 +20,7 @@ local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
 local mouseoverDisplay = false
 local createThread = false
 
-function CreateMouseoverDisplay(parent, ID, delay, extendedBool, hotkeyID)
+function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
@@ -64,7 +64,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, hotkeyID)
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
     if extendedBool then
-        mouseoverDisplay = CreateExtendedToolTip(parent, text, body)
+        mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width)
     else
         mouseoverDisplay = CreateToolTip(parent, text)
     end
@@ -155,11 +155,13 @@ function CreateToolTip(parent, text)
     return tooltip
 end
 
-function CreateExtendedToolTip(parent, text, desc)
+function CreateExtendedToolTip(parent, text, desc, width)
+    if not width then width = 150 end
+
     if text ~= "" or desc ~= "" then
         local tooltip = Group(parent)
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
-        tooltip.Width:Set(150)
+        tooltip.Width:Set(width)
         
         if text ~= "" and text ~= nil then
             tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
@@ -203,11 +205,11 @@ function CreateExtendedToolTip(parent, text, desc)
                     tooltip.desc[i].Width:Set(tooltip.desc[1].Width)
                     LayoutHelpers.Below(tooltip.desc[index], tooltip.desc[index-1])
                 end
-                tooltip.desc[i]:SetColor('FFCCCCCC')
+                tooltip.desc[i]:SetColor('FFCCCCCC') --#FFCCCCCC
             end
             
             tooltip.extbg = Bitmap(tooltip)
-            tooltip.extbg:SetSolidColor('FF000202')
+            tooltip.extbg:SetSolidColor('FF000202') --#FF000202
             tooltip.extbg.Depth:Set(function() return tooltip.desc[1].Depth() - 1 end)
             tooltip.extbg.Top:Set(tooltip.desc[1].Top)
             tooltip.extbg.Left:Set(function() return tooltip.Left() - 2 end)
@@ -238,9 +240,9 @@ function CreateExtendedToolTip(parent, text, desc)
         tooltip:DisableHitTest(true)
         
         if text ~= "" and text ~= nil then
-            tooltip.Width:Set(function() return math.max(tooltip.title.Width(), 150) end)
+            tooltip.Width:Set(function() return math.max(tooltip.title.Width(), width) end)
         else
-            tooltip.Width:Set(function() return 150 end)
+            tooltip.Width:Set(function() return width end)
         end
         
         if text == "" and text ~= nil then
@@ -260,10 +262,10 @@ function CreateExtendedToolTip(parent, text, desc)
 end
 
 -- helpers functions to make is simple to add tooltips
-function AddButtonTooltip(control, tooltipID, delay)
+function AddButtonTooltip(control, tooltipID, delay, width)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, tooltipID, delay, true)
+            CreateMouseoverDisplay(self, tooltipID, delay, true, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
@@ -271,13 +273,13 @@ function AddButtonTooltip(control, tooltipID, delay)
     end
 end 
 
-function AddControlTooltip(control, tooltipID, delay)
+function AddControlTooltip(control, tooltipID, delay, width)
     if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, tooltipID, delay, true)
+            CreateMouseoverDisplay(self, tooltipID, delay, true, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
@@ -285,13 +287,13 @@ function AddControlTooltip(control, tooltipID, delay)
     end
 end
 
-function AddCheckboxTooltip(control, tooltipID, delay)
+function AddCheckboxTooltip(control, tooltipID, delay, width)
     if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, tooltipID, delay, true)
+            CreateMouseoverDisplay(self, tooltipID, delay, true, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
