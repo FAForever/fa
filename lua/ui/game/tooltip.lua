@@ -41,7 +41,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, hotkeyID)
         if TooltipInfo['Tooltips'][ID] then
             text = LOC(TooltipInfo['Tooltips'][ID]['title'])
             body = LOC(TooltipInfo['Tooltips'][ID]['description'])
-            if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] != "" then
+            if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
                 for i, v in Keymapping do
                     if v == TooltipInfo['Tooltips'][ID]['keyID'] then
                         local properkeyname = import('/lua/ui/dialogs/keybindings.lua').formatkeyname(i)
@@ -156,12 +156,12 @@ function CreateToolTip(parent, text)
 end
 
 function CreateExtendedToolTip(parent, text, desc)
-    if text != "" or desc != "" then
+    if text ~= "" or desc ~= "" then
         local tooltip = Group(parent)
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
         tooltip.Width:Set(150)
         
-        if text != "" and text != nil then
+        if text ~= "" and text ~= nil then
             tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
             tooltip.title.Top:Set(tooltip.Top)
             tooltip.title.Left:Set(tooltip.Left)
@@ -178,10 +178,10 @@ function CreateExtendedToolTip(parent, text, desc)
         tooltip.desc = {}
         local tempTable = false
         
-        if desc != "" and desc != nil then
+        if desc ~= "" and desc ~= nil then
             tooltip.desc[1] = UIUtil.CreateText(tooltip, "", 12, UIUtil.bodyFont)
             tooltip.desc[1].Width:Set(tooltip.Width)
-            if text == "" and text != nil then
+            if text == "" and text ~= nil then
                 tooltip.desc[1].Top:Set(tooltip.Top)
                 tooltip.desc[1].Left:Set(tooltip.Left)
             else
@@ -218,7 +218,7 @@ function CreateExtendedToolTip(parent, text, desc)
         
         tooltip.extborder = Bitmap(tooltip)
         tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
-        if text != "" and text != nil then
+        if text ~= "" and text ~= nil then
             tooltip.extborder.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
             tooltip.extborder.Top:Set(function() return tooltip.bg.Top() - 1 end)
             tooltip.extborder.Left:Set(function() return tooltip.bg.Left() - 1 end)
@@ -229,7 +229,7 @@ function CreateExtendedToolTip(parent, text, desc)
             tooltip.extborder.Left:Set(function() return tooltip.extbg.Left() - 1 end)
             tooltip.extborder.Right:Set(function() return tooltip.extbg.Right() + 1 end)
         end
-        if desc != "" and desc != nil then
+        if desc ~= "" and desc ~= nil then
             tooltip.extborder.Bottom:Set(function() return tooltip.extbg.Bottom() + 1 end)
         else
             tooltip.extborder.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
@@ -237,15 +237,15 @@ function CreateExtendedToolTip(parent, text, desc)
         
         tooltip:DisableHitTest(true)
         
-        if text != "" and text != nil then
+        if text ~= "" and text ~= nil then
             tooltip.Width:Set(function() return math.max(tooltip.title.Width(), 150) end)
         else
             tooltip.Width:Set(function() return 150 end)
         end
         
-        if text == "" and text != nil then
+        if text == "" and text ~= nil then
             tooltip.Height:Set(function() return (tooltip.desc[1].Height() * table.getn(tempTable)) end)
-        elseif desc == "" and desc != nil then
+        elseif desc == "" and desc ~= nil then
             tooltip.Height:Set(function() return tooltip.title.Height() end)
             tooltip.Width:Set(function() return tooltip.title.Width() end)
         else
@@ -306,7 +306,7 @@ function AddComboTooltip(control, tooltipTable, optPosition)
     end
     control.OnOverItem = function(self, index, text)
         --tooltip popup here, note, -1 is possible index (which means not over an item)
-        if index != -1 and tooltipTable[index] then
+        if index ~= -1 and tooltipTable[index] then
             CreateMouseoverDisplay(locParent, tooltipTable[index], nil, true)
         else
             DestroyMouseoverDisplay()
@@ -322,7 +322,7 @@ function RemoveComboTooltip(control)
 end
 
 function SetTooltipText(control, id)
-    if not mouseoverDisplay or control != mouseoverDisplay:GetParent() then return end
+    if not mouseoverDisplay or control ~= mouseoverDisplay:GetParent() then return end
     if mouseoverDisplay.title then
         mouseoverDisplay.title:SetText(id)
     else
