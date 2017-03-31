@@ -2219,10 +2219,10 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 	return float4( color.rgb, alpha );
 }
 
-/// NomadNormalMappedPS
+/// NomadsNormalMappedPS
 ///
 /// Lighting using normal maps
-float4 NomadNormalMappedPS( NORMALMAPPED_VERTEX vertex, 
+float4 NomadsNormalMappedPS( NORMALMAPPED_VERTEX vertex, 
                        uniform bool maskAlbedo, 
                        uniform bool glow, 
                        uniform bool hiDefShadows,
@@ -6770,7 +6770,7 @@ technique GlassAlpha_LowFidelity
 
 // STRUCTS
 
-struct NOMADBUILD_VERTEX
+struct NOMADSBUILD_VERTEX
 {
     float4 position : POSITION0;
     float3 normal : TEXCOORD3;
@@ -6786,7 +6786,7 @@ struct NOMADBUILD_VERTEX
 
 // VERTEX SHADERS ---------------------------------------------------------------------------------------------
 
-NOMADBUILD_VERTEX NOMADBuildVS(
+NOMADSBUILD_VERTEX NOMADSBuildVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
     float3 tangent : TANGENT0,
@@ -6803,7 +6803,7 @@ NOMADBUILD_VERTEX NOMADBuildVS(
     float1 colorLookup : TEXCOORD7
 )
 {
-    NOMADBUILD_VERTEX vertex = (NOMADBUILD_VERTEX)0;
+    NOMADSBUILD_VERTEX vertex = (NOMADSBUILD_VERTEX)0;
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
@@ -6833,7 +6833,7 @@ NOMADBUILD_VERTEX NOMADBuildVS(
 
 // SAMPLERS --------------------------------------------------------------------------------------------------
 
-// This sampler is for sampling the nomad noise cube texture
+// This sampler is for sampling the nomads noise cube texture
 sampler3D NoiseCubeSampler = sampler_state
 {
     texture = (lookupTexture);
@@ -6896,7 +6896,7 @@ float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 }
 
 // The factory build rect
-float4 NomadFactoryBuildHologramPS( NOMADBUILD_VERTEX vertex ) : COLOR0
+float4 NomadsFactoryBuildHologramPS( NOMADSBUILD_VERTEX vertex ) : COLOR0
 {
     // The holographic colour
     float3 holo = float3(1.0, 0.5, 0.0);
@@ -6910,7 +6910,7 @@ float4 StunnedUnit( VERTEXNORMAL_VERTEX vertex ) : COLOR
 }
 
 // creates an orange see through version of the unit
-float4 NomadBuildHologramPS( NOMADBUILD_VERTEX vertex,
+float4 NomadsBuildHologramPS( NOMADSBUILD_VERTEX vertex,
                     uniform bool FadeAlmostDone ) : COLOR0
 {
     // The holographic colour
@@ -6931,7 +6931,7 @@ float4 NomadBuildHologramPS( NOMADBUILD_VERTEX vertex,
 }
 
 // creates the noise effect
-float4 NomadBuildNoisePS( NOMADBUILD_VERTEX vertex,
+float4 NomadsBuildNoisePS( NOMADSBUILD_VERTEX vertex,
                     uniform bool FadeAlmostDone ) : COLOR0
 {
     // The holographic colour
@@ -6959,7 +6959,7 @@ float4 NomadBuildNoisePS( NOMADBUILD_VERTEX vertex,
 
 
 // This applies texture fade in
-float4 NomadBuildPS( NORMALMAPPED_VERTEX vertex,
+float4 NomadsBuildPS( NORMALMAPPED_VERTEX vertex,
                      uniform bool hiDefShadows ) : COLOR0
 {
     clip(vertex.material.y - 0.9f);
@@ -7003,9 +7003,9 @@ float4 NomadBuildPS( NORMALMAPPED_VERTEX vertex,
     return color;
 }
 
-/// Nomad powered armor
+/// Nomads powered armor
 ///
-float4 NomadPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+float4 NomadsPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
 //    float4 color = float4( 1, 0.4, 0.18, 0.5);
     float4 color = float4( 0.4, 0.6, 0.18, 0.5);
@@ -7025,9 +7025,9 @@ float4 NomadPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     return color * glowpulse;
 }
 
-/// Nomad personal shield
+/// Nomads personal shield
 ///
-float4 NomadPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+float4 NomadsPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
     float4 baseshellcolor = float4( 0.9, 0.5, 0.1, 0.6);
 
@@ -7053,7 +7053,7 @@ float4 NomadPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 /// Bubble shield
 ///
-float4 ShieldNomadPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsPS( EFFECT_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -7078,7 +7078,7 @@ float4 ShieldNomadPS( EFFECT_VERTEX vertex ) : COLOR
     return color;
 }
 
-float4 ShieldNomadLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 {
     float3 color = float3( 1, 0.53, 0.24);
     float4 colormask = tex2D( albedoSampler, vertex.texcoord0.xy);
@@ -7187,8 +7187,8 @@ technique NOMADBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(true);
     }
     pass P1
     {
@@ -7198,7 +7198,7 @@ technique NOMADBuild_MediumFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P2
     {
@@ -7207,8 +7207,8 @@ technique NOMADBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
@@ -7235,7 +7235,7 @@ technique NOMADBuild_LowFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P1
     {
@@ -7244,8 +7244,8 @@ technique NOMADBuild_LowFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
@@ -7273,8 +7273,8 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(false);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(false);
     }
     pass P1
     {
@@ -7283,8 +7283,8 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(false);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(false);
     } 
 }
 
@@ -7312,8 +7312,8 @@ technique NomadFactoryBuildRect_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadFactoryBuildHologramPS();
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsFactoryBuildHologramPS();
     }
 }
 
@@ -7498,7 +7498,7 @@ technique NomadPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -7527,7 +7527,7 @@ technique NomadPowerArmor_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -7556,7 +7556,7 @@ technique NomadPowerArmor_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -7587,7 +7587,7 @@ technique NomadPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -7616,7 +7616,7 @@ technique NomadPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -7645,7 +7645,7 @@ technique NomadPhaseShield_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -7681,7 +7681,7 @@ technique ShieldNomad_MedFidelity
 			0,  // rotating (Y axis)
 			0.004   // speed of specular texture (top to bottom)
 		);
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
@@ -7712,7 +7712,7 @@ technique ShieldNomad_LowFidelity
 			0.008,  // albedo speed top to bottom
 			0  // rotation Y axis of secondary texture
 		);
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
     }
 }
 
@@ -7746,7 +7746,7 @@ technique ShieldNomadStealth_MedFidelity
 			0,  // rotating (Y axis)
 			0.006   // speed of specular texture (top to bottom)
 		);
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
@@ -7777,7 +7777,7 @@ technique ShieldNomadStealth_LowFidelity
 			0.04,  // albedo speed top to bottom
 			0  // rotation Y axis of secondary texture
 		);
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
     }
 }
 
@@ -7806,8 +7806,8 @@ technique NOMADSBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(true);
     }
     pass P1
     {
@@ -7817,7 +7817,7 @@ technique NOMADSBuild_MediumFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P2
     {
@@ -7826,8 +7826,8 @@ technique NOMADSBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
@@ -7854,7 +7854,7 @@ technique NOMADSBuild_LowFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P1
     {
@@ -7863,8 +7863,8 @@ technique NOMADSBuild_LowFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
@@ -7892,8 +7892,8 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(false);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(false);
     }
     pass P1
     {
@@ -7902,8 +7902,8 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(false);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(false);
     } 
 }
 
@@ -7931,8 +7931,8 @@ technique NomadsFactoryBuildRect_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadFactoryBuildHologramPS();
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsFactoryBuildHologramPS();
     }
 }
 
@@ -8117,7 +8117,7 @@ technique NomadsPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8146,7 +8146,7 @@ technique NomadsPowerArmor_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8175,7 +8175,7 @@ technique NomadsPowerArmor_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8206,7 +8206,7 @@ technique NomadsPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -8235,7 +8235,7 @@ technique NomadsPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -8264,7 +8264,7 @@ technique NomadsPhaseShield_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -8300,7 +8300,7 @@ technique ShieldNomads_MedFidelity
             0,  // rotating (Y axis)
             0.004   // speed of specular texture (top to bottom)
         );
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
@@ -8331,7 +8331,7 @@ technique ShieldNomads_LowFidelity
             0.008,  // albedo speed top to bottom
             0  // rotation Y axis of secondary texture
         );
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
     }
 }
 
@@ -8365,7 +8365,7 @@ technique ShieldNomadsStealth_MedFidelity
             0,  // rotating (Y axis)
             0.006   // speed of specular texture (top to bottom)
         );
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
@@ -8396,7 +8396,7 @@ technique ShieldNomadsStealth_LowFidelity
             0.04,  // albedo speed top to bottom
             0  // rotation Y axis of secondary texture
         );
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
     }
 }
 
@@ -8421,7 +8421,7 @@ technique NomadsUnit2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
             true,  // mask albedo
             true,  // glow
             true,  // hi def shadows
@@ -8448,7 +8448,7 @@ technique NomadsUnit2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
 }
 
@@ -8489,7 +8489,7 @@ technique NomadsUnitStunned2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
             true,  // mask albedo
             true,  // glow
             true,  // hi def shadows
@@ -8524,7 +8524,7 @@ technique NomadsUnitStunned2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -8576,7 +8576,7 @@ technique NomadsPowerArmor2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -8584,7 +8584,7 @@ technique NomadsPowerArmor2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8605,7 +8605,7 @@ technique NomadsPowerArmor2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -8613,7 +8613,7 @@ technique NomadsPowerArmor2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8642,7 +8642,7 @@ technique NomadsPowerArmor2_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
@@ -8665,7 +8665,7 @@ technique NomadsPhaseShield2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadNormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -8673,7 +8673,7 @@ technique NomadsPhaseShield2_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -8694,7 +8694,7 @@ technique NomadsPhaseShield2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadNormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -8702,7 +8702,7 @@ technique NomadsPhaseShield2_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -8731,7 +8731,7 @@ technique NomadsPhaseShield2_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
