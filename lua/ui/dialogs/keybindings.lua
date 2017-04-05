@@ -495,8 +495,8 @@ function CreateUI()
     
     keyFilter = Bitmap(dialogContent)
     keyFilter:SetSolidColor('FF282828')-- #FF282828
-    keyFilter.Left:Set(function() return dialogContent.Left() + 70 end)
-    keyFilter.Right:Set(function() return dialogContent.Right() - 10 end)
+    keyFilter.Left:Set(function() return dialogContent.Left() + 63 end)
+    keyFilter.Right:Set(function() return dialogContent.Right() - 6 end)
     keyFilter.Top:Set(function() return title.Bottom() + 10 end)
     keyFilter.Bottom:Set(function() return title.Bottom() + 40 end)
     keyFilter.Width:Set(function() return keyFilter.Right() - keyFilter.Left() end)
@@ -514,19 +514,18 @@ function CreateUI()
         '\n\n Note that collapsing of key categories is disabled while this filter contains some text'
     }, nil, 200)
 
-    keyFilter.label = UIUtil.CreateText(dialogContent, 'Filter', 16)
+    keyFilter.label = UIUtil.CreateText(dialogContent, 'Filter', 17)
     keyFilter.label:SetColor('FF929191') -- #FF929191
-    keyFilter.label:SetFont(UIUtil.titleFont, 16)
-    LayoutHelpers.AtVerticalCenterIn(keyFilter.label, keyFilter)
-    LayoutHelpers.AtLeftIn(keyFilter.label, dialogContent, 15)
+    keyFilter.label:SetFont(UIUtil.titleFont, 17)
+    LayoutHelpers.AtVerticalCenterIn(keyFilter.label, keyFilter, 2)
+    LayoutHelpers.AtLeftIn(keyFilter.label, dialogContent, 9)
 
     local text = LOC("<LOC key_binding_filterInfo>Type key binding or name of action")
-    keyFilter.info = UIUtil.CreateText(keyFilter, text, 17, UIUtil.bodyFont)
+    keyFilter.info = UIUtil.CreateText(keyFilter, text, 17, UIUtil.titleFont)
     keyFilter.info:SetColor('FF727171') -- #FF727171
-    keyFilter.info:SetFont("Arial Bold", 17)
     keyFilter.info:DisableHitTest()
-    LayoutHelpers.AtHorizontalCenterIn(keyFilter.info, keyFilter)
-    LayoutHelpers.AtVerticalCenterIn(keyFilter.info, keyFilter,4)
+    LayoutHelpers.AtHorizontalCenterIn(keyFilter.info, keyFilter, -7)
+    LayoutHelpers.AtVerticalCenterIn(keyFilter.info, keyFilter, 2)
      
     keyFilter.text = Edit(keyFilter)
     keyFilter.text:SetForegroundColor('FFF1ECEC') -- #FFF1ECEC
@@ -561,8 +560,8 @@ function CreateUI()
     keyFilter.clear = UIUtil.CreateText(keyFilter.text, 'X', 17, "Arial Bold")
     keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A 
     keyFilter.clear:EnableHitTest()
-    LayoutHelpers.AtVerticalCenterIn(keyFilter.clear, keyFilter.text, 2)
-    LayoutHelpers.AtRightIn(keyFilter.clear, keyFilter.text, 5)
+    LayoutHelpers.AtVerticalCenterIn(keyFilter.clear, keyFilter.text, 1)
+    LayoutHelpers.AtRightIn(keyFilter.clear, keyFilter.text, 9)
 
     keyFilter.clear.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
