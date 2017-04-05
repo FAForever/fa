@@ -51,6 +51,8 @@ consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console backgroun
 consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
 consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
 menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
+factionTextColor = import('/lua/lazyvar.lua').Create()      -- faction color for text foreground
+factionBackColor = import('/lua/lazyvar.lua').Create()      -- faction color for text background
 
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
@@ -261,6 +263,8 @@ function SetCurrentSkin(skin)
     fixedFont:Set(skinTable.fixedFont)
     titleFont:Set(skinTable.titleFont)
     bodyColor:Set(skinTable.bodyColor)
+    factionTextColor:Set(skinTable.factionTextColor)
+    factionBackColor:Set(skinTable.factionBackColor)
     fontColor:Set(skinTable.fontColor)
     fontOverColor:Set(skinTable.fontOverColor)
     fontDownColor:Set(skinTable.fontDownColor)
