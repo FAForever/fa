@@ -618,7 +618,7 @@ function CreateUI()
     -- Called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
-    -- aixs can be "Vert" or "Horz"
+    -- axis can be "Vert" or "Horz"
     keyContainer.GetScrollValues = function(self, axis)
         local size = GetLinesVisible()
         local visibleMax = math.min(self.top + GetLinesTotal(), size)
@@ -753,8 +753,6 @@ function SortData(dataTable)
                     else 
                         return a.action < b.action
                     end
-
-                    --return string.lower(a.text) < string.lower(b.text) 
                 else 
                     return a.id < b.id
                 end
