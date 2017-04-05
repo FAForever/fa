@@ -520,7 +520,7 @@ function CreateUI()
     LayoutHelpers.AtVerticalCenterIn(keyFilter.label, keyFilter)
     LayoutHelpers.AtLeftIn(keyFilter.label, dialogContent, 15)
 
-    local text = LOC("<LOC key_binding_filterInfo>TYPE KEY BINDING OR NAME OF ACTION")
+    local text = LOC("<LOC key_binding_filterInfo>Type key binding or name of action")
     keyFilter.info = UIUtil.CreateText(keyFilter, text, 17, UIUtil.bodyFont)
     keyFilter.info:SetColor('FF727171') -- #FF727171
     keyFilter.info:SetFont("Arial Bold", 17)
