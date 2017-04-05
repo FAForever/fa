@@ -6738,6 +6738,7 @@ key_binding_0002="Appuyez ɣef la combinaison de touches que vous souhaitez assi
 key_binding_0003="Assigner touche"
 key_binding_0004="Réinitialiser"
 key_binding_0005="Êtes-vous certain de vouloir réinitialiser toutes les touches assignées ?"
+key_binding_filterInfo="Type key binding or name of action"
 keymap_category_0090="Utilisateur"
 order_0000="Déplacem."
 order_0001="Construction"
