@@ -9,6 +9,56 @@ function GetDistanceBetweenTwoEntities(entity1, entity2)
     return VDist3(entity1:GetPosition(),entity2:GetPosition())
 end
 
+-- Function originally created to check if a Mass Storage can be queued in a location without overlapping
+function CanBuildInSpot(originUnit, unitId, pos)
+    local bp = __blueprints[unitId]
+    local mySkirtX = bp.Physics.SkirtSizeX / 2
+    local mySkirtZ = bp.Physics.SkirtSizeZ / 2
+
+    -- Find the distance between my skirt and the skirt of a potential Quantum Gateway
+    local xDiff = mySkirtX + 5 -- Using 5 because that's half the size of a Quantum Gateway, the largest stock structure
+    local zDiff = mySkirtZ + 5
+
+    -- Full extent of search rectangle
+    local x1 = pos.x - xDiff
+    local z1 = pos.z - zDiff
+    local x2 = pos.x + xDiff
+    local z2 = pos.z + zDiff
+
+    -- Find all the units in that rectangle
+    local units = GetUnitsInRect(Rect(x1, z1, x2, z2))
+
+    -- Filter it down to structures only
+    units = EntityCategoryFilterDown(categories.STRUCTURE, units)
+
+    -- Bail if there's nothing in range
+    if not units[1] then return end
+
+    local allowed = true
+    for _, struct in units do
+        if struct ~= originUnit then
+            local structPhysics = struct:GetBlueprint().Physics
+            local structPos = struct:GetPosition()
+
+            -- These can be positive or negative, so we need to make them positive using math.abs
+            local xDist = math.abs(pos.x - structPos.x)
+            local zDist = math.abs(pos.z - structPos.z)
+
+            local skirtDiffx = mySkirtX + (structPhysics.SkirtSizeX / 2)
+            local skirtDiffz = mySkirtZ + (structPhysics.SkirtSizeZ / 2)
+
+            -- Check if the axis difference is smaller than the combined skirt distance
+            -- If it is, we overlap, and can't build here
+            if xDist < skirtDiffx and zDist < skirtDiffz then
+                allowed = false
+                break
+            end
+        end
+    end
+
+    return allowed
+end
+
 -- Note: Includes allied units in selection!!
 function GetEnemyUnitsInSphere(unit, position, radius)
     local x1 = position.x - radius

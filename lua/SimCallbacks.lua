@@ -79,11 +79,14 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
+local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
 Callbacks.CapMex = function(data, units)
     local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
     if not units[1] then return end
+
     local mex = GetEntityById(data.target)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
+
     if mex:GetCurrentLayer() == 'Seabed' then return end
 
     local pos = mex:GetPosition()
@@ -100,10 +103,19 @@ Callbacks.CapMex = function(data, units)
 
     if not builder then return end
 
-    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x+2, pos.y, pos.z), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z+2), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x-2, pos.y, pos.z), msid, {})
+    local locations = {
+        up = Vector(pos.x, pos.y, pos.z - 2),
+        down = Vector(pos.x, pos.y, pos.z + 2),
+        left = Vector(pos.x - 2, pos.y, pos.z),
+        right = Vector(pos.x + 2, pos.y, pos.z),
+    }
+
+    for key, location in locations do
+        if CanBuildInSpot(mex, msid, location) then
+            IssueBuildMobile({builder}, location, msid, {})
+        end
+    end
+
     IssueGuard(units, builder)
 end
 
