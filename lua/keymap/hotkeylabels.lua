@@ -211,7 +211,7 @@ function getKeyTables()
     if upgradeKey then
         upgradeKey["textsize"] = textSizes[string.len(upgradeKey.key)]
         if not upgradeKey["textsize"] then
-            WARN('Not showing label for keybind ' .. group.key .. ' due to length')
+            WARN('Not showing label for keybind ' .. upgradeKey.key .. ' due to length')
             upgradeKey = nil
         end
     end
