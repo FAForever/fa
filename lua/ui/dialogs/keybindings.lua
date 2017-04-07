@@ -774,10 +774,14 @@ function SortData(dataTable)
 end
 -- format all key data, group them based on key category or default to none category and finally sort all keys
 function FormatData()
-    local retkeys = {}
     local keyData = {}
     local keyLookup = import('/lua/keymap/keymapper.lua').GetKeyLookup()
     local keyActions = import('/lua/keymap/keymapper.lua').GetKeyActions()
+
+    -- reset previously formated key actions in all groups because they might have been re-mapped
+    for category, group in keyGroups do
+        group.actions = {} 
+    end
     -- group game keys and key defined in mods by their key category
     for k, v in keyActions do
         local category = string.lower(v.category or 'none')
@@ -785,14 +789,11 @@ function FormatData()
 
         if not keyGroups[category] then
             keyGroups[category] = {}
+            keyGroups[category].actions = {}
             keyGroups[category].name = category
             keyGroups[category].collapsed = linesCollapsed
             keyGroups[category].order = table.getsize(keyGroups) - 1
             keyGroups[category].text = v.category or keyCategories['none'].text
-        end
-
-        if not retkeys[category] then
-            retkeys[category] = {}
         end
 
         local data = {
@@ -803,22 +804,22 @@ function FormatData()
             order = keyGroups[category].order,
             text = LOC(keydesc[k] or k or "<LOC key_binding_0001>No action text"),
         }
-        table.insert(retkeys[category], data)
+        table.insert(keyGroups[category].actions, data)
     end
-
+    -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
-    for category, v in retkeys do
+    for category, group in keyGroups do
         keyData[index] = { 
             type = 'header', 
             id = index, 
             order = keyGroups[category].order, 
-            count = table.getsize(v), 
+            count = table.getsize(group.actions), 
             category = category, 
             text = keyGroups[category].text,
             collapsed = keyGroups[category].collapsed
         }
         index = index + 1
-        for _, data in v do 
+        for _, data in group.actions do 
             keyData[index]  = { 
                 type = 'entry', 
                 text = data.text,
