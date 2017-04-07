@@ -191,7 +191,7 @@ end
 
 local function AssignCurrentSelection()
     for k, v in keyTable do
-        if v._selected then
+        if v.selected then
             EditActionKey(panel, v.action, v.key)
             break
         end
@@ -201,7 +201,7 @@ end
 local function UnbindCurrentSelection()
     local Keymapper = import('/lua/keymap/keymapper.lua')
     for k, v in keyTable do
-        if v._selected then
+        if v.selected then
             Keymapper.ClearUserKeyMapping(v.key)
             break
         end
@@ -216,7 +216,7 @@ local function GetLineColor(lineID, data)
     elseif data.type == 'spacer' then
         return '00000000' --#00000000
     elseif data.type == 'entry' then
-        if data._selected then
+        if data.selected then
             return UIUtil.factionBackColor
         elseif math.mod(lineID, 2) == 1 then
             return 'ff202020' --#ff202020
@@ -252,11 +252,11 @@ end
 local function SelectLine(dataIndex)
     local index = nil
     for k, v in keyTable   do
-        v._selected = false
+        v.selected = false
     end
 
     if keyTable[dataIndex].type == 'entry' then
-       keyTable[dataIndex]._selected = true
+       keyTable[dataIndex].selected = true
     end
     keyContainer:Filter(keyword)
 end
