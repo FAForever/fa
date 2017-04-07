@@ -92,7 +92,7 @@ local function EditActionKey(parent, action, currentKey)
 
     local keyCodeLookup = import('/lua/keymap/keymapper.lua').GetKeyCodeLookup()
     local keyAdder = {}
-    local currentKeyPattern
+    local keyPattern
 
     local function AddKey(keyCode, modifiers)
         local key = keyCodeLookup[keyCode]
@@ -101,24 +101,24 @@ local function EditActionKey(parent, action, currentKey)
         end
 
         local keyComboName = ""
-        currentKeyPattern = ""
+        keyPattern = ""
 
         if key ~= 'Ctrl' and modifiers.Ctrl then
-            currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
+            keyPattern = keyPattern .. keyNames['11'] .. "-"
             keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
         end
 
         if key ~= 'Alt' and modifiers.Alt then
-            currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
+            keyPattern = keyPattern .. keyNames['12'] .. "-"
             keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
         end
 
         if key ~= 'Shift' and modifiers.Shift then
-            currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
+            keyPattern = keyPattern .. keyNames['10'] .. "-"
             keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
         end
 
-        currentKeyPattern = currentKeyPattern .. key
+        keyPattern = keyPattern .. key
         keyComboName = keyComboName .. LOC(properKeyNames[key])
 
         keyText:SetText(keyComboName)
@@ -135,32 +135,32 @@ local function EditActionKey(parent, action, currentKey)
 
     local function AssignKey()
         -- Check if key is already assigned to something else
-        local Keymapper = import('/lua/keymap/keymapper.lua')
+        local KeyMapper = import('/lua/keymap/keymapper.lua')
 
         local function ClearShiftKey()
-            Keymapper.ClearUserKeyMapping("Shift-" .. currentKeyPattern)
-            LOG("clearing Shift-"..currentKeyPattern)
+            KeyMapper.ClearUserKeyMapping("Shift-" .. keyPattern)
+            LOG("clearing Shift-"..keyPattern)
         end
 
         local function ClearAltKey()
-            Keymapper.ClearUserKeyMapping("Alt-" .. currentKeyPattern)
-            LOG("clearing Alt-"..currentKeyPattern)
+            KeyMapper.ClearUserKeyMapping("Alt-" .. keyPattern)
+            LOG("clearing Alt-"..keyPattern)
         end
 
         local function MapKey()
-            Keymapper.SetUserKeyMapping(currentKeyPattern, currentKey, action)
-            local cat = Keymapper.KeyCategory(currentKeyPattern, Keymapper.GetCurrentKeyMap(), Keymapper.GetKeyActions())
+            KeyMapper.SetUserKeyMapping(keyPattern, currentKey, action)
+            local cat = KeyMapper.KeyCategory(keyPattern, KeyMapper.GetCurrentKeyMap(), KeyMapper.GetKeyActions())
             if cat and cat == "hotbuilding" then
-                if Keymapper.IsKeyInMap("Shift-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(panel, "Shift-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                if KeyMapper.IsKeyInMap("Shift-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
+                    UIUtil.QuickDialog(panel, "Shift-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
                         nil, nil,
                         true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
-                if Keymapper.IsKeyInMap("Alt-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(panel, "Alt-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                if KeyMapper.IsKeyInMap("Alt-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
+                    UIUtil.QuickDialog(panel, "Alt-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
                         nil, nil,
@@ -172,7 +172,7 @@ local function EditActionKey(parent, action, currentKey)
             keyContainer:Filter(keyword)
         end
 
-        if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
+        if KeyMapper.IsKeyInMap(keyPattern, KeyMapper.GetCurrentKeyMap()) then
             UIUtil.QuickDialog(panel, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
@@ -200,10 +200,10 @@ local function AssignCurrentSelection()
 end
 
 local function UnbindCurrentSelection()
-    local Keymapper = import('/lua/keymap/keymapper.lua')
+    local KeyMapper = import('/lua/keymap/keymapper.lua')
     for k, v in keyTable do
         if v.selected then
-            Keymapper.ClearUserKeyMapping(v.key)
+            KeyMapper.ClearUserKeyMapping(v.key)
             break
         end
     end
@@ -775,11 +775,11 @@ end
 -- format all key data, group them based on key category or default to none category and finally sort all keys
 function FormatData()
     local retkeys = {}
-    local KeyData = {}
+    local keyData = {}
     local keyLookup = import('/lua/keymap/keymapper.lua').GetKeyLookup()
-    local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions()
+    local keyActions = import('/lua/keymap/keymapper.lua').GetKeyActions()
     -- group game keys and key defined in mods by their key category
-    for k, v in keyactions do
+    for k, v in keyActions do
         local category = string.lower(v.category or 'none')
         local keyForAction = keyLookup[k]
 
@@ -808,7 +808,7 @@ function FormatData()
 
     local index = 1
     for category, v in retkeys do
-        KeyData[index] = { 
+        keyData[index] = { 
             type = 'header', 
             id = index, 
             order = keyGroups[category].order, 
@@ -819,7 +819,7 @@ function FormatData()
         }
         index = index + 1
         for _, data in v do 
-            KeyData[index]  = { 
+            keyData[index]  = { 
                 type = 'entry', 
                 text = data.text,
                 action = data.action,
@@ -840,11 +840,11 @@ function FormatData()
         end
     end
 
-    SortData(KeyData)
+    SortData(keyData)
 
     -- store index of a header line for each key line
     local header = 1
-    for i, data in KeyData do
+    for i, data in keyData do
         if data.type == 'header' then
             header = i
         elseif data.type == 'entry' then
@@ -853,7 +853,7 @@ function FormatData()
         data.index = i
     end
 
-    return KeyData
+    return keyData
 end
 
 function FormatKeyName(key)
