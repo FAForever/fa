@@ -251,7 +251,6 @@ local function ToggleLines(category)
 end
 
 local function SelectLine(dataIndex)
-    local index = nil
     for k, v in keyTable   do
         v.selected = false
     end
@@ -807,8 +806,6 @@ function FormatData()
         table.insert(retkeys[category], data)
     end
 
-    local indexOrders = 1
-    local indexSelection = 1
     local index = 1
     for category, v in retkeys do
         KeyData[index] = { 
