@@ -373,10 +373,10 @@ function CreateLine()
         return false
     end
 
-    line.toggle = CreateToggle(line, 
+    line.toggle = CreateToggle(line,
          'FF131212',  --#FF131212'
          UIUtil.factionTextColor,
-         line.key.Height() + 2, 
+         line.key.Height() + 2,
          18, '+')
     LayoutHelpers.AtLeftIn(line.toggle, line)
     LayoutHelpers.AtVerticalCenterIn(line.toggle, line)
@@ -384,7 +384,7 @@ function CreateLine()
     Tooltip.AddControlTooltip(line.toggle, 
     {
         text = 'Toggle Category',
-        body = 'Toggle visibility of all actions for this category of keys' 
+        body = 'Toggle visibility of all actions for this category of keys'
     })
 
     line.Update = function(self, data, lineID)
@@ -422,7 +422,7 @@ function CreateLine()
     end
     return line
 end
- 
+
 function CreateUI()
     if WorldIsLoading() or (import('/lua/ui/game/gamemain.lua').supressExitDialog == true) then
         return
@@ -441,7 +441,6 @@ function CreateUI()
     dialogContent.Height:Set(730)
 
     panel = Popup(GetFrame(0), dialogContent)
-
     panel.OnDestroy = function(self)
         RemoveInputCapture(dialogContent)
     end
@@ -809,19 +808,19 @@ function FormatData()
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, group in keyGroups do
-        keyData[index] = { 
-            type = 'header', 
-            id = index, 
-            order = keyGroups[category].order, 
-            count = table.getsize(group.actions), 
-            category = category, 
+        keyData[index] = {
+            type = 'header',
+            id = index,
+            order = keyGroups[category].order,
+            count = table.getsize(group.actions),
+            category = category,
             text = keyGroups[category].text,
             collapsed = keyGroups[category].collapsed
         }
         index = index + 1
         for _, data in group.actions do 
-            keyData[index]  = { 
-                type = 'entry', 
+            keyData[index] = {
+                type = 'entry',
                 text = data.text,
                 action = data.action,
                 key = data.key,
@@ -829,7 +828,7 @@ function FormatData()
                 category = category,
                 order = keyGroups[category].order,
                 collapsed = keyGroups[category].collapsed,
-                id = index, 
+                id = index,
                 filters = { -- create filter parameters for quick searching of keys
                      key =  string.gsub( string.lower(data.keyText), ' %+ ', ' '),
                      text = string.lower(data.text or ''),
