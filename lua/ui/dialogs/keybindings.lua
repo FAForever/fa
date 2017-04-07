@@ -315,7 +315,15 @@ function CreateLine()
     line.Width:Set(function() return line.Right() - line.Left() end)
 
     line.statistics = UIUtil.CreateText(line, '', 16, "Arial")
-    line.statistics:DisableHitTest()
+    line.statistics:EnableHitTest()
+    line.statistics:SetColor('FF9A9A9A') --#FF9A9A9A'
+    line.statistics:SetAlpha(0.9)
+
+    Tooltip.AddControlTooltip(line.statistics,
+    {
+        text = 'Category Statistics',
+        body = 'Show total of bound actions and total of all actions in this category of keys'
+    })
 
     LayoutHelpers.AtLeftIn(line.description, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.description, line)
@@ -330,11 +338,13 @@ function CreateLine()
             line:SetAlpha(0.9)
             line.key:SetAlpha(1.0)
             line.description:SetAlpha(1.0)
+            line.statistics:SetAlpha(1.0)
             PlaySound(Sound({Cue = "UI_Menu_Rollover_Sml", Bank = "Interface"})) 
         elseif event.Type == 'MouseExit' then
             line:SetAlpha(1.0)
             line.key:SetAlpha(0.9)
             line.description:SetAlpha(0.9)
+            line.statistics:SetAlpha(0.9)
 
         elseif self.data.type == 'entry' then
             if event.Type == 'ButtonPress' then
@@ -388,14 +398,16 @@ function CreateLine()
                self.toggle.txt:SetText('+')
             else
                self.toggle.txt:SetText('-')
-            end 
+            end
+            local stats = keyGroups[data.category].bindings .. ' / ' .. 
+                          keyGroups[data.category].visible  ..' Actions'
+
             line.toggle:Show()
             line.description:SetText(data.text)
             line.description:SetFont(UIUtil.titleFont, 16)
             line.description:SetColor(UIUtil.factionTextColor) 
             line.key:SetText('')
-            line.statistics:SetText(keyGroups[data.category].visible  ..' Actions') 
-            line.statistics:SetColor('FF9A9A9A') --#FF9A9A9A'
+            line.statistics:SetText(stats)
             
         elseif data.type == 'spacer' then
             line.toggle:Hide()
@@ -688,8 +700,14 @@ function CreateUI()
                 if v.type == 'header' then
                     table.insert(linesVisible, k)
                     keyGroups[v.category].visible = v.count
-                elseif not v.collapsed then
-                    table.insert(linesVisible, k)
+                    keyGroups[v.category].bindings = 0
+                elseif v.type == 'entry' then
+                    if not v.collapsed then
+                        table.insert(linesVisible, k)
+                    end
+                    if v.key then
+                        keyGroups[v.category].bindings = keyGroups[v.category].bindings + 1
+                    end
                 end
             end
         else
@@ -698,6 +716,7 @@ function CreateUI()
                 local match = false
                 if v.type == 'header' then
                     keyGroups[v.category].visible = 0
+                    keyGroups[v.category].bindings = 0
                     if not headersVisible[k] then
                         headersVisible[k] = true
                         table.insert(linesVisible, k)
@@ -728,6 +747,9 @@ function CreateUI()
                         keyGroups[v.category].collapsed = false
                         keyGroups[v.category].visible = keyGroups[v.category].visible + 1
                         table.insert(linesVisible, k)
+                        if v.key then
+                            keyGroups[v.category].bindings = keyGroups[v.category].bindings + 1
+                        end
                     end
                 end
             end
