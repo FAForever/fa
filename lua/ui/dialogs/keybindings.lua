@@ -171,6 +171,7 @@ local function EditActionKey(parent, action, currentKey)
             keyTable = FormatData()
             keyContainer:Filter(keyword)
         end
+
         if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
             UIUtil.QuickDialog(panel, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
@@ -277,7 +278,7 @@ function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
     button.txt:SetFont(UIUtil.bodyFont, txtSize)
     LayoutHelpers.AtVerticalCenterIn(button.txt, button)
     LayoutHelpers.AtHorizontalCenterIn(button.txt, button)
-    
+
     button:SetAlpha(0.8)
     button.txt:SetAlpha(0.8)
 
@@ -370,10 +371,9 @@ function CreateLine()
                 return true
             end
         end
-
         return false
     end
-    
+
     line.toggle = CreateToggle(line, 
          'FF131212',  --#FF131212'
          UIUtil.factionTextColor,
@@ -387,12 +387,10 @@ function CreateLine()
         text = 'Toggle Category',
         body = 'Toggle visibility of all actions for this category of keys' 
     })
-    
+
     line.Update = function(self, data, lineID)
-        
         line:SetSolidColor(GetLineColor(lineID, data))
         line.data = table.copy(data)
-          
         if data.type == 'header' then
             if keyGroups[self.data.category].collapsed then
                self.toggle.txt:SetText('+')
@@ -401,14 +399,12 @@ function CreateLine()
             end
             local stats = keyGroups[data.category].bindings .. ' / ' .. 
                           keyGroups[data.category].visible  ..' Actions'
-
             line.toggle:Show()
             line.description:SetText(data.text)
             line.description:SetFont(UIUtil.titleFont, 16)
             line.description:SetColor(UIUtil.factionTextColor) 
             line.key:SetText('')
             line.statistics:SetText(stats)
-            
         elseif data.type == 'spacer' then
             line.toggle:Hide()
             line.key:SetText('')
@@ -425,7 +421,6 @@ function CreateLine()
             line.statistics:SetText('')
         end
     end
-
     return line
 end
  
@@ -504,7 +499,7 @@ function CreateUI()
             end
         end
     end
-    
+
     keyFilter = Bitmap(dialogContent)
     keyFilter:SetSolidColor('FF282828')-- #FF282828
     keyFilter.Left:Set(function() return dialogContent.Left() + 63 end)
@@ -513,7 +508,7 @@ function CreateUI()
     keyFilter.Bottom:Set(function() return title.Bottom() + 40 end)
     keyFilter.Width:Set(function() return keyFilter.Right() - keyFilter.Left() end)
     keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
-    
+
     keyFilter:EnableHitTest()
     import('/lua/ui/game/tooltip.lua').AddControlTooltip(keyFilter, 
     {
@@ -538,7 +533,7 @@ function CreateUI()
     keyFilter.info:DisableHitTest()
     LayoutHelpers.AtHorizontalCenterIn(keyFilter.info, keyFilter, -7)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.info, keyFilter, 2)
-     
+
     keyFilter.text = Edit(keyFilter)
     keyFilter.text:SetForegroundColor('FFF1ECEC') -- #FFF1ECEC
     keyFilter.text:SetBackgroundColor('04E1B44A') -- #04E1B44A
@@ -599,16 +594,14 @@ function CreateUI()
     keyContainer.Bottom:Set(function() return resetButton.Top() - 10 end)
     keyContainer.Height:Set(function() return keyContainer.Bottom() - keyContainer.Top() - 10 end)
     keyContainer.top = 0
-
     UIUtil.CreateLobbyVertScrollbar(keyContainer)
-    
+
     local index = 1
     keyEntries = {}
     keyEntries[index] = CreateLine()
     LayoutHelpers.AtTopIn(keyEntries[1], keyContainer)
 
     index = index + 1
-    
     while keyEntries[table.getsize(keyEntries)].Top() + (2 * keyEntries[1].Height()) < keyContainer.Bottom() do
         keyEntries[index] = CreateLine()
         LayoutHelpers.Below(keyEntries[index], keyEntries[index-1])
@@ -756,7 +749,6 @@ function CreateUI()
         end
         self:CalcVisible()
     end
-
     keyFilter.text:SetText('')
 end
 
@@ -787,7 +779,6 @@ function FormatData()
     local KeyData = {}
     local keyLookup = import('/lua/keymap/keymapper.lua').GetKeyLookup()
     local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions()
-
     -- group game keys and key defined in mods by their key category
     for k, v in keyactions do
         local category = string.lower(v.category or 'none')
@@ -885,9 +876,9 @@ function FormatKeyName(key)
 
     while string.find(key, '-') do
         local loc = string.find(key, '-')
-        local token = string.sub(key, 1, loc-1)
-        result = result..LookupToken(token)..' + '
-        key = string.sub(key, loc+1)
+        local token = string.sub(key, 1, loc - 1)
+        result = result .. LookupToken(token) .. ' + '
+        key = string.sub(key, loc + 1)
     end
 
     return result..LookupToken(key)
