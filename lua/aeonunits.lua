@@ -190,27 +190,16 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
         local bp = self:GetBlueprint()
-        local bpAnim = bp.Display.AnimationOpen
-        if not bpAnim then return end
-        if not self.OpenAnim then
-            self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(bpAnim)
-            self.Trash:Add(self.OpenAnim)
-        end
         if not self.Rotator then
             self.Rotator = CreateRotator(self, 'Pod', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)
         end
         self.Rotator:SetSpinDown(false)
         self.Rotator:SetTargetSpeed(self.RotateSpeed)
-        self.OpenAnim:SetRate(1)
     end,
 
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
-        if self.OpenAnim then
-            self.OpenAnim:SetRate(-1)
-        end
         if self.Rotator then
             
             self.Rotator:SetTargetSpeed(0)
