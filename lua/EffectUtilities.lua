@@ -1086,11 +1086,11 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
     if validAdjacency then
         -- Offset beam positions above the ground at current positions terrain height
         for k, v in nodeList do
-            v.pos[2] = GetSurfaceHeight(v.pos[1], v.pos[3]) + verticalOffset
+            v.pos[2] = GetTerrainHeight(v.pos[1], v.pos[3]) + verticalOffset
         end
 
-        unitHub.pos[2] = GetSurfaceHeight(unitHub.pos[1], unitHub.pos[3]) + verticalOffset
-        adjacentHub.pos[2] = GetSurfaceHeight(adjacentHub.pos[1], adjacentHub.pos[3]) + verticalOffset
+        unitHub.pos[2] = GetTerrainHeight(unitHub.pos[1], unitHub.pos[3]) + verticalOffset
+        adjacentHub.pos[2] = GetTerrainHeight(adjacentHub.pos[1], adjacentHub.pos[3]) + verticalOffset
 
         -- Set the mesh of the entity and attach any node effects
         for i = 1, numNodes do
