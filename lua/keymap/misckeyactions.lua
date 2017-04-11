@@ -372,5 +372,5 @@ function CreateTemplateFactory()
     if selection and table.getn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
     end
-    import('/modules/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
+    import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
 end
