@@ -28,7 +28,6 @@ whitelist = {
     "lua.nx5",
     "meshes.nx5",
     "mods.nx5",
-    "modules.nx5",
     "projectiles.nx5",
     "schook.nx5",
     "textures.nx5",
