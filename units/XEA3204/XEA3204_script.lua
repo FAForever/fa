@@ -8,7 +8,6 @@
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
 XEA3204 = Class(TConstructionUnit) {
-
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         self.docked = true
@@ -29,8 +28,8 @@ XEA3204 = Class(TConstructionUnit) {
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.returning = false
     end,
 
@@ -44,7 +43,7 @@ XEA3204 = Class(TConstructionUnit) {
         self.returning = true
     end,
 
-    OnMotionHorzEventChange = function( self, new, old )
+    OnMotionHorzEventChange = function(self, new, old)
         if self and not self:IsDead() then
             if self.Parent and not self.Parent:IsDead() then
                 local myPosition = self:GetPosition()

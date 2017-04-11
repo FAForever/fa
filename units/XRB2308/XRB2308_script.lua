@@ -19,8 +19,8 @@ XRB2308 = Class(CStructureUnit) {
         self:StartSinkingFromBuild()
 
         local army = self:GetArmy() -- Add inital sinking effects
-        self.Trash:Add(CreateAttachedEmitter(self,'xrb2308', army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
-        self.Trash:Add(CreateAttachedEmitter(self,'xrb2308', army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
 
         ChangeState(self, self.IdleState)
     end,
@@ -28,7 +28,7 @@ XRB2308 = Class(CStructureUnit) {
     StartSinkingFromBuild = function(self)
         -- Add sinking effect for the duration of the sinking
         local army = self:GetArmy()
-        self.Trash:Add(CreateAttachedEmitter(self,'xrb2308', army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
 
         -- Create sinker projectile
         local bone = 0
@@ -87,8 +87,8 @@ XRB2308 = Class(CStructureUnit) {
 
         -- Add an initial death explosion
         local army = self:GetArmy()
-        self.Trash:Add(CreateAttachedEmitter(self,'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
-        self.Trash:Add(CreateAttachedEmitter(self,'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
 
         self:DestroyAllDamageEffects()
         self:PlaySound(bp.Audio.Destroyed)
