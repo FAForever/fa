@@ -808,35 +808,37 @@ function FormatData()
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, group in keyGroups do
-        keyData[index] = {
-            type = 'header',
-            id = index,
-            order = keyGroups[category].order,
-            count = table.getsize(group.actions),
-            category = category,
-            text = keyGroups[category].text,
-            collapsed = keyGroups[category].collapsed
-        }
-        index = index + 1
-        for _, data in group.actions do 
+        if table.getsize(group.actions) > 0 then
             keyData[index] = {
-                type = 'entry',
-                text = data.text,
-                action = data.action,
-                key = data.key,
-                keyText = LOC(data.keyText),
-                category = category,
-                order = keyGroups[category].order,
-                collapsed = keyGroups[category].collapsed,
+                type = 'header',
                 id = index,
-                filters = { -- create filter parameters for quick searching of keys
-                     key =  string.gsub( string.lower(data.keyText), ' %+ ', ' '),
-                     text = string.lower(data.text or ''),
-                     action = string.lower(data.action or ''),
-                     category = string.lower(data.category or ''),
-                }
-            } 
+                order = keyGroups[category].order,
+                count = table.getsize(group.actions),
+                category = category,
+                text = keyGroups[category].text,
+                collapsed = keyGroups[category].collapsed
+            }
             index = index + 1
+            for _, data in group.actions do 
+                keyData[index] = {
+                    type = 'entry',
+                    text = data.text,
+                    action = data.action,
+                    key = data.key,
+                    keyText = LOC(data.keyText),
+                    category = category,
+                    order = keyGroups[category].order,
+                    collapsed = keyGroups[category].collapsed,
+                    id = index,
+                    filters = { -- create filter parameters for quick searching of keys
+                         key =  string.gsub( string.lower(data.keyText), ' %+ ', ' '),
+                         text = string.lower(data.text or ''),
+                         action = string.lower(data.action or ''),
+                         category = string.lower(data.category or ''),
+                    }
+                } 
+                index = index + 1
+            end
         end
     end
 
