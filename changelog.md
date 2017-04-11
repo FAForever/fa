@@ -24,6 +24,9 @@ Patch 3680 (Upcoming)
 - Fixed unit restrictions not updating correctly when HQs are transferred between players
 - Fixed ancient bug which didn't deselect factory units properly, leading to accidental pausing of those units
 - Fixed the 'Select Onscreen Land/Air/Navy' hotkey also selecting the factories of that type
+- Fixed the Mex Cap feature somehow allowing storage to be built inside units built via upgrade
+- Fixed bug where the Aeon shields didn't visually rotate properly
+- Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -46,6 +49,7 @@ Patch 3680 (Upcoming)
 - Pause button is now visible and active in the Enhancements and Selection tabs
 - Allowed multiple nuke pings to display simultaneously
 - Corrected several incorrect tooltips on SCUs
+- You can now search for bindings or actions in the F1 key binding menu
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
@@ -68,6 +72,7 @@ Patch 3680 (Upcoming)
 - PhilipJFry
 - Speed2
 - TheKeyBlue
+- ThomasHiatt
 
 
 Patch 3676 (27th February, 2017)
