@@ -1756,7 +1756,7 @@ function CreateExtraControls(controlType)
     end
 end
 
-local insertIntoTableLowestTechFirst = import('/modules/selectionsort.lua').insertIntoTableLowestTechFirst
+local insertIntoTableLowestTechFirst = import('/lua/ui/game/selectionsort.lua').insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
