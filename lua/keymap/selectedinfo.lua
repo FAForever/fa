@@ -12,10 +12,11 @@ local selectionOverlay = {
 SelectedInfoOn = true
 SelectedOverlayOn = true
 
-if options.gui_enhanced_unitview == 0 then 
+if options.gui_enhanced_unitview == 0 then
    SelectedInfoOn = false
 end
-if options.gui_enhanced_unitrings == 0 then 
+
+if options.gui_enhanced_unitrings == 0 then
    SelectedOverlayOn = false
 end
 
@@ -44,12 +45,12 @@ function GetUnitRolloverInfo(unit)
 	if unit:GetFocus() then
 		info.focus = GetUnitRolloverInfo(unit:GetFocus())
 	end
-   
+
 	local killStat = unit:GetStat('KILLS')
 	info.kills = killStat.Value
 
 	local missileInfo = unit:GetMissileInfo()
-	info.nukeSiloBuildCount = missileInfo.nukeSiloBuildCount 
+	info.nukeSiloBuildCount = missileInfo.nukeSiloBuildCount
 	info.nukeSiloMaxStorageCount = missileInfo.nukeSiloMaxStorageCount
 	info.nukeSiloStorageCount = missileInfo.nukeSiloStorageCount
 	info.tacticalSiloBuildCount = missileInfo.tacticalSiloBuildCount
@@ -59,7 +60,6 @@ function GetUnitRolloverInfo(unit)
 	info.customName = unit:GetCustomName(unit)
 	info.userUnit = unit
 	info.armyIndex = unit:GetArmy() - 1
---   info.teamColor="ffe80a0a"
 
 	return info
 end
@@ -81,7 +81,7 @@ function ToggleOverlayOn()
       local selUnits = GetSelectedUnits()
       if selUnits and table.getn(selUnits) == 1 then
          ActivateSingleRangeOverlay()
-      end         
+      end
    end
 end
 
