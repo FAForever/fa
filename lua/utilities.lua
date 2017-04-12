@@ -28,8 +28,8 @@ function CanBuildInSpot(originUnit, unitId, pos)
     -- Find all the units in that rectangle
     local units = GetUnitsInRect(Rect(x1, z1, x2, z2))
 
-    -- Filter it down to structures only
-    units = EntityCategoryFilterDown(categories.STRUCTURE, units)
+    -- Filter it down to structures and experimentals only
+    units = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, units)
 
     -- Bail if there's nothing in range
     if not units[1] then return false end
