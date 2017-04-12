@@ -10,10 +10,18 @@
 
 local Prefs = import('/lua/user/prefs.lua')
 
+function GetDefaultKeyMapName()
+    return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
+end
+
+function SetDefaultKeyMapName(preset)
+    Prefs.SetToCurrentProfile("UserKeyMapName", preset)
+end
+
 function GetDefaultKeyMap()
-    local ret = {}
-    local defaultKeyMap = import('defaultKeyMap.lua').defaultKeyMap
-    local debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
+    local ret = {} 
+    local defaultKeyMap = import(GetDefaultKeyMapName()).defaultKeyMap
+    local debugKeyMap = import(GetDefaultKeyMapName()).debugKeyMap
 
     for k,v in defaultKeyMap do
         ret[k] = v
@@ -142,6 +150,13 @@ function GetKeyActions()
     if userActions ~= nil then
         for k,v in userActions do
             ret[k] = v
+        end
+    end
+
+    -- remove invalid key actions
+    for k,v in ret do
+        if string.find(k, '-') then
+            ret[k] = nil
         end
     end
 
