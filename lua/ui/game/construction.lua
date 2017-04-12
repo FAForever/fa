@@ -153,7 +153,7 @@ function DecreaseBuildCountInQueue(unitIndex, count)
         supportfactory = blueprint.CategoriesHash.SUPPORTFACTORY
     end
 
-    if not tech3 and supportfactory then
+    if not (tech3 and supportfactory) then
         oldDecreaseBuildCountInQueue(unitIndex, count)
     else
         LOG("Not canceling t3 support factory")
