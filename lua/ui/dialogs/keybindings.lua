@@ -462,7 +462,7 @@ function CreateLine()
                self.toggle.txt:SetText('-')
             end
             local stats = keyGroups[data.category].bindings .. ' / ' .. 
-                          keyGroups[data.category].visible  ..' Actions'
+                          keyGroups[data.category].visible  ..' Actions Bound'
             line.toggle:Show()
             line.assignKeyButton:Hide()
             line.unbindKeyButton:Hide()
