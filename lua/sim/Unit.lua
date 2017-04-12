@@ -718,7 +718,7 @@ Unit = Class(moho.unit_methods) {
 
         if not self.CaptureThread then
             self.CaptureThread = self:ForkThread(function()
-                local captors = self:GetCaptors()
+                local captors = self.Captors or {}
                 while table.getsize(captors) > 0 do
                     for _, c in captors do
                         self:CheckCaptor(c)
