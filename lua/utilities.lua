@@ -32,9 +32,8 @@ function CanBuildInSpot(originUnit, unitId, pos)
     units = EntityCategoryFilterDown(categories.STRUCTURE, units)
 
     -- Bail if there's nothing in range
-    if not units[1] then return end
+    if not units[1] then return false end
 
-    local allowed = true
     for _, struct in units do
         if struct ~= originUnit then
             local structPhysics = struct:GetBlueprint().Physics
@@ -50,13 +49,12 @@ function CanBuildInSpot(originUnit, unitId, pos)
             -- Check if the axis difference is smaller than the combined skirt distance
             -- If it is, we overlap, and can't build here
             if xDist < skirtDiffx and zDist < skirtDiffz then
-                allowed = false
-                break
+                return false
             end
         end
     end
 
-    return allowed
+    return true
 end
 
 -- Note: Includes allied units in selection!!
