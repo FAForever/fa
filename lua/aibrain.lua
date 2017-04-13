@@ -717,7 +717,7 @@ AIBrain = Class(moho.aibrain_methods) {
             self.CurrentPlan = bestPlan
         end
         if not self.CurrentPlan then
-            error(' * AI ERROR: Invalid plan list for army - '..self.Name, 2)
+            error('*AI ERROR: Invalid plan list for army - '..self.Name, 2)
         end
     end,
 
@@ -1022,7 +1022,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     GetLocationPosition = function(self, locationType)
         if not self.BuilderManagers[locationType] then
-            WARN(' * AI ERROR: Invalid location type - ' .. locationType)
+            WARN('*AI ERROR: Invalid location type - ' .. locationType)
             return false
         end
         return self.BuilderManagers[locationType].Position
@@ -1241,7 +1241,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         if not consumptionData[consumptionType] then
-            WARN(' * AI WARNING: Invalid consumptionType - ' .. consumptionType)
+            WARN('*AI WARNING: Invalid consumptionType - ' .. consumptionType)
             return
         end
 
@@ -1522,18 +1522,18 @@ AIBrain = Class(moho.aibrain_methods) {
     --  },
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
-            local stng = ' * AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
+            local stng = '*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
             error(stng, 1)
             return
         end
 
         if pltnTable.RequiresConstruction == nil then
-            error(' * AI ERROR: INVALID PLATOON LIST IN ' .. self.CurrentPlan .. ' - MISSING RequiresConstruction', 1)
+            error('*AI ERROR: INVALID PLATOON LIST IN ' .. self.CurrentPlan .. ' - MISSING RequiresConstruction', 1)
             return
         end
 
         if not pltnTable.Priority then
-            error(' * AI ERROR: INVALID PLATOON LIST IN ' .. self.CurrentPlan .. ' - MISSING PRIORITY', 1)
+            error('*AI ERROR: INVALID PLATOON LIST IN ' .. self.CurrentPlan .. ' - MISSING PRIORITY', 1)
             return
         end
 
@@ -1856,7 +1856,7 @@ AIBrain = Class(moho.aibrain_methods) {
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
                 if not v.PlatoonHandles then
-                    error(' * AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
+                    error('*AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
                     return false
                 end
                 for num, plat in v.PlatoonHandles do
@@ -1879,7 +1879,7 @@ AIBrain = Class(moho.aibrain_methods) {
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
                 if not v.PlatoonHandles then
-                    error(' * AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
+                    error('*AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
                     return false
                 end
                 for num, plat in v.PlatoonHandles do
@@ -1901,7 +1901,7 @@ AIBrain = Class(moho.aibrain_methods) {
     -- Adds a new build location
     PBMAddBuildLocation = function(self, loc, radius, locType, useCenterPoint)
         if not radius or not loc or not locType then
-            error(' * AI ERROR: INVALID BUILD LOCATION FOR PBM', 2)
+            error('*AI ERROR: INVALID BUILD LOCATION FOR PBM', 2)
             return false
         end
         if type(loc) == 'string' then
@@ -1928,7 +1928,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if not found then
             table.insert(self.PBM.Locations, spec)
         else
-            error(' * AI  ERROR: Attempting to add a build location with a duplicate name: '..spec.LocationType, 2)
+            error('*AI  ERROR: Attempting to add a build location with a duplicate name: '..spec.LocationType, 2)
             return
         end
     end,
@@ -2030,7 +2030,7 @@ AIBrain = Class(moho.aibrain_methods) {
     -- PlatoonType = 'Air', 'Land' or 'Sea'
     PBMSortPlatoonsViaPriority = function(self, platoonType)
          if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
-            local strng = ' * AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
+            local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
             error(strng, 2)
             return false
         end
@@ -2136,7 +2136,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 return true
             end
         end
-        error(' * AI DEBUG: Error trying to store a PBM platoon')
+        error('*AI DEBUG: Error trying to store a PBM platoon')
 
         return false
     end,
@@ -2145,7 +2145,7 @@ AIBrain = Class(moho.aibrain_methods) {
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
                 if not v.PlatoonHandles then
-                    error(' * AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
+                    error('*AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
                     return false
                 end
                 for num, plat in v.PlatoonHandles do
@@ -2159,7 +2159,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     PBMSetHandleBuilding = function(self, builder)
         if not builder.PlatoonHandles then
-            error(' * AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
+            error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
             return false
         end
         for k, v in builder.PlatoonHandles do
@@ -2168,14 +2168,14 @@ AIBrain = Class(moho.aibrain_methods) {
                 return true
             end
         end
-        error(' * AI DEBUG: No handle spot empty! - ' .. builder.BuilderName)
+        error('*AI DEBUG: No handle spot empty! - ' .. builder.BuilderName)
 
         return false
     end,
 
     PBMCheckHandleBuilding = function(self, builder)
         if not builder.PlatoonHandles then
-            error(' * AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
+            error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
             return false
         end
         for k, v in builder.PlatoonHandles do
@@ -2188,7 +2188,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     PBMSetBuildingHandleFalse = function(self, builder)
         if not builder.PlatoonHandles then
-            ERROR(' * AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
+            ERROR('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
             return false
         end
         for k, v in builder.PlatoonHandles do

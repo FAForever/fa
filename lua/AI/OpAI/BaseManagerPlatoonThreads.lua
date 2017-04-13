@@ -637,7 +637,7 @@ function ExpansionEngineer(platoon)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
 
-    if not data.BaseName and aiBrain.BaseManagers[data.BaseName] and aiBrain.BaseManagers[data.BaseName].ExpansionBaseData then
+    if not (data.BaseName and aiBrain.BaseManagers[data.BaseName] and aiBrain.BaseManagers[data.BaseName].ExpansionBaseData) then
         aiBrain:DisbandPlatoon(platoon)
         return
     end

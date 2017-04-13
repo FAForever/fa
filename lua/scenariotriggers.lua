@@ -231,7 +231,7 @@ function CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
     }
     for num, trigger in aiBrain.TriggerList do
         if name == trigger.Name then
-            error(' * TRIGGER ERROR: Must use unique names for new triggers- Supplied name: '..trigger.Name, 2)
+            error('*TRIGGER ERROR: Must use unique names for new triggers- Supplied name: '..trigger.Name, 2)
             return
         end
     end

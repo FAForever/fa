@@ -543,7 +543,6 @@ function PatrolChainPickerThread(platoon)
         if data.PatrolChains then
             local chain = Random(1, table.getn(data.PatrolChains))
             ScenarioFramework.PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(data.PatrolChains[chain]))
-            LOG('Picked chain number ', chain)
         else
             error('*SCENARIO PLATOON AI ERROR: PatrolChains not defined', 2)
         end
@@ -1875,7 +1874,6 @@ function GetLoadTransports(platoon)
         if not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
-                LOG('*DEBUG: ADDING UNIT TO LEFTOVER POOL')
             end
         end
     end
@@ -1929,11 +1927,9 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 else
-                    LOG('*AI DEBUG: FOUND TRANSPORT NOT ENOUGH SLOTS')
                     table.insert(leftoverUnits, unit)
                 end
             else
-                LOG('*AI DEBUG: NO TRANSPORT FOUND')
                 table.insert(leftoverUnits, unit)
             end
         end
@@ -2183,16 +2179,15 @@ function GetTransportsThread(platoon)
                             end
                         end
                         sortedList[k] = value
-                        -- remove from unsorted table
+                        -- Remove from unsorted table
                         table.remove(transports, key)
                     end
                     -- Take transports as needed
-                    for i=1, table.getn(sortedList) do
+                    for i = 1, table.getn(sortedList) do
                         if transportsNeeded then
                             local id = sortedList[i].Id
                             aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
                             numTransports = numTransports + 1
-                            IssueMove({sortedList[i].Unit}, platoon:GetPlatoonPosition())
                             if not transSlotTable[id] then
                                 transSlotTable[id] = GetNumTransportSlots(sortedList[i].Unit)
                             end
@@ -2278,7 +2273,7 @@ function GetNumTransportSlots(unit)
         Medium = 0,
         Small = 0,
     }
-    for i=1, unit:GetBoneCount() do
+    for i = 1, unit:GetBoneCount() do
         if unit:GetBoneName(i) ~= nil then
             if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
                 bones.Large = bones.Large + 1

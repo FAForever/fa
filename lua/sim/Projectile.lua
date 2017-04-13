@@ -73,7 +73,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
-    -- Do not call the base class __init and __post_init, we already have a c + + object
+    -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self, spec)
     end,
 
@@ -366,7 +366,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             ImpactEffects = self.FxImpactShield
             ImpactEffectScale = self.FxShieldHitScale
         else
-            LOG(' * ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
+            LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
         local TerrainEffects = self:GetTerrainEffects(targetType, self:GetBlueprint().Display.ImpactEffects.Type)
