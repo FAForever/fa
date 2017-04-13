@@ -11,7 +11,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local minimumLabelMass = 10
 
 Prop = Class(moho.prop_methods, Entity) {
-    -- Do not call the base class __init and __post_init, we already have a c + + object
+    -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self, spec)
     end,
 
@@ -58,7 +58,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     AddPropCallback = function(self, fn, type)
         if not fn then
-            error(' * ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
+            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
         table.insert(self.EventCallbacks[type], fn)
