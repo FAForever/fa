@@ -50,6 +50,8 @@ Patch 3680 (Upcoming)
 - Allowed multiple nuke pings to display simultaneously
 - Corrected several incorrect tooltips on SCUs
 - You can now search for bindings or actions in the F1 key binding menu
+- The buttons for adding and removing key bindings have been moved to be on the same line as the binding
+- Added Hotbuild Preset button. This will automatically set your bindings to the Hotbuild Preset. There is also a button to set back to Default Preset.
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
@@ -61,6 +63,7 @@ Patch 3680 (Upcoming)
 - Uncapped max framerate for people with monitor refresh rates >100
 - Fixed desync in COOP
 - Allow Salem death sound on land in COOP
+- Allowed restricted units to be captured in COOP
 
 ### Contributors
 - CookieNoob
