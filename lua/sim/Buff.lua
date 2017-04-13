@@ -210,11 +210,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
             if not vals.DoNoFill and not unit.IsBeingTransferred then
                 if val > oldmax then
-                    local adjust = val - oldmax
-                    if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
-                        adjust = adjust / 2
-                    end
-                    unit:AdjustHealth(unit, adjust)
+                    unit:AdjustHealth(unit, val - oldmax)
                 else
                     unit:SetHealth(unit, math.min(unit:GetHealth(), unit:GetMaxHealth()))
                 end
