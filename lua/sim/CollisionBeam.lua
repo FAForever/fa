@@ -126,13 +126,13 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     CreateBeamEffects = function(self)
         local army = self:GetArmy()
         for k, y in self.FxBeamStartPoint do
-            local fx = CreateAttachedEmitter(self, 0, army, y ):ScaleEmitter(self.FxBeamStartPointScale)
-            table.insert( self.BeamEffectsBag, fx)
+            local fx = CreateAttachedEmitter(self, 0, army, y):ScaleEmitter(self.FxBeamStartPointScale)
+            table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         for k, y in self.FxBeamEndPoint do
-            local fx = CreateAttachedEmitter(self, 1, army, y ):ScaleEmitter(self.FxBeamEndPointScale)
-            table.insert( self.BeamEffectsBag, fx)
+            local fx = CreateAttachedEmitter(self, 1, army, y):ScaleEmitter(self.FxBeamEndPointScale)
+            table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         if table.getn(self.FxBeam) ~= 0 then
@@ -144,7 +144,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
 
-            table.insert( self.BeamEffectsBag, fxBeam )
+            table.insert(self.BeamEffectsBag, fxBeam)
             self.Trash:Add(fxBeam)
         else
             LOG('*ERROR: THERE IS NO BEAM EMITTER DEFINED FOR THIS COLLISION BEAM ', repr(self.FxBeam))
@@ -158,7 +158,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self.BeamEffectsBag = {}
     end,
 
-    CreateImpactEffects = function( self, army, EffectTable, EffectScale )
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         EffectTable = EffectTable or {}
         EffectScale = EffectScale or 1
@@ -170,39 +170,39 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
     end,
 
-    CreateTerrainEffects = function( self, army, EffectTable, EffectScale )
+    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for k, v in EffectTable do
             emit = CreateAttachedEmitter(self,1,army,v)
-            table.insert(self.TerrainEffectsBag, emit )
+            table.insert(self.TerrainEffectsBag, emit)
             if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale)
             end
         end
     end,
 
-    DestroyTerrainEffects = function( self )
+    DestroyTerrainEffects = function(self)
         for k, v in self.TerrainEffectsBag do
             v:Destroy()
         end
         self.TerrainEffectsBag = {}
     end,
 
-    UpdateTerrainCollisionEffects = function( self, TargetType )
+    UpdateTerrainCollisionEffects = function(self, TargetType)
         local pos = self:GetPosition(1)
         local TerrainType = nil
 
         if self.TerrainImpactType ~= 'Default' then
-            TerrainType = GetTerrainType( pos.x,pos.z )
+            TerrainType = GetTerrainType(pos.x,pos.z)
         else
-            TerrainType = GetTerrainType( -1, -1 )
+            TerrainType = GetTerrainType(-1, -1)
         end
 
         local TerrainEffects = TerrainType.FXImpact[TargetType][self.TerrainImpactType] or nil
 
         if TerrainEffects and (self.LastTerrainType ~= TerrainType) then
             self:DestroyTerrainEffects()
-            self:CreateTerrainEffects( self:GetArmy(), TerrainEffects, self.TerrainImpactScale )
+            self:CreateTerrainEffects(self:GetArmy(), TerrainEffects, self.TerrainImpactScale)
             self.LastTerrainType = TerrainType
         end
     end,
@@ -242,7 +242,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     OnImpact = function(self, impactType, targetEntity)
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT ', repr(self))
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT, WEAPON =  ', repr(self.Weapon), 'Type = ', impactType)
-        -- LOG('CollisionBeam impacted with: ' .. impactType )
+        -- LOG('CollisionBeam impacted with: ' .. impactType)
         -- Possible 'type' values are:
         --  'Unit'
         --  'Terrain'
@@ -311,8 +311,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             LOG('*ERROR: CollisionBeam:OnImpact(): UNKNOWN TARGET TYPE ', repr(impactType))
         end
 
-        self:CreateImpactEffects( army, ImpactEffects, ImpactEffectScale )
-        self:UpdateTerrainCollisionEffects( impactType )
+        self:CreateImpactEffects(army, ImpactEffects, ImpactEffectScale)
+        self:UpdateTerrainCollisionEffects(impactType)
     end,
 
     GetCollideFriendly = function(self)

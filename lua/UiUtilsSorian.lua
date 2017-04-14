@@ -19,7 +19,7 @@ function ProcessAIChat(to, from, text)
                         SimCallback({Func = 'AIChat', Args = {Army = i, NewTarget = 'at will'}})
                     else
                         for x, z in armies.armiesTable do
-                            if trim(string.lower(string.gsub(z.nickname,'%b()', '' ))) == string.lower(aftertext) then
+                            if trim(string.lower(string.gsub(z.nickname,'%b()', ''))) == string.lower(aftertext) then
                                 SimCallback({Func = 'AIChat', Args = {Army = i, NewTarget = x}})
                             end
                         end

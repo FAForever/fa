@@ -14,7 +14,7 @@ InitialRegistration = true
 doscript '/lua/system/BuffBlueprints.lua'
 
 # Load buff definitions
-import( '/lua/sim/BuffDefinitions.lua')
+import('/lua/sim/BuffDefinitions.lua')
 
 # Load Platoon Template systems
 doscript '/lua/system/GlobalPlatoonTemplate.lua'

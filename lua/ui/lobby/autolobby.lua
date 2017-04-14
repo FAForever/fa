@@ -176,7 +176,7 @@ local function CheckForLaunch()
     gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
-    lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
+    lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
     LOG(repr(gameInfo))
     lobbyComm:LaunchGame(gameInfo)
 end
@@ -265,7 +265,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerID = myID
 
         -- Ok, I'm connected to the host. Now request to become a player
-        lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
+        lobbyComm:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
     end
 
     lobbyComm.DataReceived = function(self,data)
@@ -274,7 +274,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         if lobbyComm:IsHost() then
             # Host Messages
             if data.Type == 'AddPlayer' then
-                HostAddPlayer( data.SenderID, data.PlayerInfo )
+                HostAddPlayer(data.SenderID, data.PlayerInfo)
             end
         else
             # Non-Host Messages

@@ -101,7 +101,7 @@ end
 #
 ##############################################################################################################
 function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
-    local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain )
+    local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain)
     if numUnits < numReq then
         return true
     end
@@ -117,13 +117,13 @@ end
 # parameter 3: int      num             = 1
 #
 ##############################################################################################################
-function NumUnitsLessNearBase( aiBrain, baseName, category, num )
+function NumUnitsLessNearBase(aiBrain, baseName, category, num)
     if brain.BaseTemplates[baseName].Location == nil then
         return false
     else
         local unitList = brain:GetUnitsAroundPoint(category,
                                                    brain.BaseTemplates[baseName].Location,
-                                                   brain.BaseTemplates[baseName].Radius, 'Ally' )
+                                                   brain.BaseTemplates[baseName].Radius, 'Ally')
         local count = 0
         for i,unit in unitList do
             if unit:GetAIBrain() == brain then
@@ -245,7 +245,7 @@ function HaveLessThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category,
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain )
+    local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain)
     if ScenarioInfo.VarTable[varName] then
         if numUnits < ScenarioInfo.VarTable[varName] then
             return true
@@ -267,7 +267,7 @@ function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, catego
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain )
+    local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain)
     if ScenarioInfo.VarTable[varName] then
         if numUnits > ScenarioInfo.VarTable[varName] then
             return true
@@ -297,7 +297,7 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, con
 
     local numUnits
     if consCat then
-        numUnits = aiBrain:NumCurrentlyBuilding(cat, cat + categories.CONSTRUCTION + consCat )
+        numUnits = aiBrain:NumCurrentlyBuilding(cat, cat + categories.CONSTRUCTION + consCat)
     else
         numUnits = aiBrain:NumCurrentlyBuilding(cat, cat + categories.CONSTRUCTION)
     end
@@ -323,19 +323,19 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
+    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 numBuilding = numBuilding + 1
             end
         end
         #DUNCAN - added to pick up engineers that havent started building yet... does it work?
         if not unit:BeenDestroyed() and not unit:IsUnitState('Building') then
             local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 #LOG('Engi building but not in building state...')
                 numBuilding = numBuilding + 1
             end
@@ -365,16 +365,16 @@ end
 # parameter 9: expr     threatRings = false
 #
 ##############################################################################################################
-function HaveLessThanUnitsAroundMarkerCategory( aiBrain, markerType, markerRadius, locationType, locationRadius,
-    unitCount, unitCategory, threatMin, threatMax, threatRings, threatType )
-    local pos = aiBrain:PBMGetLocationCoords( locationType )
+function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius, locationType, locationRadius,
+    unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
+    local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
         return false
     end
-    local positions = AIUtils.AIGetMarkersAroundLocation( aiBrain, markerType, pos, locationType, threatMin, threatMax, threatRings, threatType)
+    local positions = AIUtils.AIGetMarkersAroundLocation(aiBrain, markerType, pos, locationType, threatMin, threatMax, threatRings, threatType)
     for k,v in positions do
-        local unitTotal = table.getn( AIUtils.GetOwnUnitsAroundPoint( aiBrain, ParseEntityCategory(unitCategory), v.Position, markerRadius, threatMin,
-            threatMax, threatRings, threatType) )
+        local unitTotal = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(unitCategory), v.Position, markerRadius, threatMin,
+            threatMax, threatRings, threatType))
         if unitTotal < unitCount then
             return true
         end
@@ -382,84 +382,84 @@ function HaveLessThanUnitsAroundMarkerCategory( aiBrain, markerType, markerRadiu
     return false
 end
 
-function StartLocationNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindStartLocationNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+function StartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindStartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function StartLocationsFull( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindStartLocationNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+function StartLocationsFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindStartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if not pos then
         return true
     end
     return false
 end
 
-function ExpansionAreaNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindExpansionAreaNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+function ExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function NavalAreaNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+function NavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function NavalAreasFull( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer( aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+function NavalAreasFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if not pos then
         return true
     end
     return false
 end
 
-function DefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindDefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
+function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function NavalDefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindNavalDefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
+function NavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindNavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function HaveAreaWithUnitsFewWalls( aiBrain, locationType, locationRadius, unitCount, unitCategory, threatMin, threatMax, threatRings, threatType )
-    local pos = aiBrain:PBMGetLocationCoords( locationType )
+function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
+    local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
         return false
     end
     local positions = {}
     if aiBrain:PBMHasPlatoonList() then
         for k,v in aiBrain.PBM.Locations do
-            if v.LocationType ~= locationType and Utils.XZDistanceTwoVectors( pos, v.Location ) <= locationRadius then
-                table.insert( positions, v.Location )
+            if v.LocationType ~= locationType and Utils.XZDistanceTwoVectors(pos, v.Location) <= locationRadius then
+                table.insert(positions, v.Location)
             end
         end
     elseif aiBrain.BuilderManagers[locationType] then
-        table.insert( positions, aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords() )
+        table.insert(positions, aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords())
     end
-    local otherPos = AIUtils.AIGetMarkersAroundLocation( aiBrain, 'Defensive Point', pos, locationRadius, threatMin, threatMax, threatRings, threatType)
+    local otherPos = AIUtils.AIGetMarkersAroundLocation(aiBrain, 'Defensive Point', pos, locationRadius, threatMin, threatMax, threatRings, threatType)
     for k,v in otherPos do
-        table.insert( positions, v.Position )
+        table.insert(positions, v.Position)
     end
     for k,v in positions do
-        local unitTotal = table.getn( AIUtils.GetOwnUnitsAroundPoint( aiBrain, ParseEntityCategory('DEFENSE'), v, 30, threatMin,
-            threatMax, threatRings, threatType) )
+        local unitTotal = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory('DEFENSE'), v, 30, threatMin,
+            threatMax, threatRings, threatType))
         if unitTotal > unitCount then
             if aiBrain:GetNumUnitsAroundPoint(categories.WALL, v, 30, 'Ally') < 15 then
                 return true
@@ -486,7 +486,7 @@ function HaveUnitsWithCategoryAndAlliance(aiBrain, greater, numReq, category, al
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    local numUnits = aiBrain:GetNumUnitsAroundPoint( testCat, Vector(0,0,0), 100000, alliance )
+    local numUnits = aiBrain:GetNumUnitsAroundPoint(testCat, Vector(0,0,0), 100000, alliance)
     if numUnits > numReq and greater then
         return true
     elseif numUnits < numReq and not greater then
@@ -496,8 +496,8 @@ function HaveUnitsWithCategoryAndAlliance(aiBrain, greater, numReq, category, al
 end
 
 
-function EngineersNeedGuard( aiBrain, locationType )
-    local units = aiBrain:GetListOfUnits( categories.ENGINEER - categories.COMMAND, false )
+function EngineersNeedGuard(aiBrain, locationType)
+    local units = aiBrain:GetListOfUnits(categories.ENGINEER - categories.COMMAND, false)
     for k,v in units do
         if v.NeedGuard and not v.BeingGuarded then
             return true
@@ -509,7 +509,7 @@ end
 # =========================================== #
 #     Builder Manager Generic Unit Counts
 # =========================================== #
-function HaveUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, compareType )
+function HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -519,22 +519,22 @@ function HaveUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCat
         WARN('*AI WARNING: HaveUnitComparisonAtLocation - Invalid location - ' .. locationType)
         return false
     end
-    local numUnits = table.getn( AIUtils.GetOwnUnitsAroundPoint( aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() ) )
+    local numUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius()))
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function UnitsLessAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return HaveUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '<')
+function UnitsLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
-function UnitsGreaterAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return HaveUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '>')
+function UnitsGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
 # ============================================ #
 #     Builder Manager Location Pool Counts
 # ============================================ #
-function HavePoolUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, compareType )
+function HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -549,18 +549,18 @@ function HavePoolUnitComparisonAtLocation( aiBrain, locationType, unitCount, uni
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function PoolLessAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return HavePoolUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '<')
+function PoolLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
-function PoolGreaterAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return HavePoolUnitComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '>')
+function PoolGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
 # ======================================= #
 #     Builder Manager Engineer Counts
 # ======================================= #
-function EngineerComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, compareType )
+function EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -574,18 +574,18 @@ function EngineerComparisonAtLocation( aiBrain, locationType, unitCount, unitCat
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function EngineerLessAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return EngineerComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '<' )
+function EngineerLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
-function EngineerGreaterAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return EngineerComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '>' )
+function EngineerGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
 # ====================================== #
 #     Factory Manager Factory Counts
 # ====================================== #
-function FactoryComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, compareType )
+function FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -599,18 +599,18 @@ function FactoryComparisonAtLocation( aiBrain, locationType, unitCount, unitCate
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function FactoryLessAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return FactoryComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '<' )
+function FactoryLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
-function FactoryGreaterAtLocation( aiBrain, locationType, unitCount, unitCategory)
-    return FactoryComparisonAtLocation( aiBrain, locationType, unitCount, unitCategory, '>' )
+function FactoryGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
+    return FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
 # ====================================== #
 #     Factory Manager Factory Ratios
 # ====================================== #
-function FactoryRatioComparisonAtLocation( aiBrain, locationType, unitCategory, unitCategory2, compareType )
+function FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, compareType)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -629,18 +629,18 @@ function FactoryRatioComparisonAtLocation( aiBrain, locationType, unitCategory, 
     return CompareBody(numUnits, numUnits2, compareType)
 end
 
-function FactoryRatioLessAtLocation( aiBrain, locationType, unitCategory, unitCategory2)
-    return FactoryRatioComparisonAtLocation( aiBrain, locationType, unitCategory, unitCategory2, '<' )
+function FactoryRatioLessAtLocation(aiBrain, locationType, unitCategory, unitCategory2)
+    return FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, '<')
 end
 
-function FactoryRatioGreaterAtLocation( aiBrain, locationType, unitCategory, unitCategory2)
-    return FactoryRatioComparisonAtLocation( aiBrain, locationType, unitCategory, unitCategory2, '>' )
+function FactoryRatioGreaterAtLocation(aiBrain, locationType, unitCategory, unitCategory2)
+    return FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, '>')
 end
 
 # ============================== #
 #     Manager Builing Counts
 # ============================== #
-function LocationBuildingComparison( aiBrain, locationType, unitCount, unitCategory, compareType, builderCat )
+function LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, builderCat)
     local platoonFormManager = aiBrain.BuilderManagers[locationType].PlatoonFormManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -658,18 +658,18 @@ function LocationBuildingComparison( aiBrain, locationType, unitCount, unitCateg
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function BuildingLessAtLocation( aiBrain, locationType, unitCount, unitCategory, builderCat)
-    return LocationBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '<', builderCat )
+function BuildingLessAtLocation(aiBrain, locationType, unitCount, unitCategory, builderCat)
+    return LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', builderCat)
 end
 
-function BuildingGreaterAtLocation( aiBrain, locationType, unitCount, unitCategory, builderCat)
-    return LocationBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '>', builderCat )
+function BuildingGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory, builderCat)
+    return LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', builderCat)
 end
 
 # ============================================ #
 #     Factory Manager Building Unit Counts
 # ============================================ #
-function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, facCat )
+function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, facCat)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -689,18 +689,18 @@ function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, u
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function LocationFactoriesBuildingLess( aiBrain, locationType, unitCount, unitCategory, facCat)
-    return LocationFactoriesBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '<', facCat )
+function LocationFactoriesBuildingLess(aiBrain, locationType, unitCount, unitCategory, facCat)
+    return LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', facCat)
 end
 
-function LocationFactoriesBuildingGreater( aiBrain, locationType, unitCount, unitCategory, facCat)
-    return LocationFactoriesBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '>', facCat )
+function LocationFactoriesBuildingGreater(aiBrain, locationType, unitCount, unitCategory, facCat)
+    return LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', facCat)
 end
 
 # ============================================= #
 #     Engineer Manager Building Unit Counts
 # ============================================= #
-function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, engCat )
+function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, engCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -720,18 +720,18 @@ function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, u
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function LocationEngineersBuildingLess( aiBrain, locationType, unitCount, unitCategory, engCat)
-    return LocationEngineersBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '<', engCat )
+function LocationEngineersBuildingLess(aiBrain, locationType, unitCount, unitCategory, engCat)
+    return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', engCat)
 end
 
-function LocationEngineersBuildingGreater( aiBrain, locationType, unitCount, unitCategory, engCat)
-    return LocationEngineersBuildingComparison( aiBrain, locationType, unitCount, unitCategory, '>', engCat )
+function LocationEngineersBuildingGreater(aiBrain, locationType, unitCount, unitCategory, engCat)
+    return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', engCat)
 end
 
 # ===================================================== #
 #     Engineers Wanting Assistance Build Conditions
 # ===================================================== #
-function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, unitCategory, compareType, engCat )
+function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, unitCategory, compareType, engCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -747,7 +747,7 @@ function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, un
         engCat = ParseEntityCategory(engCat)
     end
 
-    local numUnits = table.getn( engineerManager:GetEngineersWantingAssistance(testCat, engCat) )
+    local numUnits = table.getn(engineerManager:GetEngineersWantingAssistance(testCat, engCat))
     return CompareBody(numUnits, 0, compareType)
 end
 
@@ -822,7 +822,7 @@ end
 # ======================================================================================= #
 #     Adjacency Check - Ensures a building category can have something adjacent to it
 # ======================================================================================= #
-function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
+function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not factoryManager then
         WARN('*AI WARNING: FactoryCapCheck - Invalid location - ' .. locationType)
@@ -834,13 +834,13 @@ function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
         testCat = ParseEntityCategory(category)
     end
 
-    local reference  = AIUtils.GetOwnUnitsAroundPoint( aiBrain, testCat, factoryManager:GetLocationCoords(), radius )
+    local reference  = AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, factoryManager:GetLocationCoords(), radius)
     if not reference or table.getn(reference) == 0 then
         return false
     end
 
     local template = {}
-    local unitSize = aiBrain:GetUnitBlueprint( testUnit ).Physics
+    local unitSize = aiBrain:GetUnitBlueprint(testUnit).Physics
     for k,v in reference do
         if not v.Dead then
             local targetSize = v:GetBlueprint().Physics
@@ -851,21 +851,21 @@ function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
             for i=0,((targetSize.SkirtSizeX/2)-1) do
                 local testPos = { targetPos[1] + 1 + (i * 2), targetPos[3]-(unitSize.SkirtSizeZ/2), 0 }
                 local testPos2 = { targetPos[1] + 1 + (i * 2), targetPos[3]+targetSize.SkirtSizeZ+(unitSize.SkirtSizeZ/2), 0 }
-                table.insert( template, testPos )
-                table.insert( template, testPos2 )
+                table.insert(template, testPos)
+                table.insert(template, testPos2)
             end
             # Sides of unit
             for i=0,((targetSize.SkirtSizeZ/2)-1) do
                 local testPos = { targetPos[1]+targetSize.SkirtSizeX + (unitSize.SkirtSizeX/2), targetPos[3] + 1 + (i * 2), 0 }
                 local testPos2 = { targetPos[1]-(unitSize.SkirtSizeX/2), targetPos[3] + 1 + (i*2), 0 }
-                table.insert( template, testPos )
-                table.insert( template, testPos2 )
+                table.insert(template, testPos)
+                table.insert(template, testPos2)
             end
         end
     end
 
     for k,v in template do
-        if aiBrain:CanBuildStructureAt(testUnit, { v[1], 0, v[2] } ) then
+        if aiBrain:CanBuildStructureAt(testUnit, { v[1], 0, v[2] }) then
             return true
         end
     end
@@ -875,25 +875,25 @@ end
 # ================== #
 #     Unit Ratio
 # ================== #
-function HaveUnitRatio( aiBrain, ratio, categoryOne, compareType, categoryTwo )
+function HaveUnitRatio(aiBrain, ratio, categoryOne, compareType, categoryTwo)
     local testCatOne = categoryOne
     if type(testCatOne) == 'string' then
         testCatOne = ParseEntityCategory(testCatOne)
     end
-    local numOne = aiBrain:GetCurrentUnits( testCatOne )
+    local numOne = aiBrain:GetCurrentUnits(testCatOne)
 
     local testCatTwo = categoryTwo
     if type(testCatTwo) == 'string' then
         testCatTwo = ParseEntityCategory(testCatTwo)
     end
-    local numTwo = aiBrain:GetCurrentUnits( testCatTwo )
+    local numTwo = aiBrain:GetCurrentUnits(testCatTwo)
 
     return CompareBody(numOne / numTwo, ratio, compareType)
 end
 
-function HaveUnitRatioGreaterThan( aiBrain, ratio, categoryOne, categoryTwo )
-    local numOne = aiBrain:GetCurrentUnits( categoryOne )
-    local numTwo = aiBrain:GetCurrentUnits( categoryTwo )
+function HaveUnitRatioGreaterThan(aiBrain, ratio, categoryOne, categoryTwo)
+    local numOne = aiBrain:GetCurrentUnits(categoryOne)
+    local numTwo = aiBrain:GetCurrentUnits(categoryTwo)
     if numOne / numTwo < ratio then
         return true
     end
@@ -906,7 +906,7 @@ end
 function UnitCapCheckGreater(aiBrain, percent)
     local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
-    if ( currentCount / cap ) > percent then
+    if (currentCount / cap) > percent then
         return true
     end
     return false
@@ -915,7 +915,7 @@ end
 function UnitCapCheckLess(aiBrain, percent)
     local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
-    if ( currentCount / cap ) < percent then
+    if (currentCount / cap) < percent then
         return true
     end
     return false
@@ -942,7 +942,7 @@ function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
 
     local bp = GetUnitBlueprintByName(buildingId)
     if not bp.Economy.BuildTime or not bp.Economy.BuildCostMass then
-        WARN('*AI ERROR: Unit for EconomyCheckStructure is missing blueprint values - ' .. unitType )
+        WARN('*AI ERROR: Unit for EconomyCheckStructure is missing blueprint values - ' .. unitType)
         return false
     end
 
@@ -960,7 +960,7 @@ function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
     local basePosition = aiBrain:GetLocationPosition(locationType)
 
     # Check around basePosition for StructureThreat
-    local unit = AIUtils.AIFindBrainTargetAroundPoint( aiBrain, basePosition, range, category )
+    local unit = AIUtils.AIFindBrainTargetAroundPoint(aiBrain, basePosition, range, category)
 
     if unit then
         return true
@@ -971,9 +971,9 @@ end
 function UnitToExpansionsValue(aiBrain, unitCategory, compareType, large, small, naval)
     local needCount = aiBrain:GetManagerCount('Start Location') * large
 
-    needCount = needCount + ( aiBrain:GetManagerCount('Expansion Area') * small )
+    needCount = needCount + (aiBrain:GetManagerCount('Expansion Area') * small)
 
-    needCount = needCount + ( aiBrain:GetManagerCount('Naval Area') * naval )
+    needCount = needCount + (aiBrain:GetManagerCount('Naval Area') * naval)
 
     local testCat = unitCategory
     if type(testCat) == 'string' then
@@ -1046,7 +1046,7 @@ function NavalBaseCount(aiBrain, compareType, checkNum)
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
-function CompareBody( numOne, numTwo, compareType )
+function CompareBody(numOne, numTwo, compareType)
     if compareType == '>' then
         if numOne > numTwo then
             return true
@@ -1072,11 +1072,11 @@ end
 
 #DUNCAN - credit to Sorian.
 function CmdrHasUpgrade(aiBrain, upgrade, has)
-    local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
+    local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
     for k,v in units do
-        if v:HasEnhancement( upgrade ) and has then
+        if v:HasEnhancement(upgrade) and has then
             return true
-        elseif not v:HasEnhancement( upgrade ) and not has then
+        elseif not v:HasEnhancement(upgrade) and not has then
             return true
         end
     end
@@ -1084,8 +1084,8 @@ function CmdrHasUpgrade(aiBrain, upgrade, has)
 end
 
 #DUNCAN - moved here from Markerbuildconditions so its evaluated instantly.
-function CanBuildFirebase( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
-    local ref, refName = AIUtils.AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
+function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
+    local ref, refName = AIUtils.AIFindFirebaseLocation(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     if not ref then
         return false
     end
@@ -1099,7 +1099,7 @@ function UnitsNeedGuard(aiBrain, category)
         testCat = ParseEntityCategory(category)
     end
 
-    local units = aiBrain:GetListOfUnits( testCat  , false )
+    local units = aiBrain:GetListOfUnits(testCat  , false)
     for k,v in units do
         if not v.BeingAirGuarded and not v.BeingLandGuarded then
             return true
@@ -1122,7 +1122,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     if not engineerManager then
         return false
     end
-    local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
+    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
     for k,v in Structures do
         if not v.Dead and v:GetHealthPercent() < .8 then
         #LOG('*AI DEBUG: DamagedStructuresInArea return true')
@@ -1138,7 +1138,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     if not engineerManager then
         return false
     end
-    local unfinished = aiBrain:GetUnitsAroundPoint( category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
+    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
@@ -1149,7 +1149,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
 end
 
 function GetGuards(aiBrain, Unit)
-    local engs = aiBrain:GetUnitsAroundPoint( categories.ENGINEER, Unit:GetPosition(), 10, 'Ally' )
+    local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER, Unit:GetPosition(), 10, 'Ally')
     local count = 0
     local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
     for k,v in engs do
@@ -1159,7 +1159,7 @@ function GetGuards(aiBrain, Unit)
     end
     if UpgradesFrom and UpgradesFrom != 'none' then -- Used to filter out upgrading units
         local oldCat = ParseEntityCategory(UpgradesFrom)
-        local oldUnit = aiBrain:GetUnitsAroundPoint( oldCat, Unit:GetPosition(), 0, 'Ally' )
+        local oldUnit = aiBrain:GetUnitsAroundPoint(oldCat, Unit:GetPosition(), 0, 'Ally')
         if oldUnit then
             count = count + 1
         end

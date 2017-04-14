@@ -21,7 +21,7 @@ URB0102 = Class(CAirFactoryUnit) {
 
 --Overwrite FinishBuildThread to speed up platform lowering rate
 
-    FinishBuildThread = function(self, unitBeingBuilt, order )
+    FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         local bp = self:GetBlueprint()

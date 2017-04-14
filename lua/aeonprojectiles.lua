@@ -528,11 +528,11 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
 
     CreateTrailFX = function(self)
         local army = self:GetArmy()
-        if( self.PolyTrail ) then
-            table.insert( self.TrailEmitters, CreateTrail(self, -1, army, self.PolyTrail ))
+        if(self.PolyTrail) then
+            table.insert(self.TrailEmitters, CreateTrail(self, -1, army, self.PolyTrail))
         end
         for i in self.FxTrails do
-            table.insert( self.TrailEmitters, CreateEmitterOnEntity(self, army, self.FxTrails[i]))
+            table.insert(self.TrailEmitters, CreateEmitterOnEntity(self, army, self.FxTrails[i]))
         end
     end,
 
@@ -594,18 +594,18 @@ AQuarkBombProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        CreateLightParticle( self, -1, self:GetArmy(), 26, 6, 'sparkle_white_add_08', 'ramp_white_02' )
+        CreateLightParticle(self, -1, self:GetArmy(), 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
 
         if targetType == 'Terrain' or targetType == 'Prop' then
             local pos = self:GetPosition()
-            DefaultExplosion.CreateScorchMarkSplat( self, 3 )
+            DefaultExplosion.CreateScorchMarkSplat(self, 3)
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
-            DamageRing( self, pos, 0.1, self.DamageData.DamageRadius, 10, 'Fire', false, false )
-            DamageArea( self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true )
-            DamageArea( self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true )
+            DamageRing(self, pos, 0.1, self.DamageData.DamageRadius, 10, 'Fire', false, false)
+            DamageArea(self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true)
+            DamageArea(self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true)
         end
 
-        EmitterProjectile.OnImpact( self, targetType, targetEntity )
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 

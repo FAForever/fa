@@ -71,7 +71,7 @@ PlatoonTemplate {
     Name = 'AntiAirHunt',
     Plan = 'InterceptorAI',
     GlobalSquads = {
-        { categories.AIR * categories.MOBILE * categories.ANTIAIR * ( categories.TECH1 + categories.TECH2 + categories.TECH3 ) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 5, 100, 'attack', 'none' },
+        { categories.AIR * categories.MOBILE * categories.ANTIAIR * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 5, 100, 'attack', 'none' },
     }
 }
 
@@ -79,7 +79,7 @@ PlatoonTemplate {
     Name = 'AntiAirBaseGuard',
     Plan = 'GuardBase',
     GlobalSquads = {
-        { categories.AIR * categories.MOBILE * categories.ANTIAIR * ( categories.TECH1 + categories.TECH2 + categories.TECH3 ) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 1, 100, 'attack', 'none' },
+        { categories.AIR * categories.MOBILE * categories.ANTIAIR * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 1, 100, 'attack', 'none' },
     }
 }
 
@@ -87,7 +87,7 @@ PlatoonTemplate {
     Name = 'GunshipBaseGuard',
     Plan = 'GuardBase',
     GlobalSquads = {
-        { categories.AIR * categories.MOBILE * categories.GROUNDATTACK * ( categories.TECH1 + categories.TECH2 + categories.TECH3 ) - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 1, 100, 'attack', 'none' },
+        { categories.AIR * categories.MOBILE * categories.GROUNDATTACK * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 1, 100, 'attack', 'none' },
     }
 }
 
@@ -121,7 +121,7 @@ PlatoonTemplate {
     Name = 'AirEscort',
     Plan = 'GuardUnit',
     GlobalSquads = {
-        { categories.AIR * categories.MOBILE * categories.ANTIAIR * ( categories.TECH1 + categories.TECH2 + categories.TECH3 ) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 5, 100, 'attack', 'none' },
+        { categories.AIR * categories.MOBILE * categories.ANTIAIR * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, 5, 100, 'attack', 'none' },
     }
 }
 

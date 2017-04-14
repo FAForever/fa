@@ -24,7 +24,7 @@ end
 
 function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
-        AddBuilderTable( aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
+        AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
     end
 end
 
@@ -58,7 +58,7 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
             if not Builders[v] then
                 WARN('*AI ERROR: Invalid Builder named - ' .. v)
             end
-            table.insert( builders, managers[tableType]:AddBuilder(Builders[v], locationType) )
+            table.insert(builders, managers[tableType]:AddBuilder(Builders[v], locationType))
         end
     end
 end

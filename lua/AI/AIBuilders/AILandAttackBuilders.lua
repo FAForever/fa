@@ -30,7 +30,7 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager:GetLocationRadius()
 
-    local poolThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, position, radius )
+    local poolThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, position, radius)
     if poolThreat > targetNumber then
         return true
     end
@@ -300,7 +300,7 @@ BuilderGroup {
             #DUNCAN - Was 1.05 power
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.2 }},
             #DUNCAN - reduce ratio from 0.1, ratio doesnt include tech 1
-            { UCBC, 'HaveUnitRatio', { 0.08, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.TECH1 }},
+            { UCBC, 'HaveUnitRatio', { 0.08, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.TECH1 }},
         },
     },
     Builder {
@@ -313,7 +313,7 @@ BuilderGroup {
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 3, 'FACTORY LAND TECH3' }},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.05 }},
             #DUNCAN - reduce ratio from 0.1
-            { UCBC, 'HaveUnitRatio', { 0.08, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.TECH1 }},
+            { UCBC, 'HaveUnitRatio', { 0.08, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.TECH1 }},
         },
     },
     Builder {
@@ -504,7 +504,7 @@ BuilderGroup {
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
-            { UCBC, 'HaveUnitRatio', { 0.1, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE}},
+            { UCBC, 'HaveUnitRatio', { 0.1, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE}},
         },
     },
 }

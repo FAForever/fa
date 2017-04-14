@@ -13,23 +13,23 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Utils = import('/lua/utilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
-function DefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindDefensivePointNeedsStructureSorian( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
+function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindDefensivePointNeedsStructureSorian(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function ExpansionPointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
-    local pos, name = AIUtils.AIFindExpansionPointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
+function ExpansionPointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
+    local pos, name = AIUtils.AIFindExpansionPointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
         return true
     end
     return false
 end
 
-function AIThreatExists( aiBrain, threatThreshold )
+function AIThreatExists(aiBrain, threatThreshold)
     for k,v in aiBrain.BaseMonitor.AlertsTable do
         if v.Threat >= threatThreshold then
             return true
@@ -48,7 +48,7 @@ end
 # parameter 2: expr     unitCategory3   = "Unit Category"
 #
 ##############################################################################################################
-function FactoryRatioLessOrEqual( aiBrain, locationType, num, unitCategory, unitCategory2, unitCategory3 )
+function FactoryRatioLessOrEqual(aiBrain, locationType, num, unitCategory, unitCategory2, unitCategory3)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -88,12 +88,12 @@ end
 # parameter 2: int      shield          = "minimum shield %"
 #
 ##############################################################################################################
-function CDRHealthGreaterThan( aiBrain, health, shield )
+function CDRHealthGreaterThan(aiBrain, health, shield)
     local cdr = aiBrain:GetListOfUnits(categories.COMMAND, false)[1]
     if not cdr then return false end
     local cdrhealth = cdr:GetHealthPercent()
     local cdrshield
-    if (cdr:HasEnhancement( 'Shield' ) or cdr:HasEnhancement( 'ShieldGeneratorField' ) or cdr:HasEnhancement( 'ShieldHeavy' )) and cdr:ShieldIsOn() then
+    if (cdr:HasEnhancement('Shield') or cdr:HasEnhancement('ShieldGeneratorField') or cdr:HasEnhancement('ShieldHeavy')) and cdr:ShieldIsOn() then
         cdrshield = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
     else
         cdrshield = 1
@@ -218,12 +218,12 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
+    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 numBuilding = numBuilding + 1
             end
         end
@@ -250,12 +250,12 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
+    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 numBuilding = numBuilding + 1
             end
         end
@@ -281,7 +281,7 @@ function LessThanEconTrend(aiBrain, mTrend, eTrend)
     end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     local cheatmult = tonumber(ScenarioInfo.Options.CheatMult) or 2
-    local cheatAI = string.find( aiBrain.Nickname, 'AIx:')
+    local cheatAI = string.find(aiBrain.Nickname, 'AIx:')
     if cheatAI and (econ.MassTrend < mTrend * cheatmult and econ.EnergyTrend < eTrend * cheatmult) then
         return true
     elseif not cheatAI and (econ.MassTrend < mTrend and econ.EnergyTrend < eTrend) then
@@ -300,12 +300,12 @@ end
 #
 ##############################################################################################################
 function GreaterThanEconEfficiencyOverTimeExp(aiBrain, MassEfficiency, EnergyEfficiency)
-    local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
+    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( categories.EXPERIMENTAL, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(categories.EXPERIMENTAL, buildingUnit) then
                 numBuilding = numBuilding + 1
             end
         end
@@ -473,7 +473,7 @@ function EngineerNeedsAssistance(aiBrain, doesbool, locationType, category)
     for _,cat in category do
         local bCategory = ParseEntityCategory(cat)
 
-        local engs = engineerManager:GetEngineersBuildingCategory(bCategory, categories.ALLUNITS )
+        local engs = engineerManager:GetEngineersBuildingCategory(bCategory, categories.ALLUNITS)
         for k,v in engs do
             if v.DesiresAssist == true then
                 if v.MinNumAssistees and SUtils.GetGuards(aiBrain, v) < v.MinNumAssistees then
@@ -548,7 +548,7 @@ function T4BuildingCheck(aiBrain)
     return true
 end
 
-function HavePoolUnitComparisonAtLocationExp( aiBrain, locationType, unitCount, unitCategory, compareType )
+function HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
     if type(unitCategory) == 'string' then
@@ -563,15 +563,15 @@ function HavePoolUnitComparisonAtLocationExp( aiBrain, locationType, unitCount, 
     return CompareBody(numUnits, unitCount, compareType)
 end
 
-function PoolLessAtLocationExp( aiBrain, locationType, unitCount, unitCategory)
-    return HavePoolUnitComparisonAtLocationExp( aiBrain, locationType, unitCount, unitCategory, '<')
+function PoolLessAtLocationExp(aiBrain, locationType, unitCount, unitCategory)
+    return HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
-function PoolGreaterAtLocationExp( aiBrain, locationType, unitCount, unitCategory)
-    return HavePoolUnitComparisonAtLocationExp( aiBrain, locationType, unitCount, unitCategory, '>')
+function PoolGreaterAtLocationExp(aiBrain, locationType, unitCount, unitCategory)
+    return HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
-function CompareBody( numOne, numTwo, compareType )
+function CompareBody(numOne, numTwo, compareType)
     if compareType == '>' then
         if numOne > numTwo then
             return true

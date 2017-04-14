@@ -50,7 +50,7 @@ XSS0201 = Class(SSubUnit) {
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnMotionVertEventChange = function( self, new, old )
+    OnMotionVertEventChange = function(self, new, old)
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetWeaponEnabledByLabel('FrontTurret', true)

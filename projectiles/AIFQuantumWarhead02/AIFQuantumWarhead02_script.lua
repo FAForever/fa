@@ -53,8 +53,8 @@ AIFQuantumWarhead02 = Class(NullShell) {
             z = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in self.CloudFlareEffects do
-                emit = CreateEmitterAtEntity( self, army, v )
-                emit:OffsetEmitter( x * OffsetMul, y * OffsetMul, z * OffsetMul )
+                emit = CreateEmitterAtEntity(self, army, v)
+                emit:OffsetEmitter(x * OffsetMul, y * OffsetMul, z * OffsetMul)
                 emit:SetEmitterCurveParam('XDIR_CURVE', x * DirectionMul, 0.01)
                 emit:SetEmitterCurveParam('YDIR_CURVE', y * DirectionMul, 0.01)
                 emit:SetEmitterCurveParam('ZDIR_CURVE', z * DirectionMul, 0.01)
@@ -64,11 +64,11 @@ AIFQuantumWarhead02 = Class(NullShell) {
                 CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
             end
 
-            WaitSeconds(RandomFloat( 0.05, 0.15 ))
+            WaitSeconds(RandomFloat(0.05, 0.15))
         end
 
         CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
-        CreateEmitterAtEntity( self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp' )
+        CreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
     end,
 
     DistortionField = function(self)

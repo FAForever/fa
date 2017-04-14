@@ -26,7 +26,7 @@ local CreateScaledBoom = function(unit, overkill, bone)
         unit,
         bone or 0,
         explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-    )
+)
 end
 
 -- MISC UNITS

@@ -8,7 +8,7 @@
 
 local sharedUnits = {}
 
-function BreakAlliance( data )
+function BreakAlliance(data)
 
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
@@ -26,7 +26,7 @@ function BreakAlliance( data )
     import('/lua/SimPing.lua').OnAllianceChange()
 end
 
-function OnAllianceResult( resultData )
+function OnAllianceResult(resultData)
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
@@ -43,7 +43,7 @@ function OnAllianceResult( resultData )
     end
     import('/lua/SimPing.lua').OnAllianceChange()
 end
-import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAllianceResult )
+import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 function KillSharedUnits(owner)
     if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
@@ -106,8 +106,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local posblEnh = bp.Enhancements
         if posblEnh then
             for k,v in posblEnh do
-                if unit:HasEnhancement( k ) then
-                   table.insert( enh, k )
+                if unit:HasEnhancement(k) then
+                   table.insert(enh, k)
                 end
             end
         end
@@ -141,7 +141,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do
-                unit:CreateEnhancement( v )
+                unit:CreateEnhancement(v)
             end
         end
         if unitHealth > unit:GetMaxHealth() then
@@ -152,13 +152,13 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             unit:SetFuelRatio(fuelRatio)
         end
         if numNukes and numNukes > 0 then
-            unit:GiveNukeSiloAmmo( (numNukes - unit:GetNukeSiloAmmoCount()) )
+            unit:GiveNukeSiloAmmo((numNukes - unit:GetNukeSiloAmmoCount()))
         end
         if numTacMsl and numTacMsl > 0 then
-            unit:GiveTacticalSiloAmmo( (numTacMsl - unit:GetTacticalSiloAmmoCount()) )
+            unit:GiveTacticalSiloAmmo((numTacMsl - unit:GetTacticalSiloAmmoCount()))
         end
         if unit.MyShield then
-            unit.MyShield:SetHealth( unit, ShieldHealth )
+            unit.MyShield:SetHealth(unit, ShieldHealth)
             if shieldIsOn then
                 unit:EnableShield()
             else
@@ -186,22 +186,22 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     return newUnits
 end
 
-function GiveUnitsToPlayer( data, units )
+function GiveUnitsToPlayer(data, units)
     if units then
         local owner = units[1]:GetArmy()
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
-            TransferUnitsOwnership( units, data.To )
+            TransferUnitsOwnership(units, data.To)
         end
     end
 end
 
-function SetResourceSharing( data )
+function SetResourceSharing(data)
     if not OkayToMessWithArmy(data.Army) then return end
     local brain = GetArmyBrain(data.Army)
     brain:SetResourceSharing(data.Value)
 end
 
-function RequestAlliedVictory( data )
+function RequestAlliedVictory(data)
     -- You cannot change this in a team game
 
     if ScenarioInfo.TeamGame then

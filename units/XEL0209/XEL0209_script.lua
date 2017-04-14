@@ -49,7 +49,7 @@ XEL0209 = Class(TConstructionUnit) {
 
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
-        self:SetAllWeaponsEnabled( true)
+        self:SetAllWeaponsEnabled(true)
     end,--]]
 }
 

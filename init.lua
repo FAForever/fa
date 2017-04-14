@@ -63,7 +63,7 @@ whitelist = {
 }
 
 local function mount_dir(dir, mountpoint)
-    table.insert(path, { dir = dir, mountpoint = mountpoint } )
+    table.insert(path, { dir = dir, mountpoint = mountpoint })
 end
 
 local function mount_contents(dir, mountpoint)
@@ -152,7 +152,7 @@ mount_map_dir(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme C
 -- This section mounts sounds from the mods directory to allow mods to add custom sounds to the game
 function mount_mod_sounds(MODFOLDER)
     -- searching for mods inside the modfolder
-    for _,mod in io.dir( MODFOLDER..'\\*.*') do
+    for _,mod in io.dir(MODFOLDER..'\\*.*') do
         -- do we have a true directory ?
         if mod != '.' and mod != '..' then
             -- searching for sounds inside mod folder

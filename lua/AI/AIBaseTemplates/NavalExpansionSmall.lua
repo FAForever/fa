@@ -73,7 +73,7 @@ BaseBuilderTemplate {
         end
 
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        if not ( personality == 'easy' or personality == 'medium' ) then
+        if not (personality == 'easy' or personality == 'medium') then
             return 50
         end
 

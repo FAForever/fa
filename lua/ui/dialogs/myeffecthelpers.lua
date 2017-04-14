@@ -159,7 +159,7 @@ function MoveAndScaleTo(control, newScale, xVal, yVal, time, mode, origin, frame
 
 
     control.OnFrame = function(self, elapsedTime)
-        timeAccum = math.min( time, timeAccum + elapsedTime )
+        timeAccum = math.min(time, timeAccum + elapsedTime)
         self.Width:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialWidth, newWidth)))
         self.Height:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialHeight, newHeight)))
         self.Left:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialXpos, xVal)))

@@ -49,7 +49,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil
@@ -115,13 +115,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
         -- Destructively overwriting this function to make it use AttachBeamEntityToEntity()
         local army = self:GetArmy()
         for k, y in self.FxBeamStartPoint do
-            local fx = CreateAttachedEmitter(self, 0, army, y ):ScaleEmitter(self.FxBeamStartPointScale)
-            table.insert( self.BeamEffectsBag, fx)
+            local fx = CreateAttachedEmitter(self, 0, army, y):ScaleEmitter(self.FxBeamStartPointScale)
+            table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         for k, y in self.FxBeamEndPoint do
-            local fx = CreateAttachedEmitter(self, 1, army, y ):ScaleEmitter(self.FxBeamEndPointScale)
-            table.insert( self.BeamEffectsBag, fx)
+            local fx = CreateAttachedEmitter(self, 1, army, y):ScaleEmitter(self.FxBeamEndPointScale)
+            table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         if table.getn(self.FxBeam) ~= 0 then
@@ -129,7 +129,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
             if self.TargetEntity then
-                fxBeam = AttachBeamEntityToEntity( self.OriginUnit, self.OriginBone, self.TargetEntity, 0, army, bp )
+                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, army, bp)
             else
                 fxBeam = CreateBeamEmitter(bp, army)
                 AttachBeamToEntity(fxBeam, self, 0, army)
@@ -140,7 +140,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
 
-            table.insert( self.BeamEffectsBag, fxBeam )
+            table.insert(self.BeamEffectsBag, fxBeam)
             self.Trash:Add(fxBeam)
         else
             LOG('*ERROR: THERE IS NO BEAM EMITTER DEFINED FOR THIS COLLISION BEAM ', repr(self.FxBeam))
@@ -156,7 +156,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )
+                self.Scorching = self:ForkThread(self.ScorchThread)
             end
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
@@ -165,7 +165,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
-    OnDisable = function( self )
+    OnDisable = function(self)
         PhasonCollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil
@@ -180,15 +180,15 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         local Util = import('/lua/utilities.lua')
 
         while true do
-            if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
+                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army)
                 LastPosition = CurrentPosition
                 skipCount = 1
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
 
-            WaitSeconds( self.ScorchSplatDropTime )
+            WaitSeconds(self.ScorchSplatDropTime)
             size = 1 + (Random() * 1.1)
             CurrentPosition = self:GetPosition(1)
         end
@@ -211,8 +211,8 @@ local PhasonBeam = Class(DefaultBeamWeapon) {
             end
         end
         if beam and not beam:IsEnabled() then
-            beam:PassOrigin( self.unit, muzzle )
-            beam:PassTarget( self:GetCurrentTarget(), self:GetCurrentTargetPos() )
+            beam:PassOrigin(self.unit, muzzle)
+            beam:PassTarget(self:GetCurrentTarget(), self:GetCurrentTargetPos())
         end
         return DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
     end,

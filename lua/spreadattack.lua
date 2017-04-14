@@ -52,7 +52,7 @@ function MakeShadowCopyOrders(command)
   end
 
   -- Skip handling the order if it does not belong to the given subset.
-  if not( TranslatedOrder[command.CommandType] ) then
+  if not(TranslatedOrder[command.CommandType]) then
     return
   end
 
@@ -71,7 +71,7 @@ function MakeShadowCopyOrders(command)
   for _,unit in ipairs(command.Units) do
 
     -- Initialise the orders table, if needed.
-    if not( ShadowOrders[unit:GetEntityId()] ) then
+    if not(ShadowOrders[unit:GetEntityId()]) then
       ShadowOrders[unit:GetEntityId()] = {}
     end
     table.insert(ShadowOrders[unit:GetEntityId()],Order)
@@ -90,7 +90,7 @@ function SpreadAttack()
   -- Get the currently selected units.
   local curSelection = GetSelectedUnits()
 
-  if not ( curSelection ) then
+  if not (curSelection) then
     return
   end
 
@@ -99,7 +99,7 @@ function SpreadAttack()
     local unitorders = ShadowOrders[unit:GetEntityId()]
 
     -- Only mix orders if this unit has any orders to mix.
-    if not( unitorders ) and not( unitorders[1] ) then
+    if not(unitorders) and not(unitorders[1]) then
       continue
     end
 
@@ -164,11 +164,11 @@ function SpreadAttack()
 
     -- All Attack orders have been mixed, now it's time to reassign those orders.
     -- Since giving orders is a Sim-side command, use a SimCallback function.
-    SimCallback( { Func = "GiveOrders",
+    SimCallback({ Func = "GiveOrders",
                    Args = { unit_orders = unitorders,
                             unit_id     = unit:GetEntityId(),
                             From = GetFocusArmy()},
-                 }, false )
+                 }, false)
 
     -- Handle the next unit.
   end
@@ -187,12 +187,12 @@ function GiveOrders(Data)
     if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
         local unit = GetEntityById(Data.unit_id)
         -- Skip units with no valid shadow orders.
-        if not( Data.unit_orders ) or not( Data.unit_orders[1] ) then
+        if not(Data.unit_orders) or not(Data.unit_orders[1]) then
             return
         end
 
         -- All orders will be re-issued, so all existing orders have to be cleared first.
-        IssueClearCommands( { unit } )
+        IssueClearCommands({ unit })
 
         -- Re-issue all orders.
         for _,order in ipairs(Data.unit_orders) do
@@ -200,15 +200,15 @@ function GiveOrders(Data)
             -- Currently supported 3 orders are: Attack, Move and AggressiveMove
             if order.CommandType == "Attack" then
                 local victim = GetEntityById(order.Target)
-                IssueAttack( { unit },victim)
+                IssueAttack({ unit },victim)
             end
 
             if order.CommandType == "Move" then
-                IssueMove( { unit },order.Position)
+                IssueMove({ unit },order.Position)
             end
 
             if order.CommandType == "AggressiveMove" then
-                IssueAggressiveMove( { unit },order.Position)
+                IssueAggressiveMove({ unit },order.Position)
             end
         end
     end
