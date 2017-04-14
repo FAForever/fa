@@ -63,8 +63,8 @@ ShieldCollider = Class(Projectile) {
                     self.Plane:OnImpact(targetType)
                 end
                 self:Destroy()
-            elseif targetType == 'Shield' and targetEntity.ShieldType == 'Bubble' then
-                if not self.ShieldImpacted then
+            elseif targetType == 'Shield' and targetEntity and not targetEntity:BeenDestroyed() and targetEntity.ShieldType == 'Bubble' then
+                if not self.ShieldImpacted and not self.Plane.GroundImpacted then
                     self.ShieldImpacted = true -- Only impact once
 
                     -- Find the vector to the impact location, used for the impact ripple FX
@@ -74,6 +74,10 @@ ShieldCollider = Class(Projectile) {
                     local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
                     if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
                         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+
+                        self:DetachAll('anchor') -- Make sure to detach just in case, prior to trying to attach
+                        self.Plane:DetachAll(self.PlaneBone)
+
                         self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
                         self.Plane.Detector = CreateCollisionDetector(self.Plane)
                         self.Plane.Detector:WatchBone(self.PlaneBone)
