@@ -18,11 +18,11 @@ local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 WorldViewParams = {
-	ui_SelectTolerance = 7.0,
-	ui_DisableCursorFixing = false,
-	ui_ExtractSnapTolerance = 4.0,
-	ui_MinExtractSnapPixels = 10,
-	ui_MaxExtractSnapPixels = 1000,
+    ui_SelectTolerance = 7.0,
+    ui_DisableCursorFixing = false,
+    ui_ExtractSnapTolerance = 4.0,
+    ui_MinExtractSnapPixels = 10,
+    ui_MaxExtractSnapPixels = 1000,
 }
 
 local CommandDecals = {}
@@ -261,10 +261,10 @@ WorldView = Class(moho.UIWorldView, Control) {
             self:ApplyCursor()
         end
     end,
-    
+
     OnDestroy = function(self)
         self:ResetDecals()
-        
+
         for i, v in self._pingAnimationThreads do
             if v then KillThread(v) end
         end
@@ -291,7 +291,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             GetCursor():SetTexture(unpack(self.Cursor))
         end
     end,
-    
+
     DisplayPing = function(self, pingData)
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
@@ -325,8 +325,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                     end
                 end)
             end
-		end
-		
+        end
+
         if not self:IsHidden() and pingData.Location then
             local coords = self:Project(Vector(pingData.Location[1], pingData.Location[2], pingData.Location[3]))
             if not pingData.Renew then
@@ -381,7 +381,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                     if Arrow then Arrow:Destroy() end
                 end))
             end
-            
+
             --If this ping is a marker, create the edit controls for it.
             if not self._disableMarkers and pingData.Marker then
                 if not self.Markers then self.Markers = {} end
@@ -400,7 +400,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.Marker.TeamColor.Width:Set(12)
                 PingGroup.Marker.TeamColor.Depth:Set(function() return PingGroup.Marker.Depth() - 1 end)
                 LayoutHelpers.AtCenterIn(PingGroup.Marker.TeamColor, PingGroup.Marker)
-                
+
                 PingGroup.Marker.HandleEvent = function(marker, event)
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
@@ -447,41 +447,41 @@ WorldView = Class(moho.UIWorldView, Control) {
                         end
                     end
                 end
-                
+
                 PingGroup.BGMid = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-mid.dds'))
                 LayoutHelpers.AtCenterIn(PingGroup.BGMid, PingGroup, 17)
                 PingGroup.BGMid.Depth:Set(function() return PingGroup.Marker.Depth() - 2 end)
-                
+
                 PingGroup.Name = UIUtil.CreateText(PingGroup, PingGroup.data.Name, 14, UIUtil.bodyFont)
                 PingGroup.Name:DisableHitTest()
                 PingGroup.Name:SetDropShadow(true)
                 PingGroup.Name:SetColor('ff00cc00')
                 LayoutHelpers.AtCenterIn(PingGroup.Name, PingGroup.BGMid)
-                
+
                 PingGroup.BGRight = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-right.dds'))
                 LayoutHelpers.AtVerticalCenterIn(PingGroup.BGRight, PingGroup.BGMid, 1)
                 PingGroup.BGRight.Left:Set(function() return math.max(PingGroup.Name.Right(), PingGroup.BGMid.Right()) end)
                 PingGroup.BGRight.Depth:Set(PingGroup.BGMid.Depth)
-                
+
                 PingGroup.BGLeft = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-left.dds'))
                 LayoutHelpers.AtVerticalCenterIn(PingGroup.BGLeft, PingGroup.BGMid, 1)
                 PingGroup.BGLeft.Right:Set(function() return math.min(PingGroup.Name.Left(), PingGroup.BGMid.Left()) end)
                 PingGroup.BGLeft.Depth:Set(PingGroup.BGMid.Depth)
-                
+
                 if PingGroup.Name.Width() > PingGroup.BGMid.Width() then
                     PingGroup.StretchLeft = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-stretch.dds'))
                     LayoutHelpers.AtVerticalCenterIn(PingGroup.StretchLeft, PingGroup.BGMid, 1)
                     PingGroup.StretchLeft.Left:Set(PingGroup.BGLeft.Right)
                     PingGroup.StretchLeft.Right:Set(PingGroup.BGMid.Left)
                     PingGroup.StretchLeft.Depth:Set(function() return PingGroup.BGMid.Depth() - 1 end)
-                    
+
                     PingGroup.StretchRight = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-stretch.dds'))
                     LayoutHelpers.AtVerticalCenterIn(PingGroup.StretchRight, PingGroup.BGMid, 1)
                     PingGroup.StretchRight.Left:Set(PingGroup.BGMid.Right)
                     PingGroup.StretchRight.Right:Set(PingGroup.BGRight.Left)
                     PingGroup.StretchRight.Depth:Set(function() return PingGroup.BGMid.Depth() - 1 end)
                 end
-                
+
                 PingGroup.Height:Set(5)
                 PingGroup.Width:Set(5)
                 PingGroup.Left:Set(function() return PingGroup.coords.x - PingGroup.Height() / 2 end)
@@ -490,7 +490,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.OnFrame = function(pinggrp, deltaTime)
                     pinggrp.coords = self:Project(Vector(PingGroup.data.Location[1], PingGroup.data.Location[2], PingGroup.data.Location[3]))
                     PingGroup.Left:Set(function() return self.Left() + (PingGroup.coords.x - PingGroup.Height() / 2) end)
-                    PingGroup.Top:Set(function() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end)    
+                    PingGroup.Top:Set(function() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end)
                     if pinggrp.NewPosition then
                         pinggrp:Hide()
                         pinggrp.Marker:Hide()
@@ -516,7 +516,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-    
+
     UpdatePing = function(self, pingData)
         if pingData.Action == 'flush' and self.Markers then
             for ownerID, pingTable in self.Markers do
@@ -543,7 +543,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-    
+
     ShowPings = function(self, show)
         self.PingVis = show
         if not self:IsHidden() and self.Markers then
@@ -559,8 +559,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-    
-    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen) 
+
+    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
         local Arrow = Button(parent, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'),
                 UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_down.dds'),
                 UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_over.dds'),
@@ -663,7 +663,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
         return Arrow
     end,
-    
+
     Register = function(self, cameraName, disableMarkers, displayName, order)
         self._cameraName = cameraName
         self._disableMarkers = disableMarkers

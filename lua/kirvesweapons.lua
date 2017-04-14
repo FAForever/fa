@@ -54,6 +54,6 @@ SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
 
 Dummy = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.TargetingCollisionBeam,
-    
+
     FxBeamEndPointScale = 0.01,
 }

@@ -60,8 +60,8 @@ BuffFieldBlueprint { -- Seraphim ACU Advanced Restoration
 -- targetData may also be an "Enhancement" section of a units blueprint rather than
 -- a full blueprint.
 
--- Modified to calculate the cost of an upgrade. The third argument is the economy section of 
--- the unit that is currently upgrading into the new unit. We subtract that cost from the cost 
+-- Modified to calculate the cost of an upgrade. The third argument is the economy section of
+-- the unit that is currently upgrading into the new unit. We subtract that cost from the cost
 -- of the unit that is being built
 
 -- In order to keep backwards compatibility, there is a new option in the blueprint economy section.

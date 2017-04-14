@@ -163,7 +163,7 @@ function ScoreThread()
             ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
             ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
             ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
-           
+
             ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
@@ -223,7 +223,7 @@ function SyncScores()
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
-        
+
         -- We don't want to report full scores to server unless game over
         if victory.gameOver then
             Sync.StatsToSend = Sync.Score
@@ -256,6 +256,6 @@ function SyncScores()
 end
 
 function init()
-    ForkThread(ScoreThread)    
+    ForkThread(ScoreThread)
     ForkThread(ScoreHistoryThread)
 end

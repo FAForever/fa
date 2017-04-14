@@ -74,7 +74,7 @@ URL0301 = Class(CCommandUnit) {
         if not bp then return end
         if enh == 'CloakingGenerator' then
             self.StealthEnh = false
-			self.CloakEnh = true
+            self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranSCUCloakBonus'] then
                BuffBlueprint {
@@ -209,54 +209,54 @@ URL0301 = Class(CCommandUnit) {
         -- If we could find a blueprint with v.Add.OnDeath, then add the buff
         if bp ~= nil then
             -- Apply Buff
-			self:AddBuff(bp)
+            self:AddBuff(bp)
         end
         -- Otherwise, we should finish killing the unit
         CCommandUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     IntelEffects = {
-		Cloak = {
-		    {
-			    Bones = {
-				    'Head',
-				    'Right_Elbow',
-				    'Left_Elbow',
-				    'Right_Arm01',
-				    'Left_Shoulder',
-				    'Torso',
-				    'URL0301',
-				    'Left_Thigh',
-				    'Left_Knee',
-				    'Left_Leg',
-				    'Right_Thigh',
-				    'Right_Knee',
-				    'Right_Leg',
-			    },
-			    Scale = 1.0,
-			    Type = 'Cloak01',
-		    },
-		},
-		Field = {
-		    {
-			    Bones = {
-				    'Head',
-				    'Right_Elbow',
-				    'Left_Elbow',
-				    'Right_Arm01',
-				    'Left_Shoulder',
-				    'Torso',
-				    'URL0301',
-				    'Left_Thigh',
-				    'Left_Knee',
-				    'Left_Leg',
-				    'Right_Thigh',
-				    'Right_Knee',
-				    'Right_Leg',
-			    },
-			    Scale = 1.6,
-			    Type = 'Cloak01',
-		    },
+        Cloak = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Elbow',
+                    'Left_Elbow',
+                    'Right_Arm01',
+                    'Left_Shoulder',
+                    'Torso',
+                    'URL0301',
+                    'Left_Thigh',
+                    'Left_Knee',
+                    'Left_Leg',
+                    'Right_Thigh',
+                    'Right_Knee',
+                    'Right_Leg',
+                },
+                Scale = 1.0,
+                Type = 'Cloak01',
+            },
+        },
+        Field = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Elbow',
+                    'Left_Elbow',
+                    'Right_Arm01',
+                    'Left_Shoulder',
+                    'Torso',
+                    'URL0301',
+                    'Left_Thigh',
+                    'Left_Knee',
+                    'Left_Leg',
+                    'Right_Thigh',
+                    'Right_Knee',
+                    'Right_Leg',
+                },
+                Scale = 1.6,
+                Type = 'Cloak01',
+            },
         },
     },
 
@@ -266,16 +266,16 @@ URL0301 = Class(CCommandUnit) {
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
-			    self.IntelEffectsBag = {}
-			    self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
-			end
+                self.IntelEffectsBag = {}
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+            end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
-	            self.IntelEffectsBag = {}
-		        self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
-		    end
+                self.IntelEffectsBag = {}
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+            end
         end
     end,
 

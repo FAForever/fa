@@ -1047,7 +1047,7 @@ function Reset(self)
 end
 
 ---
--- 
+--
 function moho.discovery_service_methods()
 end
 

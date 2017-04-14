@@ -34,11 +34,11 @@ function OnSync()
         ConExecute('UI_RenderUnitBars true')
     end
 
-	if not table.empty(Sync.AIChat) then
-		for k, v in Sync.AIChat do
-			import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
-		end
-	end
+    if not table.empty(Sync.AIChat) then
+        for k, v in Sync.AIChat do
+            import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
+        end
+    end
 
     if Sync.UserConRequests then
         for num, execRequest in Sync.UserConRequests do
@@ -55,8 +55,8 @@ function OnSync()
     end
 
     if Sync.NukeLaunchData then
-		import('/lua/ui/game/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
-	end
+        import('/lua/ui/game/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
+    end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
     if not table.empty(Sync.Reclaim) then

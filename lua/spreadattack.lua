@@ -41,7 +41,7 @@ function MakeShadowCopyOrders(command)
   -- - FormMove           : These orders are copied, but will be renamed to normal Move orders
   -- - FormAttack         : These orders are copied, but will be renamed to normal Attack orders
   -- - FormAggressiveMove : These orders are copied, but will be renamed to normal AggressiveMove orders
-  
+
   -- If the order has the Clear bit set, then all previously issued orders will be removed first,
   -- even if the specific order will not be handled below.
   -- This conveniently also handles the Stop order (= clear all orders).
@@ -55,7 +55,7 @@ function MakeShadowCopyOrders(command)
   if not( TranslatedOrder[command.CommandType] ) then
     return
   end
-  
+
   local Order = {
     CommandType = "",
     Position    = {},
@@ -66,7 +66,7 @@ function MakeShadowCopyOrders(command)
   Order.CommandType = TranslatedOrder[command.CommandType]
   Order.Position    = command.Target.Position
   Order.Target      = command.Target.EntityId
-  
+
   -- Add this order to each individual unit.
   for _,unit in ipairs(command.Units) do
 
@@ -99,10 +99,10 @@ function SpreadAttack()
     local unitorders = ShadowOrders[unit:GetEntityId()]
 
     -- Only mix orders if this unit has any orders to mix.
-    if not( unitorders ) and not( unitorders[1] ) then 
+    if not( unitorders ) and not( unitorders[1] ) then
       continue
     end
-  
+
     -- Find all consecutive Attack orders, and only mix those.
     local beginAttack,endAttack,counter = nil,nil,1
 
@@ -127,12 +127,12 @@ function SpreadAttack()
           break
         end
       end
-      
+
       -- Skip if there was no Attack found, or only one attack (can't swap one command).
       if beginAttack == nil or endAttack == beginAttack then
         break
       end
-      
+
       -- Rearrange the first few attack orders (equal to the number of targets) so that the targets are uniformly attacked on the first pass.
       -- For example, 3 units attacking 8 units (? denotes random target):
       -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
@@ -161,13 +161,13 @@ function SpreadAttack()
 
       -- Repeat this loop and search for more Attack series.
     end
-  
+
     -- All Attack orders have been mixed, now it's time to reassign those orders.
     -- Since giving orders is a Sim-side command, use a SimCallback function.
     SimCallback( { Func = "GiveOrders",
                    Args = { unit_orders = unitorders,
                             unit_id     = unit:GetEntityId(),
-                            From = GetFocusArmy()}, 
+                            From = GetFocusArmy()},
                  }, false )
 
     -- Handle the next unit.

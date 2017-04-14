@@ -321,7 +321,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -398,7 +398,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,

@@ -32,7 +32,7 @@ function DoPing(pingType)
     end
     local army = GetArmiesTable().focusArmy - 1
     if GetFocusArmy() == -1 then
-        return 
+        return
     end
     local data = {Owner = army, Type = pingType, Location = position, Type = pingType}
     data = table.merged(data, PingTypes[pingType])

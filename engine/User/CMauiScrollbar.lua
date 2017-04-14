@@ -22,7 +22,7 @@ function CMauiScrollbar:base()
 end
 
 ---
--- 
+--
 function CMauiScrollbar:moho.scrollbar_methods()
 end
 

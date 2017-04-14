@@ -17,7 +17,7 @@ function BeginLoggingStats()
 end
 
 ---
--- 
+--
 function BlueprintLoaderUpdateProgress()
 end
 

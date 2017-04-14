@@ -17,7 +17,7 @@ function CDamage:SetTarget()
 end
 
 ---
--- 
+--
 function CDamage:moho.CDamage()
 end
 

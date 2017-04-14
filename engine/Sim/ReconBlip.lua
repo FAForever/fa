@@ -47,7 +47,7 @@ function ReconBlip:base()
 end
 
 ---
--- 
+--
 function ReconBlip:moho.blip_methods()
 end
 

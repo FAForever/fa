@@ -12,7 +12,7 @@ function CMauiMesh:base()
 end
 
 ---
--- 
+--
 function CMauiMesh:moho.mesh_methods()
 end
 

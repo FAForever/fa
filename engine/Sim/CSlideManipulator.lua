@@ -32,7 +32,7 @@ function CSlideManipulator:base()
 end
 
 ---
--- 
+--
 function CSlideManipulator:moho.SlideManipulator()
 end
 

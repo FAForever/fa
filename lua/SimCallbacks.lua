@@ -1,5 +1,5 @@
----- 
----- 
+----
+----
 ---- This module contains the Sim-side lua functions that can be invoked
 ---- from the user side.  These need to validate all arguments against
 ---- cheats and exploits.
@@ -175,7 +175,7 @@ Callbacks.OnControlGroupAssign = function(units)
                 for i,v in ScenarioInfo.ControlGroupUnits do
                    if unit == v then
                         table.remove(ScenarioInfo.ControlGroupUnits, i)
-                   end 
+                   end
                 end
             end
         end
@@ -184,7 +184,7 @@ Callbacks.OnControlGroupAssign = function(units)
         if not ScenarioInfo.ControlGroupUnits then
             ScenarioInfo.ControlGroupUnits = {}
         end
-        
+
         -- add units to list
         local entities = {}
         for k,v in units do
@@ -195,7 +195,7 @@ Callbacks.OnControlGroupAssign = function(units)
         -- remove units on death
         for k,v in entities do
             SimTriggers.CreateUnitDeathTrigger(OnUnitKilled, v)
-            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes   
+            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes
         end
     end
 end

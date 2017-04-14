@@ -10,13 +10,13 @@
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
-UEB0303 = Class(TSeaFactoryUnit) {    
+UEB0303 = Class(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)
         self.Trash:Add(self.BuildPointSlider)
     end,
-    
+
 
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
@@ -64,7 +64,7 @@ UEB0303 = Class(TSeaFactoryUnit) {
             dir = dir * -1
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
         self.ArmSlider1:SetGoal(0, 0, 0)

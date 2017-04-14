@@ -54,34 +54,34 @@ function SetLayout()
         controls.constructionGroup.Top:Set(function() return controlClusterGroup.Top() + 2 end)
     end
     controls.constructionGroup.Right:Set(controlClusterGroup.Right)
-    
+
     controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/construct-panel_bmp_t.dds'))
     LayoutHelpers.AtTopIn(controls.minBG, controls.constructionGroup, 36)
     LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 21)
     LayoutHelpers.ResetRight(controls.minBG)
     LayoutHelpers.ResetBottom(controls.minBG)
-    
+
     controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_t.dds'))
     controls.leftBracketMin.Left:Set(controls.constructionGroup.Left)
     controls.leftBracketMin.Top:Set(function() return controls.constructionGroup.Top() + 1 end)
-    
+
     controls.leftBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_b.dds'))
     controls.leftBracketMax.Left:Set(controls.constructionGroup.Left)
     controls.leftBracketMax.Bottom:Set(function() return controls.constructionGroup.Bottom() + 4 end)
-    
+
     controls.leftBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_m.dds'))
     controls.leftBracketMid.Left:Set(function() return controls.constructionGroup.Left() + 7 end)
     controls.leftBracketMid.Bottom:Set(controls.leftBracketMax.Top)
     controls.leftBracketMid.Top:Set(controls.leftBracketMin.Bottom)
-    
+
     controls.rightBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
     controls.rightBracketMin.Right:Set(function() return controls.minBG.Right() + 11 end)
     controls.rightBracketMin.Top:Set(function() return controls.constructionGroup.Top() + 6 end)
-    
+
     controls.rightBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
     controls.rightBracketMax.Right:Set(function() return controls.minBG.Right() + 11 end)
     controls.rightBracketMax.Bottom:Set(function() return controls.constructionGroup.Bottom() + 1 end)
-    
+
     controls.rightBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
     controls.rightBracketMid.Right:Set(function() return controls.minBG.Right() + 11 end)
     controls.rightBracketMid.Bottom:Set(controls.rightBracketMax.Top)
@@ -101,7 +101,7 @@ function SetLayout()
         controls.midBG2:Destroy()
         controls.midBG2 = false
     end
-    
+
     controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/construct-panel_bmp_m.dds'))
     controls.midBG3.Left:Set(controls.minBG.Left)
     controls.midBG3.Top:Set(controls.minBG.Bottom)
@@ -110,7 +110,7 @@ function SetLayout()
     controls.midBG3:SetTiled(true)
     LayoutHelpers.ResetRight(controls.midBG3)
     LayoutHelpers.ResetHeight(controls.midBG3)
-    
+
     controls.choices.Top:Set(function() return controls.constructionGroup.Top() + 100 end)
     controls.choices.Bottom:Set(function() return controls.constructionGroup.Bottom() - 38 end)
     controls.choices.Left:Set(function() return controls.minBG.Left() + 10 end)
@@ -118,7 +118,7 @@ function SetLayout()
     controls.choices:SetToVertical(true)
     LayoutHelpers.ResetHeight(controls.choices)
     LayoutHelpers.ResetRight(controls.choices)
-    
+
     controls.choicesBGMin:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/que-panel_bmp_t.dds'))
     LayoutHelpers.AtLeftTopIn(controls.choicesBGMin, controls.choices, 1, -30)
     controls.choicesBGMax:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/que-panel_bmp_b.dds'))
@@ -131,18 +131,18 @@ function SetLayout()
     controls.choicesBGMid.Top:Set(controls.choicesBGMin.Bottom)
     controls.choicesBGMid.Bottom:Set(controls.choicesBGMax.Top)
     LayoutHelpers.ResetRight(controls.choicesBGMid)
-    
+
     controls.choicesBGMax.Depth:Set(function() return controls.choices.Depth() - 2 end)
     controls.choicesBGMid.Depth:Set(function() return controls.choices.Depth() - 2 end)
     controls.choicesBGMin.Depth:Set(function() return controls.choices.Depth() - 2 end)
-    
+
     controls.scrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
     controls.scrollMin:SetTexture(textures.midBtn.up)
     LayoutHelpers.Above(controls.scrollMin, controls.choices, 2)
     LayoutHelpers.AtLeftIn(controls.scrollMin, controls.choices, -1)
     LayoutHelpers.ResetRight(controls.scrollMin)
     LayoutHelpers.ResetTop(controls.scrollMin)
-    
+
     controls.scrollMinIcon:SetTexture(textures.minIcon.on)
     LayoutHelpers.AtCenterIn(controls.scrollMinIcon, controls.scrollMin)
     controls.scrollMinIcon:DisableHitTest()
@@ -154,13 +154,13 @@ function SetLayout()
         controls.scrollMinIcon:SetTexture(textures.minIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.scrollMax:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
     controls.scrollMax:SetTexture(textures.midBtn.up)
     LayoutHelpers.Above(controls.scrollMax, controls.pageMax, 1)
     LayoutHelpers.ResetRight(controls.scrollMax)
     LayoutHelpers.ResetTop(controls.scrollMax)
-    
+
     controls.scrollMaxIcon:SetTexture(textures.maxIcon.on)
     LayoutHelpers.AtCenterIn(controls.scrollMaxIcon, controls.scrollMax)
     controls.scrollMaxIcon:DisableHitTest()
@@ -172,13 +172,13 @@ function SetLayout()
         controls.scrollMaxIcon:SetTexture(textures.maxIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.pageMin:SetNewTextures(textures.minBtn.up, textures.minBtn.down, textures.minBtn.over, textures.minBtn.dis)
     controls.pageMin:SetTexture(textures.minBtn.up)
     LayoutHelpers.Above(controls.pageMin, controls.scrollMin, 1)
     LayoutHelpers.ResetRight(controls.pageMin)
     LayoutHelpers.ResetTop(controls.pageMin)
-    
+
     controls.pageMinIcon:SetTexture(textures.pageMinIcon.on)
     LayoutHelpers.AtCenterIn(controls.pageMinIcon, controls.pageMin)
     controls.pageMinIcon:DisableHitTest()
@@ -190,15 +190,15 @@ function SetLayout()
         controls.pageMinIcon:SetTexture(textures.pageMinIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.pageMax:SetNewTextures(textures.maxBtn.up, textures.maxBtn.down, textures.maxBtn.over, textures.maxBtn.dis)
     controls.pageMax:SetTexture(textures.maxBtn.up)
     LayoutHelpers.AtBottomIn(controls.pageMax, controls.choicesBGMax, -1)
     LayoutHelpers.AtLeftIn(controls.pageMax, controls.choicesBGMax, -1)
     LayoutHelpers.ResetRight(controls.pageMax)
     LayoutHelpers.ResetTop(controls.pageMax)
-    
-    
+
+
     controls.pageMaxIcon:SetTexture(textures.pageMaxIcon.on)
     LayoutHelpers.AtCenterIn(controls.pageMaxIcon, controls.pageMax)
     controls.pageMaxIcon:DisableHitTest()
@@ -210,13 +210,13 @@ function SetLayout()
         controls.pageMaxIcon:SetTexture(textures.pageMaxIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.secondaryChoices.Top:Set(controls.choices.Top)
     controls.secondaryChoices.Bottom:Set(controls.choices.Bottom)
     controls.secondaryChoices.Left:Set(function() return controls.choices.Right() + 4 end)
     controls.secondaryChoices.Right:Set(function() return controls.secondaryChoices.Left() + 56 end)
     controls.secondaryChoices:SetToVertical(true)
-    
+
     controls.secondaryChoicesBGMin:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/que-panel_bmp_t.dds'))
     LayoutHelpers.AtLeftTopIn(controls.secondaryChoicesBGMin, controls.secondaryChoices, 1, -30)
     controls.secondaryChoicesBGMax:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/que-panel_bmp_b.dds'))
@@ -229,25 +229,25 @@ function SetLayout()
     controls.secondaryChoicesBGMid.Top:Set(controls.secondaryChoicesBGMin.Bottom)
     controls.secondaryChoicesBGMid.Bottom:Set(controls.secondaryChoicesBGMax.Top)
     LayoutHelpers.ResetRight(controls.secondaryChoicesBGMid)
-    
+
     controls.secondaryChoicesBGMin.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
     controls.secondaryChoicesBGMax.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
     controls.secondaryChoicesBGMid.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
-    
+
     LayoutHelpers.AtLeftIn(controls.secondaryProgress, controls.secondaryChoices, 8)
     LayoutHelpers.AtTopIn(controls.secondaryProgress, controls.secondaryChoices, 42)
     LayoutHelpers.ResetBottom(controls.secondaryProgress)
     controls.secondaryProgress.Depth:Set(function() return controls.secondaryChoices.Depth() + 5 end)
     controls.secondaryProgress.Width:Set(40)
     controls.secondaryProgress.Height:Set(4)
-    
+
     controls.secondaryScrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
     controls.secondaryScrollMin:SetTexture(textures.midBtn.up)
     LayoutHelpers.Above(controls.secondaryScrollMin, controls.secondaryChoices, 2)
     LayoutHelpers.AtLeftIn(controls.secondaryScrollMin, controls.secondaryChoices, -1)
     LayoutHelpers.ResetRight(controls.secondaryScrollMin)
     LayoutHelpers.ResetTop(controls.secondaryScrollMin)
-    
+
     controls.secondaryScrollMinIcon:SetTexture(textures.minIcon.on)
     LayoutHelpers.AtCenterIn(controls.secondaryScrollMinIcon, controls.secondaryScrollMin)
     controls.secondaryScrollMinIcon:DisableHitTest()
@@ -259,13 +259,13 @@ function SetLayout()
         controls.secondaryScrollMinIcon:SetTexture(textures.minIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.secondaryScrollMax:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
     controls.secondaryScrollMax:SetTexture(textures.midBtn.up)
     LayoutHelpers.Above(controls.secondaryScrollMax, controls.secondaryPageMax, 1)
     LayoutHelpers.ResetRight(controls.secondaryScrollMax)
     LayoutHelpers.ResetTop(controls.secondaryScrollMax)
-    
+
     controls.secondaryScrollMaxIcon:SetTexture(textures.maxIcon.on)
     LayoutHelpers.AtCenterIn(controls.secondaryScrollMaxIcon, controls.secondaryScrollMax)
     controls.secondaryScrollMaxIcon:DisableHitTest()
@@ -277,13 +277,13 @@ function SetLayout()
         controls.secondaryScrollMaxIcon:SetTexture(textures.maxIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.secondaryPageMin:SetNewTextures(textures.minBtn.up, textures.minBtn.down, textures.minBtn.over, textures.minBtn.dis)
     controls.secondaryPageMin:SetTexture(textures.minBtn.up)
     LayoutHelpers.Above(controls.secondaryPageMin, controls.secondaryScrollMin, 1)
     LayoutHelpers.ResetRight(controls.secondaryPageMin)
     LayoutHelpers.ResetTop(controls.secondaryPageMin)
-    
+
     controls.secondaryPageMinIcon:SetTexture(textures.pageMinIcon.on)
     LayoutHelpers.AtCenterIn(controls.secondaryPageMinIcon, controls.secondaryPageMin)
     controls.secondaryPageMinIcon:DisableHitTest()
@@ -295,14 +295,14 @@ function SetLayout()
         controls.secondaryPageMinIcon:SetTexture(textures.pageMinIcon.on)
         Button.OnEnable(self)
     end
-    
+
     controls.secondaryPageMax:SetNewTextures(textures.maxBtn.up, textures.maxBtn.down, textures.maxBtn.over, textures.maxBtn.dis)
     controls.secondaryPageMax:SetTexture(textures.maxBtn.up)
     LayoutHelpers.AtBottomIn(controls.secondaryPageMax, controls.secondaryChoicesBGMax, -1)
     LayoutHelpers.AtLeftIn(controls.secondaryPageMax, controls.secondaryChoicesBGMax, -1)
     LayoutHelpers.ResetRight(controls.secondaryPageMax)
     LayoutHelpers.ResetTop(controls.secondaryPageMax)
-    
+
     controls.secondaryPageMaxIcon:SetTexture(textures.pageMaxIcon.on)
     LayoutHelpers.AtCenterIn(controls.secondaryPageMaxIcon, controls.secondaryPageMax)
     controls.secondaryPageMaxIcon:DisableHitTest()
@@ -314,14 +314,14 @@ function SetLayout()
         controls.secondaryPageMaxIcon:SetTexture(textures.pageMaxIcon.on)
         Button.OnEnable(self)
     end
-    
-    controls.extraBtn1:SetNewTextures(UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_up.dds'), 
+
+    controls.extraBtn1:SetNewTextures(UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_up.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_selected.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_over.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_over.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_dis.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_dis.dds'))
-    controls.extraBtn2:SetNewTextures(UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_up.dds'), 
+    controls.extraBtn2:SetNewTextures(UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_up.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_selected.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_over.dds'),
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_over.dds'),
@@ -329,7 +329,7 @@ function SetLayout()
         UIUtil.UIFile('/game/construct-sm_horiz_btn/que_btn_dis.dds'))
     LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 9, 5)
     LayoutHelpers.RightOf(controls.extraBtn2, controls.extraBtn1, 3)
-    
+
     controls.constructionGroup:DisableHitTest()
     LayoutTabs(import('/lua/ui/game/construction.lua').controls)
     controls.constructionGroup:Hide()
@@ -337,7 +337,7 @@ end
 
 function LayoutTabs(controls)
     local prevControl = false
-    
+
     local tabFiles = {
         construction = '/game/construct-tab_top_btn/top_tab_btn_',
         selection = '/game/construct-tab_top_btn/mid_tab_btn_',
@@ -353,55 +353,55 @@ function LayoutTabs(controls)
         RCH = '/game/construct-tech_btn/r_upgrade_btn_',
         Back = '/game/construct-tech_btn/m_upgrade_btn_',
     }
-    
+
     local function GetTabTextures(id)
         if tabFiles[id] then
             local pre = tabFiles[id]
             return UIUtil.UIFile(pre..'up_bmp.dds'), UIUtil.UIFile(pre..'sel_bmp.dds'),
-                UIUtil.UIFile(pre..'over_bmp.dds'), UIUtil.UIFile(pre..'down_bmp.dds'), 
+                UIUtil.UIFile(pre..'over_bmp.dds'), UIUtil.UIFile(pre..'down_bmp.dds'),
                 UIUtil.UIFile(pre..'dis_bmp.dds'), UIUtil.UIFile(pre..'dis_bmp.dds')
         elseif techFiles[id] then
             local pre = techFiles[id]
             return UIUtil.UIFile(pre..'up.dds'), UIUtil.UIFile(pre..'selected.dds'),
-                UIUtil.UIFile(pre..'over.dds'), UIUtil.UIFile(pre..'down.dds'), 
+                UIUtil.UIFile(pre..'over.dds'), UIUtil.UIFile(pre..'down.dds'),
                 UIUtil.UIFile(pre..'dis.dds'), UIUtil.UIFile(pre..'dis.dds')
         end
     end
-    
+
     local function SetupTab(control)
         control:SetNewTextures(GetTabTextures(control.ID))
         control:UseAlphaHitTest(false)
-               
+
         control.OnDisable = function(self)
             self.disabledGroup:Enable()
             Checkbox.OnDisable(self)
         end
-        
+
         control.disabledGroup.Height:Set(25)
         control.disabledGroup.Width:Set(40)
         LayoutHelpers.AtCenterIn(control.disabledGroup, control)
-        
+
         control.OnEnable = function(self)
             self.disabledGroup:Disable()
             Checkbox.OnEnable(self)
         end
     end
-    
+
     if table.getsize(controls.tabs) > 0 then
         for id, control in controls.tabs do
             SetupTab(control)
-             
+
             if not prevControl then
                 LayoutHelpers.AtLeftTopIn(control, controls.minBG, 134, 60)
             else
                 local offset = 0
                 LayoutHelpers.Below(control, prevControl, offset)
             end
-            
+
             prevControl = control
         end
     end
-    
+
     SetupTab(controls.constructionTab)
     LayoutHelpers.AtLeftTopIn(controls.constructionTab, controls.constructionGroup, 20, 7)
     SetupTab(controls.selectionTab)
@@ -420,7 +420,7 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
-        
+
     elseif type == 'selection' then
         controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/template_on.dds')
         controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/template_off.dds')

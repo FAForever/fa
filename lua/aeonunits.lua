@@ -42,7 +42,7 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag )
-        unitBeingBuilt.Trash:Add( thread )        
+        unitBeingBuilt.Trash:Add( thread )
     end,
 }
 
@@ -70,7 +70,7 @@ AConcreteStructureUnit = Class(ConcreteStructureUnit) {
 AConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateAeonConstructionUnitBuildingEffects( self, unitBeingBuilt, self.BuildEffectsBag )
-    end,  
+    end,
 }
 
 
@@ -160,8 +160,8 @@ ASonarUnit = Class(SonarUnit) {}
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag )
-        unitBeingBuilt.Trash:Add( thread )    
-    end,	
+        unitBeingBuilt.Trash:Add( thread )
+    end,
 }
 
 
@@ -184,9 +184,9 @@ AShieldLandUnit = Class(ShieldLandUnit) {}
 #  SHIELD STRUCTURES
 #-------------------------------------------------------------
 AShieldStructureUnit = Class(ShieldStructureUnit) {
-    
+
     RotateSpeed = 60,
-    
+
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
         local bp = self:GetBlueprint()
@@ -201,10 +201,10 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
         if self.Rotator then
-            
+
             self.Rotator:SetTargetSpeed(0)
         end
-    end,    
+    end,
 
 }
 
@@ -252,9 +252,9 @@ AQuantumGateUnit = Class(QuantumGateUnit) {}
 #  RADAR JAMMER UNITS
 #-------------------------------------------------------------
 ARadarJammerUnit = Class(RadarJammerUnit) {
-    
+
     RotateSpeed = 60,
-    
+
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
@@ -270,7 +270,7 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
             self.Trash:Add(self.Rotator)
         end
     end,
-    
+
     OnIntelEnabled = function(self)
         RadarJammerUnit.OnIntelEnabled(self)
         if self.OpenAnim then
@@ -289,9 +289,9 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
         if self.OpenAnim then
             self.OpenAnim:SetRate(-1)
         end
-        if self.Rotator then            
+        if self.Rotator then
             self.Rotator:SetTargetSpeed(0)
         end
-    end,    
+    end,
 
 }

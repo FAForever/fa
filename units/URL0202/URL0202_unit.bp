@@ -207,7 +207,7 @@ UnitBlueprint {
             BeamCollisionDelay = 0.1,
             BeamLifetime = 0.1,
             CollideFriendly = false,
-            Damage = 25, 
+            Damage = 25,
             DamageType = 'Normal',
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {
@@ -216,7 +216,7 @@ UnitBlueprint {
             },
             FiringTolerance = 0,
             Label = 'MainGun',
-            LeadTarget = false, 
+            LeadTarget = false,
             MaxRadius = 23,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -239,7 +239,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1.8,
-            ReTargetOnMiss = true,  
+            ReTargetOnMiss = true,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

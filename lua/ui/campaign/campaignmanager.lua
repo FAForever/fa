@@ -122,10 +122,10 @@ end
 function IsOperationSelectable(campaign, operation)
     if campaignSequence[campaign] then
         local campTable = GetCampaignTable()
-        if campTable[campaign][operation] then  
+        if campTable[campaign][operation] then
             return true
         end
-        
+
         local lastCompletedOp = GetLastCompletedOperation(campaign)
         if GetNextOperation(campaign, lastCompletedOp).opID == operation then
             for i, v in campTable[campaign][lastCompletedOp] do
@@ -143,7 +143,7 @@ function IsOperationFinished(campaign, operation, difficulty)
     local campTable = GetCampaignTable()
     if campaignSequence[campaign] and campTable[campaign][operation] then
         if difficulty then
-            if campTable[campaign][operation][difficulty].allPrimary == true then  
+            if campTable[campaign][operation][difficulty].allPrimary == true then
                 return true
             end
         else
@@ -184,8 +184,8 @@ function OperationVictory(ovTable, skipDialog)
             GetFrame(0),
             resultText,
             "<LOC _Ok>",
-            function() 
-                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable) 
+            function()
+                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable)
             end,
             true)
     end

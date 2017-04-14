@@ -56,17 +56,17 @@ function ApplyBuff(unit, buffName, instigator)
     end
 
     local ubt = unit.Buffs.BuffTable
-    
+
     -- We're going to need some naughty, hard-coded stuff here for a regen aura edge case where
     -- we need the advanced version to take precedence over the lower version, but not vice versa.
     if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
-    
+
     if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
         for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
             RemoveBuff(unit, key, true)
         end
     end
-    
+
     if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
         for key, bufftbl in ubt[def.BuffType] do
             RemoveBuff(unit, key, true)
@@ -220,7 +220,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
             local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
             local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
-            
+
             unit:SetRegen(val)
         elseif atype == 'Damage' then
             for i = 1, unit:GetWeaponCount() do
@@ -361,7 +361,7 @@ end
 
 -- Calculates the buff from all the buffs of the same time the unit has.
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
-    
+
     local adds = 0
     local mults = 1.0
     local multsTotal = 0 -- Used only for regen buffs
@@ -377,11 +377,11 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         if v.Mult then
             if affectType == 'Regen' then
                 -- Regen mults use MaxHp as base, so should always be <1
-                
+
                 -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
                 -- they will remove this
                 if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit:GetUnitId() .. ' and buff ' .. buffName) return end
-            
+
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
@@ -402,7 +402,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             bool = true
         end
     end
-    
+
     -- Adds are calculated first, then the mults.  May want to expand that later.
     local returnVal = false
     returnVal = (initialVal + adds + multsTotal) * mults

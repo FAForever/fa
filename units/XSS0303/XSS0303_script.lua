@@ -20,8 +20,8 @@ XSS0303 = Class(AircraftCarrier) {
         AntiAirLeft = Class(SAALosaareAutoCannonWeapon) {},
         CruiseMissiles = Class(SLaanseMissileWeapon) {},
     },
-    
-    
+
+
     BuildAttachBone = 'XSS0303',
 
     OnStopBeingBuilt = function(self,builder,layer)

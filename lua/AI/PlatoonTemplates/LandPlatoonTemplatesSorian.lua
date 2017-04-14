@@ -105,8 +105,8 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
-    Name = 'T1GhettoSquad',   
-    Plan = 'GhettoAISorian',    
+    Name = 'T1GhettoSquad',
+    Plan = 'GhettoAISorian',
     GlobalSquads = {
         { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 6, 6, 'attack', 'none' },
     }
@@ -114,30 +114,30 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'T1MassHuntersCategorySorian',
-    #Plan = 'AttackForceAI',    
-    Plan = 'GuardMarkerSorian',    
+    #Plan = 'AttackForceAI',
+    Plan = 'GuardMarkerSorian',
     GlobalSquads = {
         { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 100, 'attack', 'none' },
-		#{ categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
+        #{ categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
 }
 
 PlatoonTemplate {
     Name = 'T2MassHuntersCategorySorian',
-    #Plan = 'AttackForceAI',    
-    Plan = 'GuardMarkerSorian',    
+    #Plan = 'AttackForceAI',
+    Plan = 'GuardMarkerSorian',
     GlobalSquads = {
         #{ categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 100, 'attack', 'none' },
-		{ categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 100, 'attack', 'none' },
-		#{ categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 25, 'attack', 'none' },
+        { categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 100, 'attack', 'none' },
+        #{ categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 25, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
 }
 
 PlatoonTemplate {
     Name = 'T4ExperimentalLandSorian',
-    Plan = 'ExperimentalAIHubSorian',   
+    Plan = 'ExperimentalAIHubSorian',
     GlobalSquads = {
         { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.url0401, 1, 10, 'attack', 'none' }
     },
@@ -145,7 +145,7 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'T4ExperimentalScathisSorian',
-    Plan = 'ExperimentalAIHubSorian',   
+    Plan = 'ExperimentalAIHubSorian',
     GlobalSquads = {
         { categories.url0401, 1, 1, 'attack', 'none' }
     },
@@ -153,7 +153,7 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'T4ExperimentalLandLate',
-    Plan = 'ExperimentalAIHubSorian',   
+    Plan = 'ExperimentalAIHubSorian',
     GlobalSquads = {
         { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.url0401, 2, 5, 'attack', 'GrowthFormation' }
     },

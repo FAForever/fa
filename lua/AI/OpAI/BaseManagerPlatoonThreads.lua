@@ -789,7 +789,7 @@ function BaseManagerEngineerThread(platoon)
                 if v ~= 'ALLUNITS' then
                     unitType = v
                 end
-                
+
                 repeat
                     nameSet = false
                     local markedUnfinished = false
@@ -801,15 +801,15 @@ function BaseManagerEngineerThread(platoon)
                             else
                                 WaitSeconds(3)
                             end
-                            
+
                             if not aiBrain:PlatoonExists(platoon) then
                                 return
                             end
-                            
+
                             if not markedUnfinished and eng.UnitBeingBuilt then
                                 baseManager.UnfinishedBuildings[unitName] = true
                             end
-                            
+
                             if not nameSet then
                                 local buildingUnit = eng.UnitBeingBuilt
                                 if unitName and buildingUnit and not buildingUnit:IsDead() then
@@ -866,12 +866,12 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                         -- and TransportUnitsToLocation(platoon, {location[1], 0, location[2]}) then
                         IssueClearCommands({eng})
                         aiBrain:BuildStructure(eng, category, location, false)
-                        
+
                         local unitName = false
                         if namesTable[location[1]][location[2]] then
                             unitName = namesTable[location[1]][location[2]]
                         end
-                        
+
                         return true, unitName
                     end
                 end
@@ -884,7 +884,7 @@ end
 -- Finish building structures that werent finshed
 function BuildUnfinishedStructures(platoon)
     platoon:Stop()
-    
+
     local aiBrain = platoon:GetBrain()
     local platoonUnits = platoon:GetPlatoonUnits()
     local armyIndex = aiBrain:GetArmyIndex()
@@ -937,7 +937,7 @@ function BaseManagerPatrolLocationFactoriesAI(platoon)
             and not aiBrain.BaseManagers[platoon.PlatoonData.BaseName].FunctionalityStates.EngineerReclaiming then
         patrol = false
     end
-    
+
     local returnOut = false
     while aiBrain:PlatoonExists(platoon) and not returnOut do
         platoon:Stop()
@@ -993,7 +993,7 @@ function PlatoonSetTargetPriorities(platoon)
         for k, v in platoon.PlatoonData.TargetPriorities do
             table.insert(priList, ParseEntityCategory(v))
         end
-        
+
         local squads = { 'attack', 'support', 'scout', 'artillery' }
         for k, v in squads do
             platoon:SetPrioritizedTargetList(v, priList)
@@ -1071,7 +1071,7 @@ function BaseManagerScoutingAI(platoon)
         if numPoints > 0 then
             platoon:Stop()
         end
-        
+
         local count = 0
         if numPoints > 0 then
             while count < 10 do

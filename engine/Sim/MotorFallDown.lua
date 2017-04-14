@@ -2,7 +2,7 @@
 -- @classmod Sim.MotorFallDown
 
 ---
--- 
+--
 function MotorFallDown:moho.MotorFallDown()
 end
 

@@ -22,7 +22,7 @@ function CMauiCursor:Show()
 end
 
 ---
--- 
+--
 function CMauiCursor:moho.cursor_methods()
 end
 

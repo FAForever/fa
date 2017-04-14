@@ -22,7 +22,7 @@ function ScriptedDecal:SetTexture()
 end
 
 ---
--- 
+--
 function ScriptedDecal:moho.userDecal_methods()
 end
 

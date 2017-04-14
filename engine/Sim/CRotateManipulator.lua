@@ -52,7 +52,7 @@ function CRotateManipulator:base()
 end
 
 ---
--- 
+--
 function CRotateManipulator:moho.RotateManipulator()
 end
 

@@ -8,24 +8,24 @@
 #**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-AIPlansList = 
+AIPlansList =
 {
     # ---
     # UEF
     # ---
-    {   
+    {
     },
 
     # ----
     # Aeon
     # ----
-    {   
+    {
     },
 
     # ------
     # Cybran
     # ------
-    {   
+    {
         '/maps/perftest/perftest_playerplan.lua',
     },
 }

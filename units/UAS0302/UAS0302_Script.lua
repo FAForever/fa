@@ -25,7 +25,7 @@ UAS0302 = Class( ASeaUnit ) {
         AntiMissile1 = Class( AAMWillOWisp ) {},
         AntiMissile2 = Class( AAMWillOWisp ) {},
     },
-    
+
     OnCreate = function(self)
         ASeaUnit.OnCreate(self)
         for i = 1, 3 do

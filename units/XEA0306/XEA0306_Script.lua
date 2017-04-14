@@ -107,7 +107,7 @@ XEA0306 = Class(AirTransport) {
             WaitSeconds( util.GetRandomFloat( 0.2, 0.9 ))
         end
     end,
-    
+
     GetUnitSizes = function(self)
         local bp = self:GetBlueprint()
         if self:GetFractionComplete() < 1.0 then
@@ -115,7 +115,7 @@ XEA0306 = Class(AirTransport) {
         else
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
-    end,    
+    end,
 }
 
 TypeClass = XEA0306

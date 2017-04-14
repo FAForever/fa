@@ -419,11 +419,11 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
         builder.buildBots = {}
     end
 
-	local builderArmy = builder:GetArmy()
+    local builderArmy = builder:GetArmy()
     local unitBeingBuiltArmy = unitBeingBuilt:GetArmy()
 
     -- If is new, won't spawn build bots if they might accidentally capture the unit
-	if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) then
+    if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) then
         for k, b in builder.buildBots do
             if b:BeenDestroyed() then
                 builder.buildBots[k] = nil

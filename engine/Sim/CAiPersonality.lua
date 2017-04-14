@@ -172,7 +172,7 @@ function CAiPersonality:GetUpgradesDriven()
 end
 
 ---
--- 
+--
 function CAiPersonality:moho.aipersonality_methods()
 end
 

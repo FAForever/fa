@@ -21,7 +21,7 @@ local nextUnbox = function(t, k)
 end
 
 LoggingEnabled = false
-LoggedChanges = {}  
+LoggedChanges = {}
 
 -- A flat, fixed-keyset table eagerly populated with WatchedValues.
 WatchedValueTable = Class() {
@@ -41,7 +41,7 @@ WatchedValueTable = Class() {
         local WatchedMetaTable = {
             -- Get a value from a WatchedValueTable
             __index = function(wvt, key)
-                local msg = 'WatchedValueTable __index function(wvt, ' 
+                local msg = 'WatchedValueTable __index function(wvt, '
                             .. repr(key).. ') '  .. tostring(_store[key])
                 -- limit logging only to changes of the WatchedValueTable
                 if LoggingEnabled and not LoggedChanges[msg] then

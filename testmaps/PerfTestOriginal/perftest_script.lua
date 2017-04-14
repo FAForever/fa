@@ -40,7 +40,7 @@ function StartPerfTest()
 
     -- Long wait to give stuff time to load up before running the perf test.
     WaitSeconds(25)
-    
+
     Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Intro_Shot'), 0.0)
     BeginLoggingStats('perftest.log')
     WaitSeconds(2)
@@ -224,17 +224,17 @@ function GetAllArmiesGoing()
     P_NG_L2_P3 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'SecondLine', 'PLTN_3')
     P_NG_L3_P1 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'ThirdLine', 'PLTN_1')
     P_NG_L3_P2 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'ThirdLine', 'PLTN_2')
-    
+
     -- Aircraft Carrier
     P_NG_L3_P3 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'ThirdLine', 'PLTN_3')
-    
+
     -- Torpedo Group
     P_NG_L4_P1 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'Flying_Group', 'PLTN_1')
     P_NG_L4_P2 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'Flying_Group', 'PLTN_2')
-    
+
     -- Carrier Group
     P_NG_L4_P3 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'Flying_Group', 'PLTN_3')
-    
+
     -- Guard Group
     P_NG_L4_P4 = SpawnAndSetArmySubGroupState('HoldFire', 'Player', 'Naval_Group', 'Flying_Group', 'PLTN_4')
     IssueTransportLoad(P_NG_L4_P3, P_NG_L3_P3[1])
@@ -276,14 +276,14 @@ function GetAllArmiesGoing()
     U_NG_L2_P3 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'SecondLine', 'PLTN_3')
     U_NG_L3_P1 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'ThirdLine', 'PLTN_1')
     U_NG_L3_P2 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'ThirdLine', 'PLTN_2')
-    
+
     -- Experimental Sub
     U_NG_L3_P3 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'ThirdLine', 'PLTN_3')
-    
+
     IssueDive(U_NG_L3_P3)
     -- Sub Group
     U_NG_L4_P1 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'AirGroup', 'PLTN_1')
-    
+
     -- Active Attack Group
     U_NG_L4_P2 = SpawnAndSetArmySubGroupState('HoldFire', 'UEF', 'UEF_Naval_Group', 'AirGroup', 'PLTN_2')
     IssueTransportLoad(U_NG_L4_P1, U_NG_L3_P3[1])
@@ -302,7 +302,7 @@ function GetAllArmiesGoing()
     A_Base_All = SpawnAndSetArmySubGroupState('HoldFire', 'Aeon', 'Base', 'EverythingElse')
     A_Base_Patrol = SpawnAndOrder('AFG_Patrol', 'Aeon', 'Base', 'AirPatrol')
     WaitSeconds(5)
-    
+
     for k, v in A_Base_Nukes do
         BuildNukes(v, 5)
     end
@@ -504,10 +504,10 @@ function SpawnCybranBase()
     -- Cybran Neutral
     -- Cybran Base
     C_Base = ScenarioUtils.CreateArmyGroup('Cybran_2', 'Neutral_Base')
-    
+
     -- Patrolling Cybran Spyplane
     C_Spy_1 = SpawnAndOrder('C_Spy_Patrol', 'Cybran_2', 'CN_Spyplane', 'PLTN_1')
-    
+
     -- Air Staging Platforms and planes
     C_Flight_Group_1 = ScenarioUtils.CreateArmySubGroup('Cybran_2', 'Base_Planes', 'PLTN_1')
     C_Flight_Group_2 = ScenarioUtils.CreateArmySubGroup('Cybran_2', 'Base_Planes', 'PLTN_2')

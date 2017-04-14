@@ -7,10 +7,10 @@
 -- **
 -- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
--- 
+--
 -- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
 -- that may or may not exist depending on how the simulation is executing.
--- 
+--
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
@@ -23,7 +23,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     FxBeamEndPointScale = 1,
 
     FxImpactProp = {},
-    FxImpactShield = {},    
+    FxImpactShield = {},
     FxImpactNone = {},
 
     FxUnitHitScale = 1,
@@ -87,7 +87,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
-        
+
         local dmgmod = 1
         if self.Weapon.DamageModifiers then
             for k, v in self.Weapon.DamageModifiers do
@@ -95,7 +95,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             end
         end
         damage = damage * dmgmod
-        
+
         if instigator then
             local radius = damageData.DamageRadius
             if radius and radius > 0 then
@@ -138,12 +138,12 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         if table.getn(self.FxBeam) ~= 0 then
             local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], army)
             AttachBeamToEntity(fxBeam, self, 0, army)
-            
+
             -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
-            
+
             table.insert( self.BeamEffectsBag, fxBeam )
             self.Trash:Add(fxBeam)
         else
@@ -306,7 +306,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             ImpactEffectScale = self.FxPropHitScale
         elseif impactType == 'Shield' then
             ImpactEffects = self.FxImpactShield
-            ImpactEffectScale = self.FxShieldHitScale            
+            ImpactEffectScale = self.FxShieldHitScale
         else
             LOG('*ERROR: CollisionBeam:OnImpact(): UNKNOWN TARGET TYPE ', repr(impactType))
         end
@@ -338,9 +338,9 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         local data = self.DamageTable
         if data.Buffs then
             for k, v in data.Buffs do
-                if v.Add.OnImpact == true and not EntityCategoryContains((ParseEntityCategory(v.TargetDisallow) or ''), target) 
+                if v.Add.OnImpact == true and not EntityCategoryContains((ParseEntityCategory(v.TargetDisallow) or ''), target)
                     and EntityCategoryContains((ParseEntityCategory(v.TargetAllow) or categories.ALLUNITS), target) then
-                    
+
                     target:AddBuff(v)
                 end
             end

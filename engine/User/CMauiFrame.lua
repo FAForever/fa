@@ -17,7 +17,7 @@ function CMauiFrame:base()
 end
 
 ---
--- 
+--
 function CMauiFrame:moho.frame_methods()
 end
 
