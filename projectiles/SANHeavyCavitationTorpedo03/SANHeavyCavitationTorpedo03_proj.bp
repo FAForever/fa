@@ -21,7 +21,7 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
 #        'TORPEDO',
-	'NOSPLASHDAMAGE',
+    'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 1,
@@ -50,7 +50,7 @@ ProjectileBlueprint {
         CollideSurface = true, # false
         DestroyOnWater = false,
         InitialSpeed = 5,
-	Lifetime = 7, #added
+    Lifetime = 7, #added
         MaxSpeed = 12,
         StayUnderwater = true,
         TrackTarget = false,

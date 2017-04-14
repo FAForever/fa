@@ -4019,7 +4019,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 myThreat = myThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
             end
         until threat > myThreat or overallThreat <= 0
-        
+
         for k, v in self.AirAttackPoints do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
                 self.AirAttackPoints[k] = nil

@@ -574,7 +574,7 @@ function OnResume()
     ResumedBy = nil
 end
 
--- Called immediately when the user hits the pause button on the machine 
+-- Called immediately when the user hits the pause button on the machine
 -- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
@@ -596,15 +596,15 @@ local _beatFunctions = {}
 
 -- Adds a function callback that will be called on sim beats
 -- @param fn       - specifies function callback
--- @param throttle - specifies whether never to run a function more than 10 times per second 
+-- @param throttle - specifies whether never to run a function more than 10 times per second
 --                   to reduce UI load when speeding up sim / replay
--- @param key      - specifies optional key used later for removing callbacks by a key 
+-- @param key      - specifies optional key used later for removing callbacks by a key
 function AddBeatFunction(fn, throttle, key)
     table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
 end
 
 -- Removes a function callback from calling on sim beats
--- @param fn  - specifies function callback  
+-- @param fn  - specifies function callback
 -- @param key - specifies optional key associated with function callback
 function RemoveBeatFunction(fn, key)
     for i,v in _beatFunctions do

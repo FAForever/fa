@@ -30,7 +30,7 @@ UEA0203 = Class(AirTransport, TAirUnit) {
             -- XMAX, XMIN, YMAX, YMIN, ZMAX, ZMIN, TURNMULT, TURNSPEED
             value:SetThrustingParam(-0.0, 0.0, -0.25, 0.25, -0.1, 0.1, 1.0, 0.25)
         end
-        
+
         for k, v in self.EngineManipulators do
             self.Trash:Add(v)
         end

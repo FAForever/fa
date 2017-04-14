@@ -107,7 +107,7 @@ changelog = {
             '      civilian AI, if there is one.',
             '- Improved the tooltip when hovering over your score in the lobby. It will now show a more detailed explanation including your rating deviation',
             '- Fixed the position of the load button in Skirmish mode when launching offline',
-            '- Fixed "Odd vs Even" autoteam button for random faction being the same as the "Top vs Bottom"', 
+            '- Fixed "Odd vs Even" autoteam button for random faction being the same as the "Top vs Bottom"',
             '- Fixed new players joining a lobby being unable to see closed slots as being closed',
             '- Fixed auto team settings not working for games with >8 players',
             '- Changed "Remove Player" to "Kick Player" for clarity',

@@ -87,7 +87,7 @@ function CLobby:SendData(self, targetID, table)
 end
 
 ---
--- 
+--
 function CLobby:moho.lobby_methods()
 end
 

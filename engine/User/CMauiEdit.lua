@@ -157,7 +157,7 @@ function CMauiEdit:base()
 end
 
 ---
--- 
+--
 function CMauiEdit:moho.edit_methods()
 end
 

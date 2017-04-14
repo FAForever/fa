@@ -63,12 +63,12 @@ end
 -- DEFAULT EXPLOSION BASE FUNCTIONS --
 --------------------------------------
 function CreateScalableUnitExplosion( unit, overKillRatio )
-	if unit then
-		if IsUnit(unit) then
-			local explosionEntity = CreateUnitExplosionEntity( unit, overKillRatio )
-			ForkThread( _CreateScalableUnitExplosion, explosionEntity )
-		end
-	end
+    if unit then
+        if IsUnit(unit) then
+            local explosionEntity = CreateUnitExplosionEntity( unit, overKillRatio )
+            ForkThread( _CreateScalableUnitExplosion, explosionEntity )
+        end
+    end
 end
 
 function CreateDefaultHitExplosion( obj, scale )
@@ -301,22 +301,22 @@ end
 function CreateDebrisProjectiles( obj, volume, dimensions )
     local partamounts = math.min(GetRandomInt( 1 + (volume * 25), (volume * 50) ) , 100)
     local sx, sy, sz = unpack(dimensions)
-	local vector = obj.Spec.OverKillRatio.debris_Vector
+    local vector = obj.Spec.OverKillRatio.debris_Vector
     for i = 1, partamounts do
         local xpos, xpos, zpos = GetRandomOffset( sx, sy, sz, 1 )
-		local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
-		if vector then
-			xdir = (vector[1] * 5) + GetRandomOffset2( sx, sy, sz, 3 )
-			ydir = math.abs((vector[2] * 5 )) + GetRandomOffset( sx, sy, sz, 3 )
-			zdir = (vector[3] * 5) + GetRandomOffset2( sx, sy, sz, 1 )
-		end
+        local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
+        if vector then
+            xdir = (vector[1] * 5) + GetRandomOffset2( sx, sy, sz, 3 )
+            ydir = math.abs((vector[2] * 5 )) + GetRandomOffset( sx, sy, sz, 3 )
+            zdir = (vector[3] * 5) + GetRandomOffset2( sx, sy, sz, 1 )
+        end
 
         local rand = 4
-		if volume < 0.2 then
-			rand = 9
-		elseif volume > 2 then
-			rand = 10
-		end
+        if volume < 0.2 then
+            rand = 9
+        elseif volume > 2 then
+            rand = 10
+        end
         obj:CreateProjectile('/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp',xpos,xpos,zpos,xdir,ydir + 4.5,zdir)
     end
 end

@@ -13,26 +13,26 @@ SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
     ExplodeSound = 'Nuke_Impact',
     AmbientSound = 'Nuke_Flight',
 
-	InitialEffects = {
-		'/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
-	},
-    
+    InitialEffects = {
+        '/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
+    },
+
     ThrustEffects = {
-		'/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
-	},
-    
+        '/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
+    },
+
     LaunchEffects = {
-		'/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
-	},
-    
+        '/effects/emitters/seraphim_expnuke_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
+    },
+
     OnCreate = function(self)
         SExperimentalStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_proj.bp'
         self:LauncherCallbacks()
-    end, 
+    end,
 
     -- Need to preserve warp action
     OnImpact = function(self, TargetType, TargetEntity)

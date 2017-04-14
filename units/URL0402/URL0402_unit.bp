@@ -12,7 +12,7 @@ UnitBlueprint {
             'Right_Projectile02',
             'Left_Projectile02',
             'Exhaust05',
-            'Exhaust02',    
+            'Exhaust02',
         },
     },
     Audio = {
@@ -85,7 +85,7 @@ UnitBlueprint {
         'OVERLAYCOUNTERINTEL',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
-		'OVERLAYINDIRECTFIRE',
+        'OVERLAYINDIRECTFIRE',
     },
     CollisionOffsetY = 0.9,
     Defense = {
@@ -226,7 +226,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 260000,
         BuildCostMass = 19000,
-        BuildTime = 15750, 
+        BuildTime = 15750,
         MaintenanceConsumptionPerSecondEnergy = 400,
     },
     General = {

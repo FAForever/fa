@@ -17,7 +17,7 @@ function CMauiHistogram:base()
 end
 
 ---
--- 
+--
 function CMauiHistogram:moho.histogram_methods()
 end
 

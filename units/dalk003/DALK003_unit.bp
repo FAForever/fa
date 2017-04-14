@@ -89,7 +89,7 @@ UnitBlueprint {
                 AnimationRateMin = 1.5,
                 Weight = 1,
             },
-        },		
+        },
         AnimationWalk = '/units/DALK003/DALK003_walk.sca',
         AnimationWalkRate = 6,
         Mesh = {

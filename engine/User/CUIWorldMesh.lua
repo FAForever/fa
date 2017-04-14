@@ -77,7 +77,7 @@ function CUIWorldMesh:SetStance(vector position,  [quaternion orientation])
 end
 
 ---
--- 
+--
 function CUIWorldMesh:moho.world_mesh_methods()
 end
 

@@ -37,7 +37,7 @@ function CAimManipulator:base()
 end
 
 ---
--- 
+--
 function CAimManipulator:moho.AimManipulator()
 end
 

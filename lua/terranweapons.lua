@@ -69,7 +69,7 @@ TDFLandGaussCannonWeapon = Class(DefaultProjectileWeapon) {
 }
 
 TDFZephyrCannonWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.TLaserMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.TLaserMuzzleFlash,
 }
 
 TDFRiotWeapon = Class(DefaultProjectileWeapon) {
@@ -157,7 +157,7 @@ TSAMLauncher = Class(DefaultProjectileWeapon) {
 
 TANTorpedoLandWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
@@ -165,7 +165,7 @@ TANTorpedoLandWeapon = Class(DefaultProjectileWeapon) {
 
 TANTorpedoAngler = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
@@ -226,8 +226,8 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
     PlayFxMuzzleSequence = function(self, muzzle)
-		DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
-		for k, v in self.FxShellEject do
+        DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
+        for k, v in self.FxShellEject do
             CreateAttachedEmitter(self.unit, self:GetBlueprint().TurretBonePitch, self.unit:GetArmy(), v)
         end
     end,

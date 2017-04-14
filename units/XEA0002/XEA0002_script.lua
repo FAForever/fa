@@ -34,7 +34,7 @@ XEA0002 = Class(TAirUnit) {
             self.Parent.Satellite = nil
         end
 
-        TAirUnit.OnKilled(self, instigator, type, overkillRatio)        
+        TAirUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     Open = function(self)

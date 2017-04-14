@@ -17,7 +17,7 @@ function IAniManipulator:SetPrecedence(integer)
 end
 
 ---
--- 
+--
 function IAniManipulator:moho.manipulator_methods()
 end
 

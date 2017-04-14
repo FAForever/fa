@@ -1413,7 +1413,7 @@ Scenario = {
                             }},
                         },
                         ChildrenType = {'CombatFighters'},
-                    }, 
+                    },
 
     #### AEON SPECIFIC ####
             #### T1

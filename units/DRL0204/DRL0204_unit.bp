@@ -1,10 +1,10 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'Torso',		
-			'Turret_Barrel',
-		},
-	},
+    AI = {
+        TargetBones = {
+            'Torso',
+            'Turret_Barrel',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',

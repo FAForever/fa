@@ -236,7 +236,7 @@ end
 
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
-    bp.Mod = current_mod 
+    bp.Mod = current_mod
     SetShortId(bp)
     StoreBlueprint('Unit', bp)
 end
@@ -248,7 +248,7 @@ end
 
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
-    bp.Mod = current_mod 
+    bp.Mod = current_mod
     SetBackwardsCompatId(bp)
     StoreBlueprint('Projectile', bp)
 end
@@ -307,7 +307,7 @@ end
 -- after building SCU.
 function HandleUnitWithBuildPresets(bps, all_bps)
 
-    -- hashing sort categories for quick lookup 
+    -- hashing sort categories for quick lookup
     local sortCategories = { ['SORTOTHER'] = true, ['SORTINTEL'] = true, ['SORTSTRATEGIC'] = true, ['SORTDEFENSE'] = true, ['SORTECONOMY'] = true, ['SORTCONSTRUCTION'] = true, }
 
     local tempBp = {}
@@ -334,7 +334,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
                         e = e + (tempBp.Enhancements[enh].BuildCostEnergy or 0)
                         m = m + (tempBp.Enhancements[enh].BuildCostMass or 0)
                         t = t + (tempBp.Enhancements[enh].BuildTime or 0)
-                        -- HUSSAR added name of the enhancement so that preset units cannot be built 
+                        -- HUSSAR added name of the enhancement so that preset units cannot be built
                         -- if they have restricted enhancement(s)
                         tempBp.CategoriesHash[enh] = true -- hashing without changing case of enhancements
                     else
@@ -377,7 +377,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- clean up some data that's not needed anymore
             tempBp.CategoriesHash['USEBUILDPRESETS'] = false
             tempBp.EnhancementPresets = nil
-            -- synchronizing Categories with CategoriesHash for compatibility 
+            -- synchronizing Categories with CategoriesHash for compatibility
             tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
             table.insert(all_bps.Unit, tempBp )
@@ -426,7 +426,7 @@ function PreModBlueprints(all_bps)
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
     for _, bp in all_bps.Unit do
-    
+
         ExtractCloakMeshBlueprint(bp)
 
         -- skip units without categories
@@ -434,7 +434,7 @@ function PreModBlueprints(all_bps)
             continue
         end
 
-        -- saving Categories as a hash table for later usage by sim/ui functions 
+        -- saving Categories as a hash table for later usage by sim/ui functions
         bp.CategoriesHash = table.hash(bp.Categories)
 
         -- adding or deleting categories on the fly
@@ -529,7 +529,7 @@ function PreModBlueprints(all_bps)
                 end
             end
         end
-        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility 
+        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility
         bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
@@ -552,7 +552,7 @@ function PostModBlueprints(all_bps)
             continue
         end
 
-        -- check if blueprint was changed in ModBlueprints(all_bps)  
+        -- check if blueprint was changed in ModBlueprints(all_bps)
         if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
            bp.CategoriesHash = table.hash(bp.Categories)
         end
@@ -568,7 +568,7 @@ function PostModBlueprints(all_bps)
             if table.getsize(issues) == 0 then
                 table.insert(preset_bps, table.deepcopy(bp))
             else
-                issues = table.concat(issues,', ') 
+                issues = table.concat(issues,', ')
                 WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
@@ -587,8 +587,8 @@ end
 --- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua 
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua 
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua
 function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
 
     local task = 'Blueprints Loading... '
@@ -596,15 +596,15 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     local total = nil
     local files = {}
 
-    -- set default parameters if they are not provided  
+    -- set default parameters if they are not provided
     if not pattern then pattern = '*.bp' end
-    if not directories then 
+    if not directories then
         directories = {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'}
     end
 
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
-    
-    if not mods then 
+
+    if not mods then
         mods = __active_mods or import('/lua/mods.lua').GetGameMods()
     end
     InitOriginalBlueprints()
@@ -619,7 +619,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
             for k,file in files do
                 BlueprintLoaderUpdateProgress()
                 -- update UnitManager UI via taskNotifier only if it exists
-                if taskNotifier then 
+                if taskNotifier then
                    taskNotifier:Update(task, total, k)
                 end
                 safecall(task .. ': ' .. file, doscript, file)
@@ -641,7 +641,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
         for k,file in files do
             BlueprintLoaderUpdateProgress()
             -- update UnitManager UI via taskNotifier only if it exists
-            if taskNotifier then 
+            if taskNotifier then
                taskNotifier:Update(task, total, k)
             end
             safecall(task .. ': ' .. file, doscript, file)
@@ -661,12 +661,12 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
     PostModBlueprints(original_blueprints)
-     
+
     stats.UnitsTotal = table.getsize(original_blueprints.Unit)
     stats.UnitsPreset = stats.UnitsTotal - stats.UnitsOrg - stats.UnitsMod
     if stats.UnitsTotal > 0 then
         LOG('Blueprints Loading... completed: ' .. stats.UnitsOrg .. ' original, '
-                                                .. stats.UnitsMod .. ' modded, and ' 
+                                                .. stats.UnitsMod .. ' modded, and '
                                                 .. stats.UnitsPreset .. ' preset units')
     end
     stats.ProjsTotal = table.getsize(original_blueprints.Projectile)
@@ -674,7 +674,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
         LOG('Blueprints Loading... completed: ' .. stats.ProjsOrg .. ' original and '
                                                 .. stats.ProjsMod .. ' modded projectiles')
     end
-     
+
     if not skipRegistration then
         BlueprintLoaderUpdateProgress()
         LOG('Blueprints Registering...')

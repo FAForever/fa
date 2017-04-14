@@ -12,7 +12,7 @@ function CMauiBorder:base()
 end
 
 ---
--- 
+--
 function CMauiBorder:moho.border_methods()
 end
 

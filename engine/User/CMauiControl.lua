@@ -127,7 +127,7 @@ function CMauiControl:Show()
 end
 
 ---
--- 
+--
 function CMauiControl:moho.control_methods()
 end
 

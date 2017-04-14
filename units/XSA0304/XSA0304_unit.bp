@@ -24,7 +24,7 @@ UnitBlueprint {
         LiftFactor = 7,
         MaxAirspeed = 17,
         MinAirspeed = 15,
-        PredictAheadForBombDrop = 3,        
+        PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
         TurnSpeed = 0.8,
@@ -307,7 +307,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,

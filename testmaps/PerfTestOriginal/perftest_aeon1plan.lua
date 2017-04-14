@@ -9,7 +9,7 @@
 #****************************************************************************
 
 function EvaluatePlan(brain)
-	return 100
+    return 100
 end
 
 function ExecutePlan(brain)

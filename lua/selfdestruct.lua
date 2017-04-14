@@ -3,7 +3,7 @@ function ToggleSelfDestruct(data)
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
     end
-    
+
     if data.owner ~= -1 then
         local unitEntities = {}
         for _, unitId in data.units do

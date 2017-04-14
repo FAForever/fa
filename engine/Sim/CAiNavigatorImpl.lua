@@ -2,7 +2,7 @@
 -- @classmod Sim.CAiNavigatorImpl
 
 ---
--- 
+--
 function CAiNavigatorImpl:AtGoal()
 end
 
@@ -12,12 +12,12 @@ function CAiNavigatorImpl:BroadcastResumeTaskEvent()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:CanPathToGoal()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:FollowingLeader()
 end
 
@@ -32,22 +32,22 @@ function CAiNavigatorImpl:GetGoalPos()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:GetStatus()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:HasGoodPath()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:IgnoreFormation()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:IsIgnorningFormation()
 end
 
@@ -67,7 +67,7 @@ function CAiNavigatorImpl:SetSpeedThroughGoal()
 end
 
 ---
--- 
+--
 function CAiNavigatorImpl:moho.navigator_methods()
 end
 

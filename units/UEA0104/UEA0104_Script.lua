@@ -81,7 +81,7 @@ UEA0104 = Class(AirTransport) {
 
     OnCreate = function(self)
         AirTransport.OnCreate(self)
-        -- CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed, 
+        -- CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
         self.Sliders = {}
         self.Sliders[1] = CreateSlider(self, 'Char01')
         self.Sliders[1]:SetGoal(0, 0, -35)
@@ -96,7 +96,7 @@ UEA0104 = Class(AirTransport) {
             self.Trash:Add(v)
         end
     end,
-    
+
     ExpandThread = function(self)
         if self.Sliders then
             for k, v in self.Sliders do
@@ -109,7 +109,7 @@ UEA0104 = Class(AirTransport) {
             end
         end
     end,
-    
+
     GetUnitSizes = function(self)
         local bp = self:GetBlueprint()
         if self:GetFractionComplete() < 1.0 then
@@ -117,7 +117,7 @@ UEA0104 = Class(AirTransport) {
         else
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
-    end,    
+    end,
 
 }
 

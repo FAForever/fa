@@ -17,7 +17,7 @@ function CBuilderArmManipulator:base()
 end
 
 ---
--- 
+--
 function CBuilderArmManipulator:moho.BuilderArmManipulator()
 end
 

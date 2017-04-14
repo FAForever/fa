@@ -133,7 +133,7 @@ UnitBlueprint {
         BuildCostMass = 1100,
         BuildRate = 90,
         BuildTime = 3000,
-        DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zeb9503',
         },

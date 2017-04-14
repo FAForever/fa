@@ -1,5 +1,5 @@
 -- ==========================================================================================
--- * File       : lua/modules/ui/lobby/TaskNotifier.lua 
+-- * File       : lua/modules/ui/lobby/TaskNotifier.lua
 -- * Authors    : FAF Community, HUSSAR
 -- * Summary    : Contains logic for notifying UI about progress of single or multiple tasks
 -- ==========================================================================================
@@ -14,7 +14,7 @@
 -- taskNotifier:Update('task name with 2 updates', 2, 1) -- total progress = 0.5, task progress = 0.50
 -- taskNotifier:Update('task name with 2 updates', 2, 2) -- total progress = 1.0, task progress = 1.00
 -- taskNotifier:Complete()
--- or 
+-- or
 -- for multiple tasks, set total number of updates from all tasks
 -- taskNotifier.totalUpdates = 5
 -- update the TaskNotifier, each time progress of tasks should change:
@@ -29,7 +29,7 @@
 --     --TODO update UI progress bar with info about the task
 -- end
 -- function OnTaskComplete()
---     --TODO complete and hide UI progress bar 
+--     --TODO complete and hide UI progress bar
 -- end
 
 function Create()
@@ -41,7 +41,7 @@ function Create()
         lastUpdateTime = CurrentTime(),
         OnProgressCallback = false,
         OnCompleteCallback = false,
-        -- reset all tasks and progress 
+        -- reset all tasks and progress
         Reset = function(self)
             self.tasks = {}
             self.currentTask = nil
@@ -69,7 +69,7 @@ function Create()
             local key = taskName..'-'..taskGoal
             -- update stats for specified task
             if self.tasks[key] then
-               self.tasks[key].update = taskUpdate 
+               self.tasks[key].update = taskUpdate
                if self.tasks[key].goal > 0 then
                     self.tasks[key].progress = self.tasks[key].update / self.tasks[key].goal
                end
@@ -77,8 +77,8 @@ function Create()
                 self.tasks[key] = {}
                 self.tasks[key].name = taskName
                 self.tasks[key].goal = taskGoal
-                self.tasks[key].update = 0 
-                self.tasks[key].progress = 0  
+                self.tasks[key].update = 0
+                self.tasks[key].progress = 0
             end
 
             self.currentTask = self.tasks[key]
@@ -92,9 +92,9 @@ function Create()
                end
             end
             -- filter out unnecessary UI updates to increase performance
-            if not self.lastUpdateTime or CurrentTime() - self.lastUpdateTime > 0.25 then 
-                self.lastUpdateTime = CurrentTime() 
-                -- notify UI using OnProgress callback 
+            if not self.lastUpdateTime or CurrentTime() - self.lastUpdateTime > 0.25 then
+                self.lastUpdateTime = CurrentTime()
+                -- notify UI using OnProgress callback
                 if self.OnProgressCallback then
                    self.OnProgressCallback(self.currentTask)
                    WaitSeconds(0.001) -- allow UI to refresh
@@ -112,7 +112,7 @@ function Create()
             end
 
             if self.OnCompleteCallback then
-               self.OnCompleteCallback() 
+               self.OnCompleteCallback()
             end
         end,
     }

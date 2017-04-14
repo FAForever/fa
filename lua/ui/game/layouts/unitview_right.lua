@@ -30,10 +30,10 @@ function SetLayout()
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-    
+
     controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
     LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -19, -2)
-    
+
     if controls.bracketMid then
         controls.bracketMid:Destroy()
         controls.bracketMid = false
@@ -42,12 +42,12 @@ function SetLayout()
         controls.bracketMax:Destroy()
         controls.bracketMax = false
     end
-    
+
     LayoutHelpers.AtLeftTopIn(controls.name, controls.bg, 16, 14)
     LayoutHelpers.AtRightIn(controls.name, controls.bg, 16)
     controls.name:SetClipToWidth(true)
     controls.name:SetDropShadow(true)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.icon, controls.bg, 12, 34)
     controls.icon.Height:Set(48)
     controls.icon.Width:Set(48)
@@ -94,14 +94,14 @@ function SetLayout()
     controls.actionIcon.Width:Set(48)
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
-    
+
     controls.abilities.Left:Set(function() return controls.bg.Right() + 20 end)
     controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
     controls.abilities.Height:Set(50)
     controls.abilities.Width:Set(200)
 
     SetBG(controls)
-    
+
     if options.gui_detailed_unitview != 0 then
         LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 25)
         LayoutHelpers.Below(controls.shieldBar, controls.healthBar)
@@ -111,7 +111,7 @@ function SetLayout()
     else
         LayoutHelpers.AtLeftTopIn(controls.statGroups[1].icon, controls.bg, 70, 60)
         LayoutHelpers.AtLeftTopIn(controls.statGroups[2].icon, controls.bg, 70, 80)
-    end   
+    end
 end
 
 function SetBG(controls)

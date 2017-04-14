@@ -12,7 +12,7 @@ keyCategories = {
     ['hotbuilding'] = "<LOC keymap_category_091>Hotbuilding",
     ['hotbuildingExtra'] = "<LOC keymap_category_092>Hotbuilding - Extra keys",
     ['none'] = "<LOC keymap_category_0089>Unassigned Actions",
-    ['mods'] = "<LOC keymap_category_0091>Mods", 
+    ['mods'] = "<LOC keymap_category_0091>Mods",
 }
 
 keyCategoryOrder = {
@@ -25,7 +25,7 @@ keyCategoryOrder = {
     'game',
     'chat',
     'user',
-    'mods', 
+    'mods',
     'debug',
     'none'
 }

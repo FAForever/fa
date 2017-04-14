@@ -1,5 +1,5 @@
 -- ==========================================================================================
--- * File       : lua/system/utils.lua 
+-- * File       : lua/system/utils.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains global functions for working with tables and strings
 -- ==========================================================================================
@@ -24,7 +24,7 @@ function RandomIter(someSet)
     end
 end
 
---- safecall(msg, fn, ...) calls the given function with the given args, and 
+--- safecall(msg, fn, ...) calls the given function with the given args, and
 --- catches any error and logs a warning including the given message.
 --- Returns nil if the function failed, otherwise returns the function's result.
 function safecall(msg, fn, ...)
@@ -39,7 +39,7 @@ end
 
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)
-    if not t then return end -- prevents looping over nil table 
+    if not t then return end -- prevents looping over nil table
     local r = {}
     for k,v in t do
         r[k] = v
@@ -50,7 +50,7 @@ end
 --- table.contains(t,val) returns the key for val if it is in t table.
 --- Otherwise, return nil
 function table.find(t,val)
-    if not t then return end -- prevents looping over nil table 
+    if not t then return end -- prevents looping over nil table
     for k,v in t do
         if v == val then
             return k
@@ -62,7 +62,7 @@ end
 --- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
 function table.subset(t1,t2)
     if not t1 and not t2 then return true end  -- nothing is in nothing
-    if not t1 then return true end  -- nothing is in something 
+    if not t1 then return true end  -- nothing is in something
     if not t2 then return false end -- something is not in nothing
     for k,v in t1 do
         if t2[k] ~= v then return false end
@@ -162,7 +162,7 @@ function table.subtract(t1, t2)
 end
 
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
---- are expected to be numerically keyed (existing keys are discarded). 
+--- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
 function table.cat(t1, t2)
     -- handling nil tables before lopping
@@ -180,7 +180,7 @@ function table.cat(t1, t2)
     return r
 end
 
---- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. 
+--- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs.
 --- Slightly more overhead, but can constructively concat *all* the things)
 function table.concatenate(...)
     local ret = {}
@@ -197,7 +197,7 @@ function table.concatenate(...)
 end
 
 --- Destructively concatenate two tables. (numerical keys only)
---- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, 
+--- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed,
 --- but this avoids the need to copy the values in t1, saving some time.
 function table.destructiveCat(t1, t2)
     for k, v in t2 do
@@ -270,8 +270,8 @@ end
 function table.concatkeys(t, sep)
     sep = sep or ", "
     local tt = table.keys(t)
-    return table.concat(tt,sep) 
-end 
+    return table.concat(tt,sep)
+end
 
 --- Iterates over a table in key-sorted order:
 ---   for k,v in sortedpairs(t) do
@@ -292,12 +292,12 @@ end
 
 --- Returns actual size of a table, including string keys
 function table.getsize(t)
-    -- handling nil table like empty tables so that no need to check 
+    -- handling nil table like empty tables so that no need to check
     -- for nil table and then size of table:
-    -- if t and table.getsize(t) > 0 then 
-    -- do some thing 
-    -- end 
-    if type(t) ~= 'table' then return 0 end 
+    -- if t and table.getsize(t) > 0 then
+    -- do some thing
+    -- end
+    if type(t) ~= 'table' then return 0 end
     local size = 0
     for k, v in t do
         size = size + 1
@@ -334,8 +334,8 @@ end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
 --- it is useful for preparing hash table before sorting its values
---- table.indexize { [a] = 'one', [b] = 'two', [c] = 'three' } => 
----                { [1] = 'one', [2] = 'two', [3] = 'three' } 
+--- table.indexize { [a] = 'one', [b] = 'two', [c] = 'three' } =>
+---                { [1] = 'one', [2] = 'two', [3] = 'three' }
 function table.indexize(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
@@ -349,8 +349,8 @@ end
 
 --- Converts a table to a new table with values as keys and values equal to true, duplicated table values are discarded
 --- it is useful for quickly looking up values in tables instead of looping over them
---- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } => 
----            { [A] = true, [B] = true, [C] = true } 
+--- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } =>
+---            { [A] = true, [B] = true, [C] = true }
 function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
@@ -361,12 +361,12 @@ function table.hash(t)
             r[v] = true
         end
     end
-    return r 
+    return r
 end
 
 --- Converts a table to a new table with values as keys only if their values are true
---- it is reverse logic of table.hash(t) 
---- table.unhash { [A] = true, [B] = true, [C] = false }  => 
+--- it is reverse logic of table.hash(t)
+--- table.unhash { [A] = true, [B] = true, [C] = false }  =>
 --               { [1] = 'A',  [2] = 'B', }
 function table.unhash(t)
     if not t then return {} end -- prevents looping over nil table
@@ -405,7 +405,7 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
-    return table.getsize(t) == 0 
+    return table.getsize(t) == 0
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -446,7 +446,7 @@ function printField(k, v, tblName, printer)
     if "table" == type(k) then
         table.print(k, tblName .. " ", printer)
     else
-        tblName = tblName .. '' .. tostring(k)  
+        tblName = tblName .. '' .. tostring(k)
     end
     if "string" == type(v) then
         printer(tblName .. " = " .. "\"" .. v .. "\"")
@@ -502,7 +502,7 @@ end
 --- @param fn is optional filtering function that is applied to each value of the table
 function table.count(t, fn)
     if not t then return 0 end -- prevents looping over nil table
-    if not fn then fn = function(v) return v end end  
+    if not fn then fn = function(v) return v end end
     local r = table.filter(t, fn)
     return table.getsize(r)
 end
@@ -546,29 +546,29 @@ function StringStartsWith(stringToMatch, valueToSeek)
     return string.sub(stringToMatch, 1, valueToSeek:len()) == valueToSeek
 end
 
---- Extracts a string between two specified strings  
+--- Extracts a string between two specified strings
 --- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
 function StringExtract(str, str1, str2, fromEnd)
     local pattern = str1 .. '(.*)' .. str2
     if fromEnd then pattern = '.*' .. pattern end
     local i, ii, m = string.find(str, pattern)
-    return m 
+    return m
 end
 
 --- Adds comma as thousands separator in specified value
 --- e.g. StringComma(10000) --> 10,000
 function StringComma(value)
     local str = value or 0
-    while true do  
+    while true do
       str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end
-    end 
+    end
     return str
 end
 
---- Prepends a string with specified symbol or one space 
+--- Prepends a string with specified symbol or one space
 function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
@@ -583,14 +583,14 @@ end
 --- e.g. StringCapitalize('abc123') --> 321cba
 function StringReverse(str)
     local tbl =  {}
-    str:gsub(".",function(c) table.insert(tbl,c) end)  
+    str:gsub(".",function(c) table.insert(tbl,c) end)
     tbl = table.reverse(tbl)
-    return table.concat(tbl) 
+    return table.concat(tbl)
 end
---- Capitalizes each word in specified string 
+--- Capitalizes each word in specified string
 --- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
 function StringCapitalize(str)
-    return string.gsub(" "..str, "%W%l", string.upper):sub(2) 
+    return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
 --- Check if a given string starts with specified string
 function StringStarts(str, startString)
@@ -603,16 +603,16 @@ end
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
-    
-    if type(itemA) == "string" or 
+
+    if type(itemA) == "string" or
        type(itemB) == "string" then
         if string.lower(itemA) == string.lower(itemB) then
             return 0
         else
             -- sort string using alpha order
-            return string.lower(itemA) < string.lower(itemB) 
+            return string.lower(itemA) < string.lower(itemB)
         end
-    else 
+    else
        if math.abs(itemA - itemB) < 0.0001 then
             return 0
        else
@@ -622,7 +622,7 @@ function Sort(itemA, itemB)
     end
 end
 
--- Rounds a number to specified double precision 
+-- Rounds a number to specified double precision
 function math.round(num, idp)
     if not idp then
         return math.floor(num+.5)
@@ -639,26 +639,26 @@ end
 --- Creates timer for profiling task(s) and calculating time delta between consecutive function calls, e.g.
 --- local timer = CreateTimer()
 --- timer:Start() -- then execute some LUA code
---- timer:Stop() 
+--- timer:Stop()
 --- or
 --- timer:Start('task1') -- then execute task #1
---- timer:Stop('task1') 
+--- timer:Stop('task1')
 --- timer:Start('task2') -- then execute task #2
---- timer:Stop('task2') 
-function CreateTimer() 
+--- timer:Stop('task2')
+function CreateTimer()
     return {
-        tasks = {}, 
+        tasks = {},
         Reset = function(self)
             self.tasks = {}
         end,
         -- starts profiling timer for optional task name
         Start = function(self, name, useLogging)
-            name = self:Verify(name) 
-            -- capture start time 
+            name = self:Verify(name)
+            -- capture start time
             self.tasks[name].stop  = nil
             self.tasks[name].start = CurrentTime()
             self.tasks[name].calls = self.tasks[name].calls + 1
-            
+
             if useLogging then
                 LOG('Timing task: ' ..  name .. ' started' )
             end
@@ -666,15 +666,15 @@ function CreateTimer()
         -- stops profiling timer and calculates stats for optional task name
         Stop = function(self, name, useLogging)
             name = self:Verify(name)
-            -- capture stop time  
-            self.tasks[name].stop  = CurrentTime() 
+            -- capture stop time
+            self.tasks[name].stop  = CurrentTime()
             self.tasks[name].time  = self.tasks[name].stop - self.tasks[name].start
             self.tasks[name].total = self.tasks[name].total + self.tasks[name].time
             -- track improvements between consecutive profiling of the same task
             if self.tasks[name].last then
                self.tasks[name].delta = self.tasks[name].last - self.tasks[name].time
             end
-            -- save current time for comparing with the next task profiling 
+            -- save current time for comparing with the next task profiling
             self.tasks[name].last = self.tasks[name].time
 
             if useLogging then
@@ -684,9 +684,9 @@ function CreateTimer()
         end,
         -- verifies if profiling timer has stats for optional task name
         Verify = function(self, name)
-            if not name then name = 'default-task' end 
+            if not name then name = 'default-task' end
             if not self.tasks[name] then
-                self.tasks[name] = {} 
+                self.tasks[name] = {}
                 self.tasks[name].name  = name
                 self.tasks[name].start = nil
                 self.tasks[name].stop  = nil
@@ -711,32 +711,32 @@ function CreateTimer()
                 WARN( 'Timer cannot get time duration for not started task: ' ..  tostring(name) )
             elseif not self.tasks[name].stop then
                 WARN( 'Timer cannot get time duration for not stopped task: ' ..  tostring(name) )
-            else 
+            else
                 ret = string.format("%0.3f seconds", self.tasks[name].time)
             end
             return ret
-        end, 
+        end,
         -- gets time delta between latest and previous profiling of named tasks
         GetDelta = function(self, name)
             name = self:Verify(name)
             local ret = ''
             if not self.tasks[name].delta then
                 WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) )
-            else 
+            else
                 ret = string.format("%0.3f seconds", self.tasks[name].delta)
                 if self.tasks[name].delta > 0 then
-                    ret = '+' .. ret 
+                    ret = '+' .. ret
                 end
             end
             return ret
-        end, 
+        end,
         -- gets time total of all profiling calls of named tasks
         GetTotal = function(self, name)
             name = self:Verify(name)
             local ret = ''
             if not self.tasks[name].start then
                 WARN( 'Timer cannot get time total for not started task: ' ..  tostring(name) )
-            else 
+            else
                 ret = string.format("%0.3f seconds", self.tasks[name].total)
             end
             return ret
@@ -746,7 +746,7 @@ function CreateTimer()
             name = self:Verify(name)
             local ret = self:GetTime(name)
             if self.tasks[name].delta then
-                ret = ret .. ', delta: ' .. self:GetDelta(name) 
+                ret = ret .. ', delta: ' .. self:GetDelta(name)
             end
             if self.tasks[name].calls > 1 then
                 ret = ret .. ', calls: ' .. tostring(self.tasks[name].calls)
@@ -754,16 +754,16 @@ function CreateTimer()
             end
             return ret
          end,
-        -- prints profiling stats of all tasks in increasing order of tasks 
+        -- prints profiling stats of all tasks in increasing order of tasks
         -- @param key is optional sorting argument of tasks, e.g. 'stop', 'time', 'start'
-         Print = function(self, key) 
-            key = key or 'stop' 
+         Print = function(self, key)
+            key = key or 'stop'
             local sorted = table.indexize(self.tasks)
-            sorted = table.sorted(sorted, sort_by(key)) 
-            for _, task in sorted do 
+            sorted = table.sorted(sorted, sort_by(key))
+            for _, task in sorted do
                 if task.stop then
                     LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
-                end 
+                end
             end
          end
     }

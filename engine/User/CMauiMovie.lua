@@ -37,7 +37,7 @@ function CMauiMovie:base()
 end
 
 ---
--- 
+--
 function CMauiMovie:moho.movie_methods()
 end
 

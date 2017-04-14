@@ -11,7 +11,7 @@ EmptyCollisionBeam = Class(CollisionBeam) {
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = {},
     FxImpactProp = {},
-    FxImpactShield = {},    
+    FxImpactShield = {},
     FxImpactNone = {},
 }
 
@@ -45,7 +45,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
-        self.Scorching = nil   
+        self.Scorching = nil
     end,
 
 }
@@ -63,7 +63,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
@@ -75,12 +75,12 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
-        self.Scorching = nil   
+        self.Scorching = nil
     end,
 
     ScorchThread = function(self)
         local army = self:GetArmy()
-        local size = 1 + (Random() * 1.1) 
+        local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
@@ -92,7 +92,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
-                
+
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1 + (Random() * 1.1)
             CurrentPosition = self:GetPosition(1)

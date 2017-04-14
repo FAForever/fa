@@ -1002,7 +1002,7 @@ Scenario = {
     --[[  Platoons                                                                 ]]--
     --[[                                                                           ]]--
     next_platoon_id = '2',
-    Platoons = 
+    Platoons =
     {
         ['Blank_Template'] = {
             'Blank_Template',
@@ -1015,12 +1015,12 @@ Scenario = {
     next_army_id = '11',
     next_group_id = '483',
     next_unit_id = '3631',
-    Armies = 
+    Armies =
     {
         --[[                                                                           ]]--
         --[[  Army                                                                     ]]--
         --[[                                                                           ]]--
-        ['Cybran_2'] =  
+        ['Cybran_2'] =
         {
             personality = '',
             plans = '/maps/perftest/perftest_cybran2planlist.lua',
@@ -3570,7 +3570,7 @@ Scenario = {
         --[[                                                                           ]]--
         --[[  Army                                                                     ]]--
         --[[                                                                           ]]--
-        ['Player'] =  
+        ['Player'] =
         {
             personality = '',
             plans = '/maps/perftest/perftest_playerplanlist.lua',
@@ -7273,7 +7273,7 @@ Scenario = {
         --[[                                                                           ]]--
         --[[  Army                                                                     ]]--
         --[[                                                                           ]]--
-        ['UEF'] =  
+        ['UEF'] =
         {
             personality = '',
             plans = '/maps/perftest/perftest_uefplanlist.lua',
@@ -11243,7 +11243,7 @@ Scenario = {
         --[[                                                                           ]]--
         --[[  Army                                                                     ]]--
         --[[                                                                           ]]--
-        ['Aeon1'] =  
+        ['Aeon1'] =
         {
             personality = '',
             plans = '/maps/perftest/perftest_aeon1planlist.lua',
@@ -11293,7 +11293,7 @@ Scenario = {
         --[[                                                                           ]]--
         --[[  Army                                                                     ]]--
         --[[                                                                           ]]--
-        ['Aeon'] =  
+        ['Aeon'] =
         {
             personality = '',
             plans = '/maps/perftest/perftest_aeonplanlist.lua',

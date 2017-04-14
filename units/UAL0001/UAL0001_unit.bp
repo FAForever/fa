@@ -1148,7 +1148,7 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
 
             -- Chrono firing is limited by the weapon script timer mechanism
-            -- Check and try to fire every tick so that OC does not cause an 
+            -- Check and try to fire every tick so that OC does not cause an
             -- additional 5s delay, and repeated OC doesn't jam the system.
             RateOfFire = 10,
             TargetCheckInterval = 0.1,

@@ -422,10 +422,10 @@ function GetUpkeep(bp)
     local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
     local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass
     local negMassRate = bp.Economy.MaintenanceConsumptionPerSecondMass or bp.MaintenanceConsumptionPerSecondMass
-    
+
     local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
     local upkeepMass = GetYield(negMassRate, plusMassRate)
-    
+
     return upkeepEnergy, upkeepMass
 end
 
