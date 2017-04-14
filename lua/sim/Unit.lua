@@ -3674,6 +3674,7 @@ Unit = Class(moho.unit_methods) {
     SetVeteranLevel = function(self, level)
         local old = self.VeteranLevel
         self.VeteranLevel = level
+        self.IncreasingVet = true -- Extremely ugly hack. The other half of this is in Buff.lua
 
         --Apply default veterancy buffs
         local buffTypes = { 'Regen', 'Health', }
