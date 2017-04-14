@@ -171,7 +171,6 @@ end
 --We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
 --However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
-
     local buffDef = Buffs[buffName]
 
     local buffAffects = buffDef.Affects
@@ -207,6 +206,13 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             local oldmax = unit:GetMaxHealth()
 
             unit:SetMaxHealth(val)
+
+            -- Stupid ugly hack to handle veterancy miscalculating instaheal thanks to removal of previous level buff resetting oldmax invisibly
+            if val > oldmax and unit.IncreasingVet then
+                oldmax = unit.MaxVetHP or oldmax
+                unit.MaxVetHP = val
+                unit.IncreasingVet = nil
+            end
 
             if not vals.DoNoFill and not unit.IsBeingTransferred then
                 if val > oldmax then
