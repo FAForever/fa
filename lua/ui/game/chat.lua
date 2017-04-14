@@ -52,9 +52,9 @@ GUI.chatLines = GUI.chatLines or {}
 local FactionsIcon = {}
 local Factions = import('/lua/factions.lua').Factions
 for k, FactionData in Factions do
-    table.insert( FactionsIcon, FactionData.Icon )
+    table.insert(FactionsIcon, FactionData.Icon)
 end
-table.insert( FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds' )
+table.insert(FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 
 local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb'}
@@ -908,7 +908,7 @@ function CreateChatList(parent)
     container.entries = {}
     local function CreatePlayerEntry(data)
         if not data.human and not data.civilian then
-            data.nickname = UiUtilsS.trim(string.gsub(data.nickname,'%b()', '' ))
+            data.nickname = UiUtilsS.trim(string.gsub(data.nickname,'%b()', ''))
         end
         local text = UIUtil.CreateText(container, data.nickname, 12, "Arial")
         text:SetColor('ffffffff')

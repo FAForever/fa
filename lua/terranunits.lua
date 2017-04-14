@@ -50,11 +50,11 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 --------------------------------------------------------------
 TAirFactoryUnit = Class(AirFactoryUnit) {
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        WaitSeconds( 0.1 )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        WaitSeconds(0.1)
         for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add( CreateAttachedEmitter( self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )
-            self.BuildEffectsBag:Add( self:ForkThread( EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag ) )
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
 
@@ -70,8 +70,8 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order  ~= 'Upgrade' then
             self:StartArmsMoving()
         end
@@ -124,13 +124,13 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {
 --------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom  ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         else
-            CreateUEFBuildSliceBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+            CreateUEFBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -149,7 +149,7 @@ TConstructionUnit = Class(ConstructionUnit) {
     TransformThread = function(self, water)
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
-            self.Trash:Add( self.TransformManipulator )
+            self.Trash:Add(self.TransformManipulator)
         end
 
         if water then
@@ -188,11 +188,11 @@ THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 --  LAND FACTORY STRUCTURES
 --------------------------------------------------------------
 TLandFactoryUnit = Class(LandFactoryUnit) {
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        WaitSeconds( 0.1 )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        WaitSeconds(0.1)
         for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add( CreateAttachedEmitter( self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )
-            self.BuildEffectsBag:Add( self:ForkThread( EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag ) )
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
 }
@@ -216,7 +216,7 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
 }
@@ -242,7 +242,7 @@ TMobileFactoryUnit = Class(LandUnit) {
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
 }
@@ -264,11 +264,11 @@ TSonarUnit = Class(SonarUnit) {
 --------------------------------------------------------------
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        WaitSeconds( 0.1 )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        WaitSeconds(0.1)
         for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add( CreateAttachedEmitter( self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )
-            self.BuildEffectsBag:Add( self:ForkThread( EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag ) )
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
 
@@ -284,8 +284,8 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order  ~= 'Upgrade' then
             self:StartArmsMoving()
         end
@@ -334,7 +334,7 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if builder and EntityCategoryContains(categories.MOBILE, builder) then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag )	)
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)	)
         end
     end,
 }
@@ -405,7 +405,7 @@ TShieldSeaUnit = Class(ShieldSeaUnit) {}
 TPodTowerUnit = Class(TStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         TStructureUnit.OnStopBeingBuilt(self, builder, layer)
-        ChangeState( self, self.FinishedBeingBuilt )
+        ChangeState(self, self.FinishedBeingBuilt)
     end,
 
     PodTransfer = function(self, pod, podData)
@@ -414,7 +414,7 @@ TPodTowerUnit = Class(TStructureUnit) {
             if not self.PodData then
                 self.PodData = {}
             end
-            self.PodData[pod.PodName] = table.deepcopy( podData )
+            self.PodData[pod.PodName] = table.deepcopy(podData)
             self.PodData[pod.PodName].PodHandle = pod
             pod:SetParent(self, pod.PodName)
         end
@@ -430,13 +430,13 @@ TPodTowerUnit = Class(TStructureUnit) {
 
                 -- store off the pod name so we can give to new unit
                 local podName = k
-                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy( v.PodHandle, captor:GetArmy() )
+                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy(v.PodHandle, captor:GetArmy())
                 newPod.PodName = podName
 
                 -- create a callback for when the unit is flipped.  set creator for the new pod to the new tower
                 self:AddUnitCallback(
                     function(newUnit, captor)
-                        newUnit:PodTransfer( newPod, v )
+                        newUnit:PodTransfer(newPod, v)
                     end,
                     'OnCapturedNewUnit'
                 )
@@ -459,12 +459,12 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
         local unitid = self:GetBlueprint().General.UpgradesTo
         if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
-            ChangeState( self, self.UpgradingState )
+            ChangeState(self, self.UpgradingState)
         end
     end,
 
@@ -504,8 +504,8 @@ TPodTowerUnit = Class(TStructureUnit) {
         -- Get build rate of tower
         local buildRate = bp.Economy.BuildRate
 
-        local energy_rate = ( podData.BuildCostEnergy / podData.BuildTime ) * buildRate
-        local mass_rate = ( podData.BuildCostMass / podData.BuildTime ) * buildRate
+        local energy_rate = (podData.BuildCostEnergy / podData.BuildTime) * buildRate
+        local mass_rate = (podData.BuildCostMass / podData.BuildTime) * buildRate
 
         -- Set Consumption - Buff system will replace this here
         self:SetConsumptionPerSecondEnergy(energy_rate)
@@ -514,7 +514,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     CreatePod = function(self, podName)
-        local location = self:GetPosition( self.PodData[podName].PodAttachpoint )
+        local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
@@ -544,12 +544,12 @@ TPodTowerUnit = Class(TStructureUnit) {
                     if not self.PodData then
                         self.PodData = {}
                     end
-                    self.PodData[v.PodName] = table.deepcopy( v )
-                    self:CreatePod( v.PodName )
+                    self.PodData[v.PodName] = table.deepcopy(v)
+                    self:CreatePod(v.PodName)
                 end
             end
 
-            ChangeState( self, self.MaintainPodsState )
+            ChangeState(self, self.MaintainPodsState)
         end,
     },
 
@@ -557,8 +557,8 @@ TPodTowerUnit = Class(TStructureUnit) {
         Main = function(self)
             self.MaintainState = true
             if self.Rebuilding then
-                self:SetPodConsumptionRebuildRate( self.PodData[ self.Rebuilding ] )
-                ChangeState( self, self.RebuildingPodState )
+                self:SetPodConsumptionRebuildRate(self.PodData[ self.Rebuilding ])
+                ChangeState(self, self.RebuildingPodState)
             end
             local bp = self:GetBlueprint()
             while true and not self.Rebuilding do
@@ -566,7 +566,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                     -- Check if all the pods are active
                     if not self.PodData[v.PodName].Active then
                         -- Cost of new pod
-                        local podBP = self:GetAIBrain():GetUnitBlueprint( v.PodUnitID )
+                        local podBP = self:GetAIBrain():GetUnitBlueprint(v.PodUnitID)
                         self.PodData[v.PodName].EnergyRemain = podBP.Economy.BuildCostEnergy
                         self.PodData[v.PodName].MassRemain = podBP.Economy.BuildCostMass
 
@@ -581,7 +581,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                         -- Change to RebuildingPodState
                         self.Rebuilding = v.PodName
                         self:SetWorkProgress(0.01)
-                        ChangeState( self, self.RebuildingPodState )
+                        ChangeState(self, self.RebuildingPodState)
                     end
                 end
                 WaitSeconds(1)
@@ -589,7 +589,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         end,
 
         OnProductionPaused = function(self)
-            ChangeState( self, self.PausedState )
+            ChangeState(self, self.PausedState)
         end,
     },
 
@@ -608,29 +608,29 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self.PodData[ self.Rebuilding ].EnergyRemain = self.PodData[ self.Rebuilding ].EnergyRemain - energy
                 self.PodData[ self.Rebuilding ].MassRemain = self.PodData[ self.Rebuilding ].MassRemain - mass
 
-                self:SetWorkProgress( ( self.PodData[ self.Rebuilding ].BuildCostMass - self.PodData[ self.Rebuilding ].MassRemain ) / self.PodData[ self.Rebuilding ].BuildCostMass )
+                self:SetWorkProgress((self.PodData[ self.Rebuilding ].BuildCostMass - self.PodData[ self.Rebuilding ].MassRemain) / self.PodData[ self.Rebuilding ].BuildCostMass)
 
-                if ( self.PodData[ self.Rebuilding ].EnergyRemain <= 0 ) and ( self.PodData[ self.Rebuilding ].MassRemain <= 0 ) then
+                if (self.PodData[ self.Rebuilding ].EnergyRemain <= 0) and (self.PodData[ self.Rebuilding ].MassRemain <= 0) then
                     rebuildFinished = true
                 end
             until rebuildFinished
 
             -- create pod, deactivate consumption, clear building
-            self:CreatePod( self.Rebuilding )
+            self:CreatePod(self.Rebuilding)
             self.Rebuilding = false
             self:SetWorkProgress(0)
             self:SetConsumptionPerSecondEnergy(0)
             self:SetConsumptionPerSecondMass(0)
             self:SetConsumptionActive(false)
 
-            ChangeState( self, self.MaintainPodsState )
+            ChangeState(self, self.MaintainPodsState)
         end,
 
         OnProductionPaused = function(self)
             self:SetConsumptionPerSecondEnergy(0)
             self:SetConsumptionPerSecondMass(0)
             self:SetConsumptionActive(false)
-            ChangeState( self, self.PausedState )
+            ChangeState(self, self.PausedState)
         end,
     },
 
@@ -640,7 +640,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         end,
 
         OnProductionUnpaused = function(self)
-            ChangeState( self, self.MaintainPodsState )
+            ChangeState(self, self.MaintainPodsState)
         end,
     },
 

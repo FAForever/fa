@@ -251,21 +251,21 @@ function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficienc
     return false
 end
 
-function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory )
+function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
     local econTime = aiBrain:GetEconomyOverTime()
 
     local testCat = unitCategory
     if type(testCat) == 'string' then
         testCat = ParseEntityCategory(testCat)
     end
-    local unitCount = aiBrain:GetCurrentUnits( testCat )
+    local unitCount = aiBrain:GetCurrentUnits(testCat)
 
     # Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
 
-    local checkRatio = ( econTime.MassIncome * 10 ) / unitCount
+    local checkRatio = (econTime.MassIncome * 10) / unitCount
 
-    return CompareBody( checkRatio, ratio, compareType )
+    return CompareBody(checkRatio, ratio, compareType)
 end
 
 function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
@@ -273,7 +273,7 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     # T1 Test
     local testCat = categories.TECH1 * categories.FACTORY
-    local unitCount = aiBrain:GetCurrentUnits( testCat )
+    local unitCount = aiBrain:GetCurrentUnits(testCat)
     # Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
 
@@ -281,24 +281,24 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     # T2 Test
     testCat = categories.TECH2 * categories.FACTORY
-    unitCount = aiBrain:GetCurrentUnits( testCat )
+    unitCount = aiBrain:GetCurrentUnits(testCat)
 
-    massTotal = massTotal + ( unitCount * t2Drain )
+    massTotal = massTotal + (unitCount * t2Drain)
 
     # T3 Test
     testCat = categories.TECH3 * categories.FACTORY
-    unitCount = aiBrain:GetCurrentUnits( testCat )
+    unitCount = aiBrain:GetCurrentUnits(testCat)
 
-    massTotal = massTotal + ( unitCount * t3Drain )
+    massTotal = massTotal + (unitCount * t3Drain)
 
-    if not CompareBody( (econTime.MassIncome * 10), massTotal, '>' ) then
+    if not CompareBody((econTime.MassIncome * 10), massTotal, '>') then
         return false
     end
 
     return true
 end
 
-function MassToFactoryRatioBaseCheck( aiBrain, locationType )
+function MassToFactoryRatioBaseCheck(aiBrain, locationType)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not factoryManager then
         WARN('*AI WARNING: FactoryCapCheck - Invalid location - ' .. locationType)
@@ -312,7 +312,7 @@ function MassToFactoryRatioBaseCheck( aiBrain, locationType )
     return GreaterThanMassIncomeToFactory(aiBrain, t1, t2, t3)
 end
 
-function CompareBody( numOne, numTwo, compareType )
+function CompareBody(numOne, numTwo, compareType)
     if compareType == '>' then
         if numOne > numTwo then
             return true

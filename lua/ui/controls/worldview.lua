@@ -88,7 +88,7 @@ local function NukeDecalFunc()
         function(w)
             return w.NukeWeapon
         end
-    )
+)
 
     local inner = 0
     local outer = 0
@@ -117,7 +117,7 @@ local function TacticalDecalFunc()
         function(w)
             return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
         end
-    )
+)
 end
 
 local function AttackDecalFunc(mode)
@@ -125,7 +125,7 @@ local function AttackDecalFunc(mode)
         function(w)
             return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
         end
-    )
+)
 end
 
 DecalFunctions = {

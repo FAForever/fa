@@ -204,7 +204,7 @@ function BeginSession()
         for k, v in markers do
             if v.type == 'Effect' then
                 local EffectMarkerEntity = Entity()
-                Warp( EffectMarkerEntity, v.position )
+                Warp(EffectMarkerEntity, v.position)
                 EffectMarkerEntity:SetOrientation(OrientFromDir(v.orientation), true)
                 for k, v in EffectTemplate [v.EffectTemplate] do
                     CreateEmitterAtBone(EffectMarkerEntity,-2,-1,v):ScaleEmitter(v.scale or 1):OffsetEmitter(v.offset.x or 0, v.offset.y or 0, v.offset.z or 0)

@@ -30,7 +30,7 @@ WatchedValueTable = Class() {
         -- We hide this away in the closure of the metatable.
         local _store = {}
         if LoggingEnabled then
-            table.print(initialMapping, 'WatchedValueTable initialMapping' )
+            table.print(initialMapping, 'WatchedValueTable initialMapping')
         end
 
         -- Explicitly track the keyset so we can iterate our keys without having to worry about

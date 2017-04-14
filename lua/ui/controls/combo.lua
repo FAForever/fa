@@ -589,7 +589,7 @@ BitmapCombo = Class(Group) {
     end,
 
     -- Nuke the old bitmap array and replace it
-    ChangeBitmapArray = function( self, bitmapArray, isColor )
+    ChangeBitmapArray = function(self, bitmapArray, isColor)
         if self._list then
             for k,v in self._list do
                 v:Destroy()

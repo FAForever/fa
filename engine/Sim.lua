@@ -2,7 +2,7 @@
 -- @module Sim
 
 --- Restrict the army from building the unit category.
--- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
 -- @param army Army's index.
 -- @param category Unit category.
 function AddBuildRestriction(army, category)
@@ -806,7 +806,7 @@ function Random()
 end
 
 --- Unrestrict the army from building the unit category.
--- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
 -- @param army Army's index.
 -- @param category Unit category.
 function RemoveBuildRestriction(army, category)

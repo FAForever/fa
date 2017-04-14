@@ -139,7 +139,7 @@ local function parseCommandlineArguments()
 end
 local argv = parseCommandlineArguments()
 
-local playerRating = math.floor( Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100 )
+local playerRating = math.floor(Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100)
 
 local teamTooltips = {
     'lob_team_none',
@@ -378,7 +378,7 @@ function GetLocalPlayerData()
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
         }
-    )
+)
 end
 
 function GetAIPlayerData(name, AIPersonality)
@@ -390,7 +390,7 @@ function GetAIPlayerData(name, AIPersonality)
             Human = false,
             AIPersonality = AIPersonality,
         }
-    )
+)
 end
 
 local function DoSlotBehavior(slot, key, name)
@@ -456,7 +456,7 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
                 HostUtils.RemoveAI(slot)
             else
-                lobbyComm:SendData( hostID, { Type = 'ClearSlot', Slot = slot } )
+                lobbyComm:SendData(hostID, { Type = 'ClearSlot', Slot = slot })
             end
         end
     else
@@ -1630,7 +1630,7 @@ function PrivateChat(targetID,text)
     end
 end
 
-function UpdateAvailableSlots( numAvailStartSpots, scenario )
+function UpdateAvailableSlots(numAvailStartSpots, scenario)
     if numAvailStartSpots > LobbyComm.maxPlayerSlots then
         WARN("Lobby requests " .. numAvailStartSpots .. " but there are only " .. LobbyComm.maxPlayerSlots .. " available")
     end
@@ -2377,16 +2377,16 @@ function CreateSlotsUI(makeLabel)
         colorSelector.Width:Set(COLUMN_WIDTHS[6])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow } )
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow })
                 SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                 UpdateGame()
             else
                 if IsColorFree(index) then
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = curRow } )
+                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = index, Slot = curRow })
                     SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                     UpdateGame()
                 else
-                    self:SetItem( gameInfo.PlayerOptions[curRow].PlayerColor )
+                    self:SetItem(gameInfo.PlayerOptions[curRow].PlayerColor)
                 end
             end
         end
@@ -2798,7 +2798,7 @@ function CreateUI(maxPlayers)
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
-    )
+)
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
     LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
@@ -3199,7 +3199,7 @@ function CreateUI(maxPlayers)
         GUI.defaultOptions.OnClick = function()
             -- Return all options to their default values.
             OptionUtils.SetDefaults()
-            lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
+            lobbyComm:BroadcastData({ Type = "SetAllPlayerNotReady" })
             UpdateGame()
         end
     end
@@ -3875,7 +3875,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerID = myID
         localPlayerName = myName
 
-        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = Mods.GetLocallyAvailableMods(), Name = localPlayerName} )
+        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = Mods.GetLocallyAvailableMods(), Name = localPlayerName})
 
         lobbyComm:SendData(hostID,
             {
@@ -4046,12 +4046,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
                     SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = data.Color, Slot = data.Slot } )
+                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = data.Slot })
                     SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
                 else
                     -- Sorry, it's not free. Force the player back to the color we have for him.
-                    lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color =
-                    gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
+                    lobbyComm:SendData(data.SenderID, { Type = 'SetColor', Color =
+                    gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot })
                 end
             elseif data.Type == 'ClearSlot' then
                 if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
@@ -4854,7 +4854,7 @@ function ShowTitleDialog()
             SetGameOption("Title", text, true)
             SetGameTitleText(text)
         end, gameInfo.GameOptions.Title
-    )
+)
 end
 
 -- Rule title
@@ -4879,7 +4879,7 @@ function ShowRuleDialog()
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
         end
-    )
+)
 end
 
 -- Faction selector
@@ -4977,7 +4977,7 @@ function UpdateFactionSelector()
     GUI.factionSelector:EnableSpecificButtons(enabledList)
 end
 
-function GetSlotFactionIndex( factionIndex )
+function GetSlotFactionIndex(factionIndex)
     local localSlot = GUI.slots[FindSlotForID(localPlayerID)]
     local actualFaction = allAvailableFactionsList[factionIndex]
     for index,value in localSlot.AvailableFactions do

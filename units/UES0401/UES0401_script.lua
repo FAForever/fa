@@ -64,7 +64,7 @@ UES0401 = Class(TSeaUnit) {
         end
     end,
 
-    OnMotionVertEventChange = function( self, new, old )
+    OnMotionVertEventChange = function(self, new, old)
         TSeaUnit.OnMotionVertEventChange(self, new, old)
 
         if new == 'Down' then

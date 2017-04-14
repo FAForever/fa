@@ -320,7 +320,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 
             -- create BP table for the assigned preset with required info
             tempBp.EnhancementPresetAssigned = {
-                Enhancements = table.deepcopy( preset.Enhancements ),
+                Enhancements = table.deepcopy(preset.Enhancements),
                 Name = name,
                 BaseBlueprintId = bp.BlueprintId,
             }
@@ -380,7 +380,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- synchronizing Categories with CategoriesHash for compatibility
             tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
-            table.insert(all_bps.Unit, tempBp )
+            table.insert(all_bps.Unit, tempBp)
 
             BlueprintLoaderUpdateProgress()
         end

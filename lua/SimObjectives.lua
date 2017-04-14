@@ -1236,7 +1236,7 @@ function Timer(Type, Complete, Title, Description, Target)
         false,
         true,
         onTick
-   )
+)
 
     return objective
 end
@@ -1350,7 +1350,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                                     -- Areas = {'areaName1', 'areaName2', ...}
                       IsLoading,    -- Are we loading a saved game?
                       loadedTag     -- If IsLoading is specified, whats the tag?
-    )
+)
 
     if Type == 'bonus' then
         return {Tag = 'Invalid'} -- Bonus objectives cut

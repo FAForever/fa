@@ -251,7 +251,7 @@ function GetSelectedSimMods()
         function(uid)
             return not AllMods()[uid].ui_only
         end
-    )
+)
 end
 
 function GetSelectedUIMods()
@@ -259,7 +259,7 @@ function GetSelectedUIMods()
         function(uid)
             return AllMods()[uid].ui_only
         end
-    )
+)
 end
 
 local function LoadModInfo(filename)

@@ -280,7 +280,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
     if extras then
         for k,armyName in extras do
-            local index = table.getn( sessionInfo.teamInfo ) + 1
+            local index = table.getn(sessionInfo.teamInfo) + 1
             sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
             sessionInfo.teamInfo[index].Civilian = true

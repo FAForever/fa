@@ -92,8 +92,8 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local army = self:GetArmy()
         if targetType == 'Terrain' then
-            CreateDecal( self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, army )
-            CreateDecal( self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, army )
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, army)
             self:ShakeCamera(20, 1, 0, 1)
         end
         local pos = self:GetPosition()
@@ -113,10 +113,10 @@ TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         local army = self:GetArmy()
-        #CreateLightParticle( self, -1, army, 16, 6, 'glow_03', 'ramp_antimatter_02' )
+        #CreateLightParticle(self, -1, army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         if targetType == 'Terrain' then
-            CreateDecal( self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, army )
-            CreateDecal( self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, army )
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, army)
             self:ShakeCamera(20, 1, 0, 1)
         end
         local pos = self:GetPosition()
@@ -280,9 +280,9 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         local army = self:GetArmy()
-        CreateLightParticle( self, -1, army, 2.75, 4, 'sparkle_03', 'ramp_fire_03' )
+        CreateLightParticle(self, -1, army, 2.75, 4, 'sparkle_03', 'ramp_fire_03')
         if TargetType == 'Terrain' then
-            CreateSplat( self:GetPosition(), 0, 'scorch_008_albedo', 6, 6, 250, 200, army )
+            CreateSplat(self:GetPosition(), 0, 'scorch_008_albedo', 6, 6, 250, 200, army)
 
             #local blanketSides = 12
             #local blanketAngle = (2*math.pi) / blanketSides
@@ -296,7 +296,7 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
             #        :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
             #end
         end
-        EmitterProjectile.OnImpact( self, TargetType, TargetEntity )
+        EmitterProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
 }
 
@@ -399,7 +399,7 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
-    CreateImpactEffects = function( self, army, EffectTable, EffectScale )
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
@@ -427,7 +427,7 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
-    CreateImpactEffects = function( self, army, EffectTable, EffectScale )
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)

@@ -252,7 +252,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     end
 
-    local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex )
+    local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
 
     if table.getn(threatTable) == 0 then
         return false
@@ -261,7 +261,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
     local platoonUnits = platoon:GetPlatoonUnits()
     #eval platoon threat
     local myThreat = GetThreatOfUnits(platoon)
-    local friendlyThreat = aiBrain:GetThreatAtPosition( platoonPosition, 1, true, ThreatTable[platoon.MovementLayer], aiBrain:GetArmyIndex() ) - myThreat
+    local friendlyThreat = aiBrain:GetThreatAtPosition(platoonPosition, 1, true, ThreatTable[platoon.MovementLayer], aiBrain:GetArmyIndex()) - myThreat
     friendlyThreat = friendlyThreat * -1
 
     local threatDist
@@ -335,18 +335,18 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         #################
 
         # Determine the value of the target
-        primaryThreat = aiBrain:GetThreatAtPosition( {threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex )
-        secondaryThreat = aiBrain:GetThreatAtPosition( {threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex )
+        primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex)
+        secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex)
 
         baseThreat = primaryThreat + secondaryThreat
 
-        targetThreat = ( primaryThreat or 0 ) * PrimaryThreatWeight + ( secondaryThreat or 0 ) * SecondaryThreatWeight
+        targetThreat = (primaryThreat or 0) * PrimaryThreatWeight + (secondaryThreat or 0) * SecondaryThreatWeight
         threat[3] = targetThreat
 
         # Determine relative strength of platoon compared to enemy threat
-        local enemyThreat = aiBrain:GetThreatAtPosition( {threat[1], 0, threat[2]}, EnemyThreatRings, true, ThreatTable[platoon.MovementLayer] or 'AntiSurface')
+        local enemyThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, EnemyThreatRings, true, ThreatTable[platoon.MovementLayer] or 'AntiSurface')
         if IgnoreCommanderStrength then
-            enemyThreat = enemyThreat - aiBrain:GetThreatAtPosition( {threat[1], EnemyThreatRings, threat[2]}, 1, true, 'Commander')
+            enemyThreat = enemyThreat - aiBrain:GetThreatAtPosition({threat[1], EnemyThreatRings, threat[2]}, 1, true, 'Commander')
         end
         #defaults to no threat (threat difference is opposite of platoon threat)
         local threatDiff =  myThreat - enemyThreat
@@ -413,7 +413,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         return false
     end
     local x = threatTable[curMaxIndex][1]
-    local y = GetTerrainHeight( threatTable[curMaxIndex][1], threatTable[curMaxIndex][2] )
+    local y = GetTerrainHeight(threatTable[curMaxIndex][1], threatTable[curMaxIndex][2])
     local z = threatTable[curMaxIndex][2]
 
     return {x, y, z}
@@ -475,7 +475,7 @@ function CheckNavalPathingSorian(aiBrain, platoon, location, maxRange, selectedW
             if success then
                 #I hate having to do this check, but the influence map doesn't have enough resolution and without it the boats
                 #will just get stuck on the shore. The code hits this case about once every 5-10 seconds on a large map with 4 naval AIs
-                local numUnits = aiBrain:GetNumUnitsAroundPoint( categories.NAVAL + categories.STRUCTURE, bestGoalPos, maxRange, 'Enemy')
+                local numUnits = aiBrain:GetNumUnitsAroundPoint(categories.NAVAL + categories.STRUCTURE, bestGoalPos, maxRange, 'Enemy')
                 if numUnits > 0 then
                     break
                 else
@@ -608,7 +608,7 @@ function CheckNavalPathing(aiBrain, platoon, location, maxRange, selectedWeaponA
             if success then
                 #I hate having to do this check, but the influence map doesn't have enough resolution and without it the boats
                 #will just get stuck on the shore. The code hits this case about once every 5-10 seconds on a large map with 4 naval AIs
-                local numUnits = aiBrain:GetNumUnitsAroundPoint( categories.NAVAL + categories.STRUCTURE, bestGoalPos, maxRange, 'Enemy')
+                local numUnits = aiBrain:GetNumUnitsAroundPoint(categories.NAVAL + categories.STRUCTURE, bestGoalPos, maxRange, 'Enemy')
                 if numUnits > 0 then
                     break
                 else
@@ -631,7 +631,7 @@ end
 #   Returns:
 #       A table representing the path
 #-----------------------------------------------------
-function AINavalPlanB( aiBrain, platoon )
+function AINavalPlanB(aiBrain, platoon)
     #Get a random naval area and issue a movement thar.
     local navalAreas = AIUtils.AIGetMarkerLocations(aiBrain, 'Naval Area')
 
@@ -642,7 +642,7 @@ function AINavalPlanB( aiBrain, platoon )
             continue
         end
 
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10 )
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10)
 
         if path then
             return path, reason
@@ -663,7 +663,7 @@ end
 #       a table of every command in every command queue for every unit in the platoon
 #       or an empty table if it fails
 #-----------------------------------------------------
-function AIPlatoonNavalAttackVector( aiBrain, platoon )
+function AIPlatoonNavalAttackVector(aiBrain, platoon)
 
     GetMostRestrictiveLayer(platoon)
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
@@ -683,7 +683,7 @@ function AIPlatoonNavalAttackVector( aiBrain, platoon )
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
 
         # check if we can path to here safely... give a large threat weight to sort by threat first
-        path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )
+        path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         # clear command queue
         platoon:Stop()
@@ -739,7 +739,7 @@ end
 #       or an empty table if it fails
 #-----------------------------------------------------
 
-function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
+function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos = GetBestThreatTarget(aiBrain, platoon)
@@ -768,8 +768,8 @@ function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
             local squareRadius = (ScenarioInfo.size[1] / 16) / table.getn(lookAroundTable)
             for ix, offsetX in lookAroundTable do
                 for iz, offsetZ in lookAroundTable do
-                    local surf = GetSurfaceHeight( bestPos[1]+offsetX, bestPos[3]+offsetZ )
-                    local terr = GetTerrainHeight( bestPos[1]+offsetX, bestPos[3]+offsetZ )
+                    local surf = GetSurfaceHeight(bestPos[1]+offsetX, bestPos[3]+offsetZ)
+                    local terr = GetTerrainHeight(bestPos[1]+offsetX, bestPos[3]+offsetZ)
                     # is it lower land... make it our new position to continue searching around
                     if terr >= surf and terr < attackPosHeight then
                         bestPos[1] = bestPos[1] + offsetX
@@ -790,7 +790,7 @@ function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
 
         GetMostRestrictiveLayer(platoon)
         # check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         # clear command queue
         platoon:Stop()
@@ -800,10 +800,10 @@ function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
         if (not path and reason == 'NoPath') or bNeedTransports then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
         # Require transports over 500 away
-        elseif VDist2Sq( position[1], position[3], attackPos[1], attackPos[3] ) > 512*512 then
+        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
         # use if possible at 250
-        elseif VDist2Sq( position[1], position[3], attackPos[1], attackPos[3] ) > 256*256 then
+        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, false)
         end
 
@@ -893,7 +893,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 counter = -6
             end
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil( ( transportsNeeded.Small + ( transportsNeeded.Medium * 2 ) + ( transportsNeeded.Large * 4 ) ) / 10 )
+            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -911,7 +911,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
+                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -965,9 +965,9 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         end
 
         if transportLocation then
-            local minThreat = aiBrain:GetThreatAtPosition( transportLocation, 0, true )
+            local minThreat = aiBrain:GetThreatAtPosition(transportLocation, 0, true)
             if minThreat > 0 then
-                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'Overall' )
+                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'Overall')
                 for threatIdx,threatEntry in threatTable do
                     if threatEntry[3] < minThreat then
                         # if it's land...
@@ -985,12 +985,12 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         # path from transport drop off to end location
         local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
         # use the transport!
-        AIUtils.UseTransports( units, platoon:GetSquadUnits('Scout'), transportLocation, platoon )
+        AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
         # just in case we're still landing...
         for _,v in units do
             if not v.Dead then
-                if v:IsUnitState( 'Attached' ) then
+                if v:IsUnitState('Attached') then
                    WaitSeconds(2)
                 end
             end
@@ -1062,7 +1062,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
             # ask for a transport every 10 seconds
             local counter = 0
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil( ( transportsNeeded.Small + ( transportsNeeded.Medium * 2 ) + ( transportsNeeded.Large * 4 ) ) / 10 )
+            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -1080,7 +1080,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
+                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -1146,9 +1146,9 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         if transportLocation then
-            local minThreat = aiBrain:GetThreatAtPosition( transportLocation, 0, true )
+            local minThreat = aiBrain:GetThreatAtPosition(transportLocation, 0, true)
             if minThreat > 0 then
-                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'Overall' )
+                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'Overall')
                 for threatIdx,threatEntry in threatTable do
                     if threatEntry[3] < minThreat then
                         # if it's land...
@@ -1166,12 +1166,12 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         # path from transport drop off to end location
         local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
         # use the transport!
-        AIUtils.UseTransports( units, platoon:GetSquadUnits('Scout'), transportLocation, platoon )
+        AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
         # just in case we're still landing...
         for _,v in units do
             if not v.Dead then
-                if v:IsUnitState( 'Attached' ) then
+                if v:IsUnitState('Attached') then
                    WaitSeconds(2)
                 end
             end
@@ -1232,17 +1232,17 @@ function GetMostRestrictiveLayer(platoon)
     for k,v in platoon:GetPlatoonUnits() do
         if not v.Dead then
             local mType = v:GetBlueprint().Physics.MotionType
-            if ( mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious' ) and ( platoon.MovementLayer == 'Air' or platoon.MovementLayer == 'Water' ) then
+            if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (platoon.MovementLayer == 'Air' or platoon.MovementLayer == 'Water') then
                 platoon.MovementLayer = 'Amphibious'
                 unit = v
-            elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and ( platoon.MovementLayer ~= 'Water' ) then
+            elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and (platoon.MovementLayer ~= 'Water') then
                 platoon.MovementLayer = 'Water'
                 unit = v
                 break   --Nothing more restrictive than water, since there should be no mixed land/water platoons
             elseif mType == 'RULEUMT_Air' and platoon.MovementLayer == 'Air' then
                 platoon.MovementLayer = 'Air'
                 unit = v
-            elseif ( mType == 'RULEUMT_Biped' or mType == 'RULEUMT_Land' ) and platoon.MovementLayer ~= 'Land' then
+            elseif (mType == 'RULEUMT_Biped' or mType == 'RULEUMT_Land') and platoon.MovementLayer ~= 'Land' then
                 platoon.MovementLayer = 'Land'
                 unit = v
                 break   --Nothing more restrictive than land, since there should be no mixed land/water platoons
@@ -1285,8 +1285,8 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
     end
 
     #If we are within 100 units of the destination, don't bother pathing.
-    if (VDist2Sq( start[1], start[3], destination[1], destination[3] ) <= 10000 or
-        (testPathDist and VDist2Sq( start[1], start[3], destination[1], destination[3] ) <= testPathDist)) and
+    if (VDist2Sq(start[1], start[3], destination[1], destination[3]) <= 10000 or
+        (testPathDist and VDist2Sq(start[1], start[3], destination[1], destination[3]) <= testPathDist)) and
         testPath then
             table.insert(finalPath, destination)
             return finalPath
@@ -1453,15 +1453,15 @@ function DrawPathGraph()
             for mn, markerInfo in graph do
 
                 -- Draw the marker path node
-                DrawCircle( markerInfo.position, 5, markerInfo.color )
-                DrawCircle( markerInfo.position, 5.5, markerInfo.color )
+                DrawCircle(markerInfo.position, 5, markerInfo.color)
+                DrawCircle(markerInfo.position, 5.5, markerInfo.color)
 
                 -- Draw the connecting lines to its adjacent nodes
                 for i, node in markerInfo.adjacent do
 
                     local otherMarker = ScenarioUtils.GetMarker(node)
                     if otherMarker then
-                        DrawLinePop( markerInfo.position, otherMarker.position, markerInfo.color )
+                        DrawLinePop(markerInfo.position, otherMarker.position, markerInfo.color)
                     end
                 end
             end
@@ -1557,7 +1557,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, des
 
             # this brings the dist value from 0 to 100% of the maximum length with can travel on a map
             #dist = 100 * dist / math.sqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ))
-            dist = 100 * dist / ( mapSizeX + mapSizeZ )
+            dist = 100 * dist / (mapSizeX + mapSizeZ)
 
             --get threat from current node to adjacent node
             local threat = aiBrain:GetThreatBetweenPositions(newNode.position, lastNode.position, nil, threatType)
@@ -1663,7 +1663,7 @@ function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, 
                 local dist = VDist2Sq(newNode.position[1], newNode.position[3], endNode.position[1], endNode.position[3])
 
                 # this brings the dist value from 0 to 100% of the maximum length with can travel on a map
-                dist = 100 * dist / ( mapSizeX + mapSizeZ ) #(mapSizeX * mapSizeX  + mapSizeZ * mapSizeZ)
+                dist = 100 * dist / (mapSizeX + mapSizeZ) #(mapSizeX * mapSizeX  + mapSizeZ * mapSizeZ)
 
                 --get threat from current node to adjacent node
                 local threat = aiBrain:GetThreatBetweenPositions(newNode.position, lastNode.position, nil, threatType)
@@ -1751,7 +1751,7 @@ end
 #   Returns:
 #       true and the destinationPos if successful, false and the closest point it could get to otherwise
 #-----------------------------------------------------
-function CheckPlatoonPathingEx( platoon, destPos )
+function CheckPlatoonPathingEx(platoon, destPos)
     local unit = GetMostRestrictiveLayer(platoon)
 
     if platoon.MovementLayer == 'Air' then
@@ -1779,7 +1779,7 @@ function CheckPlatoonPathingEx( platoon, destPos )
             bestPos = platPos
         end
     else
-        result, bestPos = unit:CanPathTo( destPos )
+        result, bestPos = unit:CanPathTo(destPos)
     end
 
     return result, bestPos
@@ -1958,7 +1958,7 @@ function GetClosestPathNodeInRadiusByLayerSorian(location, destination, radius, 
 end
 
 
-function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
+function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
 
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos = GetBestThreatTarget(aiBrain, platoon)
@@ -1987,8 +1987,8 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
 #            local squareRadius = (ScenarioInfo.size[1] / 16) / table.getn(lookAroundTable)
 #            for ix, offsetX in lookAroundTable do
 #                for iz, offsetZ in lookAroundTable do
-#                    local surf = GetSurfaceHeight( bestPos[1]+offsetX, bestPos[3]+offsetZ )
-#                    local terr = GetTerrainHeight( bestPos[1]+offsetX, bestPos[3]+offsetZ )
+#                    local surf = GetSurfaceHeight(bestPos[1]+offsetX, bestPos[3]+offsetZ)
+#                    local terr = GetTerrainHeight(bestPos[1]+offsetX, bestPos[3]+offsetZ)
 #                    # is it lower land... make it our new position to continue searching around
 #                    if terr >= surf and terr < attackPosHeight then
 #                        bestPos[1] = bestPos[1] + offsetX
@@ -2009,7 +2009,7 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
 
         GetMostRestrictiveLayer(platoon)
         # check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         # clear command queue
         platoon:Stop()
@@ -2029,10 +2029,10 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
         if (not path and reason == 'NoPath') or bNeedTransports then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, true, false, true)
         # Require transports over 512 away
-        elseif VDist2Sq( position[1], position[3], attackPos[1], attackPos[3] ) > 512*512 and inBase then
+        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 and inBase then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, true, false, false)
         # use if possible at 256
-        elseif VDist2Sq( position[1], position[3], attackPos[1], attackPos[3] ) > 256*256 and inBase then
+        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 and inBase then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, false, false, false)
         end
 
@@ -2074,7 +2074,7 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
     return cmd
 end
 
-function AIPlatoonNavalAttackVectorSorian( aiBrain, platoon )
+function AIPlatoonNavalAttackVectorSorian(aiBrain, platoon)
 
     GetMostRestrictiveLayer(platoon)
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
@@ -2092,7 +2092,7 @@ function AIPlatoonNavalAttackVectorSorian( aiBrain, platoon )
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3] then
 
         # check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         # clear command queue
         platoon:Stop()
@@ -2166,7 +2166,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 counter = 6
             end
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil( ( transportsNeeded.Small + ( transportsNeeded.Medium * 2 ) + ( transportsNeeded.Large * 4 ) ) / 10 )
+            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -2184,7 +2184,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
+                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -2258,14 +2258,14 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
         end
 
         if transportLocation then
-            local minThreat = aiBrain:GetThreatAtPosition( transportLocation, 0, true, 'AntiAir' )
+            local minThreat = aiBrain:GetThreatAtPosition(transportLocation, 0, true, 'AntiAir')
             local pos = platoon:GetPlatoonPosition()
             if not pos then
                 return false
             end
             local closest = VDist2Sq(pos[1], pos[3], transportLocation[1], transportLocation[3])
             if minThreat > 0 then
-                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'AntiAir' )
+                local threatTable = aiBrain:GetThreatsAroundPosition(transportLocation, 1, true, 'AntiAir')
                 for threatIdx,threatEntry in threatTable do
                     local distance = VDist2Sq(pos[1], pos[3], threatEntry[1], threatEntry[2])
                     if threatEntry[3] < minThreat then
@@ -2293,12 +2293,12 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
         # path from transport drop off to end location
         local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
         # use the transport!
-        AIUtils.UseTransports( units, platoon:GetSquadUnits('Scout'), transportLocation, platoon )
+        AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
         # just in case we're still landing...
         for _,v in units do
             if not v.Dead then
-                if v:IsUnitState( 'Attached' ) then
+                if v:IsUnitState('Attached') then
                    WaitSeconds(2)
                 end
             end

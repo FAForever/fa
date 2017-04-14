@@ -44,7 +44,7 @@ end
 #
 ##############################################################################################################
 function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
-    local num = Random( minNumber, maxNumber)
+    local num = Random(minNumber, maxNumber)
     if higherThan < num and lowerThan > num then
         return true
     end
@@ -262,7 +262,7 @@ function ReclaimablesInArea(aiBrain, locType)
     #    return false
     #end
 
-    local ents = AIUtils.AIGetReclaimablesAroundLocation( aiBrain, locType )
+    local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
     if ents and table.getn(ents) > 0 then
         return true
     end
@@ -277,7 +277,7 @@ end
 # parameter 1: string   locType     = "MAIN"
 #
 ##############################################################################################################
-function CheckAvailableGates( aiBrain, locType )
+function CheckAvailableGates(aiBrain, locType)
     local pos, rad
     if aiBrain:PBMHasPlatoonList() then
         for k,v in aiBrain.PBM.Locations do
@@ -294,7 +294,7 @@ function CheckAvailableGates( aiBrain, locType )
     if not pos then
         return false
     end
-    local gates = GetOwnUnitsAroundPoint( aiBrain, categories.GATE, pos, rad )
+    local gates = GetOwnUnitsAroundPoint(aiBrain, categories.GATE, pos, rad)
     if not gates then
         return false
     else
@@ -381,7 +381,7 @@ end
 #
 ##############################################################################################################
 function CDRRunningAway(aiBrain)
-    local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
+    local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
     for k,v in units do
         if not v.Dead and v.Running then
             return true
@@ -400,7 +400,7 @@ end
 ##############################################################################################################
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
-    if aiBrain.CheatEnabled and ( 0.5 * num ) < time then
+    if aiBrain.CheatEnabled and (0.5 * num) < time then
         return true
     elseif num < time then
         return true
@@ -416,7 +416,7 @@ end
 #
 ##############################################################################################################
 function LessThanGameTime(aiBrain, num)
-    return ( not GreaterThanGameTime( aiBrain, num ) )
+    return (not GreaterThanGameTime(aiBrain, num))
 end
 
 ##############################################################################################################

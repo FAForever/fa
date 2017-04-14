@@ -23,7 +23,7 @@ local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
-function AirAttackCondition(aiBrain, locationType, targetNumber )
+function AirAttackCondition(aiBrain, locationType, targetNumber)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
 
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -31,9 +31,9 @@ function AirAttackCondition(aiBrain, locationType, targetNumber )
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager:GetLocationRadius()
 
-    local surfaceThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius )
-    local airThreat = pool:GetPlatoonThreat( 'AntiAir', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius )
-    if ( surfaceThreat + airThreat ) > targetNumber then
+    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local airThreat = pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    if (surfaceThreat + airThreat) > targetNumber then
         return true
     end
     return false

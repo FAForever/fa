@@ -365,11 +365,11 @@ SShleoAACannon = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
-        local PolytrailGroup = self.PolyTrails[RandomInt(1,table.getn( self.PolyTrails ))]
+        local PolytrailGroup = self.PolyTrails[RandomInt(1,table.getn(self.PolyTrails))]
         local army = self:GetArmy()
 
         for k, v in PolytrailGroup do
-            CreateTrail(self, -1, army, v )
+            CreateTrail(self, -1, army, v)
         end
     end,
 }

@@ -915,7 +915,7 @@ function FormatData()
                     collapsed = keyGroups[category].collapsed,
                     id = index,
                     filters = { -- create filter parameters for quick searching of keys
-                         key =  string.gsub( string.lower(data.keyText), ' %+ ', ' '),
+                         key =  string.gsub(string.lower(data.keyText), ' %+ ', ' '),
                          text = string.lower(data.text or ''),
                          action = string.lower(data.action or ''),
                          category = string.lower(data.category or ''),

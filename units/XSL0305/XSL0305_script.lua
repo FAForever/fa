@@ -39,7 +39,7 @@ XSL0305 = Class(SLandUnit) {
 
             self:SetWeaponEnabledByLabel('SniperGun', true)
             self:SetWeaponEnabledByLabel('MainGun', false)
-            self:GetWeaponManipulatorByLabel('SniperGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('MainGun'):GetHeadingPitch() )
+            self:GetWeaponManipulatorByLabel('SniperGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('MainGun'):GetHeadingPitch())
         end
 
 
@@ -49,8 +49,8 @@ XSL0305 = Class(SLandUnit) {
         end
         self.ShieldEffectsBag = {}
 
-        table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' ) )
-        #CreateAttachedEmitter( self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp' )
+        table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp'))
+        #CreateAttachedEmitter(self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp')
         ###end added visual que
 
     end,
@@ -64,9 +64,9 @@ XSL0305 = Class(SLandUnit) {
 
             self:SetWeaponEnabledByLabel('SniperGun', false)
             self:SetWeaponEnabledByLabel('MainGun', true)
-            self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch( self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch() )
+            self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch())
             ##this is to remove the effect generated in sniper mode
-            #table.remove( self.ShieldEffectsBag )
+            #table.remove(self.ShieldEffectsBag)
             #EffectUtil.CleanupEffectBag(self,'ShieldEffectsBag')
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do

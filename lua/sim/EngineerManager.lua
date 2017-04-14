@@ -28,7 +28,7 @@ EngineerManager = Class(BuilderManager) {
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },
-            Intel = { Category = categories.STRUCTURE * ( categories.SONAR + categories.RADAR + categories.OMNI ), Units = {}, UnitsList = {}, Count = 0, },
+            Intel = { Category = categories.STRUCTURE * (categories.SONAR + categories.RADAR + categories.OMNI), Units = {}, UnitsList = {}, Count = 0, },
             MobileIntel = { Category = categories.MOBILE - categories.ENGINEER - categories.SHIELD, Units = {}, UnitsList = {}, Count = 0, },
         }
 
@@ -63,7 +63,7 @@ EngineerManager = Class(BuilderManager) {
             end
         end
         -- If built unit is of the category passed in return true
-        if beingBuilt and EntityCategoryContains( category, beingBuilt ) then
+        if beingBuilt and EntityCategoryContains(category, beingBuilt) then
             return true
         end
         return false
@@ -82,7 +82,7 @@ EngineerManager = Class(BuilderManager) {
             end
         end
         -- If built unit is of the category passed in return true
-        if beingBuilt and EntityCategoryContains( categories.EXPERIMENTAL, beingBuilt ) then
+        if beingBuilt and EntityCategoryContains(categories.EXPERIMENTAL, beingBuilt) then
             return true
         end
         return false
@@ -103,34 +103,34 @@ EngineerManager = Class(BuilderManager) {
         --LOG('*AI DEBUG: Shutting down units for mass needs')
 
         -- Disable engineers building defenses
-        pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.DEFENSE )
+        pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.DEFENSE)
 
         -- Disable shields
         if pauseVal != true then
-            pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.SHIELD )
+            pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.SHIELD)
         end
 
         -- Disable factory builders
         if pauseVal != true then
-            pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) )
+            pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.FACTORY * (categories.TECH2 + categories.TECH3))
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck )
+            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck)
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.MOBILE - categories.EXPERIMENTAL )
+            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.MOBILE - categories.EXPERIMENTAL)
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL )
+            --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL)
         end
 
-        self:ForkThread( self.LowMassRepeatThread )
+        self:ForkThread(self.LowMassRepeatThread)
     end,
 
     LowMassRepeatThread = function(self)
@@ -150,7 +150,7 @@ EngineerManager = Class(BuilderManager) {
 
     MassCheck = function(self, econ, pauseVal)
         local massRequest = econ.MassRequestOverTime - pauseVal
-        if econ.MassIncome > ( massRequest * 0.9 ) then
+        if econ.MassIncome > (massRequest * 0.9) then
             --LOG('*AI DEBUG: Under the cutoff')
             return true
         end
@@ -159,7 +159,7 @@ EngineerManager = Class(BuilderManager) {
 
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 --LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
                 pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondMass()
@@ -177,7 +177,7 @@ EngineerManager = Class(BuilderManager) {
     -- ======================================================== --
     EnergyCheck = function(self, econ, pauseVal)
         local energyRequest = econ.EnergyRequestOverTime - pauseVal
-        if econ.EnergyIncome > ( energyRequest * 0.9 ) then
+        if econ.EnergyIncome > (energyRequest * 0.9) then
             --LOG('*AI DEBUG: Under the cutoff')
             return true
         end
@@ -187,7 +187,7 @@ EngineerManager = Class(BuilderManager) {
 
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 --LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
                 pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondEnergy()
@@ -237,7 +237,7 @@ EngineerManager = Class(BuilderManager) {
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.ALLUNITS - categories.ENERGYPRODUCTION)
         end
 
-        self:ForkThread( self.LowEnergyRepeatThread )
+        self:ForkThread(self.LowEnergyRepeatThread)
     end,
 
     LowEnergyRepeatThread = function(self)
@@ -287,7 +287,7 @@ EngineerManager = Class(BuilderManager) {
             end
         end
         -- If built unit is of the category passed in return true
-        if beingBuilt and EntityCategoryContains( category, beingBuilt ) then
+        if beingBuilt and EntityCategoryContains(category, beingBuilt) then
             return true
         end
         return false
@@ -319,34 +319,34 @@ EngineerManager = Class(BuilderManager) {
         LOG('*AI DEBUG: Shutting down units for mass needs')
 
         -- Disable engineers building defenses
-        pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.DEFENSE )
+        pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.DEFENSE)
 
         -- Disable shields
         if pauseVal != true then
-            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.SHIELD )
+            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.SHIELD)
         end
 
         -- Disable factory builders
         if pauseVal != true then
-            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) )
+            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.FACTORY * (categories.TECH2 + categories.TECH3))
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck )
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck)
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.MOBILE - categories.EXPERIMENTAL )
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.MOBILE - categories.EXPERIMENTAL)
         end
 
         -- Disable those building mobile units (through assist or experimental)
         if pauseVal != true then
-            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL )
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL)
         end
 
-        self:ForkThread( self.LowMassRepeatThreadSorian )
+        self:ForkThread(self.LowMassRepeatThreadSorian)
     end,
 
     LowMassRepeatThreadSorian = function(self)
@@ -366,7 +366,7 @@ EngineerManager = Class(BuilderManager) {
 
     DisableMassGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 LOG('*AI DEBUG: Disabling unit for mass')
                 --v.Unit:OnPaused()
                 IssuePause(v.Unit)
@@ -386,7 +386,7 @@ EngineerManager = Class(BuilderManager) {
 
     DisableEnergyGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 LOG('*AI DEBUG: Disabling unit for energy')
                 --v.Unit:OnPaused()
                 IssuePause(v.Unit)
@@ -437,7 +437,7 @@ EngineerManager = Class(BuilderManager) {
             pauseVal = self:DisableEnergyGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.ALLUNITS - categories.ENERGYPRODUCTION)
         end
 
-        self:ForkThread( self.LowEnergyRepeatThreadSorian )
+        self:ForkThread(self.LowEnergyRepeatThreadSorian)
     end,
 
     LowEnergyRepeatThreadSorian = function(self)
@@ -475,9 +475,9 @@ EngineerManager = Class(BuilderManager) {
 
     AddUnit = function(self, unit, dontAssign)
         for k,v in self.ConsumptionUnits do
-            if EntityCategoryContains( v.Category, unit ) then
-                table.insert( v.Units, { Unit = unit, Status = true } )
-                table.insert( v.UnitsList, unit )
+            if EntityCategoryContains(v.Category, unit) then
+                table.insert(v.Units, { Unit = unit, Status = true })
+                table.insert(v.UnitsList, unit)
                 v.Count = v.Count + 1
 
                 if not unit.BuilderManagerData then
@@ -493,7 +493,7 @@ EngineerManager = Class(BuilderManager) {
                         unit.BuilderManagerData.EngineerManager:RemoveUnit(unit)
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitDestroyedTrigger(deathFunction, unit )
+                    import('/lua/scenariotriggers.lua').CreateUnitDestroyedTrigger(deathFunction, unit)
 
                     local newlyCapturedFunction = function(unit, captor)
                         local aiBrain = captor:GetAIBrain()
@@ -506,9 +506,9 @@ EngineerManager = Class(BuilderManager) {
                         end
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit )
+                    import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
 
-                    if EntityCategoryContains( categories.ENGINEER, unit ) then
+                    if EntityCategoryContains(categories.ENGINEER, unit) then
                         local unitConstructionFinished = function(unit, finishedUnit)
                                                     -- Call function on builder manager; let it handle the finish of work
                                                     local aiBrain = unit:GetAIBrain()
@@ -532,7 +532,7 @@ EngineerManager = Class(BuilderManager) {
 
                 if not dontAssign then
                     --self:AssignEngineerTask(unit)
-                    self:ForkThread( self.InitialWait, unit )
+                    self:ForkThread(self.InitialWait, unit)
                 end
 
                 return
@@ -549,19 +549,19 @@ EngineerManager = Class(BuilderManager) {
 
     GetNumCategoryUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
-            local numUnits = EntityCategoryCount( category, self.ConsumptionUnits[unitType].UnitsList )
+            local numUnits = EntityCategoryCount(category, self.ConsumptionUnits[unitType].UnitsList)
             --LOG('*AI DEBUG: '..self.Brain.Nickname..' - GetNumCategoryUnits returns '..numUnits..' at '..self.LocationType)
-            return EntityCategoryCount( category, self.ConsumptionUnits[unitType].UnitsList )
+            return EntityCategoryCount(category, self.ConsumptionUnits[unitType].UnitsList)
         end
         return 0
     end,
 
-    GetNumCategoryBeingBuilt = function(self, category, engCategory )
-        return table.getn(self:GetEngineersBuildingCategory(category, engCategory ))
+    GetNumCategoryBeingBuilt = function(self, category, engCategory)
+        return table.getn(self:GetEngineersBuildingCategory(category, engCategory))
     end,
 
-    GetEngineersBuildingCategory = function(self, category, engCategory )
-        local engs = self:GetUnits( 'Engineers', engCategory )
+    GetEngineersBuildingCategory = function(self, category, engCategory)
+        local engs = self:GetUnits('Engineers', engCategory)
         local units = {}
         for k,v in engs do
             if v.Dead then
@@ -577,23 +577,23 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not EntityCategoryContains( category, beingBuiltUnit ) then
+            if not EntityCategoryContains(category, beingBuiltUnit) then
                 continue
             end
 
-            table.insert( units, v)
+            table.insert(units, v)
         end
         return units
     end,
 
-    GetEngineerFactionIndex = function( self, engineer )
-        if EntityCategoryContains( categories.UEF, engineer ) then
+    GetEngineerFactionIndex = function(self, engineer)
+        if EntityCategoryContains(categories.UEF, engineer) then
             return 1
-        elseif EntityCategoryContains( categories.AEON, engineer ) then
+        elseif EntityCategoryContains(categories.AEON, engineer) then
             return 2
-        elseif EntityCategoryContains( categories.CYBRAN, engineer ) then
+        elseif EntityCategoryContains(categories.CYBRAN, engineer) then
             return 3
-        elseif EntityCategoryContains( categories.SERAPHIM, engineer ) then
+        elseif EntityCategoryContains(categories.SERAPHIM, engineer) then
             return 4
         else
             return 5
@@ -603,28 +603,28 @@ EngineerManager = Class(BuilderManager) {
     UnitFromCustomFaction = function(self, engineer)
         local customFactions = self.Brain.CustomFactions
         for k,v in customFactions do
-            if EntityCategoryContains( v.customCat, engineer ) then
+            if EntityCategoryContains(v.customCat, engineer) then
                 LOG('*AI DEBUG: UnitFromCustomFaction: '..k)
                 return k
             end
         end
     end,
 
-    GetBuildingId = function( self, engineer, buildingType )
-        local faction = self:GetEngineerFactionIndex( engineer )
+    GetBuildingId = function(self, engineer, buildingType)
+        local faction = self:GetEngineerFactionIndex(engineer)
         if faction > 4 then
             if self:UnitFromCustomFaction(engineer) then
                 faction = self:UnitFromCustomFaction(engineer)
                 LOG('*AI DEBUG: GetBuildingId faction: '..faction)
-                return self.Brain:DecideWhatToBuild( engineer, buildingType, self.Brain.CustomFactions[faction] )
+                return self.Brain:DecideWhatToBuild(engineer, buildingType, self.Brain.CustomFactions[faction])
             end
         else
-            return self.Brain:DecideWhatToBuild( engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction] )
+            return self.Brain:DecideWhatToBuild(engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction])
         end
     end,
 
     GetEngineersQueued = function(self, buildingType)
-        local engs = self:GetUnits( 'Engineers', categories.ALLUNITS )
+        local engs = self:GetUnits('Engineers', categories.ALLUNITS)
         local units = {}
         for k,v in engs do
             if v.Dead then
@@ -635,7 +635,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            local buildingId = self:GetBuildingId( v, buildingType )
+            local buildingId = self:GetBuildingId(v, buildingType)
             local found = false
             for num, data in v.EngineerBuildQueue do
                 if data[1] == buildingId then
@@ -648,13 +648,13 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert( units, v )
+            table.insert(units, v)
         end
         return units
     end,
 
     GetEngineersBuildQueue = function(self, buildingType)
-        local engs = self:GetUnits( 'Engineers', categories.ALLUNITS )
+        local engs = self:GetUnits('Engineers', categories.ALLUNITS)
         local units = {}
         for k,v in engs do
             if v.Dead then
@@ -681,13 +681,13 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert( units, v )
+            table.insert(units, v)
         end
         return units
     end,
 
-    GetEngineersWantingAssistance = function(self, category, engCategory )
-        local testUnits = self:GetEngineersBuildingCategory(category, engCategory )
+    GetEngineersWantingAssistance = function(self, category, engCategory)
+        local testUnits = self:GetEngineersBuildingCategory(category, engCategory)
 
         local retUnits = {}
         for k,v in testUnits do
@@ -695,18 +695,18 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if v.NumAssistees and table.getn( v:GetGuards() ) >= v.NumAssistees then
+            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
                 continue
             end
 
-            table.insert( retUnits, v )
+            table.insert(retUnits, v)
         end
         return retUnits
     end,
 
     GetUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
-            return EntityCategoryFilterDown( category, self.ConsumptionUnits[unitType].UnitsList )
+            return EntityCategoryFilterDown(category, self.ConsumptionUnits[unitType].UnitsList)
         end
         return {}
     end,
@@ -728,11 +728,11 @@ EngineerManager = Class(BuilderManager) {
 
         local found = false
         for k,v in self.ConsumptionUnits do
-            if EntityCategoryContains( v.Category, unit ) then
+            if EntityCategoryContains(v.Category, unit) then
                 for num,sUnit in v.Units do
                     if sUnit.Unit == unit then
-                        table.remove( v.Units, num )
-                        table.remove( v.UnitsList, num )
+                        table.remove(v.Units, num)
+                        table.remove(v.UnitsList, num)
                         v.Count = v.Count - 1
                         found = true
                         break
@@ -754,7 +754,7 @@ EngineerManager = Class(BuilderManager) {
         local unitPos = unit:GetPosition()
         for k,v in managers do
             if v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 or v == 'MAIN' then
-                local checkDistance = VDist3( v.EngineerManager:GetLocationCoords(), unitPos)
+                local checkDistance = VDist3(v.EngineerManager:GetLocationCoords(), unitPos)
                 if not distance or checkDistance < distance then
                     distance = checkDistance
                     bestManager = v.EngineerManager
@@ -768,7 +768,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     TaskFinished = function(self, unit)
-        if VDist3( self.Location, unit:GetPosition() ) > self.Radius and not EntityCategoryContains( categories.COMMAND, unit ) then
+        if VDist3(self.Location, unit:GetPosition()) > self.Radius and not EntityCategoryContains(categories.COMMAND, unit) then
             self:ReassignUnit(unit)
         else
             self:AssignEngineerTask(unit)
@@ -776,29 +776,29 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     UnitConstructionStarted = function(self, unit, unitBeingBuilt)
-        if EntityCategoryContains( categories.FACTORY, unitBeingBuilt ) then
+        if EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
             self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
-        elseif EntityCategoryContains( categories.EXPERIMENTAL + categories.MOBILE, unitBeingBuilt ) then
+        elseif EntityCategoryContains(categories.EXPERIMENTAL + categories.MOBILE, unitBeingBuilt) then
             self:AddConsumption(unit, 'Units', unitBeingBuilt)
-        elseif EntityCategoryContains( categories.MASSEXTRACTION + categories.MASSFABRICATION + categories.ENERGYPRODUCTION, unitBeingBuilt ) then
+        elseif EntityCategoryContains(categories.MASSEXTRACTION + categories.MASSFABRICATION + categories.ENERGYPRODUCTION, unitBeingBuilt) then
             self:AddConsumption(unit, 'Resources', unitBeingBuilt)
-        elseif EntityCategoryContains( categories.DEFENSE, unitBeingBuilt ) then
+        elseif EntityCategoryContains(categories.DEFENSE, unitBeingBuilt) then
             self:AddConsumption(unit, 'Defenses', unitBeingBuilt)
-        elseif EntityCategoryContains( categories.ENGINEER, unitBeingBuilt ) then
+        elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
             self:AddConsumption(unit, 'Engineers', unitBeingBuilt)
-        elseif EntityCategoryContains( categories.STRUCTURE, unitBeingBuilt ) then
+        elseif EntityCategoryContains(categories.STRUCTURE, unitBeingBuilt) then
             self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
         else
-            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt:GetUnitId() )
+            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt:GetUnitId())
         end
     end,
 
     AddConsumption = function(self, unit, consumptionType, unitBeingBuilt)
-        self.Brain:AddConsumption( self.LocationType, consumptionType, unit, unitBeingBuilt )
+        self.Brain:AddConsumption(self.LocationType, consumptionType, unit, unitBeingBuilt)
     end,
 
     UnitConstructionFinished = function(self, unit, finishedUnit)
-        if EntityCategoryContains( categories.FACTORY * categories.STRUCTURE, finishedUnit ) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
+        if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
@@ -820,14 +820,14 @@ EngineerManager = Class(BuilderManager) {
         self.Brain:RemoveConsumption(self.LocationType, unit)
     end,
 
-    EngineerWaiting = function( self, unit )
+    EngineerWaiting = function(self, unit)
         WaitSeconds(5)
-        self:AssignEngineerTask( unit )
+        self:AssignEngineerTask(unit)
     end,
 
-    InitialWait = function( self, unit )
+    InitialWait = function(self, unit)
         WaitSeconds(2)
-        self:AssignEngineerTask( unit )
+        self:AssignEngineerTask(unit)
     end,
 
     AssignTimeout = function(self, builderName)
@@ -858,11 +858,11 @@ EngineerManager = Class(BuilderManager) {
 
     DelayAssign = function(self, unit)
         if not unit.DelayThread then
-            unit.DelayThread = unit:ForkThread( self.DelayAssignBody, self )
+            unit.DelayThread = unit:ForkThread(self.DelayAssignBody, self)
         end
     end,
 
-    DelayAssignBody = function( unit, manager )
+    DelayAssignBody = function(unit, manager)
         WaitSeconds(1)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
@@ -885,12 +885,12 @@ EngineerManager = Class(BuilderManager) {
         local builder = self:GetHighestBuilder('Any', {unit})
         if builder then
             -- Fork off the platoon here
-            local template = self:GetEngineerPlatoonTemplate( builder:GetPlatoonTemplate() )
-            local hndl = self.Brain:MakePlatoon( template[1], template[2] )
-            self.Brain:AssignUnitsToPlatoon( hndl, {unit}, 'support', 'none' )
+            local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
+            local hndl = self.Brain:MakePlatoon(template[1], template[2])
+            self.Brain:AssignUnitsToPlatoon(hndl, {unit}, 'support', 'none')
             unit.PlatoonHandle = hndl
 
-            --if EntityCategoryContains( categories.COMMAND, unit ) then
+            --if EntityCategoryContains(categories.COMMAND, unit) then
             --    LOG('*AI DEBUG: ARMY '..self.Brain.Nickname..': Engineer Manager Forming - '..builder.BuilderName..' - Priority: '..builder:GetPriority())
             --end
 
@@ -911,7 +911,7 @@ EngineerManager = Class(BuilderManager) {
             --If we have additional threads to fork on the platoon, do that as well.
             if builder:GetPlatoonAddPlans() then
                 for papk, papv in builder:GetPlatoonAddPlans() do
-                    hndl:ForkThread( hndl[papv] )
+                    hndl:ForkThread(hndl[papv])
                 end
             end
 
@@ -923,7 +923,7 @@ EngineerManager = Class(BuilderManager) {
 
             if builder:GetPlatoonAddBehaviors() then
                 for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                    hndl:ForkThread( import('/lua/ai/AIBehaviors.lua')[pafv] )
+                    hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
                 end
             end
 
@@ -951,7 +951,7 @@ EngineerManager = Class(BuilderManager) {
             return
         end
         self.AssigningTask = false
-        self:ForkThread( self.EngineerWaiting, unit )
+        self:ForkThread(self.EngineerWaiting, unit)
     end,
 
     ManagerLoopBody = function(self,builder,bType)
@@ -967,8 +967,8 @@ EngineerManager = Class(BuilderManager) {
         builder:FormDebug()
 
         -- Check if the category of the unit matches the category of the builder
-        local template = self:GetEngineerPlatoonTemplate( builder:GetPlatoonTemplate() )
-        if not unit.Dead and EntityCategoryContains( template[3][1], unit ) and builder:CheckInstanceCount() then
+        local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
+        if not unit.Dead and EntityCategoryContains(template[3][1], unit) and builder:CheckInstanceCount() then
             return true
         end
 

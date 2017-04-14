@@ -271,7 +271,7 @@ Weapon = Class(moho.weapon_methods) {
             self.unit.Trash:Add(sndEnt)
             sndEnt:AttachTo(self.unit,-1)
         end
-        self.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
+        self.AmbientSounds[sound]:SetAmbientSound(bp.Audio[sound], nil)
     end,
 
     StopWeaponAmbientSound = function(self, sound)
@@ -347,14 +347,14 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetValidTargetsForCurrentLayer = function(self, newLayer)
-        -- LOG( 'SetValidTargetsForCurrentLayer, layer = ', newLayer )
+        -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
         local weaponBlueprint = self:GetBlueprint()
         if weaponBlueprint.FireTargetLayerCapsTable then
             if weaponBlueprint.FireTargetLayerCapsTable[newLayer] then
-                -- LOG( 'Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer] )
-                self:SetFireTargetLayerCaps( weaponBlueprint.FireTargetLayerCapsTable[newLayer] )
+                -- LOG('Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer])
+                self:SetFireTargetLayerCaps(weaponBlueprint.FireTargetLayerCapsTable[newLayer])
             else
-                -- LOG( 'Setting Target Layer Caps to None' )
+                -- LOG('Setting Target Layer Caps to None')
                 self:SetFireTargetLayerCaps('None')
             end
         end

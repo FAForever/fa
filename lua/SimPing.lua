@@ -52,10 +52,10 @@ function SpawnPing(data)
 
         -- Callbacks to allied brains
         for num,brain in ArmyBrains do
-            if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
-                ArmyBrains[num]:DoPingCallbacks( data )
+            if data.Owner + 1 ~= num and IsAlly(num, data.Owner + 1) then
+                ArmyBrains[num]:DoPingCallbacks(data)
                 if not SUtils.IsAIArmy(data.Owner + 1) then
-                    ArmyBrains[num]:DoAIPing( data )
+                    ArmyBrains[num]:DoAIPing(data)
                 end
             end
         end
@@ -87,10 +87,10 @@ function SpawnSpecialPing(data)
 
     -- Callbacks to allied brains
     for num,brain in ArmyBrains do
-        if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
-            ArmyBrains[num]:DoPingCallbacks( data )
+        if data.Owner + 1 ~= num and IsAlly(num, data.Owner + 1) then
+            ArmyBrains[num]:DoPingCallbacks(data)
             if not SUtils.IsAIArmy(data.Owner + 1) then
-                ArmyBrains[num]:DoAIPing( data )
+                ArmyBrains[num]:DoAIPing(data)
             end
         end
     end

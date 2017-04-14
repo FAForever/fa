@@ -3,11 +3,11 @@
 local AbilityDefinition = import('/lua/abilitydefinition.lua').abilities
 
 
-function GetUnitsScript( TaskName, SelectedUnits, data )
-    return GetAbilityUnitsForFocusArmy( TaskName )
+function GetUnitsScript(TaskName, SelectedUnits, data)
+    return GetAbilityUnitsForFocusArmy(TaskName)
 end
 
-function GetRangeCheckUnits( TaskName )
+function GetRangeCheckUnits(TaskName)
     return GetAbilityRangeCheckUnitsForFocusArmy(TaskName)
 end
 
@@ -15,7 +15,7 @@ function VerifyScriptCommand(data)
 # TODO: cooldown check to see if ability is allowed to be used
     local TaskName = data.TaskName
     local army = GetFocusArmy()
-    if TaskName and UnitsAreInArmy(data.Units, army) and LocationIsOk(data, GetRangeCheckUnits(TaskName) ) then
+    if TaskName and UnitsAreInArmy(data.Units, army) and LocationIsOk(data, GetRangeCheckUnits(TaskName)) then
         data.AuthorizedUnits = data.Units
         data.UserValidated = true
     else
@@ -132,7 +132,7 @@ LocationIsOk = function(data, RangeCheckUnits)
                         continue
                     elseif maxDist > 0 then              # unit counts towards range check, do check
                         posU = unit:GetPosition()
-                        dist = VDist2( posU[1], posU[3], posM[1], posM[3] )
+                        dist = VDist2(posU[1], posU[3], posM[1], posM[3])
                         InRange = (dist >= minDist and dist <= maxDist)
                         if InRange then
                             break

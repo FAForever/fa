@@ -61,7 +61,7 @@ function NamePing(callback, curName)
         function(self, markerName)
             cb(markerName)
         end
-    )
+)
 
     dialog.OnClosed = function()
         dialog = nil

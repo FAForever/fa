@@ -12,7 +12,7 @@ function Unit:AddToggleCap(capName)
 end
 
 ---
---  Unit:AddUnitToStorage( storedUnit )
+--  Unit:AddUnitToStorage(storedUnit)
 function Unit:AddUnitToStorage(storedUnit)
 end
 

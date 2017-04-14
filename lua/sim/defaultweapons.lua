@@ -62,7 +62,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                     dist = tpDist
                 end
             end
-            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs( dist / (( 1 / rof ) - (bp.MuzzleChargeDelay or 0))) * 1.25
+            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
 
         -- Ensure firing cycle is compatible internally
@@ -438,7 +438,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             local bp = self:GetBlueprint()
             if not bp.RackBones then
-                error('Error on rackbones ' .. self.unit:GetUnitId() )
+                error('Error on rackbones ' .. self.unit:GetUnitId())
             end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
@@ -584,7 +584,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             while clockTime > 0.0 and
                   not self:BeenDestroyed() and
                   not self.unit.Dead do
-                self.unit:SetWorkProgress( 1 - clockTime / totalTime )
+                self.unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 0.1
                 WaitSeconds(0.1)
             end
@@ -865,7 +865,7 @@ BareBonesWeapon = Class(Weapon) {
 
     OnFire = function(self)
         local myBlueprint = self:GetBlueprint()
-        local myProjectile = self.unit:CreateProjectile( myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         if self.Data then
             myProjectile:PassData(self.Data)
         end
@@ -1244,8 +1244,8 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     EconomySupportsBeam = function(self)
         local aiBrain = self.unit:GetAIBrain()
-        local energyIncome = aiBrain:GetEconomyIncome( 'ENERGY' ) * 10
-        local energyStored = aiBrain:GetEconomyStored( 'ENERGY' )
+        local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10
+        local energyStored = aiBrain:GetEconomyStored('ENERGY')
         local nrgReq = self:GetWeaponEnergyRequired()
         local nrgDrain = self:GetWeaponEnergyDrain()
 

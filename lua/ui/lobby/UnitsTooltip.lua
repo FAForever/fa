@@ -50,7 +50,7 @@ local function stringTime(time)
     time = time / 60
     local timeMM =  math.floor(time / 60)
     local timeSS =  math.floor(math.mod(time, 60))
-    return string.format("%02d:%02d", timeMM, timeSS )
+    return string.format("%02d:%02d", timeMM, timeSS)
 end
 
 -- initializes value to zero if it is nil
@@ -132,7 +132,7 @@ function Create(parent, bp)
     tooltipUI.Categories:SetFont(fontTextName, fontTextSize-1)
     tooltipUI.Categories:SetColors('FFFC9038', '00000000', UIUtil.fontColor, '00000000') --#FFFC9038
     local wrapped = Text.WrapText(value, tooltipWidth-10, function(value) return tooltipUI.Categories:GetStringAdvance(value) end)
-    wrappedHeight = ( table.getsize(wrapped) or 1) * tooltipHeight
+    wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
     tooltipUI.Categories.Height:Set(wrappedHeight)
     LayoutHelpers.AtLeftTopIn(tooltipUI.Categories, tooltipUI, left, top)
 
@@ -157,7 +157,7 @@ function Create(parent, bp)
         tooltipUI.Descr:SetFont(fontTextName, fontTextSize-1)
         tooltipUI.Descr:SetColors(colorText, '00000000', UIUtil.fontColor, '00000000')
         local wrapped = Text.WrapText(value, tooltipWidth-10, function(value) return tooltipUI.Descr:GetStringAdvance(value) end)
-        wrappedHeight = ( table.getsize(wrapped) or 1) * tooltipHeight
+        wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
         tooltipUI.Descr.Height:Set(wrappedHeight)
         LayoutHelpers.AtLeftTopIn(tooltipUI.Descr, tooltipUI, left, top)
 
@@ -186,7 +186,7 @@ function Create(parent, bp)
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
     healthValue = init(bp.NewHealth or bp.Defense.Health)
-    healthString = StringComma( math.floor(healthValue)) .. ' '
+    healthString = StringComma(math.floor(healthValue)) .. ' '
     HealthText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
     HealthText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(HealthText, tooltipUI, column4, top)
@@ -232,7 +232,7 @@ function Create(parent, bp)
     top  = top + MassCostText.Height() + 2
 
     shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
-    shieldString = StringComma( math.floor(shieldValue)) .. ' '
+    shieldString = StringComma(math.floor(shieldValue)) .. ' '
     ShieldText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
     ShieldText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(ShieldText, tooltipUI, column4, top)

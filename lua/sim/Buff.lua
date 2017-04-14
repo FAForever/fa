@@ -230,7 +230,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
 
-                    if val >= ( math.abs(val) + 0.5 ) then
+                    if val >= (math.abs(val) + 0.5) then
                         val = math.ceil(val)
                     else
                         val = math.floor(val)
@@ -309,7 +309,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             end
         elseif atype == 'BuildRate' then
             local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
-            unit:SetBuildRate( val )
+            unit:SetBuildRate(val)
         -------- ADJACENCY BELOW --------
         elseif atype == 'EnergyActive' then
             local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)

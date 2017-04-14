@@ -111,7 +111,7 @@ function OnFirstUpdate()
         local focusArmy = armiesInfo.focusArmy
         local playerName = armiesInfo.armiesTable[focusArmy].nickname
         avatars[1]:SetCustomName(playerName)
-        PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
+        PlaySound(Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'})
         ForkThread(function()
             WaitSeconds(1)
             UIZoomTo(avatars, 1)
@@ -277,7 +277,7 @@ function AdjustFrameRate()
         end
     end
 
-    ConExecute("SC_FrameTimeClamp " .. (1000 / fps ))
+    ConExecute("SC_FrameTimeClamp " .. (1000 / fps))
 end
 
 local provider = false

@@ -1255,7 +1255,7 @@ BuilderGroup {
         Priority = 980,
         BuilderConditions = {
                 #DUNCAN - commented out
-                #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENGINEER * ( categories.TECH2 + categories.TECH3 ) } },
+                #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENGINEER * (categories.TECH2 + categories.TECH3) } },
                 #DUNCAN - Changed to 3
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'HYDROCARBON'}},
                 #DUNCAN - Added so doenst build before a few mass exs
