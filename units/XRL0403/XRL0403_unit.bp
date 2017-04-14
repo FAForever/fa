@@ -62,11 +62,11 @@ UnitBlueprint {
     },
     Buffs = {
         Regen = {
-            Level1 = 15,
-            Level2 = 30,
-            Level3 = 45,
-            Level4 = 60,
-            Level5 = 75,
+            Level1 = 10,
+            Level2 = 65,
+            Level3 = 120,
+            Level4 = 180,
+            Level5 = 235,
         },
     },
     BuildIconSortPriority = 30,
