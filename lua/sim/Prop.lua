@@ -292,7 +292,8 @@ Prop = Class(moho.prop_methods, Entity) {
             time = 1
         end
 
-        local perProp = {time=time / n_props, mass=(self.MaxMassReclaim * self.ReclaimLeft * 1.05) / n_props, energy=(self.MaxEnergyReclaim * self.ReclaimLeft * 1.05) / n_props}
+        local compensationMult = 1.25 -- This mult is used to increase the value of split props to make up for reclaiming them being slower
+        local perProp = {time = time / n_props, mass = (self.MaxMassReclaim * self.ReclaimLeft * compensationMult) / n_props, energy = (self.MaxEnergyReclaim * self.ReclaimLeft * compensationMult) / n_props}
         for _, p in newprops do
             p:SetMaxReclaimValues(perProp.time, perProp.mass, perProp.energy)
         end
