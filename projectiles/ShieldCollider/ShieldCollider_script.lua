@@ -106,8 +106,8 @@ ShieldCollider = Class(Projectile) {
                     local finalDamage = math.min(shieldDamageLimit, damage)
                     targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
 
-                    -- Play an impact effect, but only if not bouncing
-                    if not self.Plane.Detector then
+                    -- Play an impact effect, but only if not bouncing. Also stop Exps, because it just looks very silly.
+                    if not self.Plane.Detector and not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then
                         self.Plane:CreateDestructionEffects(self, self.OverKillRatio)
                     end
 
