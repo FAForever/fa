@@ -7,7 +7,7 @@ function CPrefetchSet:Update({d3d_textures=...,  batch_textures=...,  models=...
 end
 
 ---
--- 
+--
 function CPrefetchSet:moho.CPrefetchSet()
 end
 

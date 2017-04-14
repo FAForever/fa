@@ -152,7 +152,7 @@ function Projectile:base()
 end
 
 ---
--- 
+--
 function Projectile:moho.projectile_methods()
 end
 

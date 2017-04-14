@@ -92,7 +92,7 @@ function CMauiBitmap:base()
 end
 
 ---
--- 
+--
 function CMauiBitmap:moho.bitmap_methods()
 end
 

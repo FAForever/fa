@@ -32,7 +32,7 @@ function IEffect:SetEmitterParam('name',  value)
 end
 
 ---
--- 
+--
 function IEffect:moho.IEffect()
 end
 

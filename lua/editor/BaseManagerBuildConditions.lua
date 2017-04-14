@@ -195,7 +195,7 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
     end
-    
+
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local cdrUnit = false
     for _, v in pool:GetPlatoonUnits() do
@@ -203,11 +203,11 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
             cdrUnit = v
         end
     end
-    
+
     if not cdrUnit then
         return false
     end
-    
+
     for dNum, data in aiBrain.BaseManagers[baseName].LevelNames do
         if data.Priority > 0 then
             local buildTemplate = aiBrain.BaseTemplates[baseName .. data.Name].Template
@@ -275,7 +275,7 @@ function HighestFactoryLevel(aiBrain, level, baseName)
     if not bManager then
         return false
     end
-    
+
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager:GetRadius())
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager:GetRadius())
     if t3FacList and table.getn(t3FacList) > 0 then
@@ -299,7 +299,7 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     if not bManager then
         return false
     end
-    
+
     local facCat = ParseEntityCategory('FACTORY * TECH'..techLevel)
     local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager:GetPosition(), bManager:GetRadius())
     local typeCount = {Air = 0, Land = 0, Sea = 0, }
@@ -377,7 +377,7 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
     if not bManager then
         return false
     end
-    
+
     local catCheck
     if type == 'Air' then
         catCheck = categories.AIR
@@ -386,7 +386,7 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
     elseif type == 'Sea' then
         catCheck = categories.NAVAL
     end
-    
+
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager:GetRadius())
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager:GetRadius())
     if t3FacList and table.getn(t3FacList) > 0 then

@@ -18,7 +18,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
     -- Effects not attached but created at the position of CIFEMPFluxWarhead02
     NormalEffects = {'/effects/emitters/empfluxwarhead_concussion_ring_01_emit.bp',
                      '/effects/emitters/empfluxwarhead_fallout_01_emit.bp'},
-                     
+
     PlumeVelocityScale = 0.1,
 
     EffectThread = function(self)
@@ -67,7 +67,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         local angleVariation = angle * 0.5
         local projectiles = {}
 
-        local xVec = 0 
+        local xVec = 0
         local yVec = 0.3
         local zVec = 0
         local velocity = 0
@@ -81,7 +81,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         for i = 0, (numProjectiles -1) do
             xVec = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = 0.3 + RandomFloat(-0.8, 1.0)
-            zVec = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation)) 
+            zVec = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             velocity = 2.4 + (yVec * 3)
             table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0) )
         end

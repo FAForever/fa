@@ -121,9 +121,9 @@ fullSyncOccured = false
 scoreInterval = 10 -- FIXME: this should be synced from sim side
 
 function UpdateScoreData(newData)
-	if fullSyncOccured == false then
-		scoreData.current = table.deepcopy(newData)
-	end
+    if fullSyncOccured == false then
+        scoreData.current = table.deepcopy(newData)
+    end
 end
 
 function OnFullSync(accumData)

@@ -59,7 +59,7 @@ URL0303 = Class(CWalkingLandUnit) {
             end
         end
 
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff 
+        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
         if bp ~= nil then
             self:AddBuff(bp)
         end

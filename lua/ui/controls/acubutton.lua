@@ -155,7 +155,7 @@ ACUButton = Class(Group) {
     SetClosed = function(self, closed)
         -- Opening the slot is a simple matter of deleting the "X".
         self:RemoveTextOverlay()
-        
+
         if not closed then
             return
         end
@@ -180,7 +180,7 @@ ACUButton = Class(Group) {
         -- Put the little green "X" over the little ACU.
         self:draw("2c7f33", "O")
     end,
-    
+
     draw = function(self, color, text)
         local textOverlay = Text(self)
         textOverlay:SetFont(UIUtil.bodyFont, 20)
@@ -190,7 +190,7 @@ ACUButton = Class(Group) {
 
         self.textOverlay = textOverlay
     end,
-    
+
     RemoveTextOverlay = function(self)
         if self.textOverlay then
             self.textOverlay:Destroy()

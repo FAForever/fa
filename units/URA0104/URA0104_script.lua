@@ -29,7 +29,7 @@ URA0104 = Class(AirTransport) {
 
     BeamExhaustIdle = '/effects/emitters/missile_exhaust_fire_beam_05_emit.bp',
     BeamExhaustCruise = '/effects/emitters/missile_exhaust_fire_beam_04_emit.bp',
-    
+
     OnCreate = function( self )
         AirTransport.OnCreate(self)
         if not self.OpenAnim then

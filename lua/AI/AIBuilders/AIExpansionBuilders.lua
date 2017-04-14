@@ -27,7 +27,7 @@ local ExtractorToFactoryRatio = 3
 BuilderGroup {
     BuilderGroupName = 'EngineerExpansionBuildersFull',
     BuildersType = 'EngineerBuilder',
-    
+
     ########################################
     ## Builds expansion bases
     ########################################
@@ -38,11 +38,11 @@ BuilderGroup {
         Priority = 985,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 5, 0, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-            { MIBC, 'LessThanGameTime', { 600 } },              
+            { MIBC, 'LessThanGameTime', { 600 } },
             #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
             #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
@@ -51,7 +51,7 @@ BuilderGroup {
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true, #DUNCAN - added
+            RequireTransport = true, #DUNCAN - added
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -63,28 +63,28 @@ BuilderGroup {
                 ThreatMax = 5,
                 ThreatRings = 0,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {  
-					#DUNCAN - adjusted
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1AADefense',
-					'T1Radar',	
-                }               
+                BuildStructures = {
+                    #DUNCAN - adjusted
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1Radar',
+                }
             },
             NeedGuard = true,
         }
-    }, 
-    
+    },
+
     Builder {
         BuilderName = 'T1VacantStartingAreaEngineer',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 932,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 100, 0, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
@@ -106,27 +106,27 @@ BuilderGroup {
                 ThreatMax = 100,
                 ThreatRings = 0,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					#DUNCAN - adjusted
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1GroundDefense',
-					'T1AADefense',
-					'T1LandFactory',
-					'T1Radar',	
+                BuildStructures = {
+                    #DUNCAN - adjusted
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1GroundDefense',
+                    'T1AADefense',
+                    'T1LandFactory',
+                    'T1Radar',
                 }
             },
             NeedGuard = true,
         }
-    },       
+    },
     Builder {
         BuilderName = 'T2VacantStartingAreaEngineer',
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 942, #DUNCAN - was 922
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
@@ -148,16 +148,16 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
+                BuildStructures = {
                     #DUNCAN - Added strat missle, radar, extra PD, move fac to end, added shield
                     'T1GroundDefense',
-					'T1Radar',
+                    'T1Radar',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissile',
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2ShieldDefense',          
+                    'T2StrategicMissile',
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2ShieldDefense',
                 }
             },
             NeedGuard = true,
@@ -166,11 +166,11 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3VacantStartingAreaEngineer',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority = 922, 
+        Priority = 922,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
@@ -189,16 +189,16 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
+                BuildStructures = {
                     #DUNCAN - Added strat missle, radar, extra PD, move fac to end, added shield
                     'T1GroundDefense',
-					'T1Radar',
+                    'T1Radar',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissile',
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2ShieldDefense',            
+                    'T2StrategicMissile',
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2ShieldDefense',
                 }
             },
             NeedGuard = true,
@@ -209,7 +209,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerExpansionBuildersFull - Naval',
     BuildersType = 'EngineerBuilder',
-    
+
     ########################################
     ## Builds expansion bases
     ########################################
@@ -220,8 +220,8 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             #{ EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -239,23 +239,23 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-                    'T1GroundDefense',                    
+                BuildStructures = {
+                    'T1GroundDefense',
                     'T1LandFactory',
-                    'T1AADefense',     
+                    'T1AADefense',
                 }
             },
             NeedGuard = true,
         }
-    },       
+    },
     Builder {
         BuilderName = 'T2VacantStartingAreaEngineer - Naval',
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 922,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             #{ EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -273,16 +273,16 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
+                BuildStructures = {
                     #DUNCAN - Added strat missle, radar, extra PD, move fac to end, added shield
                     'T1GroundDefense',
-					'T1Radar',
+                    'T1Radar',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissile',
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2ShieldDefense',     
+                    'T2StrategicMissile',
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2ShieldDefense',
                 }
             },
             NeedGuard = true,
@@ -294,8 +294,8 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
@@ -314,17 +314,17 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
+                BuildStructures = {
                     #DUNCAN - Added strat missle, radar, extra PD, move fac to end, added shield
                     'T1GroundDefense',
-					'T1Radar',
+                    'T1Radar',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissile',
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2ShieldDefense', 
-					'T3AADefense',					
+                    'T2StrategicMissile',
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2ShieldDefense',
+                    'T3AADefense',
                 }
             },
             NeedGuard = true,
@@ -335,7 +335,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerExpansionBuildersSmall',
     BuildersType = 'EngineerBuilder',
-    
+
     ########################################
     ## Builds expansion bases
     ########################################
@@ -345,11 +345,11 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             #{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
-            { UCBC, 'UnitCapCheckLess', { .8 } },            
+            { UCBC, 'UnitCapCheckLess', { .8 } },
             #{ EBC, 'MassIncomeToUnitRatio', { 10, '>=', 'FACTORY TECH1 STRUCTURE' } },
             #{ EBC, 'MassIncomeToUnitRatio', { 20, '>=', 'FACTORY TECH2 STRUCTURE' } },
             #{ EBC, 'MassIncomeToUnitRatio', { 30, '>=', 'FACTORY TECH3 STRUCTURE' } },
@@ -369,11 +369,11 @@ BuilderGroup {
                 ThreatMax = 100,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-                    'T1GroundDefense',                    
-                    'T1LandFactory',  
-					#DUNCAN - added AA
-					'T1AADefense',
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    #DUNCAN - added AA
+                    'T1AADefense',
                 }
             },
             NeedGuard = true,
@@ -385,7 +385,7 @@ BuilderGroup {
         Priority = 0, #DUNCAN - was 850
         InstanceCount = 4,
         BuilderConditions = {
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             #{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
@@ -393,7 +393,7 @@ BuilderGroup {
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -405,61 +405,61 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {    #DUNCAN - added AA, radar, land fac                
-                    'T1GroundDefense',                    
+                BuildStructures = {    #DUNCAN - added AA, radar, land fac
                     'T1GroundDefense',
-					'T1AADefense',
-					'T1AADefense',					
+                    'T1GroundDefense',
+                    'T1AADefense',
+                    'T1AADefense',
                 }
             },
             NeedGuard = true,
         }
-    },  
-	Builder {
+    },
+    Builder {
         BuilderName = 'T1 Engineer Drop',
         PlatoonTemplate = 'EngineerDrop',
         Priority = 0, #DUNCAN - not working yet
         InstanceCount = 2,
         BuilderConditions = {
-            { UCBC, 'UnitCapCheckLess', { .8 } },       
-			{ MIBC, 'LessThanGameTime', { 600 } }, 			
+            { UCBC, 'UnitCapCheckLess', { .8 } },
+            { MIBC, 'LessThanGameTime', { 600 } }, 
         },
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
                 BuildClose = true,
-				NearMarkerType = 'Mass',
-                BuildStructures = {                    
+                NearMarkerType = 'Mass',
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
                     'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense', 					
-                    'T1LandFactory',  
-					'T1AADefense',
-					'T1AADefense',
-					'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense', 
-					'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1AADefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
+                    'T1GroundDefense',
                 }
             },
             NeedGuard = false,
         }
     },
-	
+
     Builder {
         BuilderName = 'T2VacantExpansiongAreaEngineer',
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 850,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             #{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
@@ -482,13 +482,13 @@ BuilderGroup {
                 BuildStructures = {
                     #DUNCAN - Added strat missle, radar, extra PD, move fac to end, added shield
                     'T1GroundDefense',
-					'T1Radar',
+                    'T1Radar',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissile',
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2ShieldDefense',
+                    'T2StrategicMissile',
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2ShieldDefense',
                 }
             },
             NeedGuard = true,
@@ -500,8 +500,8 @@ BuilderGroup {
         Priority = 850,
         InstanceCount = 2,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'ExpansionBaseCheck', { } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             #{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
@@ -537,7 +537,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerFirebaseBuilders',
     BuildersType = 'EngineerBuilder',
-    
+
     ########################################
     ## Builds fire bases
     ########################################
@@ -568,17 +568,17 @@ BuilderGroup {
                 MarkerUnitCategory = 'DEFENSE TECH2',
                 MarkerRadius = 20,
                 BuildStructures = {  #DUNCAN - changed base a bit
-					'T2GroundDefense',
-					'T1GroundDefense',
-					'T1Radar',
-					'T1AADefense',
+                    'T2GroundDefense',
+                    'T1GroundDefense',
+                    'T1Radar',
+                    'T1AADefense',
                     'T2StrategicMissile',
                     'T2ShieldDefense',
-					'T2StrategicMissileDefense',
-					'T2GroundDefense',
-					'T2AADefense',
+                    'T2StrategicMissileDefense',
+                    'T2GroundDefense',
+                    'T2AADefense',
                     'T2StrategicMissile',
-					'T2Artillery',
+                    'T2Artillery',
                 }
             }
         }
@@ -609,14 +609,14 @@ BuilderGroup {
                 MarkerUnitCategory = 'DEFENSE TECH2',
                 MarkerRadius = 20,
                 BuildStructures = { #DUNCAN - changed base a bit
-					'T2GroundDefense',
+                    'T2GroundDefense',
                     'T1Radar',
-					'T2GroundDefense',
+                    'T2GroundDefense',
                     'T3AADefense',
                     'T2ShieldDefense',
                     'T2StrategicMissile',
                     'T2Artillery',
-					'T3AADefense',
+                    'T3AADefense',
                     'T2Artillery',
                     'T2Artillery',
                 }

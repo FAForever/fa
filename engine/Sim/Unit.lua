@@ -627,7 +627,7 @@ function Unit:base()
 end
 
 ---
--- 
+--
 function Unit:moho.unit_methods()
 end
 

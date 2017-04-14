@@ -37,7 +37,7 @@ EnhanceTask = Class(ScriptTask) {
                 unit:GetNavigator():AbortMove()
                 return TASKSTATUS.Wait
             else
-				-- check if enhancement was started (not restricted and met prerequisite)
+                -- check if enhancement was started (not restricted and met prerequisite)
                 local workStarted = unit:OnWorkBegin(self.CommandData.Enhancement)
                 if not workStarted then
                     self.Success = false   -- required for AI notification

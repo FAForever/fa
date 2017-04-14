@@ -196,7 +196,7 @@ function GetClosestVector(vFrom, vToList)
         if dist > cDist then
             dist = cDist
             retVec = vTo
-        end 
+        end
     end
 
     return retVec

@@ -17,7 +17,7 @@ function CUIMapPreview:base()
 end
 
 ---
--- 
+--
 function CUIMapPreview:moho.ui_map_preview_methods()
 end
 

@@ -25,7 +25,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
     end
-        
+
     if not Prefs.GetOption('tooltips') then return end
     local createDelay = 0
     if delay and Prefs.GetOption('tooltip_delay') then
@@ -141,7 +141,7 @@ function CreateToolTip(parent, text)
     tooltip.bg.Bottom:Set(tooltip.Bottom)
     tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
     tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
-    
+
     tooltip.border = Bitmap(tooltip)
     tooltip.border:SetSolidColor(UIUtil.tooltipBorderColor)
     tooltip.border.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
@@ -149,9 +149,9 @@ function CreateToolTip(parent, text)
     tooltip.border.Top:Set(function() return tooltip.bg.Top() - 1 end)
     tooltip.border.Right:Set(function() return tooltip.bg.Right() + 1 end)
     tooltip.border.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
-    
+
     tooltip:DisableHitTest(true)
-    
+
     return tooltip
 end
 
@@ -162,12 +162,12 @@ function CreateExtendedToolTip(parent, text, desc, width)
         local tooltip = Group(parent)
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
         tooltip.Width:Set(width)
-        
+
         if text ~= "" and text ~= nil then
             tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
             tooltip.title.Top:Set(tooltip.Top)
             tooltip.title.Left:Set(tooltip.Left)
-                    
+
             tooltip.bg = Bitmap(tooltip)
             tooltip.bg:SetSolidColor(UIUtil.tooltipTitleColor)
             tooltip.bg.Depth:Set(function() return tooltip.title.Depth() - 1 end)
@@ -176,10 +176,10 @@ function CreateExtendedToolTip(parent, text, desc, width)
             tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
             tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
         end
-        
+
         tooltip.desc = {}
         local tempTable = false
-        
+
         if desc ~= "" and desc ~= nil then
             tooltip.desc[1] = UIUtil.CreateText(tooltip, "", 12, UIUtil.bodyFont)
             tooltip.desc[1].Width:Set(tooltip.Width)
@@ -189,13 +189,13 @@ function CreateExtendedToolTip(parent, text, desc, width)
             else
                 LayoutHelpers.Below(tooltip.desc[1], tooltip.title)
             end
-            
+
             local textBoxWidth = tooltip.Width()
             tempTable = import('/lua/maui/text.lua').WrapText(LOC(desc), textBoxWidth,
             function(text)
                 return  tooltip.desc[1]:GetStringAdvance(text)
             end)
-            
+
             for i=1, table.getn(tempTable) do
                 if i == 1 then
                     tooltip.desc[i]:SetText(tempTable[i])
@@ -207,7 +207,7 @@ function CreateExtendedToolTip(parent, text, desc, width)
                 end
                 tooltip.desc[i]:SetColor('FFCCCCCC') --#FFCCCCCC
             end
-            
+
             tooltip.extbg = Bitmap(tooltip)
             tooltip.extbg:SetSolidColor('FF000202') --#FF000202
             tooltip.extbg.Depth:Set(function() return tooltip.desc[1].Depth() - 1 end)
@@ -216,8 +216,8 @@ function CreateExtendedToolTip(parent, text, desc, width)
             tooltip.extbg.Right:Set(function() return tooltip.Right() + 2 end)
             tooltip.extbg.Bottom:Set(tooltip.desc[table.getn(tempTable)].Bottom)
         end
-        
-        
+
+
         tooltip.extborder = Bitmap(tooltip)
         tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
         if text ~= "" and text ~= nil then
@@ -236,15 +236,15 @@ function CreateExtendedToolTip(parent, text, desc, width)
         else
             tooltip.extborder.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
         end
-        
+
         tooltip:DisableHitTest(true)
-        
+
         if text ~= "" and text ~= nil then
             tooltip.Width:Set(function() return math.max(tooltip.title.Width(), width) end)
         else
             tooltip.Width:Set(function() return width end)
         end
-        
+
         if text == "" and text ~= nil then
             tooltip.Height:Set(function() return (tooltip.desc[1].Height() * table.getn(tempTable)) end)
         elseif desc == "" and desc ~= nil then
@@ -253,8 +253,8 @@ function CreateExtendedToolTip(parent, text, desc, width)
         else
             tooltip.Height:Set(function() return tooltip.title.Height() + (tooltip.desc[1].Height() * table.getn(tempTable)) end)
         end
-        
-        
+
+
         return tooltip
     else
         WARN("Tooltip error! Text and description are both empty!  This should not happen.")
@@ -271,7 +271,7 @@ function AddButtonTooltip(control, tooltipID, delay, width)
         end
         return Button.HandleEvent(self, event)
     end
-end 
+end
 
 function AddControlTooltip(control, tooltipID, delay, width)
     if not control.oldHandleEvent then

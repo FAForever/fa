@@ -12,7 +12,7 @@ local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
 
 
 URB0203 = Class(CSeaFactoryUnit) {
-    
+
     StartArmsMoving = function(self)
         CSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
@@ -42,7 +42,7 @@ URB0203 = Class(CSeaFactoryUnit) {
             WaitFor(self.ArmSlider2)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         CSeaFactoryUnit.StopArmsMoving(self)
         self.ArmSlider1:SetGoal(0, 0, 0)

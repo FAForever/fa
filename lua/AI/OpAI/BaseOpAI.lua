@@ -42,7 +42,7 @@ OpAI = Class {
             self.ChildMonitorHandle = false
             self.PreCreateFinished = true
         end,
-        
+
         FindMaster = function(self, force)
             if self.MasterData and not force then
                 return true
@@ -55,7 +55,7 @@ OpAI = Class {
             end
             return false
         end,
-        
+
         FindChildren = function(self, force)
             if self.ChildrenHandles and table.getn(self.ChildrenHandles) > 0 and not force then
                 return true
@@ -82,10 +82,10 @@ OpAI = Class {
             end
         end,
 
-        ChildNameCheck = function(self,name)           
+        ChildNameCheck = function(self,name)
             for k,v in self.ChildrenNames do
                 local found = string.find(v.BuilderName, name .. '_', 1, true)
-                if v.BuilderName == name or found then                   
+                if v.BuilderName == name or found then
                     return true
                 end
             end
@@ -126,7 +126,7 @@ OpAI = Class {
         SetFunctionStatus = function(self,funcName,bool)
             ScenarioInfo.OSPlatoonCounter[self.MasterName..'_' .. funcName] = bool
         end,
-        
+
         -- TODO: make a system out of this.  Derive functionality per override per OpAI type
         MasterPlatoonFunctionalityChange = function( self, functionData )
             if functionData[2] == 'LandAssaultWithTransports' then
@@ -145,11 +145,11 @@ OpAI = Class {
                 categories.SPECIALLOWPRI,
                 categories.ALLUNITS - categories.COMMAND,
                 categories.COMMAND,
-                
+
             }
             , cat)
         end,
-        
+
         TargetCommanderNever = function( self, cat)
             return self:SetTargettingPriorities(
             {
@@ -159,9 +159,9 @@ OpAI = Class {
                 categories.STRUCTURE * categories.ECONOMIC,
                 categories.MOBILE - categories.COMMAND,
                 categories.SPECIALLOWPRI,
-                categories.ALLUNITS - categories.COMMAND,   
+                categories.ALLUNITS - categories.COMMAND,
             }
-            , cat)        
+            , cat)
         end,
 
         --categories is an optional parameter specifying a subset of the platoon we wish to set target priorities for.
@@ -169,40 +169,40 @@ OpAI = Class {
             if not self:FindMaster() then
                 return false
             end
-            
+
             local priList = { unpack(priTable) }
             local defList = {'SPECIALHIGHPRI', 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'SPECIALLOWPRI', 'ALLUNITS',}
-              
-            if categories then               
+
+            if categories then
                 --save the priorities for this category.
                 if not self.MasterData.PlatoonData.CategoryPriorities then self.MasterData.PlatoonData.CategoryPriorities = {} end
-                
+
                 --NOTE: This should probably be a table.deepcopy if we're going to alter the original table in the future.
-                
+
                 self.MasterData.PlatoonData.CategoryPriorities[categories] = priList
-                
+
             else
                 for i,v in defList do
                     table.insert(priList, v)
                 end
-                
+
                 self.MasterData.PlatoonData.TargetPriorities = {}
-                
+
                 for i,v in priList do
                     table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 end
-                
+
                 --for k,v in priTable do
                 --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 --end
                 --for k,v in defaultPri do
                 --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 --end
-                
+
             end
-            
+
             table.insert( self.MasterData.PlatoonAddFunctions, { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'PlatoonSetTargetPriorities' })
-            
+
             return true
         end,
 
@@ -284,7 +284,7 @@ OpAI = Class {
             self:SetChildActive(childName, true)
             return true
         end,
-        
+
         SetChildQuantity = function(self, childrenType, quantity)
             if not self:FindChildren() or not self:FindMaster() then
                 return false
@@ -299,7 +299,7 @@ OpAI = Class {
             self:KeepChildren(childrenType)
             self:OverrideTemplateSize(quantity)
         end,
-        
+
         RemoveChildren = function(self, childrenType)
             if not self:FindChildren() then
                 return false
@@ -310,7 +310,7 @@ OpAI = Class {
             else
                 table.insert( removeTable, childrenType )
             end
-            
+
             for k,v in self.ChildrenNames do
                 if v.ChildrenType then
                     local found = false
@@ -338,7 +338,7 @@ OpAI = Class {
                end
             end
         end,
-        
+
         KeepChildren = function(self, childrenType)
             if not self:FindChildren() then
                 return false
@@ -349,7 +349,7 @@ OpAI = Class {
             else
                 table.insert( keepTable, childrenType )
             end
-            
+
             for k,v in self.ChildrenNames do
                 if v.ChildrenType then
                     -- Child must have all children type to be kept
@@ -362,13 +362,13 @@ OpAI = Class {
                                 break
                             end
                         end
-                        
+
                         -- This child was not found; break out so we can remove
                         if not found then
                             break
                         end
                     end
-                    
+
                     -- All keeptable children must be found to be kept as well.
                     if found then
                         found = false
@@ -380,7 +380,7 @@ OpAI = Class {
                                     break
                                 end
                             end
-                            
+
                             -- Child not found; break to remove
                             if not found then
                                 break
@@ -420,12 +420,12 @@ OpAI = Class {
                 return false
             end
             for k,v in self.ChildrenHandles do
-                local found 
-                
+                local found
+
                 if bName and v.ChildBuilder.BuilderName then
                     found = string.find(bName, v.ChildBuilder.BuilderName .. '_', 1, true)
                 end
-                
+
                 if not bName or bName == v.ChildBuilder.BuilderName or found then
                     table.insert( v.ChildBuilder.BuildConditions, { fileName, funcName, parameters } )
                 end
@@ -603,12 +603,12 @@ OpAI = Class {
                 end
             end
         end,
-        
+
         SetChildrenActive = function(self, childrenTypes)
             if not self:FindChildren() then
                 return false
             end
-            
+
             for k,v in childrenTypes do
                 self:SetChildActive( v, true )
             end
@@ -633,7 +633,7 @@ OpAI = Class {
             for k,v in self.ChildrenNames do
                 -- Make sure this child has children types
                 if v.ChildrenType then
-                
+
                     -- We don't want to change by default
                     local change = false
                     -- if the type is 'All' or we find that this builder has this child type, we may want to change
@@ -688,7 +688,7 @@ OpAI = Class {
             else
                 self.GlobalVarName = name .. '_' .. self.BuilderType.Name
             end
-            
+
             -- Load all the platoon data info in the formation desired
             local platoonData = {}
             if not builderData then
@@ -709,29 +709,29 @@ OpAI = Class {
                 end
             end
             platoonData.LocationType = location
-            
+
             local builders = false
             local saveFile
-            
+
             if type(self.BuilderType) == "string" then --BuilderType is old-school
                 ScenarioUtils.LoadOSB('OSB_' .. self.BuilderType .. '_' .. name, brain.Name, platoonData)
 
                 local fileName = '/lua/ai/OpAI/' .. self.BuilderType .. '_save.lua'
                 saveFile = import(fileName)
-                
+
                 builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
                 self.MasterName = 'OSB_Master_' .. self.BuilderType .. '_' .. brain.Name .. '_' .. name
             else --If BuilderType is a table (was pregenerated)
-            
+
                 ScenarioUtils.LoadOSB(builderType, brain.Name, platoonData)
                 saveFile = {Scenario = builderType}
-                
+
                 --self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name .. '_' .. brain.Name .. '_' .. name
                 self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name .. '_' .. brain.Name
             end
-            
+
             builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
-            
+
             if not builders then
                 error('*OpAI ERROR: No OpAI Global named: '..self.BuilderType, 2)
             end

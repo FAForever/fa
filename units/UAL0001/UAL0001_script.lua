@@ -50,7 +50,7 @@ UAL0001 = Class(ACUUnit) {
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
-    end,  
+    end,
 
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
@@ -109,7 +109,7 @@ UAL0001 = Class(ACUUnit) {
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
-            
+
         if not Buffs['AeonACUT2BuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonACUT2BuildRate',

@@ -22,7 +22,7 @@ function CCollisionManipulator:base()
 end
 
 ---
--- 
+--
 function CCollisionManipulator:moho.CollisionManipulator()
 end
 

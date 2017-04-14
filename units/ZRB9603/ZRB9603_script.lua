@@ -11,7 +11,7 @@
 local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
 
 
-ZRB0303 = Class(CSeaFactoryUnit) {    
+ZRB0303 = Class(CSeaFactoryUnit) {
     StartArmsMoving = function(self)
         CSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
@@ -59,7 +59,7 @@ ZRB0303 = Class(CSeaFactoryUnit) {
             dir = dir * -1
         end
     end,
-    
+
     StopArmsMoving = function(self)
         CSeaFactoryUnit.StopArmsMoving(self)
         self.ArmSlider1:SetGoal(0, 0, 0)

@@ -15,50 +15,50 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1NavalUpgradeBuilders',
         'SorianT2NavalUpgradeBuilders',
-		
+
         # Pass engineers to main as needed
         #'Engineer Transfers',
-        
+
         # Engineer Builders
         'SorianEngineerFactoryBuilders',
         'SorianT1EngineerBuilders',
         'SorianT2EngineerBuilders',
         'SorianT3EngineerBuilders',
         'SorianEngineerNavalFactoryBuilder',
-        
+
         # Mass
         'SorianEngineerMassBuildersLowerPri',
-        
+
         # ==== EXPANSION ==== #
         'SorianEngineerExpansionBuildersFull',
-        
+
         # ==== DEFENSES ==== #
         'SorianT1NavalDefenses',
         'SorianT2NavalDefenses',
         'SorianT3NavalDefenses',
-        
+
         # ==== ATTACKS ==== #
         'SorianT1SeaFactoryBuilders',
         'SorianT2SeaFactoryBuilders',
         'SorianT3SeaFactoryBuilders',
-		
-		'SorianT2SeaStrikeForceBuilders',
-		
-		'SorianSeaHunterFormBuilders',
+
+        'SorianT2SeaStrikeForceBuilders',
+
+        'SorianSeaHunterFormBuilders',
         'SorianBigSeaAttackFormBuilders',
         'SorianMassHunterSeaFormBuilders',
-		
-		# ===== STRATEGIES ====== #
-		
-		'SorianParagonStrategyExp',
-		
-		# == STRATEGY PLATOONS == #
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
-        
+
+        # ===== STRATEGIES ====== #
+
+        'SorianParagonStrategyExp',
+
+        # == STRATEGY PLATOONS == #
+
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
+
         # ==== NAVAL EXPANSION ==== #
         'SorianNavalExpansionBuildersFast',
-		
+
         # ==== EXPERIMENTALS ==== #
         #'SorianMobileNavalExperimentalEngineers',
         #'SorianMobileNavalExperimentalForm',
@@ -83,32 +83,32 @@ BaseBuilderTemplate {
         MassToFactoryValues = {
             T1Value = 8, #6
             T2Value = 20, #15
-            T3Value = 30, #22.5 
+            T3Value = 30, #22.5
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
         if markerType != 'Naval Area' then
             return 0
         end
-		
-		local isIsland = false
+
+        local isIsland = false
         local startX, startZ = aiBrain:GetArmyStartPos()
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-		local base = ScenarioInfo.ArmySetup[aiBrain.Name].AIBase
-		
-		if personality == 'sorianadaptive' and base == 'SorianMainWater' then
-			return 250
-		end
-		
+        local base = ScenarioInfo.ArmySetup[aiBrain.Name].AIBase
+
+        if personality == 'sorianadaptive' and base == 'SorianMainWater' then
+            return 250
+        end
+
         if personality == 'sorianwater' then
             return 200
         end
-        
+
         return 0
     end,
 }
