@@ -298,7 +298,7 @@ function BuildPlayerLines()
         parent.Items[i].srCheck:SetCheck(shareResources, true)
         parent.Items[i].srCheck.OnCheck = function(self, checked)
             shareResources = checked
-            SimCallback( {  Func = "SetResourceSharing",
+            SimCallback({  Func = "SetResourceSharing",
                             Args = { Army = GetFocusArmy(),
                                      Value = checked,
                                    }
@@ -314,7 +314,7 @@ function BuildPlayerLines()
         parent.Items[i].avCheck:SetCheck(alliedVictory, true)
         parent.Items[i].avCheck.OnCheck = function(self, checked)
             alliedVictory = checked
-            SimCallback( {  Func = "RequestAlliedVictory",
+            SimCallback({  Func = "RequestAlliedVictory",
                             Args = { Army = GetFocusArmy(),
                                      Value = checked,
                                    }
@@ -373,7 +373,7 @@ function BuildPlayerLines()
         parent.Items[i].odCheck:SetCheck(drawOffered, true)
         parent.Items[i].odCheck.OnCheck = function(self, checked)
             drawOffered = checked
-            SimCallback( {  Func = "SetOfferDraw",
+            SimCallback({  Func = "SetOfferDraw",
                             Args = { Army = GetFocusArmy(),
                                      Value = checked,
                                    }
@@ -490,7 +490,7 @@ function CreateShareResourcesDialog(control)
         LayoutHelpers.AtVerticalCenterIn(massSlider, massStatus)
         massSlider.Left:Set(control.giveResourcesGroup.Left)
         massSlider.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
-        massSlider:SetValue( 0 )
+        massSlider:SetValue(0)
 
         massInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
         massInput:SetColor('ff00ff00')
@@ -517,7 +517,7 @@ function CreateShareResourcesDialog(control)
         LayoutHelpers.AtVerticalCenterIn(energySlider, energyStatus)
         energySlider.Left:Set(control.giveResourcesGroup.Left)
         energySlider.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
-        energySlider:SetValue( 0 )
+        energySlider:SetValue(0)
 
         energyInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
         energyInput:SetColor('ffffc700')
@@ -535,7 +535,7 @@ function CreateShareResourcesDialog(control)
         cancelBtn.Left:Set(function() return control.giveResourcesGroup.Left() + ((control.giveResourcesGroup.Width() / 4) * 3) - (okBtn.Width() / 2) end)
 
         okBtn.OnClick = function(self, modifiers)
-            SimCallback( { Func="GiveResourcesToPlayer",
+            SimCallback({ Func="GiveResourcesToPlayer",
                            Args={ From=GetFocusArmy(),
                                   To=control.Data.armyIndex,
                                   Mass=massSlider:GetValue() / 100.0,

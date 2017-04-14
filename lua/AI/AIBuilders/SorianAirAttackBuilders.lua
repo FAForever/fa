@@ -27,7 +27,7 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
-function AirAttackCondition(aiBrain, locationType, targetNumber )
+function AirAttackCondition(aiBrain, locationType, targetNumber)
     local UC = import('/lua/editor/UnitCountBuildConditions.lua')
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -36,16 +36,16 @@ function AirAttackCondition(aiBrain, locationType, targetNumber )
     end
     if aiBrain:GetCurrentEnemy() then
         local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-        targetNumber = aiBrain:GetThreatAtPosition( {estartX, 0, estartZ}, 1, true, 'AntiAir' )
+        targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiAir')
     end
 
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager:GetLocationRadius()
 
-    --local surfaceThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius )
-    local surfaceThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE)
-    local airThreat = 0 #pool:GetPlatoonThreat( 'AntiAir', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius )
-    if ( surfaceThreat + airThreat ) >= targetNumber then
+    --local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE)
+    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    if (surfaceThreat + airThreat) >= targetNumber then
         return true
     elseif UC.UnitCapCheckGreater(aiBrain, .95) then
         return true

@@ -42,7 +42,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil
@@ -63,7 +63,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )
+                self.Scorching = self:ForkThread(self.ScorchThread)
             end
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
@@ -72,7 +72,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
         CollisionBeam.OnImpact(self, impactType, targetEntity)
    end,
 
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil
@@ -85,15 +85,15 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         while true do
-            if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
+                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army)
                 LastPosition = CurrentPosition
                 skipCount = 1
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
 
-            WaitSeconds( self.ScorchSplatDropTime )
+            WaitSeconds(self.ScorchSplatDropTime)
             size = 1 + (Random() * 1.1)
             CurrentPosition = self:GetPosition(1)
         end

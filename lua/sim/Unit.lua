@@ -4024,7 +4024,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Create teleport charge effect
         self:PlayTeleportChargeEffects(location, orientation)
-        WaitFor(self.TeleportDrain )
+        WaitFor(self.TeleportDrain)
 
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)

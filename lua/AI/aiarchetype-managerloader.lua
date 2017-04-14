@@ -22,7 +22,7 @@ function GetHighestBuilder(aiBrain)
     for k,v in BaseBuilderTemplates do
         if v.FirstBaseFunction then
             local baseVal, baseType = v.FirstBaseFunction(aiBrain)
-            #LOG( '*DEBUG: testing ' .. k .. ' - Val ' .. baseVal )
+            #LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
             if baseVal > returnVal then
                 returnVal = baseVal
                 base = k
@@ -38,7 +38,7 @@ function GetHighestBuilder(aiBrain)
     return false
 end
 
-function EvaluatePlan( aiBrain )
+function EvaluatePlan(aiBrain)
     local base, returnVal = GetHighestBuilder(aiBrain)
 
     return returnVal
@@ -69,10 +69,10 @@ function ExecutePlan(aiBrain)
 
         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
         for k,v in pool:GetPlatoonUnits() do
-            if EntityCategoryContains( categories.ENGINEER, v ) then
+            if EntityCategoryContains(categories.ENGINEER, v) then
                 mainManagers.EngineerManager:AddUnit(v)
-            elseif EntityCategoryContains( categories.FACTORY * categories.STRUCTURE, v ) then
-                mainManagers.FactoryManager:AddFactory( v )
+            elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, v) then
+                mainManagers.FactoryManager:AddFactory(v)
             end
         end
 

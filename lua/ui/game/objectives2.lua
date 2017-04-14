@@ -322,7 +322,7 @@ function UpdateObjectiveItems(skipAnnounce)
                 local positions = self.data.unitPositions
                 if targets and table.getsize(targets) > 0 then
                     local max = table.getn(targets)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getn(targets )) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getn(targets)) + 1
 
                     for idx,target in targets do
                         if idx == desiredTarget then
@@ -331,16 +331,16 @@ function UpdateObjectiveItems(skipAnnounce)
                                                   target.Value[3] - 20,
                                                   target.Value[1] + 20,
                                                   target.Value[3] + 20)
-                                GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             elseif target.Type == 'Area' then
-                                GetCamera("WorldCamera"):MoveToRegion( target.Value, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(target.Value, 1.0)
                             end
                             self.TargetFocus = idx
                         end
                     end
                 elseif positions and table.getsize(positions) > 0 then
                     local max = table.getsize(positions)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getsize(positions)) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getsize(positions)) + 1
 
                     for idx,target in positions do
                         if idx >= desiredTarget then
@@ -348,7 +348,7 @@ function UpdateObjectiveItems(skipAnnounce)
                                               target[3] - 20,
                                               target[1] + 20,
                                               target[3] + 20)
-                            GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                            GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             self.TargetFocus = idx
                         end
                     end

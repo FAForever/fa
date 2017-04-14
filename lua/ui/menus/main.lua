@@ -681,7 +681,7 @@ function CreateUI()
         LayoutHelpers.AtHorizontalCenterIn(mainMenuGroup, border)
 
         mainMenuGroup.Top:Set(function()
-            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height() ) / 2 ) -- includes offset for alpha on border_lm
+            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height()) / 2) -- includes offset for alpha on border_lm
             return math.floor(logo.Bottom() - 18)
         end)
     end

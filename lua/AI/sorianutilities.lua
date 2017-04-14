@@ -31,13 +31,13 @@ end
 function split(str, delimiter)
     local result = { }
     local from = 1
-    local delim_from, delim_to = string.find( str, delimiter, from  )
+    local delim_from, delim_to = string.find(str, delimiter, from)
     while delim_from do
-        table.insert( result, string.sub( str, from , delim_from-1 ) )
+        table.insert(result, string.sub(str, from , delim_from-1))
         from = delim_to + 1
-        delim_from, delim_to = string.find( str, delimiter, from  )
+        delim_from, delim_to = string.find(str, delimiter, from)
     end
-    table.insert( result, string.sub( str, from  ) )
+    table.insert(result, string.sub(str, from))
     return result
 end
 
@@ -75,9 +75,9 @@ end
 #   Returns:
 #       Distance
 #-----------------------------------------------------
-function XZDistanceTwoVectorsSq( v1, v2 )
+function XZDistanceTwoVectorsSq(v1, v2)
     if not v1 or not v2 then return false end
-    return VDist2Sq( v1[1], v1[3], v2[1], v2[3] )
+    return VDist2Sq(v1[1], v1[3], v2[1], v2[3])
 end
 
 #Small function the draw intel points on the map for debugging
@@ -94,9 +94,9 @@ function DrawIntel(aiBrain)
         if aiBrain:GetArmyIndex() == GetFocusArmy() then
             for k, v in aiBrain.InterestList.HighPriority do
                 if threatColor[v.Type] then
-                    DrawCircle( v.Position, 1, threatColor[v.Type] )
-                    DrawCircle( v.Position, 3, threatColor[v.Type] )
-                    DrawCircle( v.Position, 5, threatColor[v.Type] )
+                    DrawCircle(v.Position, 1, threatColor[v.Type])
+                    DrawCircle(v.Position, 3, threatColor[v.Type])
+                    DrawCircle(v.Position, 5, threatColor[v.Type])
                 end
             end
         end
@@ -108,9 +108,9 @@ function AICheckForWeakEnemyBase(aiBrain)
     if aiBrain:GetCurrentEnemy() and table.getn(aiBrain.AirAttackPoints) == 0 then
         local enemy = aiBrain:GetCurrentEnemy()
         local x,z = enemy:GetArmyStartPos()
-        local enemyBaseThreat = aiBrain:GetThreatAtPosition( {x,0,z}, 1, true, 'AntiAir', enemy:GetArmyIndex())
+        local enemyBaseThreat = aiBrain:GetThreatAtPosition({x,0,z}, 1, true, 'AntiAir', enemy:GetArmyIndex())
         local bomberThreat = 0
-        local bombers = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), {x,0,z}, 10000 )
+        local bombers = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), {x,0,z}, 10000)
         for k, unit in bombers do
             bomberThreat = bomberThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
         end
@@ -240,12 +240,12 @@ function AIHandleACUIntel(aiBrain, intel)
     end
     if attack then
         local bomberThreat = 0
-        local bombers = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), intel.Position, 500 )
+        local bombers = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), intel.Position, 500)
         for k, unit in bombers do
             bomberThreat = bomberThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
         end
         #If AntiAir threat level is less than our bomber threat around the ACU
-        if aiBrain:GetThreatAtPosition( intel.Position, 1, true, 'AntiAir' ) < bomberThreat then
+        if aiBrain:GetThreatAtPosition(intel.Position, 1, true, 'AntiAir') < bomberThreat then
             #Set an alert for the location
             table.insert(aiBrain.BaseMonitor.AlertsTable,
                 {
@@ -341,14 +341,14 @@ function AIHandleLandIntel(aiBrain, intel)
         Position = intel.Position,
         Name = 'IntelBase'..nextBase,
         }
-    )
+)
     #Set an alert for the location
     table.insert(aiBrain.BaseMonitor.AlertsTable,
         {
         Position = intel.Position,
         Threat = intel.Threat,
         }
-    )
+)
     aiBrain.BaseMonitor.AlertSounded = true
     aiBrain:ForkThread(aiBrain.BaseMonitorAlertTimeout, intel.Position)
     aiBrain.BaseMonitor.ActiveAlerts = aiBrain.BaseMonitor.ActiveAlerts + 1
@@ -356,7 +356,7 @@ end
 
 #Unused
 function AIMicro(aiBrain, platoon, target, threatatLocation, mySurfaceThreat)
-    local friendlyThreat = aiBrain:GetThreatAtPosition( platoon:GetPlatoonPosition(), 1, true, 'AntiSurface', aiBrain:GetArmyIndex()) - mySurfaceThreat
+    local friendlyThreat = aiBrain:GetThreatAtPosition(platoon:GetPlatoonPosition(), 1, true, 'AntiSurface', aiBrain:GetArmyIndex()) - mySurfaceThreat
     if mySurfaceThreat + friendlyThreat > threatatLocation * 3 or table.getn(platoon:GetPlatoonUnits()) > 14 then
         platoon:AggressiveMoveToLocation(target:GetPosition())
     #elseif threatatLocation * 2 > mySurfaceThreat + friendlyThreat then
@@ -413,9 +413,9 @@ function CircleAround(aiBrain, platoon, target)
             end
         end
 
-        platoon:MoveToLocation( movePos[1], false)
-        platoon:MoveToLocation( movePos[2], false)
-        platoon:MoveToLocation( movePos[3], false)
+        platoon:MoveToLocation(movePos[1], false)
+        platoon:MoveToLocation(movePos[2], false)
+        platoon:MoveToLocation(movePos[3], false)
     else
         if ePos[3] > platPos[3] then
             leftright = 1
@@ -444,9 +444,9 @@ function CircleAround(aiBrain, platoon, target)
             end
         end
 
-        platoon:MoveToLocation( movePos[1], false)
-        platoon:MoveToLocation( movePos[2], false)
-        platoon:MoveToLocation( movePos[3], false)
+        platoon:MoveToLocation(movePos[1], false)
+        platoon:MoveToLocation(movePos[2], false)
+        platoon:MoveToLocation(movePos[3], false)
     end
     WaitSeconds(5)
 end
@@ -476,7 +476,7 @@ function OrderedRetreat(aiBrain, platoon)
         if path and table.getn(path) > 1 then
             platoon:MoveToLocation(path[1], false)
         elseif path and table.getn(path) == 1 and VDist2Sq(path[1][1], path[1][3], platPos[1], platPos[3]) < 100 then
-            IssueGuard( platoon, platPos )
+            IssueGuard(platoon, platPos)
         end
     end
 end
@@ -494,19 +494,19 @@ end
 #   Returns:
 #       Threat level
 #-----------------------------------------------------
-function GetThreatAtPosition( aiBrain, pos, rings, ttype, threatFilters, enemyIndex)
+function GetThreatAtPosition(aiBrain, pos, rings, ttype, threatFilters, enemyIndex)
     local threat
     if enemyIndex then
-        threat = aiBrain:GetThreatAtPosition( pos, rings, true, ttype, enemyIndex )
+        threat = aiBrain:GetThreatAtPosition(pos, rings, true, ttype, enemyIndex)
     else
-        threat = aiBrain:GetThreatAtPosition( pos, rings, true, ttype )
+        threat = aiBrain:GetThreatAtPosition(pos, rings, true, ttype)
     end
     for k,v in threatFilters do
         local rthreat
         if enemyIndex then
-            rthreat = aiBrain:GetThreatAtPosition( pos, rings, true, v, enemyIndex )
+            rthreat = aiBrain:GetThreatAtPosition(pos, rings, true, v, enemyIndex)
         else
-            rthreat = aiBrain:GetThreatAtPosition( pos, rings, true, v )
+            rthreat = aiBrain:GetThreatAtPosition(pos, rings, true, v)
         end
         threat = threat - rthreat
     end
@@ -535,10 +535,10 @@ function ThreatBugcheck(aiBrain)
     local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
     local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
 
-    local enemyThreat = aiBrain:GetThreatAtPosition( {estartX, 0, estartZ}, 1, true, 'Overall', enemyIndex )
-    local myThreat = 0 --aiBrain:GetThreatAtPosition( {myStartX, 0, myStartZ}, 1, true, 'Overall', myIndex )
+    local enemyThreat = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'Overall', enemyIndex)
+    local myThreat = 0 --aiBrain:GetThreatAtPosition({myStartX, 0, myStartZ}, 1, true, 'Overall', myIndex)
     local unitThreat = 0
-    local units = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.ALLUNITS, {myStartX, 0, myStartZ}, 200 )
+    local units = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.ALLUNITS, {myStartX, 0, myStartZ}, 200)
     for k,v in units do
         if not v.Dead then
             unitThreat = (v:GetBlueprint().Defense.SurfaceThreatLevel or 0) + (v:GetBlueprint().Defense.AirThreatLevel or 0) + (v:GetBlueprint().Defense.SubThreatLevel or 0) + (v:GetBlueprint().Defense.EconomyThreatLevel or 0)
@@ -596,14 +596,14 @@ function AddCustomUnitSupport(aiBrain)
             for plat, tbl in tempfile do
                 for fac, entry in tbl do
                     if aiBrain.CustomUnits[plat] and aiBrain.CustomUnits[plat][fac] then
-                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                     elseif aiBrain.CustomUnits[plat] then
                         aiBrain.CustomUnits[plat][fac] = {}
-                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                     else
                         aiBrain.CustomUnits[plat] = {}
                         aiBrain.CustomUnits[plat][fac] = {}
-                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                        table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                     end
                 end
             end
@@ -617,14 +617,14 @@ function AddCustomUnitSupport(aiBrain)
         for plat, tbl in tempfile do
             for fac, entry in tbl do
                 if aiBrain.CustomUnits[plat] and aiBrain.CustomUnits[plat][fac] then
-                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                 elseif aiBrain.CustomUnits[plat] then
                     aiBrain.CustomUnits[plat][fac] = {}
-                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                 else
                     aiBrain.CustomUnits[plat] = {}
                     aiBrain.CustomUnits[plat][fac] = {}
-                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+                    table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] })
                 end
             end
         end
@@ -643,7 +643,7 @@ function AddCustomFactionSupport(aiBrain)
             local tempfile = import(v).FactionList
             for x, z in tempfile do
                 #LOG('*AI DEBUG: Adding faction: '..z.cat)
-                table.insert(aiBrain.CustomFactions, z )
+                table.insert(aiBrain.CustomFactions, z)
             end
         end
     end
@@ -683,14 +683,14 @@ function GetTemplateReplacement(aiBrain, building, faction)
     return retTemplate
 end
 
-function GetEngineerFaction( engineer )
-    if EntityCategoryContains( categories.UEF, engineer ) then
+function GetEngineerFaction(engineer)
+    if EntityCategoryContains(categories.UEF, engineer) then
         return 'UEF'
-    elseif EntityCategoryContains( categories.AEON, engineer ) then
+    elseif EntityCategoryContains(categories.AEON, engineer) then
         return 'Aeon'
-    elseif EntityCategoryContains( categories.CYBRAN, engineer ) then
+    elseif EntityCategoryContains(categories.CYBRAN, engineer) then
         return 'Cybran'
-    elseif EntityCategoryContains( categories.SERAPHIM, engineer ) then
+    elseif EntityCategoryContains(categories.SERAPHIM, engineer) then
         return 'Seraphim'
     else
         return false
@@ -725,7 +725,7 @@ end
 #-----------------------------------------------------
 function CanRespondEffectively(aiBrain, location, platoon)
     #Get units in area
-    local targets = aiBrain:GetUnitsAroundPoint( categories.ALLUNITS, location, 32, 'Enemy' )
+    local targets = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, location, 32, 'Enemy')
     #If threat of platoon is the same as the threat in the distess area
     if AIAttackUtils.GetAirThreatOfUnits(platoon) > 0 and aiBrain:GetThreatAtPosition(location, 0, true, 'Air') > 0 then
         return true
@@ -786,17 +786,17 @@ function AISendChat(aigroup, ainickname, aiaction, targetnickname, extrachat)
             local chattext
             if targetnickname then
                 if IsAIArmy(targetnickname) then
-                    targetnickname = trim(string.gsub(targetnickname,'%b()', '' ))
+                    targetnickname = trim(string.gsub(targetnickname,'%b()', ''))
                 end
-                chattext = string.gsub(AIChatText[aiaction][ranchat],'%[target%]', targetnickname )
+                chattext = string.gsub(AIChatText[aiaction][ranchat],'%[target%]', targetnickname)
             elseif extrachat then
-                chattext = string.gsub(AIChatText[aiaction][ranchat],'%[extra%]', extrachat )
+                chattext = string.gsub(AIChatText[aiaction][ranchat],'%[extra%]', extrachat)
             else
                 chattext = AIChatText[aiaction][ranchat]
             end
-            table.insert(Sync.AIChat, {group=aigroup, text=chattext, sender=ainickname} )
+            table.insert(Sync.AIChat, {group=aigroup, text=chattext, sender=ainickname})
         else
-            table.insert(Sync.AIChat, {group=aigroup, text=aiaction, sender=ainickname} )
+            table.insert(Sync.AIChat, {group=aigroup, text=aiaction, sender=ainickname})
         end
     end
 end
@@ -834,7 +834,7 @@ function FinishAIChat(data)
             AISendChat('allies', aiBrain.Nickname, 'Targeting at will')
         else
             if IsEnemy(data.NewTarget, data.Army) then
-                aiBrain:SetCurrentEnemy( ArmyBrains[data.NewTarget] )
+                aiBrain:SetCurrentEnemy(ArmyBrains[data.NewTarget])
                 aiBrain.targetoveride = true
                 AISendChat('allies', aiBrain.Nickname, 'tcrespond', ArmyBrains[data.NewTarget].Nickname)
             elseif IsAlly(data.NewTarget, data.Army) then
@@ -950,21 +950,21 @@ end
 #   Returns:
 #       target or false
 #-----------------------------------------------------
-function FindClosestUnitPosToAttack( aiBrain, platoon, squad, maxRange, atkCat, selectedWeaponArc, turretPitch )
+function FindClosestUnitPosToAttack(aiBrain, platoon, squad, maxRange, atkCat, selectedWeaponArc, turretPitch)
     local position = platoon:GetPlatoonPosition()
     if not aiBrain or not position or not maxRange then
         return false
     end
-    local targetUnits = aiBrain:GetUnitsAroundPoint( atkCat, position, maxRange, 'Enemy' )
+    local targetUnits = aiBrain:GetUnitsAroundPoint(atkCat, position, maxRange, 'Enemy')
     local retUnit = false
     local distance = 999999
     for num, unit in targetUnits do
         if not unit.Dead then
             local unitPos = unit:GetPosition()
             #If unit is close enough, can be attacked, and not obstructed
-            if (not retUnit or Utils.XZDistanceTwoVectors( position, unitPos ) < distance) and platoon:CanAttackTarget( squad, unit ) and (not turretPitch or not CheckBlockingTerrain(position, unitPos, selectedWeaponArc, turretPitch)) then
+            if (not retUnit or Utils.XZDistanceTwoVectors(position, unitPos) < distance) and platoon:CanAttackTarget(squad, unit) and (not turretPitch or not CheckBlockingTerrain(position, unitPos, selectedWeaponArc, turretPitch)) then
                 retUnit = unit #:GetPosition()
-                distance = Utils.XZDistanceTwoVectors( position, unitPos )
+                distance = Utils.XZDistanceTwoVectors(position, unitPos)
             end
         end
     end
@@ -1132,13 +1132,13 @@ function CheckBlockingTerrain(pos, targetPos, firingArc, turretPitch)
             local nextpos = {pos[1] - (xstep * i), 0, pos[3] - (ystep * i)}
 
             #Get height for both points
-            local lastPosHeight = GetTerrainHeight( lastPos[1], lastPos[3] )
-            local nextposHeight = GetTerrainHeight( nextpos[1], nextpos[3] )
-            if GetSurfaceHeight( lastPos[1], lastPos[3] ) > lastPosHeight then
-                lastPosHeight = GetSurfaceHeight( lastPos[1], lastPos[3] )
+            local lastPosHeight = GetTerrainHeight(lastPos[1], lastPos[3])
+            local nextposHeight = GetTerrainHeight(nextpos[1], nextpos[3])
+            if GetSurfaceHeight(lastPos[1], lastPos[3]) > lastPosHeight then
+                lastPosHeight = GetSurfaceHeight(lastPos[1], lastPos[3])
             end
-            if GetSurfaceHeight( nextpos[1], nextpos[3] ) > nextposHeight then
-                nextposHeight = GetSurfaceHeight( nextpos[1], nextpos[3] )
+            if GetSurfaceHeight(nextpos[1], nextpos[3]) > nextposHeight then
+                nextposHeight = GetSurfaceHeight(nextpos[1], nextpos[3])
             else
                 nextposHeight = nextposHeight + .5
             end
@@ -1188,16 +1188,16 @@ function GetSlopeAngle(pos, targetPos, posHeight, targetHeight)
 end
 
 #Unused - Deprecated
-function MajorLandThreatExists( aiBrain )
+function MajorLandThreatExists(aiBrain)
     local StartX, StartZ = aiBrain:GetArmyStartPos()
-    local numET2 = aiBrain:GetNumUnitsAroundPoint( categories.STRUCTURE * categories.STRATEGIC * categories.TECH2, Vector(StartX,0,StartZ), 360, 'Enemy' )
-    local numET3Art = aiBrain:GetNumUnitsAroundPoint( categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, Vector(StartX,0,StartZ), 900, 'Enemy' )
-    local numENuke = aiBrain:GetNumUnitsAroundPoint( categories.STRUCTURE * categories.NUKE * categories.SILO, Vector(StartX,0,StartZ), 100000, 'Enemy' )
-    local numET4Art = aiBrain:GetNumUnitsAroundPoint( categories.STRUCTURE * categories.STRATEGIC * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy' )
-    local numET4Sat = aiBrain:GetNumUnitsAroundPoint( categories.STRUCTURE * categories.ORBITALSYSTEM * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy' )
-    local numET4Exp = aiBrain:GetNumUnitsAroundPoint( categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL), Vector(StartX,0,StartZ), 100000, 'Enemy' )
-    local numET4AExp = aiBrain:GetNumUnitsAroundPoint( categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy' )
-    local numEDef = aiBrain:GetNumUnitsAroundPoint( categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR), Vector(StartX,0,StartZ), 150, 'Enemy' )
+    local numET2 = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.STRATEGIC * categories.TECH2, Vector(StartX,0,StartZ), 360, 'Enemy')
+    local numET3Art = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, Vector(StartX,0,StartZ), 900, 'Enemy')
+    local numENuke = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.NUKE * categories.SILO, Vector(StartX,0,StartZ), 100000, 'Enemy')
+    local numET4Art = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.STRATEGIC * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy')
+    local numET4Sat = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.ORBITALSYSTEM * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy')
+    local numET4Exp = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL), Vector(StartX,0,StartZ), 100000, 'Enemy')
+    local numET4AExp = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy')
+    local numEDef = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR), Vector(StartX,0,StartZ), 150, 'Enemy')
     local retcat = false
     if numET4Art > 0 then
         retcat = categories.STRUCTURE * categories.STRATEGIC * categories.EXPERIMENTAL #'STRUCTURE STRATEGIC EXPERIMENTAL'
@@ -1220,9 +1220,9 @@ function MajorLandThreatExists( aiBrain )
 end
 
 #Unused - Deprecated
-function MajorAirThreatExists( aiBrain )
+function MajorAirThreatExists(aiBrain)
     local StartX, StartZ = aiBrain:GetArmyStartPos()
-    local numET4Exp = aiBrain:GetUnitsAroundPoint( categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy' )
+    local numET4Exp = aiBrain:GetUnitsAroundPoint(categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy')
     local retcat = false
     for k,v in numET4Exp do
         if v:GetFractionComplete() == 1 then
@@ -1245,7 +1245,7 @@ end
 #       Number of assisters
 #-----------------------------------------------------
 function GetGuards(aiBrain, Unit)
-    local engs = aiBrain:GetUnitsAroundPoint( categories.ENGINEER - categories.POD, Unit:GetPosition(), 10, 'Ally' )
+    local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER - categories.POD, Unit:GetPosition(), 10, 'Ally')
     local count = 0
     local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
     for k,v in engs do
@@ -1255,7 +1255,7 @@ function GetGuards(aiBrain, Unit)
     end
     if UpgradesFrom and UpgradesFrom != 'none' then -- Used to filter out upgrading units
         local oldCat = ParseEntityCategory(UpgradesFrom)
-        local oldUnit = aiBrain:GetUnitsAroundPoint( oldCat, Unit:GetPosition(), 0, 'Ally' )
+        local oldUnit = aiBrain:GetUnitsAroundPoint(oldCat, Unit:GetPosition(), 0, 'Ally')
         if oldUnit then
             count = count + 1
         end
@@ -1297,7 +1297,7 @@ end
 function Nuke(aiBrain)
     local atkPri = { 'STRUCTURE STRATEGIC EXPERIMENTAL', 'EXPERIMENTAL ARTILLERY OVERLAYINDIRECTFIRE', 'EXPERIMENTAL ORBITALSYSTEM', 'STRUCTURE ARTILLERY TECH3', 'STRUCTURE NUKE TECH3', 'EXPERIMENTAL ENERGYPRODUCTION STRUCTURE', 'COMMAND', 'TECH3 MASSFABRICATION STRUCTURE', 'TECH3 ENERGYPRODUCTION STRUCTURE', 'TECH2 STRATEGIC STRUCTURE', 'TECH3 DEFENSE STRUCTURE', 'TECH2 DEFENSE STRUCTURE', 'TECH2 ENERGYPRODUCTION STRUCTURE' }
     local maxFire = false
-    local Nukes = aiBrain:GetListOfUnits( categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true )
+    local Nukes = aiBrain:GetListOfUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true)
     local nukeCount = 0
     local launcher
     local bp
@@ -1333,7 +1333,7 @@ function Nuke(aiBrain)
         repeat
             #Get a target and target position. This function also ensures that we fire at a new target
             #and one that we have enough nukes to hit the target
-            target, tarPosition, antiNukes = AIUtils.AIFindBrainNukeTargetInRangeSorian( aiBrain, launcher, maxRadius, atkPri, nukeCount, oldTarget )
+            target, tarPosition, antiNukes = AIUtils.AIFindBrainNukeTargetInRangeSorian(aiBrain, launcher, maxRadius, atkPri, nukeCount, oldTarget)
             if target then
                 #Send a message to allies letting them know we are letting nukes fly
                 #Also ping the map where we are targeting
@@ -1346,7 +1346,7 @@ function Nuke(aiBrain)
                     AISendChat(aitarget, ArmyBrains[aiBrain:GetArmyIndex()].Nickname, 'nuketaunt')
                 end
                 #Get anti-nukes int the area
-                #local antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, tarPosition, 90, 'Enemy' )
+                #local antiNukes = aiBrain:GetNumUnitsAroundPoint(categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, tarPosition, 90, 'Enemy')
                 local nukesToFire = {}
                 for k, v in Nukes do
                     #If we have nukes that have not fired yet
@@ -1364,7 +1364,7 @@ function Nuke(aiBrain)
                 ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
             end
             #Keep track of old targets
-            table.insert( oldTarget, target )
+            table.insert(oldTarget, target)
             fireCount = 0
             #WaitSeconds(15)
         until nukeCount <= 0 or target == false
@@ -1375,7 +1375,7 @@ function CheckCost(aiBrain, pos, massCost)
     if massCost == 0 then
         massCost = 12000
     end
-    local units = aiBrain:GetUnitsAroundPoint( categories.ALLUNITS, pos, 30, 'Enemy' )
+    local units = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, pos, 30, 'Enemy')
     local massValue = 0
     for k,v in units do
         if not v.Dead then
@@ -1408,7 +1408,7 @@ function LaunchNukesTimed(nukesToFire, target)
     local lastFT = nukes[1].flightTime
     for k,v in nukes do
         WaitSeconds(lastFT - v.flightTime)
-        IssueNuke( {v.unit}, target )
+        IssueNuke({v.unit}, target)
         lastFT = v.flightTime
     end
 end
@@ -1426,7 +1426,7 @@ end
 #-----------------------------------------------------
 function FindUnfinishedUnits(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local unfinished = aiBrain:GetUnitsAroundPoint( buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
+    local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
     local retUnfinished = false
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
@@ -1451,7 +1451,7 @@ end
 #-----------------------------------------------------
 function FindDamagedShield(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local shields = aiBrain:GetUnitsAroundPoint( buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
+    local shields = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
     local retShield = false
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
@@ -1493,7 +1493,7 @@ function NumberofUnitsBetweenPoints(aiBrain, start, finish, unitCat, stepby, all
     local ystep = (start[3] - finish[3]) / steps
     #For each point check to see if the destination is close
     for i = 0, steps do
-        local numUnits = aiBrain:GetNumUnitsAroundPoint( unitCat, {finish[1] + (xstep * i),0 , finish[3] + (ystep * i)}, stepby, alliance )
+        local numUnits = aiBrain:GetNumUnitsAroundPoint(unitCat, {finish[1] + (xstep * i),0 , finish[3] + (ystep * i)}, stepby, alliance)
         returnNum = returnNum + numUnits
     end
 
@@ -1522,8 +1522,8 @@ function DestinationBetweenPoints(destination, start, finish)
     local ystep = (start[3] - finish[3]) / step
     #For each point check to see if the destination is close
     for i = 1, step do
-        #DrawCircle( {start[1] - (xstep * i), 0, start[3] - (ystep * i)}, 5, '0000ff' )
-        #DrawCircle( {start[1] - (xstep * i), 0, start[3] - (ystep * i)}, 100, '0000ff' )
+        #DrawCircle({start[1] - (xstep * i), 0, start[3] - (ystep * i)}, 5, '0000ff')
+        #DrawCircle({start[1] - (xstep * i), 0, start[3] - (ystep * i)}, 100, '0000ff')
         if VDist2Sq(start[1] - (xstep * i), start[3] - (ystep * i), finish[1], finish[3]) <= 10000 then break end
         if VDist2Sq(start[1] - (xstep * i), start[3] - (ystep * i), destination[1], destination[3]) < 10000 then
             return true
@@ -1564,10 +1564,10 @@ end
 function Round(x, places)
     if places then
         shift = 10 ^ places
-        result = math.floor( x * shift + 0.5 ) / shift
+        result = math.floor(x * shift + 0.5) / shift
         return result
     else
-        result = math.floor( x + 0.5 )
+        result = math.floor(x + 0.5)
         return result
     end
 end

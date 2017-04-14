@@ -268,7 +268,7 @@ function GetUnitTitle(bp)
     end
 
     if bp.Interface.HelpText then
-        name = name and (name .. ' - ' ) or ''
+        name = name and (name .. ' - ') or ''
         name = name .. LOCF(bp.Interface.HelpText)
     end
 
@@ -984,7 +984,7 @@ function GetUnitsGroups(bps, faction)
     -- Grouping ACU/SCU upgrades in separate tables because they have different cost/stats
     faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER - CIVILIAN')
     faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND - CIVILIAN')
-    local mobileUnits       = GetUnits(faction.Blueprints, '('..faction.Name..' - UPGRADE - COMMAND - SUBCOMMANDER - STRUCTURE - CIVILIAN)' )
+    local mobileUnits       = GetUnits(faction.Blueprints, '('..faction.Name..' - UPGRADE - COMMAND - SUBCOMMANDER - STRUCTURE - CIVILIAN)')
     faction.Units.AIR       = GetUnits(mobileUnits, '(AIR - POD - SATELLITE)')
     faction.Units.LAND      = GetUnits(mobileUnits, '(LAND - ENGINEER - POD - '..TECH4ARTY..')')
     faction.Units.NAVAL     = GetUnits(mobileUnits, '(NAVAL - MOBILESONAR)')

@@ -191,7 +191,7 @@ BuilderGroup {
         BuilderConditions = {
             #DUNCAN - commented out
             #{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, ( categories.RADAR + categories.OMNI ) * categories.STRUCTURE}},
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncome',  { 0.5, 15 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.2 }}, #DUNCAN - was 0.9,1.2
@@ -212,7 +212,7 @@ BuilderGroup {
         Priority = 850,
         BuilderConditions = {
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.TECH3 } },
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, ( categories.RADAR + categories.OMNI ) * categories.STRUCTURE}},
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncome',  { 7.5, 100}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -232,7 +232,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, ( categories.RADAR + categories.OMNI ) * categories.STRUCTURE } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE } },
             { EBC, 'GreaterThanEconIncome',  { 15, 400}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},

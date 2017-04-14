@@ -240,7 +240,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterGameMods = CreateModsFilter(dialogContent, modsTags.GAME)
     Tooltip.AddControlTooltip(filterGameMods, {
         text = LOC('<LOC uiunitmanager_01>Filter Game Mods'),
-        body = LOC('<LOC uiunitmanager_02>Toggle visibility of all game mods in above list of mods.') } )
+        body = LOC('<LOC uiunitmanager_02>Toggle visibility of all game mods in above list of mods.') })
     LayoutHelpers.AtLeftIn(filterGameMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 15)
 
@@ -248,7 +248,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, {
         text = LOC('<LOC uiunitmanager_03>Filter UI Mods'),
-        body = LOC('<LOC uiunitmanager_04>Toggle visibility of all UI mods in above list of mods.') } )
+        body = LOC('<LOC uiunitmanager_04>Toggle visibility of all UI mods in above list of mods.') })
     LayoutHelpers.AtLeftIn(filterUIMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 15)
 
@@ -256,7 +256,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, {
         text = LOC('<LOC uiunitmanager_05>Filter Blacklisted Mods'),
-        body = LOC('<LOC uiunitmanager_06>Toggle visibility of blacklisted mods in above list of mods.') } )
+        body = LOC('<LOC uiunitmanager_06>Toggle visibility of blacklisted mods in above list of mods.') })
     LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 15)
 

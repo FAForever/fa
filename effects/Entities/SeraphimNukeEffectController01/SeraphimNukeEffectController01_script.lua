@@ -24,7 +24,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-        WaitSeconds( 3.5 )
+        WaitSeconds(3.5)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -48,16 +48,16 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 0.0
         local px, pz
 
-        WaitSeconds( 3.5 )
+        WaitSeconds(3.5)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
-            local proj = self:CreateProjectile( SIFExperimentalStrategicMissileEffect06, px, -8, pz, xVec, 0, zVec )
+            local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect06, px, -8, pz, xVec, 0, zVec)
             proj:SetLifetime(3.0)
-            proj:SetVelocity(RandomFloat( 11, 20 ))
+            proj:SetVelocity(RandomFloat(11, 20))
             proj:SetAcceleration(-0.35)
         end
     end,
@@ -113,7 +113,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
-            local proj = self:CreateProjectile( SIFExperimentalStrategicMissileEffect02, px, -12, pz, xVec, 0, zVec )
+            local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect02, px, -12, pz, xVec, 0, zVec)
             proj:SetLifetime(12.0)
             proj:SetVelocity(10.0)
             proj:SetAcceleration(-0.35)

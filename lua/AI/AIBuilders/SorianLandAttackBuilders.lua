@@ -37,16 +37,16 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     if aiBrain:GetCurrentEnemy() then
         local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
         local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
-        --targetNumber = aiBrain:GetThreatAtPosition( {estartX, 0, estartZ}, 1, true, 'AntiSurface' )
-        targetNumber = SUtils.GetThreatAtPosition( aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex )
+        --targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
+        targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
     end
 
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager:GetLocationRadius()
 
-    --local surThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius )
-    local surThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
-    local airThreat = 0 #pool:GetPlatoonThreat( 'AntiAir', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius )
+    --local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
+    local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
+    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
     local adjustForTime = 1 + (math.floor(GetGameTimeSeconds()/60) * .01)
     --LOG("*AI DEBUG: Pool Threat: "..surThreat.." adjustment: "..adjustForTime.." Enemy Threat: "..targetNumber)
     if (surThreat + airThreat) >= targetNumber and targetNumber > 0 then
@@ -432,7 +432,7 @@ BuilderGroup {
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 4, 'FACTORY TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.05 }},
             { SBC, 'NoRushTimeCheck', { 600 }},
-            { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE - categories.TECH1}},
+            { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE - categories.TECH1}},
         },
     },
     Builder {
@@ -446,7 +446,7 @@ BuilderGroup {
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 3, 'FACTORY TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.05 }},
             { SBC, 'NoRushTimeCheck', { 600 }},
-            { UCBC, 'HaveUnitRatio', { 0.05, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
+            { UCBC, 'HaveUnitRatio', { 0.05, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
         },
     },
     Builder {
@@ -636,7 +636,7 @@ BuilderGroup {
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.05 }},
             { SBC, 'NoRushTimeCheck', { 600 }},
-            { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.MOBILE * ( categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE) ) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE - categories.TECH1}},
+            { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.MOBILE * (categories.COUNTERINTELLIGENCE + (categories.SHIELD * categories.DEFENSE)) - categories.DIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE - categories.TECH1}},
         },
     },
 }

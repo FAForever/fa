@@ -319,7 +319,7 @@ BuilderGroup {
             #{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Structures' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
-            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2Artillery', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2Artillery', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderData = {
@@ -341,7 +341,7 @@ BuilderGroup {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -465,7 +465,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             #{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'EXPERIMENTAL LAND', 'Enemy'}},
             { SBC, 'T4ThreatExists', {{'Land'}, categories.LAND}},
-            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -648,7 +648,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             #{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'EXPERIMENTAL LAND', 'Enemy'}},
             { SBC, 'T4ThreatExists', {{'Land'}, categories.LAND}},
-            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            #{ UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -2314,7 +2314,7 @@ BuilderGroup {
             #{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Structures' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
-            { UCBC, 'CheckUnitRange', { 'LocationType', 'T2Artillery', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            { UCBC, 'CheckUnitRange', { 'LocationType', 'T2Artillery', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderData = {
@@ -2336,7 +2336,7 @@ BuilderGroup {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            { UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + ( categories.LAND * ( categories.TECH2 + categories.TECH3 ) ) } },
+            { UCBC, 'CheckUnitRange', { 'LocationType', 'T2StrategicMissile', categories.STRUCTURE + (categories.LAND * (categories.TECH2 + categories.TECH3)) } },
         },
         BuilderType = 'Any',
         BuilderData = {

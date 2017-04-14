@@ -54,7 +54,7 @@ PlatoonFormManager = Class(BuilderManager) {
                 templateData.Plan,
             }
             for k,v in templateData.FactionSquads do
-                table.insert( template, unpack(v) )
+                table.insert(template, unpack(v))
             end
         end
         return template
@@ -63,7 +63,7 @@ PlatoonFormManager = Class(BuilderManager) {
     GetUnitsBeingBuilt = function(self, buildingCategory, builderCategory)
         local position = self.Location
         local radius = self.Radius
-        local filterUnits = AIUtils.GetOwnUnitsAroundPoint( self.Brain, builderCategory, position, radius )
+        local filterUnits = AIUtils.GetOwnUnitsAroundPoint(self.Brain, builderCategory, position, radius)
 
         local retUnits = {}
 
@@ -81,19 +81,19 @@ PlatoonFormManager = Class(BuilderManager) {
 
             # Check for unit being built compatibility
             local beingBuiltUnit = v.UnitBeingBuilt
-            if not beingBuiltUnit or not EntityCategoryContains( buildingCategory, beingBuiltUnit ) then
+            if not beingBuiltUnit or not EntityCategoryContains(buildingCategory, beingBuiltUnit) then
                 continue
             end
 
             # Engineer doesn't want any more assistance
-            if v.NumAssistees and table.getn( v:GetGuards() ) >= v.NumAssistees then
+            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
                 continue
             end
 
             # Check if valid economy exists for this assist
 
             # Unit had not problems; add to possible list
-            table.insert( retUnits, v )
+            table.insert(retUnits, v)
         end
 
         return retUnits
@@ -105,7 +105,7 @@ PlatoonFormManager = Class(BuilderManager) {
         if self.Brain.BuilderManagers[self.LocationType] and builder:GetPriority() >= 1 and builder:CheckInstanceCount() then
             local personality = self.Brain:GetPersonality()
             local poolPlatoon = self.Brain:GetPlatoonUniquelyNamed('ArmyPool')
-            local template = self:GetPlatoonTemplate( builder:GetPlatoonTemplate() )
+            local template = self:GetPlatoonTemplate(builder:GetPlatoonTemplate())
             builder:FormDebug()
             local radius = self.Radius
             if builder:GetFormRadius() then radius = builder:GetFormRadius() end
@@ -122,7 +122,7 @@ PlatoonFormManager = Class(BuilderManager) {
                 local hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
 
                 #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)
-                #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()) )
+                #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()))
                 hndl.PlanName = template[2]
 
                 #If we have specific AI, fork that AI thread
@@ -139,7 +139,7 @@ PlatoonFormManager = Class(BuilderManager) {
                 #If we have additional threads to fork on the platoon, do that as well.
                 if builder:GetPlatoonAddPlans() then
                     for papk, papv in builder:GetPlatoonAddPlans() do
-                        hndl:ForkThread( hndl[papv] )
+                        hndl:ForkThread(hndl[papv])
                     end
                 end
 
@@ -151,7 +151,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
                 if builder:GetPlatoonAddBehaviors() then
                     for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                        hndl:ForkThread( import('/lua/ai/AIBehaviors.lua')[pafv] )
+                        hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
                     end
                 end
 

@@ -48,10 +48,10 @@ OnSync = function()
     end
 
     if Sync.EnhanceRestrict then
-        import('/lua/enhancementcommon.lua').RestrictList( Sync.EnhanceRestrict )
+        import('/lua/enhancementcommon.lua').RestrictList(Sync.EnhanceRestrict)
     end
     if Sync.Restrictions then
-        import('/lua/game.lua').SetRestrictions( Sync.Restrictions )
+        import('/lua/game.lua').SetRestrictions(Sync.Restrictions)
     end
 
     if Sync.NISVideo then

@@ -50,11 +50,11 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         local army = self:GetArmy()
 
         for k, v in self.PlumeEffects do
-            CreateAttachedEmitter( plume, -1, army, v )
+            CreateAttachedEmitter(plume, -1, army, v)
         end
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity( self, army, v )
+            CreateEmitterAtEntity(self, army, v)
         end
 
         self:StarCloudDispersal()
@@ -63,7 +63,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
     StarCloudDispersal = function(self)
         local numProjectiles = 5
         local angle = (2*math.pi) / numProjectiles
-        local angleInitial = RandomFloat( 0, angle )
+        local angleInitial = RandomFloat(0, angle)
         local angleVariation = angle * 0.5
         local projectiles = {}
 
@@ -83,10 +83,10 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
             yVec = 0.3 + RandomFloat(-0.8, 1.0)
             zVec = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             velocity = 2.4 + (yVec * 3)
-            table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0) )
+            table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0))
         end
 
-        WaitSeconds( 3 )
+        WaitSeconds(3)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -104,7 +104,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         plume:SetVelocity(0,27 * self.PlumeVelocityScale,0)
     end,
 
-    PlumeThread = function(self, plume, scale )
+    PlumeThread = function(self, plume, scale)
 
         -- Anim Time : 1.0 sec
         plume:SetScale(0.229 * scale,0.229 * scale,0.229 * scale)

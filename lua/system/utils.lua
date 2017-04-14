@@ -423,7 +423,7 @@ end
 
 -- table.binsert(t, value, cmp) binary insert value into table using cmp-func
 function table.binsert(t, value, cmp)
-      local cmp = cmp or (function( a,b ) return a < b end)
+      local cmp = cmp or (function(a,b) return a < b end)
       local start, stop, mid, state = 1, table.getsize(t), 1, 0
       while start <= stop do
          mid = math.floor((start + stop) / 2)
@@ -660,7 +660,7 @@ function CreateTimer()
             self.tasks[name].calls = self.tasks[name].calls + 1
 
             if useLogging then
-                LOG('Timing task: ' ..  name .. ' started' )
+                LOG('Timing task: ' ..  name .. ' started')
             end
         end,
         -- stops profiling timer and calculates stats for optional task name
@@ -708,9 +708,9 @@ function CreateTimer()
             name = self:Verify(name)
             local ret = ''
             if not self.tasks[name].start then
-                WARN( 'Timer cannot get time duration for not started task: ' ..  tostring(name) )
+                WARN('Timer cannot get time duration for not started task: ' ..  tostring(name))
             elseif not self.tasks[name].stop then
-                WARN( 'Timer cannot get time duration for not stopped task: ' ..  tostring(name) )
+                WARN('Timer cannot get time duration for not stopped task: ' ..  tostring(name))
             else
                 ret = string.format("%0.3f seconds", self.tasks[name].time)
             end
@@ -721,7 +721,7 @@ function CreateTimer()
             name = self:Verify(name)
             local ret = ''
             if not self.tasks[name].delta then
-                WARN( 'Timer cannot get time delta after just one profiling of task: ' ..  tostring(name) )
+                WARN('Timer cannot get time delta after just one profiling of task: ' ..  tostring(name))
             else
                 ret = string.format("%0.3f seconds", self.tasks[name].delta)
                 if self.tasks[name].delta > 0 then
@@ -735,7 +735,7 @@ function CreateTimer()
             name = self:Verify(name)
             local ret = ''
             if not self.tasks[name].start then
-                WARN( 'Timer cannot get time total for not started task: ' ..  tostring(name) )
+                WARN('Timer cannot get time total for not started task: ' ..  tostring(name))
             else
                 ret = string.format("%0.3f seconds", self.tasks[name].total)
             end
@@ -762,7 +762,7 @@ function CreateTimer()
             sorted = table.sorted(sorted, sort_by(key))
             for _, task in sorted do
                 if task.stop then
-                    LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name)  )
+                    LOG('Timing task: ' ..  task.name ..' completed in ' ..  self:ToString(task.name))
                 end
             end
          end

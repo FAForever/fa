@@ -120,12 +120,12 @@ BaseBuilderTemplate {
         end
 
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        if not( personality == 'adaptive' or personality == 'tech' ) then
+        if not(personality == 'adaptive' or personality == 'tech') then
             return 0
         end
 
         local threatCutoff = 10 # value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
+        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 100
         elseif distance > 500 then

@@ -116,14 +116,14 @@ BrainConditionsMonitor = Class {
             newCondition = ImportCondition()
         end
         newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, cFilename, cFunctionName, cData)
-        table.insert( self.ResultTable, newCondition )
+        table.insert(self.ResultTable, newCondition)
 
         # Add in a hashed table for quicker key lookup, may not be necessary
         local newTable = {
             ConditionParameters = cData,
             Key = newCondition:GetKey(),
         }
-        table.insert( self.ConditionData.TableConditions[cFilename][cFunctionName], newTable )
+        table.insert(self.ConditionData.TableConditions[cFilename][cFunctionName], newTable)
         return newTable.Key
     end,
 
@@ -147,15 +147,15 @@ BrainConditionsMonitor = Class {
 
         # No match, insert data into the function conditions table
         local newCondition = FunctionCondition()
-        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters )
-        table.insert( self.ResultTable, newCondition )
+        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters)
+        table.insert(self.ResultTable, newCondition)
 
         local newTable = {
             Function = func,
             Key = newCondition:GetKey(),
             ConditionParameters = parameters,
         }
-        table.insert( self.ConditionData.FunctionConditions, newTable )
+        table.insert(self.ConditionData.FunctionConditions, newTable)
         return newTable.Key
     end,
 
@@ -165,7 +165,7 @@ BrainConditionsMonitor = Class {
             local checks = 0
             local numResults = 0
             local numChecks = table.getn(self.ResultTable)
-            local numPerTick = math.ceil( numChecks / ( self.ThreadWaitDuration * 10 ) )
+            local numPerTick = math.ceil(numChecks / (self.ThreadWaitDuration * 10))
 
             for k,v in self.ResultTable do
                 if not v:LocationExists() then
@@ -267,7 +267,7 @@ ImportCondition = Class(Condition) {
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionData do
-            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
                 if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then
@@ -316,7 +316,7 @@ InstantImportCondition = Class(Condition) {
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionData do
-            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
                 if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then
@@ -339,14 +339,14 @@ FunctionCondition = Class(Condition) {
     end,
 
     CheckCondition = function(self)
-        self.Status = self.FunctionHandle( self.Brain, unpack(self.FunctionParameters) )
+        self.Status = self.FunctionHandle(self.Brain, unpack(self.FunctionParameters))
         return self.Status
     end,
 
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionParameters do
-            if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
                 if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then

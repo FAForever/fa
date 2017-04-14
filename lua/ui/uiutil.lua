@@ -620,7 +620,7 @@ function CreateNinePatchStd(parent, texturePath)
         SkinnableFile(texturePath .. 'right.dds'),
         SkinnableFile(texturePath .. 'top.dds'),
         SkinnableFile(texturePath .. 'bottom.dds')
-    )
+)
 end
 
 function SurroundWithNinePatch(parent, texturePath, fudgeX, fudgeY)
@@ -653,7 +653,7 @@ function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
         SkinnableFile(texturePath .. 'right.dds'),
         SkinnableFile(texturePath .. 'top.dds'),
         SkinnableFile(texturePath .. 'bottom.dds')
-    )
+)
 
     border:Surround(control, fudgeX or 62, fudgeY or 62)
     LayoutHelpers.DepthOverParent(border, control, 2)
@@ -669,7 +669,7 @@ function CreateCheckboxStd(parent, texturePath)
         SkinnableFile(texturePath .. '-s_btn_over.dds'),
         SkinnableFile(texturePath .. '-d_btn_dis.dds'),
         SkinnableFile(texturePath .. '-s_btn_dis.dds')
-    )
+)
     return checkbox
 end
 
@@ -699,8 +699,8 @@ end
 
  function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)
-    button.label:SetFont( dialogButtonFont, pointSize )
-    button.label:SetColor( dialogButtonColor )
+    button.label:SetFont(dialogButtonFont, pointSize)
+    button.label:SetColor(dialogButtonColor)
     return button
 end
 
@@ -721,12 +721,12 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
         scrollbarbot = textureName..'bar-bot_scr_up.dds'
     end
     local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
-    scrollbar:SetTextures(  SkinnableFile(scrollbg)
+    scrollbar:SetTextures(   SkinnableFile(scrollbg)
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
                             ,SkinnableFile(scrollbarbot))
 
-    local scrollUpButton = Button(  scrollbar
+    local scrollUpButton = Button(    scrollbar
                                     , SkinnableFile(textureName..'arrow-up_scr_up.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_down.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_over.dds')

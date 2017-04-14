@@ -39,7 +39,7 @@ SingleBeamProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         if self.BeamName then
-            CreateBeamEmitterOnEntity( self, -1, self:GetArmy(), self.BeamName )
+            CreateBeamEmitterOnEntity(self, -1, self:GetArmy(), self.BeamName)
         end
     end,
 }
@@ -54,7 +54,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
         local beam = nil
         local army = self:GetArmy()
         for k, v in self.Beams do
-            CreateBeamEmitterOnEntity( self, -1, army, v )
+            CreateBeamEmitterOnEntity(self, -1, army, v)
         end
     end,
 }
@@ -189,18 +189,18 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         if self.PolyTrails then
-            local NumPolyTrails = table.getn( self.PolyTrails )
+            local NumPolyTrails = table.getn(self.PolyTrails)
             local army = self:GetArmy()
 
             if self.RandomPolyTrails != 0 then
                 local index = nil
                 for i = 1, self.RandomPolyTrails do
-                    index = math.floor( Random( 1, NumPolyTrails))
-                    CreateTrail(self, -1, army, self.PolyTrails[index] ):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
+                    index = math.floor(Random(1, NumPolyTrails))
+                    CreateTrail(self, -1, army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
                 end
             else
                 for i = 1, NumPolyTrails do
-                    CreateTrail(self, -1, army, self.PolyTrails[i] ):OffsetEmitter(0, 0, self.PolyTrailOffset[i])
+                    CreateTrail(self, -1, army, self.PolyTrails[i]):OffsetEmitter(0, 0, self.PolyTrailOffset[i])
                 end
             end
         end
@@ -222,7 +222,7 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         if self.BeamName != '' then
-            CreateBeamEmitterOnEntity( self, -1, self:GetArmy(), self.BeamName )
+            CreateBeamEmitterOnEntity(self, -1, self:GetArmy(), self.BeamName)
         end
     end,
 }
@@ -241,7 +241,7 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
         local beam = nil
         local army = self:GetArmy()
         for k, v in self.Beams do
-            CreateBeamEmitterOnEntity( self, -1, army, v )
+            CreateBeamEmitterOnEntity(self, -1, army, v)
         end
     end,
 }
@@ -298,7 +298,7 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- GENERIC DEBRIS PROJECTILE
 -----------------------------------------------------------------
-BaseGenericDebris = Class( EmitterProjectile ){
+BaseGenericDebris = Class(EmitterProjectile){
     FxUnitHitScale = 0.25,
     FxWaterHitScale = 0.25,
     FxUnderWaterHitScale = 0.25,

@@ -24,7 +24,7 @@ Builder = Class {
         # make sure the table of strings exist, they are required for the builder
         local verifyDictionary = { 'Priority', 'BuilderName' }
         for k,v in verifyDictionary do
-            if not self:VerifyDataName( v, data ) then return false end
+            if not self:VerifyDataName(v, data) then return false end
         end
 
         self.Priority = data.Priority
@@ -78,7 +78,7 @@ Builder = Class {
 
         # Builders can have a function to update the priority
         if self.PriorityFunction then
-            local newPri = self.PriorityFunction[1]( self, self.Brain, builderManager, unpack(self.PriorityFunction[2]) )
+            local newPri = self.PriorityFunction[1](self, self.Brain, builderManager, unpack(self.PriorityFunction[2]))
             if newPri != self.Priority then
                 self.Priority = newPri
                 self.PriorityAltered = true
@@ -94,13 +94,13 @@ Builder = Class {
         self.Priority = self.Priority + val
     end,
 
-    GetBuilderData = function(self, locationType, builderData )
+    GetBuilderData = function(self, locationType, builderData)
         # Get builder data out of the globals and convert data here
         local returnData = {}
         builderData = builderData or Builders[self.BuilderName].BuilderData
         for k,v in builderData do
             if type(v) == 'table' then
-                returnData[k] = self:GetBuilderData(locationType, v )
+                returnData[k] = self:GetBuilderData(locationType, v)
             else
                 if type(v) == 'string' and v == 'LocationType' then
                     returnData[k] = locationType
@@ -203,7 +203,7 @@ Builder = Class {
                         end
                     end
                 end
-                table.insert( tempConditions, self.Brain.ConditionsMonitor:AddCondition( unpack(bCond) ) )
+                table.insert(tempConditions, self.Brain.ConditionsMonitor:AddCondition(unpack(bCond)))
             end
         end
         self.BuilderConditions = tempConditions
@@ -247,7 +247,7 @@ FactoryBuilder = Class(Builder) {
 
         local verifyDictionary = { 'PlatoonTemplate', }
         for k,v in verifyDictionary do
-            if not self:VerifyDataName( v, data ) then return false end
+            if not self:VerifyDataName(v, data) then return false end
         end
         return true
     end,
@@ -276,14 +276,14 @@ PlatoonBuilder = Class(Builder) {
 
         local verifyDictionary = { 'PlatoonTemplate', }
         for k,v in verifyDictionary do
-            if not self:VerifyDataName( v, data ) then return false end
+            if not self:VerifyDataName(v, data) then return false end
         end
 
         # Setup for instances to be stored inside a table rather than creating new
         self.InstanceCount = {}
         local num = 1
-        while num <= ( data.InstanceCount or 1 ) do
-            table.insert( self.InstanceCount, { Status = 'Available', PlatoonHandle = false } )
+        while num <= (data.InstanceCount or 1) do
+            table.insert(self.InstanceCount, { Status = 'Available', PlatoonHandle = false })
             num = num + 1
         end
         return true
@@ -322,7 +322,7 @@ PlatoonBuilder = Class(Builder) {
                 local destroyedCallback = function(brain,platoon)
                     if platoon.BuilderHandle then
                         #platoon.BuilderHandle:RemoveHandle(platoon)
-                        self:ForkThread( self.DelayRemove, self, platoon )
+                        self:ForkThread(self.DelayRemove, self, platoon)
                     end
                 end
                 platoon:AddDestroyCallback(destroyedCallback)

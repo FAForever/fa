@@ -272,7 +272,7 @@ function Entity:SetMesh(meshBp,  bool keepActor)
 end
 
 ---
---  Entity:SetOrientation(orientation, immediately )
+--  Entity:SetOrientation(orientation, immediately)
 function Entity:SetOrientation(orientation,  immediately)
 end
 

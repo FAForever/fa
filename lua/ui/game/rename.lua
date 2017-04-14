@@ -13,7 +13,7 @@ function ShowRenameDialog(currentName)
         function(self, newName)
             GetSelectedUnits()[1]:SetCustomName(newName)
         end
-    )
+)
     dialog.inputBox:SetText(currentName)
 
     dialog.OnClosed = function()

@@ -292,9 +292,9 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
             movie.curMovie = 1
 
             local height = 6 * textArea:GetRowHeight()
-            textArea.Height:Set( height )
-            textArea.Top:Set( function() return movie.Bottom() end )
-            textArea.Width:Set( function() return movie.Width() / 2 end )
+            textArea.Height:Set(height)
+            textArea.Top:Set(function() return movie.Bottom() end)
+            textArea.Width:Set(function() return movie.Width() / 2 end)
             LayoutHelpers.AtHorizontalCenterIn(textArea,parent)
             textArea.Depth:Set(function() return movie.Depth() + 5 end)
 
@@ -321,14 +321,14 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                     -- Play sfx and voice sounds only if available
                     if movies[movie.curMovie].sfx and movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ),
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}),
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     elseif movies[movie.curMovie].sfx then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}))
                     elseif movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     else
                         movie:Set(movies[movie.curMovie].vid)
                     end
