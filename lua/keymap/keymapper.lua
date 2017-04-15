@@ -27,11 +27,9 @@ function GetDefaultKeyMap()
         ret[k] = v
     end
 
-
     for k,v in debugKeyMap do
         ret[k] = v
     end
-
 
     return ret
 end
@@ -45,7 +43,6 @@ function GetUserKeyMap()
     for k,v in userKeyMap do
         ret[k] = v
     end
-
 
     local userDebugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
     if not userDebugKeyMap then
