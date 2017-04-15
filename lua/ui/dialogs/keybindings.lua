@@ -508,7 +508,7 @@ function CreateUI()
     keyTable = FormatData()
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(880)
+    dialogContent.Width:Set(980)
     dialogContent.Height:Set(730)
 
     panel = Popup(GetFrame(0), dialogContent)
