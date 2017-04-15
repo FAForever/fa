@@ -44,13 +44,13 @@ function GetUserKeyMap()
         ret[k] = v
     end
 
-    local userDebugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
-    if not userDebugKeyMap then
-        userDebugKeyMap = import('defaultKeyMap.lua').debugKeyMap
+    local debugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
+    if not debugKeyMap then
+        debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
     end
 
-    if userDebugKeyMap then
-        for k,v in userDebugKeyMap do
+    if debugKeyMap then
+        for k,v in debugKeyMap do
             ret[k] = v
         end
     end
@@ -60,13 +60,13 @@ end
 
 function GetUserDebugKeyMap()
     local ret = {}
-    local debugMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
+    local debugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
 
-    if not debugMap then
-        debugMap = import('defaultKeyMap.lua').debugKeyMap
+    if not debugKeyMap then
+        debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
     end
 
-    for k,v in debugMap do
+    for k,v in debugKeyMap do
         ret[k] = v
     end
     return ret
