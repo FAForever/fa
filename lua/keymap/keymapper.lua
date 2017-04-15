@@ -46,7 +46,7 @@ function GetUserKeyMap()
 
     local debugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
     if not debugKeyMap then
-        debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
+        debugKeyMap = import(GetDefaultKeyMapName()).debugKeyMap
     end
 
     if debugKeyMap then
@@ -63,7 +63,7 @@ function GetUserDebugKeyMap()
     local debugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
 
     if not debugKeyMap then
-        debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
+        debugKeyMap = import(GetDefaultKeyMapName()).debugKeyMap
     end
 
     for k,v in debugKeyMap do
