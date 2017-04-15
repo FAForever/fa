@@ -14,6 +14,7 @@ function GetDefaultKeyMapName()
     return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
 end
 
+-- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
 function SetDefaultKeyMapName(preset)
     Prefs.SetToCurrentProfile("UserKeyMapName", preset)
 end
@@ -123,6 +124,13 @@ end
 function ClearUserKeyMap()
     Prefs.SetToCurrentProfile("UserKeyMap", nil)
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
+end
+
+-- resets UserKeyMap to specified preset name: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+function ResetUserKeyMapTo(preset)
+    Prefs.SetToCurrentProfile("UserKeyMapName", preset)
+    Prefs.SetToCurrentProfile("UserKeyMap", GetDefaultKeyMap())
+    Prefs.SetToCurrentProfile("UserDebugKeyMap", GetUserDebugKeyMap())
 end
 
 function GetKeyActions()
