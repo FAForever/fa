@@ -63,11 +63,13 @@ end
 
 function GetUserDebugKeyMap()
     local ret = {}
-    local UserDebugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
+    local debugMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
 
-    if not UserDebugKeyMap then return nil end
+    if not debugMap then
+        debugMap = import('defaultKeyMap.lua').debugKeyMap
+    end
 
-    for k,v in UserDebugKeyMap do
+    for k,v in debugMap do
         ret[k] = v
     end
     return ret
@@ -80,9 +82,6 @@ end
 function ClearUserKeyMapping(key)
     local newUserMap = GetCurrentKeyMap()
     local newDebugMap = GetUserDebugKeyMap()
-    if not newDebugMap then
-        newDebugMap = import('defaultKeyMap.lua').debugKeyMap
-    end
 
     if IsKeyInMap(key, newDebugMap) then
         LOG("clearing debug key ".. key)
@@ -100,9 +99,6 @@ function SetUserKeyMapping(key, oldKey, action)
     ClearUserKeyMapping(key)
     local newUserMap = GetCurrentKeyMap()
     local newDebugMap = GetUserDebugKeyMap()
-    if not newDebugMap then
-        newDebugMap = import('defaultKeyMap.lua').debugKeyMap
-    end
 
     if oldKey ~= nil then
         if IsKeyInMap(oldKey, newDebugMap) then
