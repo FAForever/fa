@@ -26,7 +26,7 @@ Patch 3680 (Upcoming)
 - Fixed the 'Select Onscreen Land/Air/Navy' hotkey also selecting the factories of that type
 - Fixed the Mex Cap feature somehow allowing storage to be built inside units built via upgrade
 - Fixed bug where the Aeon shields didn't visually rotate properly
-- Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes
+- Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes or hydros
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
