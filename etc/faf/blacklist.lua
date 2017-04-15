@@ -129,4 +129,5 @@ Blacklist = {
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
     
     ['12345678-3343-4bf6-9236-451244fa9999'] = BROKEN,
+    ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = OBSOLETE,
 }
