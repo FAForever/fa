@@ -1857,9 +1857,9 @@ end
 function CDRReturnHomeSorian(aiBrain, cdr, Mult)
     -- This is a reference... so it will autoupdate
     local cdrPos = cdr:GetPosition()
+    local rad = 100 * Mult
     local distSqAway = rad * rad
     local loc = cdr.CDRHome
-    local rad = 100 * Mult
     if not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
         local plat = aiBrain:MakePlatoon('', '')
         aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
