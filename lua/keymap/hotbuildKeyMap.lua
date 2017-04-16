@@ -9,7 +9,6 @@ defaultKeyMap = {
     ['Shift-Esc']           = 'soft_stop',
     ['Pause']               = 'pause',
     ['Ctrl-F']              = 'cap_frame',
-    ['Alt-L']               = 'toggle_lifebars',
     ['Ctrl-W']              = 'tog_military',
     ['Ctrl-E']              = 'tog_defense',
     ['Ctrl-R']              = 'tog_econ',
@@ -105,7 +104,6 @@ defaultKeyMap = {
     ['O']                   = 'overcharge',
     ['Z']                   = 'toggle_repeat_build',
 
-    ['Shift-R']             = 'shift_repair',
     ['Shift-A']             = 'shift_reclaim',
     ['Shift-Q']             = 'shift_patrol',
     ['Shift-I']             = 'shift_guard',
@@ -133,8 +131,6 @@ defaultKeyMap = {
     ['N']                   = 'tml',
     ['M']                   = 'upgrades',
 
-    ['Alt-R']               = 'toggle_reclaim_labels',
-
     ['Tab']                 = 'pause_unit',
 
     ['LeftBracket']         = 'mode',
@@ -156,7 +152,7 @@ defaultKeyMap = {
 
 debugKeyMap = {
     ['Alt-F2']              = 'debug_create_unit',
-    ['Alt-T']               = 'debug_teleport',
+    ['Ctrl-T']              = 'debug_teleport',
     ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
     ['Ctrl-F9']             = 'debug_toggle_log_window',
