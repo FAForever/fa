@@ -143,20 +143,20 @@ local function EditActionKey(parent, action, currentKey)
     end
 
     local function AssignKey()
-        -- Check if key is already assigned to something else
 
         local function ClearShiftKey()
             KeyMapper.ClearUserKeyMapping("Shift-" .. keyPattern)
-            LOG("clearing Shift-"..keyPattern)
+            LOG("Keybindings clearing Shift-"..keyPattern)
         end
 
         local function ClearAltKey()
             KeyMapper.ClearUserKeyMapping("Alt-" .. keyPattern)
-            LOG("clearing Alt-"..keyPattern)
+            LOG("Keybindings clearing Alt-"..keyPattern)
         end
 
         local function MapKey()
             KeyMapper.SetUserKeyMapping(keyPattern, currentKey, action)
+            -- checks if hotbuild modifier keys are conflicting with already mapped actions
             local keyMapping = KeyMapper.GetKeyMappingDetails()
             if keyMapping[keyPattern] and keyMapping[keyPattern].category == "HOTBUILDING" then
                 local hotKey = "Shift-" .. keyPattern
@@ -182,6 +182,7 @@ local function EditActionKey(parent, action, currentKey)
             keyContainer:Filter(keyword)
         end
 
+        -- checks if this key is already assigned to some other action
         local keyMapping = KeyMapper.GetKeyMappingDetails()
         if keyMapping[keyPattern] then
             UIUtil.QuickDialog(popup, 
@@ -267,7 +268,7 @@ local function SelectLine(dataIndex)
 
     if keyTable[dataIndex].type == 'entry' then
        keyTable[dataIndex].selected = true
-       table.print(keyTable[dataIndex],'SelectLine')
+       --table.print(keyTable[dataIndex],'SelectLine')
     end
     keyContainer:Filter(keyword)
 end
