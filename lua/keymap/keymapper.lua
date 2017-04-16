@@ -126,10 +126,24 @@ function ClearUserKeyMap()
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
 end
 
--- resets UserKeyMap to specified preset name: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
-function ResetUserKeyMapTo(preset)
-    Prefs.SetToCurrentProfile("UserKeyMapName", preset)
-    Prefs.SetToCurrentProfile("UserKeyMap", GetDefaultKeyMap())
+-- resets UserKeyMap in game references file and saves new keybinding preset: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+function ResetUserKeyMapTo(newPreset)
+    local oldPreset = GetDefaultKeyMapName()
+    LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')
+    Prefs.SetToCurrentProfile("UserKeyMapName", newPreset)
+    local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
+    LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
+    -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
+    Prefs.SetToCurrentProfile("UserKeyMap", nil)
+    Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
+end
+
+-- saves current UserKeyMap to game references file
+function SaveUserKeyMap()
+    local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
+    local newKeyMap = GetCurrentKeyMap()
+    LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to ' .. table.getsize(newKeyMap))
+    Prefs.SetToCurrentProfile("UserKeyMap", newKeyMap)
     Prefs.SetToCurrentProfile("UserDebugKeyMap", GetUserDebugKeyMap())
 end
 
