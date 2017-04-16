@@ -234,6 +234,7 @@ function GetKeyMappingDetails()
             local info = {}
             info.name = GetActionName(action)
             info.action = keyActions[action]
+            info.category = string.upper(keyActions[action].category or 'none')
             info.key = key
             ret[key] = info
         end
@@ -254,7 +255,7 @@ function GenerateHotbuildModifiers()
                 if not modBinding then
                     modifiers[modKey] =  info.action
                 else
-                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.action.category..'" category')
+                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
                 end
 
                 modKey = "Alt-" .. key
@@ -262,7 +263,7 @@ function GenerateHotbuildModifiers()
                 if not modBinding then
                     modifiers[modKey] = info.action
                 else
-                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.action.category..'" category')
+                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
                 end
             end
         end
