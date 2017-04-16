@@ -157,26 +157,8 @@ function getUnitKeyGroups()
 end
 
 function addModifiers()
-    modifiersKeys = {}
-    -- Adding modifiers shorcuts on the fly.
-    local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
-    for key, action in currentKeyMap do
-        if action["category"] == "hotbuilding" then
-            if key ~= nil then
-                if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
-                    modifiersKeys["Shift-" .. key] = action
-                else
-                    WARN("Shift-" .. key .. " is already bind")
-                end
-
-                if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
-                    modifiersKeys["Alt-" .. key] = action
-                else
-                    WARN("Alt-" .. key .. " is already bind")
-                end
-            end
-        end
-    end
+    -- generating modifiers shortcuts on the fly.
+    modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
     IN_AddKeyMapTable(modifiersKeys)
 end
 
