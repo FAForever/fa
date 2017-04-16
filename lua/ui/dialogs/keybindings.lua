@@ -163,17 +163,13 @@ local function EditActionKey(parent, action, currentKey)
                 if KeyMapper.IsKeyInMap("Shift-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
                     UIUtil.QuickDialog(popup, "Shift-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearShiftKey,
-                        "<LOC _No>", nil,
-                        nil, nil,
-                        true,
+                        "<LOC _No>", nil, nil, nil, true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
                 if KeyMapper.IsKeyInMap("Alt-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
                     UIUtil.QuickDialog(popup, "Alt-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearAltKey,
-                        "<LOC _No>", nil,
-                        nil, nil,
-                        true,
+                        "<LOC _No>", nil, nil, nil, true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
             end
@@ -184,9 +180,7 @@ local function EditActionKey(parent, action, currentKey)
         if KeyMapper.IsKeyInMap(keyPattern, KeyMapper.GetCurrentKeyMap()) then
             UIUtil.QuickDialog(popup, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
-                "<LOC _No>", nil,
-                nil, nil,
-                true,
+                "<LOC _No>", nil, nil, nil, true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
         else
             MapKey()
