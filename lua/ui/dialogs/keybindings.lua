@@ -211,7 +211,7 @@ end
 local function UnbindCurrentSelection()
     for k, v in keyTable do
         if v.selected then
-            import('/lua/keymap/keymapper.lua').ClearUserKeyMapping(v.key)
+            KeyMapper.ClearUserKeyMapping(v.key)
             break
         end
     end
