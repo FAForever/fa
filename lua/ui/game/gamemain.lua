@@ -36,28 +36,8 @@ local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
--- Hotbuild stuff
-modifiersKeys = {}
-
--- Adding modifiers shortcuts on the fly.
-local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
-for key, action in currentKeyMap do
-    if action["category"] == "hotbuilding" then
-        if key ~= nil then
-            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
-                modifiersKeys["Shift-" .. key] = action
-            else
-                WARN("Shift-" .. key .. " is already bind")
-            end
-
-            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
-                modifiersKeys["Alt-" .. key] = action
-            else
-                WARN("Alt-" .. key .. " is already bind")
-            end
-        end
-    end
-end
+-- generating hotbuild modifier shortcuts on the fly
+modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
 IN_AddKeyMapTable(modifiersKeys)
 
 -- check this flag to see if it's valid to show the exit dialog
