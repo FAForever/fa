@@ -9,6 +9,21 @@
 -- It is also used by hotbuild.lua to fetch existing mappings
 
 local Prefs = import('/lua/user/prefs.lua')
+local KeyDescriptions = import('/lua/keymap/keydescriptions.lua').keyDescriptions
+
+function GetActionName(action)
+    local name = ''
+    if KeyDescriptions[action] then
+        name = LOC(KeyDescriptions[action])
+    else
+        name = LOC("<LOC key_binding_0001>No description text") .. ' for action ' .. action
+    end
+    -- check if action is meant to be mapped with a key modifier, e.g. attack vs shift_attack action
+    if string.find(action, 'shift_') == 1 then
+        name = name .. ' - with key modifier'
+    end
+    return name
+end
 
 function GetDefaultKeyMapName()
     return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
