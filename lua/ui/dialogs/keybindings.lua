@@ -45,28 +45,23 @@ for order, category in keyCategoryOrder do
 end
 
 local function ResetBindingToDefaultKeyMap()
-    WARN('KeyMapName ' .. KeyMapper.GetDefaultKeyMapName())
     IN_ClearKeyMap()
-    KeyMapper.SetDefaultKeyMapName('defaultKeyMap.lua')
-    WARN('KeyMapName ' .. KeyMapper.GetDefaultKeyMapName())
-    KeyMapper.ClearUserKeyMap()
+    KeyMapper.ResetUserKeyMapTo('defaultKeyMap.lua')
     IN_AddKeyMapTable(KeyMapper.GetKeyActions())
     keyTable = FormatData()
     keyContainer:Filter(keyword)
 end
 
 local function ResetBindingToHotbuildKeyMap()
-    WARN('KeyMapName ' .. KeyMapper.GetDefaultKeyMapName())
     IN_ClearKeyMap()
-    KeyMapper.SetDefaultKeyMapName('hotbuildKeyMap.lua')
-    WARN('KeyMapName ' .. KeyMapper.GetDefaultKeyMapName())
-    KeyMapper.ClearUserKeyMap()
+    KeyMapper.ResetUserKeyMapTo('hotbuildKeyMap.lua')
     IN_AddKeyMapTable(KeyMapper.GetKeyActions())
     keyTable = FormatData()
     keyContainer:Filter(keyword)
 end
 
 local function ConfirmNewKeyMap()
+    KeyMapper.SaveUserKeyMap()
     -- TODO: Add option to accept the changes to the key map?
     IN_AddKeyMapTable(KeyMapper.GetKeyMappings(true))
     -- Update hotbuild modifiers
@@ -494,14 +489,21 @@ function CreateLine()
     return line
 end
 
+function CloseUI()
+    LOG('Keybindings CloseUI')
+    if panel then
+       panel:Close()
+       panel = false
+    end
+end
 function CreateUI()
+    LOG('Keybindings CreateUI')
     if WorldIsLoading() or (import('/lua/ui/game/gamemain.lua').supressExitDialog == true) then
         return
     end
 
     if panel then
-        panel:Close()
-        panel = false
+        CloseUI()
         return
     end
     keyword = ''
@@ -512,6 +514,8 @@ function CreateUI()
     dialogContent.Height:Set(730)
 
     panel = Popup(GetFrame(0), dialogContent)
+    panel.OnShadowClicked = CloseUI
+    panel.OnEscapePressed = CloseUI
     panel.OnDestroy = function(self)
         RemoveInputCapture(dialogContent)
     end
@@ -531,13 +535,12 @@ function CreateUI()
         text = 'Close Dialog', body = 'Closes this dialog and confirms assignments of key bindings'
     })
     closeButton.OnClick = function(self, modifiers)
-        ConfirmNewKeyMap()
-        panel:Close()
-        panel = false
+        -- confirmation of changes will occur on OnClosed of this UI
+        CloseUI() 
     end
 
     panel.OnClosed = function(self)
-        panel = false
+        ConfirmNewKeyMap()
     end
 
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Default Preset"))
