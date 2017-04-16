@@ -884,6 +884,9 @@ function FormatData()
             order = keyGroups[category].order,
             text = LOC(keydesc[k] or k or "<LOC key_binding_0001>No action text"),
         }
+        if string.find(data.action, 'shift_') == 1 then
+            data.text = data.text .. ' - with key modifier'
+        end
         table.insert(keyGroups[category].actions, data)
     end
     -- flatten all key actions to a list separated by a header with info about key category
