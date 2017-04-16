@@ -224,7 +224,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 50,				#53
             DamageFriendly = false,
-            DamageRadius = 3,				#4
+            DamageRadius = 4,				#4
             DamageType = 'Normal',
             DetonatesAtTargetHeight = true,
             DisplayName = 'Olaris AA Artillery Cannon',
@@ -233,13 +233,13 @@ UnitBlueprint {
                 Land = 'Air',
                 Water = 'Air',
             },
-            FiringRandomness = 2.5,
+            FiringRandomness = 2,
             FiringTolerance = 2,
             Label = 'AAFizz',
             MaxRadius = 44,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 25,			#20
+            MuzzleVelocity = 35,			#20
             ProjectileId = '/projectiles/SAAOlarisAAArtillery06/SAAOlarisAAArtillery06_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 2,
