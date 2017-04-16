@@ -23,7 +23,7 @@ local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
 local keyCategoryOrder = import('/lua/keymap/keycategories.lua').keyCategoryOrder
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 
-local panel
+local popup = nil
 local keyContainer
 local keyTable
 local keyFilter
@@ -75,7 +75,7 @@ local function EditActionKey(parent, action, currentKey)
     dialogContent.Height:Set(130)
     dialogContent.Width:Set(400)
 
-    local keyPopup = Popup(panel, dialogContent)
+    local keyPopup = Popup(popup, dialogContent)
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 9)
@@ -161,7 +161,7 @@ local function EditActionKey(parent, action, currentKey)
             local cat = KeyMapper.KeyCategory(keyPattern, KeyMapper.GetCurrentKeyMap(), KeyMapper.GetKeyActions())
             if cat and cat == "hotbuilding" then
                 if KeyMapper.IsKeyInMap("Shift-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(panel, "Shift-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                    UIUtil.QuickDialog(popup, "Shift-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
                         nil, nil,
@@ -169,7 +169,7 @@ local function EditActionKey(parent, action, currentKey)
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
                 if KeyMapper.IsKeyInMap("Alt-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(panel, "Alt-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                    UIUtil.QuickDialog(popup, "Alt-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
                         nil, nil,
@@ -182,7 +182,7 @@ local function EditActionKey(parent, action, currentKey)
         end
 
         if KeyMapper.IsKeyInMap(keyPattern, KeyMapper.GetCurrentKeyMap()) then
-            UIUtil.QuickDialog(panel, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
+            UIUtil.QuickDialog(popup, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
                 nil, nil,
@@ -202,7 +202,7 @@ end
 local function AssignCurrentSelection()
     for k, v in keyTable do
         if v.selected then
-            EditActionKey(panel, v.action, v.key)
+            EditActionKey(popup, v.action, v.key)
             break
         end
     end
@@ -491,9 +491,9 @@ end
 
 function CloseUI()
     LOG('Keybindings CloseUI')
-    if panel then
-       panel:Close()
-       panel = false
+    if popup then
+       popup:Close()
+       popup = false
     end
 end
 function CreateUI()
@@ -502,7 +502,7 @@ function CreateUI()
         return
     end
 
-    if panel then
+    if popup then
         CloseUI()
         return
     end
@@ -513,10 +513,10 @@ function CreateUI()
     dialogContent.Width:Set(980)
     dialogContent.Height:Set(730)
 
-    panel = Popup(GetFrame(0), dialogContent)
-    panel.OnShadowClicked = CloseUI
-    panel.OnEscapePressed = CloseUI
-    panel.OnDestroy = function(self)
+    popup = Popup(GetFrame(0), dialogContent)
+    popup.OnShadowClicked = CloseUI
+    popup.OnEscapePressed = CloseUI
+    popup.OnDestroy = function(self)
         RemoveInputCapture(dialogContent)
     end
 
@@ -539,7 +539,7 @@ function CreateUI()
         CloseUI() 
     end
 
-    panel.OnClosed = function(self)
+    popup.OnClosed = function(self)
         ConfirmNewKeyMap()
     end
 
@@ -548,7 +548,7 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
     LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() / 2))
     defaultButton.OnClick = function(self, modifiers)
-        UIUtil.QuickDialog(panel, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default (GPG) preset?",
+        UIUtil.QuickDialog(popup, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default (GPG) preset?",
             "<LOC _Yes>", ResetBindingToDefaultKeyMap,
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
@@ -564,7 +564,7 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(hotbuildButton, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(hotbuildButton, dialogContent)
     hotbuildButton.OnClick = function(self, modifiers)
-        UIUtil.QuickDialog(panel, "<LOC key_binding_0008>Are you sure you want to reset all key bindings to the hotbuild (FAF) preset?",
+        UIUtil.QuickDialog(popup, "<LOC key_binding_0008>Are you sure you want to reset all key bindings to the hotbuild (FAF) preset?",
             "<LOC _Yes>", ResetBindingToHotbuildKeyMap,
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
