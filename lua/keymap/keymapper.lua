@@ -224,6 +224,31 @@ function GetKeyMappings()
     return keyMap
 end
 
+-- Returns key mappings with modifier shortcuts generated on the fly based on current hotbuild mappings
+function GenerateHotbuildModifiers()
+    local modifiers = {}
+    local keyMappings = GetKeyMappings()
+    for key, action in keyMappings do
+        if action["category"] == "hotbuilding" then
+            if key ~= nil then
+
+                if not IsKeyInMap("Shift-" .. key, keyMappings) then
+                    modifiers["Shift-" .. key] = action
+                else
+                    WARN("Shift-" .. key .. " is already bind")
+                end
+
+                if not IsKeyInMap("Alt-" .. key, keyMappings) then
+                    modifiers["Alt-" .. key] = action
+                else
+                    WARN("Alt-" .. key .. " is already bind")
+                end
+            end
+        end
+    end
+    return modifiers
+end
+
 -- Returns action names mapped to keys
 function GetKeyLookup()
     local currentKeyMap = GetCurrentKeyMap()
