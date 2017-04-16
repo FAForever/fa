@@ -82,10 +82,10 @@ function ClearUserKeyMapping(key)
     local newDebugMap = GetUserDebugKeyMap()
 
     if IsKeyInMap(key, newDebugMap) then
-        LOG("clearing debug key ".. key)
+        LOG("Keybindings clearing debug key ".. key)
         newDebugMap[key] = nil
     elseif IsKeyInMap(key, newUserMap) then
-        LOG("clearing key ".. key)
+        LOG("Keybindings clearing action key ".. key)
         newUserMap[key] = nil
     end
 
@@ -107,13 +107,13 @@ function SetUserKeyMapping(key, oldKey, action)
     end
 
     if IsActionInMap(action, newUserMap) or IsActionInMap(action, import('defaultKeyMap.lua').defaultKeyMap) then
-        LOG("adding key "..key .. " in user map")
+        LOG("Keybindings adding key "..key .. " in user map for " .. action)
         newUserMap[key] = action
     elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import('defaultKeyMap.lua').debugKeyMap) then
-        LOG("adding key "..key .. " in user map debug")
+        LOG("Keybindings adding key "..key .. " in debug map for " .. action)
         newDebugMap[key] = action
     else
-        LOG("adding key "..key .. " in user map")
+        LOG("Keybindings adding key "..key .. " in user map for " .. action)
         newUserMap[key] = action
     end
 
@@ -198,7 +198,7 @@ function GetKeyMappings()
     for key, action in currentKeyMap do
         keyMap[key] = keyActions[action]
         if keyMap[key] == nil then
-            WARN("Key action not found " .. action .. " for key " .. key)
+            WARN('Keybindings cannot find action "' .. action .. '" for key ' .. key)
         end
     end
 
@@ -274,7 +274,6 @@ end
 
 -- Given an action in string form, checks to see if it's already in the key map
 function IsActionInMap(action, map)
-    LOG("checking " .. action)
     for _, curaction in map do
         if action == curaction then
             return true
