@@ -132,8 +132,10 @@ function ResetUserKeyMapTo(newPreset)
     LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')
     Prefs.SetToCurrentProfile("UserKeyMapName", newPreset)
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
-    -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
+    if table.getsize(oldKeyMap) > 0 then
+        LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
+    end
+     -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
     Prefs.SetToCurrentProfile("UserKeyMap", nil)
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
 end
@@ -142,7 +144,9 @@ end
 function SaveUserKeyMap()
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
     local newKeyMap = GetCurrentKeyMap()
-    LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to ' .. table.getsize(newKeyMap))
+    if table.getsize(oldKeyMap) ~= table.getsize(newKeyMap) then
+        LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to ' .. table.getsize(newKeyMap))
+    end
     Prefs.SetToCurrentProfile("UserKeyMap", newKeyMap)
     Prefs.SetToCurrentProfile("UserDebugKeyMap", GetUserDebugKeyMap())
 end
