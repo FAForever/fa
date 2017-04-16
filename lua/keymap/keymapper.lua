@@ -224,24 +224,45 @@ function GetKeyMappings()
     return keyMap
 end
 
+-- Returns details for keys mapped to actions
+function GetKeyMappingDetails()
+    local keyMap = GetCurrentKeyMap()
+    local keyActions = GetKeyActions()
+    local ret = {}
+    for key, action in keyMap do
+        if keyActions[action] then
+            local info = {}
+            info.name = GetActionName(action)
+            info.action = keyActions[action]
+            info.key = key
+            ret[key] = info
+        end
+    end
+    return ret
+end
+
 -- Returns key mappings with modifier shortcuts generated on the fly based on current hotbuild mappings
 function GenerateHotbuildModifiers()
+    local keyDetails = GetKeyMappingDetails()
     local modifiers = {}
-    local keyMappings = GetKeyMappings()
-    for key, action in keyMappings do
-        if action["category"] == "hotbuilding" then
-            if key ~= nil then
 
-                if not IsKeyInMap("Shift-" .. key, keyMappings) then
-                    modifiers["Shift-" .. key] = action
+    for key, info in keyDetails do
+        if info.action["category"] == "hotbuilding" then
+            if key ~= nil then
+                local modKey = "Shift-" .. key
+                local modBinding = keyDetails[modKey]
+                if not modBinding then
+                    modifiers[modKey] =  info.action
                 else
-                    WARN("Shift-" .. key .. " is already bind")
+                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.action.category..'" category')
                 end
 
-                if not IsKeyInMap("Alt-" .. key, keyMappings) then
-                    modifiers["Alt-" .. key] = action
+                modKey = "Alt-" .. key
+                modBinding = keyDetails[modKey]
+                if not modBinding then
+                    modifiers[modKey] = info.action
                 else
-                    WARN("Alt-" .. key .. " is already bind")
+                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.action.category..'" category')
                 end
             end
         end
