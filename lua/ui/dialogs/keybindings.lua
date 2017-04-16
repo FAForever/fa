@@ -157,16 +157,22 @@ local function EditActionKey(parent, action, currentKey)
 
         local function MapKey()
             KeyMapper.SetUserKeyMapping(keyPattern, currentKey, action)
-            local cat = KeyMapper.KeyCategory(keyPattern, KeyMapper.GetCurrentKeyMap(), KeyMapper.GetKeyActions())
-            if cat and cat == "hotbuilding" then
-                if KeyMapper.IsKeyInMap("Shift-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(popup, "Shift-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+            local keyMapping = KeyMapper.GetKeyMappingDetails()
+            if keyMapping[keyPattern] and keyMapping[keyPattern].category == "HOTBUILDING" then
+                local hotKey = "Shift-" .. keyPattern
+                if keyMapping[hotKey] then
+                    UIUtil.QuickDialog(popup, 
+                        LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
+                            hotKey, keyMapping[hotKey].category, keyMapping[hotKey].name),
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil, nil, nil, true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
-                if KeyMapper.IsKeyInMap("Alt-" .. keyPattern, KeyMapper.GetCurrentKeyMap()) then
-                    UIUtil.QuickDialog(popup, "Alt-"..keyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                hotKey = "Alt-" .. keyPattern
+                if keyMapping[hotKey] then
+                    UIUtil.QuickDialog(popup, 
+                        LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
+                            hotKey, keyMapping[hotKey].category, keyMapping[hotKey].name),
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil, nil, nil, true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
@@ -176,8 +182,11 @@ local function EditActionKey(parent, action, currentKey)
             keyContainer:Filter(keyword)
         end
 
-        if KeyMapper.IsKeyInMap(keyPattern, KeyMapper.GetCurrentKeyMap()) then
-            UIUtil.QuickDialog(popup, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
+        local keyMapping = KeyMapper.GetKeyMappingDetails()
+        if keyMapping[keyPattern] then
+            UIUtil.QuickDialog(popup, 
+                LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
+                    keyPattern, keyMapping[keyPattern].category, keyMapping[keyPattern].name),
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil, nil, nil, true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
