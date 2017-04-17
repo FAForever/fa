@@ -3674,14 +3674,9 @@ Unit = Class(moho.unit_methods) {
     SetVeteranLevel = function(self, level)
         local old = self.VeteranLevel
         self.VeteranLevel = level
-        self.IncreasingVet = true -- Extremely ugly hack. The other half of this is in Buff.lua
 
         --Apply default veterancy buffs
-        local buffTypes = { 'Regen', 'Health', }
-        local notUsingMaxHealth = self:GetBlueprint().MaxHealthNotAffectHealth
-        if notUsingMaxHealth then
-                buffTypes = { 'Regen', 'MaxHealth', }
-        end
+        local buffTypes = {'Regen', 'MaxHealth'}
 
         for k,bType in buffTypes do
             Buff.ApplyBuff( self, 'Veterancy' .. bType .. level )
@@ -3704,7 +3699,18 @@ Unit = Class(moho.unit_methods) {
             end
         end
         self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
+        self:DoVeterancyHealing(level)
+
         self:DoUnitCallbacks('OnVeteran')
+    end,
+
+    -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
+    DoVeterancyHealing = function(self, level)
+        local bp = self:GetBlueprint()
+        local maxHealth = bp.Defense.MaxHealth
+        local mult = bp.VeteranHealingMult[level] or 0.1
+
+        self:AdjustHealth(self, maxHealth * mult)
     end,
 
     --Table housing data on what to use to generate buffs for a unit
