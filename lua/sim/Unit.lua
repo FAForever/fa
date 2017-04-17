@@ -1404,7 +1404,7 @@ Unit = Class(moho.unit_methods) {
             if animBlock.Mesh then
                 self:SetMesh(animBlock.Mesh)
             end
-            if animBlock.Animation then
+            if animBlock.Animation and self:ShallSink() then
                 local sinkAnim = CreateAnimator(self)
                 self:StopRocking()
                 self.DeathAnimManip = sinkAnim
