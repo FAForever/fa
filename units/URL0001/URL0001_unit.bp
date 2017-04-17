@@ -758,6 +758,13 @@ UnitBlueprint {
         Level4 = 90,
         Level5 = 120,
     },
+    VeteranHealingMult = { -- This table is used to override the vet instant heal multiplier per level
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+    },
     Weapon = {
         {
             AboveWaterFireOnly = true,
