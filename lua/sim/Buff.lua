@@ -180,7 +180,6 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     end
 
     for atype, vals in buffAffects do
-
         if atype == 'Health' then
             --Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
 
@@ -201,25 +200,20 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 unit:AdjustHealth(instigator, healthadj)
             end
         elseif atype == 'MaxHealth' then
+            -- With this type of buff, the idea is to adjust the Max Health of a unit.
+            -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
+            --     rest of the unit's HP affected to match. If it's not flagged, the unit's HP
+            --     will be adjusted by the same amount and direction as the max
             local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
             local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
+
             local oldmax = unit:GetMaxHealth()
+            local difference = oldmax - unit:GetHealth()
 
             unit:SetMaxHealth(val)
 
-            -- Stupid ugly hack to handle veterancy miscalculating instaheal thanks to removal of previous level buff resetting oldmax invisibly
-            if val > oldmax and unit.IncreasingVet then
-                oldmax = unit.MaxVetHP or oldmax
-                unit.MaxVetHP = val
-                unit.IncreasingVet = nil
-            end
-
-            if not vals.DoNoFill and not unit.IsBeingTransferred then
-                if val > oldmax then
-                    unit:AdjustHealth(unit, val - oldmax)
-                else
-                    unit:SetHealth(unit, math.min(unit:GetHealth(), unit:GetMaxHealth()))
-                end
+            if not vals.DoNotFill and not unit.IsBeingTransferred then
+                unit:SetHealth(unit, unit:GetMaxHealth() - difference)
             end
         elseif atype == 'Regen' then
             -- Adjusted to use a special case of adding mults and calculating the final value
