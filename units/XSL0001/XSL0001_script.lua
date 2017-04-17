@@ -118,7 +118,7 @@ XSL0001 = Class(ACUUnit) {
                     buff_bp.Affects.MaxHealth = {
                         Add = 0,
                         Mult = bp.MaxHealthFactor,
-                        DoNoFill = true,
+                        DoNotFill = true,
                     }
                 end
 
