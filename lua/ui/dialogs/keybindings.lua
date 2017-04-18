@@ -61,7 +61,7 @@ end
 
 local function ConfirmNewKeyMap()
     KeyMapper.SaveUserKeyMap()
-    -- TODO: Add option to accept the changes to the key map?
+    IN_ClearKeyMap()
     IN_AddKeyMapTable(KeyMapper.GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
