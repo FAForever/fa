@@ -1800,10 +1800,6 @@ local function TryLaunch(skipNoObserversCheck)
         return
     end
 
-    if not EveryoneHasEstablishedConnections() then
-        return
-    end
-
     if not gameInfo.GameOptions.AllowObservers then
         local hostIsObserver = false
         local anyOtherObservers = false
@@ -1820,30 +1816,22 @@ local function TryLaunch(skipNoObserversCheck)
             return
         end
 
-        if anyOtherObservers then
-            if skipNoObserversCheck then
-                -- we send the observer list before kicking the players, in case they are not registered as observer
-                -- and won't disconnect correctly before the game launch.
-                sendObserversList(gameInfo)
-                for k,observer in gameInfo.Observers:pairs() do
-                    lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
-                end
-                gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
-            else
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
-                                   "<LOC _Yes>", function() TryLaunch(true) end,
-                                   "<LOC _No>", nil,
-                                   nil, nil,
-                                   true,
-                                   {worldCover = false, enterButton = 1, escapeButton = 2}
-                                   )
-                return
-            end
+        if anyOtherObservers and not skipNoObserversCheck then
+            UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
+                                    "<LOC _Yes>", function() TryLaunch(true) end,
+                                    "<LOC _No>", nil, nil, nil, true,
+                                    {worldCover = false, enterButton = 1, escapeButton = 2})
+            return
         end
+
+        HostUtils.KickObservers("GameLaunched")
+    end
+
+    if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
+        return
     end
 
     numberOfPlayers = numPlayers
-
     local function LaunchGame()
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
@@ -3543,18 +3531,22 @@ function CalcConnectionStatus(peer)
     end
 end
 
-function EveryoneHasEstablishedConnections()
+function EveryoneHasEstablishedConnections(check_observers)
     local important = {}
     for slot, player in gameInfo.PlayerOptions:pairs() do
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
     end
-    for slot, observer in gameInfo.Observers:pairs() do
-        if not table.find(important, observer.OwnerID) then
-            table.insert(important, observer.OwnerID)
+
+    if check_observers then
+        for slot,observer in gameInfo.Observers:pairs() do
+            if not table.find(important, observer.OwnerID) then
+                table.insert(important, observer.OwnerID)
+            end
         end
     end
+
     local result = true
     for k, id in important do
         if id ~= localPlayerID then
@@ -6090,6 +6082,13 @@ function InitHostUtils()
             end
 
             return -1
+        end,
+
+        KickObservers = function(reason)
+            for k,observer in gameInfo.Observers:pairs() do
+                lobbyComm:EjectPeer(observer.OwnerID, reason or "KickedByHost")
+            end
+            gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
         end
     }
 end
