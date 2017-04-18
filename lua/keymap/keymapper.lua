@@ -20,7 +20,7 @@ function GetActionName(action)
     end
     -- check if action is meant to be mapped with a key modifier, e.g. attack vs shift_attack action
     if string.find(action, 'shift_') == 1 then
-        name = name .. ' - with key modifier'
+        name = name .. ' - SHIFT version'
     end
     return name
 end
@@ -122,13 +122,13 @@ function SetUserKeyMapping(key, oldKey, action)
     end
 
     if IsActionInMap(action, newUserMap) or IsActionInMap(action, import('defaultKeyMap.lua').defaultKeyMap) then
-        LOG("Keybindings adding key "..key .. " in user map for " .. action)
+        LOG('Keybindings adding key "'..key .. '" in user map for action: ' .. action)
         newUserMap[key] = action
     elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import('defaultKeyMap.lua').debugKeyMap) then
-        LOG("Keybindings adding key "..key .. " in debug map for " .. action)
+        LOG('Keybindings adding key "'..key .. '" in debug map for action: ' .. action)
         newDebugMap[key] = action
     else
-        LOG("Keybindings adding key "..key .. " in user map for " .. action)
+        LOG('Keybindings adding key "'..key .. '" in user map for action: ' .. action)
         newUserMap[key] = action
     end
 
