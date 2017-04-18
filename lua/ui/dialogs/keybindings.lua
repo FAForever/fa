@@ -69,6 +69,15 @@ local function ConfirmNewKeyMap()
     end
 end
 
+local function ClearActionKey(action, currentKey)
+    KeyMapper.ClearUserKeyMapping(currentKey)
+    -- auto-clear shift action, e.g. 'shift_attack' for 'attack' action
+    local target = KeyMapper.GetShiftAction(action, 'orders')
+    if target and target.key then
+        KeyMapper.ClearUserKeyMapping(target.key)
+    end
+end
+
 local function EditActionKey(parent, action, currentKey)
     local dialogContent = Group(parent)
     dialogContent.Height:Set(130)
@@ -156,6 +165,13 @@ local function EditActionKey(parent, action, currentKey)
 
         local function MapKey()
             KeyMapper.SetUserKeyMapping(keyPattern, currentKey, action)
+
+            -- auto-assign shift action, e.g. 'shift_attack' for 'attack' action
+            local target = KeyMapper.GetShiftAction(action, 'orders')
+            if target and not KeyMapper.ContainsKeyModifiers(keyPattern) then
+               KeyMapper.SetUserKeyMapping('Shift-' .. keyPattern, target.key, target.name)
+            end
+
             -- checks if hotbuild modifier keys are conflicting with already mapped actions
             local keyMapping = KeyMapper.GetKeyMappingDetails()
             if keyMapping[keyPattern] and keyMapping[keyPattern].category == "HOTBUILDING" then
@@ -214,7 +230,7 @@ end
 local function UnbindCurrentSelection()
     for k, v in keyTable do
         if v.selected then
-            KeyMapper.ClearUserKeyMapping(v.key)
+            ClearActionKey(v.action, v.key)
             break
         end
     end
