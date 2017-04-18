@@ -349,6 +349,25 @@ function IsActionInMap(action, map)
     return false
 end
 
+-- Return a shift action (if exists) for specified action name, e.g. 'shift_attack' for 'attack' action
+function GetShiftAction(actionName, category)
+    local keyActions = GetKeyActions()
+    local keyLookup = GetKeyLookup()
+     
+    local name = 'shift_' .. actionName
+    local action = keyActions[name]
+    if action  and action.category == category then
+        action.name = name
+        action.key = keyLookup[name]
+        return action
+    end
+    return false
+end
+
+function ContainsKeyModifiers(key)
+    return StringStarts(key, 'Shift') or StringStarts(key, 'Ctrl') or StringStarts(key, 'Alt')
+end
+
 function KeyCategory(key, map, actions)
     local compKeyCombo = NormalizeKey(key)
     -- Return the category of a key
