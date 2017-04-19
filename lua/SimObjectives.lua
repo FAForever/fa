@@ -1213,6 +1213,10 @@ function Protect(Type, Complete, Title, Description, Target)
         UpdateObjective( Title, 'timer', {Time = newTime}, objective.Tag)
     end
 
+    local function onTick(newTime)
+        UpdateObjective( Title, 'timer', {Time = newTime}, objective.Tag)
+    end
+
     local function OnExpired()
         if objective.Active then
             objective.Active = false
