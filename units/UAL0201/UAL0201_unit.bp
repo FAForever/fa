@@ -239,7 +239,7 @@ UnitBlueprint {
             DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Disruptor Cannon',
-            FiringRandomnessWhileMoving = 0.1,
+            FiringRandomnessWhileMoving = 0.3,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
