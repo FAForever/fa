@@ -80,27 +80,29 @@ end
 
 local function EditActionKey(parent, action, currentKey)
     local dialogContent = Group(parent)
-    dialogContent.Height:Set(130)
+    dialogContent.Height:Set(170)
     dialogContent.Width:Set(400)
 
     local keyPopup = Popup(popup, dialogContent)
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
-    LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 9)
+    LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 15)
     LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
     cancelButton.OnClick = function(self, modifiers)
         keyPopup:Close()
     end
 
     local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
-    LayoutHelpers.LeftOf(okButton, cancelButton, 145)
+    LayoutHelpers.AtBottomIn(okButton, dialogContent, 15)
+    LayoutHelpers.AtLeftIn(okButton, dialogContent, -2)
 
-    local helpText = UIUtil.CreateText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
+    local helpText = UIUtil.CreateWrappedText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
 
     local keyText = UIUtil.CreateText(dialogContent, FormatKeyName(currentKey), 24)
-    LayoutHelpers.AtTopIn(keyText, dialogContent, 40)
+    keyText:SetColor(UIUtil.factionBackColor)
+    LayoutHelpers.Below(keyText, helpText)
     LayoutHelpers.AtHorizontalCenterIn(keyText, dialogContent)
 
     dialogContent:AcquireKeyboardFocus(false)
