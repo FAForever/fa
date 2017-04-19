@@ -1120,3 +1120,43 @@ function SetTextBoxText(textBox, text)
         textBox:AddItem(line)
     end 
 end
+
+-- Create a group control with a text wrapped on multiple lines, within parent's Width
+function CreateWrappedText(parent, textStr, textSize, textFont, textColor, textMargin, dropshadow)
+    if not textMargin then textMargin = 10 end
+    local group = Group(parent)
+    group.Width:Set(parent.Width()- (textMargin * 3))
+    group.linesWidth = group.Width()
+    group.lines = {}
+    group.lines[1] = CreateText(group, "", textSize, textFont, dropshadow)
+    group.lines[1]:SetColor(textColor or fontColor)
+    LayoutHelpers.AtTopIn(group.lines[1], group, textMargin)
+    LayoutHelpers.AtHorizontalCenterIn(group.lines[1], group)
+
+    group.textLines = import('/lua/maui/text.lua').WrapText(LOC(textStr), group.linesWidth,
+    function(txt)
+        return group.lines[1]:GetStringAdvance(txt)
+    end)
+    
+    group.linesHeight = 0
+    local previousLine = false
+    for i, txtLine in group.textLines do
+        if i == 1 then
+            group.lines[1]:SetText(txtLine)
+            previousLine = group.lines[1]
+        else
+            group.lines[i] = CreateText(group, txtLine, textSize, textFont, dropshadow)
+            group.lines[i]:SetColor(textColor or fontColor)
+            LayoutHelpers.Below(group.lines[i], previousLine)
+            LayoutHelpers.AtHorizontalCenterIn(group.lines[i], group)
+            previousLine = group.lines[i]
+        end
+        group.linesHeight = group.linesHeight + group.lines[i]:Height()
+    end
+    group.linesCount = table.getn(group.textLines)
+    group.Height:Set(group.linesHeight + textMargin + textMargin)
+    if parent.Height and parent.Height() < group.Height() then
+       parent.Height:Set(group.Height() + 5)
+    end
+    return group
+end
