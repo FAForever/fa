@@ -2,7 +2,7 @@
 -- All of this data is sent to the sim and back to the UI for display on the world views
 
 PingTypes = {
-    nuke = {Lifetime = 10, Mesh = 'nuke_marker', Ring = NukePingTexturePath..'/game/marker/ring_nuke04-blur.dds', ArrowColor = 'red', Sound = 'Aeon_Select_Radar'},
+    nuke = {Lifetime = 10, Mesh = 'nuke_marker', Ring = '/textures/ui/common/game/marker/ring_nuke04-blur.dds', ArrowColor = 'red', Sound = 'Aeon_Select_Radar'},
 }
 
 local lastPingData = {}
