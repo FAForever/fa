@@ -1118,5 +1118,5 @@ function SetTextBoxText(textBox, text)
     local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
     for i, line in wrapped do
         textBox:AddItem(line)
-    end 
+    end
 end
