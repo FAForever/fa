@@ -165,11 +165,6 @@ local function EditActionKey(parent, action, currentKey)
             LOG("Keybindings clearing Shift-"..keyPattern)
         end
 
-        local function ClearAltKey()
-            KeyMapper.ClearUserKeyMapping("Alt-" .. keyPattern)
-            LOG("Keybindings clearing Alt-"..keyPattern)
-        end
-
         local function MapKey()
             KeyMapper.SetUserKeyMapping(keyPattern, currentKey, action)
 
@@ -188,15 +183,6 @@ local function EditActionKey(parent, action, currentKey)
                         LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
                             hotKey, keyMapping[hotKey].category, keyMapping[hotKey].name),
                         "<LOC _Yes>", ClearShiftKey,
-                        "<LOC _No>", nil, nil, nil, true,
-                        {escapeButton = 2, enterButton = 1, worldCover = false})
-                end
-                hotKey = "Alt-" .. keyPattern
-                if keyMapping[hotKey] then
-                    UIUtil.QuickDialog(popup, 
-                        LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
-                            hotKey, keyMapping[hotKey].category, keyMapping[hotKey].name),
-                        "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil, nil, nil, true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end

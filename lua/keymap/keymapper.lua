@@ -261,14 +261,6 @@ function GenerateHotbuildModifiers()
                 else
                     WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
                 end
-
-                modKey = "Alt-" .. key
-                modBinding = keyDetails[modKey]
-                if not modBinding then
-                    modifiers[modKey] = info.action
-                else
-                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
-                end
             end
         end
     end
