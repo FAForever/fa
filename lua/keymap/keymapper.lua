@@ -240,6 +240,7 @@ function GetKeyMappingDetails()
             info.action = keyActions[action]
             info.category = string.upper(keyActions[action].category or 'none')
             info.key = key
+            info.id = action
             ret[key] = info
         end
     end
