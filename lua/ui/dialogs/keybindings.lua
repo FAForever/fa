@@ -193,7 +193,7 @@ local function EditActionKey(parent, action, currentKey)
 
         -- checks if this key is already assigned to some other action
         local keyMapping = KeyMapper.GetKeyMappingDetails()
-        if keyMapping[keyPattern] and keyMapping[keyPattern].key ~= keyPattern then
+        if keyMapping[keyPattern] and keyMapping[keyPattern].id ~= action then
             UIUtil.QuickDialog(popup, 
                 LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
                     keyPattern, keyMapping[keyPattern].category, keyMapping[keyPattern].name),
