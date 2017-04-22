@@ -750,6 +750,7 @@ function CreateUI()
             local id = i + self.top
             local index = linesVisible[id]
             local data = keyTable[index]
+
             if data then
                 line:Update(data, id)
             else
