@@ -93,6 +93,8 @@ function GetCurrentKeyMap()
 end
 
 function ClearUserKeyMapping(key)
+    if not key then return end
+
     local newUserMap = GetCurrentKeyMap()
     local newDebugMap = GetUserDebugKeyMap()
 
@@ -109,6 +111,8 @@ function ClearUserKeyMapping(key)
 end
 
 function SetUserKeyMapping(key, oldKey, action)
+    if not key or not action then return end
+
     ClearUserKeyMapping(key)
     local newUserMap = GetCurrentKeyMap()
     local newDebugMap = GetUserDebugKeyMap()
