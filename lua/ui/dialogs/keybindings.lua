@@ -6,7 +6,6 @@
 -----------------------------------------------------------------
 
 -- This file is the F1 menu used for navigating and interacting with keybindings
-
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group     = import('/lua/maui/group.lua').Group
@@ -277,7 +276,6 @@ local function SelectLine(dataIndex)
 
     if keyTable[dataIndex].type == 'entry' then
        keyTable[dataIndex].selected = true
-       --table.print(keyTable[dataIndex],'SelectLine')
     end
     keyContainer:Filter(keyword)
 end
@@ -357,7 +355,6 @@ function CreateLine()
     LayoutHelpers.AtVerticalCenterIn(line.description, line)
     LayoutHelpers.AtRightIn(line.key, line, line.Width() - keyBindingWidth + 30)
     LayoutHelpers.AtVerticalCenterIn(line.key, line)
-
     LayoutHelpers.AtRightIn(line.statistics, line, 10)
     LayoutHelpers.AtVerticalCenterIn(line.statistics, line)
 
@@ -373,7 +370,6 @@ function CreateLine()
             line.key:SetAlpha(0.9)
             line.description:SetAlpha(0.9)
             line.statistics:SetAlpha(0.9)
-
         elseif self.data.type == 'entry' then
             if event.Type == 'ButtonPress' then
                 SelectLine(self.data.index)
@@ -427,7 +423,7 @@ function CreateLine()
 
     line.assignKeyButton = CreateToggle(line,
          '645F5E5E',  --#735F5E5E'
-         'FFAEACAC',  --#FFAEACAC' UIUtil.factionTextColor,
+         'FFAEACAC',  --#FFAEACAC'
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.assignKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.assignKeyButton, line)
@@ -443,7 +439,7 @@ function CreateLine()
 
     line.unbindKeyButton = CreateToggle(line,
          '645F5E5E',  --#645F5E5E'
-         'FFAEACAC',  --#FFAEACAC' UIUtil.factionTextColor,
+         'FFAEACAC',  --#FFAEACAC'
          line.key.Height() + 4, 18, 'x')
     LayoutHelpers.AtRightIn(line.unbindKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.unbindKeyButton, line)
