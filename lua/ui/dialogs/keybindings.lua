@@ -15,6 +15,7 @@ local Text      = import('/lua/maui/text.lua').Text
 local Edit      = import('/lua/maui/edit.lua').Edit
 local Popup     = import('/lua/ui/controls/popups/popup.lua').Popup
 local Tooltip   = import('/lua/ui/game/tooltip.lua')
+local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 
 local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
 local keyNames = import('/lua/keymap/keyNames.lua').keyNames
@@ -97,13 +98,16 @@ local function EditActionKey(parent, action, currentKey)
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 15)
     LayoutHelpers.AtLeftIn(okButton, dialogContent, -2)
 
-    local helpText = UIUtil.CreateWrappedText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
+    local helpText = MultiLineText(dialogContent, UIUtil.bodyFont, 16, UIUtil.fontColor)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
+    helpText.Width:Set(dialogContent.Width() - 10)
+    helpText:SetText(LOC("<LOC key_binding_0002>Hit the key combination you'd like to assign"))
+    helpText:SetCenteredHorizontally(true)
 
     local keyText = UIUtil.CreateText(dialogContent, FormatKeyName(currentKey), 24)
     keyText:SetColor(UIUtil.factionBackColor)
-    LayoutHelpers.Below(keyText, helpText)
+    LayoutHelpers.Above(keyText, okButton)
     LayoutHelpers.AtHorizontalCenterIn(keyText, dialogContent)
 
     dialogContent:AcquireKeyboardFocus(false)
