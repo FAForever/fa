@@ -63,9 +63,10 @@ local function ConfirmNewKeyMap()
     KeyMapper.SaveUserKeyMap()
     IN_ClearKeyMap()
     IN_AddKeyMapTable(KeyMapper.GetKeyMappings(true))
-    -- Update hotbuild modifiers
+    -- update hotbuild modifiers and re-initialize hotbuild labels
     if SessionIsActive() then
         import('/lua/keymap/hotbuild.lua').addModifiers()
+        import('/lua/keymap/hotkeylabels.lua').init()
     end
 end
 
