@@ -1897,6 +1897,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
+        if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
+            self:Kill()
+            return false
+        end
+
         local bp = self:GetBlueprint()
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
