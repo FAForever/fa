@@ -11,7 +11,7 @@ mod_info.lua file which contains various bits of info:
     author = "Joe"                              # Optional author info
     url = "http://www.gaspoweredgames.com"      # Optional URL to anywhere author likes
 
-    uid = B019FBEE-E411-11DB-AFAE-13D355D89593 
+    uid = B019FBEE-E411-11DB-AFAE-13D355D89593
         Uniquely identify this mod. This defaults to the mods name, but that's
         not a very safe way to keep mods differentiated. I'd recommend using a GUID
         or Guaranteed Unique ID. Also, every new version of a mod should get a new
@@ -82,7 +82,7 @@ mod_info.lua file which contains various bits of info:
         not supply an 'after' list, the 'requires' list will be used in its place.
         Same format as 'requires'.
     }
-    
+
     requiresNames = {
         # an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
         ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod v123",
@@ -251,7 +251,7 @@ function GetSelectedSimMods()
         function(uid)
             return not AllMods()[uid].ui_only
         end
-    )
+)
 end
 
 function GetSelectedUIMods()
@@ -259,7 +259,7 @@ function GetSelectedUIMods()
         function(uid)
             return AllMods()[uid].ui_only
         end
-    )
+)
 end
 
 local function LoadModInfo(filename)
@@ -324,7 +324,7 @@ end
 -- sorts mods according to their before/after lists, otherwise alphabetically
 -- returns true when first less than second
 local function ModComp(first, second)
-    
+
     if _mod_cache[first].before then
         for i,uid in _mod_cache[first].before do
             if _mod_cache[second].uid == uid then
@@ -332,7 +332,7 @@ local function ModComp(first, second)
             end
         end
     end
-    
+
     if _mod_cache[first].after then
         for i,uid in _mod_cache[first].after do
             if _mod_cache[second].uid == uid then
@@ -340,7 +340,7 @@ local function ModComp(first, second)
             end
         end
     end
-    
+
     return first < second
 end
 
@@ -412,7 +412,7 @@ function GetDependencies(uid)
                             ret.conflicts[id] = true
                             break;  -- don't need to continue as we're just looking for this mod
                         end
-                    end        
+                    end
                 end
             end
         end
@@ -434,11 +434,11 @@ function GetDependencies(uid)
             end
         end
     end
-    
+
     if allMods[uid] then
         RecurseDependencies(uid, ret)
     end
-    
+
     if table.empty(ret.requires) then ret.requires = nil end
     if table.empty(ret.missing) then ret.missing = nil end
     if table.empty(ret.conflicts) then ret.conflicts = nil end

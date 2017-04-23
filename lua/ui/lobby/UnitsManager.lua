@@ -1,9 +1,9 @@
 -- ==========================================================================================
--- * File       : lua/modules/ui/lobby/UnitsManager.lua 
+-- * File       : lua/modules/ui/lobby/UnitsManager.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains UI for managing unit and enhancement restrictions
 -- ==========================================================================================
-local Mods     = import('/lua/mods.lua')    
+local Mods     = import('/lua/mods.lua')
 local UIUtil   = import('/lua/ui/uiutil.lua')
 local Utils    = import('/lua/system/utils.lua')
 local Tooltip  = import('/lua/ui/game/tooltip.lua')
@@ -11,19 +11,19 @@ local Group    = import('/lua/maui/group.lua').Group
 local Popup    = import('/lua/ui/controls/popups/popup.lua').Popup
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Bitmap   = import('/lua/maui/bitmap.lua').Bitmap
-local Grid     = import('/lua/maui/grid.lua').Grid 
+local Grid     = import('/lua/maui/grid.lua').Grid
 local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UnitsAnalyzer   = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local UnitsRestrictions = import('/lua/ui/lobby/UnitsRestrictions.lua')
 
 -- Stores unit blueprints for all factions
-local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} } 
+local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 
 -- Stores unit blueprints per faction
-local factions = {} 
+local factions = {}
 
--- Stores info about preset restrictions 
+-- Stores info about preset restrictions
 local presets = {}
 presets.PerRow   = 35 -- Determines number of presets' icons per row
 presets.Data     = UnitsRestrictions.GetPresetsData()
@@ -34,16 +34,16 @@ local GUI = {
     bg = nil,
     popup = nil,
     title = nil,
-    stats = nil, 
+    stats = nil,
     unitsGrid = nil,
     presetsGrid = nil,
-    -- stores references to checkboxes for quick toggling of Presets and Units 
+    -- stores references to checkboxes for quick toggling of Presets and Units
     checkboxes = { Units = {}, Presets = {} }
 }
-  
+
 -- Stores current IDs of units restricted by Presets and Custom selection
 local restrictions = { Custom = {}, Presets = {}, Stats = {} }
- 
+
 local initFontSize = 13
 local unitFontSize = 0 -- Calculated when dialog is created
 local dialogMaxWidth = 1920  -- Used to determine scaling of icons/fonts
@@ -60,7 +60,7 @@ local cellSize = 0
 local cellSpace = 0
 local gridWidth  = 0
 local gridMargin = 0
--- This table contains blueprint's categories or IDs for ordering units in grid columns, e.g. 
+-- This table contains blueprint's categories or IDs for ordering units in grid columns, e.g.
 -- Units matching first entry will be placed as first item in a column
 -- If two units match the first entry then the next entry is used for comparing
 local sortBy = {
@@ -103,7 +103,7 @@ local sortBy = {
         'ANTIMISSILE',
         'NUKE',
     },
-    ENGINEERING = { 
+    ENGINEERING = {
         'GATE',
         'SORTCONSTRUCTION',
         'NAVAL',
@@ -119,16 +119,16 @@ local sortBy = {
         'SUPPORTFACTORY',
         'POD',
     },
-    ECO = { 
+    ECO = {
         'EXPERIMENTAL',
-        'MASSFABRICATION', 
+        'MASSFABRICATION',
         'MASSEXTRACTION',
         'MASSSTORAGE',
         'ENERGYPRODUCTION',
         'ENERGYSTORAGE',
         'HYDROCARBON',
     },
-    SUPPORT = { 
+    SUPPORT = {
         'SONAR',
         'RADAR',
         'OMNI',
@@ -139,7 +139,7 @@ local sortBy = {
         'HEAVYWALL',
         'AIRSTAGINGPLATFORM',
     },
-    UPGRADES = { 
+    UPGRADES = {
         'COMMAND',
         'SUBCOMMANDER',
         'UPGRADE', -- Created in UnitsAnalyzer
@@ -201,7 +201,7 @@ local timer = CreateTimer()
 -- @param parent - Parent UI control to create the dialog inside.
 -- @param initial - a list of keys from presetsData.lua for which the corresponding
 --                  toggles in this popup should be initially selected.
--- @param OnOk - a function that will be passed the new set of selected keys 
+-- @param OnOk - a function that will be passed the new set of selected keys
 --               if the dialog is closed via the "OK" button.
 -- @param OnCancel A function to be called if the dialog is canceled.
 -- @param isHost If false, the control will be read-only.
@@ -236,7 +236,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     GUI.popup.OnShadowClicked = doCancel
     GUI.popup.OnEscapePressed = doCancel
 
-    
+
     timer:Start('CreateControls')
     CreateControls(OnOk, doCancel, isHost)
     timer:Stop('CreateControls')
@@ -246,7 +246,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         GUI.resetBtn:Hide()
         GUI.okBtn:Hide()
     end
-    
+
     GUI.content = Group(GUI.bg)
     LayoutHelpers.AtLeftIn(GUI.content, GUI.bg, 6)
     GUI.content.Top:Set(function() return GUI.title.Bottom() - 2 end)
@@ -255,16 +255,16 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     GUI.content:DisableHitTest()
 
     GUI.progressBar = StatusBar(GUI.bg, 0, 1, false, false, nil, nil, true)
-    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0 
-    GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds')) 
+    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0
+    GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     GUI.progressBar:SetValue(0)
     GUI.progressBar.Height:Set(5)
-    GUI.progressBar.Left:Set(function() return GUI.bg.Left() + 30 end) 
-    GUI.progressBar.Right:Set(function() return GUI.bg.Right() - 30 end) 
+    GUI.progressBar.Left:Set(function() return GUI.bg.Left() + 30 end)
+    GUI.progressBar.Right:Set(function() return GUI.bg.Right() - 30 end)
     LayoutHelpers.AtVerticalCenterIn(GUI.progressBar, GUI.bg)
 
     GUI.progressTxt = UIUtil.CreateText(GUI.bg, "Blueprints Loading ... ", 16, UIUtil.titleFont)
-    GUI.progressTxt:SetColor('FFAEACAC') -- #FFAEACAC 
+    GUI.progressTxt:SetColor('FFAEACAC') -- #FFAEACAC
     LayoutHelpers.Above(GUI.progressTxt, GUI.progressBar, 5)
     LayoutHelpers.AtHorizontalCenterIn(GUI.progressTxt, GUI.bg)
 
@@ -308,7 +308,7 @@ function OnBlueprintsLoaded()
                     factions[bp.Faction] = {}
                     factions[bp.Faction].Name = bp.Faction
                     factions[bp.Faction].Blueprints = {}
-                    if not factionsOrder[bp.Faction] then 
+                    if not factionsOrder[bp.Faction] then
                          factionsOrder[bp.Faction] = table.getsize(factionsOrder) + 1
                     end
                end
@@ -320,7 +320,7 @@ function OnBlueprintsLoaded()
         cellMax = 0
         for name, faction in factions do
             UnitsAnalyzer.GetUnitsGroups(faction.Blueprints, faction)
-            for group, units in faction.Units do 
+            for group, units in faction.Units do
                 if table.getsize(units) > 0 then
                     cellMax = cellMax + 1
                 elseif group ~= 'CIVILIAN' then
@@ -332,8 +332,8 @@ function OnBlueprintsLoaded()
 
         -- scale cell size by dialog size and make space for scroll bar
         cellSpace = dialogWidth - dialogScrollWidth - 20
-        cellSize = math.floor(cellSpace / cellMax) 
-        cellSize = math.min(cellSize, 55) 
+        cellSize = math.floor(cellSpace / cellMax)
+        cellSize = math.min(cellSize, 55)
         -- calculate grid size and margin to ensure grids are centered
         gridWidth = cellSize * cellMax
         gridMargin = (cellSpace - gridWidth) / 2
@@ -382,7 +382,7 @@ function CreatePresetsGrid()
         else
             row = 1
             column = column + 1
-        end 
+        end
 
         if row > rowMax then
            row = 1
@@ -392,7 +392,7 @@ function CreatePresetsGrid()
     end
     GUI.presetsGrid:EndBatch()
 end
--- Creates a grid with buttons representing all original units and modded units (if game mods are enabled) 
+-- Creates a grid with buttons representing all original units and modded units (if game mods are enabled)
 function CreateUnitsGrid()
     GUI.unitsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 25)
     GUI.unitsGrid.Top:Set(function() return GUI.presetsGrid.Bottom() + 6 end)
@@ -408,7 +408,7 @@ function CreateUnitsGrid()
         end
         return false
     end
-    
+
     local column = 1
     local order = table.inverse(factionsOrder)
     for order, name in order do
@@ -433,7 +433,7 @@ function CreateUnitsGrid()
 end
 
 function CreateControls(OnOk, OnCancel, isHost)
-    
+
     GUI.title = UIUtil.CreateText(GUI.bg, "<LOC restricted_units_dlg_0000>Unit Manager", 20, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(GUI.title, GUI.bg, 6)
     LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.bg)
@@ -446,7 +446,7 @@ function CreateControls(OnOk, OnCancel, isHost)
         text = 'Current Restrictions',
         body = 'Restrictions are set using Presets (first two rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
             .. 'To minimize number of restrictions, first select custom restrictions and then preset restrictions.' })
-    
+
     GUI.cancelBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Cancel>")
     LayoutHelpers.AtBottomIn(GUI.cancelBtn, GUI.bg, 5)
     LayoutHelpers.AtHorizontalCenterIn(GUI.cancelBtn, GUI.bg)
@@ -485,7 +485,7 @@ function CreateControls(OnOk, OnCancel, isHost)
         ToggleUnitCheckboxes(false)
         UpdateRestrictionsStats()
     end
-    
+
     GUI.controls = {}
     table.insert(GUI.controls, GUI.title)
     table.insert(GUI.controls, GUI.stats)
@@ -502,21 +502,21 @@ function CloseDialog()
     import('/lua/ui/lobby/UnitsAnalyzer.lua').StopBlueprints()
 
     for id, control in GUI.controls or {} do
-        if control then 
-           control:Destroy()  
-        end 
+        if control then
+           control:Destroy()
+        end
     end
     GUI.controls = nil
 
     for _, checkbox in GUI.checkboxes.Units or {} do
-        if checkbox then 
+        if checkbox then
            checkbox = nil
-        end 
+        end
     end
     for _, checkbox in GUI.checkboxes.Presets or {} do
-        if checkbox then 
+        if checkbox then
            checkbox = nil
-        end 
+        end
     end
     GUI.checkboxes = { Units = {}, Presets = {} }
 
@@ -527,9 +527,9 @@ end
 
 
 function UpdateRestrictionsUI()
-    -- Order of updating restrictions is important and 
+    -- Order of updating restrictions is important and
     -- custom restrictions must be set first
-    -- then preset restrictions or state of checkboxes will be wrong 
+    -- then preset restrictions or state of checkboxes will be wrong
     for _, restriction in restrictions.Initial do
         if GUI.checkboxes.Units[restriction] then
             restrictions.Custom[restriction] = true
@@ -544,7 +544,7 @@ function UpdateRestrictionsUI()
             end
         end
     end
-     
+
     ProcessRestrictions()
 end
 
@@ -581,13 +581,13 @@ function UpdateRestrictionsStats()
     GUI.stats:SetText(info)
 
     return restrictions.Stats
-end 
+end
 
 local UnitsTooltip = import('/lua/ui/lobby/UnitsTooltip.lua')
- 
+
 function CreateUnitIcon(parent, bp, faction)
     local colors = {}
-                  
+
     local control = Bitmap(parent)
     control.bp = bp -- Save blueprint reference for later
     control.Height:Set(cellSize)
@@ -603,7 +603,7 @@ function CreateUnitIcon(parent, bp, faction)
     fill:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(fill, control)
     LayoutHelpers.AtHorizontalCenterIn(fill, control)
-        
+
     local hover = Bitmap(control)
     hover.Height:Set(cellSize)
     hover.Width:Set(cellSize)
@@ -611,13 +611,13 @@ function CreateUnitIcon(parent, bp, faction)
     LayoutHelpers.AtVerticalCenterIn(hover, control)
     LayoutHelpers.AtHorizontalCenterIn(hover, control)
 
-    local checkbox = Checkbox(control,  
-          imagePath, -- up.dds'),       
-          imagePath, -- over.dds'),       
-          imagePath, -- down.dds'),       
-          imagePath, -- down.dds'),       
-          imagePath, -- dis.dds'),    
-          imagePath, -- dis.dds'),    
+    local checkbox = Checkbox(control,
+          imagePath, -- up.dds'),
+          imagePath, -- over.dds'),
+          imagePath, -- down.dds'),
+          imagePath, -- down.dds'),
+          imagePath, -- dis.dds'),
+          imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     checkbox.Height:Set(cellSize - 6)
     checkbox.Width:Set(cellSize - 6)
@@ -698,8 +698,8 @@ function CreateUnitIcon(parent, bp, faction)
         techUI:SetColor(colors.TextUncheck)
         techUI:SetText(bp.Tech or '')
         checkbox.selector = fill
-    end 
-     
+    end
+
     LayoutHelpers.AtVerticalCenterIn(overlay, control)
     LayoutHelpers.AtHorizontalCenterIn(overlay, control)
 
@@ -714,13 +714,13 @@ function CreateUnitIcon(parent, bp, faction)
     table.insert(GUI.checkboxes.Units[bp.ID], checkbox)
 
     control.HandleEvent = function(self, event)
-        if event.Type == 'WheelRotation' then 
-            return false -- Allows grid scrolling 
+        if event.Type == 'WheelRotation' then
+            return false -- Allows grid scrolling
         elseif event.Type == 'MouseEnter' then
             PlaySound(Sound({ Cue = "UI_MFD_Rollover", Bank = "Interface" }))
             UnitsTooltip.Create(self, self.bp)
 
-            if self.bp.Type == 'UPGRADE' then    
+            if self.bp.Type == 'UPGRADE' then
                 hover:SetSolidColor('ff7F7F7F')
             else
                 hover:SetSolidColor('7F'..string.sub(colors.FillChecked,3,8))
@@ -737,8 +737,8 @@ function CreateUnitIcon(parent, bp, faction)
 
             -- Switching to custom restrictions
             TogglePresetCheckboxes(false)
-            
-            for ID, isRestricted in restrictions.Presets do 
+
+            for ID, isRestricted in restrictions.Presets do
                 if isRestricted then
                     restrictions.Custom[ID] = true
                     restrictions.Presets[ID] = false
@@ -769,10 +769,10 @@ function CreateUnitIcon(parent, bp, faction)
         local fillColor = checked and colors.FillChecked or colors.FillUncheck
         local textColor = checked and colors.TextChecked or colors.TextUncheck
         self.selector:SetSolidColor(fillColor)
-        techUI:SetColor(textColor) 
-    end 
+        techUI:SetColor(textColor)
+    end
 
-    return control  
+    return control
 end
 
 function CreatePresetIcon(parent, presetName)
@@ -784,8 +784,8 @@ function CreatePresetIcon(parent, presetName)
     colors.HoverExit   = '00ffffff'
 
     local control = Bitmap(parent)
-    control.preset = preset                     
-    control.presetName = presetName                     
+    control.preset = preset
+    control.presetName = presetName
     control.Height:Set(cellSize)
     control.Width:Set(cellSize)
     control:SetSolidColor(colors.FillUncheck)
@@ -809,12 +809,12 @@ function CreatePresetIcon(parent, presetName)
     LayoutHelpers.AtHorizontalCenterIn(hover, control)
 
     local checkbox = Checkbox(control,
-          imagePath, -- up.dds'),       
-          imagePath, -- over.dds'),       
-          imagePath, -- down.dds'),       
-          imagePath, -- down.dds'),       
-          imagePath, -- dis.dds'),    
-          imagePath, -- dis.dds'),    
+          imagePath, -- up.dds'),
+          imagePath, -- over.dds'),
+          imagePath, -- down.dds'),
+          imagePath, -- down.dds'),
+          imagePath, -- dis.dds'),
+          imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     checkbox.Height:Set(cellSize-2)
     checkbox.Width:Set(cellSize-2)
@@ -854,7 +854,7 @@ function CreatePresetIcon(parent, presetName)
         end
 
         return true
-    end     
+    end
 
     checkbox.OnCheck = function(self, checked)
         local fillColor = checked and colors.FillChecked or colors.FillUncheck
@@ -900,13 +900,13 @@ function ProcessRestrictions()
             local preset = presets.Data[name]
             if preset.categories then
                 categories[preset.categories] = true
-                info = info .. preset.categories  
+                info = info .. preset.categories
             end
             if preset.enhancements then
                 for _, enh in preset.enhancements do
                     enhancements[enh] = true
                 end
-                
+
                 info = info .. " (" .. table.concat(preset.enhancements, ' + ') .. ')'
             end
             presetsInfo[name] = info
@@ -979,7 +979,7 @@ function CreateGridColumn(faction, units, col, sortCategories, sortReversed)
     return col
 end
 
--- Adds safely an icon to specified grid and increases grid size if needed 
+-- Adds safely an icon to specified grid and increases grid size if needed
 function CreateGridCell(targetGrid, icon, col, row)
     targetGrid.rows = targetGrid.rows or 0
     targetGrid.cols = targetGrid.cols or 0
@@ -1024,7 +1024,7 @@ function CreateGrid(parent, cellSize, cellSize, cols, rows)
 
     return grid
 end
- 
+
 -- Compares two variables of any type
 function CompareUnitsBy(a, b)
     local typeA, typeB = type(a), type(b)

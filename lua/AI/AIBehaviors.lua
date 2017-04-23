@@ -1857,9 +1857,9 @@ end
 function CDRReturnHomeSorian(aiBrain, cdr, Mult)
     -- This is a reference... so it will autoupdate
     local cdrPos = cdr:GetPosition()
+    local rad = 100 * Mult
     local distSqAway = rad * rad
     local loc = cdr.CDRHome
-    local rad = 100 * Mult
     if not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
         local plat = aiBrain:MakePlatoon('', '')
         aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
@@ -2597,7 +2597,7 @@ end
 function InWaterCheck(platoon)
     local t4Pos = platoon:GetPlatoonPosition()
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
-    
+
     return inWater
 end
 
@@ -2605,9 +2605,9 @@ function FatBoyBehaviorSorian(self)
     if not self:GatherUnitsSorian() then
         return
     end
-    
+
     AssignExperimentalPrioritiesSorian(self)
-    
+
     -- Find target loop
     local experimental
     local targetUnit = false
@@ -2622,11 +2622,11 @@ function FatBoyBehaviorSorian(self)
         if lastBase then
             targetUnit, lastBase = WreckBaseSorian(self, lastBase)
         end
-        
+
         if not lastBase then
             targetUnit, lastBase = FindExperimentalTargetSorian(self)
         end
-        
+
         useMove = InWaterCheck(self)
         if targetUnit then
             IssueClearCommands(platoonUnits)
@@ -2662,7 +2662,7 @@ function FatBoyBehaviorSorian(self)
                     break
                 end
             end
-            
+
             if not airUnit then
                 closestBlockingShield = GetClosestShieldProtectingTargetSorian(experimental, experimental)
             end
@@ -2696,7 +2696,7 @@ function FatBoyBehaviorSorian(self)
                         break
                     end
                 end
-                
+
                 if not airUnit then
                     closestBlockingShield = GetClosestShieldProtectingTargetSorian(experimental, experimental)
                 end
@@ -2714,7 +2714,7 @@ function BehemothBehaviorSorian(self)
         return
     end
     AssignExperimentalPrioritiesSorian(self)
-    
+
     -- Find target loop
     local experimental
     local targetUnit = false
@@ -2731,7 +2731,7 @@ function BehemothBehaviorSorian(self)
         if lastBase then
             targetUnit, lastBase = WreckBaseSorian(self, lastBase)
         end
-        
+
         if not lastBase then
             targetUnit, lastBase = FindExperimentalTargetSorian(self)
         end
@@ -2780,7 +2780,7 @@ function BehemothBehaviorSorian(self)
                     break
                 end
             end
-            
+
             if not airUnit then
                 closestBlockingShield = GetClosestShieldProtectingTargetSorian(experimental, experimental)
             end
@@ -2804,7 +2804,7 @@ function BehemothBehaviorSorian(self)
                 if SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), closestBlockingShield:GetPosition()) < 40000 then
                     farAway = false
                 end
-                
+
                 -- Wait for shield to die loop
                 while not closestBlockingShield.Dead and aiBrain:PlatoonExists(self) and useMove == InWaterCheck(self)
                 and self:IsCommandsActive(cmd) do
@@ -2824,7 +2824,7 @@ function BehemothBehaviorSorian(self)
                         break
                     end
                 end
-                
+
                 if not airUnit then
                     closestBlockingShield = GetClosestShieldProtectingTargetSorian(experimental, experimental)
                 end

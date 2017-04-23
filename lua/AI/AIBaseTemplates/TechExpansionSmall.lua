@@ -14,7 +14,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T2SpeedUpgradeBuildersExpansions',
         'T2SpeedUpgradeBuildersExpansions',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
@@ -23,28 +23,28 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'LandInitialFactoryConstruction',
         'EngineerFactoryConstructionLandHigherPriority',
-        
+
         # ==== DEFENSES ==== #
         'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-        
+
         'T1DefensivePoints',
         'T2DefensivePoints',
         'T3DefensivePoints',
-        
+
         'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
-        
+
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
-        
+
         'MiscDefensesEngineerBuilders',
-        
+
         # ==== NAVAL EXPANSION ==== #
         'NavalExpansionBuilders',
-        
+
         # ==== LAND UNIT BUILDERS ==== #
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
@@ -52,7 +52,7 @@ BaseBuilderTemplate {
         'FrequentLandAttackFormBuilders',
         'MassHunterLandFormBuilders',
         'MiscLandFormBuilders',
-        
+
         'T1LandAA',
         'T2LandAA',
 
@@ -65,11 +65,11 @@ BaseBuilderTemplate {
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-        
+
         'TransportFactoryBuilders',
-        
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
@@ -86,13 +86,13 @@ BaseBuilderTemplate {
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
         'AirScoutFormBuilders',
-        
+
         'LandScoutFactoryBuilders',
         'LandScoutFormBuilders',
-        
+
         'RadarEngineerBuilders',
         'RadarUpgradeBuildersExpansion',
-        
+
         'CounterIntelBuilders',
     },
     BaseSettings = {
@@ -103,8 +103,8 @@ BaseBuilderTemplate {
             SCU = 2,
         },
         FactoryCount = {
-            Land = 2, 
-            Air = 1, 
+            Land = 2,
+            Air = 1,
             Sea = 0,
             Gate = 1,
         },
@@ -118,14 +118,14 @@ BaseBuilderTemplate {
         if markerType != 'Expansion Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        if not( personality == 'adaptive' or personality == 'tech' ) then
+        if not(personality == 'adaptive' or personality == 'tech') then
             return 0
         end
 
         local threatCutoff = 10 # value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
+        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 100
         elseif distance > 500 then
@@ -135,7 +135,7 @@ BaseBuilderTemplate {
         else # within 250
             return 10
         end
-        
+
         return 0
     end,
 }

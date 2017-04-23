@@ -12,7 +12,7 @@ function ResetSyncTable()
         CameraRequests = {},
         Sounds = {},
         Voice = {},
-		AIChat = {},
+        AIChat = {},
 
         # Table of army indices set to "victory" or "defeat".
         # It's the user layer's job to determine if any UI needs to be shown
@@ -25,7 +25,7 @@ function ResetSyncTable()
 
         # Contain operation data when op is complete
         OperationComplete = nil,
-        
+
         UnitData = {},
         ReleaseIds = {},
     }

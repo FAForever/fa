@@ -128,10 +128,10 @@ XSB2401 = Class(SStructureUnit) {
     end,
 
     ChargeNukeSound = function(self)
-		WaitSeconds(1.5)
-		self:PlayUnitAmbientSound( 'NukeCharge' )
-		WaitSeconds(9.5)
-		self:StopUnitAmbientSound( 'NukeCharge' )
+        WaitSeconds(1.5)
+        self:PlayUnitAmbientSound('NukeCharge')
+        WaitSeconds(9.5)
+        self:StopUnitAmbientSound('NukeCharge')
     end,
 }
 

@@ -26,7 +26,7 @@ local CreateScaledBoom = function(unit, overkill, bone)
         unit,
         bone or 0,
         explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-    )
+)
 end
 
 -- MISC UNITS
@@ -184,7 +184,7 @@ StructureUnit = Class(Unit) {
         if terrain then
             terrainName = terrain.Name
         end
-        
+
         -- Players and AI can build buildings outside of their faction. Get the *building's* faction to determine the correct tarrain-specific tarmac
         local factionTable = {e = 1, a = 2, r = 3, s = 4}
         local faction  = factionTable[string.sub(self:GetUnitId(), 2, 2)]
@@ -200,7 +200,7 @@ StructureUnit = Class(Unit) {
                 self.Trash:Add(tarmacHndl)
             end
         end
-        
+
         if normal and tarmac.Normal then
             local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, army, 0)
 
@@ -209,7 +209,7 @@ StructureUnit = Class(Unit) {
                 self.Trash:Add(tarmacHndl)
             end
         end
-        
+
         if glow and tarmac.Glow then
             local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, army, 0)
 
@@ -222,7 +222,7 @@ StructureUnit = Class(Unit) {
 
     DestroyTarmac = function(self)
         if not self.TarmacBag then return end
-        
+
         for k, v in self.TarmacBag.Decals do
             v:Destroy()
         end
@@ -332,7 +332,7 @@ StructureUnit = Class(Unit) {
                     self.AnimatorUpgradeManip:SetAnimationFraction(fractionOfComplete)
                     WaitTicks(1)
                 end
-                
+
                 if not self.Dead then
                     self.AnimatorUpgradeManip:SetRate(1)
                 end
@@ -808,9 +808,9 @@ FactoryUnit = Class(StructureUnit) {
     CalculateRollOffPoint = function(self)
         local bp = self:GetBlueprint().Physics.RollOffPoints
         local px, py, pz = unpack(self:GetPosition())
-        
+
         if not bp then return 0, px, py, pz end
-        
+
         local vectorObj = self:GetRallyPoint()
         local bpKey = 1
         local distance, lowest = nil
@@ -821,7 +821,7 @@ FactoryUnit = Class(StructureUnit) {
                 lowest = distance
             end
         end
-        
+
         local fx, fy, fz, spin
         local bpP = bp[bpKey]
         local unitBP = self.UnitBeingBuilt:GetBlueprint().Display.ForcedBuildSpin
@@ -830,11 +830,11 @@ FactoryUnit = Class(StructureUnit) {
         else
             spin = bpP.UnitSpin
         end
-        
+
         fx = bpP.X + px
         fy = bpP.Y + py
         fz = bpP.Z + pz
-        
+
         return spin, fx, fy, fz
     end,
 
@@ -876,17 +876,17 @@ FactoryUnit = Class(StructureUnit) {
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
-        
+
         -- Wait until unit has left the factory
         while not self.UnitBeingBuilt.Dead and self.MoveCommand and not IsCommandDone(self.MoveCommand) do
             WaitSeconds(0.5)
         end
-        
+
         self.MoveCommand = nil
         self:PlayFxRollOffEnd()
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
-        
+
         ChangeState(self, self.IdleState)
     end,
 
@@ -1552,7 +1552,7 @@ WalkingLandUnit = Class(MobileUnit) {
             if not self.Animator then
                 self.Animator = CreateAnimator(self, true)
             end
-            
+
             local bpDisplay = self:GetBlueprint().Display
             if bpDisplay.AnimationWalk then
                 self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)

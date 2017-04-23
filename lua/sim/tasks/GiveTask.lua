@@ -51,7 +51,7 @@ GiveTask = Class(ScriptTask) {
                     ArrowColor='yellow',
                 }
                 SpawnPing(data)
-	       end
+           end
         end
 
         transferList[self.Army] = {}

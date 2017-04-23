@@ -97,7 +97,7 @@ function CMauiItemList:base()
 end
 
 ---
--- 
+--
 function CMauiItemList:moho.item_list_methods()
 end
 

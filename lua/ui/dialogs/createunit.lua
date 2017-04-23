@@ -34,11 +34,11 @@ local function getItems()
     return idlist
 end
 
-local function CreateNameFilter(data)   
+local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
     group.Height:Set(30)
-    
+
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
     LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -49,11 +49,11 @@ local function CreateNameFilter(data)
     if activeFilters[data.key] == nil then
         activeFilters[data.key] = {}
     end
-    
+
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
     LayoutHelpers.AtVerticalCenterIn(group.label, group)
-    
+
     if data.choices then
         group.items = {}
         for i, v in data.choices do
@@ -65,11 +65,11 @@ local function CreateNameFilter(data)
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             end
             LayoutHelpers.AtVerticalCenterIn(group.items[index], group)
-            
+
             group.items[index].label = UIUtil.CreateText(group.items[index], v.title, 10, UIUtil.bodyFont)
             LayoutHelpers.AtCenterIn(group.items[index].label, group.items[index])
             group.items[index].label:DisableHitTest()
-            
+
             group.items[index].sortFunc = v.sortFunc
             group.items[index].filterKey = v.key
             group.items[index].key = data.key
@@ -120,7 +120,7 @@ local function CreateNameFilter(data)
         group.edit.filterKey = data.key
         group.edit.key = data.key
         group.edit.sortFunc = data.sortFunc
-        
+
         group.edit.OnTextChanged = function(self, new, old)
             if new == '' then
                 activeFilters[self.key][self.filterKey] = nil
@@ -136,12 +136,12 @@ local function CreateNameFilter(data)
             end
             RefreshList()
         end
-        
+
         defaultEditField = group.edit
-        
+
         specialFilterControls[data.key] = group.edit
     end
-    
+
     group.check.OnCheck = function(self, checked)
         activeFilterTypes[self.key] = checked
         filterSet[data.key].value = checked
@@ -157,13 +157,13 @@ local function CreateNameFilter(data)
                 v.label:SetColor(labelColor)
             end
         else
-            
+
         end
         group.label:SetColor(labelColor)
         RefreshList()
     end
     group.check:SetCheck(filterSet[data.key].value)
-    
+
     return group
 end
 
@@ -173,9 +173,9 @@ function CreateDialog(x, y)
         dialog = false
         return
     end
-    
+
     CreationList = {}
-    
+
     dialog = Bitmap(GetFrame(0))
     dialog:SetSolidColor('CC000000')
     dialog.Height:Set(600)
@@ -183,7 +183,7 @@ function CreateDialog(x, y)
     dialog.Left:Set(function() return math.max(math.min(x, GetFrame(0).Right() - dialog.Width()), 0) end)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    
+
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
     LayoutHelpers.AtBottomIn(cancelBtn, dialog)
     LayoutHelpers.AtRightIn(cancelBtn, dialog)
@@ -191,11 +191,11 @@ function CreateDialog(x, y)
         dialog:Destroy()
         dialog = false
     end
-    
+
     local countLabel = UIUtil.CreateText(dialog, 'Count:', 12, UIUtil.bodyFont)
     LayoutHelpers.AtBottomIn(countLabel, dialog,10)
     LayoutHelpers.AtLeftIn(countLabel, dialog, 5)
-    
+
     local count = Edit(dialog)
     count:SetForegroundColor(UIUtil.fontColor)
     count:SetBackgroundColor('ff333333')
@@ -207,7 +207,7 @@ function CreateDialog(x, y)
     count:SetMaxChars(4)
     count:SetText('1')
     LayoutHelpers.RightOf(count, countLabel, 5)
-    
+
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
@@ -225,7 +225,7 @@ function CreateDialog(x, y)
         dialog:Destroy()
         dialog = false
     end
-    
+
     local function SetFilters(filterTable)
         for filterGroup, groupControls in filterGroups do
             local key = groupControls.check.key
@@ -247,19 +247,19 @@ function CreateDialog(x, y)
         end
         RefreshList()
     end
-    
+
     local function CreateArmySelectionSlot(parent, index, armyData)
         local group = Bitmap(parent)
         group.Height:Set(30)
         group.Width:Set(function() return parent.Width() / 2 end)
-        
+
         local iconBG = Bitmap(group)
         iconBG.Height:Set(30)
         iconBG.Width:Set(30)
         iconBG:SetSolidColor(armyData.color)
         LayoutHelpers.AtLeftTopIn(iconBG, group)
         iconBG:DisableHitTest()
-        
+
         local icon = Bitmap(iconBG)
         if armyData.civilian then
             icon:SetSolidColor('aaaaaaaa')
@@ -268,7 +268,7 @@ function CreateDialog(x, y)
         end
         LayoutHelpers.FillParent(icon, iconBG)
         icon:DisableHitTest()
-        
+
         local name = UIUtil.CreateText(group, armyData.nickname, 12, UIUtil.bodyFont)
         LayoutHelpers.RightOf(name, icon, 2)
         LayoutHelpers.AtTopIn(name, group)
@@ -278,7 +278,7 @@ function CreateDialog(x, y)
         local army = UIUtil.CreateText(group, armyData.name, 12, UIUtil.bodyFont)
         LayoutHelpers.Below(army, name)
         army:DisableHitTest()
-        
+
         group.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 if currentArmy == index then
@@ -310,11 +310,11 @@ function CreateDialog(x, y)
         end
         return group
     end
-    
+
     local armiesGroup = Group(dialog)
     armiesGroup.Width:Set(dialog.Width)
     LayoutHelpers.AtLeftTopIn(armiesGroup, dialog)
-    
+
     armiesGroup.armySlots = {}
     local lowestControl = false
     for index, val in GetArmiesTable().armiesTable do
@@ -333,16 +333,16 @@ function CreateDialog(x, y)
             lowestControl = armiesGroup.armySlots[i]
         end
     end
-    
+
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
-    
+
     local filterSetCombo = Combo(dialog, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     filterSetCombo.Width:Set(250)
     LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
-    filterSetCombo.OnClick = function(self, index, text, skipUpdate) 
+    filterSetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
     end
-    
+
     local function RefreshFilterList(defName)
         filterSetCombo:ClearItems()
         filterSetCombo.itemArray = {}
@@ -362,8 +362,8 @@ function CreateDialog(x, y)
             filterSetCombo:AddItems(filterSetCombo.itemArray, default)
         end
     end
-    
-    local saveFilterSet = UIUtil.CreateButton(dialog, 
+
+    local saveFilterSet = UIUtil.CreateButton(dialog,
         '/dialogs/toggle_btn/toggle-d_btn_up.dds',
         '/dialogs/toggle_btn/toggle-d_btn_down.dds',
         '/dialogs/toggle_btn/toggle-d_btn_over.dds',
@@ -381,12 +381,12 @@ function CreateDialog(x, y)
             else
                 newFilterListing[name] = filterSet
             end
-            SetPreference('CreateUnitFilters',newFilterListing) 
+            SetPreference('CreateUnitFilters',newFilterListing)
             RefreshFilterList(name)
         end)
     end
-    
-    local delFilterSet = UIUtil.CreateButton(dialog, 
+
+    local delFilterSet = UIUtil.CreateButton(dialog,
         '/dialogs/toggle_btn/toggle-d_btn_up.dds',
         '/dialogs/toggle_btn/toggle-d_btn_down.dds',
         '/dialogs/toggle_btn/toggle-d_btn_over.dds',
@@ -404,13 +404,13 @@ function CreateDialog(x, y)
             if oldFilterSets[delName] then
                 oldFilterSets[delName] = nil
             end
-            SetPreference('CreateUnitFilters',oldFilterSets) 
+            SetPreference('CreateUnitFilters',oldFilterSets)
             RefreshFilterList()
        end
     end
-    
+
     RefreshFilterList()
-    
+
     filterGroups = {}
     for filtIndex, filter in nameFilters do
         local index = filtIndex
@@ -422,28 +422,28 @@ function CreateDialog(x, y)
             LayoutHelpers.Below(filterGroups[index], filterGroups[index-1])
         end
     end
-    
+
     dialog.unitList = Group(dialog)
     dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - 5 end)
     dialog.unitList.Width:Set(function() return dialog.Width() - 40 end)
     LayoutHelpers.Below(dialog.unitList, filterGroups[table.getn(filterGroups)])
     dialog.unitList.top = 0
-    
+
     dialog.unitEntries = {}
-    
+
     UIUtil.CreateVertScrollbarFor(dialog.unitList)
-    
+
     local LineColors = {
         Up = '00000000', Sel_Up = 'ff447744',
         Over = 'ff444444', Sel_Over = 'ff669966',
     }
-    
+
     local mouseover = false
     local function CreateElementMouseover(unitData,x,y)
         if mouseover then mouseover:Destroy() end
         mouseover = Bitmap(dialog)
         mouseover:SetSolidColor('dd115511')
-        
+
         mouseover.img = Bitmap(mouseover)
         mouseover.img.Height:Set(40)
         mouseover.img.Width:Set(40)
@@ -453,14 +453,14 @@ function CreateDialog(x, y)
         else
             mouseover.img:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
         end
-        
+
         mouseover.name = UIUtil.CreateText(mouseover, __blueprints[unitData].Description, 14, UIUtil.bodyFont)
         LayoutHelpers.RightOf(mouseover.name, mouseover.img, 2)
-        
+
         mouseover.desc = UIUtil.CreateText(mouseover, __blueprints[unitData].General.UnitName or unitData, 14, UIUtil.bodyFont)
         LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
         LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
-        
+
         mouseover.Left:Set(x+20)
         mouseover.Top:Set(y+20)
         mouseover.Height:Set(function() return mouseover.img.Height() + 4 end)
@@ -479,7 +479,7 @@ function CreateDialog(x, y)
             mouseover = false
         end
     end
-    
+
     local function CreateUnitElements()
         if dialog.unitEntries then
             for i, v in dialog.unitEntries do
@@ -487,7 +487,7 @@ function CreateDialog(x, y)
             end
             dialog.unitEntries = {}
         end
-        
+
         local function CreateElement(index)
             dialog.unitEntries[index] = Bitmap(dialog.unitList)
             dialog.unitEntries[index].Left:Set(dialog.unitList.Left)
@@ -531,14 +531,14 @@ function CreateDialog(x, y)
                     MoveMouseover(event.MouseX,event.MouseY)
                 end
             end
-                        
+
             dialog.unitEntries[index].id = UIUtil.CreateText(dialog.unitEntries[index], '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtLeftTopIn(dialog.unitEntries[index].id, dialog.unitEntries[index])
         end
-        
+
         CreateElement(1)
         LayoutHelpers.AtTopIn(dialog.unitEntries[1], dialog.unitList)
-            
+
         local index = 2
         while dialog.unitEntries[table.getsize(dialog.unitEntries)].Top() + (2 * dialog.unitEntries[1].Height()) < dialog.unitList.Bottom() do
             CreateElement(index)
@@ -547,13 +547,13 @@ function CreateDialog(x, y)
         end
     end
     CreateUnitElements()
-    
+
     local numLines = function() return table.getsize(dialog.unitEntries) end
-    
+
     local function DataSize()
         return table.getn(UnitList)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -610,7 +610,7 @@ function CreateDialog(x, y)
         end
         --LOG(repr(ObjectiveLogData))
     end
-    
+
     dialog.unitList.HandleEvent = function(control, event)
         if event.Type == 'WheelRotation' then
             local lines = 3
@@ -647,7 +647,7 @@ function RefreshList()
             end
         end
         if allValid then
-            
+
             table.insert(UnitList, {id = v, name = LOC(__blueprints[v].General.UnitName) or '', desc = LOC(__blueprints[v].Description) or ''})
         end
     end
@@ -662,11 +662,11 @@ function NameSet(callback)
     nameDialog = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp.dds'), "Marker Name Dialog")
     LayoutHelpers.AtCenterIn(nameDialog, GetFrame(0))
     nameDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
-    
+
     local label = UIUtil.CreateText(nameDialog, "Name your filter set:", 16, UIUtil.buttonFont)
     label.Top:Set(function() return nameDialog.Top() + 30 end)
     label.Left:Set(function() return nameDialog.Left() + 35 end)
-    
+
     local cancelButton = UIUtil.CreateButtonStd(nameDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
     cancelButton.Top:Set(function() return nameDialog.Top() + 112 end)
     cancelButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
@@ -693,7 +693,7 @@ function NameSet(callback)
         nameDialog:Destroy()
         nameDialog = false
     end
-    
+
     nameEdit.OnEnterPressed = function(self, text)
         okButton.OnClick()
     end

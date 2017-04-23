@@ -99,6 +99,7 @@ Blacklist = {
     ['ecbf6277-24e3-437a-b968-EcoManager-v4'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v5'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v6'] = UPGRADE,
+    ['ecbf6277-24e3-437a-b968-EcoManager-v7'] = UPGRADE,
 
     -- Nofity (Old broken ones)
     ['3d098ad8-adb1-4c5d-8daa-a42418274de2'] = UPGRADE,
@@ -130,4 +131,11 @@ Blacklist = {
     
     ['12345678-3343-4bf6-9236-451244fa9999'] = BROKEN,
     ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = OBSOLETE,
+    
+    ['D49b27d4-7252-42b8-b39e-ac04cc195adb'] = INCOMPATIBLE,
+    ['728e8d44-98e9-11e5-8994-feff819cdc9f'] = INCOMPATIBLE,
+    ['55394440-5DC8-11E3-91ED-66546288709B'] = INCOMPATIBLE,
+    ['5048d937-4872-4e86-9f09-dd1806a0629c'] = INCOMPATIBLE,
+    ['2bc59538-fc2c-4a18-964b-85322e9562a2'] = INCOMPATIBLE,
+    ['022E3DB4-9C00-4ED7-9876-4866D316E009'] = INCOMPATIBLE,
 }

@@ -21,10 +21,10 @@ URA0001 = Class(CAirUnit) {
         self:SetConsumptionActive(false)
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams( self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag )
+        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
     end,
 
     OnStartReclaim = function(self, target)
@@ -55,11 +55,11 @@ URA0001 = Class(CAirUnit) {
     OnKilled = function(self)
         self:StopBuildingEffects()
     end,
-    
+
     -- Don't cycle intel!
     EnableUnitIntel = function(self, disabler, intel)
     end,
-    
+
     -- Don't make wreckage
     CreateWreckage = function (self, overkillRatio)
         overkillRatio = 1.1

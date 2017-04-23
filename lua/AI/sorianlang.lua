@@ -8,11 +8,11 @@
 #****************************************************************************
 
 AINames = {
-	#Czar
+    #Czar
     uaa0310 = {
         'Donut of Doom',
-		'Chariot of Fire',
-		'Champion of the Sky',
+        'Chariot of Fire',
+        'Champion of the Sky',
         'Aera Cura',
         'Acca Larentia',
         'Averna',
@@ -44,14 +44,14 @@ AINames = {
         'Vica Pota',
         'Viriplaca',
         'Volumna',
-        'Voluptas', 
+        'Voluptas',
     },
-	#Colossus
+    #Colossus
     ual0401 = {
         'Golem',
         'Cyclops',
-		'Missionary',
-		'Wrath',
+        'Missionary',
+        'Wrath',
         'Anakim',
         'Argus',
         'Atlas',
@@ -71,22 +71,22 @@ AINames = {
         'Jentilak',
         'Angrboda',
     },
-	#Tempest
+    #Tempest
     uas0401 = {
         'Sea Cleanser',
-		'Purifier',
+        'Purifier',
         'Divine Hammer',
-		'Divine Thunder',
-		'Divine Intervention',
-       	'Divine Punishment',
-		'Truth',
-		'Peace',
-       	'Glory',
-		'Devotion',
-		'Faith',
-       	'Purity',
+        'Divine Thunder',
+        'Divine Intervention',
+        'Divine Punishment',
+        'Truth',
+        'Peace',
+        'Glory',
+        'Devotion',
+        'Faith',
+        'Purity',
     },
-	#Soul Ripper
+    #Soul Ripper
     ura0401 = {
         'Beast',
         'Ogre',
@@ -99,13 +99,13 @@ AINames = {
         'Imp',
         'Meffit',
     },
-	#Scathis
+    #Scathis
     url0401 = {
         'Base Pounder',
         'Aconite',
         'Adonis',
         'Bloodflower',
-		'Doom Blossom',
+        'Doom Blossom',
         'Foxglove',
         'Henbane',
         'Larkspur',
@@ -113,13 +113,13 @@ AINames = {
         'Hemlock',
         'Toloache',
     },
-	#Monkeylord
+    #Monkeylord
     url0402 = {
         'Gorilla King',
-		'Berserker',
-		'Flayer',
-		'Shelob',
-		'Your End',
+        'Berserker',
+        'Flayer',
+        'Shelob',
+        'Your End',
         'Black Widow',
         'Black Katipo',
         'Red Widow',
@@ -132,23 +132,23 @@ AINames = {
         'Tarantula',
         'Wolf',
         'Six Eyes',
-        'Bolas', 
+        'Bolas',
     },
-	#Megalith
+    #Megalith
     xrl0403 = {
         'Fiddler',
-		'Soldier',
-		'Hermit',
-		'Spider',
-		'Opilio',
-		'Tanner',
+        'Soldier',
+        'Hermit',
+        'Spider',
+        'Opilio',
+        'Tanner',
     },
-	#Fatboy
-	uel0401 = {
+    #Fatboy
+    uel0401 = {
         'Fort Knox',
-		'Bertha',
-		'Victory',
-		'Firepower',
+        'Bertha',
+        'Victory',
+        'Firepower',
         'Centurion',
         'Conqueror',
         'Chieftain',
@@ -166,26 +166,26 @@ AINames = {
         'Bradley',
         'Stryker',
     },
-	#Novax Satellite
-	xea0002 = {
+    #Novax Satellite
+    xea0002 = {
         'Skynet',
-		'Death from Above',
-		'Eye in the Sky',
-		'Orbital Defense',
-		'UEF Defense Net',
-		'Solar Bean',
+        'Death from Above',
+        'Eye in the Sky',
+        'Orbital Defense',
+        'UEF Defense Net',
+        'Solar Bean',
     },
-	#Atlantis
-	ues0401 = {
+    #Atlantis
+    ues0401 = {
         'Sword of the Ocean',
-		'Great White',
-		'Kraken',
-		'Deep One',
+        'Great White',
+        'Kraken',
+        'Deep One',
     },
-	#Mavor
+    #Mavor
     ueb2401 = {
         'Longshot',
-		'Pride of the UEF',
+        'Pride of the UEF',
         'Ballista',
         'Catapult',
         'Helepolis',
@@ -195,20 +195,20 @@ AINames = {
         'Warwolf',
         'Onager',
         'Bad Neighbor',
-		'Gods Slingshot',
+        'Gods Slingshot',
     },
-	#Ahwassa
-	xsa0402 = {
+    #Ahwassa
+    xsa0402 = {
         'Chariot of Doom',
-		'Wrath',
-		'Vengeance',
-		'Revenge',
-		'Anger',
-		'Fury',
-		'Avenger',
+        'Wrath',
+        'Vengeance',
+        'Revenge',
+        'Anger',
+        'Fury',
+        'Avenger',
     },
-	#Ythotha
-	xsl0401 = {
+    #Ythotha
+    xsl0401 = {
         'Bolthorn',
         'Grid',
         'Hrod',
@@ -228,90 +228,90 @@ AINames = {
 }
 
 AIChatText = {
-	nukechat = { 
-		'Nuke volley headed for [target].', 
-		'Launching nukes at [target].', 
-		'Firing nukes at [target].', 
-		'Gonna make [target]\'s base glow in the dark.',
-		'I have nukes headed for [target].',
-	},
-	targetchat = { 
-		'Switching targets to [target].', 
-		'Focusing attacks on [target].', 
-		'Attacking [target].', 
-		'Sending units at [target].',
-		'Shifting focus to [target].',
-	},
-	tcrespond = {
-		'Copy that, targeting [target].',
-		'Roger, switching targets to [target].',
-		'Copy, let\'s get [target].',
-		'Roger that, focusing attacks on [target].',
-		'Copy, [target] is the new target.',
-	},
-	tcerrorally = {
-		'I cannot target [target], They are an ally.',
-		'Umm, [target] is our ally.',
-		'[target] is an ally! Sheesh, I\'m the computer player.',
-		'Since [target] is an ally attacking them would be a bad idea.',
-		'Wake up! [target] is an ally. Wow!',
-	},
-	nuketaunt = {
-		'Goodnight and goodluck.',
-		'Nice knowing you.',
-		'gg',
-		'This is going to leave a mark.',
-		'Say hello to my little friend.',
-		'Mind if I set this nuke here, thanks ;).',
-		'Catch!',
-		'This is only going to sting for a second.',
-		'I\'ve Got a little present for ya!',
-	},
-	t4taunt = {
-		'This will all be over soon.',
-		'Been nice knowing you.',
-		'I hope you weren\'t getting used to being alive.',
-		'Say hello to my BIG friend.',
-		'Now, you guys play nice with my pet.',
-		'I\'m sending a playmate for you.',
-		'I\'ve Got a surprise for ya!',
-	},
-	ilost = {
-		'GG',
-		'You got lucky.',
-		'Haxxors.',
-		'Noooooo.',
-		'Next time, your mine.',
-		'I was going easy on you, noob.',
-		'I\'ll get you next time.',
-	},
-	badmap = {
-		'Ok. I give up. Where are the map markers?',
-		'Um, can we play on a map with markers?',
-		'OMG I\'m blind! There aren\'t any markers',
-		'There aren\'t any map markers. Is there a \\nextmap command?',
-		'New map please. Preferably one with markers.',
-	},
-	focuschat = {
-		'Currently focusing on [extra].',
-	},
-	giveengineer = {
-		'Use it wisely.',
-		'Sure, not like I was going to use it or anything :P',
-		'Here.',
-		'Fine, but getting it there is your problem.',
-		'OK.',
-		'I guess so.',
-		'Have fun with it.',
-	},
-	genericchat = {
-		'Roger.',
-		'Copy.',
-		'Copy that.',
-		'Roger that.',
-		'Got it.',
-		'Ok.',
-		'I got it.',
-		'No problem.',
-	},
+    nukechat = {
+        'Nuke volley headed for [target].',
+        'Launching nukes at [target].',
+        'Firing nukes at [target].',
+        'Gonna make [target]\'s base glow in the dark.',
+        'I have nukes headed for [target].',
+    },
+    targetchat = {
+        'Switching targets to [target].',
+        'Focusing attacks on [target].',
+        'Attacking [target].',
+        'Sending units at [target].',
+        'Shifting focus to [target].',
+    },
+    tcrespond = {
+        'Copy that, targeting [target].',
+        'Roger, switching targets to [target].',
+        'Copy, let\'s get [target].',
+        'Roger that, focusing attacks on [target].',
+        'Copy, [target] is the new target.',
+    },
+    tcerrorally = {
+        'I cannot target [target], They are an ally.',
+        'Umm, [target] is our ally.',
+        '[target] is an ally! Sheesh, I\'m the computer player.',
+        'Since [target] is an ally attacking them would be a bad idea.',
+        'Wake up! [target] is an ally. Wow!',
+    },
+    nuketaunt = {
+        'Goodnight and goodluck.',
+        'Nice knowing you.',
+        'gg',
+        'This is going to leave a mark.',
+        'Say hello to my little friend.',
+        'Mind if I set this nuke here, thanks ;).',
+        'Catch!',
+        'This is only going to sting for a second.',
+        'I\'ve Got a little present for ya!',
+    },
+    t4taunt = {
+        'This will all be over soon.',
+        'Been nice knowing you.',
+        'I hope you weren\'t getting used to being alive.',
+        'Say hello to my BIG friend.',
+        'Now, you guys play nice with my pet.',
+        'I\'m sending a playmate for you.',
+        'I\'ve Got a surprise for ya!',
+    },
+    ilost = {
+        'GG',
+        'You got lucky.',
+        'Haxxors.',
+        'Noooooo.',
+        'Next time, your mine.',
+        'I was going easy on you, noob.',
+        'I\'ll get you next time.',
+    },
+    badmap = {
+        'Ok. I give up. Where are the map markers?',
+        'Um, can we play on a map with markers?',
+        'OMG I\'m blind! There aren\'t any markers',
+        'There aren\'t any map markers. Is there a \\nextmap command?',
+        'New map please. Preferably one with markers.',
+    },
+    focuschat = {
+        'Currently focusing on [extra].',
+    },
+    giveengineer = {
+        'Use it wisely.',
+        'Sure, not like I was going to use it or anything :P',
+        'Here.',
+        'Fine, but getting it there is your problem.',
+        'OK.',
+        'I guess so.',
+        'Have fun with it.',
+    },
+    genericchat = {
+        'Roger.',
+        'Copy.',
+        'Copy that.',
+        'Roger that.',
+        'Got it.',
+        'Ok.',
+        'I got it.',
+        'No problem.',
+    },
 }

@@ -82,7 +82,7 @@ function CAiAttackerImpl:Stop()
 end
 
 ---
--- 
+--
 function CAiAttackerImpl:moho.CAiAttackerImpl_methods()
 end
 

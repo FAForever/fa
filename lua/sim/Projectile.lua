@@ -130,7 +130,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             MetaImpactRadius = nil,
         }
         self.Trash = TrashBag()
-		local bp = self:GetBlueprint()
+        local bp = self:GetBlueprint()
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
         local snd = self:GetBlueprint().Audio.ExistLoop
@@ -202,7 +202,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
-                
+
                 -- Calculate the excess damage amount
                 local excess = health - amount
                 local maxHealth = self:GetBlueprint().Defense.MaxHealth or 10
@@ -230,11 +230,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
-			if self.FxImpactTrajectoryAligned then
-				emit = CreateEmitterAtBone(self, -2, army, v)
-			else
-				emit = CreateEmitterAtEntity(self, army, v)
-			end
+            if self.FxImpactTrajectoryAligned then
+                emit = CreateEmitterAtBone(self, -2, army, v)
+            else
+                emit = CreateEmitterAtEntity(self, army, v)
+            end
             if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
@@ -258,8 +258,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if ImpactEffectType then
             TerrainType = GetTerrainType(pos.x, pos.z)
             if TerrainType.FXImpact[TargetType][ImpactEffectType] == nil then
-			    TerrainType = GetTerrainType(-1, -1)
-		    end
+                TerrainType = GetTerrainType(-1, -1)
+            end
         else
             TerrainType = GetTerrainType(-1, -1)
             ImpactEffectType = 'Default'
@@ -274,14 +274,14 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
 
         -- If this unit category is on the weapon's do-not-collide list, skip!
-		local weaponBP = firingWeapon:GetBlueprint()
-		if weaponBP.DoNotCollideList then
-			for k, v in pairs(weaponBP.DoNotCollideList) do
-				if EntityCategoryContains(ParseEntityCategory(v), self) then
-					return false
-				end
-			end
-		end
+        local weaponBP = firingWeapon:GetBlueprint()
+        if weaponBP.DoNotCollideList then
+            for k, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
         return true
     end,
 
@@ -372,7 +372,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local TerrainEffects = self:GetTerrainEffects(targetType, self:GetBlueprint().Display.ImpactEffects.Type)
         self:CreateImpactEffects(army, ImpactEffects, ImpactEffectScale)
         self:CreateTerrainEffects(army, TerrainEffects, self:GetBlueprint().Display.ImpactEffects.Scale or 1)
-        
+
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
             self:ForkThread(self.ImpactTimeoutThread, timeout)
@@ -396,26 +396,26 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- When this projectile impacts with the target, do any buffs that have been passed to it.
     DoUnitImpactBuffs = function(self, target)
         local data = self.DamageData
-		-- Check for buff
-		if data.Buffs then
-		    -- Check for valid target
-			for k, v in data.Buffs do
-				if v.Add.OnImpact == true then
-					if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
-						target = self:GetLauncher()
-					end
-					-- Check for target validity
+        -- Check for buff
+        if data.Buffs then
+            -- Check for valid target
+            for k, v in data.Buffs do
+                if v.Add.OnImpact == true then
+                    if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
+                        target = self:GetLauncher()
+                    end
+                    -- Check for target validity
                     if target and IsUnit(target) then
-					    if v.Radius and v.Radius > 0 then
-						    -- This is a radius buff
-						    -- get the position of the projectile
-						    target:AddBuff(v, self:GetPosition())
-					    else
-					        -- This is a single target buff
-						    target:AddBuff(v)
-					    end
-				    end
-			    end
+                        if v.Radius and v.Radius > 0 then
+                            -- This is a radius buff
+                            -- get the position of the projectile
+                            target:AddBuff(v, self:GetPosition())
+                        else
+                            -- This is a single target buff
+                            target:AddBuff(v)
+                        end
+                    end
+                end
             end
         end
     end,

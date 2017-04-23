@@ -36,7 +36,7 @@ function CreateBackMovie(parent)
     local backMovie = Movie(parent)
     backMovie:Set('/movies/main_menu.sfd')
     LayoutHelpers.AtCenterIn(backMovie, parent)
-    
+
     backMovie:Loop(true)
     backMovie:Play()
 
@@ -49,7 +49,7 @@ function CreateBackMovie(parent)
 end
 
 function CreateUI()
-   
+
     UIUtil.SetCurrentSkin('uef')
     import('/lua/ui/game/gamemain.lua').supressExitDialog = false
     local mainMenu = {}
@@ -57,17 +57,17 @@ function CreateUI()
     -- this should be shown if there are no profiles
     if not GetPreference("profile.current") then
         profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-           	CreateUI()
+            CreateUI()
         end)
         return
     end
-    
+
     -- to disable any button on the menu, just comment/delete the "action" key/value pair or set to nil
     local menuExtras = {
         title = '<LOC tooltipui0355>Extras',
         {
             name = '<LOC _Mod_Manager>',
-            tooltip = 'mainmenu_mod',    
+            tooltip = 'mainmenu_mod',
             action = function() ButtonMod() end,
             color = menuFontColorAlt,
         },
@@ -78,7 +78,7 @@ function CreateUI()
         },
         {
             name = '<LOC OPTIONS_0086>EULA',
-            tooltip = 'options_eula',    
+            tooltip = 'options_eula',
             action = function() ButtonEULA() end,
             color = menuFontColorAlt,
         },
@@ -98,24 +98,24 @@ function CreateUI()
         {
             name = '',
             color = menuFontColorAlt,
-        },           
+        },
     }
     local menuTop = {
         title = '<LOC main_menu_0000>Forged Alliance',
         {
             name = '<LOC _Campaign>',
-            tooltip = 'mainmenu_campaign',    
-            action = function() ButtonCampaign() end, 
+            tooltip = 'mainmenu_campaign',
+            action = function() ButtonCampaign() end,
         },
         {
             name = '<LOC _Skirmish>',
-            tooltip = 'mainmenu_skirmish',    
+            tooltip = 'mainmenu_skirmish',
             action = function() ButtonSkirmish() end,
         },
         {
             name = '<LOC main_menu_0001>Multiplayer LAN',
-            tooltip = 'mainmenu_mp',    
-            action = function() ButtonLAN() end, 
+            tooltip = 'mainmenu_mp',
+            action = function() ButtonLAN() end,
         },
         {
             name = '<LOC _Replay>',
@@ -130,13 +130,13 @@ function CreateUI()
         },
         {
             name = '<LOC _Options>',
-            tooltip = 'mainmenu_options',    
+            tooltip = 'mainmenu_options',
             action = function() ButtonOptions() end,
             color = menuFontColorAlt,
         },
         {
             name = '<LOC _Exit>',
-            tooltip = 'mainmenu_exit',    
+            tooltip = 'mainmenu_exit',
             action = function() ButtonExit() end,
         }
     }
@@ -146,54 +146,54 @@ function CreateUI()
 
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
-    
+
     local backMovie = false
     if Prefs.GetOption("mainmenu_bgmovie") then
         backMovie = CreateBackMovie(parent)
-    end  
-    
+    end
+
     local darker = Bitmap(parent)
     LayoutHelpers.FillParent(darker, parent)
     darker:SetSolidColor('200000')
     darker:SetAlpha(.5)
     darker:Hide()
-    
+
     -- BORDER, LOGO and TEXT
     local border = Group(parent, "border")
     LayoutHelpers.FillParent(border, parent)
-    
+
     -- SupCom logo resizes to current resolution
     local logo = Bitmap(border, UIUtil.UIFile('/scx_menu/logo/logo.dds'))
     LayoutHelpers.AtHorizontalCenterIn(logo, border)
     LayoutHelpers.AtTopIn(logo, border)
     logo.Depth:Set(60)
-    
+
     -- Borders
     local topBorder = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-console-top_bmp.dds'))
     LayoutHelpers.AtHorizontalCenterIn(topBorder, border)
     LayoutHelpers.AtTopIn(topBorder, border)
     topBorder.Depth:Set(function() return logo.Depth() - 1 end)
-    
+
     local botBorderLeft = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-bot-left.dds'))
     LayoutHelpers.AtLeftIn(botBorderLeft, border)
     LayoutHelpers.AtBottomIn(botBorderLeft, border)
-    
+
     local botBorderRight = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-bot-right.dds'))
     LayoutHelpers.AtRightIn(botBorderRight, border)
     LayoutHelpers.AtBottomIn(botBorderRight, border)
-    
+
     local botBorderMiddle = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-bot-mid.dds'))
     LayoutHelpers.AtBottomIn(botBorderMiddle, border)
     botBorderMiddle.Left:Set(botBorderLeft.Right)
     botBorderMiddle.Right:Set(botBorderRight.Left)
-    
+
     local scrollingBG = Bitmap(botBorderLeft)
     scrollingBG:SetSolidColor('ff000000')
     scrollingBG.Left:Set(function() return botBorderLeft.Right() - 30 end)
     scrollingBG.Right:Set(function() return botBorderRight.Left() + 30 end)
     scrollingBG.Height:Set(20)
     LayoutHelpers.AtBottomIn(scrollingBG, border)
-    
+
     -- legal text
     local legalText = UIUtil.CreateText(botBorderLeft, LOC(import('/lua/ui/help/eula.lua').LEGAL_TEXT), 9, UIUtil.bodyFont)
     legalText:SetColor('ffa5a5a5')
@@ -220,14 +220,14 @@ function CreateUI()
             musicHandle = PlaySound(Sound({Cue = "Main_Menu", Bank = "Music",}))
         end
     end
-    
+
     function StopMusic()
         if musicHandle then
             StopSound(musicHandle)
             musicHandle = false
         end
     end
-    
+
     parent.OnDestroy = function()
         if ambientSoundHandle then
             StopSound(ambientSoundHandle)
@@ -235,9 +235,9 @@ function CreateUI()
         end
         StopMusic()
     end
-    
+
     StartMusic()
-    
+
     -- TOP-LEVEL GROUP TO PARENT ALL DYNAMIC CONTENT
     local topLevelGroup = Group(border, "topLevelGroup")
     LayoutHelpers.FillParent(topLevelGroup, border)
@@ -250,34 +250,34 @@ function CreateUI()
     mainMenuGroup.Left:Set(0)
     mainMenuGroup.Top:Set(0)
     mainMenuGroup.Depth:Set(101)
-    
+
     local menuBracketMiddle = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-tube-v_bmp.dds'))
-    
+
     local menuBracketBar = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-tube-h_bmp.dds'))
     LayoutHelpers.AtCenterIn(menuBracketBar, menuBracketMiddle, 60)
-    
+
     local menuBracketLeft = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left_bmp.dds'))
     LayoutHelpers.AtCenterIn(menuBracketLeft, menuBracketMiddle, 200, -190)
-    
+
     local menuBracketLeftGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left-energy_bmp.dds'))
     LayoutHelpers.AtCenterIn(menuBracketLeftGlow, menuBracketLeft, 0, 22)
-    
+
     local menuBracketRight = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right_bmp.dds'))
     LayoutHelpers.AtCenterIn(menuBracketRight, menuBracketMiddle, 200, 190)
-    
+
     local menuBracketRightGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right-energy_bmp.dds'))
     LayoutHelpers.AtCenterIn(menuBracketRightGlow, menuBracketRight, 0, -22)
-    
+
     menuBracketMiddle.Top:Set(function() return topBorder.Bottom() - menuBracketLeft.Height() end)
     LayoutHelpers.AtHorizontalCenterIn(menuBracketMiddle, border)
-    
+
     menuBracketMiddle.Depth:Set(function() return topBorder.Depth() - 1 end)
     menuBracketBar.Depth:Set(function() return menuBracketMiddle.Depth() - 3 end)
     menuBracketLeft.Depth:Set(function() return topBorder.Depth() - 1 end)
     menuBracketRight.Depth:Set(function() return topBorder.Depth() - 1 end)
     menuBracketLeftGlow.Depth:Set(function() return menuBracketLeft.Depth() - 2 end)
     menuBracketRightGlow.Depth:Set(function() return menuBracketRight.Depth() - 2 end)
-    
+
     menuBracketMiddle.Animate = function(control, animIn, callback)
         control:SetNeedsFrameUpdate(true)
         if animIn then
@@ -309,7 +309,7 @@ function CreateUI()
             self.Top:Set(newTop)
         end
     end
-    
+
     -- debug FMV head button
     if HasCommandLineArg("/headtest") then
         local headTestBtn = UIUtil.CreateButtonStd(mainMenuGroup, '/scx_menu/small-btn/small', "Head Test", 12)
@@ -320,28 +320,28 @@ function CreateUI()
             import('/lua/ui/campaign/_head_test.lua').CreateUI()
         end
     end
-    
+
     -- TODO: don't destroy the whole menu. just destroy the buttons, then you only have to set the top once.
     function MenuBuild(menuTable, center)
         if menuTable == 'home' then
             menuTable = menuTop
         end
-    
+
         -- title
         mainMenu.titleBack = Bitmap(mainMenuGroup, UIUtil.UIFile('/menus/main03/panel-top_bmp.dds'))
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
         LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 10)
-        
+
         mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, GetPreference("profile.current"), 26)
         LayoutHelpers.AtCenterIn(mainMenu.titleTxt, mainMenu.titleBack, 3)
         mainMenu.titleTxt:SetText(LOC(menuTable.title))
         mainMenu.titleTxt:SetNewColor(menuFontColorTitle)
         mainMenu.titleTxt:Hide()
-                
+
         -- profile button
-        
+
         local profileDlg = nil
-        
+
         mainMenu.profile = UIUtil.CreateButtonStd(mainMenu.titleBack, '/menus/main02/profile-edit', LOC("<LOC _Change_Profile>Change Profile"), 12)
         LayoutHelpers.CenteredBelow(mainMenu.profile, mainMenu.titleBack, -25)
         mainMenu.profile.OnRolloverEvent = function(self, event)
@@ -351,7 +351,7 @@ function CreateUI()
                 self.label:SetColor('ff000000')
             end
         end
-    
+
         function SetNameToCurrentProfile()
             local currentProfile = GetPreference("profile.current")
             if currentProfile then
@@ -372,7 +372,7 @@ function CreateUI()
                 end
              end
         end
-        
+
         mainMenu.profile.HandleEvent = function(self, event)
             if animation_active then
                 return true
@@ -384,30 +384,30 @@ function CreateUI()
             end
             Button.HandleEvent(self, event)
         end
-        
+
         mainMenu.profile.leftBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_left.dds'))
         mainMenu.profile.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
         LayoutHelpers.AtTopIn(mainMenu.profile.leftBracket, mainMenu.profile, -52)
         mainMenu.profile.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
         mainMenu.profile.leftBracket:SetAlpha(0)
-        
+
         mainMenu.profile.rightBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_right.dds'))
         mainMenu.profile.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
         LayoutHelpers.AtTopIn(mainMenu.profile.rightBracket, mainMenu.profile, -52)
         mainMenu.profile.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
         mainMenu.profile.rightBracket:SetAlpha(0)
-        
+
         mainMenu.profile.SetItemAlpha = function(self, alpha)
             self:SetAlpha(alpha)
             self.label:SetAlpha(alpha)
             mainMenu.titleBack:SetAlpha(alpha)
             mainMenu.titleTxt:SetAlpha(alpha)
         end
-        
+
         mainMenu.profile:SetItemAlpha(0)
-        
+
         mainMenu.profile.FadeIn = function(control)
-            if control.clickfunc then 
+            if control.clickfunc then
                 control:Enable()
             end
             control:DisableHitTest(true)
@@ -470,21 +470,21 @@ function CreateUI()
                 end
             end
         end
-    
+
         SetNameToCurrentProfile()
-    
+
         mainMenu.profile.OnClick = function(self)
             MenuHide(function()
                 if not profileDlg then
                     profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-                       	SetNameToCurrentProfile()
-                       	profileDlg = nil
-                       	MenuShow()
+                        SetNameToCurrentProfile()
+                        profileDlg = nil
+                        MenuShow()
                     end)
                 end
             end)
         end
-        
+
         -- menu buttons
         local buttonHeight = nil
         for k, v in menuTable do
@@ -493,7 +493,7 @@ function CreateUI()
                 if v.name then
                     mainMenu[k].btn = UIUtil.CreateButtonStd(mainMenuGroup, '/scx_menu/large-no-bracket-btn/large', v.name, 22, 2, 0, "UI_Menu_MouseDown", "UI_Menu_Rollover")
                 elseif v.image then
-                    mainMenu[k].btn = Button(mainMenuGroup, 
+                    mainMenu[k].btn = Button(mainMenuGroup,
                         UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_up.dds'),
                         UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_down.dds'),
                         UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_over.dds'),
@@ -513,13 +513,13 @@ function CreateUI()
                 else
                     local lastBtn = k - 1
                     LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu[lastBtn].btn, -5)
-                end                
+                end
                 if v.action then
                     mainMenu[k].btn.glow = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/large-btn/large_btn_glow.dds'))
                     LayoutHelpers.AtCenterIn(mainMenu[k].btn.glow, mainMenu[k].btn)
                     mainMenu[k].btn.glow:SetAlpha(0)
                     mainMenu[k].btn.glow:DisableHitTest()
-                    mainMenu[k].btn.rofunc = function(self, event) 
+                    mainMenu[k].btn.rofunc = function(self, event)
                         if animation_active then
                             return true
                         end
@@ -546,17 +546,17 @@ function CreateUI()
                     LOG('DISABLING MAIN MENU BUTTON')
                     mainMenu[k].btn:Disable()
                 end
-                
+
                 mainMenu[k].btn.leftBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_left.dds'))
                 mainMenu[k].btn.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.leftBracket, mainMenu[k].btn, -6)
                 mainMenu[k].btn.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
-                
+
                 mainMenu[k].btn.rightBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_right.dds'))
                 mainMenu[k].btn.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.rightBracket, mainMenu[k].btn, -6)
                 mainMenu[k].btn.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
-                
+
                 mainMenu[k].btn:Disable()
                 mainMenu[k].btn:SetAlpha(0, true)
                 mainMenu[k].btn.SetItemAlpha = function(control, alpha)
@@ -568,7 +568,7 @@ function CreateUI()
                     end
                 end
                 mainMenu[k].btn.FadeIn = function(control)
-                    if control.clickfunc then 
+                    if control.clickfunc then
                         control:Enable()
                         if control.label then
                             control.label:SetColor(menuFontColor)
@@ -654,10 +654,10 @@ function CreateUI()
                 end
             end
         end
-        
-        local numButtons = table.getn(mainMenu)        
+
+        local numButtons = table.getn(mainMenu)
         local lastBtn = mainMenu[numButtons].btn
-        
+
         if initial then
             ForkThread(function()
                 WaitSeconds(.2)
@@ -667,7 +667,7 @@ function CreateUI()
         else
             MenuAnimation(true)
         end
-        
+
         -- set ESC key functionality depending on menu layer
         if menuTable == 'home' or menuTable == menuTop then
             SetEscapeHandle(ButtonExit)
@@ -679,16 +679,16 @@ function CreateUI()
         mainMenuGroup.Height:Set(function() return (mainMenuSize * buttonHeight) + mainMenu.titleBack.Height() end)
         mainMenuGroup.Width:Set(mainMenu.titleBack.Width)
         LayoutHelpers.AtHorizontalCenterIn(mainMenuGroup, border)
-        
+
         mainMenuGroup.Top:Set(function()
-            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height() ) / 2 ) -- includes offset for alpha on border_lm
+            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height()) / 2) -- includes offset for alpha on border_lm
             return math.floor(logo.Bottom() - 18)
         end)
     end
 
 
     -- Animate the menu
-    
+
     function MenuAnimation(fadeIn, callback, skipSlide)
         animation_active = false
         local function ButtonFade(menuSlide)
@@ -726,7 +726,7 @@ function CreateUI()
             ButtonFade(not skipSlide)
         end
     end
-    
+
     function SetEscapeHandle(action)
         import('/lua/ui/uimain.lua').SetEscapeHandler(function() action() end)
     end
@@ -743,7 +743,7 @@ function CreateUI()
             if callback then callback() end
         end)
     end
-    
+
     function MenuShow()
         mainMenuGroup.Depth:Set(101)    -- and setting it back again
         mainMenuGroup:Show()
@@ -756,12 +756,12 @@ function CreateUI()
         elseif Prefs.GetOption("mainmenu_bgmovie") == false and backMovie then
             backMovie:Destroy()
             backMovie = false
-        elseif backMovie then 
+        elseif backMovie then
             backMovie:Play()
         end
         MenuAnimation(true)
     end
-    
+
     function MenuDestroy(callback, skipSlide)
         MenuAnimation(false, function()
             for k, v in mainMenu do
@@ -782,13 +782,13 @@ function CreateUI()
             callback()
         else
             Prefs.SetToCurrentProfile('MenuTutorialPrompt', true)
-            UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0006>This appears to be your first time playing Supreme Commander: Forged Alliance. Would you like to play the tutorial before you begin?", 
+            UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0006>This appears to be your first time playing Supreme Commander: Forged Alliance. Would you like to play the tutorial before you begin?",
                 "<LOC _Yes>", function()
                         StopMusic()
                         parent:Destroy()
                         LaunchSinglePlayerSession(
                             import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(
-                                import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'), 
+                                import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
                                 2, nil, nil, true
                             )
                         )
@@ -798,7 +798,7 @@ function CreateUI()
                 true,  {worldCover = true, enterButton = 1, escapeButton = 2})
         end
     end
-    
+
     function ButtonCampaign()
         TutorialPrompt(function()
             MenuAnimation(false, function()
@@ -855,7 +855,7 @@ function CreateUI()
 
     function ButtonOptions()
         MenuHide(function()
-            import('/lua/ui/dialogs/options.lua').CreateDialog(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)    
+            import('/lua/ui/dialogs/options.lua').CreateDialog(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
         end)
     end
 
@@ -886,9 +886,9 @@ function CreateUI()
     local exitDlg = nil
 
     function ButtonExit()
-        
+
         if not exitDlg then
-            exitDlg = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
+            exitDlg = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
                         "<LOC _Yes>", function()
                             StopMusic()
                             parent:Destroy()
@@ -897,7 +897,7 @@ function CreateUI()
                         "<LOC _No>", function() exitDlg = nil end,
                         nil, nil,
                         true,  {worldCover = true, enterButton = 1, escapeButton = 2})
-        end                        
+        end
     end
 
     -- START

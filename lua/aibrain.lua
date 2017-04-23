@@ -2672,7 +2672,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
 
                 for num, bcData in self.PBM.BuildConditionsTable do
-                    if bcData[1] == v[1] and bcData[2] == v[2] and table.getn(bcData[3] == table.getn(v[3])) then
+                    if bcData[1] == v[1] and bcData[2] == v[2] and table.getn(bcData[3]) == table.getn(v[3]) then
                         local tablePos = 1
                         found = num
                         while tablePos <= table.getn(v[3]) do
@@ -4019,7 +4019,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 myThreat = myThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
             end
         until threat > myThreat or overallThreat <= 0
-        
+
         for k, v in self.AirAttackPoints do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
                 self.AirAttackPoints[k] = nil

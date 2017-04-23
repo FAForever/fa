@@ -157,7 +157,7 @@ function UnitWeapon:WeaponHasTarget()
 end
 
 ---
--- 
+--
 function UnitWeapon:moho.weapon_methods()
 end
 

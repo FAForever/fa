@@ -35,7 +35,7 @@ function SetDefaultKeyMapName(preset)
 end
 
 function GetDefaultKeyMap()
-    local ret = {} 
+    local ret = {}
     local defaultKeyMap = import(GetDefaultKeyMapName()).defaultKeyMap
     local debugKeyMap = import(GetDefaultKeyMapName()).debugKeyMap
 

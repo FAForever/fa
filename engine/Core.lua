@@ -17,7 +17,7 @@ function BeginLoggingStats()
 end
 
 ---
--- 
+--
 function BlueprintLoaderUpdateProgress()
 end
 
@@ -147,7 +147,7 @@ function PointVector()
 end
 
 ---
---  RPCSound( {cue,bank,cutoff} ) - Make a sound parameters object
+--  RPCSound({cue,bank,cutoff}) - Make a sound parameters object
 function RPCSound({cue, bank, cutoff})
 end
 
@@ -232,7 +232,7 @@ function SecondsPerTick()
 end
 
 ---
---  Sound( {cue,bank,cutoff} ) - Make a sound parameters object
+--  Sound({cue,bank,cutoff}) - Make a sound parameters object
 function Sound({cue, bank, cutoff})
 end
 

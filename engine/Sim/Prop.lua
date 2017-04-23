@@ -7,7 +7,7 @@ function Prop:base()
 end
 
 ---
--- 
+--
 function Prop:moho.prop_methods()
 end
 

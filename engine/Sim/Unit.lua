@@ -12,7 +12,7 @@ function Unit:AddToggleCap(capName)
 end
 
 ---
---  Unit:AddUnitToStorage( storedUnit )
+--  Unit:AddUnitToStorage(storedUnit)
 function Unit:AddUnitToStorage(storedUnit)
 end
 
@@ -627,7 +627,7 @@ function Unit:base()
 end
 
 ---
--- 
+--
 function Unit:moho.unit_methods()
 end
 

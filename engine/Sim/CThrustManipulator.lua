@@ -7,7 +7,7 @@ function CThrustManipulator:base()
 end
 
 ---
--- 
+--
 function CThrustManipulator:moho.ThrustManipulator()
 end
 

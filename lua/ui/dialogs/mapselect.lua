@@ -721,7 +721,7 @@ function RefreshOptions(skipRefresh)
         for _,optionData in OptionSource[4].options do
             changedOptions[optionData.key] = nil
         end
-        
+
         OptionContainer:CalcVisible()
     end
 end
@@ -837,7 +837,7 @@ function SetupOptionsPanel(parent, curOptions)
                 -- otherwise, don't use saved data for advanced options
                 local advancedOptions = OptionSource[4].options
                 for _,option in advancedOptions do
-                    if option.key == data.key then 
+                    if option.key == data.key then
                         return false
                     end
                 end
@@ -999,7 +999,7 @@ function PopulateMapList()
     local count = 1
     for i,sceninfo in scenarios do
         local passedFiltering = true
-        
+
         -- If this is the currently selected map, mark it for reselection
         if selectedScenario and string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
             selectedRow = count - 1

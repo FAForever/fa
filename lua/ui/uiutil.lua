@@ -414,7 +414,7 @@ function UIFile(filespec, checkMods)
                             end
                         end
                     end
-                    
+
                     if not inmod then
                         found = false
                         useSkin = skins[useSkin].default
@@ -425,7 +425,7 @@ function UIFile(filespec, checkMods)
                 end
             end
         end
-        
+
         if not found then
             SPEW('[uiutil.lua, function UIFile()] - Unable to find file:'.. origPath .. filespec)
             found = filespec
@@ -620,7 +620,7 @@ function CreateNinePatchStd(parent, texturePath)
         SkinnableFile(texturePath .. 'right.dds'),
         SkinnableFile(texturePath .. 'top.dds'),
         SkinnableFile(texturePath .. 'bottom.dds')
-    )
+)
 end
 
 function SurroundWithNinePatch(parent, texturePath, fudgeX, fudgeY)
@@ -653,7 +653,7 @@ function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
         SkinnableFile(texturePath .. 'right.dds'),
         SkinnableFile(texturePath .. 'top.dds'),
         SkinnableFile(texturePath .. 'bottom.dds')
-    )
+)
 
     border:Surround(control, fudgeX or 62, fudgeY or 62)
     LayoutHelpers.DepthOverParent(border, control, 2)
@@ -669,7 +669,7 @@ function CreateCheckboxStd(parent, texturePath)
         SkinnableFile(texturePath .. '-s_btn_over.dds'),
         SkinnableFile(texturePath .. '-d_btn_dis.dds'),
         SkinnableFile(texturePath .. '-s_btn_dis.dds')
-    )
+)
     return checkbox
 end
 
@@ -699,16 +699,16 @@ end
 
  function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)
-    button.label:SetFont( dialogButtonFont, pointSize )
-    button.label:SetColor( dialogButtonColor )
+    button.label:SetFont(dialogButtonFont, pointSize)
+    button.label:SetColor(dialogButtonColor)
     return button
 end
 
 --* return the standard scrollbar
 function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom, offset_top)
     offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
+    offset_bottom = offset_bottom or 0
+    offset_top = offset_top or 0
     local textureName = filename or '/small-vert_scroll/'
     local scrollbg = textureName..'back_scr_mid.dds'
     local scrollbarmid = textureName..'bar-mid_scr_over.dds'
@@ -721,12 +721,12 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
         scrollbarbot = textureName..'bar-bot_scr_up.dds'
     end
     local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
-    scrollbar:SetTextures(  SkinnableFile(scrollbg)
+    scrollbar:SetTextures(   SkinnableFile(scrollbg)
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
                             ,SkinnableFile(scrollbarbot))
 
-    local scrollUpButton = Button(  scrollbar
+    local scrollUpButton = Button(    scrollbar
                                     , SkinnableFile(textureName..'arrow-up_scr_up.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_down.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_over.dds')
@@ -747,7 +747,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
 
-	scrollDownButton.Left:Set(scrollbar.Left)
+    scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
 
     scrollbar.Right:Set(scrollUpButton.Right)
@@ -791,8 +791,8 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
             end
             if control.oldHandleEvent then
                 return control.oldHandleEvent(self, event)
-			end
-			return true
+            end
+            return true
         end
     end
 end
@@ -861,9 +861,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         if callback then
             button.OnClick = function(self)
                 callback()
-				if destroyOnCallback then
+                if destroyOnCallback then
                     popup:Close()
-				end
+                end
             end
         else
             button.OnClick = function(self)

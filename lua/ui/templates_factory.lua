@@ -14,7 +14,7 @@ function GetInitialName()
         end
     end
     local name = '(' .. nextNum + 1 .. ')'
-    
+
     return name
 end
 

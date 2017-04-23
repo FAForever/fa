@@ -97,12 +97,12 @@ function Projectile:SetMaxSpeed(speed)
 end
 
 ---
---  Projectile:SetNewTarget( entity )
+--  Projectile:SetNewTarget(entity)
 function Projectile:SetNewTarget(entity)
 end
 
 ---
---  Projectile:SetNewTargetGround( location )
+--  Projectile:SetNewTargetGround(location)
 function Projectile:SetNewTargetGround(location)
 end
 
@@ -152,7 +152,7 @@ function Projectile:base()
 end
 
 ---
--- 
+--
 function Projectile:moho.projectile_methods()
 end
 

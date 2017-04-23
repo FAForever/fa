@@ -87,7 +87,7 @@ function CUIWorldView:base()
 end
 
 ---
--- 
+--
 function CUIWorldView:moho.UIWorldView()
 end
 

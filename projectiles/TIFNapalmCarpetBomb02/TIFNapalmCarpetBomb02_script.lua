@@ -14,13 +14,13 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) {
 
     OnImpact = function(self, TargetType, targetEntity)
-        if TargetType != 'Shield' and TargetType != 'Water' and TargetType != 'Air' and TargetType != 'UnitAir' and TargetType != 'Projectile' then 
+        if TargetType != 'Shield' and TargetType != 'Water' and TargetType != 'Air' and TargetType != 'UnitAir' and TargetType != 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
             local size = RandomFloat(3.75,5.0)
             CreateDecal(self:GetPosition(), rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 15, self:GetArmy())
-        end	 
-        TNapalmHvyCarpetBombProjectile.OnImpact( self, TargetType, targetEntity )
-    end,	    
+        end
+        TNapalmHvyCarpetBombProjectile.OnImpact(self, TargetType, targetEntity)
+    end,
 }
 
 TypeClass = TIFNapalmCarpetBomb02

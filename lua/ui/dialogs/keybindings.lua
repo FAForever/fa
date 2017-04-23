@@ -288,9 +288,9 @@ function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
     if not txt then txt = '?' end
 
     local button  = Bitmap(parent)
-    button:SetSolidColor(bgColor) 
+    button:SetSolidColor(bgColor)
     button.Height:Set(bgSize)
-    button.Width:Set(bgSize + 4) 
+    button.Width:Set(bgSize + 4)
     button.txt = UIUtil.CreateText(button, txt, txtSize)
     button.txt:SetColor(txtColor)
     button.txt:SetFont(UIUtil.bodyFont, txtSize)
@@ -364,7 +364,7 @@ function CreateLine()
             line.key:SetAlpha(1.0)
             line.description:SetAlpha(1.0)
             line.statistics:SetAlpha(1.0)
-            PlaySound(Sound({Cue = "UI_Menu_Rollover_Sml", Bank = "Interface"})) 
+            PlaySound(Sound({Cue = "UI_Menu_Rollover_Sml", Bank = "Interface"}))
         elseif event.Type == 'MouseExit' then
             line:SetAlpha(1.0)
             line.key:SetAlpha(0.9)
@@ -384,7 +384,7 @@ function CreateLine()
             if string.len(keyword) == 0 then
                 ToggleLines(self.data.category)
                 keyFilter.text:AcquireFocus()
-                
+
                 if keyGroups[self.data.category].collapsed then
                    self.toggle.txt:SetText('+')
                 else
@@ -415,7 +415,7 @@ function CreateLine()
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.toggle, line, keyBindingWidth - 30)
     LayoutHelpers.AtVerticalCenterIn(line.toggle, line)
-    Tooltip.AddControlTooltip(line.toggle, 
+    Tooltip.AddControlTooltip(line.toggle,
     {
         text = 'Toggle Category',
         body = 'Toggle visibility of all actions for this category of keys'
@@ -427,7 +427,7 @@ function CreateLine()
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.assignKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.assignKeyButton, line)
-    Tooltip.AddControlTooltip(line.assignKeyButton, 
+    Tooltip.AddControlTooltip(line.assignKeyButton,
     {
         text = LOC("<LOC key_binding_0003>Assign Key"),
         body = 'Opens a dialog that allows assigning key binding for a given action'
@@ -443,7 +443,7 @@ function CreateLine()
          line.key.Height() + 4, 18, 'x')
     LayoutHelpers.AtRightIn(line.unbindKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.unbindKeyButton, line)
-    Tooltip.AddControlTooltip(line.unbindKeyButton, 
+    Tooltip.AddControlTooltip(line.unbindKeyButton,
     {
         text = LOC("<LOC key_binding_0007>Unbind Key"),
         body = 'Removes currently assigned key binding for a given action'
@@ -456,7 +456,7 @@ function CreateLine()
 
     line.Update = function(self, data, lineID)
         line:SetSolidColor(GetLineColor(lineID, data))
-        line.data = table.copy(data) 
+        line.data = table.copy(data)
 
         if data.type == 'header' then
             if keyGroups[self.data.category].collapsed then
@@ -464,14 +464,14 @@ function CreateLine()
             else
                self.toggle.txt:SetText('-')
             end
-            local stats = keyGroups[data.category].bindings .. ' / ' .. 
+            local stats = keyGroups[data.category].bindings .. ' / ' ..
                           keyGroups[data.category].visible  ..' Actions Bound'
             line.toggle:Show()
             line.assignKeyButton:Hide()
             line.unbindKeyButton:Hide()
             line.description:SetText(data.text)
             line.description:SetFont(UIUtil.titleFont, 16)
-            line.description:SetColor(UIUtil.factionTextColor) 
+            line.description:SetColor(UIUtil.factionTextColor)
             line.key:SetText('')
             line.statistics:SetText(stats)
         elseif data.type == 'spacer' then
@@ -491,7 +491,7 @@ function CreateLine()
             line.description:SetColor(UIUtil.fontColor)
             line.statistics:SetText('')
             line.unbindKeyButton:Show()
-            line.assignKeyButton:Show() 
+            line.assignKeyButton:Show()
         end
     end
     return line
@@ -518,7 +518,7 @@ function CreateUI()
     keyTable = FormatData()
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(880)
+    dialogContent.Width:Set(980)
     dialogContent.Height:Set(730)
 
     popup = Popup(GetFrame(0), dialogContent)
@@ -538,7 +538,7 @@ function CreateUI()
     closeButton.Width:Set(200)
     LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
     LayoutHelpers.AtRightIn(closeButton, dialogContent, offset - (closeButton.Width() / 2))
-    Tooltip.AddControlTooltip(closeButton, 
+    Tooltip.AddControlTooltip(closeButton,
     {
         text = 'Close Dialog', body = 'Closes this dialog and confirms assignments of key bindings'
     })
@@ -561,7 +561,7 @@ function CreateUI()
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
-    Tooltip.AddControlTooltip(defaultButton, 
+    Tooltip.AddControlTooltip(defaultButton,
     {
         text = LOC("<LOC key_binding_0004>Default Preset"),
         body = 'Reset all key bindings to the default (GPG) preset'
@@ -577,7 +577,7 @@ function CreateUI()
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
-    Tooltip.AddControlTooltip(hotbuildButton, 
+    Tooltip.AddControlTooltip(hotbuildButton,
     {
         text = LOC("<LOC key_binding_0009>Hotbuild Preset"),
         body = 'Reset all key bindings to the hotbuild (FAF) preset'
@@ -601,7 +601,7 @@ function CreateUI()
     keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
 
     keyFilter:EnableHitTest()
-    import('/lua/ui/game/tooltip.lua').AddControlTooltip(keyFilter, 
+    import('/lua/ui/game/tooltip.lua').AddControlTooltip(keyFilter,
     {
         text = 'Key Binding Filter',
         body = 'Filter all actions by typing either: ' ..
@@ -656,7 +656,7 @@ function CreateUI()
     end
 
     keyFilter.clear = UIUtil.CreateText(keyFilter.text, 'X', 17, "Arial Bold")
-    keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A 
+    keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A
     keyFilter.clear:EnableHitTest()
     LayoutHelpers.AtVerticalCenterIn(keyFilter.clear, keyFilter.text, 1)
     LayoutHelpers.AtRightIn(keyFilter.clear, keyFilter.text, 9)
@@ -672,7 +672,7 @@ function CreateUI()
         end
         return true
     end
-    Tooltip.AddControlTooltip(keyFilter.clear, 
+    Tooltip.AddControlTooltip(keyFilter.clear,
     {
         text = 'Clear Filter',
         body = 'Clears text that was typed in the filter field.'
@@ -700,10 +700,10 @@ function CreateUI()
     end
 
     local height = keyContainer.Height()
-    local items = math.floor(keyContainer.Height() / keyEntries[1].Height()) 
+    local items = math.floor(keyContainer.Height() / keyEntries[1].Height())
 
-    local GetLinesTotal = function() 
-        return table.getsize(keyEntries) 
+    local GetLinesTotal = function()
+        return table.getsize(keyEntries)
     end
 
     local function GetLinesVisible()
@@ -778,10 +778,10 @@ function CreateUI()
     -- filter all key-bindings by checking if either text, action, or a key contains target string
     keyContainer.Filter = function(self, target)
         local headersVisible = {}
-        linesVisible = {} 
+        linesVisible = {}
 
         if not target or string.len(target) == 0 then
-            keyFilter.info:Show() 
+            keyFilter.info:Show()
             for k, v in keyTable do
                 if v.type == 'header' then
                     table.insert(linesVisible, k)
@@ -822,9 +822,9 @@ function CreateUI()
                         match = true
                         v.filterMatch = 'category'
                     else
-                        match = false 
+                        match = false
                         v.filterMatch = nil
-                    end 
+                    end
                     if match then
                         if not headersVisible[v.header] then
                             headersVisible[v.header] = true
@@ -847,23 +847,23 @@ end
 
 function SortData(dataTable)
     table.sort(dataTable, function(a, b)
-        if a.order ~= b.order then 
+        if a.order ~= b.order then
             return a.order < b.order
         else
-            if a.category ~= b.category then 
+            if a.category ~= b.category then
                 return string.lower(a.category) < string.lower(b.category)
             else
-                if a.type == 'entry' and b.type == 'entry' then 
-                    if string.lower(a.text) ~= string.lower(b.text) then 
-                        return string.lower(a.text) < string.lower(b.text) 
-                    else 
+                if a.type == 'entry' and b.type == 'entry' then
+                    if string.lower(a.text) ~= string.lower(b.text) then
+                        return string.lower(a.text) < string.lower(b.text)
+                    else
                         return a.action < b.action
                     end
-                else 
+                else
                     return a.id < b.id
                 end
             end
-        end 
+        end
     end)
 end
 -- format all key data, group them based on key category or default to none category and finally sort all keys
@@ -874,7 +874,7 @@ function FormatData()
 
     -- reset previously formated key actions in all groups because they might have been re-mapped
     for category, group in keyGroups do
-        group.actions = {} 
+        group.actions = {}
     end
     -- group game keys and key defined in mods by their key category
     for k, v in keyActions do
@@ -914,7 +914,7 @@ function FormatData()
                 collapsed = keyGroups[category].collapsed
             }
             index = index + 1
-            for _, data in group.actions do 
+            for _, data in group.actions do
                 keyData[index] = {
                     type = 'entry',
                     text = data.text,
@@ -926,12 +926,12 @@ function FormatData()
                     collapsed = keyGroups[category].collapsed,
                     id = index,
                     filters = { -- create filter parameters for quick searching of keys
-                         key =  string.gsub( string.lower(data.keyText), ' %+ ', ' '),
+                         key =  string.gsub(string.lower(data.keyText), ' %+ ', ' '),
                          text = string.lower(data.text or ''),
                          action = string.lower(data.action or ''),
                          category = string.lower(data.category or ''),
                     }
-                } 
+                }
                 index = index + 1
             end
         end

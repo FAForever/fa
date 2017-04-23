@@ -425,7 +425,7 @@ function CAiBrain:TakeResource(type, amount)
 end
 
 ---
--- 
+--
 function CAiBrain:moho.aibrain_methods()
 end
 

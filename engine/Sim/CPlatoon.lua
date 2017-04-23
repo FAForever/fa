@@ -62,7 +62,7 @@ end
 -- @param position Table with position {x, y, z}.
 -- @return command
 function CPlatoon:FerryToLocation(position)
-end 
+end
 
 --- Returns closest unit to the platoon's squad.
 -- Example: FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL).
@@ -304,7 +304,7 @@ function CPlatoon:UseTeleporter()
 end
 
 ---
--- 
+--
 function CPlatoon:moho.platoon_methods()
 end
 

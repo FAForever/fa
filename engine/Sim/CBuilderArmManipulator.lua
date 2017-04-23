@@ -7,7 +7,7 @@ function CBuilderArmManipulator:SetAimingArc(minHeading,  maxHeading,  headingMa
 end
 
 ---
---  CBuilderArmManipulator:SetHeadingPitch( heading, pitch )
+--  CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
 function CBuilderArmManipulator:SetHeadingPitch(heading,  pitch)
 end
 
@@ -17,7 +17,7 @@ function CBuilderArmManipulator:base()
 end
 
 ---
--- 
+--
 function CBuilderArmManipulator:moho.BuilderArmManipulator()
 end
 

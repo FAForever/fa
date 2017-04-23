@@ -33,7 +33,7 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUCC_Guard               = (1 << 3),
     RULEUCC_Patrol              = (1 << 4),
     RULEUCC_RetaliateToggle     = (1 << 5),
-    
+
     // Unit specific rules
     RULEUCC_Repair              = (1 << 6),
     RULEUCC_Capture             = (1 << 7),
@@ -52,13 +52,13 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUCC_Reclaim             = (1 << 20),
     RULEUCC_SpecialAction       = (1 << 21),
     RULEUCC_Dock                = (1 << 22),
-   
+
     // Unit general
     RULEUCC_Script              = (1 << 23),
  }
- 
+
  toggleModes = {
-    
+
     // Unit toggle rules
     RULEUTC_ShieldToggle        = (1 << 0),
     RULEUTC_WeaponToggle        = (1 << 1),
@@ -70,7 +70,7 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUTC_SpecialToggle       = (1 << 7),
     RULEUTC_CloakToggle         = (1 << 8),
 }
- 
+
 --]]
 
 local commandMode = false
@@ -149,15 +149,15 @@ end
 
 function AddDefaultCommandFeedbackBlips(pos)
     AddCommandFeedbackBlip({
-        Position = pos, 
+        Position = pos,
         MeshName = '/meshes/game/flag02d_lod0.scm',
         TextureName = '/meshes/game/flag02d_albedo.dds',
         ShaderName = 'CommandFeedback',
         UniformScale = 0.5,
-    }, 0.7)		
+    }, 0.7)
 
     AddCommandFeedbackBlip({
-        Position = pos, 
+        Position = pos,
         MeshName = '/meshes/game/crosshair02d_lod0.scm',
         TextureName = '/meshes/game/crosshair02d_albedo.dds',
         ShaderName = 'CommandFeedback2',
@@ -191,7 +191,7 @@ function AssistMex(command)
         SimCallback({Func = 'CapMex', Args = {target = command.Target.EntityId}}, true)
     end
 end
-    
+
 
 function OnCommandIssued(command)
     if not command.Clear then
@@ -215,7 +215,7 @@ function OnCommandIssued(command)
         end
     elseif command.CommandType == 'BuildMobile' then
     AddCommandFeedbackBlip({
-        Position = command.Target.Position, 
+        Position = command.Target.Position,
         BlueprintID = command.Blueprint,
         TextureName = '/meshes/game/flag02d_albedo.dds',
         ShaderName = 'CommandFeedback',
@@ -236,13 +236,13 @@ function OnCommandIssued(command)
         end
         avgPoint[1] = avgPoint[1] / table.getn(command.Units)
         avgPoint[2] = avgPoint[2] / table.getn(command.Units)
-        
+
         avgPoint[1] = command.Target.Position[1] - avgPoint[1]
         avgPoint[2] = command.Target.Position[3] - avgPoint[2]
-        
+
         local rotation = math.atan(avgPoint[1]/avgPoint[2])
         rotation = rotation * 180 / math.pi
-        if avgPoint[2] < 0 then 
+        if avgPoint[2] < 0 then
             rotation = rotation + 180
         end
         local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}

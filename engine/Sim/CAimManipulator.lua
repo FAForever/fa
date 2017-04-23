@@ -7,7 +7,7 @@ function CAimManipulator:OnTarget()
 end
 
 ---
---  AimManipulator:SetAimHeadingOffset( offset )
+--  AimManipulator:SetAimHeadingOffset(offset)
 function CAimManipulator:SetAimHeadingOffset(offset)
 end
 
@@ -22,7 +22,7 @@ function CAimManipulator:SetFiringArc(minHeading,  maxHeading,  headingMaxSlew, 
 end
 
 ---
---  AimManipulator:SetHeadingPitch( heading, pitch )
+--  AimManipulator:SetHeadingPitch(heading, pitch)
 function CAimManipulator:SetHeadingPitch(heading,  pitch)
 end
 
@@ -37,7 +37,7 @@ function CAimManipulator:base()
 end
 
 ---
--- 
+--
 function CAimManipulator:moho.AimManipulator()
 end
 

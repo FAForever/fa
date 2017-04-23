@@ -133,8 +133,8 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
 
     if View.Description then
         -- If SubCommander enhancement, then remove extension. (ual0301_Engineer --> ual0301)
-        if string.find( bpID, '0301_' ) then
-            bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1 )
+        if string.find(bpID, '0301_') then
+            bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
         end
         local tempDescID = bpID.."-"..iconID
         if UnitDescriptions[tempDescID] and not string.find(bp.Name, 'Remove') then
@@ -256,7 +256,7 @@ function WrapAndPlaceText(air, physics, weapons, abilities, text, control)
         if control.Value[index] then
             control.Value[index]:SetText(v)
         else
-            control.Value[index] = UIUtil.CreateText( control, v, 12, UIUtil.bodyFont)
+            control.Value[index] = UIUtil.CreateText(control, v, 12, UIUtil.bodyFont)
             LayoutHelpers.Below(control.Value[index], control.Value[index-1])
             control.Value[index].Right:Set(function() return control.Right() - 7 end)
             control.Value[index].Width:Set(function() return control.Right() - control.Left() - 14 end)
@@ -377,11 +377,11 @@ function DisplayResources(bp, time, energy, mass)
     if time > 0 then
         local consumeEnergy = -energy / time
         local consumeMass = -mass / time
-        View.BuildCostGroup.EnergyValue:SetText( string.format("%d (%d)",-energy,consumeEnergy) )
-        View.BuildCostGroup.MassValue:SetText( string.format("%d (%d)",-mass,consumeMass) )
+        View.BuildCostGroup.EnergyValue:SetText(string.format("%d (%d)",-energy,consumeEnergy))
+        View.BuildCostGroup.MassValue:SetText(string.format("%d (%d)",-mass,consumeMass))
 
-        View.BuildCostGroup.EnergyValue:SetColor( "FFF05050" )
-        View.BuildCostGroup.MassValue:SetColor( "FFF05050" )
+        View.BuildCostGroup.EnergyValue:SetColor("FFF05050")
+        View.BuildCostGroup.MassValue:SetColor("FFF05050")
     end
 
     -- Upkeep Group
@@ -389,28 +389,28 @@ function DisplayResources(bp, time, energy, mass)
     local showUpkeep = false
     if upkeepEnergy ~= 0 or upkeepMass ~= 0 then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0002>Yield"))
-        View.UpkeepGroup.EnergyValue:SetText( string.format("%d",upkeepEnergy) )
-        View.UpkeepGroup.MassValue:SetText( string.format("%d",upkeepMass) )
+        View.UpkeepGroup.EnergyValue:SetText(string.format("%d",upkeepEnergy))
+        View.UpkeepGroup.MassValue:SetText(string.format("%d",upkeepMass))
         if upkeepEnergy >= 0 then
-            View.UpkeepGroup.EnergyValue:SetColor( "FF50F050" )
+            View.UpkeepGroup.EnergyValue:SetColor("FF50F050")
         else
-            View.UpkeepGroup.EnergyValue:SetColor( "FFF05050" )
+            View.UpkeepGroup.EnergyValue:SetColor("FFF05050")
         end
 
         if upkeepMass >= 0 then
-            View.UpkeepGroup.MassValue:SetColor( "FF50F050" )
+            View.UpkeepGroup.MassValue:SetColor("FF50F050")
         else
-            View.UpkeepGroup.MassValue:SetColor( "FFF05050" )
+            View.UpkeepGroup.MassValue:SetColor("FFF05050")
         end
         showUpkeep = true
     elseif bp.Economy and (bp.Economy.StorageEnergy ~= 0 or bp.Economy.StorageMass ~= 0) then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0006>Storage"))
         local upkeepEnergy = bp.Economy.StorageEnergy or 0
         local upkeepMass = bp.Economy.StorageMass or 0
-        View.UpkeepGroup.EnergyValue:SetText( string.format("%d",upkeepEnergy) )
-        View.UpkeepGroup.MassValue:SetText( string.format("%d",upkeepMass) )
-        View.UpkeepGroup.EnergyValue:SetColor( "FF50F050" )
-        View.UpkeepGroup.MassValue:SetColor( "FF50F050" )
+        View.UpkeepGroup.EnergyValue:SetText(string.format("%d",upkeepEnergy))
+        View.UpkeepGroup.MassValue:SetText(string.format("%d",upkeepMass))
+        View.UpkeepGroup.EnergyValue:SetColor("FF50F050")
+        View.UpkeepGroup.MassValue:SetColor("FF50F050")
         showUpkeep = true
     end
 
@@ -422,10 +422,10 @@ function GetUpkeep(bp)
     local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
     local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass
     local negMassRate = bp.Economy.MaintenanceConsumptionPerSecondMass or bp.MaintenanceConsumptionPerSecondMass
-    
+
     local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
     local upkeepMass = GetYield(negMassRate, plusMassRate)
-    
+
     return upkeepEnergy, upkeepMass
 end
 

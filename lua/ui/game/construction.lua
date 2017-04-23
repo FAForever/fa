@@ -1555,11 +1555,11 @@ function CreateTemplateOptionMenu(button, templateObj)
         maxWidth = math.max(maxWidth, itemControls[i].label.Width() + 4)
         prevControl = itemControls[i]
     end
-    
+
     for _, control in itemControls do
         control.Width:Set(maxWidth)
     end
-    
+
     title.Width:Set(maxWidth)
     group.Height:Set(totHeight)
     group.Width:Set(maxWidth)
@@ -1632,7 +1632,7 @@ function CreateSubMenu(parentMenu, contents, onClickFunc, setupOnClickHandler)
     menu.Height:Set(totHeight)
     menu.Width:Set(maxWidth)
     UIUtil.SurroundWithNinePatch(menu, "/game/chat_brd/", 4, 4)
-    
+
     return menu
 end
 
@@ -2332,7 +2332,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     local function ConvertID(BPID)
                         local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                         for k, prefix in prefixes do
-                            local newBPID = string.gsub(BPID, "(%a + )(%d + )", prefix .. "%2")
+                            local newBPID = string.gsub(BPID, "(%a +)(%d +)", prefix .. "%2")
                             if table.find(buildableUnits, newBPID) then
                                 return newBPID
                             end

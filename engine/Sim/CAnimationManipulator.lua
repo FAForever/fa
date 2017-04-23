@@ -62,7 +62,7 @@ function CAnimationManipulator:base()
 end
 
 ---
--- 
+--
 function CAnimationManipulator:moho.AnimationManipulator()
 end
 

@@ -265,7 +265,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                     end
                 )
             end
-            
+
             -- Pick a faction movie table of the default one
             local movies = {}
             if operationVictoryTable.opData.opMovies.postOpMovies.factionDependant then
@@ -292,9 +292,9 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
             movie.curMovie = 1
 
             local height = 6 * textArea:GetRowHeight()
-            textArea.Height:Set( height )
-            textArea.Top:Set( function() return movie.Bottom() end )
-            textArea.Width:Set( function() return movie.Width() / 2 end )
+            textArea.Height:Set(height)
+            textArea.Top:Set(function() return movie.Bottom() end)
+            textArea.Width:Set(function() return movie.Width() / 2 end)
             LayoutHelpers.AtHorizontalCenterIn(textArea,parent)
             textArea.Depth:Set(function() return movie.Depth() + 5 end)
 
@@ -321,14 +321,14 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                     -- Play sfx and voice sounds only if available
                     if movies[movie.curMovie].sfx and movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ),
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}),
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     elseif movies[movie.curMovie].sfx then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}))
                     elseif movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     else
                         movie:Set(movies[movie.curMovie].vid)
                     end
@@ -424,36 +424,36 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
     -- set controls that are global to the dialog
     bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-	LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
-	LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
-	bg.continueBtn:UseAlphaHitTest(false)
+    LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
+    LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
+    bg.continueBtn:UseAlphaHitTest(false)
 
-	bg.continueBtn.glow = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-	LayoutHelpers.AtCenterIn(bg.continueBtn.glow, bg.continueBtn)
-	bg.continueBtn.glow:SetAlpha(0)
-	bg.continueBtn.glow:DisableHitTest()
+    bg.continueBtn.glow = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    LayoutHelpers.AtCenterIn(bg.continueBtn.glow, bg.continueBtn)
+    bg.continueBtn.glow:SetAlpha(0)
+    bg.continueBtn.glow:DisableHitTest()
 
     bg.continueBtn.pulse = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-	LayoutHelpers.AtCenterIn(bg.continueBtn.pulse, bg.continueBtn)
-	bg.continueBtn.pulse:DisableHitTest()
-	bg.continueBtn.pulse:SetAlpha(.5)
+    LayoutHelpers.AtCenterIn(bg.continueBtn.pulse, bg.continueBtn)
+    bg.continueBtn.pulse:DisableHitTest()
+    bg.continueBtn.pulse:SetAlpha(.5)
 
     EffectHelpers.Pulse(bg.continueBtn.pulse, 2, .5, 1)
 
     bg.continueBtn.OnRolloverEvent = function(self, event)
-	   	if event == 'enter' then
-			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-			self.label:SetColor('black')
-		elseif event == 'down' then
-			self.label:SetColor('black')
-		else
-			EffectHelpers.FadeOut(self.glow, .25, 1, 0)
-			self.label:SetColor('FFbadbdb')
-		end
-	end
+        if event == 'enter' then
+            EffectHelpers.FadeIn(self.glow, .25, 0, 1)
+            self.label:SetColor('black')
+        elseif event == 'down' then
+            self.label:SetColor('black')
+        else
+            EffectHelpers.FadeOut(self.glow, .25, 1, 0)
+            self.label:SetColor('FFbadbdb')
+        end
+    end
 
     bg.continueBtn.OnClick = function(self, modifiers)
-	    hotstats.clean_view()
+        hotstats.clean_view()
         ConExecute("ren_Oblivion false")
         EscapeHandler.SafeQuit()
     end
@@ -462,32 +462,32 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
      -- Rehost button in case of failure
     if showCampaign and not operationVictoryTable.success then
         bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-    	LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
-    	bg.continueBtn:UseAlphaHitTest(false)
+        LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
+        bg.continueBtn:UseAlphaHitTest(false)
 
-    	bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
-    	bg.rehostBtn.glow:SetAlpha(0)
-    	bg.rehostBtn.glow:DisableHitTest()
+        bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+        LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
+        bg.rehostBtn.glow:SetAlpha(0)
+        bg.rehostBtn.glow:DisableHitTest()
 
         bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
-    	bg.rehostBtn.pulse:DisableHitTest()
-    	bg.rehostBtn.pulse:SetAlpha(.5)
+        LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
+        bg.rehostBtn.pulse:DisableHitTest()
+        bg.rehostBtn.pulse:SetAlpha(.5)
 
         EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
 
         bg.rehostBtn.OnRolloverEvent = function(self, event)
-    	   	if event == 'enter' then
-    			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-    			self.label:SetColor('black')
-    		elseif event == 'down' then
-    			self.label:SetColor('black')
-    		else
-    			EffectHelpers.FadeOut(self.glow, .25, 1, 0)
-    			self.label:SetColor('FFbadbdb')
-    		end
-    	end
+            if event == 'enter' then
+                EffectHelpers.FadeIn(self.glow, .25, 0, 1)
+                self.label:SetColor('black')
+            elseif event == 'down' then
+                self.label:SetColor('black')
+            else
+                EffectHelpers.FadeOut(self.glow, .25, 1, 0)
+                self.label:SetColor('FFbadbdb')
+            end
+        end
 
         bg.rehostBtn.OnClick = function(self, modifiers)
             ConExecute("ren_Oblivion false")

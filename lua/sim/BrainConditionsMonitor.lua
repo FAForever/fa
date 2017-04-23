@@ -16,22 +16,22 @@ BrainConditionsMonitor = Class {
         end
 
         self.Trash = TrashBag()
-        
+
         self.ThreadWaitDuration = 7
-        
+
         self.Brain = false
         self.Active = false
-        
+
         self.ResultTable = {}
         self.ConditionData = {
             TableConditions = {},
             FunctionConditions = {},
         }
         self.ConditionsTable = {}
-                
+
         self.PreCreateFinished = true
     end,
-    
+
     # Create the thing
     Create = function(self, brain)
         if not self.PreCreateFinished then
@@ -39,10 +39,10 @@ BrainConditionsMonitor = Class {
         end
         self.Brain = brain
     end,
-	
+
     Destroy = function(self)
-		KillThread(self.ConditionMonitor)
-		self.Active = false
+        KillThread(self.ConditionMonitor)
+        self.Active = false
         self.Trash:Destroy()
     end,
 
@@ -54,7 +54,7 @@ BrainConditionsMonitor = Class {
         WARN('*WARNING: No Condition found with condition key: ' .. conditionKey)
         return false
     end,
-    
+
     # Checks the condition and returns the result
     CheckConditionTable = function(self, cFilename, cFunctionName, cData)
         if not cData or not type(cData) == 'table' then
@@ -63,12 +63,12 @@ BrainConditionsMonitor = Class {
         end
         return import(cFilename)[cFunctionName](self.Brain, unpack(cData))
     end,
-    
+
     # Runs the function and retuns the result
     CheckConditionFunction = function(self, func, params)
         return func(unpack(params))
     end,
-    
+
     # Find the key for a condition or adds it to the table and checks the condition
     GetConditionKey = function(self, cFilename, cFunctionName, cData)
         if not cFunctionName then
@@ -76,17 +76,17 @@ BrainConditionsMonitor = Class {
         elseif not cData or type(cData) != 'table' then
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing data table')
         end
-        
+
         # Key the TableConditions by filename
         if not self.ConditionData.TableConditions[cFilename] then
             self.ConditionData.TableConditions[cFilename] = {}
         end
-        
+
         # Key the filenames by function name
         if not self.ConditionData.TableConditions[cFilename][cFunctionName] then
             self.ConditionData.TableConditions[cFilename][cFunctionName] = {}
         end
-        
+
         # Check if the cData matches up
         for num,data in self.ConditionData.TableConditions[cFilename][cFunctionName] do
             # Check if the data is the same length
@@ -105,28 +105,28 @@ BrainConditionsMonitor = Class {
                 end
             end
         end
-        
+
         # No match found, so add the data to the table and return the key (same number as num items)
         local newCondition
-        if cFilename == '/lua/editor/InstantBuildConditions.lua' 
-            or cFilename == '/lua/editor/UnitCountBuildConditions.lua' or cFilename == '/lua/editor/EconomyBuildConditions.lua' 
-			or cFilename == '/lua/editor/SorianInstantBuildConditions.lua' then
+        if cFilename == '/lua/editor/InstantBuildConditions.lua'
+            or cFilename == '/lua/editor/UnitCountBuildConditions.lua' or cFilename == '/lua/editor/EconomyBuildConditions.lua'
+            or cFilename == '/lua/editor/SorianInstantBuildConditions.lua' then
             newCondition = InstantImportCondition()
         else
             newCondition = ImportCondition()
         end
         newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, cFilename, cFunctionName, cData)
-        table.insert( self.ResultTable, newCondition )
-        
+        table.insert(self.ResultTable, newCondition)
+
         # Add in a hashed table for quicker key lookup, may not be necessary
-        local newTable = { 
-            ConditionParameters = cData, 
+        local newTable = {
+            ConditionParameters = cData,
             Key = newCondition:GetKey(),
         }
-        table.insert( self.ConditionData.TableConditions[cFilename][cFunctionName], newTable )
+        table.insert(self.ConditionData.TableConditions[cFilename][cFunctionName], newTable)
         return newTable.Key
     end,
-    
+
     # Find the key for a condition that is a function
     GetConditionKeyFunction = function(self, func, parameters)
         # See if there is a matching function
@@ -144,38 +144,38 @@ BrainConditionsMonitor = Class {
                 end
             end
         end
-        
+
         # No match, insert data into the function conditions table
         local newCondition = FunctionCondition()
-        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters )
-        table.insert( self.ResultTable, newCondition )
-        
+        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters)
+        table.insert(self.ResultTable, newCondition)
+
         local newTable = {
             Function = func,
             Key = newCondition:GetKey(),
             ConditionParameters = parameters,
         }
-        table.insert( self.ConditionData.FunctionConditions, newTable )
+        table.insert(self.ConditionData.FunctionConditions, newTable)
         return newTable.Key
     end,
-    
+
     # Thread that will monitor conditions the brain asks for over time
     ConditionMonitorThread = function(self)
         while true do
             local checks = 0
-			local numResults = 0
+            local numResults = 0
             local numChecks = table.getn(self.ResultTable)
-            local numPerTick = math.ceil( numChecks / ( self.ThreadWaitDuration * 10 ) )
-            
+            local numPerTick = math.ceil(numChecks / (self.ThreadWaitDuration * 10))
+
             for k,v in self.ResultTable do
-				if not v:LocationExists() then
-					#Don't remove the condition, just skip over.
-					#If the base gets rebuilt the AI will use the old keyed conditions.
-					continue
-				end
-				numResults = numResults + 1
+                if not v:LocationExists() then
+                    #Don't remove the condition, just skip over.
+                    #If the base gets rebuilt the AI will use the old keyed conditions.
+                    continue
+                end
+                numResults = numResults + 1
                 v:CheckCondition()
-                
+
                 # Load balance per tick here
                 checks = checks + 1
                 if checks >= numPerTick then
@@ -183,11 +183,11 @@ BrainConditionsMonitor = Class {
                     checks = 0
                 end
             end
-			#LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
+            #LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
             WaitTicks(1)
         end
     end,
-    
+
     # Adds a condition to the table and returns the key
     AddCondition = function(self, cFilename, cFunctionName, cData)
         if not self.Active then
@@ -199,7 +199,7 @@ BrainConditionsMonitor = Class {
         end
         return self:GetConditionKey(cFilename, cFunctionName, cData)
     end,
-    
+
     # forking and storing a thread on the monitor
     ForkThread = function(self, fn, ...)
         if fn then
@@ -230,11 +230,11 @@ Condition = Class {
         self.Status = false
         return self.Status
     end,
-    
+
     GetStatus = function(self, reportFailure)
         return self.Status
     end,
-    
+
     GetKey = function(self)
         return self.Key
     end
@@ -248,7 +248,7 @@ ImportCondition = Class(Condition) {
         self.FunctionData = funcData
         self.CheckTime = false
     end,
-    
+
     CheckCondition = function(self)
         if self.CheckTime != GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
@@ -263,23 +263,23 @@ ImportCondition = Class(Condition) {
         end
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionData do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionData do
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }
 
 InstantImportCondition = Class(Condition) {
@@ -290,7 +290,7 @@ InstantImportCondition = Class(Condition) {
         self.FunctionData = funcData
         self.CheckTime = false
     end,
-    
+
     # This class doesn't change when CheckCondition is called; Only changed when requested
     CheckCondition = function(self)
         #if self.CheckTime != GetGameTimeSeconds() then
@@ -312,23 +312,23 @@ InstantImportCondition = Class(Condition) {
         end
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionData do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionData do
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }
 
 FunctionCondition = Class(Condition) {
@@ -337,26 +337,26 @@ FunctionCondition = Class(Condition) {
         self.FunctionHandle = funcHandle
         self.FunctionParameters = funcParams or {}
     end,
-    
+
     CheckCondition = function(self)
-        self.Status = self.FunctionHandle( self.Brain, unpack(self.FunctionParameters) )
+        self.Status = self.FunctionHandle(self.Brain, unpack(self.FunctionParameters))
         return self.Status
     end,
-	
-	LocationExists = function(self)
-		local found = false
-		for k,v in self.FunctionParameters do
-			if type(v) == 'string' and not ( v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then 
-				if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
-					found = true
-					if self.Brain.BuilderManagers[v] then
-						return true
-					end
-				end
-			end
-		end
-		if not found then return true end
-		self.Status = false
-		return false
-	end,
+
+    LocationExists = function(self)
+        local found = false
+        for k,v in self.FunctionParameters do
+            if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
+                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                    found = true
+                    if self.Brain.BuilderManagers[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        if not found then return true end
+        self.Status = false
+        return false
+    end,
 }

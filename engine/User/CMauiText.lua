@@ -47,7 +47,7 @@ function CMauiText:base()
 end
 
 ---
--- 
+--
 function CMauiText:moho.text_methods()
 end
 

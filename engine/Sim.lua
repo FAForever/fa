@@ -2,7 +2,7 @@
 -- @module Sim
 
 --- Restrict the army from building the unit category.
--- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
 -- @param army Army's index.
 -- @param category Unit category.
 function AddBuildRestriction(army, category)
@@ -376,7 +376,7 @@ end
 -- @return sizeX, sizeZ.
 function GetMapSize()
 end
-     
+
 --- Return the reclamable things inside the given rectangle.
 -- That includes props, units, wreckages.
 -- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
@@ -806,7 +806,7 @@ function Random()
 end
 
 --- Unrestrict the army from building the unit category.
--- The categories can be combined using + - * ( ), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
+-- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
 -- @param army Army's index.
 -- @param category Unit category.
 function RemoveBuildRestriction(army, category)
@@ -944,10 +944,10 @@ end
 function StopLoop(self, handle)
 end
 
---- Request that we submit xml army stats to gpg.net. 
+--- Request that we submit xml army stats to gpg.net.
 -- TODO.
 function SubmitXMLArmyStats()
-end 
+end
 
 --- TODO.
 function TryCopyPose(unitFrom, entityTo, bCopyWorldTransform)
@@ -968,7 +968,7 @@ end
 function _c_CreateShield(spec)
 end
 
---- Print a log message 
+--- Print a log message
 -- TODO
 function print()
 end
@@ -979,7 +979,7 @@ function base()
 end
 
 ---
--- 
+--
 function moho.CollisionBeamEntity()
 end
 
@@ -989,7 +989,7 @@ function SinkAway(vy)
 end
 
 ---
--- 
+--
 function moho.entity_methods()
 end
 

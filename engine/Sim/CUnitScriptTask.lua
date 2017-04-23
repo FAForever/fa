@@ -7,7 +7,7 @@ function CUnitScriptTask:SetAIResult()
 end
 
 ---
--- 
+--
 function CUnitScriptTask:moho.ScriptTask_Methods()
 end
 

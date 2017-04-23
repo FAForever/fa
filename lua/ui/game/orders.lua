@@ -1389,7 +1389,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(true)
             end
         end
-    )
+)
     import('/lua/ui/game/commandmode.lua').AddEndBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
@@ -1397,7 +1397,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(false)
             end
         end
-    )
+)
 
     return controls.bg
 end

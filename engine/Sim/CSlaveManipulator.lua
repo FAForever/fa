@@ -7,7 +7,7 @@ function CSlaveManipulator:base()
 end
 
 ---
--- 
+--
 function CSlaveManipulator:moho.SlaveManipulator()
 end
 

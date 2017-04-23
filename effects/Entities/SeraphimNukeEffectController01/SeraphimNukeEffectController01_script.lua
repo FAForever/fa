@@ -8,13 +8,13 @@ local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-local SIFExperimentalStrategicMissileEffect02 = '/effects/Entities/SIFExperimentalStrategicMissileEffect02/SIFExperimentalStrategicMissileEffect02_proj.bp' 
-local SIFExperimentalStrategicMissileEffect04 = '/effects/Entities/SIFExperimentalStrategicMissileEffect04/SIFExperimentalStrategicMissileEffect04_proj.bp' 
+local SIFExperimentalStrategicMissileEffect02 = '/effects/Entities/SIFExperimentalStrategicMissileEffect02/SIFExperimentalStrategicMissileEffect02_proj.bp'
+local SIFExperimentalStrategicMissileEffect04 = '/effects/Entities/SIFExperimentalStrategicMissileEffect04/SIFExperimentalStrategicMissileEffect04_proj.bp'
 local SIFExperimentalStrategicMissileEffect05 = '/effects/Entities/SIFExperimentalStrategicMissileEffect05/SIFExperimentalStrategicMissileEffect05_proj.bp'
 local SIFExperimentalStrategicMissileEffect06 = '/effects/Entities/SIFExperimentalStrategicMissileEffect06/SIFExperimentalStrategicMissileEffect06_proj.bp'
 
-SeraphimNukeEffectController01 = Class(NullShell) {    
-	-- Create inner explosion plasma
+SeraphimNukeEffectController01 = Class(NullShell) {
+    -- Create inner explosion plasma
     CreateEffectInnerPlasma = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 12
@@ -24,21 +24,21 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-		WaitSeconds( 3.5 )
-        for i = 0, (num_projectiles -1) do   
+        WaitSeconds(3.5)
+        for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
-            
+
             local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect05, px, -10, pz, xVec, 0, zVec)
             proj:SetLifetime(5.0)
             proj:SetVelocity(7.0)
             proj:SetAcceleration(-0.35)
         end
-	end,
-	
-	-- Create random wavy electricity lines
+    end,
+
+    -- Create random wavy electricity lines
     CreateEffectElectricity = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 7
@@ -48,26 +48,26 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 0.0
         local px, pz
 
-		WaitSeconds( 3.5 )
-        for i = 0, (num_projectiles -1) do            
+        WaitSeconds(3.5)
+        for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
-            
-            local proj = self:CreateProjectile( SIFExperimentalStrategicMissileEffect06, px, -8, pz, xVec, 0, zVec )
+
+            local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect06, px, -8, pz, xVec, 0, zVec)
             proj:SetLifetime(3.0)
-            proj:SetVelocity(RandomFloat( 11, 20 ))
+            proj:SetVelocity(RandomFloat(11, 20))
             proj:SetAcceleration(-0.35)
         end
-	end,       
+    end,
 
     EffectThread = function(self)
         self:ForkThread(self.CreateEffectInnerPlasma)
         self:ForkThread(self.CreateEffectElectricity)
         local army = self:GetArmy()
         local position = self:GetPosition()
-        
+
         -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
         WaitSeconds(0.1)
@@ -77,27 +77,27 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         CreateLightParticle(self, -1, army, 140, 10, 'glow_02', 'ramp_blue_22')
         WaitSeconds(0.3)
         CreateLightParticle(self, -1, army, 80, 36, 'glow_02', 'ramp_blue_16')
-        
-		-- Create explosion effects
+
+        -- Create explosion effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileHit01 do
             emit = CreateEmitterAtEntity(self,army,v)
-        end	
-        	
+        end
+        
         WaitSeconds(3.0)
         CreateLightParticle(self, -1, army, 160, 6, 'glow_02', 'ramp_blue_16')
         WaitSeconds(0.1)
         CreateLightParticle(self, -1, army, 60, 60, 'glow', 'ramp_blue_22')
-        
+
         -- Create detonate effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileDetonate01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
-        
+
         -- Create ground decals
         local orientation = RandomFloat(0,2*math.pi)
         CreateDecal(position, orientation, 'Scorch_012_albedo', '', 'Albedo', 300, 300, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 150, 150, 1200, 0, army)       
-              
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 150, 150, 1200, 0, army)
+
         -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 24
@@ -107,18 +107,18 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 60.0
         local px, pz
 
-        for i = 0, (num_projectiles -1) do            
+        for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
-            
-            local proj = self:CreateProjectile( SIFExperimentalStrategicMissileEffect02, px, -12, pz, xVec, 0, zVec )
+
+            local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect02, px, -12, pz, xVec, 0, zVec)
             proj:SetLifetime(12.0)
             proj:SetVelocity(10.0)
             proj:SetAcceleration(-0.35)
         end
-              
+
         -- Create upward moving plasma plume
         local plume = self:CreateProjectile('/effects/entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 3, 0, 0, 1, 0)
         plume:SetLifetime(6.0)
@@ -126,9 +126,9 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         plume:SetAcceleration(-0.35)
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
-        
+
         WaitSeconds(1.0)
-        
+
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 15
         local horizontal_angle = (2*math.pi) / num_projectiles
@@ -136,15 +136,15 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local xVec, yVec, zVec
         local angleVariation = 0.5
         local px, py, pz
-     
+
         for i = 0, (num_projectiles -1) do
-            xVec = math.sin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation)) 
+            xVec = math.sin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = RandomFloat(0.3, 1.5) + 1.2
-            zVec = math.cos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation)) 
+            zVec = math.cos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
             px = RandomFloat(7.5, 14.0) * xVec
             py = RandomFloat(7.5, 14.0) * yVec
             pz = RandomFloat(7.5, 14.0) * zVec
-            
+
             local proj = self:CreateProjectile(SIFExperimentalStrategicMissileEffect04, px, py, pz, xVec, yVec, zVec)
             proj:SetVelocity(RandomFloat(10, 30))
             proj:SetBallisticAcceleration(-9.8)

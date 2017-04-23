@@ -277,7 +277,7 @@ function CreateUnitDistanceTrigger(callbackFunction, unitOne, unitTwo, distance)
 end
 
 function UnitDistanceTriggerThread(callbackFunction, unitOne, unitTwo, distance)
-    while not (VDist3(unitOne:GetPosition(), unitTwo:GetPosition()) < distance  ) do
+    while not (VDist3(unitOne:GetPosition(), unitTwo:GetPosition()) < distance) do
         WaitSeconds(0.5)
     end
     callbackFunction()
