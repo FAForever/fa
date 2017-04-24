@@ -865,6 +865,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local obTable = import('/lua/ui/game/objectives2.lua').GetCurrentObjectiveTable()
             local hasPrimaries = false
             local hasSecondaries = false
+            local hasBonuses = false
             if obTable then
                 for key, objective in obTable do
                     local compStr
@@ -883,6 +884,8 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                         hasPrimaries = true
                     elseif objective.type == 'secondary' then
                         hasSecondaries = true
+                    elseif objective.type == 'bonus' then
+                        hasBonuses = true
                     end
                     table.insert(tempObjectives, {title = LOC(objective.title), complete = LOC(compStr), completeColor = compColor, type = objective.type})
                 end
@@ -901,6 +904,15 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 table.insert(sortedObjectives, {title = LOC("<LOC SCORE_0040>Secondary Objectives"), type = 'header'})
                 for i, v in tempObjectives do
                     if v.type == 'secondary' then
+                        table.insert(sortedObjectives, v)
+                    end
+                end
+            end
+
+            if hasBonuses then
+                table.insert(sortedObjectives, {title = LOC("<LOC SCORE_0041>Bonus Objectives"), type = 'header'})
+                for i, v in tempObjectives do
+                    if v.type == 'bonus' then
                         table.insert(sortedObjectives, v)
                     end
                 end

@@ -1352,10 +1352,6 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                       loadedTag     -- If IsLoading is specified, whats the tag?
 )
 
-    if Type == 'bonus' then
-        return {Tag = 'Invalid'} -- Bonus objectives cut
-    end
-
     if not Sync.ObjectivesTable then
         Sync.ObjectivesTable = {}
     end
@@ -1742,6 +1738,8 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                 unit:SetStrategicUnderlay('icon_objective_primary')
             elseif Type == 'secondary' then
                 unit:SetStrategicUnderlay('icon_objective_secondary')
+            elseif Type == 'bonus' then
+                unit:SetStrategicUnderlay('icon_objective_bonus')
             end
         end
     end

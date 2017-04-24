@@ -26,7 +26,8 @@ end
 --   bool _success - instructs UI which dialog to show
 --   bool _allPrimary - true if all primary objectives completed, otherwise, false
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
-function EndOperation(_success, _allPrimary, _allSecondary)
+--   bool _allBonus - true if all bonus objectives completed, otherwise, false
+function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
     local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
     local _opData = {}
 
@@ -43,6 +44,7 @@ function EndOperation(_success, _allPrimary, _allSecondary)
             difficulty = ScenarioInfo.Options.Difficulty,
             allPrimary = _allPrimary,
             allSecondary = _allSecondary,
+            allBonus = _allBonus,
             faction = ScenarioInfo.LocalFaction,
             opData = _opData.operationData
         }
