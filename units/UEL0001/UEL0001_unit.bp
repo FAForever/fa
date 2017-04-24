@@ -116,10 +116,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
+            Level2 = 8,
+            Level3 = 15,
+            Level4 = 24,
+            Level5 = 35,
         },
     },
     Categories = {
