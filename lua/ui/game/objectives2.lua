@@ -240,6 +240,9 @@ function UpdateObjectiveItems(skipAnnounce)
         elseif data.type == 'secondary' then
             group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/secondary-ring_bmp.dds'))
             group.secondary = true
+        elseif data.type == 'bonus' then
+            group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/bonus-ring_bmp.dds'))
+            group.bonus = true
         end
         if group.bgRing then
             LayoutHelpers.AtCenterIn(group.bgRing, group.bg, -6)
@@ -428,6 +431,11 @@ function LayoutObjectiveItems()
     end
     local sortedControls = {}
     for _, item in controls.objItems do
+        if item.bonus then
+            table.insert(sortedControls, item)
+        end
+    end
+    for _, item in controls.objItems do
         if item.secondary then
             table.insert(sortedControls, item)
         end
@@ -532,6 +540,8 @@ function CreateTooltip(parentControl, objData, container)
             controls.tooltip.text.title:SetColor('ffff0000')
         elseif parentControl.secondary then
             controls.tooltip.text.title:SetColor('fffff700')
+        elseif parentControl.bonus then
+            controls.tooltip.text.title:SetColor('ffba00ff')
         else
             controls.tooltip.text.title:SetColor('ff00f7ff')
         end

@@ -163,6 +163,7 @@ end
 --  int difficulty - 1,2,3 currently supported
 --  bool allPrimary - true if all primary objectives completed, otherwise, false
 --  bool allSecondary - true if all secondary objectives completed, otherwise, false
+--  bool allBonus - true if all bonus objectives completed, otherwise, false
 --  int factionVideo - Opt.  If present, display this factions end game video
 function OperationVictory(ovTable, skipDialog)
     local resultText
