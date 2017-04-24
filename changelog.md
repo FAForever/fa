@@ -27,6 +27,8 @@ Patch 3680 (Upcoming)
 - Fixed the Mex Cap feature somehow allowing storage to be built inside units built via upgrade
 - Fixed bug where the Aeon shields didn't visually rotate properly
 - Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes or hydros
+- Fixed ships sometimes sinking through land
+- Attempted a safety check to try and fix Aeon T2 shields getting the shield up despite having been destroyed in construction
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -52,6 +54,12 @@ Patch 3680 (Upcoming)
 - You can now search for bindings or actions in the F1 key binding menu
 - The buttons for adding and removing key bindings have been moved to be on the same line as the binding
 - Added Hotbuild Preset button. This will automatically set your bindings to the Hotbuild Preset. There is also a button to set back to Default Preset.
+- Fixed Hotbuild conflicting with other binds
+- Fixed keys being able to be bound to two actions at once
+- Keybinding UI will now auto-assign shift-bindings to match a newly bound action, if the shift-bind is not in use
+- Fixed hotbuild labels in the construction UI not updating when they are re-assigned
+- Lots of text around the UI will now change colour to reflect your faction skin again
+- New Feature: Helpful tips and tricks will now show briefly on the loading screen
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
@@ -64,6 +72,8 @@ Patch 3680 (Upcoming)
 - Fixed desync in COOP
 - Allow Salem death sound on land in COOP
 - Allowed restricted units to be captured in COOP
+- Added a new objective type to COOP
+- Added a new icon for the Kill or Capture objective in COOP
 
 ### Contributors
 - CookieNoob
@@ -72,6 +82,7 @@ Patch 3680 (Upcoming)
 - Exotic-Retard
 - Hussar
 - IceDreamer
+- IDragonfire
 - PhilipJFry
 - Speed2
 - TheKeyBlue
