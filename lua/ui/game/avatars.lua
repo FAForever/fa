@@ -528,16 +528,7 @@ function CreateIdleEngineerList(parent, units)
             LayoutHelpers.AtCenterIn(entry.iconBG, entry.icon)
             entry.iconBG.Depth:Set(function() return entry.icon.Depth() - 1 end)
 
-            if options.gui_scu_manager ~= 0 then
-                --SCU MANAGER SHOW CORRECT ICON
-                if techLevel == 'C' or techLevel == 'E' then
-                    entry.techIcon = Bitmap(entry, UIUtil.UIFile('/SCUManager/tech-'..techLevel..'_bmp.dds'))
-                else
-                    entry.techIcon = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-engineers-panel/tech-'..techLevel..'_bmp.dds'))
-                end
-            else
-                entry.techIcon = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-engineers-panel/tech-'..techLevel..'_bmp.dds'))
-            end
+            entry.techIcon = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-engineers-panel/tech-'..techLevel..'_bmp.dds'))
             LayoutHelpers.AtLeftIn(entry.techIcon, entry)
             LayoutHelpers.AtVerticalCenterIn(entry.techIcon, entry.icon)
 
@@ -573,13 +564,7 @@ function CreateIdleEngineerList(parent, units)
             return entry
         end
         local engineers = {}
-        if options.gui_scu_manager ~= 0 then
-            engineers[7] = {}
-            engineers[6] = {}
-            engineers[5] = {}
-        else
-            engineers[5] = EntityCategoryFilterDown(categories.SUBCOMMANDER, unitData)
-        end
+        engineers[5] = EntityCategoryFilterDown(categories.SUBCOMMANDER, unitData)
         engineers[4] = EntityCategoryFilterDown(categories.TECH3 - categories.SUBCOMMANDER, unitData)
         engineers[3] = EntityCategoryFilterDown(categories.FIELDENGINEER, unitData)
         engineers[2] = EntityCategoryFilterDown(categories.TECH2 - categories.FIELDENGINEER, unitData)
@@ -587,26 +572,6 @@ function CreateIdleEngineerList(parent, units)
 
         local indexToIcon = {'1', '2', '2', '3', '3'}
         local keyToIcon = {'T1','T2','T2F','T3','SCU'}
-        if options.gui_scu_manager ~= 0 then
-            local tempSCUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, unitData)
-
-            if table.getsize(tempSCUs) > 0 then
-                for i, unit in tempSCUs do
-                    if unit.SCUType then
-                        if unit.SCUType == 'Combat' then
-                            table.insert(engineers[7], unit)
-                        elseif unit.SCUType == 'Engineer' then
-                            table.insert(engineers[6], unit)
-                        end
-                    else
-                        table.insert(engineers[5], unit)
-                    end
-                end
-            end
-            indexToIcon = {'1', '2', '2', '3', '3', 'E', 'C'}
-            keyToIcon = {'T1','T2','T2F','T3','SCU', 'SCU', 'SCU'}
-        end
-
         for index, units in engineers do
             local i = index
             -- ADDED SUPPORT FOR CUSTOM FACTIONS HAVING FIELD ENGINEERS
@@ -831,15 +796,6 @@ function AvatarUpdate()
 
     if needsAvatarLayout then
         import(UIUtil.GetLayoutFilename('avatars')).LayoutAvatars()
-    end
-
-    local buttons = import('/modules/scumanager.lua').buttonGroup
-    if options.gui_scu_manager == 0 then
-        buttons:Hide()
-    else
-        buttons:Show()
-        buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
-        buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)
     end
 end
 

@@ -133,7 +133,7 @@ PlatoonTemplate {
     Name = 'AeonT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.AEON * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
+        { categories.AEON * categories.ENGINEER * (categories.TECH3 + categories.SUBCOMMANDER), 1, 1, 'support', 'None' }
     },
 }
 
@@ -141,7 +141,7 @@ PlatoonTemplate {
     Name = 'UEFT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.UEF * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
+        { categories.UEF * categories.ENGINEER * (categories.TECH3 + categories.SUBCOMMANDER), 1, 1, 'support', 'None' }
     },
 }
 
@@ -149,7 +149,7 @@ PlatoonTemplate {
     Name = 'CybranT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.CYBRAN * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ) - categories.ENGINEERSTATION, 1, 1, 'support', 'None' }
+        { categories.CYBRAN * categories.ENGINEER * (categories.TECH3 + categories.SUBCOMMANDER) - categories.ENGINEERSTATION, 1, 1, 'support', 'None' }
     },
 }
 
@@ -157,7 +157,7 @@ PlatoonTemplate {
     Name = 'SeraphimT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.SERAPHIM * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
+        { categories.SERAPHIM * categories.ENGINEER * (categories.TECH3 + categories.SUBCOMMANDER), 1, 1, 'support', 'None' }
     },
 }
 

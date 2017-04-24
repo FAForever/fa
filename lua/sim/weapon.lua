@@ -258,7 +258,7 @@ Weapon = Class(moho.weapon_methods) {
         if not bp.Audio[sound] then return end
         self:PlaySound(bp.Audio[sound])
     end,
-    
+
     PlayWeaponAmbientSound = function(self, sound)
         local bp = self:GetBlueprint()
         if not bp.Audio[sound] then return end
@@ -271,9 +271,9 @@ Weapon = Class(moho.weapon_methods) {
             self.unit.Trash:Add(sndEnt)
             sndEnt:AttachTo(self.unit,-1)
         end
-        self.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
+        self.AmbientSounds[sound]:SetAmbientSound(bp.Audio[sound], nil)
     end,
-    
+
     StopWeaponAmbientSound = function(self, sound)
         if not self.AmbientSounds then return end
         if not self.AmbientSounds[sound] then return end
@@ -284,7 +284,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnEnableWeapon = function(self)
-        
+
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
@@ -315,8 +315,8 @@ Weapon = Class(moho.weapon_methods) {
                 if not self.DisabledBuffs[v.BuffType] then
                     damageTable.Buffs[k] = v
                 end
-                
-            end   
+
+            end
         end
 
         return damageTable
@@ -336,7 +336,7 @@ Weapon = Class(moho.weapon_methods) {
                 proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
                 proj.OuterRing = NukeDamage()
                 proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
-                
+
                 -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit
                 proj.Army = self.unit:GetArmy()
@@ -347,14 +347,14 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetValidTargetsForCurrentLayer = function(self, newLayer)
-        -- LOG( 'SetValidTargetsForCurrentLayer, layer = ', newLayer )
+        -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
         local weaponBlueprint = self:GetBlueprint()
         if weaponBlueprint.FireTargetLayerCapsTable then
             if weaponBlueprint.FireTargetLayerCapsTable[newLayer] then
-                -- LOG( 'Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer] )
-                self:SetFireTargetLayerCaps( weaponBlueprint.FireTargetLayerCapsTable[newLayer] )
+                -- LOG('Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer])
+                self:SetFireTargetLayerCaps(weaponBlueprint.FireTargetLayerCapsTable[newLayer])
             else
-                -- LOG( 'Setting Target Layer Caps to None' )
+                -- LOG('Setting Target Layer Caps to None')
                 self:SetFireTargetLayerCaps('None')
             end
         end
@@ -423,11 +423,11 @@ Weapon = Class(moho.weapon_methods) {
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
     end,
-    
+
     AddDamageRadiusMod = function(self, dmgRadMod)
         self.DamageRadiusMod = self.DamageRadiusMod + (dmgRadMod or 0)
     end,
-    
+
     DoOnFireBuffs = function(self)
         local data = self:GetBlueprint()
         if data.Buffs then
@@ -444,19 +444,19 @@ Weapon = Class(moho.weapon_methods) {
             self.DisabledBuffs[buffname] = true
         else
             -- Error
-            error('ERROR: DisableBuff in weapon.lua does not have a buffname') 
+            error('ERROR: DisableBuff in weapon.lua does not have a buffname')
         end
     end,
-    
+
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
         else
-            -- Error 
-            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname') 
+            -- Error
+            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname')
         end
     end,
-    
+
     -- Method to mark weapon when parent unit gets loaded on to a transport unit
     SetOnTransport = function(self, transportstate)
         self.onTransport = transportstate
@@ -473,15 +473,15 @@ Weapon = Class(moho.weapon_methods) {
                 self:SetWeaponEnabled(true)
                 self.WeaponDisabledOnTransport = false
             end
-        end        
+        end
     end,
 
     -- Method to retreive onTransport information. True if the parent unit has been loaded on to a transport unit
     GetOnTransport = function(self)
         return self.onTransport
     end,
-    
-    -- This is the function to set a weapon enabled. 
+
+    -- This is the function to set a weapon enabled.
     -- If the weapon is enhabled by an enhancement, this will check to see if the unit has the enhancement before
     -- allowing it to try to be enabled or disabled.
     SetWeaponEnabled = function(self, enable)

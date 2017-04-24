@@ -205,7 +205,7 @@ UnitBlueprint {
                 Stack = true,   -- Special flag to trigger multi-sphere collision
                 OffsetMult = 1.33,
             },
-            Label = 'AntiMissile',            
+            Label = 'AntiMissile',
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -243,7 +243,7 @@ UnitBlueprint {
         { -- Dummy weapon used manipulate the game to show correct range circle [129]
             MaxRadius = 12.5,
             RangeCategory = 'UWRC_Countermeasure',
-        }, 
+        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

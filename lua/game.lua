@@ -1,9 +1,9 @@
--- ==========================================================================================
--- * File     : /lua/game.lua
--- * Authors  : John Comes, HUSSAR
--- * Summary  : Script full of overall game functions
--- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ==========================================================================================
+-----------------------------------------------------------------
+-- File     : /lua/game.lua
+-- Authors  : John Comes, HUSSAR
+-- Summary  : Script full of overall game functions
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 FireState = {
     RETURN_FIRE = 0,
@@ -22,7 +22,7 @@ VeteranDefault = {
 local BuffFieldBlueprint = import('/lua/sim/BuffField.lua').BuffFieldBlueprint
 
 -- Seraphim ACU Buff Field Upgrades
-BuffFieldBlueprint {                         -- Seraphim ACU Restoration
+BuffFieldBlueprint { -- Seraphim ACU Restoration
     Name = 'SeraphimACURegenBuffField',
     AffectsUnitCategories = 'ALLUNITS',
     AffectsAllies = false,
@@ -35,10 +35,10 @@ BuffFieldBlueprint {                         -- Seraphim ACU Restoration
     Radius = 15,
     Buffs = {
         'SeraphimACURegenAura',
-    },
+   },
 }
 
-BuffFieldBlueprint {                         -- Seraphim ACU Advanced Restoration
+BuffFieldBlueprint { -- Seraphim ACU Advanced Restoration
     Name = 'SeraphimAdvancedACURegenBuffField',
     AffectsUnitCategories = 'ALLUNITS',
     AffectsAllies = false,
@@ -51,62 +51,55 @@ BuffFieldBlueprint {                         -- Seraphim ACU Advanced Restoratio
     Radius = 15,
     Buffs = {
         'SeraphimAdvancedACURegenAura',
-    },
-} 
+   },
+}
 
 -- Return the total time (in seconds), energy, and mass it will take for the given
 -- builder to create a unit of type target_bp.
--- 
+
 -- targetData may also be an "Enhancement" section of a units blueprint rather than
 -- a full blueprint.
 
--- 
--- Modified by Rienzilla 2/5/2013
--- 
--- Modified to calculate the cost of an upgrade. The third argument is the economy section of 
--- the unit that is currently upgrading into the new unit. We subtract that cost from the cost 
+-- Modified to calculate the cost of an upgrade. The third argument is the economy section of
+-- the unit that is currently upgrading into the new unit. We subtract that cost from the cost
 -- of the unit that is being built
--- 
+
 -- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
 -- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
 function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
-   -- 'rate' here is how fast we build relative to a unit with build rate of 1
-   local rate = builder:GetBuildRate()
-   
-   local buildtime = targetData.BuildTime or 0.1
-   local mass = targetData.BuildCostMass or 0
-   local energy = targetData.BuildCostEnergy or 0
-   
-   if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
-      -- We cant make a differential on buildtime. Not sure why but if we do it yields incorrect
-      -- results. So just mass and energy.
-      mass = math.max(mass - upgradeBaseData.BuildCostMass, 0)
-      energy = math.max(energy - upgradeBaseData.BuildCostEnergy, 0)
-   end
+    -- 'rate' here is how fast we build relative to a unit with build rate of 1
+    local rate = builder:GetBuildRate()
+    local buildtime = targetData.BuildTime or 0.1
+    local mass = targetData.BuildCostMass or 0
+    local energy = targetData.BuildCostEnergy or 0
 
-   -- Apply penalties/bonuses to effective buildtime
-   local time_mod = builder.BuildTimeModifier or 0
-   buildtime = math.max(buildtime * (100 + time_mod) * 0.01, 0.1)
+    if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
+        -- We cant make a differential on buildtime. Not sure why but if we do it yields incorrect
+        -- results. So just mass and energy.
+        mass = math.max(mass - upgradeBaseData.BuildCostMass, 0)
+        energy = math.max(energy - upgradeBaseData.BuildCostEnergy, 0)
+    end
 
-   -- Apply penalties/bonuses to effective energy cost
-   local energy_mod = builder.EnergyModifier or 0
-   energy = math.max(energy * (100 + energy_mod) * 0.01, 0)
-   
-   -- Apply penalties/bonuses to effective mass cost
-   local mass_mod = builder.MassModifier or 0
-   mass = math.max(mass * (100 + mass_mod) * 0.01, 0)
+    -- Apply penalties/bonuses to effective costs
+    local time_mod = builder.BuildTimeModifier or 0
+    local energy_mod = builder.EnergyModifier or 0
+    local mass_mod = builder.MassModifier or 0
 
-   return buildtime / rate, energy, mass
+    buildtime = math.max(buildtime * (100 + time_mod) * 0.01, 0.1)
+    energy = math.max(energy * (100 + energy_mod) * 0.01, 0)
+    mass = math.max(mass * (100 + mass_mod) * 0.01, 0)
+
+    return buildtime / rate, energy, mass
 end
 
--- HUSSAR re-structured and improved performance of checking for restricted units by
--- storing tables with ids of restricted units instead of evaluating an unit 
--- each time against restricted categories 
+-- Re-structured and improved performance of checking for restricted units by
+-- storing tables with ids of restricted units instead of evaluating an unit
+-- each time against restricted categories
 
 -- Table with presently restricted Unit IDs
 local restrictions =  {
-    Global = {}, -- set via UnitsManager (ScenarioInfo.Options.RestrictedCategories)
-    PerArmy = {}, -- set in ScenarioName_Script.lua
+    Global = {}, -- Set via UnitsManager (ScenarioInfo.Options.RestrictedCategories)
+    PerArmy = {}, -- Set in ScenarioName_Script.lua
 }
 
 -- Stores info about blueprints using Unit IDs
@@ -127,7 +120,7 @@ function GetArmyIndex(armyName)
         index = armyName
     elseif type(armyName) == 'string' then
         if ScenarioInfo.ArmySetup[armyName] then
-            index = ScenarioInfo.ArmySetup[armyName].ArmyIndex 
+            index = ScenarioInfo.ArmySetup[armyName].ArmyIndex
         end
     end
 
@@ -140,11 +133,11 @@ end
 
 -- Adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'
 -- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
--- e.g. AddRestriction(categories.TECH2)    -> restricts all T2 units for all armies
+-- e.g. AddRestriction(categories.TECH2) -> restricts all T2 units for all armies
 function AddRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.AddRestriction() called with invalid categories "' .. ToString(cats) .. '" '
-          .. 'instead of category expression, e.g. categories.LAND ' )
+          .. 'instead of category expression, e.g. categories.LAND ')
         return
     end
 
@@ -157,11 +150,11 @@ end
 
 -- Removes restriction of units with specified Entity categories, e.g. 'categories.TECH1 * categories.UEF'
 -- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
--- e.g. RemoveRestriction(categories.TECH2)    -> removes all T2 units restriction for all armies
+-- e.g. RemoveRestriction(categories.TECH2) -> removes all T2 units restriction for all armies
 function RemoveRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(cats) .. '" '
-          .. 'instead of category expression, e.g. categories.LAND ' )
+          .. 'instead of category expression, e.g. categories.LAND ')
         return
     end
 
@@ -179,8 +172,8 @@ function IgnoreRestrictions(isIgnored)
 end
 
 -- Checks whether or not a given blueprint ID is restricted by
--- * global restrictions (set in UnitsManager) or by
--- * army restrictions (set in Scenario Script)
+-- global restrictions (set in UnitsManager) or by
+-- army restrictions (set in Scenario Script)
 -- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 -- Note that global restrictions take precedence over restrictions set on specific armies
 function IsRestricted(unitId, army)
@@ -199,12 +192,12 @@ function IsRestricted(unitId, army)
     return false
 end
 
--- Gets a table with ids of restricted units { Global = {}, PerArmy = {} }
+-- Gets a table with ids of restricted units {Global = {}, PerArmy = {}}
 function GetRestrictions()
     return restrictions
 end
 
--- Sets a table with ids of restricted units { Global = {}, PerArmy = {} }
+-- Sets a table with ids of restricted units {Global = {}, PerArmy = {}}
 function SetRestrictions(blueprintIDs)
     restrictions = blueprintIDs
 end
@@ -234,16 +227,15 @@ local function GetUnitsUpgradable()
     for _, id in bps.ids do
         local bp = __blueprints[id]
 
-        -- Check for valid/upgradeable blueprints 
+        -- Check for valid/upgradeable blueprints
         if bp and bp.General and IsValidUnit(bp, id) and
             bp.General.UpgradesFrom ~= '' and
             bp.General.UpgradesFrom ~= 'none' then
 
-            local cats = table.hash(bp.Categories)
-            if not cats['BUILTBYTIER1ENGINEER'] and
-               not cats['BUILTBYTIER2ENGINEER'] and
-               not cats['BUILTBYTIER3ENGINEER'] and
-               not cats['BUILTBYTIER3COMMANDER'] then
+            if not bp.CategoriesHash['BUILTBYTIER1ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER2ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER3ENGINEER'] and
+               not bp.CategoriesHash['BUILTBYTIER3COMMANDER'] then
 
                local unit = table.deepcopy(bp)
                unit.id = id -- Save id for a reference
@@ -271,7 +263,7 @@ local function GetUnitsIds()
 end
 
 -- Resolves category restrictions to a table with ids of restricted units
--- e.g. restrictions = { categories.TECH1 } -> 
+-- e.g. restrictions = {categories.TECH1} ->
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
     if table.getsize(bps.ids) == 0 or table.getsize(bps.upgradeable) == 0 then
@@ -312,7 +304,7 @@ function ResolveRestrictions(toggle, cats, army)
             end
 
             -- Check if source blueprint is restricted by army restriction
-            if restrictions.PerArmy[army][from] then 
+            if restrictions.PerArmy[army][from] then
                restrictions.PerArmy[army][bp.id] = toggle
             end
         end

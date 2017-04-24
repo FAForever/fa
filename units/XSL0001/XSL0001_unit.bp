@@ -392,7 +392,7 @@ UnitBlueprint {
             Radius = 30,
             MaxHealthFactor = 1.1,
             RegenCeiling = 200,
-            RegenPerSecond = 0.01111111111, 
+            RegenPerSecond = 0.01111111111,
             Slot = 'RCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {

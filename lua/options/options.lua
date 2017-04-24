@@ -260,7 +260,7 @@ options = {
                 title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
                 key = 'assist_mex',
                 type = 'toggle',
-                default = false,
+                default = true,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = false},
@@ -463,19 +463,6 @@ options = {
             {
                 title = "<LOC OPTIONS_0229>Template Rotation",
                 key = 'gui_template_rotator',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0230>SCU Manager",
-                key = 'gui_scu_manager',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -727,10 +714,10 @@ options = {
                 verify = true,
                 populate = function(value)
                     -- this is a bit odd, but the value of the primary determines how to populate the value of the secondary
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 update = function(control,value)
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 ignore = function(value)
                     if value == 'overridden' then
@@ -741,7 +728,7 @@ options = {
                     if not startup then
                         ConExecute("SC_PrimaryAdapter " .. tostring(value))
                     end
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 custom = {
                     states = {

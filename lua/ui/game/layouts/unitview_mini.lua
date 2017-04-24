@@ -30,10 +30,10 @@ function SetLayout()
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-    
+
     controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
     LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -18, -2)
-    
+
     if controls.bracketMid then
         controls.bracketMid:Destroy()
         controls.bracketMid = false
@@ -42,12 +42,12 @@ function SetLayout()
         controls.bracketMax:Destroy()
         controls.bracketMax = false
     end
-    
+
     LayoutHelpers.AtLeftTopIn(controls.name, controls.bg, 16, 14)
     LayoutHelpers.AtRightIn(controls.name, controls.bg, 16)
     controls.name:SetClipToWidth(true)
     controls.name:SetDropShadow(true)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.icon, controls.bg, 12, 34)
     controls.icon.Height:Set(48)
     controls.icon.Width:Set(48)
@@ -76,7 +76,7 @@ function SetLayout()
     controls.fuelBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
-    
+
     for index = 1, table.getn(iconPositions) do
         local i = index
         if iconPositions[i] then
@@ -94,7 +94,7 @@ function SetLayout()
     controls.actionIcon.Width:Set(48)
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
-    
+
     controls.abilities.Left:Set(function() return controls.bg.Right() + 19 end)
     controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 50 end)
     controls.abilities.Height:Set(50)
@@ -126,7 +126,7 @@ function SetBG(controls)
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds')
-    )
+)
 
     controls.abilityBG:Surround(controls.abilities, 3, 5)
     LayoutHelpers.DepthUnderParent(controls.abilityBG, controls.abilities)

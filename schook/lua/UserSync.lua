@@ -46,13 +46,13 @@ OnSync = function()
     if Sync.AddTransmissions then
         import('/lua/ui/game/transmissionlog.lua').OnPostLoad(Sync.AddTransmissions)
     end
-    
+
     if Sync.EnhanceRestrict then
-        import('/lua/enhancementcommon.lua').RestrictList( Sync.EnhanceRestrict )
+        import('/lua/enhancementcommon.lua').RestrictList(Sync.EnhanceRestrict)
     end
     if Sync.Restrictions then
-        import('/lua/game.lua').SetRestrictions( Sync.Restrictions )
-    end 
+        import('/lua/game.lua').SetRestrictions(Sync.Restrictions)
+    end
 
     if Sync.NISVideo then
         import('/lua/ui/game/missiontext.lua').PlayNIS(Sync.NISVideo)
@@ -72,11 +72,11 @@ OnSync = function()
         msg.taunthead = Sync.MPTaunt[2]
         SessionSendChatMessage(msg)
     end
-    
+
     if Sync.Ping then
         import('/lua/ui/game/ping.lua').DisplayPing(Sync.Ping)
     end
-    
+
     if Sync.MaxPingMarkers then
         import('/lua/ui/game/ping.lua').MaxMarkers = Sync.MaxPingMarkers
     end
@@ -87,7 +87,7 @@ OnSync = function()
             import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
         end
     end
-    
+
     if Sync.FullScoreSync then
         if not table.empty(Sync.ScoreAccum) then
             import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
@@ -157,11 +157,11 @@ OnSync = function()
         end
         print(msg)
     end
-    
+
     if Sync.DiplomacyAction then
         import('/lua/ui/game/diplomacy.lua').ActionHandler(Sync.DiplomacyAction)
     end
-    
+
     if Sync.DiplomacyAnnouncement then
         import('/lua/ui/game/diplomacy.lua').AnnouncementHandler(Sync.DiplomacyAnnouncement)
     end
@@ -169,19 +169,19 @@ OnSync = function()
     if Sync.LockInput then
         import('/lua/ui/game/worldview.lua').LockInput()
     end
-    
+
     if Sync.UnlockInput then
         import('/lua/ui/game/worldview.lua').UnlockInput()
     end
-    
+
     if Sync.NISMode then
         import('/lua/ui/game/gamemain.lua').NISMode(Sync.NISMode)
     end
-    
+
     if Sync.RequestPlayerFaction then
         import('/lua/ui/game/factionselect.lua').RequestPlayerFaction()
     end
-    
+
     if Sync.PrintText then
         for _, textData in Sync.PrintText do
             local data = textData
@@ -191,19 +191,19 @@ OnSync = function()
             import('/lua/ui/game/textdisplay.lua').PrintToScreen(data)
         end
     end
-    
+
     if Sync.FloatingEntityText then
         for _, textData in Sync.FloatingEntityText do
             import('/lua/ui/game/unittext.lua').FloatingEntityText(textData)
         end
     end
-    
+
     if Sync.StartCountdown then
         for _, textData in Sync.StartCountdown do
             import('/lua/ui/game/unittext.lua').StartCountdown(textData)
         end
     end
-    
+
     if Sync.CancelCountdown then
         for _, textData in Sync.CancelCountdown do
             import('/lua/ui/game/unittext.lua').CancelCountdown(textData)
@@ -213,51 +213,51 @@ OnSync = function()
     if Sync.AddPingGroups then
         import('/lua/ui/game/objectives2.lua').AddPingGroups(Sync.AddPingGroups)
     end
-    
+
     if Sync.RemovePingGroups then
         import('/lua/ui/game/objectives2.lua').RemovePingGroups(Sync.RemovePingGroups)
     end
-    
+
     if Sync.SetAlliedVictory != nil then
         import('/lua/ui/game/diplomacy.lua').SetAlliedVictory(Sync.SetAlliedVictory)
     end
-    
+
     if Sync.HighlightUIPanel then
         import('/lua/ui/game/tutorial.lua').HighlightPanels(Sync.HighlightUIPanel)
     end
-    
+
     if Sync.AddCameraMarkers then
         import('/lua/ui/game/tutorial.lua').AddCameraMarkers(Sync.AddCameraMarkers)
     end
-    
+
     if Sync.RemoveCameraMarkers then
         import('/lua/ui/game/tutorial.lua').RemoveCameraMarkers(Sync.RemoveCameraMarkers)
     end
-    
+
     if Sync.EndDemo then
         import('/lua/ui/game/demo.lua').OnDemoEnd()
     end
-    
+
     if Sync.CreateSimDialogue then
         import('/lua/ui/game/simdialogue.lua').CreateSimDialogue(Sync.CreateSimDialogue)
     end
-    
+
     if Sync.SetButtonDisabled then
         import('/lua/ui/game/simdialogue.lua').SetButtonDisabled(Sync.SetButtonDisabled)
     end
-    
+
     if Sync.UpdatePosition then
         import('/lua/ui/game/simdialogue.lua').UpdatePosition(Sync.UpdatePosition)
     end
-    
+
     if Sync.UpdateButtonText then
         import('/lua/ui/game/simdialogue.lua').UpdateButtonText(Sync.UpdateButtonText)
     end
-    
+
     if Sync.SetDialogueText then
         import('/lua/ui/game/simdialogue.lua').SetDialogueText(Sync.SetDialogueText)
     end
-    
+
     if Sync.DestroyDialogue then
         import('/lua/ui/game/simdialogue.lua').DestroyDialogue(Sync.DestroyDialogue)
     end

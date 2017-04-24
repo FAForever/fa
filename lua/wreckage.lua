@@ -26,7 +26,7 @@ Wreckage = Class(Prop) {
         local health = self:GetHealth()
 
         if health <= 0 then
-            self:DoPropCallbacks( 'OnKilled' )
+            self:DoPropCallbacks('OnKilled')
             self:Destroy()
         else
             self:UpdateReclaimLeft()

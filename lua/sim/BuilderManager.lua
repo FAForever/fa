@@ -21,10 +21,10 @@ BuilderManager = Class {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
-        
+
         self.NumGet = 0
     end,
-    
+
     Destroy = function(self)
         for _,bType in self.BuilderData do
             for k,v in bType do
@@ -33,7 +33,7 @@ BuilderManager = Class {
         end
         self.Trash:Destroy()
     end,
-    
+
     # forking and storing a thread on the monitor
     ForkThread = function(self, fn, ...)
         if fn then
@@ -55,11 +55,11 @@ BuilderManager = Class {
             self.Active = false
         end
     end,
-    
+
     SortBuilderList = function(self, bType)
         # Make sure there is a type
         if not self.BuilderData[bType] then
-            error( '*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
+            error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
             return false
         end
         local sortedList = {}
@@ -80,7 +80,7 @@ BuilderManager = Class {
         self.BuilderData[bType].Builders = sortedList
         self.BuilderData[bType].NeedSort = false
     end,
-    
+
     AlterBuilder = function(self, builderName, changeTable)
         for k,v in self.BuilderData do
             for num,builder in v.Builders do
@@ -88,7 +88,7 @@ BuilderManager = Class {
                     for key,change in changeTable do
                         builder.key = change
                         if key == BuilderConditions then
-                            ChangeState( builder, builder.SetupState )
+                            ChangeState(builder, builder.SetupState)
                         end
                     end
                 end
@@ -96,19 +96,19 @@ BuilderManager = Class {
             end
         end
     end,
-    
+
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = Builder.CreateBuilder(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)
     end,
-    
+
     AddInstancedBuilder = function(self,newBuilder, builderType)
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
-            error('*BUILDERMANAGER ERROR: Invalid builder type: ' .. builderType .. ' - in builder: ' .. newBuilder.BuilderName )
+            error('*BUILDERMANAGER ERROR: Invalid builder type: ' .. builderType .. ' - in builder: ' .. newBuilder.BuilderName)
         end
         if newBuilder then
-            table.insert( self.BuilderData[builderType].Builders, newBuilder )
+            table.insert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
         end
@@ -117,7 +117,7 @@ BuilderManager = Class {
             self:ManagerLoopBody(newBuilder)
         end
     end,
-    
+
     GetBuilderPriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -128,8 +128,8 @@ BuilderManager = Class {
         end
         return false
     end,
-	
-	GetActivePriority = function(self, builderName)
+
+    GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
                 if builder:GetBuilderName() == builderName then
@@ -139,7 +139,7 @@ BuilderManager = Class {
         end
         return false
     end,
-    
+
     SetBuilderPriority = function(self,builderName,priority,temporary,setbystrat)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -150,7 +150,7 @@ BuilderManager = Class {
             end
         end
     end,
-	
+
     ResetBuilderPriority = function(self,builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -170,9 +170,9 @@ BuilderManager = Class {
         if not self.Location then
             return false
         end
-        local height = GetTerrainHeight( self.Location[1], self.Location[3] )
-        if GetSurfaceHeight( self.Location[1], self.Location[3] ) > height then
-            height = GetSurfaceHeight( self.Location[1], self.Location[3] )
+        local height = GetTerrainHeight(self.Location[1], self.Location[3])
+        if GetSurfaceHeight(self.Location[1], self.Location[3]) > height then
+            height = GetSurfaceHeight(self.Location[1], self.Location[3])
         end
         return { self.Location[1], height, self.Location[3] }
     end,
@@ -180,11 +180,11 @@ BuilderManager = Class {
     GetLocationRadius = function(self)
        return self.Radius
     end,
-    
+
     AddBuilderType = function(self, type)
         self.BuilderData[type] = { Builders = {}, NeedSort = false }
     end,
-    
+
     SetCheckInterval = function(self, interval)
         self.BuildCheckInterval = interval
     end,
@@ -196,17 +196,17 @@ BuilderManager = Class {
         end
         self.BuilderList = false
     end,
-    
+
     HasBuilderList = function(self)
         return self.BuilderList
     end,
-    
+
     # Function that is run in GetHighestBuilder; allows us to test if the builder is valid
     # within a certain type of builder mananger (ie: can factories build the builder)
     BuilderParamCheck = function(self,builder,params)
         return true
     end,
-    
+
     GetBuilder = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -217,10 +217,10 @@ BuilderManager = Class {
         end
         return false
     end,
-    
+
     GetHighestBuilder = function(self,bType,params)
         if not self.BuilderData[bType] then
-            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType )
+            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType)
         end
         if not self.Brain.BuilderManagers[self.LocationType] then
             return false
@@ -229,20 +229,20 @@ BuilderManager = Class {
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
-			if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and ( not found or v:GetPriority() == found ) and v:GetBuilderStatus() then
+            if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and (not found or v:GetPriority() == found) and v:GetBuilderStatus() then
                 found = v:GetPriority()
-                table.insert( possibleBuilders, k )
+                table.insert(possibleBuilders, k)
             elseif found and v:GetPriority() < found then
                 break
             end
         end
-        if found and found > 0 then 
+        if found and found > 0 then
             local whichBuilder = Random(1,table.getn(possibleBuilders))
             return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]
         end
         return false
     end,
-    
+
     # Called every 13 seconds to perform any cleanup; Provides better inheritance
     ManagerThreadCleanup = function(self)
         for bType,bTypeData in self.BuilderData do
@@ -251,18 +251,18 @@ BuilderManager = Class {
             end
         end
     end,
-    
+
     ManagerLoopBody = function(self,builder,bType)
         if builder:CalculatePriority(self) then
             self.BuilderData[bType].NeedSort = true
         end
         #builder:CheckBuilderConditions(self.Brain)
     end,
-    
+
     ManagerThread = function(self)
         while self.Active do
             self:ManagerThreadCleanup()
-            local numPerTick = math.ceil( self.NumBuilders / (self.BuilderCheckInterval * 10) )
+            local numPerTick = math.ceil(self.NumBuilders / (self.BuilderCheckInterval * 10))
             local numTicks = 0
             local numTested = 0
             for bType,bTypeData in self.BuilderData do
@@ -281,7 +281,7 @@ BuilderManager = Class {
                 end
             end
             if numTicks <= (self.BuilderCheckInterval * 10) then
-                WaitTicks( (self.BuilderCheckInterval * 10) - numTicks )
+                WaitTicks((self.BuilderCheckInterval * 10) - numTicks)
             end
         end
     end,

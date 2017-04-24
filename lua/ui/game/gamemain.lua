@@ -29,37 +29,15 @@ local ordersControl = false
 local OnDestroyFuncs = {}
 
 local NISActive = false
-
 local isReplay = false
-
 local waitingDialog = false
 
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
--- Hotbuild stuff
-modifiersKeys = {}
-
--- Adding modifiers shorcuts on the fly.
-local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
-for key, action in currentKeyMap do
-    if action["category"] == "hotbuilding" then
-        if key ~= nil then
-            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
-                modifiersKeys["Shift-" .. key] = action
-            else
-                WARN("Shift-" .. key .. " is already bind")
-            end
-
-            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
-                modifiersKeys["Alt-" .. key] = action
-            else
-                WARN("Alt-" .. key .. " is already bind")
-            end
-        end
-    end
-end
+-- generating hotbuild modifier shortcuts on the fly
+modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
 IN_AddKeyMapTable(modifiersKeys)
 
 -- check this flag to see if it's valid to show the exit dialog
@@ -71,9 +49,7 @@ end
 
 -- query this to see if the UI is hidden
 gameUIHidden = false
-
 PostScoreVideo = false
-
 IsSavedGame = false
 
 function KillWaitingDialog()
@@ -89,7 +65,6 @@ function SetLayout(layout)
     import('/lua/ui/game/multifunction.lua').SetLayout(layout)
     if not isReplay then
         import('/lua/ui/game/orders.lua').SetLayout(layout)
-
     end
     import('/lua/ui/game/avatars.lua').SetLayout()
     import('/lua/ui/game/unitview.lua').SetLayout(layout)
@@ -106,7 +81,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
-    import('/modules/hotbuild.lua').init()
+    import('/lua/keymap/hotbuild.lua').init()
     EnableWorldSounds()
     import('/lua/UserMusic.lua').StartPeaceMusic()
 
@@ -116,7 +91,7 @@ function OnFirstUpdate()
         local focusArmy = armiesInfo.focusArmy
         local playerName = armiesInfo.armiesTable[focusArmy].nickname
         avatars[1]:SetCustomName(playerName)
-        PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
+        PlaySound(Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'})
         ForkThread(function()
             WaitSeconds(1)
             UIZoomTo(avatars, 1)
@@ -157,10 +132,10 @@ function CreateUI(isReplay)
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
-    -- set up our layout change function
+    -- Set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
 
-    -- update loc table with player's name
+    -- Update loc table with player's name
     local focusarmy = GetFocusArmy()
     if focusarmy >= 1 then
         LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusarmy].nickname
@@ -195,7 +170,7 @@ function CreateUI(isReplay)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
-        controls.ordersControl  = ordersControl
+        controls.ordersControl = ordersControl
     end
 
     import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
@@ -242,7 +217,6 @@ function CreateUI(isReplay)
     ConExecute('res_AfterPrefetchDelay 100')
     ConExecute('res_PrefetcherActivityDelay 1')
 
-    -- below added for FAF
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
@@ -252,25 +226,23 @@ function CreateUI(isReplay)
     else
         local clients = GetSessionClients()
         if table.getsize(clients) <= 1 then
-            -- no need for unnecessary lag when playing alone
+            -- No need for unnecessary lag when playing alone
             ConExecute('net_lag 0')
         end
     end
 
-    import('/modules/scumanager.lua').Init()
-
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
-        import('/modules/console_commands.lua').Init()
+        import('/lua/ui/game/launchconsolecommands.lua').Init()
     end
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 
-    local hotkeyLabelsInit = import('/modules/hotkeylabels.lua').init
+    local hotkeyLabelsInit = import('/lua/keymap/hotkeylabels.lua').init
     hotkeyLabelsInit()
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
--- Lets find out max hz capability of adapter so we don't render unecessary frames, should help a bit with render thread at 100%
+-- Let's find out max Hz capability of adapter so we don't render unnecessary frames, should help a bit with render thread at 100%
 function AdjustFrameRate()
     if options.vsync == 1 then return end
 
@@ -281,11 +253,11 @@ function AdjustFrameRate()
         local data = utils.StringSplit(options.primary_adapter, ',')
         local hz = tonumber(data[3])
         if hz then
-            fps = math.max(60, math.min(100, hz))
+            fps = math.max(60, hz)
         end
     end
 
-    ConExecute("SC_FrameTimeClamp " .. (1000 / fps ))
+    ConExecute("SC_FrameTimeClamp " .. (1000 / fps))
 end
 
 local provider = false
@@ -473,19 +445,18 @@ end
 
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
---      oldSelection: What the selection was before
---      newSelection: What the selection is now
---      added: Which units were added to the old selection
---      removed: Which units where removed from the old selection
-
+-- @param oldSelection: What the selection was before
+-- @param newSelection: What the selection is now
+-- @param added: Which units were added to the old selection
+-- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
-    
+
     if not hotkeyLabelsOnSelectionChanged then
-        hotkeyLabelsOnSelectionChanged = import('/modules/hotkeylabels.lua').onSelectionChanged
+        hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged
     end
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
@@ -518,7 +489,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         if not isReplay then
             import('/lua/ui/game/orders.lua').SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
-        -- todo change the current command mode if no longer available? or set to nil?
+        -- TODO change the current command mode if no longer available? or set to nil?
         import('/lua/ui/game/construction.lua').OnSelection(buildableCategories,newSelection,isOldSelection)
     end
 
@@ -530,10 +501,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if newSelection then
         local n = table.getn(newSelection)
 
-        if n == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
-            import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
+        if n == 1 and import("/lua/keymap/selectedinfo.lua").SelectedOverlayOn then
+            import("/lua/keymap/selectedinfo.lua").ActivateSingleRangeOverlay()
         else
-            import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
+            import("/lua/keymap/selectedinfo.lua").DeactivateSingleRangeOverlay()
         end
 
         -- if something died in selection, restore command mode
@@ -583,9 +554,8 @@ function OnResume()
     ResumedBy = nil
 end
 
--- Called immediately when the user hits the pause button. This only ever gets
--- called on the machine that initiated the pause (i.e. other network players
-                                                  -- won't call this)
+-- Called immediately when the user hits the pause button on the machine
+-- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -604,22 +574,32 @@ end
 
 local _beatFunctions = {}
 
--- throttle means never run function more than 10 times per second to reduce
--- UI load when speeding up sim / replay
-function AddBeatFunction(fn, throttle)
-    table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
+-- Adds a function callback that will be called on sim beats
+-- @param fn       - specifies function callback
+-- @param throttle - specifies whether never to run a function more than 10 times per second
+--                   to reduce UI load when speeding up sim / replay
+-- @param key      - specifies optional key used later for removing callbacks by a key
+function AddBeatFunction(fn, throttle, key)
+    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
 end
 
-function RemoveBeatFunction(fn)
+-- Removes a function callback from calling on sim beats
+-- @param fn  - specifies function callback
+-- @param key - specifies optional key associated with function callback
+function RemoveBeatFunction(fn, key)
     for i,v in _beatFunctions do
         if v.fn == fn then
+            table.remove(_beatFunctions, i)
+            break
+        end
+        if key and v.key == key then
             table.remove(_beatFunctions, i)
             break
         end
     end
 end
 
--- this function is called whenever the sim beats
+-- Calls function callbacks that were added previously, whenever the sim beat occurs
 local last = 0
 function OnBeat()
     local rate = GetSimRate()
@@ -698,7 +678,7 @@ function HideGameUI(state)
     end
 end
 
--- Given a userunit that is adjacent to a given blueprint, does it yield a
+-- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
     -- fixme: todo
@@ -767,7 +747,7 @@ function NISMode(state)
         end
         worldView.viewLeft:EnableResourceRendering(preNISSettings.Resources)
         worldView.viewLeft:SetCartographic(preNISSettings.Cartographic)
-        -- Todo: Restore settings of overlays, lifebars properly
+        -- TODO: Restore settings of overlays, life-bars properly
         ConExecute('UI_RenderUnitBars true')
         ConExecute('UI_NisRenderIcons true')
         ConExecute('ren_SelectBoxes true')

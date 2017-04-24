@@ -21,7 +21,7 @@ local nextUnbox = function(t, k)
 end
 
 LoggingEnabled = false
-LoggedChanges = {}  
+LoggedChanges = {}
 
 -- A flat, fixed-keyset table eagerly populated with WatchedValues.
 WatchedValueTable = Class() {
@@ -30,7 +30,7 @@ WatchedValueTable = Class() {
         -- We hide this away in the closure of the metatable.
         local _store = {}
         if LoggingEnabled then
-            table.print(initialMapping, 'WatchedValueTable initialMapping' )
+            table.print(initialMapping, 'WatchedValueTable initialMapping')
         end
 
         -- Explicitly track the keyset so we can iterate our keys without having to worry about
@@ -41,7 +41,7 @@ WatchedValueTable = Class() {
         local WatchedMetaTable = {
             -- Get a value from a WatchedValueTable
             __index = function(wvt, key)
-                local msg = 'WatchedValueTable __index function(wvt, ' 
+                local msg = 'WatchedValueTable __index function(wvt, '
                             .. repr(key).. ') '  .. tostring(_store[key])
                 -- limit logging only to changes of the WatchedValueTable
                 if LoggingEnabled and not LoggedChanges[msg] then

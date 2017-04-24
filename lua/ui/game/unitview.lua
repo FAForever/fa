@@ -18,7 +18,7 @@ local Factions = import('/lua/factions.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
-local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
+local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 
 local selectedUnit = nil
 local updateThread = nil
@@ -108,26 +108,26 @@ local statFuncs = {
         end
     end,
     function(info)
-		if UnitData[info.entityId].xp ~= nil then
-			local nextLevel = 0
-			local veterancyLevels = __blueprints[info.blueprintId].Veteran or veterancyDefaults
-			for index = 1, 5 do
-				local i = index
-				local vet = veterancyLevels[string.format('Level%d', i)]
+        if UnitData[info.entityId].xp ~= nil then
+            local nextLevel = 0
+            local veterancyLevels = __blueprints[info.blueprintId].Veteran or veterancyDefaults
+            for index = 1, 5 do
+                local i = index
+                local vet = veterancyLevels[string.format('Level%d', i)]
 
-				if UnitData[info.entityId].xp < vet then
-					return string.format('%d / %d', UnitData[info.entityId].xp, vet)
-				end
-			end
+                if UnitData[info.entityId].xp < vet then
+                    return string.format('%d / %d', UnitData[info.entityId].xp, vet)
+                end
+            end
 
-			return false
-		else
-			return false
-		end
+            return false
+        else
+            return false
+        end
 
 
     end,
-	function(info)
+    function(info)
         if info.kills > 0 then
             return string.format('%d', info.kills)
         else
@@ -222,9 +222,9 @@ function UpdateWindow(info)
         end
         local techLevel = false
         local levels = {TECH1 = 1,TECH2 = 2,TECH3 = 3}
-        for i, v in bp.Categories do
-            if levels[v] then
-                techLevel = levels[v]
+        for cat, level in levels do
+            if bp.CategoriesHash[cat] then
+                techLevel = level
                 break
             end
         end
@@ -254,10 +254,10 @@ function UpdateWindow(info)
                     controls.statGroups[i].icon:SetTexture(iconType)
                     controls.statGroups[i].value:SetText(value)
                 elseif i == 3 then
-					local value, iconType, color = statFuncs[i](info, bp)
-					controls.statGroups[i].value:SetText(value)
-					controls.statGroups[i].icon:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
-				elseif i == 5 then
+                    local value, iconType, color = statFuncs[i](info, bp)
+                    controls.statGroups[i].value:SetText(value)
+                    controls.statGroups[i].icon:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
+                elseif i == 5 then
                     local text, iconType = statFuncs[i](info, bp)
                     controls.statGroups[i].value:SetText(text)
                     if iconType == 'strategic' then
@@ -399,13 +399,6 @@ function UpdateWindow(info)
             controls.abilities:Hide()
         end
     end
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType:Hide()
-        if info.userUnit.SCUType then
-            controls.SCUType:SetTexture('/textures/ui/common/SCUManager/'..info.userUnit.SCUType..'_icon.dds')
-            controls.SCUType:Show()
-        end
-    end
     if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
         if info.blueprintId ~= 'unknown' then
@@ -523,13 +516,6 @@ function CreateUI()
             self:SetAlpha(0, true)
         end
     end
-
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType = Bitmap(controls.bg)
-        LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
-        LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
-    end
-
 end
 
 function OnSelection(units)

@@ -40,9 +40,9 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 #  AIR STRUCTURES
 #-------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
-    StartBuildFx = function( self, unitBeingBuilt )
-        local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag )
-        unitBeingBuilt.Trash:Add( thread )        
+    StartBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
     end,
 }
 
@@ -68,9 +68,9 @@ AConcreteStructureUnit = Class(ConcreteStructureUnit) {
 #  Construction Units
 #-------------------------------------------------------------
 AConstructionUnit = Class(ConstructionUnit) {
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        EffectUtil.CreateAeonConstructionUnitBuildingEffects( self, unitBeingBuilt, self.BuildEffectsBag )
-    end,  
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
+    end,
 }
 
 
@@ -114,9 +114,9 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 #  LAND FACTORY STRUCTURES
 #-------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
-    StartBuildFx = function( self, unitBeingBuilt )
-        local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag )
-        unitBeingBuilt.Trash:Add( thread )
+    StartBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
     end,
 }
 
@@ -158,10 +158,10 @@ ASonarUnit = Class(SonarUnit) {}
 #  SEA FACTORY STRUCTURES
 #-------------------------------------------------------------
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
-    StartBuildFx = function( self, unitBeingBuilt )
-        local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag )
-        unitBeingBuilt.Trash:Add( thread )    
-    end,	
+    StartBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
 }
 
 
@@ -184,38 +184,27 @@ AShieldLandUnit = Class(ShieldLandUnit) {}
 #  SHIELD STRUCTURES
 #-------------------------------------------------------------
 AShieldStructureUnit = Class(ShieldStructureUnit) {
-    
+
     RotateSpeed = 60,
-    
+
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
         local bp = self:GetBlueprint()
-        local bpAnim = bp.Display.AnimationOpen
-        if not bpAnim then return end
-        if not self.OpenAnim then
-            self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(bpAnim)
-            self.Trash:Add(self.OpenAnim)
-        end
         if not self.Rotator then
             self.Rotator = CreateRotator(self, 'Pod', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)
         end
         self.Rotator:SetSpinDown(false)
         self.Rotator:SetTargetSpeed(self.RotateSpeed)
-        self.OpenAnim:SetRate(1)
     end,
 
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
-        if self.OpenAnim then
-            self.OpenAnim:SetRate(-1)
-        end
         if self.Rotator then
-            
+
             self.Rotator:SetTargetSpeed(0)
         end
-    end,    
+    end,
 
 }
 
@@ -263,9 +252,9 @@ AQuantumGateUnit = Class(QuantumGateUnit) {}
 #  RADAR JAMMER UNITS
 #-------------------------------------------------------------
 ARadarJammerUnit = Class(RadarJammerUnit) {
-    
+
     RotateSpeed = 60,
-    
+
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
@@ -281,7 +270,7 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
             self.Trash:Add(self.Rotator)
         end
     end,
-    
+
     OnIntelEnabled = function(self)
         RadarJammerUnit.OnIntelEnabled(self)
         if self.OpenAnim then
@@ -300,9 +289,9 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
         if self.OpenAnim then
             self.OpenAnim:SetRate(-1)
         end
-        if self.Rotator then            
+        if self.Rotator then
             self.Rotator:SetTargetSpeed(0)
         end
-    end,    
+    end,
 
 }

@@ -14,18 +14,18 @@ local AAMWillOWisp = import('/lua/aeonweapons.lua').AAMWillOWisp
 --Custom files
 local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
 
-UAS0302 = Class( ASeaUnit ) {
+UAS0302 = Class(ASeaUnit) {
     FxDamageScale = 2,
     DestructionTicks = 400,
 
     Weapons = {
-        BackTurret = Class( NavalCannonOblivionWeapon ) {},
-        FrontTurret = Class( NavalCannonOblivionWeapon ) {},
-        MidTurret = Class( NavalCannonOblivionWeapon ) {},
-        AntiMissile1 = Class( AAMWillOWisp ) {},
-        AntiMissile2 = Class( AAMWillOWisp ) {},
+        BackTurret = Class(NavalCannonOblivionWeapon) {},
+        FrontTurret = Class(NavalCannonOblivionWeapon) {},
+        MidTurret = Class(NavalCannonOblivionWeapon) {},
+        AntiMissile1 = Class(AAMWillOWisp) {},
+        AntiMissile2 = Class(AAMWillOWisp) {},
     },
-    
+
     OnCreate = function(self)
         ASeaUnit.OnCreate(self)
         for i = 1, 3 do

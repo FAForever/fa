@@ -14,33 +14,33 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
-		'T1EngineerBuilders',
-		#DUNCAN - Commented out
+        'T1EngineerBuilders',
+        #DUNCAN - Commented out
         #'T2EngineerBuilders',
         #'T3EngineerBuilders',
         'EngineerNavalFactoryBuilder',
-        
+
         # Mass
         'EngineerMassBuildersLowerPri',
-        
+
         # ==== EXPANSION ==== #
         'EngineerExpansionBuildersFull',
-        
+
         # ==== DEFENSES ==== #
         'T1NavalDefenses',
         'T2NavalDefenses',
         'T3NavalDefenses',
-        
+
         # ==== ATTACKS ==== #
         'T1SeaFactoryBuilders',
         'T2SeaFactoryBuilders',
         'T3SeaFactoryBuilders',
         'FrequentSeaAttackFormBuilders',
         'MassHunterSeaFormBuilders',
-        
+
         # ==== NAVAL EXPANSION ==== #
         'NavalExpansionBuilders',
     },
@@ -71,12 +71,12 @@ BaseBuilderTemplate {
         if markerType != 'Naval Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        if not ( personality == 'easy' or personality == 'medium' ) then
+        if not (personality == 'easy' or personality == 'medium') then
             return 50
         end
-        
+
         return 0
     end,
 }

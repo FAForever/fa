@@ -250,7 +250,7 @@ local function createPlayerTeamAssignmentMatrix(teamAssignmentsList, totalPlayer
 
         table.insert(playerAssignments, currentColumn, result)
         for _, currentPlayer in ipairs(currentTeam) do
-            table.insert( playerAssignments[currentColumn], 1)
+            table.insert(playerAssignments[currentColumn], 1)
             totalPreviousPlayers = totalPreviousPlayers + 1
         end
 
@@ -260,14 +260,14 @@ local function createPlayerTeamAssignmentMatrix(teamAssignmentsList, totalPlayer
         if nextTeam then
             for _,nextTeamPlayer in ipairs(nextTeam) do
                 -- Add a -1 * playing time to represent the difference
-                table.insert(playerAssignments[currentColumn], ( -1 * 1))
+                table.insert(playerAssignments[currentColumn], (-1 * 1))
                 rowsRemaining = rowsRemaining - 1
             end
         end
 
         for ixAdditionalRow=1, rowsRemaining do
             --Pad with zeros
-            table.insert( playerAssignments[currentColumn], 0)
+            table.insert(playerAssignments[currentColumn], 0)
         end
 
         currentColumn = currentColumn + 1

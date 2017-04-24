@@ -1,10 +1,10 @@
---*****************************************************************************
---* File: lua/modules/ui/dialogs/disconnect.lua
---* Author: Chris Blackwell
---* Summary: handles multiplayer disconnects
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+-----------------------------------------------------------------
+-- File: lua/modules/ui/dialogs/disconnect.lua
+-- Author: Chris Blackwell
+-- Summary: handles multiplayer disconnects
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import('/lua/maui/text.lua').Text
@@ -14,33 +14,32 @@ local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
 
 local parent = false
-local Your_index = ''
+local myIndex = ''
 
 function DestroyDialog()
-    if parent then 
+    if parent then
         parent:Destroy()
         parent = false
     end
 end
 
-
 local function CreateDialog(clients)
     import('/lua/ui/game/worldview.lua').UnlockInput()
     import('/lua/ui/game/gamemain.lua').KillWaitingDialog()
-	
-	GetCursor():Show()
+
+    GetCursor():Show()
     DestroyDialog()
-    
+
     parent = Group(GetFrame(0), "diconnectDialogParentGroup")
     parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
     parent:SetNeedsFrameUpdate(true)
     parent.time = 0
-        
+
     bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     LayoutHelpers.FillParent(bg, parent)
-            
+
     bg.border = CreateBorder(bg)
-            
+
     local dlgTitle = UIUtil.CreateText(bg, "<LOC UI_Disco0000>Connectivity", 18)
     LayoutHelpers.AtTopIn(dlgTitle, bg, -52)
     LayoutHelpers.AtHorizontalCenterIn(dlgTitle, parent)
@@ -53,40 +52,39 @@ local function CreateDialog(clients)
         slots[i] = slot
 
         slot.index = i
-        
-        if client['local'] then -- GET your index local
-			Your_index = i
-			--LOG('>>> Local index:'..Your_index)
-		end
-		
-		if previous then
+
+        if client['local'] then -- Get my local index
+            myIndex = i
+        end
+
+        if previous then
             LayoutHelpers.Below(slot, previous)
         else
             LayoutHelpers.AtTopIn(slot, parent)
             LayoutHelpers.AtHorizontalCenterIn(slot, parent)
         end
         previous = slot
-        
+
         slot.id = UIUtil.CreateText(slot, slot.index, 20, UIUtil.fixedFont)
         slot.id:SetColor('ffffffff')
         LayoutHelpers.AtLeftTopIn(slot.id, slot, 5, 1)
-        
+
         slot.name = UIUtil.CreateText(slot, client.name, 16, UIUtil.fixedFont)
         slot.name:SetColor('FFbadbdb')
         LayoutHelpers.AtLeftTopIn(slot.name, slot, 20, 4)
-        
-        slot.state = Bitmap(slot) 																		-- Skull if the player is Dead
-		slot.state:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds')) 	-- Skull bitmap
+
+        slot.state = Bitmap(slot) -- Skull if the player is dead
+        slot.state:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds')) -- Skull bitmap
         slot.state:DisableHitTest()
-		slot.state:Hide()
+        slot.state:Hide()
         LayoutHelpers.AtRightTopIn(slot.state, slot, 2, 2)
-		
-		slot.ping = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
+
+        slot.ping = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
         LayoutHelpers.AtLeftTopIn(slot.ping, slot, 5, 32)
-        
+
         slot.quiet = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
         LayoutHelpers.AtLeftTopIn(slot.quiet, slot, 120, 32)
-        
+
         slot.ejectedBy = UIUtil.CreateText(slot, '', 16, UIUtil.fixedFont)
         slot.ejectedBy:SetColor('FFbadbdb')
         LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 5, 4)
@@ -95,76 +93,74 @@ local function CreateDialog(clients)
         slot.eject.label:SetFont(UIUtil.bodyFont, 12)
         LayoutHelpers.AtLeftTopIn(slot.eject, slot, 248, 24)
         slot.eject.OnClick = function(self, modifiers) EjectSessionClient(slot.index) end
-        slot.eject:Disable()    -- disable all temporarily so they can't be misclicked, then unlock a few seconds later
+        slot.eject:Disable() -- Disable all temporarily so they can't be misclicked, then unlock a few seconds later
     end
-	
-	local canEject = false
-	local ForceEject = false
+
+    local canEject = false
+    local canEjectTime = 90
+    local forceEject = false
+    local forceEjectTime = 180
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta
-        if self.time > 180 then
-			ForceEject = true
-		elseif self.time > 45 then
-			canEject = true
+        if self.time > forceEjectTime then
+            forceEject = true
+        elseif self.time > canEjectTime then
+            canEject = true
         end
     end
 
     parent.Width:Set(function() return slots[1].Width() - 100 end)
     parent.Height:Set(function() return slots[1].Height() * table.getsize(slots) - 34 end)
-    
+
     LayoutHelpers.AtCenterIn(parent, GetFrame(0))
 
     function parent.Update(self, clients)
-		for index, client in clients do
+        for index, client in clients do
             local slot = slots[index]
-			local armiesInfo = GetArmiesTable().armiesTable
-			
+            local armiesInfo = GetArmiesTable().armiesTable
+
             if client.connected then
-                if client.quiet < 5000 then	-- IF client no lag and playing ...
-					if canEject then
-						slot.eject:Disable()
-					end
+                if client.quiet < 5000 then -- Nobody is lagging
+                    if canEject then
+                        slot.eject:Disable()
+                    end
                     slot.ping:SetText(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping))
                     slot.quiet:SetText('')
                     slot.ping:SetColor('FFbadbdb')
-                    slot.quiet:SetColor('FFbadbdb')					
-                else																										-- IF client Lag --or Observer ...
-					if ForceEject then																				-- IF client lag timeout (+3 minute), kick !
-						EjectSessionClient(index)
-						slot.eject:Disable()
-						slot.eject:Hide()
-					elseif armiesInfo[Your_index].outOfGame and canEject then				-- IF ME is Observer
-						--LOG('>>> CanEject and outOfGame')
-						EjectSessionClient(index)																-- Autokick the player lag
-						slot.eject:Disable()																			-- and Hide + Disable the Eject button
-						slot.eject:Hide()
-					elseif canEject then--or armiesInfo[index].outOfGame then 				-- IF client Lag --or Observer ...
-						--LOG('>>> CanEject')
-						slot.eject:Enable()
-					end
+                    slot.quiet:SetColor('FFbadbdb')
+                else -- Someone is lagging
+                    if forceEject then -- Lag has been going on for more than forceEjectTime
+                        EjectSessionClient(index)
+                        slot.eject:Disable()
+                        slot.eject:Hide()
+                    elseif armiesInfo[myIndex].outOfGame and canEject then -- If I am Observer
+                        EjectSessionClient(index) -- Autokick the lagging player
+                        slot.eject:Disable()
+                        slot.eject:Hide()
+                    elseif canEject then -- Someone has been quite longer than canEjectTime
+                        slot.eject:Enable()
+                    end
                     slot.ping:SetText(LOCF("%s: ---", "<LOC UI_Disco0003>Ping (ms)"))
                     slot.ping:SetColor('FFe24f2d')
                     slot.quiet:SetColor('FFe24f2d')
                     local min = client.quiet / (1000 * 60)
                     local sec = math.mod(client.quiet / 1000, 60)
-                    slot.quiet:SetText(LOCF("%s: %d:%02d", "<LOC UI_Disco0004>Quiet (m:s)",min,sec))					
+                    slot.quiet:SetText(LOCF("%s: %d:%02d", "<LOC UI_Disco0004>Quiet (m:s)",min,sec))
                 end
             else
                 slot.ping:SetText(LOC("<LOC connectivity_0003>Not Connected"))
-				slot.ping:SetColor('FFff0000')
-				--slot.ping:SetText('')
-                --slot.quiet:SetText('')
+                slot.ping:SetColor('FFff0000')
             end
-			
-			if armiesInfo[index].outOfGame then -- Show the Skull if the player is Dead
-				slot.state:Show()
-				LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 34, 4)
-			else
-				LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 5, 4)
-				slot.state:Hide()
-			end
-			
+
+            if armiesInfo[index].outOfGame then -- Show the skull if the player is dead
+                slot.state:Show()
+                LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 34, 4)
+            else
+                LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 5, 4)
+                slot.state:Hide()
+            end
+
             local ejectedBy = ''
             for k, v in client.ejectedBy do
                 if ejectedBy != '' then
@@ -183,8 +179,6 @@ local function CreateDialog(clients)
         end
     end
 end
-
-
 
 function Update()
     local needDialog = false
@@ -231,7 +225,6 @@ function Update()
 
 end
 
-
 function CreateBorder(parent)
     local tbl = {}
     tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
@@ -242,35 +235,35 @@ function CreateBorder(parent)
     tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
     tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
     tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-    
+
     tbl.tl.Bottom:Set(parent.Top)
     tbl.tl.Right:Set(parent.Left)
-    
+
     tbl.tr.Bottom:Set(parent.Top)
     tbl.tr.Left:Set(parent.Right)
-    
+
     tbl.tm.Bottom:Set(parent.Top)
     tbl.tm.Right:Set(parent.Right)
     tbl.tm.Left:Set(parent.Left)
-    
+
     tbl.l.Bottom:Set(parent.Bottom)
     tbl.l.Top:Set(parent.Top)
     tbl.l.Right:Set(parent.Left)
-    
+
     tbl.r.Bottom:Set(parent.Bottom)
     tbl.r.Top:Set(parent.Top)
     tbl.r.Left:Set(parent.Right)
-    
+
     tbl.bl.Top:Set(parent.Bottom)
     tbl.bl.Right:Set(parent.Left)
-    
+
     tbl.br.Top:Set(parent.Bottom)
     tbl.br.Left:Set(parent.Right)
-    
+
     tbl.bm.Top:Set(parent.Bottom)
     tbl.bm.Right:Set(parent.Right)
     tbl.bm.Left:Set(parent.Left)
-    
+
     tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
@@ -279,6 +272,6 @@ function CreateBorder(parent)
     tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
+
     return tbl
 end

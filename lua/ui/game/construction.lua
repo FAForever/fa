@@ -1,10 +1,9 @@
--- *****************************************************************************
--- * File: lua/modules/ui/game/construction.lua
--- * Author: Chris Blackwell / Ted Snook
--- * Summary: Construction management UI
--- *
--- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- *****************************************************************************
+-----------------------------------------------------------------
+-- File: lua/modules/ui/game/construction.lua
+-- Author: Chris Blackwell / Ted Snook
+-- Summary: Construction management UI
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
@@ -29,8 +28,8 @@ local BuildMode = import('/lua/ui/game/buildmode.lua')
 local UnitViewDetail = import('/lua/ui/game/unitviewDetail.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
-local TemplatesFactory = import('/modules/templates_factory.lua')
-local straticonsfile = import('/modules/straticons.lua')
+local TemplatesFactory = import('/lua/ui/templates_factory.lua')
+local straticonsfile = import('/lua/ui/game/straticons.lua')
 local Select = import('/lua/ui/game/selection.lua')
 local Factions = import('/lua/factions.lua').Factions
 local FactionInUnitBpToKey = import('/lua/factions.lua').FactionInUnitBpToKey
@@ -41,13 +40,11 @@ local prevBuildCategories = false
 
 -- Flag to indicate if every selected unit is a factory
 local allFactories = nil
-
 if options.gui_templates_factory ~= 0 then
     allFactories = false
 end
 
 local missingIcons = {}
-
 local dragging = false
 local index = nil -- Index of the item in the queue currently being dragged
 local originalIndex = false -- Original index of selected item (so that UpdateBuildQueue knows where to modify it from)
@@ -57,8 +54,8 @@ local updateQueue = true -- If false then queue won't update in the ui
 local modified = false -- If false then buttonrelease will increase buildcount in queue
 local dragLock = false -- To disable quick successive drags, which doubles the units in the queue
 
--- Locals for Keybind labels in build queue
-local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+-- locals for Keybind labels in build queue
+local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
 local idRelations = {}
 local upgradeKey = false
 local upgradesTo = false
@@ -97,7 +94,6 @@ if options.gui_visible_template_names ~= 0 then
     cutB = cutB + 7
 end
 
-
 -- These are external controls used for positioning, so don't add them to our local control table
 controlClusterGroup = false
 mfdControl = false
@@ -111,13 +107,12 @@ local currentCommandQueue = false
 local previousTabSet = nil
 local previousTabSize = nil
 local activeTab = nil
-
 local showBuildIcons = false
 
 controls = import('/lua/ui/controls.lua').Get()
 controls.tabs = controls.tabs or {}
 
-local constructionTabs = { 't1', 't2', 't3', 't4', 'templates' }
+local constructionTabs = {'t1', 't2', 't3', 't4', 'templates'}
 local nestedTabKey = {
     t1 = 'construction',
     t2 = 'construction',
@@ -131,7 +126,6 @@ local enhancementTooltips = {
     Back = 'construction_tab_enhancment_back',
 }
 
---
 -- Workaround for an apparent engine bug that appeared when engymod was deployed (by Rienzilla)
 --
 -- When we queue a t2 and t3 support factory (or, any upgrade, in which the upgrades
@@ -145,27 +139,18 @@ local enhancementTooltips = {
 -- So, we override DecreaseBuildCountInQueue, and make t3 support factories uncancellable.
 --
 -- TODO: make the factory cancelable, but re-add the rest of the queue once the engine has removed it
-
 local oldDecreaseBuildCountInQueue = DecreaseBuildCountInQueue
 function DecreaseBuildCountInQueue(unitIndex, count)
-
-
-    -- FIXME: maybe add some sanity checking?
+    -- TODO: maybe add some sanity checking?
     local unitStack = currentCommandQueue[unitIndex]
     local blueprint = __blueprints[unitStack.id]
 
     local tech3 = false
     local supportfactory = false
 
-    if blueprint.Categories then
-        for i, v in ipairs(blueprint.Categories) do
-            if v == 'SUPPORTFACTORY' then
-                supportfactory = true
-            elseif v == 'TECH3' then
-                tech3 = true
-            end
-            if tech3 and supportfactory then break end
-        end
+    if blueprint.CategoriesHash then
+        tech3 = blueprint.CategoriesHash.TECH3
+        supportfactory = blueprint.CategoriesHash.SUPPORTFACTORY
     end
 
     if not (tech3 and supportfactory) then
@@ -216,7 +201,7 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY, units)
+    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
     if factories[1] then
         Select.Hidden(function()
             for _, factory in factories do
@@ -235,9 +220,9 @@ function CreateTab(parent, id, onCheckFunc)
 
     btn.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            PlaySound(Sound({ Bank = 'Interface', Cue = 'UI_Tab_Rollover_02' }))
+            PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Rollover_02'}))
         elseif event.Type == 'ButtonPress' then
-            PlaySound(Sound({ Bank = 'Interface', Cue = 'UI_Tab_Click_02' }))
+            PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
         end
         Checkbox.HandleEvent(self, event)
     end
@@ -304,12 +289,14 @@ function CreateUI()
     controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
     LayoutHelpers.AtCenterIn(controls.extraBtn1.icon, controls.extraBtn1)
     controls.extraBtn1.icon:DisableHitTest()
+
     controls.extraBtn1.OnDisable = function(self)
         if controls.extraBtn1.icon then
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OffTexture)
         end
         Checkbox.OnDisable(self)
     end
+
     controls.extraBtn1.OnEnable = function(self)
         controls.extraBtn1.icon:Show()
         if controls.extraBtn1.icon then
@@ -317,6 +304,7 @@ function CreateUI()
         end
         Checkbox.OnEnable(self)
     end
+
     controls.extraBtn1:UseAlphaHitTest(true)
     controls.extraBtn2 = Checkbox(controls.minBG)
     controls.extraBtn2.icon = Bitmap(controls.extraBtn2)
@@ -324,17 +312,20 @@ function CreateUI()
     controls.extraBtn2.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds')
     LayoutHelpers.AtCenterIn(controls.extraBtn2.icon, controls.extraBtn2)
     controls.extraBtn2.icon:DisableHitTest()
+
     controls.extraBtn2.OnDisable = function(self)
         if controls.extraBtn2.icon then
             controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OffTexture)
         end
         Checkbox.OnDisable(self)
     end
+
     controls.extraBtn2.OnEnable = function(self)
         controls.extraBtn2.icon:Show()
         controls.extraBtn2.icon:SetTexture(controls.extraBtn2.icon.OnTexture)
         Checkbox.OnEnable(self)
     end
+
     controls.extraBtn2:UseAlphaHitTest(true)
     controls.secondaryProgress = StatusBar(controls.secondaryChoices, 0, 1, false, false,
         UIUtil.UIFile('/game/unit-over/health-bars-back-1_bmp.dds'),
@@ -350,6 +341,18 @@ function CreateUI()
     controls.enhancementTab = CreateTab(controls.constructionGroup, nil, OnTabCheck)
     controls.enhancementTab.ID = 'enhancement'
     Tooltip.AddCheckboxTooltip(controls.enhancementTab, 'construction_tab_enhancement')
+
+    -- We need this section so that Hotkey labels are kept properly in line with the elements they are attached to, which are reused rather than recreated
+    oldChoicesCalcVisible = controls.choices.CalcVisible
+    controls.choices.CalcVisible = function(self)
+        for i, item in self.Items do
+            if item.hotbuildKeyBg then
+                item.hotbuildKeyBg:Destroy()
+                item.hotbuildKeyText:Destroy()
+            end
+        end
+        oldChoicesCalcVisible(self)
+    end
 end
 
 function OnTabCheck(self, checked)
@@ -420,7 +423,7 @@ function CreateTabs(type)
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
         local enhCommon = import('/lua/enhancementcommon.lua')
-        local enhancementPrefixes = { Back = 'b-', LCH = 'la-', RCH = 'ra-' }
+        local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
         if enhancements.Slots then
             local tabIndex = 1
@@ -461,12 +464,16 @@ function CreateTabs(type)
             end
             desiredTabs = table.getsize(enhancements.Slots)
         end
-        defaultTabOrder = { Back = 1, LCH = 2, RCH = 3 }
+        defaultTabOrder = {Back = 1, LCH = 2, RCH = 3}
+    elseif type == 'selection' then
+        activeTab = nil
     end
+
     while table.getsize(controls.tabs) > desiredTabs do
         controls.tabs[table.getsize(controls.tabs)]:Destroy()
         controls.tabs[table.getsize(controls.tabs)] = nil
     end
+
     import(UIUtil.GetLayoutFilename('construction')).LayoutTabs(controls)
     local defaultTab = false
     local numActive = 0
@@ -483,6 +490,7 @@ function CreateTabs(type)
             tab:Disable()
         end
     end
+
     if previousTabSet ~= type or previousTabSize ~= numActive then
         if defaultTab then
             defaultTab:SetCheck(true)
@@ -496,7 +504,7 @@ end
 
 function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
-    local validIcons = { land = true, air = true, sea = true, amph = true }
+    local validIcons = {land = true, air = true, sea = true, amph = true}
     local icon = "land"
     if unitID and unitID ~= 'default' then
         if not validIcons[bp.General.Icon] then
@@ -506,6 +514,7 @@ function GetBackgroundTextures(unitID)
             icon = bp.General.Icon
         end
     end
+
     return UIUtil.UIFile('/icons/units/' .. icon .. '_up.dds'),
            UIUtil.UIFile('/icons/units/' .. icon .. '_down.dds'),
            UIUtil.UIFile('/icons/units/' .. icon .. '_over.dds'),
@@ -637,7 +646,7 @@ function CommonLogic()
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                PlaySound(Sound({ Cue = "UI_MFD_Rollover", Bank = "Interface" }))
+                PlaySound(Sound({Cue = "UI_MFD_Rollover", Bank = "Interface"}))
                 Tooltip.CreateMouseoverDisplay(self, self.tooltipID, nil, false)
             elseif event.Type == 'MouseExit' then
                 Tooltip.DestroyMouseoverDisplay()
@@ -697,14 +706,13 @@ function CommonLogic()
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                PlaySound(Sound({ Cue = "UI_MFD_Rollover", Bank = "Interface" }))
+                PlaySound(Sound({Cue = "UI_MFD_Rollover", Bank = "Interface"}))
                 Tooltip.CreateMouseoverDisplay(self, self.tooltipID, nil, false)
             elseif event.Type == 'MouseExit' then
                 Tooltip.DestroyMouseoverDisplay()
             end
             return Button.HandleEvent(self, event)
         end
-
         btn.OnRolloverEvent = OnRolloverHandler
         btn.OnClick = OnClickHandler
 
@@ -939,9 +947,11 @@ function CommonLogic()
             btn.IdleIcon:SetAlpha(0)
             return btn
         end
+
         controls.secondaryChoices.SetControlToType = function(control, type)
             oldSecondary(control, type)
         end
+
         controls.choices.SetControlToType = function(control, type)
             oldPrimary(control, type)
             -- AZ improved selection code
@@ -990,6 +1000,7 @@ function StratIconReplacement(control)
         else
             iconConversion = straticonsfile.aSpecificStratIcons[control.Data.id] or straticonsfile.aStratIconTranslation[iconName]
         end
+
         if iconConversion and DiskGetFileInfo('/textures/ui/icons_strategic/' .. iconConversion .. '.dds') then
             control.StratIcon:SetTexture('/textures/ui/icons_strategic/' .. iconConversion .. '.dds')
             LayoutHelpers.AtTopIn(control.StratIcon, control.Icon, 1)
@@ -1045,16 +1056,16 @@ function OnRolloverHandler(button, state)
                             oldQueue = table.copy(currentCommandQueue)
                         end
                     else
-                        PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+                        PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
                         DecreaseBuildCountInQueue(item.position, count)
                     end
                 elseif event.Type == 'ButtonRelease' then
                     if dragging then
-                        -- Iif queue has changed then update queue, else increase build count (like default)
+                        -- If queue has changed then update queue, else increase build count (like default)
                         if modified then
                             ButtonReleaseCallback()
                         else
-                            PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+                            PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
                             dragging = false
                             local count = 1
                             if event.Modifiers.Ctrl == true or event.Modifiers.Shift == true then
@@ -1083,20 +1094,20 @@ function OnRolloverHandler(button, state)
             end
         end
     end
-        if state == 'enter' then
-            if item.type == 'item' or item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
-                UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
-            elseif item.type == 'enhancement' then
-                UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
-            end
-        else
-            UnitViewDetail.Hide()
+
+    if state == 'enter' then
+        if item.type == 'item' or item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
+            UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
+        elseif item.type == 'enhancement' then
+            UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
         end
-    
+    else
+        UnitViewDetail.Hide()
+    end
 end
 
 function OnClickHandler(button, modifiers)
-    PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+    PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
     local item = button.Data
 
     if options.gui_improved_unit_deselection ~= 0 then
@@ -1144,7 +1155,6 @@ function OnClickHandler(button, modifiers)
             end
         end
     end
-
 
     if item.type == "templates" and allFactories then
 
@@ -1218,10 +1228,10 @@ function OnClickHandler(button, modifiers)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- Stationary means it needs to be placed, so go in to build mobile mode
-                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, { name = item.id })
+                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
-                    -- TODO -what about mobile factories?
+                    -- TODO - what about mobile factories?
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
                 end
             end
@@ -1283,7 +1293,7 @@ function OnClickHandler(button, modifiers)
                 end
             end
         else
-            import('/lua/ui/game/commandmode.lua').StartCommandMode('build', { name = item.template.templateData[3][1] })
+            import('/lua/ui/game/commandmode.lua').StartCommandMode('build', {name = item.template.templateData[3][1]})
             SetActiveBuildTemplate(item.template.templateData)
         end
 
@@ -1310,7 +1320,6 @@ function OnClickHandler(button, modifiers)
                 end
             end
         end
-
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
         if existingEnhancements[item.enhTable.Slot] and existingEnhancements[item.enhTable.Slot] ~= item.enhTable.Prerequisite then
@@ -1335,7 +1344,7 @@ function OnClickHandler(button, modifiers)
                     end,
                     "<LOC _No>", nil,
                     nil, nil,
-                    true, { worldCover = true, enterButton = 1, escapeButton = 2 })
+                    true, {worldCover = true, enterButton = 1, escapeButton = 2})
             end
         else
             local orderData = {
@@ -1452,7 +1461,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                     capturingKeys = theTemplate.templateID
                 end
                 warningtext = text
-                group.SubMenu = CreateSubMenu(group, { text }, function(id)
+                group.SubMenu = CreateSubMenu(group, {text}, function(id)
                     templates.SetTemplateKey(theTemplate.templateID, id)
                     RefreshUI()
                 end, false)
@@ -1546,9 +1555,11 @@ function CreateTemplateOptionMenu(button, templateObj)
         maxWidth = math.max(maxWidth, itemControls[i].label.Width() + 4)
         prevControl = itemControls[i]
     end
+
     for _, control in itemControls do
         control.Width:Set(maxWidth)
     end
+
     title.Width:Set(maxWidth)
     group.Height:Set(totHeight)
     group.Width:Set(maxWidth)
@@ -1618,10 +1629,10 @@ function CreateSubMenu(parentMenu, contents, onClickFunc, setupOnClickHandler)
         totHeight = totHeight + control.Height()
         maxWidth = math.max(maxWidth, control.Width() + 4)
     end
-
     menu.Height:Set(totHeight)
     menu.Width:Set(maxWidth)
     UIUtil.SurroundWithNinePatch(menu, "/game/chat_brd/", 4, 4)
+
     return menu
 end
 
@@ -1658,13 +1669,26 @@ function ToggleUnitPause()
 end
 
 function CreateExtraControls(controlType)
+    local SetupPauseButton = function()
+        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
+        controls.extraBtn2.OnCheck = function(self, checked)
+            SetPaused(sortedOptions.selection, checked)
+        end
+        if pauseEnabled then
+            controls.extraBtn2:Enable()
+        else
+            controls.extraBtn2:Disable()
+        end
+        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+    end
+
     if controlType == 'construction' or controlType == 'templates' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
         controls.extraBtn1.OnClick = function(self, modifiers)
             return Checkbox.OnClick(self, modifiers)
         end
         controls.extraBtn1.OnCheck = function(self, checked)
-            for i, v in sortedOptions.selection do
+            for _, v in sortedOptions.selection do
                 if checked then
                     v:ProcessInfo('SetRepeatQueue', 'true')
                 else
@@ -1675,7 +1699,7 @@ function CreateExtraControls(controlType)
         local allFactories = true
         local currentInfiniteQueueCheckStatus = true
 
-        for i, v in sortedOptions.selection do
+        for _, v in sortedOptions.selection do
             if not v:IsRepeatQueue() then
                 currentInfiniteQueueCheckStatus = false
             end
@@ -1692,16 +1716,7 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
 
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
         local validForTemplate = true
@@ -1732,24 +1747,16 @@ function CreateExtraControls(controlType)
         else
             controls.extraBtn1:Disable()
         end
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        SetupPauseButton()
+    elseif controlType == 'enhancement' then
+        SetupPauseButton()
     else
         controls.extraBtn1:Disable()
         controls.extraBtn2:Disable()
     end
 end
 
-
-local insertIntoTableLowestTechFirst = import('/modules/selectionsort.lua').insertIntoTableLowestTechFirst
+local insertIntoTableLowestTechFirst = import('/lua/ui/game/selectionsort.lua').insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
@@ -1808,14 +1815,14 @@ function FormatData(unitData, type)
             local index = i
             if table.getn(units) > 0 then
                 if table.getn(retData) > 0 then
-                    table.insert(retData, { type = 'spacer' })
+                    table.insert(retData, {type = 'spacer'})
                 end
 
                 for index, unit in units do
                     -- Show UI data/icons only for not restricted units
                     local restrict = false
                     if not IsRestricted(unit, GetFocusArmy()) then
-                        local bp = __blueprints[unit] 
+                        local bp = __blueprints[unit]
                         -- Check if upgradeable structure
                         if isStructure and
                                 bp and bp.General and
@@ -1824,12 +1831,12 @@ function FormatData(unitData, type)
 
                             restrict = IsRestricted(bp.General.UpgradesFrom, GetFocusArmy())
                             if not restrict then
-                                table.insert(retData, { type = 'arrow'})
+                                table.insert(retData, {type = 'arrow'})
                             end
                         end
 
                         if not restrict then
-                            table.insert(retData, { type = 'item', id = unit })
+                            table.insert(retData, {type = 'item', id = unit})
                         end
                     end
                 end
@@ -1882,7 +1889,7 @@ function FormatData(unitData, type)
 
         local function insertSpacer(didPutUnits)
             if didPutUnits then
-                table.insert(retData, { type = 'spacer' })
+                table.insert(retData, {type = 'spacer'})
                 return not didPutUnits
             end
         end
@@ -1931,7 +1938,7 @@ function FormatData(unitData, type)
             end
         end)
         for _, v in unitData do
-            table.insert(retData, { type = 'templates', id = 'template', template = v })
+            table.insert(retData, {type = 'templates', id = 'template', template = v})
         end
         CreateExtraControls('templates')
         SetSecondaryDisplay('buildQueue')
@@ -1994,7 +2001,7 @@ function FormatData(unitData, type)
                     local searching = true
                     local curID = enhTable.ID
                     while searching do
-                        table.insert(retData, { type = 'arrow' })
+                        table.insert(retData, {type = 'arrow'})
                         local tempEnh = GetEnhByID(FindDependancy(curID))
                         local disabled = true
                         if existingEnhancements[enhTable.Slot] == tempEnh.Prerequisite then
@@ -2007,13 +2014,13 @@ function FormatData(unitData, type)
                         else
                             searching = false
                             if table.getsize(usedEnhancements) <= table.getsize(filteredEnh) - 1 then
-                                table.insert(retData, { type = 'spacer' })
+                                table.insert(retData, {type = 'spacer'})
                             end
                         end
                     end
                 else
                     if table.getsize(usedEnhancements) <= table.getsize(filteredEnh) - 1 then
-                        table.insert(retData, { type = 'spacer' })
+                        table.insert(retData, {type = 'spacer'})
                     end
                 end
             end
@@ -2053,7 +2060,7 @@ function SetSecondaryDisplay(type)
         if type == 'buildQueue' then
             if currentCommandQueue and table.getn(currentCommandQueue) > 0 then
                 for index, unit in currentCommandQueue do
-                    table.insert(data, { type = 'queuestack', id = unit.id, count = unit.count, position = index })
+                    table.insert(data, {type = 'queuestack', id = unit.id, count = unit.count, position = index})
                 end
             end
             if table.getn(sortedOptions.selection) == 1 and table.getn(data) > 0 then
@@ -2066,7 +2073,7 @@ function SetSecondaryDisplay(type)
             local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
             if attachedUnits and table.getn(attachedUnits) > 0 then
                 for _, v in attachedUnits do
-                    table.insert(data, { type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v })
+                    table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
                 end
             end
             controls.secondaryProgress:SetAlpha(0, true)
@@ -2110,6 +2117,10 @@ function RefreshUI()
 end
 
 function OnSelection(buildableCategories, selection, isOldSelection)
+    if table.empty(selection) then
+        sortedOptions.selection = {}
+    end
+
     if options.gui_templates_factory ~= 0 then
         if table.empty(selection) then
             allFactories = false
@@ -2164,7 +2175,6 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        -- Engymod addition by Rienzilla
         -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
         for i, v in selection do
@@ -2322,7 +2332,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     local function ConvertID(BPID)
                         local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                         for k, prefix in prefixes do
-                            local newBPID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+                            local newBPID = string.gsub(BPID, "(%a +)(%d +)", prefix .. "%2")
                             if table.find(buildableUnits, newBPID) then
                                 return newBPID
                             end
@@ -2574,6 +2584,7 @@ function MoveItemInQueue(queue, indexfrom, indexto)
     queue[indexto] = moveditem
     modifiedQueue = queue
     currentCommandQueue = queue
+
     -- Update buttons in the UI
     SetSecondaryDisplay('buildQueue')
 end
@@ -2604,7 +2615,7 @@ end
 
 function ButtonReleaseCallback()
     if dragging == true then
-        PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+        PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
         -- Don't update the queue next time round, to avoid a list of 0 builds
         updateQueue = false
         -- Disable dragging until the queue is rebuilt

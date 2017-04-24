@@ -15,12 +15,12 @@ TPhalanxGunPolyTrailsOffsets = {0.05,0.05,0.05}
 
 OrbGlowEffect = {
     CustomEmtBpPath .. 'orbeffect_01.bp',
-    CustomEmtBpPath .. 'orbeffect_02.bp',    
+    CustomEmtBpPath .. 'orbeffect_02.bp',
 }
 
 SExperimentalUnstablePhasonLaserMuzzle01 = {
-	EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp',
-    EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp', 
+    EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp',
+    EmtBpPath .. 'seraphim_expirimental_laser_charge_01_emit.bp',
 }
 
 OthuyElectricityStrikeBeam = {

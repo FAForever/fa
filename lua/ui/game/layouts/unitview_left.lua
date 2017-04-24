@@ -25,23 +25,23 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
     UIUtil.UIFile('/game/unit_view_icons/build.dds'),
 }
-    
+
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-    
+
     controls.bracket:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
     LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -6, 3)
-    
+
     if not controls.bracketMax then
         controls.bracketMax = Bitmap(controls.bg)
     end
     controls.bracketMax:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
     LayoutHelpers.AtLeftIn(controls.bracketMax, controls.bg, -6)
     LayoutHelpers.AtBottomIn(controls.bracketMax, controls.bg, 3)
-    
+
     if not controls.bracketMid then
         controls.bracketMid = Bitmap(controls.bg)
     end
@@ -49,12 +49,12 @@ function SetLayout()
     LayoutHelpers.AtLeftIn(controls.bracketMid, controls.bg, -6)
     controls.bracketMid.Top:Set(controls.bracket.Bottom)
     controls.bracketMid.Bottom:Set(controls.bracketMax.Top)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.name, controls.bg, 16, 14)
     LayoutHelpers.AtRightIn(controls.name, controls.bg, 16)
     controls.name:SetClipToWidth(true)
     controls.name:SetDropShadow(true)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.icon, controls.bg, 12, 34)
     controls.icon.Height:Set(48)
     controls.icon.Width:Set(48)
@@ -101,14 +101,14 @@ function SetLayout()
     controls.actionIcon.Width:Set(48)
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
-    
+
     controls.abilities.Left:Set(function() return controls.bg.Right() + 20 end)
     controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
     controls.abilities.Height:Set(50)
     controls.abilities.Width:Set(200)
 
     SetBG(controls)
-    
+
     if options.gui_detailed_unitview != 0 then
         LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 25)
         LayoutHelpers.Below(controls.shieldBar, controls.healthBar)
@@ -133,7 +133,7 @@ function SetBG(controls)
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds')
-    )
+)
 
     controls.abilityBG:Surround(controls.abilities, 3, 5)
     LayoutHelpers.DepthUnderParent(controls.abilityBG, controls.abilities)

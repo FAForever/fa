@@ -14,35 +14,35 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1NavalUpgradeBuilders',
         'T2NavalUpgradeBuilders',
-        
+
         # Pass engineers to main as needed
         'Engineer Transfers',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerNavalFactoryBuilder',
-        
+
         # ==== EXPANSION ==== #
         'EngineerExpansionBuildersFull - Naval',
-        
+
         # ==== DEFENSES ==== #
         'T1NavalDefenses',
         'T2NavalDefenses',
         'T3NavalDefenses',
-        
+
         # ==== ATTACKS ==== #
         'T1SeaFactoryBuilders',
         'T2SeaFactoryBuilders',
         'T3SeaFactoryBuilders',
         'FrequentSeaAttackFormBuilders',
         'MassHunterSeaFormBuilders',
-        
+
         # ==== NAVAL EXPANSION ==== #
         'NavalExpansionBuilders',
-        
+
         # ==== EXPERIMENTALS ==== #
         'MobileNavalExperimentalEngineers',
         'MobileNavalExperimentalForm',
@@ -74,12 +74,12 @@ BaseBuilderTemplate {
         if markerType != 'Naval Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if personality == 'rushnaval' then
             return 100
         end
-        
+
         return 0
     end,
 }

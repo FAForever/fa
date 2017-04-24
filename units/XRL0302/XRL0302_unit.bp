@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'torso',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XRL',
@@ -41,13 +46,12 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH2',
-	'COUNTERINTELLIGENCE',
+        'COUNTERINTELLIGENCE',
         'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
     },
-    CollisionOffsetY = -0.025,
     CollisionOffsetZ = 0.05,
     Defense = {
         AirThreatLevel = 0,
@@ -181,9 +185,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.83,
-    SizeX = 0.4,
-    SizeY = 0.35,
-    SizeZ = 0.55,
+    SizeX = 0.5,
+    SizeY = 0.4,
+    SizeZ = 0.9,
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {

@@ -14,7 +14,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
@@ -23,13 +23,13 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'LandInitialFactoryConstruction',
 
-        # Extractor building        
+        # Extractor building
         'EngineerMassBuildersLowerPri',
-		
-		# ==== UNIT CAP BUILDERS ==== #
+
+        # ==== UNIT CAP BUILDERS ==== #
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-        
+
         # ==== LAND UNIT BUILDERS ==== #
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
@@ -48,20 +48,20 @@ BaseBuilderTemplate {
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-        
+
         'TransportFactoryBuilders',
-        
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
     },
-    NonCheatBuilders = {        
+    NonCheatBuilders = {
         'LandScoutFactoryBuilders',
         'LandScoutFormBuilders',
-        
+
         'RadarEngineerBuilders',
         'RadarUpgradeBuildersExpansion',
     },
@@ -72,14 +72,14 @@ BaseBuilderTemplate {
             Tech3 = 8,
             SCU = 1,
         },
-        
+
         FactoryCount = {
-            Land = 3, 
-            Air = 1, 
+            Land = 3,
+            Air = 1,
             Sea = 0,
             Gate = 1,
         },
-        
+
         MassToFactoryValues = {
             T1Value = 6,
             T2Value = 15,
@@ -92,14 +92,14 @@ BaseBuilderTemplate {
         if markerType != 'Expansion Area' then #DUNCAN - was Start Location
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        if not( personality == 'adaptive' or personality == 'rushbalanced' ) then
+        if not(personality == 'adaptive' or personality == 'rushbalanced') then
             return 0
         end
 
         local threatCutoff = 10 # value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
+        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 50
         elseif distance > 500 then
@@ -109,7 +109,7 @@ BaseBuilderTemplate {
         else # within 250
             return 25
         end
-        
+
         return 0
     end,
 }

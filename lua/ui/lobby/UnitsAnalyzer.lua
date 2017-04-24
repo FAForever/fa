@@ -12,7 +12,7 @@ local bpIndex = 1
 local cached = { Images = {}, Tooltips = {}, Enhancements = {} }
 
 -- Stores blueprints of units and extracted enhancements
--- Similar to Sim's __blueprints but accessible on UI/lobby side
+-- Similar to Sim's __blueprints but accessible only in UnitsManager
 local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 local projectiles = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 
@@ -21,6 +21,7 @@ local logsTypes = {
     ["WARNING"] = true,  -- Recommend to keep it always true
     ["CACHING"] = false, -- Enable only for debugging
     ["PARSING"] = false, -- Enable only for debugging
+    ["DEBUG"] = false, -- Enable only for debugging
     ["STATUS"] = true,
 }
 
@@ -88,6 +89,7 @@ CategoriesSkipped  = {
 -- Blueprints with these categories will be hidden in tooltips
 CategoriesHidden  = {
     ["NUKESUB"] = true,
+    ["SPECIALLOWPRI"] = true,
     ["DESTROYER"] = true,
     ["T2SUBMARINE"] = true,
     ["NAVALCARRIER"] = true,
@@ -198,40 +200,46 @@ CategoriesHidden  = {
 }
 
 Factions = {
-    ["AEON"] = 'FF238C00',
-    ["UEF"] = 'FF006CD9',
-    ["CYBRAN"] = 'FFB32D00',
-    ["SERAPHIM"] = 'FFFFBF00',
-    ["NOMADS"] = 'FFFF7200',
-    ["UNKNOWN"] = 'ff808080',
+    { Name = 'AEON',     Color = 'FF238C00' }, --#FF238C00
+    { Name = 'UEF',      Color = 'FF006CD9' }, --#FF006CD9
+    { Name = 'CYBRAN',   Color = 'FFB32D00' }, --#FFB32D00
+    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, --#FFFFBF00
+    { Name = 'NOMADS',   Color = 'FFFF7200' }, --#FFFF7200
+    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, --#FFD619CE
 }
 
 -- Gets unit's color based on faction of given blueprint
 function GetUnitColor(bp)
-    return Factions[bp.Faction] or Factions['UNKNOWN']
+    for _, faction in Factions do
+        if faction.Name == bp.Faction then
+            return faction.Color
+        end
+    end
+    return 'FFD619CE'
 end
 
 -- Gets unit's faction based on categories of given blueprint
 function GetUnitFaction(bp)
-    local faction = bp.General.FactionName
-    if faction then
-        faction = string.upper(faction)
-       return faction
-    else
-        if not bp.Merge then
-            Show('WARNING', bp.Info..' - missing bp.General.FactionName')
-        end
-        -- Using categories to find faction
-        for name, _ in Factions do
-            if bp.Categories[name] then
-                return name
-            end
-        end
-        if not bp.Merge then
-            Show('WARNING', bp.Info..' - missing FACTION in Categories')
+    local factionCategory = nil
+    local factionName = bp.General.FactionName
+
+    for _, faction in Factions do
+        if bp.CategoriesHash[faction.Name] then
+            factionCategory = faction.Name
+            break
         end
     end
-
+    -- validate if factionCategory and factionName are the same
+    if not factionCategory then
+        Show('WARNING', bp.Info..' - missing FACTION in bp.Categories')
+    elseif not factionName then
+        Show('WARNING', bp.Info..' - missing bp.General.FactionName')
+    else
+        if factionCategory ~= string.upper(factionName) then
+            Show('WARNING', bp.Info..' - mismatch between ' .. factionCategory .. '  in bp.Categories and ' .. factionName .. ' in bp.General.FactionName')
+        end
+        return factionCategory
+    end
     return 'UNKNOWN'
 end
 
@@ -260,7 +268,7 @@ function GetUnitTitle(bp)
     end
 
     if bp.Interface.HelpText then
-        name = name and (name .. ' - ' ) or ''
+        name = name and (name .. ' - ') or ''
         name = name .. LOCF(bp.Interface.HelpText)
     end
 
@@ -272,11 +280,11 @@ end
 
 -- Gets units tech level based on categories of given blueprint
 function GetUnitTech(bp)
-    if bp.Categories['TECH1'] then return 'T1' end
-    if bp.Categories['TECH2'] then return 'T2' end
-    if bp.Categories['TECH3'] then return 'T3' end
-    if bp.Categories['COMMAND'] then return 'T0' end
-    if bp.Categories['EXPERIMENTAL'] then return 'T4' end
+    if bp.CategoriesHash['TECH1'] then return 'T1' end
+    if bp.CategoriesHash['TECH2'] then return 'T2' end
+    if bp.CategoriesHash['TECH3'] then return 'T3' end
+    if bp.CategoriesHash['COMMAND'] then return '' end
+    if bp.CategoriesHash['EXPERIMENTAL'] then return 'T4' end
 
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TECH in bp.Categories')
@@ -287,11 +295,11 @@ end
 
 -- Gets units type based on categories of given blueprint
 function GetUnitType(bp)
-    if bp.Categories['STRUCTURE'] then return 'BASE' end
-    if bp.Categories['AIR'] then return 'AIR' end
-    if bp.Categories['LAND'] then return 'LAND' end
-    if bp.Categories['NAVAL'] then return 'NAVAL' end
-    if bp.Categories['HOVER'] then return 'HOVER' end
+    if bp.CategoriesHash['STRUCTURE'] then return 'BASE' end
+    if bp.CategoriesHash['AIR'] then return 'AIR' end
+    if bp.CategoriesHash['LAND'] then return 'LAND' end
+    if bp.CategoriesHash['NAVAL'] then return 'NAVAL' end
+    if bp.CategoriesHash['HOVER'] then return 'HOVER' end
 
     if not bp.Merge then
        Show('WARNING', bp.Info..' - missing TYPE in bp.Categories')
@@ -668,43 +676,61 @@ end
 -- Returns unit's categories that should not be hidden in tooltips
 function GetUnitsCategories(bp, showAll)
     local ret = {}
-    if bp.Categories then
 
-        local categories = table.keys(bp.Categories)
-        if showAll then
-            ret = categories
-        else
-            for _, category in categories do
-                -- Ensure categories are nicely formatted
-                if category == 'MASSPRODUCTION' then
-                    category = 'MASS PRODUCTION'
-                elseif category == 'MASSSTORAGE' then
-                    category = 'MASS STORAGE'
-                elseif category == 'ENERGYPRODUCTION' then
-                    category = 'ENERGY PRODUCTION'
-                elseif category == 'ENERGYSTORAGE' then
-                    category = 'ENERGY STORAGE'
-                end
-                -- Ensures name of enhancements are nicely formatted
-                if cached.Enhancements[category] then
-                    category = 'UPGRADE ' .. StringSplitCamel(category)
-                end
-                if not CategoriesHidden[category] then
-                    -- Ensures all categories have the same case
-                    table.insert(ret, string.upper(category))
-                end
+    if showAll then
+        ret = bp.CategoriesHash
+    else
+        for key, val in bp.CategoriesHash do
+            local category = key
+            -- Ensure categories are nicely formatted
+            if category == 'MASSPRODUCTION' then
+                category = 'MASS PRODUCTION'
+            elseif category == 'MASSSTORAGE' then
+                category = 'MASS STORAGE'
+            elseif category == 'ENERGYPRODUCTION' then
+                category = 'ENERGY PRODUCTION'
+            elseif category == 'ENERGYSTORAGE' then
+                category = 'ENERGY STORAGE'
+            elseif category == 'SUPPORTFACTORY' then
+                category = 'SUPPORT FACTORY'
+            elseif category == 'ENGINEERSTATION' then
+                category = 'ENGINEER-STATION'
+            elseif category == 'COUNTERINTELLIGENCE' then
+                category = 'COUNTER-INTELLIGENCE'
+            elseif category == 'INDIRECTFIRE' then
+                category = 'INDIRECT-FIRE'
+            elseif category == 'DIRECTFIRE' then
+                category = 'DIRECT-FIRE'
+            elseif category == 'OBRITALSYSTEM' then
+                category = 'OBRITAL-SYSTEM'
+            elseif category == 'GROUNDATTACK' then
+                category = 'GROUND-ATTACK'
             end
-        end
-
-        -- Help showing difference between support and HQ factories
-        if categories['FACTORY'] and
-           categories['STRUCTURE'] and
-           not categories['SUPPORTFACTORY'] then
-            table.insert(ret, 'HQFACTORY')
+            -- Ensures name of enhancements are nicely formatted
+            if cached.Enhancements[category] then
+                category = 'UPGRADE ' .. StringSplitCamel(category)
+            end
+            if not CategoriesHidden[category] and
+               not StringStarts(category, 'BUILTBY') and
+               not StringStarts(category, 'DUMMY') then
+                -- Ensures all categories have the same case
+                ret[string.upper(category)] = true
+            end
         end
     end
 
-    return table.sorted(ret)
+    -- Help showing difference between Support and HQ factories
+    if bp.CategoriesHash['FACTORY'] and
+       bp.CategoriesHash['STRUCTURE'] and
+       not bp.CategoriesHash['TECH1'] and -- T1 factories are the same
+       not bp.CategoriesHash['GATE'] then
+        ret['FACTORY'] = false -- hiding FACTORY* duplicate
+        if not bp.CategoriesHash['SUPPORTFACTORY']  then
+           ret['HQ FACTORY'] = true
+        end
+    end
+
+    return table.hashkeys(ret, true)
 end
 
 -- Creates basic tooltip for given blueprints based on its categories, name, and source
@@ -726,12 +752,9 @@ function GetTooltip(bp)
         tooltip.text = bp.Tech .. ' ' .. tooltip.text
     end
 
-    if bp.Categories then
-        local categories = table.keys(bp.Categories)
-        for _, category in categories do
-            if not CategoriesHidden[category] then
-                tooltip.body = tooltip.body .. category .. ' \n'
-            end
+    for category, _ in bp.CategoriesHash or {} do
+        if not CategoriesHidden[category] then
+            tooltip.body = tooltip.body .. category .. ' \n'
         end
     end
 
@@ -778,10 +801,10 @@ end
 
 --- Checks if a unit contains specified categories
 function ContainsCategory(unit, value)
-    if not unit then return false end
-    if not unit.Categories then return false end
     if not value then return false end
-    return unit.Categories[value]
+    if not unit then return false end
+    if not unit.CategoriesHash then return false end
+    return unit.CategoriesHash[value]
 end
 
 --- Checks if a unit contains categories in specified expression
@@ -937,9 +960,10 @@ function GetUnits(bps, expression)
 end
 
 -- Groups units based on their categories
-function GetUnitsGroups(bps, factionName)
+-- @param bps is table with blueprints
+-- @param faction is table with { Name = 'FACTION' }
+function GetUnitsGroups(bps, faction)
     -- NOTE these unit groupings are for visualization purpose only
-
     local TECH4ARTY = '(EXPERIMENTAL * ARTILLERY - FACTORY - LAND)' -- mobile factory (FATBOY)
     -- xrl0002 Crab Egg (Engineer)
     -- xrl0003 Crab Egg (Brick)
@@ -949,62 +973,71 @@ function GetUnitsGroups(bps, factionName)
     local CRABEGG = 'xrl0002 + xrl0003 + xrl0004 + xrl0005 + drlk005'
     -- Including crab eggs with factories so they are not confused with actual units built from crab eggs
     local FACTORIES = '((FACTORY * STRUCTURE) + ' .. CRABEGG .. ')'
+    local ENGINEERS = '(ENGINEER - COMMAND - SUBCOMMANDER - UPGRADE)'
+    local DRONES = '(POD - UPGRADE)'
+    local DEFENSES = '(ANTINAVY + DIRECTFIRE + ARTILLERY + ANTIAIR + MINE + ORBITALSYSTEM + SATELLITE + NUKE)'
 
-    local faction = {}
-    faction.Name = factionName
-    faction.Blueprints      = GetUnits(bps, factionName)
+    if table.getsize(faction.Blueprints) == 0 then
+        faction.Blueprints = GetUnits(bps, faction.Name)
+    end
     faction.Units = {}
     -- Grouping ACU/SCU upgrades in separate tables because they have different cost/stats
-    faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER')
-    faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND')
-    faction.Units.ALL       = GetUnits(bps, '('..factionName..' - UPGRADE - COMMAND - SUBCOMMANDER)' )
-    faction.Units.AIR       = GetUnits(faction.Units.ALL, '(AIR - STRUCTURE - POD - SATELLITE)')
-    faction.Units.LAND      = GetUnits(faction.Units.ALL, '(LAND  - STRUCTURE - ENGINEER - POD - '..TECH4ARTY..')')
-    faction.Units.NAVAL     = GetUnits(faction.Units.ALL, '(NAVAL - STRUCTURE - MOBILESONAR)')
-    faction.Bases           = {}
-    faction.Bases.ALL       = GetUnits(faction.Units.ALL, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..')')
-    faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD)')
-    faction.Bases.ECONOMIC  = GetUnits(faction.Bases.ALL, '(STRUCTURE * ECONOMIC)')
-    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
+    faction.Units.ACU       = GetUnits(faction.Blueprints, 'COMMAND + UPGRADE - SUBCOMMANDER - CIVILIAN')
+    faction.Units.SCU       = GetUnits(faction.Blueprints, 'SUBCOMMANDER + UPGRADE - COMMAND - CIVILIAN')
+    local mobileUnits       = GetUnits(faction.Blueprints, '('..faction.Name..' - UPGRADE - COMMAND - SUBCOMMANDER - STRUCTURE - CIVILIAN)')
+    faction.Units.AIR       = GetUnits(mobileUnits, '(AIR - POD - SATELLITE)')
+    faction.Units.LAND      = GetUnits(mobileUnits, '(LAND - ENGINEER - POD - '..TECH4ARTY..')')
+    faction.Units.NAVAL     = GetUnits(mobileUnits, '(NAVAL - MOBILESONAR)')
+    local buildings         = GetUnits(faction.Blueprints, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..' - CIVILIAN)')
+    faction.Units.CONSTRUCT = GetUnits(faction.Blueprints, '('..FACTORIES..' + '..ENGINEERS..' + ENGINEERSTATION + '..DRONES..' - DEFENSE)')
+    faction.Units.ECONOMIC  = GetUnits(buildings, '(STRUCTURE * ECONOMIC)')
+    faction.Units.SUPPORT   = GetUnits(buildings, '(WALL + HEAVYWALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ' ..DEFENSES..')')
+    faction.Units.CIVILIAN  = GetUnits(faction.Blueprints, '(CIVILIAN - ' ..DEFENSES..')')
 
-    faction.Bases.DEFENSES  = {}
-    -- Collect not grouped units above tables into the DEFENSES table
+    faction.Units.DEFENSES  = GetUnits(buildings, DEFENSES)
+    -- Collect not grouped units from above tables into the DEFENSES table
     -- This way we don't miss showing un-grouped units
     for ID, bp in faction.Blueprints do
         if not faction.Units.ACU[ID] and
            not faction.Units.SCU[ID] and
-
            not faction.Units.AIR[ID] and
            not faction.Units.LAND[ID] and
            not faction.Units.NAVAL[ID] and
-           not faction.Bases.FACTORIES[ID] and
-           not faction.Bases.ECONOMIC[ID] and
-           not faction.Bases.SUPPORT[ID] then
+           not faction.Units.CONSTRUCT[ID] and
+           not faction.Units.ECONOMIC[ID] and
+           not faction.Units.SUPPORT[ID] and
+           not faction.Units.CIVILIAN[ID] and
+           not faction.Units.DEFENSES[ID] then
 
-           faction.Bases.DEFENSES[ID] = bp
+           faction.Units.DEFENSES[ID] = bp
         end
     end
 
+    if logsTypes.DEBUG then
+        for group, units in faction.Units do
+            LOG('UnitsAnalyzer '..faction.Name..' faction has ' .. table.getsize(units)..' ' .. group .. ' units')
+        end
+    end
     return faction
 end
 
 -- Cache enhancements as new blueprints with Categories, Faction from their parent (unit) blueprints
 local function CacheEnhancement(key, bp, name, enh)
-    local categories = {}
+    enh.CategoriesHash = {}
     cached.Enhancements[name] = true
 
-    if blueprints.All[key].Categories then
-        categories = blueprints.All[key].Categories
+    if blueprints.All[key].CategoriesHash then
+        enh.CategoriesHash = blueprints.All[key].CategoriesHash
     end
 
     local commanderType = ''
-    categories['UPGRADE'] = true
-    if bp.Categories['COMMAND'] then
+    enh.CategoriesHash['UPGRADE'] = true
+    if bp.CategoriesHash['COMMAND'] then
         commanderType = 'ACU'
-        categories['COMMAND'] = true
-    elseif bp.Categories['SUBCOMMANDER'] then
+        enh.CategoriesHash['COMMAND'] = true
+    elseif bp.CategoriesHash['SUBCOMMANDER'] then
         commanderType = 'SCU'
-        categories['SUBCOMMANDER'] = true
+        enh.CategoriesHash['SUBCOMMANDER'] = true
     end
 
     -- Create some extra categories used for ordering enhancements in UI
@@ -1017,7 +1050,7 @@ local function CacheEnhancement(key, bp, name, enh)
         elseif slot == 'BACK' then
             enh.Slot = 'BACK'
         end
-        categories['UPGRADE '..enh.Slot] = true
+        enh.CategoriesHash['UPGRADE '..enh.Slot] = true
     end
 
     enh.ID = name
@@ -1031,10 +1064,8 @@ local function CacheEnhancement(key, bp, name, enh)
     enh.Tech = enh.Slot
     enh.Mod = bp.Mod
 
-    categories[bp.Faction] = true
-    categories[name] = true
-
-    enh.Categories = categories
+    enh.CategoriesHash[bp.Faction] = true
+    enh.CategoriesHash[name] = true
 
     if bp.Mod then
         blueprints.Modified[key] = enh
@@ -1055,11 +1086,7 @@ local function CacheProjectile(bp)
 
     -- Converting categories to hash table for quick lookup
     if  bp.Categories then
-        local categories = {}
-        for _, category in bp.Categories do
-            categories[category] = true
-        end
-        bp.Categories = categories
+        bp.CategoriesHash = table.hash(bp.Categories)
     end
 
     if bp.Mod then
@@ -1100,16 +1127,12 @@ local function CacheUnit(bp)
 
     local id = bp.ID
 
-    bp.Name = GetUnitName(bp)
-
     -- Skip processing of invalid units
     if not IsValidUnit(bp, id) then
         blueprints.Skipped[id] = bp
         return
     end
 
-    -- Converting categories to hash table for quick lookup
-    bp.Categories = table.hash(bp.Categories)
     bp.Faction = GetUnitFaction(bp)
     bp.Type = GetUnitType(bp)
     bp.Tech = GetUnitTech(bp)
@@ -1173,17 +1196,19 @@ function DidModsChanged()
     return mods.Changed
 end
 
+local timer = CreateTimer()
 -- Gets unit blueprints by loading them from the game and given active sim mods
-local function GetBlueprints(activeMods, skipGameFiles)
-    local timer = StartedTimer()
+function GetBlueprints(activeMods, skipGameFiles, taskNotifier)
+    timer:Start('LoadBlueprints')
 
+    blueprints.Loaded = false
     -- Load original FA blueprints only once
     local loadedGameFiles = table.getsize(blueprints.Original) > 0
     if loadedGameFiles then
          skipGameFiles = true
     end
 
-    local state = 'blueprints...'
+    local state = 'LoadBlueprints...'
     Show('STATUS', state)
 
     if DidModsChanged() or not skipGameFiles then
@@ -1195,40 +1220,56 @@ local function GetBlueprints(activeMods, skipGameFiles)
         projectiles.Modified = {}
         projectiles.Skipped = {}
 
+        if taskNotifier then
+            local filesCount = 0
+            -- calculate total updates based on number of files that Blueprints.lua will load
+            if not skipGameFiles then
+                filesCount = filesCount + table.getsize(DiskFindFiles('/projectiles', '*_proj.bp'))
+                filesCount = filesCount + table.getsize(DiskFindFiles('/units', '*_unit.bp'))
+            end
+            for i, mod in activeMods or {} do
+                filesCount = filesCount + table.getsize(DiskFindFiles(mod.location, '*_proj.bp'))
+                filesCount = filesCount + table.getsize(DiskFindFiles(mod.location, '*_unit.bp'))
+            end
+            taskNotifier.totalUpdates = filesCount
+        end
+
         -- allows execution of LoadBlueprints()
         doscript '/lua/system/Blueprints.lua'
 
         -- Loading projectiles first so that they can be used by units
         local dir = {'/projectiles'}
-        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true)
+        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true, taskNotifier)
         for _, bp in bps.Projectile do
             CacheProjectile(bp)
         end
 
         -- Loading units second so that they can use projectiles
         dir = {'/units'}
-        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true)
+        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true, taskNotifier)
         for _, bp in bps.Unit do
             if not string.find(bp.Source,'proj_') then
                 CacheUnit(bp)
             end
         end
-        state = state .. ' loaded '
+        state = state .. ' loaded: '
     else
-        state = state .. ' cached '
+        state = state .. ' cached: '
     end
-    info = state.. table.getsize(projectiles.All) .. ' total ('
+    info = state .. table.getsize(projectiles.All) .. ' total ('
     info = info .. table.getsize(projectiles.Original) .. ' original, '
-    info = info .. table.getsize(projectiles.Modified) .. ' modified), and '
-    info = info .. table.getsize(projectiles.Skipped) .. ' skipped projectiles'
+    info = info .. table.getsize(projectiles.Modified) .. ' modified, and '
+    info = info .. table.getsize(projectiles.Skipped) .. ' skipped) projectiles'
     Show('STATUS', info)
 
-    info = state.. table.getsize(blueprints.All) .. ' total ('
+    info = state .. table.getsize(blueprints.All) .. ' total ('
     info = info .. table.getsize(blueprints.Original) .. ' original, '
-    info = info .. table.getsize(blueprints.Modified) .. ' modified), and '
-    info = info .. table.getsize(blueprints.Skipped) .. ' skipped units'
-    info = info .. ' in ' .. timer:Stop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
+    info = info .. table.getsize(blueprints.Modified) .. ' modified and '
+    info = info .. table.getsize(blueprints.Skipped) .. ' skipped) units'
     Show('STATUS', info)
+    Show('STATUS', state .. 'in ' .. timer:Stop('LoadBlueprints'))
+
+    blueprints.Loaded = true
 
     return blueprints
 end
@@ -1238,16 +1279,35 @@ function GetBlueprintsList()
     return blueprints
 end
 
+local fetchThread = nil
 -- Fetch asynchronously all unit blueprints from the game and given active sim mods
-function FetchBlueprints(activeMods, skipGameFiles)
+function FetchBlueprints(activeMods, skipGameFiles, taskNotifier)
     local bps = {}
-    ForkThread(function()
-        Show('STATUS', 'forking thread...')
-        bps = GetBlueprints(activeMods, skipGameFiles)
-        -- check if blueprints are loaded
-        while table.getsize(bps) == 0 do
-            WaitSeconds(0.25)
+
+    StopBlueprints()
+
+    fetchThread = ForkThread(function()
+        Show('STATUS', 'FetchBlueprints...')
+        timer:Start('FetchBlueprints')
+        local start = CurrentTime()
+        bps = GetBlueprints(activeMods, skipGameFiles, taskNotifier)
+        -- check if blueprints loading  is complete
+        while not blueprints.Loaded do
+            Show('STATUS', 'FetchBlueprints... tick')
+            WaitSeconds(0.1)
         end
-        Show('STATUS', 'forking thread...done')
+        timer:Stop('FetchBlueprints', true)
+        Show('STATUS', 'FetchBlueprints...done')
+        fetchThread = nil
+        -- notify UnitManager UI about complete blueprint loading
+        if taskNotifier then
+           taskNotifier:Complete()
+        end
     end)
+end
+function StopBlueprints()
+    if fetchThread then
+        KillThread(fetchThread)
+        fetchThread = nil
+    end
 end

@@ -240,6 +240,9 @@ function UpdateObjectiveItems(skipAnnounce)
         elseif data.type == 'secondary' then
             group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/secondary-ring_bmp.dds'))
             group.secondary = true
+        elseif data.type == 'bonus' then
+            group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/bonus-ring_bmp.dds'))
+            group.bonus = true
         end
         if group.bgRing then
             LayoutHelpers.AtCenterIn(group.bgRing, group.bg, -6)
@@ -322,7 +325,7 @@ function UpdateObjectiveItems(skipAnnounce)
                 local positions = self.data.unitPositions
                 if targets and table.getsize(targets) > 0 then
                     local max = table.getn(targets)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getn(targets )) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getn(targets)) + 1
 
                     for idx,target in targets do
                         if idx == desiredTarget then
@@ -331,16 +334,16 @@ function UpdateObjectiveItems(skipAnnounce)
                                                   target.Value[3] - 20,
                                                   target.Value[1] + 20,
                                                   target.Value[3] + 20)
-                                GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             elseif target.Type == 'Area' then
-                                GetCamera("WorldCamera"):MoveToRegion( target.Value, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(target.Value, 1.0)
                             end
                             self.TargetFocus = idx
                         end
                     end
                 elseif positions and table.getsize(positions) > 0 then
                     local max = table.getsize(positions)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getsize(positions)) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getsize(positions)) + 1
 
                     for idx,target in positions do
                         if idx >= desiredTarget then
@@ -348,7 +351,7 @@ function UpdateObjectiveItems(skipAnnounce)
                                               target[3] - 20,
                                               target[1] + 20,
                                               target[3] + 20)
-                            GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                            GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             self.TargetFocus = idx
                         end
                     end
@@ -427,6 +430,11 @@ function LayoutObjectiveItems()
         return
     end
     local sortedControls = {}
+    for _, item in controls.objItems do
+        if item.bonus then
+            table.insert(sortedControls, item)
+        end
+    end
     for _, item in controls.objItems do
         if item.secondary then
             table.insert(sortedControls, item)
@@ -532,6 +540,8 @@ function CreateTooltip(parentControl, objData, container)
             controls.tooltip.text.title:SetColor('ffff0000')
         elseif parentControl.secondary then
             controls.tooltip.text.title:SetColor('fffff700')
+        elseif parentControl.bonus then
+            controls.tooltip.text.title:SetColor('ffba00ff')
         else
             controls.tooltip.text.title:SetColor('ff00f7ff')
         end

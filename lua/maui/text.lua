@@ -59,7 +59,7 @@ Text = Class(moho.text_methods, Control) {
             self:_internalSetFont()
         end
     end,
-    
+
     _internalSetFont = function(self)
         if not self._lockFontChanges then
             self:SetNewFont(self._font._family(), self._font._pointsize())
@@ -82,7 +82,7 @@ Text = Class(moho.text_methods, Control) {
             end
         end
     end,
-       
+
     SetColor = function(self, color)
         if self._color then
             self._color:Set(color)
@@ -146,25 +146,25 @@ end
 -- lineWidth - can be a number or function with the signature int function(lineNumber)
 --  when it's a number, it represents how wide each line is in pixels
 --  when it's a function, gets the line width for each line
--- advanceFunction - a function with the signature int function(string) which returns the width in pixels of the string passed in 
+-- advanceFunction - a function with the signature int function(string) which returns the width in pixels of the string passed in
 function WrapText(text, lineWidth, advanceFunction)
     -- Chinese doesn't have spaces, so fit it in to lines without trying to wrap words
     if __language == 'cn' then
         return FitText(text, lineWidth, advanceFunction)
-    end    
+    end
 
     local result = {}
     local pos = 0
     local curLine = 1
     local spaceWidth = advanceFunction(" ")
-    
+
     local lineWidthFunc = lineWidth
     if type(lineWidth) == 'number' then
         lineWidthFunc = function(line)
             return lineWidth
         end
     end
-    
+
     -- the gfind here splits the text up in to a table of all the "words" in the string delineated by spaces or tabs
     -- then the word is checked to see if contains line feeds, and splits out all the words delineated by line feeds
     -- then each set of words is added to the result table, where each entry denotes a line of text
@@ -233,7 +233,7 @@ function WrapText(text, lineWidth, advanceFunction)
                     wordWidth = wordWidth + letterWidth
                     letterIndex = letterIndex + 1
                 end
-                
+
                 result[curLine] = string.sub(word, startIndex)
                 pos = wordWidth
                 if wordWidth + spaceWidth < lineWidth then

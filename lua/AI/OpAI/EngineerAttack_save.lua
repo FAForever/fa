@@ -23,7 +23,7 @@ end
 function NeedEngineerTransports(aiBrain, masterName, locationName)
     local transportPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
 
-    return not ( transportPool and table.getn(transportPool:GetPlatoonUnits()) > 2 )
+    return not (transportPool and table.getn(transportPool:GetPlatoonUnits()) > 2)
 end
 
 

@@ -66,7 +66,6 @@ UnitBlueprint {
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
     },
-    CollisionOffsetY = -0.25,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -176,7 +175,7 @@ UnitBlueprint {
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
+            RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
@@ -221,9 +220,9 @@ UnitBlueprint {
     SelectionSizeX = 1.8,
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.39,
-    SizeX = 2.5,
+    SizeX = 2.9,
     SizeY = 1.75,
-    SizeZ = 2.5,
+    SizeZ = 2.9,
     StrategicIconName = 'icon_structure3_missile',
     StrategicIconSortPriority = 175,
     Veteran = {

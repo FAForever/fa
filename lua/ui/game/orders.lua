@@ -1,10 +1,9 @@
--- *****************************************************************************
--- * File: lua/modules/ui/game/orders.lua
--- * Author: Chris Blackwell
--- * Summary: Unit orders UI
--- *
--- * Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
--- *****************************************************************************
+-----------------------------------------------------------------
+-- File: lua/modules/ui/game/orders.lua
+-- Author: Chris Blackwell
+-- Summary: Unit orders UI
+-- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -23,12 +22,12 @@ local Select = import('/lua/ui/game/selection.lua')
 
 controls = import('/lua/ui/controls.lua').Get()
 
--- positioning controls, don't belong to file
+-- Positioning controls, don't belong to file
 local layoutVar = false
 local glowThread = false
 
--- these variables control the number of slots available for orders
--- though they are fixed, the code is written so they could easily be made soft
+-- These variables control the number of slots available for orders
+-- Though they are fixed, the code is written so they could easily be made soft
 local numSlots = 14
 local firstAltSlot = 8
 local vertRows = 3
@@ -62,7 +61,7 @@ local function CreateOrderGlow(parent)
     end
 end
 
-local hotkeyLabel_addLabel = import('/modules/hotkeylabelsUI.lua').addLabel
+local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
 local orderKeys = {}
 
 function setOrderKeys(orderKeys_)
@@ -105,7 +104,6 @@ function CreateMouseoverDisplay(parent, ID)
     if not Prefs.GetOption('tooltips') then return end
 
     local createDelay = Prefs.GetOption('tooltip_delay') or 0
-
     local text = TooltipInfo['Tooltips'][ID]['title'] or ID
     local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
 
@@ -146,12 +144,12 @@ local function CreateOrderButtonGrid()
     controls.orderButtonGrid:DeleteAll()
 end
 
--- local logic data
+-- Local logic data
 local orderCheckboxMap = false
 local currentSelection = false
 
--- helper function to create order bitmaps
--- note, your bitmaps must be in /game/orders/ and have the standard button naming convention
+-- Helper function to create order bitmaps
+-- Note, your bitmaps must be in /game/orders/ and have the standard button naming convention
 local function GetOrderBitmapNames(bitmapId)
     if bitmapId == nil then
         LOG("Error - nil bitmap passed to GetOrderBitmapNames")
@@ -165,13 +163,13 @@ local function GetOrderBitmapNames(bitmapId)
         ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
         ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
         ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
-        , "UI_Action_MouseDown", "UI_Action_Rollover"   -- sets click and rollover cues
+        , "UI_Action_MouseDown", "UI_Action_Rollover"   -- Sets click and rollover cues
 end
 
--- used by most orders, which start and stop a command mode, so they toggle on when pressed
+-- Used by most orders, which start and stop a command mode, so they toggle on when pressed
 -- and toggle off when done
 local function StandardOrderBehavior(self, modifiers)
-    -- if we're checked, end the current command mode, otherwise start it
+    -- If we're checked, end the current command mode, otherwise start it
     if self:IsChecked() then
         import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     else
@@ -179,7 +177,7 @@ local function StandardOrderBehavior(self, modifiers)
     end
 end
 
--- used by orders that happen immediately and don't change the command mode (ie the stop button)
+-- Used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function DockOrderBehavior(self, modifiers)
     if modifiers.Shift then
         IssueDockCommand(false)
@@ -189,7 +187,7 @@ local function DockOrderBehavior(self, modifiers)
     self:SetCheck(false)
 end
 
--- used by orders that happen immediately and don't change the command mode (ie the stop button)
+-- Used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
@@ -204,7 +202,7 @@ function Stop(units)
 end
 
 function ClearCommands(units)
-    local cb = { Func = 'ClearCommands'}
+    local cb = {Func = 'ClearCommands'}
 
     if units then
         local ids = {}
@@ -221,7 +219,7 @@ function SoftStop(units)
     local units = units or GetSelectedUnits()
     import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
     ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
-    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY+categories.SILO, units))
+    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
 end
 
 function StopOrderBehavior(self, modifiers)
@@ -233,7 +231,7 @@ function StopOrderBehavior(self, modifiers)
     end
 end
 
--- used by things that build weapons, etc
+-- Used by things that build weapons, etc
 local function BuildOrderBehavior(self, modifiers)
     if modifiers.Left then
         IssueCommand(GetUnitCommandFromCommandCap(self._order))
@@ -264,7 +262,7 @@ local function BuildInitFunction(control, unitList)
     end
 end
 
--- used by subs that can dive/surface
+-- Used by subs that can dive/surface
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
         local unitList = GetSelectedUnits()
@@ -279,13 +277,13 @@ local function DiveOrderBehavior(self, modifiers)
                 elseif submergedSUBState == -1 then
                     submergedSUB = true
                 end
-                -- bail out if we know, we have mixed SUBs
+                -- Bail out if we know, we have mixed SUBs
                 if surfacedSUB and submergedSUB then
                     break
                 end
             end
         end
-        -- if we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
+        -- If we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
         if submergedSUB and surfacedSUB then
             local SurfacedSubs = {}
             for i, v in unitList do
@@ -375,7 +373,7 @@ function ToggleDiveOrder()
     end
 end
 
--- pause button specific behvior
+-- Pause button specific behvior
 -- TODO pause button will be moved to construction manager
 local function PauseOrderBehavior(self, modifiers)
     Checkbox.OnClick(self)
@@ -391,7 +389,7 @@ function TogglePauseState()
     SetPaused(currentSelection, not pauseState)
 end
 
--- some toggleable abilities need reverse semantics.
+-- Some toggleable abilities need reverse semantics.
 local function CheckReverseSemantics(scriptBit)
     if scriptBit == 0 then -- shields
         return true
@@ -405,7 +403,7 @@ local function AttackMoveBehavior(self, modifiers)
         import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     else
         local modeData = {
-            name="RULEUCC_Script", 
+            name="RULEUCC_Script",
             AbilityName='AttackMove',
             TaskName='AttackMove',
             cursor = 'ATTACK_MOVE',
@@ -428,7 +426,7 @@ local function AbilityButtonBehavior(self, modifiers)
     end
 end
 
--- generic script button specific behvior
+-- Generic script button specific behvior
 local function ScriptButtonOrderBehavior(self, modifiers)
     local state = self:IsChecked()
     local mixed = false
@@ -437,15 +435,18 @@ local function ScriptButtonOrderBehavior(self, modifiers)
         self._mixedIcon:Destroy()
         self._mixedIcon = nil
     end
-    -- mixed shields get special behaviour: turn everything on, not off
+
+    -- Mixed shields get special behaviour: turn everything on, not off
     if mixed and self._data.extraInfo == 0 then
         ToggleScriptBit(currentSelection, self._data.extraInfo, false)
     else
         ToggleScriptBit(currentSelection, self._data.extraInfo, state)
     end
+
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
+
     Checkbox.OnClick(self)
 end
 
@@ -468,12 +469,12 @@ local function ScriptButtonInitFunction(control, unitList)
         control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
         LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
     end
-    control:SetCheck(result)    -- selected state
+    control:SetCheck(result) -- Selected state
 end
 
 local function DroneBehavior(self, modifiers)
     if modifiers.Left then
-        SelectUnits( { self._unit } )
+        SelectUnits({self._unit})
     end
 
     if modifiers.Right then
@@ -491,12 +492,12 @@ local function DroneInit(self, selection)
     self:SetCheck(self._pod:IsAutoMode())
 end
 
--- retaliate button specific behvior
+-- Retaliate button specific behvior
 local retaliateStateInfo = {
     [-1] = {bitmap = 'stand-ground',    helpText = "mode_mixed"},
-    [0] = { bitmap = 'return-fire',     helpText = "mode_return_fire", id = 'ReturnFire'},
-    [1] = { bitmap = 'hold-fire',       helpText = "mode_hold_fire", id = 'HoldFire'},
-    [2] = { bitmap = 'stand-ground',    helpText = "mode_hold_ground", id = 'HoldGround'},
+    [0] = {bitmap = 'return-fire',     helpText = "mode_return_fire", id = 'ReturnFire'},
+    [1] = {bitmap = 'hold-fire',       helpText = "mode_hold_fire", id = 'HoldFire'},
+    [2] = {bitmap = 'stand-ground',    helpText = "mode_hold_ground", id = 'HoldGround'},
 }
 
 local function CreateBorder(parent)
@@ -546,7 +547,6 @@ local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
     bg.border = CreateBorder(bg)
-
     bg:DisableHitTest(true)
 
     local function CreateButton(index, info)
@@ -759,7 +759,7 @@ local function OverchargeInit(control, unitList)
         control.autoModeIcon:SetAlpha(0)
     end
 
-    -- needs to override this to prevent call to self:DisableHitTest()
+    -- Needs to override this to prevent call to self:DisableHitTest()
     control.Disable = function(self)
         self._isDisabled = true
         self:OnDisable()
@@ -783,7 +783,7 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        local cb = { Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }
+        local cb = {Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }
         SimCallback(cb, true)
     end
 end
@@ -826,50 +826,50 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
--- sets up an orderInfo for each order that comes in
+-- Sets up an orderInfo for each order that comes in
 -- preferredSlot is custom data that is used to determine what slot the order occupies
 -- initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
 --      the function should have this declaration: function(checkbox, unitList)
 -- extraInfo is used for storing any extra information required in setting up the button
 local defaultOrdersTable = {
     -- Common rules
-    AttackMove = {                  helpText = "attack_move",   bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior, },
-    RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior,},
-    RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
-    RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior, },
-    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior, },
-    RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior, },
-    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction},
+    AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
+    RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
+    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = StandardOrderBehavior},
+    RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
+    RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
+    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
+    RULEUCC_RetaliateToggle = {     helpText = "mode",              bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
-    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
-    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
-    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
-    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 8,  behavior = StandardOrderBehavior},
-    RULEUCC_Transport = {           helpText = "transport",     bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior, },
-    RULEUCC_Nuke = {                helpText = "fire_nuke",     bitmapId = 'launch-nuke',           preferredSlot = 10,  behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
-    RULEUCC_Tactical = {            helpText = "fire_tactical", bitmapId = 'launch-tactical',       preferredSlot = 10,  behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
-    RULEUCC_Teleport = {            helpText = "teleport",      bitmapId = 'teleport',              preferredSlot = 10,  behavior = StandardOrderBehavior, },
-    RULEUCC_Ferry = {               helpText = "ferry",         bitmapId = 'ferry',                 preferredSlot = 10,  behavior = StandardOrderBehavior, },
-    RULEUCC_Sacrifice = {           helpText = "sacrifice",     bitmapId = 'sacrifice',             preferredSlot = 10,  behavior = StandardOrderBehavior,},
-    RULEUCC_Dive = {                helpText = "dive",          bitmapId = 'dive',                  preferredSlot = 11, behavior = DiveOrderBehavior, initialStateFunc = DiveInitFunction,},   
-    RULEUCC_Reclaim = {             helpText = "reclaim",       bitmapId = 'reclaim',               preferredSlot = 12, behavior = StandardOrderBehavior, },
-    RULEUCC_Capture = {             helpText = "capture",       bitmapId = 'convert',               preferredSlot = 13, behavior = StandardOrderBehavior,},
-    RULEUCC_Repair = {              helpText = "repair",        bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior,},
-    RULEUCC_Dock = {                helpText = "dock",          bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior,},
-    
-    DroneL = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 13, behavior = DroneBehavior,initialStateFunc = DroneInit,},
-    DroneR = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 13, behavior = DroneBehavior,initialStateFunc = DroneInit,},
+    RULEUCC_Overcharge = {          helpText = "overcharge",        bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior,          initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
+    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",    bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
+    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
+    RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
+    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior},
+    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
+    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
+    RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},
+    RULEUCC_Ferry = {               helpText = "ferry",             bitmapId = 'ferry',                 preferredSlot = 10, behavior = StandardOrderBehavior},
+    RULEUCC_Sacrifice = {           helpText = "sacrifice",         bitmapId = 'sacrifice',             preferredSlot = 10, behavior = StandardOrderBehavior},
+    RULEUCC_Dive = {                helpText = "dive",              bitmapId = 'dive',                  preferredSlot = 11, behavior = DiveOrderBehavior,           initialStateFunc = DiveInitFunction},
+    RULEUCC_Reclaim = {             helpText = "reclaim",           bitmapId = 'reclaim',               preferredSlot = 12, behavior = StandardOrderBehavior},
+    RULEUCC_Capture = {             helpText = "capture",           bitmapId = 'convert',               preferredSlot = 13, behavior = StandardOrderBehavior},
+    RULEUCC_Repair = {              helpText = "repair",            bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior},
+    RULEUCC_Dock = {                helpText = "dock",              bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior},
+
+    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0,},
-    RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1,},    
-    RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2,},
-    RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3,},
-    RULEUTC_ProductionToggle = {    helpText = "toggle_production", bitmapId = 'production',            preferredSlot = 10,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 4,},
-    RULEUTC_StealthToggle = {       helpText = "toggle_stealth",    bitmapId = 'stealth',               preferredSlot = 10,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 5,},
-    RULEUTC_GenericToggle = {       helpText = "toggle_generic",    bitmapId = 'production',            preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 6,},
-    RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7,},
-    RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8,},
+    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
+    RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
+    RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2},
+    RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3},
+    RULEUTC_ProductionToggle = {    helpText = "toggle_production", bitmapId = 'production',            preferredSlot = 10, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 4},
+    RULEUTC_StealthToggle = {       helpText = "toggle_stealth",    bitmapId = 'stealth',               preferredSlot = 10, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 5},
+    RULEUTC_GenericToggle = {       helpText = "toggle_generic",    bitmapId = 'production',            preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 6},
+    RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7},
+    RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8},
 }
 
 local standardOrdersTable = nil
@@ -878,15 +878,14 @@ local specialOrdersTable = {
     RULEUCC_Pause = {behavior = pauseFunc, notAvailableBehavior = disPauseFunc},
 }
 
-
--- this is a used as a set
+-- This is a used as a set
 local commonOrders = {
     RULEUCC_Move = true,
     RULEUCC_Attack = true,
     RULEUCC_Patrol = true,
     RULEUCC_Stop = true,
-    RULEUCC_Guard = true, 
-    RULEUCC_RetaliateToggle = true, 
+    RULEUCC_Guard = true,
+    RULEUCC_RetaliateToggle = true,
     AttackMove = true,
 }
 
@@ -906,19 +905,18 @@ Since this is a table, if you need any more information, for instance, the comma
 you can add it to the table and it will be ignored, so you're safe to put whatever info you need in to it. When the
 OnClick callback is called, self._data will contain this info.
 --]]
-
 local function AddOrder(orderInfo, slot, batchMode)
     batchMode = batchMode or false
 
     local checkbox = Checkbox(controls.orderButtonGrid, GetOrderBitmapNames(orderInfo.bitmapId))
 
-    -- set the info in to the data member for retrieval
+    -- Set the info in to the data member for retrieval
     checkbox._data = orderInfo
 
-    -- set up initial help text
+    -- Set up initial help text
     checkbox._curHelpText = orderInfo.helpText
 
-    -- set up click handler
+    -- Set up click handler
     checkbox.OnClick = orderInfo.behavior
 
     if orderInfo.onframe then
@@ -942,10 +940,10 @@ local function AddOrder(orderInfo, slot, batchMode)
                     self.Incrimenting = true
                 end
             end
-            self.Height:Set(function() return checkbox.Height() + (checkbox.Height() * alpha*.5) end)
-            self.Width:Set(function() return checkbox.Height() + (checkbox.Height() * alpha*.5) end)
+            self.Height:Set(function() return checkbox.Height() + (checkbox.Height() * alpha * .5) end)
+            self.Width:Set(function() return checkbox.Height() + (checkbox.Height() * alpha * .5) end)
             self.Alpha = alpha
-            self:SetAlpha(alpha*.45)
+            self:SetAlpha(alpha * .45)
         end
         checkbox:SetNeedsFrameUpdate(true)
         checkbox.OnFrame = orderInfo.onframe
@@ -977,8 +975,7 @@ local function AddOrder(orderInfo, slot, batchMode)
         end
     end
 
-    -- set up tooltips
-
+    -- Set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             CreateMouseoverDisplay(self, self._curHelpText, 1)
@@ -1004,7 +1001,7 @@ local function AddOrder(orderInfo, slot, batchMode)
         Checkbox.HandleEvent(self, event)
     end
 
-    -- calculate row and column, remove old item, add new checkbox
+    -- Calculate row and column, remove old item, add new checkbox
     local cols, rows = controls.orderButtonGrid:GetDimensions()
     local row = math.ceil(slot / cols)
     local col = math.mod(slot - 1, cols) + 1
@@ -1019,7 +1016,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     return checkbox
 end
 
--- creates the buttons for the common orders, and then disables them if they aren't in the order set
+-- Creates the buttons for the common orders, and then disables them if they aren't in the order set
 local function CreateCommonOrders(availableOrders, init)
     for key in commonOrders do
         local orderInfo = standardOrdersTable[key]
@@ -1038,17 +1035,17 @@ local function CreateCommonOrders(availableOrders, init)
     end
 
     for index, availOrder in availableOrders do
-        if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
+        if not standardOrdersTable[availOrder] then continue end -- Skip any orders we don't have in our table
         if commonOrders[availOrder] then
             local ck = orderCheckboxMap[availOrder]
             ck:Enable()
         end
     end
-    
+
     local units = currentSelection
     if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
-            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0) 
+            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
                     or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
                 orderCheckboxMap['AttackMove']:Enable()
                 break
@@ -1057,13 +1054,9 @@ local function CreateCommonOrders(availableOrders, init)
     end
 end
 
--- creates the buttons for the alt orders, placing them as possible
-local function CreateAltOrders(availableOrders, availableToggles, units)
--- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
--- to determine where they go by using preferred slots
-
-    --Look for units in the selection that have special ability buttons
-    --If any are found, add the ability information to the standard order table
+function AddAbilityButtons(standardOrdersTable, availableOrders, units)
+    -- Look for units in the selection that have special ability buttons
+    -- If any are found, add the ability information to the standard order table
     if units and categories.ABILITYBUTTON and EntityCategoryFilterDown(categories.ABILITYBUTTON, units) then
         for index, unit in units do
             local tempBP = UnitData[unit:GetEntityId()]
@@ -1078,6 +1071,14 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
         end
     end
+end
+
+-- Creates the buttons for the alt orders, placing them as possible
+local function CreateAltOrders(availableOrders, availableToggles, units)
+    -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
+    -- to determine where they go by using preferred slots
+    AddAbilityButtons(standardOrdersTable, availableOrders, units)
+
     local assitingUnitList = {}
     local podUnits = {}
     if table.getn(units) > 0 and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
@@ -1103,8 +1104,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         end
     end
 
-    -- determine what slots to put alt orders
-    -- we first want a table of slots we want to fill, and what orders want to fill them
+    -- Determine what slots to put alt orders
+    -- We first want a table of slots we want to fill, and what orders want to fill them
     local desiredSlot = {}
     local usedSpecials = {}
     for index, availOrder in availableOrders do
@@ -1143,19 +1144,19 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         end
     end
 
-    -- now go through that table and determine what doesn't fit and look for slots that are empty
-    -- since this is only alt orders, just deal with slots 7-12
+    -- Now go through that table and determine what doesn't fit and look for slots that are empty
+    -- Since this is only alt orders, just deal with slots 7-12
     local orderInSlot = {}
 
-    -- go through first time and add all the first entries to their preferred slot
-    for slot = firstAltSlot,numSlots do
+    -- Go through first time and add all the first entries to their preferred slot
+    for slot = firstAltSlot, numSlots do
         if desiredSlot[slot] then
             orderInSlot[slot] = desiredSlot[slot][1]
         end
     end
 
-    -- now put any additional entries wherever they will fit
-    for slot = firstAltSlot,numSlots do
+    -- Now put any additional entries wherever they will fit
+    for slot = firstAltSlot, numSlots do
         if desiredSlot[slot] and table.getn(desiredSlot[slot]) > 1 then
             for index, item in desiredSlot[slot] do
                 if index > 1 then
@@ -1169,23 +1170,22 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                     end
                     if not foundFreeSlot then
                         WARN("No free slot for order: " .. item)
-                        -- could break here, but don't, then you'll know how many extra orders you have
+                        -- Could break here, but don't, then you'll know how many extra orders you have
                     end
                 end
             end
         end
     end
 
-    -- now map it the other direction so it's order to slot
+    -- Now map it the other direction so it's order to slot
     local slotForOrder = {}
     for slot, order in orderInSlot do
         slotForOrder[order] = slot
     end
-    --LOG(repr(availableOrders), repr(orderInSlot), repr(slotForOrder))
 
-    -- create the alt order buttons
+    -- Create the alt order buttons
     for index, availOrder in availableOrders do
-        if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
+        if not standardOrdersTable[availOrder] then continue end -- Skip any orders we don't have in our table
         if not commonOrders[availOrder] then
             local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
@@ -1217,7 +1217,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 
     for index, availToggle in availableToggles do
-        if not standardOrdersTable[availToggle] then continue end   -- skip any orders we don't have in our table
+        if not standardOrdersTable[availToggle] then continue end -- Skip any orders we don't have in our table
         if not commonOrders[availToggle] then
             local orderInfo = standardOrdersTable[availToggle] or AbilityInformation[availToggle]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availToggle], true)
@@ -1241,21 +1241,20 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 end
 
--- called by gamemain when new orders are available,
+-- Called by gamemain when new orders are available,
 function SetAvailableOrders(availableOrders, availableToggles, newSelection)
-    -- save new selection
-    -- LOG('available orders: ', repr(availableOrders))
+    -- Save new selection
     currentSelection = newSelection
-    -- clear existing orders
+    -- Clear existing orders
     orderCheckboxMap = {}
     controls.orderButtonGrid:DestroyAllItems(true)
 
-    -- create our copy of orders table
+    -- Create our copy of orders table
     standardOrdersTable = table.deepcopy(defaultOrdersTable)
 
-    -- look in blueprints for any icon or tooltip overrides
-    -- note that if multiple overrides are found for the same order, then the default is used
-    -- the syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
+    -- Look in blueprints for any icon or tooltip overrides
+    -- Note that if multiple overrides are found for the same order, then the default is used
+    -- The syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
     -- In General table
     -- OrderOverrides = {
     --     RULEUTC_IntelToggle = {
@@ -1263,9 +1262,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     --         helpText = 'toggle_custom',
     --     },
     --  },
-    --
     local orderDiffs
-
     for index, unit in newSelection do
         local overrideTable = unit:GetBlueprint().General.OrderOverrides
         if overrideTable then
@@ -1274,7 +1271,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
                     orderDiffs = {}
                 end
                 if orderDiffs[orderKey] ~= nil and (orderDiffs[orderKey].bitmapId ~= override.bitmapId or orderDiffs[orderKey].helpText ~= override.helpText) then
-                    -- found order diff already, so mark it false so it gets ignored when applying to table
+                    -- Found order diff already, so mark it false so it gets ignored when applying to table
                     orderDiffs[orderKey] = false
                 else
                     orderDiffs[orderKey] = override
@@ -1283,7 +1280,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
     end
 
-    -- apply overrides
+    -- Apply overrides
     if orderDiffs ~= nil then
         for orderKey, override in orderDiffs do
             if override and override ~= false then
@@ -1305,6 +1302,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
             numValidOrders = numValidOrders + 1
         end
     end
+
     for i, v in availableToggles do
         if standardOrdersTable[v] then
             numValidOrders = numValidOrders + 1
@@ -1360,7 +1358,7 @@ end
 function SetLayout(layout)
     layoutVar = layout
 
-    -- clear existing orders
+    -- Clear existing orders
     orderCheckboxMap = {}
     if controls and controls.orderButtonGrid then
         controls.orderButtonGrid:DeleteAndDestroyAll(true)
@@ -1369,23 +1367,21 @@ function SetLayout(layout)
     CreateControls()
     import(UIUtil.GetLayoutFilename('orders')).SetLayout()
 
-    -- created greyed out orders on setup
+    -- Created greyed out orders on setup
     CreateCommonOrders({}, true)
-
-    --controls.orderButtonGrid:EndBatch()
 end
 
--- called from gamemain to create control
+-- Called from gamemain to create control
 function SetupOrdersControl(parent, mfd)
     controls.controlClusterGroup = parent
     controls.mfdControl = mfd
 
-    -- create our copy of orders table
+    -- Create our copy of orders table
     standardOrdersTable = table.deepcopy(defaultOrdersTable)
 
     SetLayout(UIUtil.currentLayout)
 
-    -- setup command mode behaviors
+    -- Setup command mode behaviors
     import('/lua/ui/game/commandmode.lua').AddStartBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
@@ -1393,7 +1389,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(true)
             end
         end
-    )
+)
     import('/lua/ui/game/commandmode.lua').AddEndBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
@@ -1401,7 +1397,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(false)
             end
         end
-    )
+)
 
     return controls.bg
 end
