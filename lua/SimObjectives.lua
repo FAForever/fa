@@ -1974,10 +1974,8 @@ function GetActionIcon(actionString)
     if action == "repair"   then return "/game/orders/repair_btn_up.dds"        end
     if action == "locate"   then return "/game/orders/omni_btn_up.dds"          end
     if action == "group"    then return "/game/orders/move_btn_up.dds"          end
-
-     -- todo: make 'kill or capture' icon?
-    if action == "killorcapture" then return "/game/orders/attack_btn_up.dds" end
-
+    if action == "killorcapture" then return "/game/orders/attack_capture_btn_up.dds" end
+    
     return ""
 end
 
