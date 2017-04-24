@@ -311,6 +311,25 @@ local function LoadDialog(parent)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
 
+    if Prefs.GetOption('loading_tips') then
+        local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
+        tipControl:SetColor(color)
+        LayoutHelpers.CenteredBelow(tipControl, textControl, 20)
+        import('/lua/maui/effecthelpers.lua').Pulse(tipControl, 1, 0, .8)
+        ForkThread(
+            function(control)
+                local tipsTbl = import('/lua/ui/help/loadingtips.lua').Tips
+                local tipsSize = table.getn(tipsTbl)
+                while WorldIsLoading() do
+                    local tipText = LOCF('%s: %s', '<LOC loadingtip_0000>Quick Tip', tipsTbl[Random(1, tipsSize)])
+                    control:SetText(tipText)
+                    WaitSeconds(7)
+                end
+            end,
+            tipControl
+        )
+    end
+
     ConExecute('UI_RenderUnitBars true')
     ConExecute('UI_NisRenderIcons true')
     ConExecute('ren_SelectBoxes true')

@@ -597,6 +597,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0078>Tooltip Delay",
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
+    options_loading_tips = {
+        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
+    },
     options_persistent_built_mode = {
         title = "<LOC OPTIONS_0205>Persistent Build Mode",
         description = "<LOC OPTIONS_0206>Toggles whether build mode is cancelled after pressing a key for a unit",
