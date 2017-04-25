@@ -88,6 +88,10 @@ Patch 3680 (Upcoming)
 - TheKeyBlue
 - ThomasHiatt
 
+### Special Thanks
+- Jackherer (French translations)
+- UnicornNoob (Russian translations)
+
 
 Patch 3676 (27th February, 2017)
 ============================
