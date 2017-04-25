@@ -383,42 +383,50 @@ function UpdateObjectiveItems(skipAnnounce)
         return group
     end
     for tag, objData in objectives do
-        if objData.complete == 'complete' or objData.complete == 'failed' then
-            if controls.objItems[tag] and not skipAnnounce and not objData.announced then
-                local objTag = tag
-                objData.announced = true
-                local announceStr = '<LOC objectives_0000>Objective Completed'
-                if objData.complete == 'failed' then
-                    announceStr = '<LOC objectives_0001>Objective Failed'
+        if objData.hidden then
+            if objData.complete == 'complete' then
+                if not skipAnnounce and not objData.announced then
+                    objData.announced = true
+                    Announcement(LOC('<LOC objectives_0000>Objective Completed'), controls.bg, LOC(objData.title))
                 end
-                Announcement(LOC(announceStr), controls.objItems[objTag], LOC(controls.objItems[objTag].data.title),
-                    function()
-                        if controls.objItems[objTag] then
-                            --LOG('destroying objective chicklet thing')
-                            controls.objItems[objTag]:Destroy()
-                            controls.objItems[objTag] = false
-                            if controls.tooltip and controls.tooltip.ID == objTag then
-                                DestroyTooltip()
-                            end
-                            LayoutObjectiveItems()
-                        end
-                    end)
-            else
-                if controls.objItems[tag] then
-                    controls.objItems[tag]:Destroy()
-                    controls.objItems[tag] = false
-                end
-            end
-            continue
-        end
-        if not controls.objItems[tag] then
-            controls.objItems[tag] = CreateObjectiveItem(objData)
-            if not skipAnnounce then
-                Announcement(LOC('<LOC objectives_0002>Objective Added'), controls.objItems[tag])
-                controls.objItems[tag]:Flash(true)
             end
         else
-            controls.objItems[tag]:Update(objData)
+            if objData.complete == 'complete' or objData.complete == 'failed' then
+                if controls.objItems[tag] and not skipAnnounce and not objData.announced then
+                    local objTag = tag
+                    objData.announced = true
+                    local announceStr = '<LOC objectives_0000>Objective Completed'
+                    if objData.complete == 'failed' then
+                        announceStr = '<LOC objectives_0001>Objective Failed'
+                    end
+                    Announcement(LOC(announceStr), controls.objItems[objTag], LOC(controls.objItems[objTag].data.title),
+                        function()
+                            if controls.objItems[objTag] then
+                                controls.objItems[objTag]:Destroy()
+                                controls.objItems[objTag] = false
+                                if controls.tooltip and controls.tooltip.ID == objTag then
+                                    DestroyTooltip()
+                                end
+                                LayoutObjectiveItems()
+                            end
+                        end)
+                else
+                    if controls.objItems[tag] then
+                        controls.objItems[tag]:Destroy()
+                        controls.objItems[tag] = false
+                    end
+                end
+                continue
+            end
+            if not controls.objItems[tag] then
+                controls.objItems[tag] = CreateObjectiveItem(objData)
+                if not skipAnnounce then
+                    Announcement(LOC('<LOC objectives_0002>Objective Added'), controls.objItems[tag])
+                    controls.objItems[tag]:Flash(true)
+                end
+            else
+                controls.objItems[tag]:Update(objData)
+            end
         end
     end
     LayoutObjectiveItems()
