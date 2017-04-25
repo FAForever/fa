@@ -2256,7 +2256,7 @@ Unit = Class(moho.unit_methods) {
         local id = built:GetUnitId()
         local bp = built:GetBlueprint()
         local index = self:GetArmy()
-        if Game.IsRestricted(id, index) then
+        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
