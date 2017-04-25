@@ -871,6 +871,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     local compStr
                     local compColor = 'ffff0000'
                     local objTitle = objective.title
+                    local objDescription = objective.description
                     if objective.complete == 'complete' then
                         compStr = "<LOC SCORE_0038>Accomplished"
                         compColor = 'ff00ff00'
@@ -888,12 +889,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     elseif objective.type == 'bonus' then
                         hasBonuses = true
                     end
+                    -- Show title and description of hidden objectives only if they're completed
                     if objective.hidden and objective.complete ~= 'complete' then
                         objTitle = "<LOC SCORE_0042>Not Discovered"
+                        objDescription = "<LOC SCORE_0048>This objective will be revealed only after it's completion"
                         compStr = "<LOC SCORE_0054>Incomplete"
                         compColor = 'ff0000ff'
                     end
-                    table.insert(tempObjectives, {title = LOC(objTitle), complete = LOC(compStr), completeColor = compColor, type = objective.type})
+                    table.insert(tempObjectives, {title = LOC(objTitle), description = objDescription, complete = LOC(compStr), completeColor = compColor, type = objective.type})
                 end
             end
 
@@ -1021,6 +1024,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                         line.title:SetFont(UIUtil.bodyFont, 14)
                         line.result:SetText(data.complete or "<LOC key_binding_0001>No action text")
                         line.result:SetColor(data.completeColor)
+                        Tooltip.AddControlTooltip(line.bg, {text = data.title, body = data.description})
                     end
                 end
                 for i, v in objEntries do
