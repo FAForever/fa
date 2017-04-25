@@ -870,6 +870,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 for key, objective in obTable do
                     local compStr
                     local compColor = 'ffff0000'
+                    local objTitle = objective.title
                     if objective.complete == 'complete' then
                         compStr = "<LOC SCORE_0038>Accomplished"
                         compColor = 'ff00ff00'
@@ -887,7 +888,12 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     elseif objective.type == 'bonus' then
                         hasBonuses = true
                     end
-                    table.insert(tempObjectives, {title = LOC(objective.title), complete = LOC(compStr), completeColor = compColor, type = objective.type})
+                    if objective.hidden and objective.complete ~= 'complete' then
+                        objTitle = "<LOC SCORE_0042>Not Discovered"
+                        compStr = "<LOC SCORE_0054>Incomplete"
+                        compColor = 'ff0000ff'
+                    end
+                    table.insert(tempObjectives, {title = LOC(objTitle), complete = LOC(compStr), completeColor = compColor, type = objective.type})
                 end
             end
 

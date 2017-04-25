@@ -1377,6 +1377,9 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         -- success or failure.
         Complete = false,
 
+        -- Hide the objective from the screen
+        Hidden = Target.Hidden,
+
         -- Decal table, keyd by area names
         Decals = {},
 
@@ -1707,6 +1710,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         tag = tag,
         type = Type,
         complete = Complete,
+        hidden = Target.Hidden,
         title = Title,
         description = Description,
         actionImage = ActionImage,
