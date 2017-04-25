@@ -472,7 +472,7 @@ function CreateTooltip(parentControl, objData, container)
         end
         controls.tooltip:Show()
     else
-        controls.tooltip = Bitmap(GetFrame(0), UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
+        controls.tooltip = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
         controls.tooltip.Depth:Set(GetFrame(0):GetTopmostDepth()+1)
 
         controls.tooltip.text = {}
@@ -486,50 +486,50 @@ function CreateTooltip(parentControl, objData, container)
         controls.tooltip.text.desc = {}
         controls.tooltip.text.desc[1] = UIUtil.CreateText(controls.tooltip, '', 12, UIUtil.bodyFont)
 
-        controls.tooltip.bgTL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
+        controls.tooltip.bgTL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
         controls.tooltip.bgTL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgTL.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgTL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgTR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
+        controls.tooltip.bgTR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
         controls.tooltip.bgTR.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgTR.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgTR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.bgLL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
+        controls.tooltip.bgLL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
         controls.tooltip.bgLL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgLL.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgLL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgLR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
+        controls.tooltip.bgLR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
         controls.tooltip.bgLR.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgLR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.bgT = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
+        controls.tooltip.bgT = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
         controls.tooltip.bgT.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgT.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgT.Right:Set(controls.tooltip.Right)
         controls.tooltip.bgT.Left:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgB = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
+        controls.tooltip.bgB = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
         controls.tooltip.bgB.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgB.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgB.Right:Set(controls.tooltip.Right)
         controls.tooltip.bgB.Left:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
+        controls.tooltip.bgL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
         controls.tooltip.bgL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgL.Top:Set(controls.tooltip.Top)
         controls.tooltip.bgL.Bottom:Set(controls.tooltip.Bottom)
         controls.tooltip.bgL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
+        controls.tooltip.bgR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
         controls.tooltip.bgR.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgR.Top:Set(controls.tooltip.Top)
         controls.tooltip.bgR.Bottom:Set(controls.tooltip.Bottom)
         controls.tooltip.bgR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.connector = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
+        controls.tooltip.connector = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
         controls.tooltip.connector.Depth:Set(controls.tooltip.Depth)
     end
 
