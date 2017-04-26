@@ -1333,8 +1333,8 @@ function AMPlatoonCounter(aiBrain, name)
     return aiBrain.AttackData.PlatoonCount[name]
 end
 
-function PlatoonAttackWithTransports(platoon, landingChain, attackChain, instant)
-    ForkThread(PlatoonAttackWithTransportsThread, platoon, landingChain, attackChain, instant)
+function PlatoonAttackWithTransports(platoon, landingChain, attackChain, instant, moveChain)
+    ForkThread(PlatoonAttackWithTransportsThread, platoon, landingChain, attackChain, instant, moveChain)
 end
 
 function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, instant, moveChain)
