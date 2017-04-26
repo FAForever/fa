@@ -1734,8 +1734,6 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             SetupVizMarker(self, unit)
         end
 
-        table.insert(self.IconOverrides, unit)
-
         -- Mark the units unless MarkUnits == false
         if Target.MarkUnits == nil or Target.MarkUnits then
             if Type == 'primary' then
@@ -1745,6 +1743,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             elseif Type == 'bonus' then
                 unit:SetStrategicUnderlay('icon_objective_bonus')
             end
+            table.insert(self.IconOverrides, unit)
         end
     end
 
