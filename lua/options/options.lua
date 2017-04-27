@@ -280,9 +280,6 @@ options = {
                 type = 'toggle',
                 restart = true,
                 default = __language,
-                set = function(key, value, startup)
-                    import('/lua/system/Localization.lua').language(value)
-                end,
                 custom = {
                     states = __installedlanguages,
                 },
