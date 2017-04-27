@@ -1403,8 +1403,8 @@ Unit = Class(moho.unit_methods) {
             local animBlock = self:ChooseAnimBlock(bp)
             if animBlock.Mesh then
                 self:SetMesh(animBlock.Mesh)
-            end
-            if animBlock.Animation and self:ShallSink() then
+            end            
+            if animBlock.Animation and (self:ShallSink() or not EntityCategoryContains(categories.NAVAL, self)) then
                 local sinkAnim = CreateAnimator(self)
                 self:StopRocking()
                 self.DeathAnimManip = sinkAnim
