@@ -139,11 +139,4 @@ function language(la)
     SetPreference('options_overrides.language', __language)
 end
 
--- get selected language from user options.
-local selectedlanguage = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').selectedlanguage
--- only apply language if we have a value. okLanguage will check if the value is valid.
-if selectedlanguage then
-__language = okLanguage(selectedlanguage)
-end
-
 loadLanguage(__language)
