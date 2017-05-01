@@ -6041,11 +6041,11 @@ function InitHostUtils()
             local armyIdx = 1
             local MAXSLOT = 16
             for slotNum = 1, MAXSLOT do
-                local playerInfo = gameinfo.PlayerOptions[slotNum]
+                local playerInfo = gameInfo.PlayerOptions[slotNum]
                 if playerInfo ~= nil then
                     SendPlayerOption(playerInfo, 'Army', armyIdx)
                     armyIdx = armyIdx + 1
-                    slotNum, playerInfo = next(gameinfo.PlayerOptions, nil)
+                    slotNum, playerInfo = next(gameInfo.PlayerOptions, nil)
                 end
             end
         end,
