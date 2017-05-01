@@ -5864,6 +5864,7 @@ function InitHostUtils()
         SendArmySettingsToServer = function()
             local armyIdx = 1
             for slotNum, playerInfo in gameInfo.PlayerOptions do
+                LOG('>> Setting army '..armyIdx..' for slot '..slotNum)
                 SendPlayerOption(playerInfo, 'Army', armyIdx)
                 armyIdx = armyIdx + 1
             end
