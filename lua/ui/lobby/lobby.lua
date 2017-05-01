@@ -5956,10 +5956,15 @@ function InitHostUtils()
         -- Call this function once just before game starts
         SendArmySettingsToServer = function()
             local armyIdx = 1
-            for slotNum, playerInfo in gameInfo.PlayerOptions do
-                LOG('>> Setting army '..armyIdx..' for slot '..slotNum)
-                SendPlayerOption(playerInfo, 'Army', armyIdx)
-                armyIdx = armyIdx + 1
+            local MAXSLOT = 16
+            for slotNum = 1,MAXSLOT do
+                local playerInfo = gameinfo.PlayerOptions[slotNum]
+                if playerInfo ~= nil then
+                    LOG('>> Setting army '..armyIdx..' for slot '..slotNum)
+                    SendPlayerOption(playerInfo, 'Army', armyIdx)
+                    armyIdx = armyIdx + 1
+                    slotNum, playerInfo = next(gameinfo.PlayerOptions, nil)
+                end
             end
         end,
 
