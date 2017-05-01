@@ -6043,6 +6043,7 @@ function InitHostUtils()
             for slotNum = 1, MAXSLOT do
                 local playerInfo = gameInfo.PlayerOptions[slotNum]
                 if playerInfo ~= nil then
+                    LOG('>> Setting army '..armyIdx..' for slot '..slotNum)
                     SendPlayerOption(playerInfo, 'Army', armyIdx)
                     armyIdx = armyIdx + 1
                     slotNum, playerInfo = next(gameInfo.PlayerOptions, nil)
