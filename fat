@@ -1,0 +1,215 @@
+#!/bin/bash
+
+LOG_PATH="C:/temp/supcom.log"
+FA_PATH="C:/ProgramData/FAForever/bin/ForgedAlliance.exe"
+
+UPSTREAM_NAME="fat-upstream"
+UPSTREAM_URI="git://github.com/FAForever/fa.git"
+WORKTREE=".fat/repo"
+INIT_FILE=$(dirname $FA_PATH)/init_fat.lua
+
+PREFS_DIR="$LOCALAPPDATA/Gas Powered Games/Supreme Commander Forged Alliance/"
+
+declare -A FA_OPTIONS
+FA_OPTIONS=(
+    [map]='scmp_009'
+    [faction]='1'
+    [init]='init_fat.lua'
+    [windowed]='1024 768'
+    [log]=$LOG_PATH
+)
+
+# filter of log output
+if [ "$1" = "-f" ]; then
+    LOG_IGNORE="^debug|info|warning: (GRN|GetResource)|NUM PROPS"
+    SED_COLOR="s#warning#\x1b[1;33m&#; s#error#\x1b[1;31m&#; s#info#\x1b[1;32m&#; s#debug#\x1b[1;30m&#"
+    
+    while read line
+    do
+        if [[ $line =~ $LOG_IGNORE ]] ; then
+            :
+        else
+            echo -e "$line\e[0;37m" | sed "$SED_COLOR"
+        fi
+    done < "${2:-/dev/stdin}"
+
+    echo -e "\e[0;37m"
+    exit
+fi
+
+
+function debug {
+    if [[ $DEBUG ]]; then
+        info $1
+    fi
+}
+
+function info {
+    printf "$*\n"
+}
+
+function warn {
+    print $*
+}
+
+function abort {
+    printf $*
+    exit
+}
+
+function pushd () {
+    command pushd "$@" > /dev/null
+}
+
+function popd () {
+    command popd "$@" > /dev/null
+}
+
+function create_init_file()
+{
+    export REPO_PATH=$(realpath $WORKTREE)
+    info "Creating init file at $INIT_FILE"
+    envsubst <init_fat.template.lua >$INIT_FILE 
+}
+
+function add_debug_facilities()
+{
+    prefs_file=$PREFS_DIR/Game.prefs
+
+    if [[ ! -f "$prefs_file" ]]; then
+        echo "$prefs_file not found"
+        exit
+    fi
+
+    grep "enable_debug_facilities = true" "$prefs_file" >/dev/null
+    if [[ $? != 0 ]]; then
+        cp "$prefs_file" "$prefs_file.backup.fat"
+        printf "\ndebug = {\n    enable_debug_facilities = true\n}" >> "$prefs_file"
+    fi
+}
+
+FA_ARGS=()
+function set_fa_args {
+    local retval="$1"
+    #FA_ARGS=()
+    FA_ARGS=(
+        //exitongameover
+        //nobugreport
+    )
+
+    for k in "${!FA_OPTIONS[@]}"
+    do
+        FA_ARGS+=(//$k ${FA_OPTIONS[$k]})
+    done
+}
+
+function start_fa {
+    if [[ ! -f $INIT_FILE ]]
+    then
+        info "$INIT_FILE doesn't exist, creating...'"
+        create_init_file
+    fi
+
+    add_debug_facilities
+    pushd $(dirname $FA_PATH)
+    set_fa_args
+    info "Launching FA..."
+    exec $FA_PATH ${FA_ARGS[@]} &
+    fa_pid=$!
+    debug "FA PID is $fa_pid"
+    popd
+    sleep 1
+    exec tail --pid=$! -f c://temp//supcom.log | ./fat -f    
+}
+
+function git_get_branch() {
+    pushd $WORKTREE
+    branch=$(git status | head -1)
+    branch=${branch##*/}
+    popd
+    debug "Branch is '$branch'"
+}
+
+function git_add_ref {
+    git remote add $UPSTREAM_NAME $UPSTREAM_URI &>/dev/null
+
+    if [[ $? != 0 ]];
+    then
+        abort "Couldn't add $UPSTREAM_URI as reference '$UPSTREAM_NAME'!'"
+        exit
+    fi
+}
+
+function git_clean_refs {
+    git remote remove $UPSTREAM_NAME &>/dev/null
+}
+function git_fetch {
+    ref=.git/refs/remotes/$UPSTREAM_NAME
+    if [[ ! -d $ref ]];
+    then
+        echo "Adding $UPSTREAM as '$UPSTREAM_NAME'..."
+        git_add_ref
+    fi
+
+    info "Fetching latest changes from $UPSTREAM_URI..."
+    git fetch -a $UPSTREAM_NAME 2>&1
+    if [[ $? != 0 ]];
+    then
+        warn "Failed to fetch latest branches"
+    fi
+    
+    output=$(git fetch $UPSTREAM_NAME +refs/pull/*/head:refs/remotes/$UPSTREAM_NAME/pr-* 2>&1)
+    n_new=`echo "$output" | wc -l`
+    n_new=$((n_new-1))
+    if [ $n_new -gt "0" ];
+    then
+        info "Found $n_new updated pull requests!"
+    else
+        info "Everything up to date!"
+    fi
+}
+
+function git_recreate_worktree {
+    info "Creating worktree in $WORKTREE..."
+    #rm -rf $WORKTREE
+    git worktree prune
+    git worktree add --detach -f $WORKTREE develop &>/dev/null
+}
+
+function git_checkout {
+    local branch=$1
+    printf "Checking out '$branch'\n"
+    if [[ ! -d $WORKTREE ]]
+    then
+        info "$WORKTREE doesn't exist, creating...'"
+        git_recreate_worktree $branch
+    fi
+    
+    pushd $WORKTREE
+
+    case "$branch" in
+    pr-*)
+        branch=remotes/$UPSTREAM_NAME/$branch
+        ;;
+    esac
+
+    git checkout --detach $branch &>/dev/null
+    if [[ $? != 0 ]];
+    then
+        abort "Something went wrong when checking out $branch!"
+        exit
+    fi
+    popd
+}
+
+function checkout {
+    git_checkout $1
+}
+
+usage() { printf "Usage:\n$0 <tag|branch|pr-id>\n\nFor example:\n$0 3640\tTest version 3640\n$0 pr-1259\tTest PR #1259\n$0 master\tTest current stable version" ; exit 0; }
+[ $# -eq 0 ] && usage
+
+git_fetch
+checkout $1
+git_get_branch
+start_fa
