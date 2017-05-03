@@ -1,4 +1,4 @@
-last_version = 3676
+last_version = 3677
 changelog = {
     {
         version = 3,
@@ -798,6 +798,16 @@ changelog = {
             '- IceDreamer',
             '- JaggedAppliance',
             '- PhilipJFry',
+        }
+    },
+    {
+        version = 3677,
+        name = 'Game Version 3677',
+        description = {
+            '- Added code to log and potentially fix an issue with army index assignment which may be causing rating irregularities',
+            '',
+            '**Contributors**',
+            '- Duk3Luk3',
         }
     },
 }

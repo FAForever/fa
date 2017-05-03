@@ -37,6 +37,14 @@ Patch 3678 (Upcoming)
 - TheKeyBlue
 
 
+Patch 3677 (3rd May, 2017)
+============================
+- Added code to log and potentially fix an issue with army index assignment which may be causing rating irregularities
+
+### Contributors
+- Duk3Luk3
+
+
 Patch 3676 (27th February, 2017)
 ============================
 ### Other
