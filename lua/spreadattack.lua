@@ -58,7 +58,7 @@ function MakeShadowCopyOrders(command)
   
   local Order = {
     CommandType = TranslatedOrder[command.CommandType],
-    position = command.target.Position,
+    Position = command.target.Position,
     EntityId = nil,
   }
   if command.target.Type == "Entity" then
@@ -104,7 +104,7 @@ local function FixOrders(unit)
   for _,command in ipairs(queue) do
     local Order = {
       CommandType = TranslatedOrder[command.type],
-      position = command.position,
+      Position = command.position,
     }
     if Order.CommandType then
       table.insert(filteredQueue, Order)
@@ -191,7 +191,7 @@ local function FixOrders(unit)
         -- Fix the positions of any moved orders.
         for i = 0, nextOrderIndex - orderIndex - 1, 1 do
           if not unitOrders[i + orderIndex].EntityId then
-            unitOrders[i + orderIndex].position = filteredQueue[i + queueIndex].position
+            unitOrders[i + orderIndex].Position = filteredQueue[i + queueIndex].Position
           end
         end
       else
@@ -207,7 +207,7 @@ local function FixOrders(unit)
         for i = orderIndex, nextOrderIndex - 1, 1 do
           local match = false
           local priority = 2
-          local position = unitOrders[i].position
+          local position = unitOrders[i].Position
           if unitOrders[i].EntityId then
             priority = 3
             local target = GetUnitById(unitOrders[i].EntityId)
@@ -217,7 +217,7 @@ local function FixOrders(unit)
             end
           end      
           for j = lastMatchQueueIndex + 1, nextQueueIndex - 1, 1 do
-            if VDist3Sq(position, filteredQueue[j].position) <= 0.0001 then
+            if VDist3Sq(position, filteredQueue[j].Position) <= 0.0001 then
               -- If the shadow orders and command queue have the same number of entries since the last match,
               -- mark any mismatches in between as matches since no orders were removed.
               if i - j == lastMatchAlignment and j > lastMatchQueueIndex + 1 then
@@ -264,7 +264,7 @@ local function FixOrders(unit)
             if not Matches[i + 1].Match then
               Matches[i + 1].Match = positionIndex
             end
-            unitOrders[i + orderIndex].position = filteredQueue[Matches[i + 1].Match].position
+            unitOrders[i + orderIndex].Position = filteredQueue[Matches[i + 1].Match].Position
           end
           positionIndex = (Matches[i + 1].Match or positionIndex) + 1
         end
@@ -274,7 +274,7 @@ local function FixOrders(unit)
       -- No orders were deleted so just fix any moved orders with position targets.
       for i = 0, nextOrderIndex - orderIndex - 1, 1 do
         if not unitOrders[i + orderIndex].EntityId then
-          unitOrders[i + orderIndex].position = filteredQueue[i + queueIndex].position
+          unitOrders[i + orderIndex].Position = filteredQueue[i + queueIndex].Position
         end
       end
     end
@@ -436,7 +436,7 @@ function GiveOrders(Data)
                 continue
             end
 			
-            local target = order.position
+            local target = order.Position
             if order.EntityId then
                 target = GetEntityById(order.EntityId)
             end
