@@ -58,11 +58,11 @@ function MakeShadowCopyOrders(command)
   
   local Order = {
     CommandType = TranslatedOrder[command.CommandType],
-    Position = command.target.Position,
+    Position = command.Target.Position,
     EntityId = nil,
   }
-  if command.target.Type == "Entity" then
-    Order.EntityId = command.target.EntityId
+  if command.Target.Type == "Entity" then
+    Order.EntityId = command.Target.EntityId
   end
   
   -- Add this order to each individual unit.
@@ -114,7 +114,6 @@ local function FixOrders(unit)
   local numOrders = table.getn(unitOrders)
   
   -- We can't trust the shadow orders if commands were added without getting a copy.
-  -- Orders could still be 
   if numOrders < table.getn(filteredQueue) then
     WARN("Spreadattack: Command queue is longer than the shadow order list.")
     return
