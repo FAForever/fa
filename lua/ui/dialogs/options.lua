@@ -493,7 +493,7 @@ function CreateDialog(over, exitBehavior)
         thread = ForkThread(function()
             for sec = 1, secondsToWait do
                 WaitSeconds(1)
-                dlg._button1.label:SetText(LOC("<LOC _Ok>") .. " [" .. (secondsToWait - sec) .. "]")
+                dlg.content._button1.label:SetText(LOC("<LOC _Ok>") .. " [" .. (secondsToWait - sec) .. "]")
             end
             dlg:Destroy()
             undoFunc()
