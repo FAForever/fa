@@ -157,15 +157,9 @@ function DecreaseBuildCountInQueue(unitIndex, count)
     local tech3 = false
     local supportfactory = false
 
-    if blueprint.Categories then
-        for i, v in ipairs(blueprint.Categories) do
-            if v == 'SUPPORTFACTORY' then
-                supportfactory = true
-            elseif v == 'TECH3' then
-                tech3 = true
-            end
-            if tech3 and supportfactory then break end
-        end
+    if blueprint.CategoriesHash then
+        tech3 = blueprint.CategoriesHash.TECH3
+        supportfactory = blueprint.CategoriesHash.SUPPORTFACTORY
     end
 
     if not (tech3 and supportfactory) then
@@ -350,6 +344,18 @@ function CreateUI()
     controls.enhancementTab = CreateTab(controls.constructionGroup, nil, OnTabCheck)
     controls.enhancementTab.ID = 'enhancement'
     Tooltip.AddCheckboxTooltip(controls.enhancementTab, 'construction_tab_enhancement')
+
+    -- We need this section so that Hotkey labels are kept properly in line with the elements they are attached to, which are reused rather than recreated
+    oldChoicesCalcVisible = controls.choices.CalcVisible
+    controls.choices.CalcVisible = function(self)
+        for i, item in self.Items do
+            if item.hotbuildKeyBg then
+                item.hotbuildKeyBg:Destroy()
+                item.hotbuildKeyText:Destroy()
+            end
+        end
+        oldChoicesCalcVisible(self)
+    end
 end
 
 function OnTabCheck(self, checked)
@@ -462,6 +468,8 @@ function CreateTabs(type)
             desiredTabs = table.getsize(enhancements.Slots)
         end
         defaultTabOrder = { Back = 1, LCH = 2, RCH = 3 }
+    elseif type == 'selection' then
+        activeTab = nil
     end
     while table.getsize(controls.tabs) > desiredTabs do
         controls.tabs[table.getsize(controls.tabs)]:Destroy()
@@ -1658,6 +1666,19 @@ function ToggleUnitPause()
 end
 
 function CreateExtraControls(controlType)
+    local SetupPauseButton = function()
+        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
+        controls.extraBtn2.OnCheck = function(self, checked)
+            SetPaused(sortedOptions.selection, checked)
+        end
+        if pauseEnabled then
+            controls.extraBtn2:Enable()
+        else
+            controls.extraBtn2:Disable()
+        end
+        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+    end
+
     if controlType == 'construction' or controlType == 'templates' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
         controls.extraBtn1.OnClick = function(self, modifiers)
@@ -1691,17 +1712,8 @@ function CreateExtraControls(controlType)
         else
             controls.extraBtn1:Disable()
         end
-
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        
+        SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
         local validForTemplate = true
@@ -1732,16 +1744,9 @@ function CreateExtraControls(controlType)
         else
             controls.extraBtn1:Disable()
         end
-        Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
-        controls.extraBtn2.OnCheck = function(self, checked)
-            SetPaused(sortedOptions.selection, checked)
-        end
-        if pauseEnabled then
-            controls.extraBtn2:Enable()
-        else
-            controls.extraBtn2:Disable()
-        end
-        controls.extraBtn2:SetCheck(GetIsPaused(sortedOptions.selection), true)
+        SetupPauseButton()
+    elseif controlType == 'enhancement' then
+        SetupPauseButton()
     else
         controls.extraBtn1:Disable()
         controls.extraBtn2:Disable()

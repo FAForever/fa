@@ -13,7 +13,6 @@ local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local SimCamera = import('/lua/SimCamera.lua').SimCamera
 local Cinematics = import('/lua/cinematics.lua')
 local SimUIVars = import('/lua/sim/SimUIState.lua')
-local Utilities = import('/lua/Utilities.lua') -- enabled so we can hide strat icons during NISs
 
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
@@ -182,9 +181,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     end
 
     if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
-        --Handle ships that can walk on land...
-        --TODO: Uncomment once we have a sound for URS0201 for this case
-        --self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
+        self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
     end
@@ -944,7 +941,17 @@ end
 function FakeGateInUnit(unit, callbackFunction, bonesToHide)
     local bp = unit:GetBlueprint()
 
-    if EntityCategoryContains( categories.COMMAND + categories.SUBCOMMANDER, unit ) then
+    if EntityCategoryContains( categories.COMMAND, unit ) then
+        if bp.CategoriesHash.UEF then
+            faction = 1
+        elseif bp.CategoriesHash.AEON then
+            faction = 2
+        elseif bp.CategoriesHash.CYBRAN then
+            faction = 3
+        elseif bp.CategoriesHash.SERAPHIM then
+            faction = 4
+        end
+
         unit:HideBone(0, true)
         unit:SetUnSelectable(true)
         unit:SetBusy(true)
@@ -1187,7 +1194,7 @@ end
 function PlayableRectCameraThread( rect )
 --    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
 --    LockInput()
---    cam:UseSystemClock()
+--    cam:UseGameClock()
 --    cam:SyncPlayableRect(rect)
 --    cam:MoveTo(rect, 1)
 --    cam:WaitFor()
@@ -1627,12 +1634,6 @@ function EndOperationSafety( units )
     ScenarioInfo.OpEnded = true
     ResetUITimer() -- turn off any timer going (per Ted)
 
---    if ScenarioInfo.MapData.Decals then
---        for k,v in ScenarioInfo.MapData.Decals do
---            v:Destroy()
---        end
---    end
-
     for k,v in ArmyBrains do
         for subk, subv in ArmyBrains do
             if not IsAlly( k, subk ) then
@@ -1662,17 +1663,14 @@ function EndOperationCamera( unit, track )
     local faction = false
     if EntityCategoryContains( categories.COMMAND, unit ) then
         local bp = unit:GetBlueprint()
-        for k,v in bp.Categories do
-            if v == 'UEF' then
-                faction = 1
-                break
-            elseif v == 'AEON' then
-                faction = 2
-                break
-            elseif v == 'CYBRAN' then
-                faction = 3
-                break
-            end
+        if bp.CategoriesHash.UEF then
+            faction = 1
+        elseif bp.CategoriesHash.AEON then
+            faction = 2
+        elseif bp.CategoriesHash.CYBRAN then
+            faction = 3
+        elseif bp.CategoriesHash.SERAPHIM then
+            faction = 4
         end
     end
     ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), faction, track, unit ,false)
@@ -1685,7 +1683,7 @@ end
 function OperationCameraThread(location, heading, faction, track, unit, unlock, time)
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
     LockInput()
-    cam:UseSystemClock()
+    cam:UseGameClock()
     WaitTicks(1)
     -- Track the unit; not totally working properly yet
     if track and unit then
@@ -1751,6 +1749,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
         -- local rectangle = ScenarioInfo.MapData.PlayableRect
         -- import('/lua/SimSync.lua').SyncPlayableRect(  Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4]) )
         cam:RevertRotation()
+        cam:UseSystemClock()
         -- cam:Reset()
         UnlockInput()
     end
@@ -1766,7 +1765,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         ScenarioInfo.NIS = true
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
         LockInput()
-        cam:UseSystemClock()
+        cam:UseGameClock()
         WaitTicks(1)
 
         local position = unit:GetPosition()
@@ -1779,6 +1778,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         cam:MoveToMarker(marker, blendtime)
         WaitSeconds(holdtime)
         cam:RevertRotation()
+        cam:UseSystemClock()
         UnlockInput()
         ScenarioInfo.NIS = false
     end
@@ -1840,10 +1840,6 @@ function OperationNISCameraThread( unitInfo, camInfo )
     if not ScenarioInfo.NIS or camInfo.overrideCam then
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
 
---        Utilities.UserConRequest('UI_RenderIcons false') -- turn strat icons off
---        Utilities.UserConRequest('UI_RenderUnitBars false') -- turn lifebars off
---        Utilities.UserConRequest('UI_RenResources false') -- turn deposit icons off
-
         local position, heading, vizmarker
         -- Setup camera information
         if camInfo.markerCam then
@@ -1857,7 +1853,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
         ScenarioInfo.NIS = true
 
         LockInput()
-        cam:UseSystemClock()
+        cam:UseGameClock()
         Sync.NISMode = 'on'
 
         if (camInfo.vizRadius) then
@@ -1868,7 +1864,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
-                Army = GetFocusArmy(),
+                Army = 1, -- TODO: First army is always Player, this will do until the system is reworked to fully support multiplayer in campaign
             }
             vizmarker = VizMarker(spec)
             WaitTicks(3) -- this seems to be needed to prevent them from popping in
@@ -1909,11 +1905,8 @@ function OperationNISCameraThread( unitInfo, camInfo )
                 cam:RevertRotation()
             end
             UnlockInput()
+            cam:UseSystemClock()
             Sync.NISMode = 'off'
-
---            Utilities.UserConRequest('UI_RenderIcons true') -- turn strat icons back on
---            Utilities.UserConRequest('UI_RenderUnitBars true') -- turn lifebars back on
---            Utilities.UserConRequest('UI_RenResources true') -- turn deposit icons back on
 
             ScenarioInfo.NIS = false
         -- Otherwise just unlock input, allowing them to click on the "Ok" button on the "Operation ended" box

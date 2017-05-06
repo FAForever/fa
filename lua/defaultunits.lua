@@ -19,6 +19,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
+local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
@@ -293,7 +294,7 @@ StructureUnit = Class(Unit) {
     OnStartBuild = function(self, unitBeingBuilt, order )
         -- check for death loop
         if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
-            return 
+            return
         end
         self.UnitBeingBuilt = unitBeingBuilt
 
@@ -1739,16 +1740,21 @@ AirUnit = Class(MobileUnit) {
         self:SetTurnMult(1)
     end,
 
-    -- Planes need to crash. Therefore, disable OnImpact apart from when called by the attached crash projectile
+    -- Planes need to crash. Called by engine or by ShieldCollider projectile on collision with ground or water
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
+
+        -- Immediately destroy units outside the map
+        if not ScenarioFramework.IsUnitInPlayableArea(self) then
+            self:Destroy()
+        end
 
         -- Only call this code once
         self.GroundImpacted = true
 
         -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
-        if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuffs missing.
-            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint?')
+        if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuff is missing
+            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint? ' .. self:GetUnitId())
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
@@ -1761,6 +1767,7 @@ AirUnit = Class(MobileUnit) {
             self.colliderProj:Destroy()
         end
 
+        self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -1854,7 +1861,7 @@ BaseTransport = Class() {
                 unit.attachmentBone = i
             end
         end
-        
+
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -2031,9 +2038,9 @@ ConstructionUnit = Class(MobileUnit) {
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
-        MobileUnit.OnStopBuild(self,unitBeingBuilt)
+        MobileUnit.OnStopBuild(self, unitBeingBuilt)
         if self.Upgrading then
-            NotifyUpgrade(self,unitBeingBuilt)
+            NotifyUpgrade(self, unitBeingBuilt)
             self:Destroy()
         end
         self.UnitBeingBuilt = nil
@@ -2045,6 +2052,14 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(-1)
         end
         self.BuildingUnit = false
+
+        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
+    end,
+
+    OnFailedToBuild = function(self)
+        MobileUnit.OnFailedToBuild(self)
+
+        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
     end,
 
     WaitForBuildAnimation = function(self, enable)
@@ -2059,14 +2074,15 @@ ConstructionUnit = Class(MobileUnit) {
     OnPrepareArmToBuild = function(self)
         MobileUnit.OnPrepareArmToBuild(self)
 
-        -- LOG( 'OnPrepareArmToBuild' )
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread( self.WaitForBuildAnimation, self, true )
+                ForkThread(self.WaitForBuildAnimation, self, true)
             end
         end
+
+        self:SetImmobile(true) -- Needed to fix a bug where the engine wouldn't correctly report a failed order, leading to move-building
     end,
 
     OnStopBuilderTracking = function(self)
@@ -2141,7 +2157,8 @@ CommandUnit = Class(WalkingLandUnit) {
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
-        self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
+        self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
+        self:SetImmobile(false) -- Needed to re-enable motion after stopping on construction start
     end,
 
     OnFailedToBuild = function(self)
@@ -2176,6 +2193,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(20)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
+        self:SetImmobile(true) -- Needed to fix a bug where the engine wouldn't correctly report a failed order, leading to move-building
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -2260,7 +2278,7 @@ CommandUnit = Class(WalkingLandUnit) {
 
         self:ShowBone(0, true)
         self:SetUnSelectable(false)
-        self:SetBusy(false)        
+        self:SetBusy(false)
         self:SetBlockCommandQueue(false)
 
         for _, v in bones or bp.Display.WarpInEffect.HideBones do

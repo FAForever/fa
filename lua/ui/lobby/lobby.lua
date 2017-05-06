@@ -551,13 +551,6 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
 
-    -- fetch unit blueprints for the Unit Manager
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), false)
-end
-
-function GetBlueprintList()
-    -- return previously fetched blueprints
-    return UnitsAnalyzer.GetBlueprintsList()
 end
 
 -- A map from message types to functions that process particular message types.
@@ -1688,14 +1681,12 @@ function UpdateAvailableSlots( numAvailStartSpots, scenario )
                         break
                     end
                 end
+                UpdateFactionSelector()
             else
                 GUI.slots[i].faction:SetItem(playerFactionIndex)
-                SetPlayerOption(i, 'Faction', playerFactionIndex)
                 gameInfo.PlayerOptions[i].Faction = playerFactionIndex
             end
         end
-        
-        UpdateFactionSelector()
     end
     
     -- if number of available slots has changed, update it
@@ -1800,10 +1791,6 @@ local function TryLaunch(skipNoObserversCheck)
         return
     end
 
-    if not EveryoneHasEstablishedConnections() then
-        return
-    end
-
     if not gameInfo.GameOptions.AllowObservers then
         local hostIsObserver = false
         local anyOtherObservers = false
@@ -1820,30 +1807,22 @@ local function TryLaunch(skipNoObserversCheck)
             return
         end
 
-        if anyOtherObservers then
-            if skipNoObserversCheck then
-                -- we send the observer list before kicking the players, in case they are not registered as observer
-                -- and won't disconnect correctly before the game launch.
-                sendObserversList(gameInfo)
-                for k,observer in gameInfo.Observers:pairs() do
-                    lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
-                end
-                gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
-            else
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
-                                   "<LOC _Yes>", function() TryLaunch(true) end,
-                                   "<LOC _No>", nil,
-                                   nil, nil,
-                                   true,
-                                   {worldCover = false, enterButton = 1, escapeButton = 2}
-                                   )
-                return
-            end
+        if anyOtherObservers and not skipNoObserversCheck then
+            UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
+                                    "<LOC _Yes>", function() TryLaunch(true) end,
+                                    "<LOC _No>", nil, nil, nil, true,
+                                    {worldCover = false, enterButton = 1, escapeButton = 2})
+            return
         end
+
+        HostUtils.KickObservers("GameLaunched")
+    end
+
+    if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
+        return
     end
 
     numberOfPlayers = numPlayers
-
     local function LaunchGame()
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
@@ -2168,8 +2147,6 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         UpdateGame()
     end
-    -- Mods have changed, so fetch blueprints for selected game mods
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 function GetAvailableColor()
@@ -3543,18 +3520,22 @@ function CalcConnectionStatus(peer)
     end
 end
 
-function EveryoneHasEstablishedConnections()
+function EveryoneHasEstablishedConnections(check_observers)
     local important = {}
     for slot, player in gameInfo.PlayerOptions:pairs() do
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
     end
-    for slot, observer in gameInfo.Observers:pairs() do
-        if not table.find(important, observer.OwnerID) then
-            table.insert(important, observer.OwnerID)
+
+    if check_observers then
+        for slot,observer in gameInfo.Observers:pairs() do
+            if not table.find(important, observer.OwnerID) then
+                table.insert(important, observer.OwnerID)
+            end
         end
     end
+
     local result = true
     for k, id in important do
         if id ~= localPlayerID then
@@ -3786,8 +3767,6 @@ function UpdateClientModStatus(newHostSimMods)
     end
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
-    -- fetch blueprints for clients since the host has changed sim mods
-    UnitsAnalyzer.FetchBlueprints(Mods.GetGameMods(), true)
 end
 
 -- LobbyComm Callbacks
@@ -4029,12 +4008,14 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
                 PossiblyAnnounceGameFull()
             elseif data.Type == 'SlotMove' then
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 ClearSlotInfo(data.OldSlot)
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'SwapPlayers' then
                 DoSlotSwap(data.Slot1, data.Slot2)
             elseif data.Type == 'ObserverAdded' then
@@ -4045,11 +4026,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 refreshObserverList()
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'ConvertPlayerToObserver' then
                 gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 ClearSlotInfo(data.OldSlot)
                 refreshObserverList()
+                UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
             elseif data.Type == 'SetColor' then
                 SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
@@ -4331,7 +4314,10 @@ end
 
 function SetPlayerOptions(slot, options, ignoreRefresh)
     if not IsLocallyOwned(slot) and not lobbyComm:IsHost() then
-        WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
+        WARN("Hey you can't set a player option on a slot you don't own:")
+        for key, val in options do
+            WARN("(slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
+        end
         return
     end
 
@@ -4875,9 +4861,19 @@ function CreateUI_Faction_Selector(lastFaction)
     end
 end
 
+function UpdateFactionSelectorForPlayer(playerInfo)
+    if playerInfo.OwnerID == localPlayerID then
+        UpdateFactionSelector()
+    end
+end
+
 function UpdateFactionSelector()
     local playerSlotID = FindSlotForID(localPlayerID)
     local playerSlot = GUI.slots[playerSlotID] 
+    if not playerSlot or not playerSlot.AvailableFactions then
+        UIUtil.setEnabled(GUI.factionSelector, false)
+        return
+    end
     
     local enabledList = {}
     for index,button in GUI.factionSelector.mButtons do
@@ -5516,7 +5512,8 @@ function DoSlotSwap(slot1, slot2)
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
     
-    UpdateFactionSelector()
+    UpdateFactionSelectorForPlayer(player1)
+    UpdateFactionSelectorForPlayer(player2)
 end
 
 function KeepSameFactionOrRandom(slotFrom, slotTo, player)
@@ -5707,7 +5704,7 @@ function InitHostUtils()
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
             
-            UpdateFactionSelector()
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
         end,
 
         RemoveAI = function(slot)
@@ -6097,6 +6094,13 @@ function InitHostUtils()
             end
 
             return -1
+        end,
+
+        KickObservers = function(reason)
+            for k,observer in gameInfo.Observers:pairs() do
+                lobbyComm:EjectPeer(observer.OwnerID, reason or "KickedByHost")
+            end
+            gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
         end
     }
 end

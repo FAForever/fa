@@ -33,7 +33,7 @@ Expressions = {
 -- 4. Try using blueprint's categories and enhancement names:  "(SUBCOMMANDER * ResourceAllocation) - SCUs with RAS preset
 -- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
 
--- NOTE that categories must be in upper case and blueprint IDs should be in lower case
+-- NOTE that categories must be in UPPER case, blueprint IDs in lower case, and enhancement names in CamelCase
 -- both categories and blueprint IDs can be used together or individually but 
 -- they need to be separated by the following operation symbols:
 -- '*'  Intersection = CATEGORY1 and CATEGORY2 and ID1 and ID2 
@@ -71,20 +71,20 @@ Expressions = {
     -- unfortunate, some units must be restricted using their IDs unless their categories are updated with a new TML category
     TMLNAVAL    = "(NUKE * SUBMERSIBLE) + xss0303 + xss0202 + xas0306 + ues0202", -- SERA Carrier + AEON Missile Ship + UEF Cruiser
     TMLDEF      = "(STRUCTURE * TECH2 * ANTIMISSILE)",
-    TMLBASE     = "(STRUCTURE * TECH2 * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
+    TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM) - ARTILLERY", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
 
     -- added exclusion of engineers and structures because they are restricted by other presets 
     LAND        = "(LAND - ENGINEER - STRUCTURE)",  
-    -- added restriction of AA structures because they are not needed when all air units are out
-    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD - SATELLITE))",  
+    -- added restriction of AA structures because they are not needed when all air units are restricted
+    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD - SATELLITE) + (LAND * ANTIAIR - DIRECTFIRE) + (TECH3 * NAVAL * CARRIER * AIRSTAGINGPLATFORM))",  
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
-    NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (SONAR * TECH3))",  
+    NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",  
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",  
     AMPHIBIOUS  = "(AMPHIBIOUS)", -- requires adding AMPHIBIOUS category to appropriate units, e.g. Monkey Lord, CYBRIAN T2 Destroyer
     SUBS        = "(NAVAL * SUBMERSIBLE)",  
 
-    DEF_LAND    = "(STRUCTURE * (DIRECTFIRE + WALL))",
+    DEF_LAND    = "(STRUCTURE * DIRECTFIRE)",
     DEF_AIR     = "(STRUCTURE * ANTIAIR)",
     DEF_NAVY    = "(STRUCTURE * ANTINAVY)",
     DEF_SHIELD  = "(STRUCTURE * SHIELD)",  
@@ -132,10 +132,10 @@ Expressions = {
 
     SUPCOMS      = "(SUBCOMMANDER + GATE)",
     RASCOMS      = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)" 
-    TMLCOMS      = "(SUBCOMMANDER * Missile)",              -- TML SCU PRESET xsl0301_missile
+    TMLCOMS      = "(SUBCOMMANDER * (Missile + RightRocket + LeftRocket))", -- TML SCU PRESET xsl0301_missile
     TELECOMS     = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
 
-    INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR",
+    INTELBASIC   = "(STRUCTURE * (OMNI + RADAR + SONAR)) + MOBILESONAR - DEFENSE",
     INTELOPTICS  = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301", 
     INTELSONAR   = "(STRUCTURE * SONAR) + MOBILESONAR",
     INTELCOUNTER = "(STRUCTURE * COUNTERINTELLIGENCE)",
@@ -154,7 +154,11 @@ local enhancements = {
     TMLPACK = { "Missile", 
                 "MissileRemove", 
                 "TacticalMissile", 
-                "TacticalMissileRemove"},
+                "TacticalMissileRemove",
+                "RightRocket",
+                "RightRocketRemove",
+                "LeftRocket",
+                "LeftRocketRemove"},
     DRONES =  { "LeftPod",          -- ACU Engineering Drone C-D1  
                 "LeftPodRemove",    -- ACU Engineering Drone C-D1  
                 "RightPod",         -- ACU Engineering Drone C-D2 

@@ -205,13 +205,13 @@ Unit = Class(moho.unit_methods) {
 
         --Set up veterancy
         self.xp = 0
-        --self.Sync.xp = self.xp
         self.VeteranLevel = 0
 
         self.debris_Vector = Vector( 0, 0, 0 )
 
+        local bp = self:GetBlueprint()
         --Define Economic modifications
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = bp.Economy
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetConsumptionPerSecondMass(bpEcon.MaintenanceConsumptionPerSecondMass or 0)
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -226,13 +226,13 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        local bpVision = self:GetBlueprint().Intel.VisionRadius
+        local bpVision = bp.Intel.VisionRadius
         self:SetIntelRadius('Vision', bpVision or 0)
 
         self:SetCanTakeDamage(true)
         self:SetCanBeKilled(true)
 
-        local bpDeathAnim = self:GetBlueprint().Display.AnimationDeath
+        local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and table.getn(bpDeathAnim) > 0 then
             self.PlayDeathAnimation = true
         end
@@ -251,7 +251,6 @@ Unit = Class(moho.unit_methods) {
 
         self.Dead = false
 
-        local bp = self:GetBlueprint()
         self:InitBuffFields()
         self:OnCreated()
 
@@ -1206,12 +1205,12 @@ Unit = Class(moho.unit_methods) {
         return self.CanBeKilled
     end,
 
-    --On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self:GetCurrentLayer()
         self.Dead = true
 
-        --Units killed while being invisible because they're teleporting should show when they're killed
+        -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
             self:ShowBone(0, true)
             self:ShowEnhancementBones()
@@ -1221,7 +1220,7 @@ Unit = Class(moho.unit_methods) {
         if layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         elseif layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
-            --Handle ships that can walk on land
+            -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
             self:PlayUnitSound('Killed')
@@ -1232,7 +1231,7 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = true
         end
 
-        self:DoUnitCallbacks( 'OnKilled' )
+        self:DoUnitCallbacks('OnKilled')
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
@@ -1255,7 +1254,7 @@ Unit = Class(moho.unit_methods) {
         ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
     end,
 
-    --Argument val is true or false. False = cannot be killed
+    -- Argument val is true or false. False = cannot be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
@@ -1607,6 +1606,11 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyBeamExhaust()
         self:DestroyAllBuildEffects()
+
+        -- Stop any motion sounds we may have
+        self:StopUnitAmbientSound('AmbientMove')
+        self:StopUnitAmbientSound('AmbientMoveLand')
+        self:StopUnitAmbientSound('AmbientMoveWater')
 
         -- BOOM!
         if self.PlayDestructionEffects then
@@ -2029,7 +2033,7 @@ Unit = Class(moho.unit_methods) {
 
         local bp = self:GetBlueprint()
 
-        if bp.Enhancements and ( table.find(bp.Categories, 'USEBUILDPRESETS') or table.find(bp.Categories, 'ISPREENHANCEDUNIT') ) then
+        if bp.Enhancements and ( bp.CategoriesHash.USEBUILDPRESETS or bp.CategoriesHash.ISPREENHANCEDUNIT ) then
 
             --Create a blank slate: Hide all enhancement bones as specified in the unit BP
             for k, enh in bp.Enhancements do
@@ -2764,17 +2768,17 @@ Unit = Class(moho.unit_methods) {
         end
         
         -- All units want normal vision!
-        if (old == 'None') then
+        if old == 'None' then
             self:EnableIntel('Vision')
         end
 
-        if( new == 'Land' ) then
+        if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
             self:PlayUnitAmbientSound('AmbientMoveLand')
-        elseif(( new == 'Water' ) or ( new == 'Seabed' )) then
+        elseif new == 'Water' or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
             self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif ( new == 'Sub' ) then
+        elseif new == 'Sub' then
             self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
@@ -2782,7 +2786,7 @@ Unit = Class(moho.unit_methods) {
         if not self.Footfalls and bpTable[new].Footfall then
             self.Footfalls = self:CreateFootFallManipulators( bpTable[new].Footfall )
         end
-        self:CreateLayerChangeEffects( new, old )
+        self:CreateLayerChangeEffects(new, old)
 
         -- Trigger the re-worded stuff that used to be inherited, no longer because of the engine bug above.
         if self.LayerChangeTrigger then
@@ -2790,21 +2794,21 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnMotionHorzEventChange = function( self, new, old )
+    OnMotionHorzEventChange = function(self, new, old)
         if self.Dead then
             return
         end
         local layer = self:GetCurrentLayer()
 
-        if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
+        if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
             end
 
-            --Initiate the unit's ambient movement sound
-            --Note that there is not currently an 'Air' version, and that
-            --AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
+            -- Initiate the unit's ambient movement sound
+            -- Note that there is not currently an 'Air' version, and that
+            -- AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
             if not (
                 ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
                 (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
@@ -2817,33 +2821,34 @@ Unit = Class(moho.unit_methods) {
             self:StopRocking()
         end
 
-        if ((new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed')) then
+        if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
             end
 
-            --Units in the water will rock back and forth a bit
+            -- Units in the water will rock back and forth a bit
             if layer == 'Water' then
                 self:StartRocking()
             end
         end
 
-        if( new == 'Stopped' or new == 'Stopping' ) then
-            --Stop ambient sounds
-            self:StopUnitAmbientSound( 'AmbientMove' )
-            self:StopUnitAmbientSound( 'AmbientMoveWater' )
-            self:StopUnitAmbientSound( 'AmbientMoveSub' )
-            self:StopUnitAmbientSound( 'AmbientMoveLand' )
+        if new == 'Stopped' or new == 'Stopping' then
+            -- Stop ambient sounds
+            self:StopUnitAmbientSound('AmbientMove')
+            self:StopUnitAmbientSound('AmbientMoveWater')
+            self:StopUnitAmbientSound('AmbientMoveSub')
+            self:StopUnitAmbientSound('AmbientMoveLand')
         end
 
         if self.MovementEffectsExist then
-            self:UpdateMovementEffectsOnMotionEventChange( new, old )
+            self:UpdateMovementEffectsOnMotionEventChange(new, old)
         end
 
         if old == 'Stopped' then
             self:DoOnHorizontalStartMoveCallbacks()
         end
+
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
             wep:OnMotionHorzEventChange(new, old)
@@ -3408,7 +3413,7 @@ Unit = Class(moho.unit_methods) {
         if not bp.Audio[sound] then return end
         local type = 'Ambient' .. sound
         local entity = self:GetSoundEntity(type)
-        if entity then
+        if entity and not entity:BeenDestroyed() then
             self.Sounds[type] = nil
             entity:SetAmbientSound(nil, nil)
             self.SoundEntities = self.SoundEntities or {}
