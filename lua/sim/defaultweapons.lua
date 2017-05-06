@@ -554,7 +554,23 @@ DefaultProjectileWeapon = Class(Weapon) {
                 self.WeaponCanFire = true
             end
 
-            if bp.CountedProjectile == true  or bp.AnimationReload then
+            if bp.CountedProjectile == true then
+                ChangeState(self, self.RackSalvoFiringState)
+            end
+
+            -- TODO: Investigate if the logic below can be used with CountedProjectile above to nullify the need
+            -- for the ManualLaunchWeapon Class
+            -- This code has the effect of forcing a unit to wait on its firing state to change from Hold Fire
+            -- before resuming the sequence from this point
+            -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
+            -- from OnGotTarget, without waiting for OnFire() to be called from engine.
+            if bp.AnimationReload then
+                if self.unit:GetFireState() == 1 then
+                    while self.unit:GetFireState() == 1 do
+                        WaitTicks(1)
+                    end
+                end
+
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
