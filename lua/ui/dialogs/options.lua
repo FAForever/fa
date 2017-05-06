@@ -22,7 +22,6 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 -- this will hold the working set of options, which won't be valid until applied
 local currentOptionsSet = false
-
 local currentTabButton = false
 local currentTabBitmap = false
 
@@ -65,29 +64,29 @@ local controlTypeCreate = {
                 currentOptionsSet[optionItemData.key] = newDefault
             end
         end
-        
+
         combo.SetCustomData(optionItemData.custom, optionItemData.default)
-       
-        combo.OnClick = function(self, index, text, skipUpdate) 
+
+        combo.OnClick = function(self, index, text, skipUpdate)
             self.Key = index
             currentOptionsSet[optionItemData.key] = combo.keyMap[index]
             if optionItemData.update and not skipUpdate then
                 optionItemData.update(self,combo.keyMap[index])
             end
         end
-        
+
         combo.OnDestroy = function(self)
-			optionItemData.control = nil
-			optionItemData.change = nil
+            optionItemData.control = nil
+            optionItemData.change = nil
         end
-        
+
         optionItemData.control = combo
         optionItemData.change = function(control, value, skipUpdate)
             -- find key in control
             for index, key in control.keyMap do
                 if key == value then
                     -- don't do anything if we're already set to this key
-                    if control:GetItem() != index then
+                    if control:GetItem() ~= index then
                         control:SetItem(index)
                         control:OnClick(index, nil, skipUpdate)
                         return
@@ -95,10 +94,10 @@ local controlTypeCreate = {
                 end
             end
         end
-        
+
         return combo
     end,
-    
+
     button = function(parent, optionItemData)
         local bg = Bitmap(parent, UIUtil.SkinnableFile('/dialogs/options-02/content-btn-line_bmp.dds'))
         bg._button = UIUtil.CreateButtonStd(bg, '/dialogs/standard-small_btn/standard-small', optionItemData.custom.text, 12, 2, 0, "UI_Opt_Mini_Button_Click", "UI_Opt_Mini_Button_Over")
@@ -108,24 +107,24 @@ local controlTypeCreate = {
                 optionItemData.update(self, 0)
             end
         end
-		optionItemData.control = bg
+        optionItemData.control = bg
         optionItemData.change = function(control, value)
             if optionItemData.update then
                 optionItemData.update(control, value)
             end
         end
         bg.OnDestroy = function(self)
-			optionItemData.control = nil
-			optionItemData.change = nil
+            optionItemData.control = nil
+            optionItemData.change = nil
         end
-        
+
         bg.SetCustomData = function(newCustomData, newDefault)
             bg._button.label:SetText(newCustomData)
         end
-        
+
         return bg
     end,
-    
+
     slider = function(parent, optionItemData)
         local sliderGroup = Group(parent)
         sliderGroup.Width:Set(parent.Width)
@@ -133,20 +132,20 @@ local controlTypeCreate = {
 
         sliderGroup._slider = false
         if optionItemData.custom.inc == 0 then
-            sliderGroup._slider = Slider(sliderGroup, false, optionItemData.custom.min, optionItemData.custom.max, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))    
+            sliderGroup._slider = Slider(sliderGroup, false, optionItemData.custom.min, optionItemData.custom.max, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
         else
-            sliderGroup._slider = IntegerSlider(sliderGroup, false, optionItemData.custom.min, optionItemData.custom.max, optionItemData.custom.inc, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))    
+            sliderGroup._slider = IntegerSlider(sliderGroup, false, optionItemData.custom.min, optionItemData.custom.max, optionItemData.custom.inc, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
         end
 
         LayoutHelpers.AtLeftTopIn(sliderGroup._slider, sliderGroup)
-        
+
         sliderGroup._value = UIUtil.CreateText(sliderGroup, "", 12)
         LayoutHelpers.RightOf(sliderGroup._value, sliderGroup._slider)
-        
+
         sliderGroup._slider.OnValueChanged = function(self, newValue)
             sliderGroup._value:SetText(math.floor(tostring(newValue)))
         end
-        
+
         sliderGroup._slider.OnValueSet = function(self, newValue)
             if optionItemData.update then
                 optionItemData.update(self, newValue)
@@ -165,25 +164,25 @@ local controlTypeCreate = {
                 optionItemData.endChange(self)
             end
         end
-        
+
         sliderGroup._slider.OnScrub = function(self,value)
             if optionItemData.update then
                 optionItemData.update(self,value)
             end
         end
 
-		optionItemData.control = sliderGroup._slider
+        optionItemData.control = sliderGroup._slider
         optionItemData.change = function(control, value, skipUpdate)
-			if not skipUpdate then
-			    control:SetValue(value)
-			end
+            if not skipUpdate then
+                control:SetValue(value)
+            end
         end
-        
+
         sliderGroup.OnDestroy = function(self)
-			optionItemData.control = nil
-			optionItemData.change = nil
+            optionItemData.control = nil
+            optionItemData.change = nil
         end
-        
+
         -- set initial value
         sliderGroup._slider:SetValue(currentOptionsSet[optionItemData.key])
 
@@ -194,7 +193,7 @@ local controlTypeCreate = {
             sliderGroup._slider:SetStartValue(newCustomData.min)
             sliderGroup._slider:SetEndValue(newCustomData.max)
         end
-        
+
         return sliderGroup
     end,
 }
@@ -202,7 +201,7 @@ local controlTypeCreate = {
 
 local function CreateOption(parent, optionItemData)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/dialogs/options-02/content-box_bmp.dds'))
-    
+
     bg._label = UIUtil.CreateText(bg, optionItemData.title, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(bg._label, bg, 9, 6)
     bg._label._tipText = optionItemData.key
@@ -214,7 +213,7 @@ local function CreateOption(parent, optionItemData)
             Tooltip.DestroyMouseoverDisplay()
         end
     end
-    
+
     -- this is here to help position the control
     --TODO get this data from layout!
     local controlGroup = Group(bg)
@@ -230,21 +229,21 @@ local function CreateOption(parent, optionItemData)
             LOG(k)
         end
     end
-    
+
     if bg._control then
         LayoutHelpers.AtCenterIn(bg._control, controlGroup)
     end
-    
+
     optionKeyToControlMap[optionItemData.key] = bg._control
-    
+
     return bg
 end
 
 local dialog = false
 
 function CreateDialog(over, exitBehavior)
-	currentOptionsSet = OptionsLogic.GetCurrent()
-    
+    currentOptionsSet = OptionsLogic.GetCurrent()
+
     local parent = false
 
     -- lots of state
@@ -263,27 +262,27 @@ function CreateDialog(over, exitBehavior)
             parent:Destroy()
         end
     end
-    
+
     if over then
         parent = over
     else
         parent = UIUtil.CreateScreenGroup(GetFrame(0), "Options ScreenGroup")
         local background = MenuCommon.SetupBackground(GetFrame(0))
     end
-    
+
     dialog = Bitmap(parent, UIUtil.UIFile('/scx_menu/options/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(dialog, parent)
-    
+
     dialog.brackets = UIUtil.CreateDialogBrackets(dialog, 41, 24, 41, 24)
-    
+
     local title = UIUtil.CreateText(dialog, "<LOC _Options>", 24, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(title, dialog, 30)
     LayoutHelpers.AtHorizontalCenterIn(title, dialog)
-    
+
     if over then
         dialog.Depth:Set(GetFrame(over:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
     end
-    
+
     local function roHandler(self, event)
         if event == 'enter' then
             self.label:SetColor('ff000000')
@@ -291,9 +290,9 @@ function CreateDialog(over, exitBehavior)
             self.label:SetColor(UIUtil.fontColor)
         end
     end
-    
+
     -- layout buttons
-    local applyBtn = Button(dialog, 
+    local applyBtn = Button(dialog,
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -304,8 +303,8 @@ function CreateDialog(over, exitBehavior)
     LayoutHelpers.AtCenterIn(applyBtn.label, applyBtn)
     Tooltip.AddButtonTooltip(applyBtn, 'options_tab_apply')
     applyBtn.OnRolloverEvent = roHandler
-    
-    dialog.cancelBtn = Button(dialog, 
+
+    dialog.cancelBtn = Button(dialog,
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -315,8 +314,8 @@ function CreateDialog(over, exitBehavior)
     LayoutHelpers.AtCenterIn(dialog.cancelBtn.label, dialog.cancelBtn)
     LayoutHelpers.LeftOf(dialog.cancelBtn, applyBtn, -6)
     dialog.cancelBtn.OnRolloverEvent = roHandler
-    
-    local okBtn = Button(dialog, 
+
+    local okBtn = Button(dialog,
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -327,8 +326,8 @@ function CreateDialog(over, exitBehavior)
     LayoutHelpers.LeftOf(okBtn, dialog.cancelBtn, -6)
     okBtn.OnRolloverEvent = roHandler
 
-    
-    local resetBtn = Button(dialog, 
+
+    local resetBtn = Button(dialog,
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
         UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -340,7 +339,7 @@ function CreateDialog(over, exitBehavior)
     Tooltip.AddButtonTooltip(resetBtn, 'options_reset_all')
     resetBtn.OnRolloverEvent = roHandler
 
-    
+
     -- set up button logic
     okBtn.OnClick = function(self, modifiers)
         OptionsLogic.SetCurrent(currentOptionsSet)
@@ -355,8 +354,8 @@ function CreateDialog(over, exitBehavior)
                     option.cancel()
                 end
             end
-        end        
-        
+        end
+
         KillDialog()
         if exitBehavior then exitBehavior() end
     end
@@ -373,23 +372,23 @@ function CreateDialog(over, exitBehavior)
             if exitBehavior then exitBehavior() end
         end
 
-        UIUtil.QuickDialog(dialog, "<LOC options_0002>Are you sure you want to reset to default values?", 
-            "<LOC _Yes>", DoReset, 
-            "<LOC _No>", nil,  
-            nil, nil, 
+        UIUtil.QuickDialog(dialog, "<LOC options_0002>Are you sure you want to reset to default values?",
+            "<LOC _Yes>", DoReset,
+            "<LOC _No>", nil,
+            nil, nil,
             true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
-    
+
     UIUtil.MakeInputModal(dialog, function() okBtn.OnClick(okBtn) end, function() dialog.cancelBtn.OnClick(dialog.cancelBtn) end)
-    
+
     -- set up option grid
     local elementWidth, elementHeight = GetTextureDimensions(UIUtil.UIFile('/dialogs/options-02/content-box_bmp.dds'))
     local optionGrid = Grid(dialog, elementWidth, elementHeight)
     LayoutHelpers.RelativeTo(optionGrid, dialog, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp', 'panel_bmp')
     LayoutHelpers.DimensionsRelativeTo(optionGrid, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp')
     local scrollbar = UIUtil.CreateVertScrollbarFor(optionGrid, -4)
-    
+
     -- set up a page
     function SetNewPage(tabControl)
         -- kill any other page
@@ -409,26 +408,26 @@ function CreateDialog(over, exitBehavior)
         LayoutHelpers.AtCenterIn(currentTabBitmap, currentTabButton)
         local tabLabel = UIUtil.CreateText(currentTabBitmap, tabData.title, 16, UIUtil.titleFont)
         LayoutHelpers.AtCenterIn(tabLabel, currentTabBitmap)
-        
+
         -- remove controls and populate grid
         optionGrid:DeleteAndDestroyAll(true)
         optionGrid:AppendCols(1, true)
-        
+
         -- initialzie key to control map each time page is changed, as controls get destroyed
         optionKeyToControlMap = {}
 
         for index, option in tabData.items do
             optionGrid:AppendRows(1, true)
-            local optCtrl = CreateOption(optionGrid, option) 
+            local optCtrl = CreateOption(optionGrid, option)
             optionGrid:SetItem(optCtrl, 1, index, true)
             if option.init then
                 option.init()
             end
         end
-                
+
         optionGrid:EndBatch()
     end
-    
+
     -- tab layout
     local prev = false
     local defaultTab = false
@@ -436,7 +435,7 @@ function CreateDialog(over, exitBehavior)
     -- get the tab data
     local options = import('/lua/options/options.lua').options
     local optionsOrder = import('/lua/options/options.lua').optionsOrder
-    
+
     for index, key in optionsOrder do
         tabData = options[key]
         local curButton = UIUtil.CreateButtonStd(dialog, '/scx_menu/tab_btn/tab', tabData.title, 16, 0, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
@@ -452,12 +451,12 @@ function CreateDialog(over, exitBehavior)
         curButton.OnClick = function(self, modifiers)
             SetNewPage(self)
         end
-        
+
         curButton.tabData = tabData
     end
-    
+
     SetNewPage(defaultTab)
-    
+
     if not optionGrid:IsScrollable("Vert") then
         scrollbar:Hide()
     end
@@ -467,7 +466,7 @@ function CreateDialog(over, exitBehavior)
             optionKeyToControlMap[optionKey].SetCustomData(newCustomData, newDefault)
         end
     end)
-    
+
     local function OptionRestartFunc(proceedFunc, cancelFunc)
         UIUtil.QuickDialog(GetFrame(0) , "<LOC options_0001>You have modified an option which requires you to restart Forged Alliance. Selecting OK will exit the game, selecting Cancel will revert the option to its prior setting."
             , "<LOC _OK>", proceedFunc
@@ -478,7 +477,7 @@ function CreateDialog(over, exitBehavior)
         )
     end
     OptionsLogic.SetSummonRestartDialogCallback(OptionRestartFunc)
-    
+
     local function VerifyFunc(undoFunc)
         local secondsToWait = 15
         local thread
@@ -490,7 +489,7 @@ function CreateDialog(over, exitBehavior)
             , true
             , {escapeButton = 2, enterButton = 1, worldCover = false}
         )
-        
+
         thread = ForkThread(function()
             for sec = 1, secondsToWait do
                 WaitSeconds(1)
