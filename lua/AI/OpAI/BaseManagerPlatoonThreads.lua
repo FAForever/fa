@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai.opai
+
 --****************************************************************************
 --**
 --**  File     :  /cdimage/lua/ai/opai/BaseManagerPlatoonThreads.lua

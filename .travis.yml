@@ -1,11 +1,16 @@
 language: python
-# Fool! The language is actually lua!
+# Fool! The language is actually Lua!
 
 env:
  - LUAC=luac5.2
 
 install:
- - "sudo apt-get install lua5.2"
+ - sudo apt-get install lua5.2         # Install Lua 5.2
+ - sudo apt-get install liblua5.2-dev  # Required for LDoc
+
+before_script:
+ - cd $TRAVIS_BUILD_DIR 
 
 script:
- - "bash ./run_lua_tests.sh"
+ - bash ./run_lua_tests.sh
+ - bash ./run_ldoc_tests.sh

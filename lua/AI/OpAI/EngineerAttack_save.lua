@@ -1,3 +1,6 @@
+--- AI related module
+-- @submodule lua.ai.opai
+
 function EngineerAttackChildCount(aiBrain, master, number)
     local ScenarioFramework = import('/lua/scenarioframework.lua')
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)

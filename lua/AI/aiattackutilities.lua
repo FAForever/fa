@@ -1,3 +1,5 @@
+--- AI related module
+-- @submodule lua.ai
 #****************************************************************************
 #**
 #**  File     :  /lua/AI/aiattackutilities.lua
