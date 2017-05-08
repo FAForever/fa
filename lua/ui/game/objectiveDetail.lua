@@ -264,14 +264,16 @@ function Create()
                     local time = LOCF("%s %02d:%02d:%02d", prefixStr,
                         math.floor(timeMinutes / 60), math.mod(timeMinutes, 60), math.mod(timeSeconds, 60))
                     line.time:SetText(time)
-                    if data.Status then
-                        if data.Status == 'complete' then
-                            status = "<LOC objui_0003>Complete"
+                    if data.complete == 'complete' then
+                        status = "<LOC objui_0003>Complete"
+                    elseif data.complete == 'incomplete' then
+                        if data.hidden then
+                            status = '<LOC objui_0005>Incomplete'
                         else
-                            status = "<LOC objui_0004>Failed"
+                            status = data.progress or '<LOC objui_0005>Incomplete'
                         end
                     else
-                        status = data.progress or '<LOC objui_0005>Incomplete'
+                        status = "<LOC objui_0004>Failed"
                     end
                     line.status:SetText(LOC(status))
                 end
@@ -418,13 +420,11 @@ function SetDetailTable(id)
     for i, v in titleData do
         table.insert(ObjectiveDetails, {text = v, type = 'title', color = 'ffe4e95f'})
     end
-    local progtext = ObjectiveLogData[id].progress
-    if ObjectiveLogData[id].Status then
-        if ObjectiveLogData[id].Status == 'complete' then
-            progtext = '<LOC objui_0003>'
-        else
-            progtext = '<LOC objui_0004>'
-        end
+    local progtext = ObjectiveLogData[id].progress or ''
+    if ObjectiveLogData[id].complete == 'complete' then
+        progtext = '<LOC objui_0003>'
+    elseif ObjectiveLogData[id].complete == 'failed' then
+        progtext = '<LOC objui_0004>'
     end
     table.insert(ObjectiveDetails, {text = LOC(progtext), type = 'desc', color = 'ffe4e95f'})
     for i, v in descData do
@@ -483,8 +483,7 @@ end
 
 function GetTargetImages(data)
     # look for an image to display
-
-    local overrideImage = data.targetImage
+    local overrideImage = UIUtil.UIFile(data.actionImage)
 
     if (overrideImage) then
         return overrideImage, overrideImage, overrideImage, overrideImage
@@ -514,27 +513,38 @@ end
 function Refresh()
     local primtitle = '<LOC SCORE_0037>'
     local sectitle = '<LOC SCORE_0040>'
+    local bontitle = '<LOC SCORE_0041>Bonus Objectives'
+    local hidtitle = '<LOC SCORE_0042>'
+    local hiddesc = '<LOC SCORE_0048>'
     local comtitle = '<LOC objui_0003>'
     local failtitle = '<LOC objui_0004>'
     local mapinfo = '<LOC sel_map_0000>'
     if isCampaign then
-        Widgets = import('/lua/ui/game/objectives2.lua').Widgets
+        local Objectives = table.deepcopy(import('/lua/ui/game/objectives2.lua').GetCurrentObjectiveTable())
         local sortedPrim = {}
         local sortedSec = {}
+        local sortedBon = {}
         local sortedCom = {}
         local sortedFail = {}
-        for i, v in Widgets do
-            if v.ObjData.Status then
-                if v.ObjData.Status == 'complete' then
-                    table.insert(sortedCom, v.ObjData)
+        for k, ObjData in Objectives do
+            if ObjData.complete ~= 'incomplete' then
+                if ObjData.complete == 'complete' then
+                    table.insert(sortedCom, ObjData)
                 else
-                    table.insert(sortedFail, v.ObjData)
+                    table.insert(sortedFail, ObjData)
                 end
             else
-                if v.ObjData.type == 'primary' then
-                    table.insert(sortedPrim, v.ObjData)
-                else
-                    table.insert(sortedSec, v.ObjData)
+                if ObjData.type == 'primary' then
+                    table.insert(sortedPrim, ObjData)
+                elseif ObjData.type == 'secondary' then
+                    table.insert(sortedSec, ObjData)
+                elseif ObjData.type == 'bonus' then
+                    if ObjData.complete ~= 'complete' then
+                        ObjData.title = hidtitle
+                        ObjData.description = hiddesc
+                        ObjData.actionImage = '/dialogs/objective-unit/help-lg-graphics_bmp.dds'
+                    end
+                    table.insert(sortedBon, ObjData)
                 end
             end
         end
@@ -543,7 +553,7 @@ function Refresh()
             return (t1.EndTime or t1.StartTime) > (t2.EndTime or t2.StartTime)
         end
         if table.getn(sortedPrim) > 0 then
-            ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffe9e45f'}
+            ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffff0000'}
             index = index + 1
             table.sort(sortedPrim, SortFunc)
             for i, v in sortedPrim do
@@ -552,10 +562,19 @@ function Refresh()
             end
         end
         if table.getn(sortedSec) > 0 then
-            ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'ffe9aa5f'}
+            ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'fffff700'}
             index = index + 1
             table.sort(sortedSec, SortFunc)
             for i, v in sortedSec do
+                ObjectiveLogData[index] = table.deepcopy(v)
+                index = index + 1
+            end
+        end
+        if table.getn(sortedBon) > 0 then
+            ObjectiveLogData[index] = {type = 'title', title = bontitle, color = 'ffba00ff'}
+            index = index + 1
+            table.sort(sortedBon, SortFunc)
+            for i, v in sortedBon do
                 ObjectiveLogData[index] = table.deepcopy(v)
                 index = index + 1
             end
