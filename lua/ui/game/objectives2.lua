@@ -196,6 +196,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
     for _, update in updateTable do
         if objectives[update.tag] and objectives[update.tag][update.updateField] then
             if update.updateField == 'complete' and not onLoad then
+                objectives[update.tag].EndTime = GetGameTimeSeconds()
                 needsLayoutUpdate = true
             end
             objectives[update.tag][update.updateField] = update.updateData
