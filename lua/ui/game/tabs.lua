@@ -80,6 +80,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'ShowObj',
+                label='<LOC _Show_Scenario_Info>Scenario',
+                tooltip = 'show_scenario',
+            },
+            {
                 action = 'RestartGame',
                 label = '<LOC _Restart_Game>Restart Game',
                 tooltip = 'esc_restart',
@@ -113,6 +118,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'ShowObj',
+                label='<LOC _Show_Scenario_Info>Scenario',
+                tooltip = 'show_scenario',
+            },
+            {
                 action = 'RestartReplay',
                 label = '<LOC _Restart_Replay>Restart Replay',
                 tooltip = 'esc_restart',
@@ -139,6 +149,11 @@ local menus = {
                 action = 'RehostGame',
                 label = '<LOC _Rehost_Game>Rehost Game',
                 tooltip = 'esc_rehost',
+            },
+            {
+                action = 'ShowObj',
+                label='<LOC _Show_Scenario_Info>Scenario',
+                tooltip = 'show_scenario',
             },
             {
                 action = 'Options',
@@ -168,6 +183,11 @@ local menus = {
                 label = '<LOC _Rehost_Game>Rehost Game',
                 tooltip = 'esc_rehost',
                 hideWhenRanked = true,
+            },
+            {
+                action = 'ShowObj',
+                label='<LOC _Show_Scenario_Info>Scenario',
+                tooltip = 'show_scenario',
             },
             {
                 action = 'ShowGameInfo',
@@ -272,6 +292,9 @@ local actions = {
             nil, nil,
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
+    end,
+    ShowObj = function()
+        import("/lua/ui/game/objectiveDetail.lua").ToggleDisplay()
     end,
     ShowGameInfo = function()
         ToggleGameInfo()
