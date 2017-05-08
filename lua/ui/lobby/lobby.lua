@@ -2781,9 +2781,13 @@ function CreateUI(maxPlayers)
             )
         end
     else
+        local modsManagerCallback = function(active_sim_mods, active_ui_mods)
+            import('/lua/mods.lua').SetSelectedMods(SetUtils.Union(active_sim_mods, active_ui_mods))
+            RefreshOptionDisplayData()
+        end
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', LOC("<LOC _Mod_Manager>"))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI)
+            import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI, false, nil, modsManagerCallback)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
