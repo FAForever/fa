@@ -401,7 +401,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'close_spawn_mex' then
         HostUtils.SetSlotClosedSpawnMex(slot)
     elseif key == 'occupy' then
-        if IsPlayer(localPlayerID) then
+        if IsPlayer(localPlayerID) and not gameInfo.PlayerOptions[FindSlotForID(localPlayerID)].Ready then
             if lobbyComm:IsHost() then
                 HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
             else
@@ -4960,11 +4960,10 @@ end
 function UpdateFactionSelector()
     local playerSlotID = FindSlotForID(localPlayerID)
     local playerSlot = GUI.slots[playerSlotID]
-    if not playerSlot or not playerSlot.AvailableFactions then
+    if not playerSlot or not playerSlot.AvailableFactions or gameInfo.PlayerOptions[playerSlotID].Ready then
         UIUtil.setEnabled(GUI.factionSelector, false)
         return
     end
-
     local enabledList = {}
     for index,button in GUI.factionSelector.mButtons do
         enabledList[index] = false
