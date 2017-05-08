@@ -525,7 +525,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         -- direct import allows data caching in ModsManager
-        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, availableMods, OnModsChanged)
+        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, OnModsChanged)
     end
     dialogContent.modButton = modButton
 

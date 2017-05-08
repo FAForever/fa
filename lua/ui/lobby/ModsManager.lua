@@ -109,8 +109,8 @@ local modsTags = {
 -- @param parent UI control to create the dialog within.
 -- @param IsHost Is the user opening the control the host (and hence able to edit?)
 -- @param availableMods Present only if user is host. The availableMods map from lobby.lua.
-function CreateDialog(parent, availableMods, saveBehaviour)
-    IsHost = availableMods ~= nil
+function CreateDialog(parent, isHost, availableMods, saveBehaviour)
+    IsHost = isHost
     callback = saveBehaviour
 
     mods.availableToAll = availableMods
