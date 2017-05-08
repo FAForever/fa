@@ -206,6 +206,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
                     if not controls.objItems[update.tag].ImageLocked and update.updateData.BlueprintId and DiskGetFileInfo('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds') then
                         if not onLoad then
                             controls.objItems[update.tag].icon:SetTexture('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds')
+                            objectives[update.tag].actionImage = '/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds'
                             controls.objItems[update.tag].ImageLocked = true
                         end
                     end
