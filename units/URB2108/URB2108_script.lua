@@ -7,11 +7,10 @@
 
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CIFMissileLoaTacticalWeapon = import('/lua/cybranweapons.lua').CIFMissileLoaTacticalWeapon
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 URB2108 = Class(CStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(CIFMissileLoaTacticalWeapon, ManualLaunchWeapon) {},
+        CruiseMissile = Class(CIFMissileLoaTacticalWeapon) {},
     },
 }
 

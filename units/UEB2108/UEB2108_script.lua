@@ -7,12 +7,11 @@
 
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 local TIFCruiseMissileLauncher = import('/lua/terranweapons.lua').TIFCruiseMissileLauncher
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 UEB2108 = Class(TStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(TIFCruiseMissileLauncher, ManualLaunchWeapon) {
+        CruiseMissile = Class(TIFCruiseMissileLauncher) {
             FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchBuilding,
         },
     },

@@ -11,7 +11,6 @@ local SDFHeavyQuarnonCannon = SeraphimWeapons.SDFHeavyQuarnonCannon
 local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 local SAAOlarisCannonWeapon = SeraphimWeapons.SAAOlarisCannonWeapon
 local SIFInainoWeapon = SeraphimWeapons.SIFInainoWeapon
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 XSS0302 = Class(SSeaUnit) {
     FxDamageScale = 2,
@@ -25,7 +24,7 @@ XSS0302 = Class(SSeaUnit) {
         AntiMissileRight = Class(SAMElectrumMissileDefense) {},
         AntiAirLeft = Class(SAAOlarisCannonWeapon) {},
         AntiAirRight = Class(SAAOlarisCannonWeapon) {},
-        InainoMissiles = Class(SIFInainoWeapon, ManualLaunchWeapon) {},
+        InainoMissiles = Class(SIFInainoWeapon) {},
     },
 }
 

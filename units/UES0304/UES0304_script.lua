@@ -9,7 +9,6 @@ local TSubUnit = import('/lua/terranunits.lua').TSubUnit
 local WeaponFile = import('/lua/terranweapons.lua')
 local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 
 UES0304 = Class(TSubUnit) {
     DeathThreadDestructionWaitTime = 0,
@@ -47,7 +46,7 @@ UES0304 = Class(TSubUnit) {
             end,
         },
 
-        NukeMissiles = Class(TIFStrategicMissileWeapon, ManualLaunchWeapon) {
+        NukeMissiles = Class(TIFStrategicMissileWeapon) {
             CurrentRack = 1,
 
             PlayFxMuzzleSequence = function(self, muzzle)

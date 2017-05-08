@@ -554,17 +554,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                 self.WeaponCanFire = true
             end
 
-            if bp.CountedProjectile == true then
-                ChangeState(self, self.RackSalvoFiringState)
-            end
-
-            -- TODO: Investigate if the logic below can be used with CountedProjectile above to nullify the need
-            -- for the ManualLaunchWeapon Class
             -- This code has the effect of forcing a unit to wait on its firing state to change from Hold Fire
             -- before resuming the sequence from this point
             -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
             -- from OnGotTarget, without waiting for OnFire() to be called from engine.
-            if bp.AnimationReload then
+            if bp.CountedProjectile == true or bp.AnimationReload then
                 if self.unit:GetFireState() == 1 then
                     while self.unit:GetFireState() == 1 do
                         WaitTicks(1)
@@ -1315,43 +1309,4 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
         local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         myProjectile:PassDamageData(self:GetDamageTable())
     end,
-}
-
--- This weapon class exists to be dual-inherited by weapons on TML and SML
-ManualLaunchWeapon = Class(DefaultProjectileWeapon) {
-    IdleState = State(DefaultProjectileWeapon.IdleState) {
-        -- We need to hook in here because sometimes the weapon attempts to bypass the OnFire check
-        OnGotTarget = function(self)
-            if self.unit:GetFireState() == 1 then -- 1 == Holding fire
-                return
-            else
-                DefaultProjectileWeapon.IdleState.OnGotTarget(self)
-            end
-        end,
-
-        OnFire = function(self)
-            if self.unit:GetFireState() == 1 then -- 1 == Holding fire
-                if not self.delayThread then
-                    self.delayThread = ForkThread(self.DelayFire, self)
-                    self.unit.Trash:Add(self.delayThread)
-                end
-            else
-                if self.delayThread then
-                    KillThread(self.delayThread)
-                    self.delayThread = nil
-                end
-
-                DefaultProjectileWeapon.IdleState.OnFire(self)
-            end
-        end,
-
-        -- Use a thread to delay firing until we're back in action
-        DelayFire = function(self)
-            while self.unit:GetFireState() == 1 do
-                WaitTicks(1)
-            end
-
-            self:OnFire()
-        end,
-    },
 }

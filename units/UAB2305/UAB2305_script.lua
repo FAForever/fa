@@ -7,12 +7,11 @@
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AIFQuantumWarhead = import('/lua/aeonweapons.lua').AIFQuantumWarhead
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
 UAB2305 = Class(AStructureUnit) {
     Weapons = {
-        QuantumMissiles = Class(AIFQuantumWarhead, ManualLaunchWeapon) {
+        QuantumMissiles = Class(AIFQuantumWarhead) {
             UnpackEffects01 = {'/effects/emitters/aeon_nuke_unpack_01_emit.bp',},
 
             PlayFxWeaponUnpackSequence = function(self)

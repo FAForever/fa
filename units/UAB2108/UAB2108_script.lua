@@ -5,13 +5,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local ACruiseMissileWeapon = import('/lua/aeonweapons.lua').ACruiseMissileWeapon
-local ManualLaunchWeapon = import('/lua/sim/defaultweapons.lua').ManualLaunchWeapon
+local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 
 UAB2108 = Class(AStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(ACruiseMissileWeapon, ManualLaunchWeapon) {},
+        CruiseMissile = Class(ACruiseMissileWeapon) {},
     },
 }
 
