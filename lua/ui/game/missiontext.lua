@@ -130,7 +130,15 @@ function PlayMFDMovie(movie, text)
                     self:SetNeedsFrameUpdate(false)
                     controls.movieBrackets:Destroy()
                     controls.movieBrackets = false
-				    SimCallback( { Func = "OnMovieFinished", Args = movie[1]} )
+                    local entryData = {
+                        movie = movie[1], 
+                        text = text, 
+                        soundbank = movie[2], 
+                        soundcue = movie[3], 
+                        faction = movie[4],
+                    }
+                    import('/lua/ui/game/transmissionlog.lua').AddEntry(entryData)
+                    SimCallback( { Func = "OnMovieFinished", Args = movie[1]} )
                 end
             end
         end
