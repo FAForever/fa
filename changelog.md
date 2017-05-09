@@ -29,6 +29,7 @@ Patch 3680 (Upcoming)
 - Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes or hydros
 - Fixed ships sometimes sinking through land
 - Attempted a safety check to try and fix Aeon T2 shields getting the shield up despite having been destroyed in construction
+- Fixed cluster bombers (Janus etc) gaining a new target halfway through a bombing run
 
 ### Lobby
 - Fixed 'Random' faction using 'Random - Unbalanced' tooltip
@@ -42,6 +43,8 @@ Patch 3680 (Upcoming)
 - Removed ability for people to spam the lobby chat with the observer button
 - Fixed several cases of CPU rating not being broadcast properly
 - Added a 'New Message' button to the lobby which jumps to bottom of chat, and disabled the chat auto-hopping to bottom with every new message, if you have scrolled up
+- Fixed the number of active mods not updating for non-hosts when they enable/disable a UI mod
+- Fixed double clicking various elements in the lobby bypassing various restrictions
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
@@ -60,6 +63,9 @@ Patch 3680 (Upcoming)
 - Fixed hotbuild labels in the construction UI not updating when they are re-assigned
 - Lots of text around the UI will now change colour to reflect your faction skin again
 - New Feature: Helpful tips and tricks will now show briefly on the loading screen
+- Fixed language changes not always taking effect on game restart properly
+- Removed nonfunctional language change hotloader
+- Fixed buttons with a countdown not counting down
 
 ### Balance
 - Increased Auto-Overcharge rate of fire from 3.3s to 5s
@@ -74,6 +80,12 @@ Patch 3680 (Upcoming)
 - Allowed restricted units to be captured in COOP
 - Added a new objective type to COOP
 - Added a new icon for the Kill or Capture objective in COOP
+- Objective tooltip in COOP now coloured according to faction skin
+- Various other extensive COOP-only changes
+- Added CZ translation file
+- Added PL translation file
+- Improved RU translations
+- Improved SP translations
 
 ### Contributors
 - CookieNoob
