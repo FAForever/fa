@@ -2681,6 +2681,17 @@ function CreateUI(maxPlayers)
     GUI.mapPanel.Height:Set(198)
     LayoutHelpers.DepthOverParent(GUI.mapPanel, GUI.panel, 2)
 
+    -- Map Preview Info Labels
+    local tooltipText = {}
+    tooltipText['text'] = LOC("<LOC lobui_0772>Map Preview")
+    -- Map Preview Info Labels
+    if isHost then
+        tooltipText['body'] = LOCF("%s\n%s", "<LOC lobui_0769>Left click ACU icon to move yourself or swap players.", "<LOC lobui_0770>Right click ACU icon to close or open the slot.")
+    else
+        tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
+    end
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
