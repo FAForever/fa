@@ -1642,17 +1642,9 @@ BaseManager = Class {
             local template = {
                 'LandScoutTemplate',
                 'NoPlan',
-                { '', 1, 1, 'Scout', 'None' },
+                { 'uel0101', 1, 1, 'Scout', 'None' },
             }
-            if faction == 1 then
-                template[3][1] = 'uel0101'
-            elseif faction == 2 then
-                template[3][1] = 'ual0101'
-            elseif faction == 3 then
-                template[3][1] = 'url0101'
-            elseif faction == 4 then
-                template[3][1] = 'xsl0101'
-            end
+            template = ScenarioUtils.FactionConvert(template, faction)
             return template
         end,
 
@@ -1661,22 +1653,14 @@ BaseManager = Class {
             local template = {
                 'AirScoutTemplate',
                 'NoPlan',
-                { '', 1, 1, 'Scout', 'None' },
+                { 'uea', 1, 1, 'Scout', 'None' },
             }
-            if faction == 1 then
-                template[3][1] = 'uea'
-            elseif faction == 2 then
-                template[3][1] = 'uaa'
-            elseif faction == 3 then
-                template[3][1] = 'ura'
-            elseif faction == 4 then
-                template[3][1] = 'xsa'
-            end
             if techLevel == 3 then
                 template[3][1] = template[3][1] .. '0302'
             else
                 template[3][1] = template[3][1] .. '0101'
             end
+            template = ScenarioUtils.FactionConvert(template, faction)
             return template
         end,
 
@@ -1685,17 +1669,9 @@ BaseManager = Class {
             local template = {
                 'CommanderTemplate',
                 'NoPlan',
-                { '', 1, 1, 'Support', 'None' },
+                { 'uel0001', 1, 1, 'Support', 'None' },
             }
-            if faction == 1 then
-                template[3][1] = 'uel0001'
-            elseif faction == 2 then
-                template[3][1] = 'ual0001'
-            elseif faction == 3 then
-                template[3][1] = 'url0001'
-            elseif faction == 4 then
-                template[3][1] = 'xsl0001'
-            end
+            template = ScenarioUtils.FactionConvert(template, faction)
             return template
         end,
 
@@ -1704,17 +1680,9 @@ BaseManager = Class {
             local template = {
                 'CommanderTemplate',
                 'NoPlan',
-                { '', 1, 1, 'Support', 'None' },
+                { 'uel0301', 1, 1, 'Support', 'None' },
             }
-            if faction == 1 then
-                template[3][1] = 'uel0301'
-            elseif faction == 2 then
-                template[3][1] = 'ual0301'
-            elseif faction == 3 then
-                template[3][1] = 'url0301'
-            elseif faction == 4 then
-                template[3][1] = 'xsl0301'
-            end
+            template = ScenarioUtils.FactionConvert(template, faction)
             return template
         end,
 
@@ -1724,19 +1692,8 @@ BaseManager = Class {
             local template = {
                 'EngineerThing',
                 'NoPlan',
-                { '', 1, size, 'Support', 'None' },
+                { 'uel', 1, size, 'Support', 'None' },
             }
-            -- what faction
-            if faction == 1 then
-                template[3][1] = 'uel'
-            elseif faction == 2 then
-                template[3][1] = 'ual'
-            elseif faction == 3 then
-                template[3][1] = 'url'
-            else
-                template[3][1] = 'xsl'
-            end
-            -- What T level
             if techLevel == 1 then
                 template[3][1] = template[3][1] .. '0105'
             elseif techLevel == 2 then
@@ -1744,6 +1701,7 @@ BaseManager = Class {
             else
                 template[3][1] = template[3][1] .. '0309'
             end
+            template = ScenarioUtils.FactionConvert(template, faction)
             return template
         end,
     }
