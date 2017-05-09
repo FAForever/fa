@@ -11,7 +11,7 @@ local redundantPingCheckTime = 8
 
 function DoNukePing(NukeLaunchData)
 	local pingType = 'nuke'
-    if SessionIsReplay() or import('/lua/ui/game/gamemain.lua').supressExitDialog then return end
+    if SessionIsReplay() or import('/lua/ui/game/gamemain.lua').supressExitDialog or import('/lua/ui/game/gamemain.lua').IsNISMode() then return end
     local position = NukeLaunchData.location
     for _, v in position do
         local var = v
