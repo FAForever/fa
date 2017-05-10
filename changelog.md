@@ -1,4 +1,4 @@
-Patch 3680 (Upcoming)
+Patch 3680 (11th May 2017)
 ============================
 ### Gameplay
 - New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
