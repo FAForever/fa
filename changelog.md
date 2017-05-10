@@ -45,6 +45,7 @@ Patch 3680 (Upcoming)
 - Added a 'New Message' button to the lobby which jumps to bottom of chat, and disabled the chat auto-hopping to bottom with every new message, if you have scrolled up
 - Fixed the number of active mods not updating for non-hosts when they enable/disable a UI mod
 - Fixed double clicking various elements in the lobby bypassing various restrictions
+- Added a tooltip to the map preview top right
 
 ### UI
 - Added new option to change the minimum reclaim label size shown in the overlay
@@ -99,6 +100,7 @@ Patch 3680 (Upcoming)
 - Speed2
 - TheKeyBlue
 - ThomasHiatt
+- Uveso
 
 ### Special Thanks
 - Jackherer (French translations)
