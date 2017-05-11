@@ -936,7 +936,7 @@ changelog = {
             '**Contributors**',
             '- IceDreamer',
             '- MrNukealizer',
-        }
+        },
     },
     {
         version = 3682,
