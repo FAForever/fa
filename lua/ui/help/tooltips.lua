@@ -807,6 +807,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
         description = "<LOC OPTIONS_0220>When on, the UI skin will change to match the faction you are playing",
     },
+    options_faction_font_color = {
+        title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
+        description = "<LOC OPTIONS_0280>When on, the UI font color will change to match the faction you are playing",
+    },
     options_hotbuild_cycle_preview = {
         title = "<LOC OPTIONS_0247>Enable Cycle Preview for Hotbuild",
         description = "<LOC OPTIONS_0248>When on, you can cycle the Hotbuild preview",
