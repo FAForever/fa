@@ -245,7 +245,7 @@ function UpdateWorldBorderState(skin, isOn)
 end
 
 --* skin control, sets the current skin table
-function SetCurrentSkin(skin)
+function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
     if not skinTable then
         skin = 'uef'
@@ -265,7 +265,11 @@ function SetCurrentSkin(skin)
     bodyColor:Set(skinTable.bodyColor)
     factionTextColor:Set(skinTable.factionTextColor)
     factionBackColor:Set(skinTable.factionBackColor)
-    fontColor:Set(skinTable.fontColor)
+    if (overrideTable.faction_font_color == nil and Prefs.GetOption('faction_font_color')) or overrideTable.faction_font_color then
+        fontColor:Set(skinTable.fontColor)
+    else
+        fontColor:Set(skins["default"].fontColor)
+    end
     fontOverColor:Set(skinTable.fontOverColor)
     fontDownColor:Set(skinTable.fontDownColor)
     dialogCaptionColor:Set(skinTable.dialogCaptionColor)
@@ -303,6 +307,10 @@ function SetCurrentSkin(skin)
     end
 
     Prefs.SetToCurrentProfile("skin", skin)
+end
+
+function UpdateCurrentSkin(overrideTable)
+    SetCurrentSkin(currentSkin(), overrideTable)
 end
 
 --* cycle through all available skins
