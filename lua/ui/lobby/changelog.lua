@@ -1,4 +1,4 @@
-last_version = 3680
+last_version = 3681
 changelog = {
     {
         version = 3,
@@ -920,6 +920,22 @@ changelog = {
             '**Special Thanks**',
             '- Jackherer (French translations)',
             '- UnicornNoob (Russian translations)',
+        }
+    },
+    {
+        version = 3681,
+        name = 'Game Version 3681',
+        description = {
+            '**Bugs**',
+            '- Fixed always loading the default or last map, which broke COOP',
+            '- Fixed a typo which broke All Faction Templates',
+            '',
+            '**Other**',
+            '- Reverted the changes to lobby text showing faction colours due to community feedback. This feature will reappear as an option in the future.',
+            '',
+            '**Contributors**',
+            '- IceDreamer',
+            '- MrNukealizer',
         }
     },
 }
