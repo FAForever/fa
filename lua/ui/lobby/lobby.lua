@@ -5123,6 +5123,17 @@ function ShowLobbyOptionsDialog()
         end
         RefreshLobbyBackground()
     end
+    
+    local cbox_FactionFontColor = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0411>Faction Font Color"))
+    LayoutHelpers.AtRightTopIn(cbox_FactionFontColor, dialogContent, 20, 94)
+    cbox_FactionFontColor.OnCheck = function(self, checked)
+        if checked then
+            Prefs.SetOption('faction_font_color', true)
+        else
+            Prefs.SetOption('faction_font_color', false)
+        end
+        UIUtil.UpdateCurrentSkin()
+    end
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
@@ -5141,6 +5152,9 @@ function ShowLobbyOptionsDialog()
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
+    --
+    local FactionFontColor = Prefs.GetOption('faction_font_color')
+    cbox_FactionFontColor:SetCheck(FactionFontColor, true)
 end
 
 -- Load and return the current list of presets from persistent storage.

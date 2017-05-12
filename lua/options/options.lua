@@ -433,6 +433,21 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_0213>Use Factional UI Font Color",
+                key = 'faction_font_color',
+                type = 'toggle',
+                default = true,
+                set = function(key,value,startup)
+                    import('/lua/ui/uiutil.lua').UpdateCurrentSkin({faction_font_color = value})
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0226>Enable Cycle Preview for Hotbuild",
                 key = 'hotbuild_cycle_preview',
                 type = 'toggle',
