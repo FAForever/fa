@@ -2332,7 +2332,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     local function ConvertID(BPID)
                         local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                         for k, prefix in prefixes do
-                            local newBPID = string.gsub(BPID, "(%a +)(%d +)", prefix .. "%2")
+                            local newBPID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
                             if table.find(buildableUnits, newBPID) then
                                 return newBPID
                             end
