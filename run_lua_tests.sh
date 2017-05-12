@@ -3,6 +3,33 @@
 # Ubuntu has luac5.2 instead
 [ -z "$LUAC" ] && LUAC="luac"
 
+
+echo -en 'travis_fold:start:Start Migration Base Test\\r'
+echo '1'
+echo '2'
+echo '3'
+echo -en 'travis_fold:end:End Migration Base Test\\r'
+
+echo -e 'travis_fold:start:Start Migration Base Test\\r'
+echo '1'
+echo '2'
+echo '3'
+echo -e 'travis_fold:end:Start Migration Base Test\\r'
+
+echo -e 'travis_fold:start:Start Migration Base Test'
+echo '1'
+echo '2'
+echo '3'
+echo -e 'travis_fold:end:Start Migration Base Test'
+
+echo 'travis_fold:start:Start Migration Base Test'
+echo '1'
+echo '2'
+echo '3'
+echo 'travis_fold:end:Start Migration Base Test'
+
+
+
 # Simple lua code syntax checker using luac
 
 preprocess_gpg_lua() {
