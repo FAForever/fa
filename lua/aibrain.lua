@@ -138,7 +138,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         self.RepeatExecution = false
 
-        if ScenarioInfo.type == 'campaign' then
+        if ScenarioInfo.type == 'campaign' or ScenarioInfo.type == 'campaign_coop' then
             self:SetResourceSharing(false)
         end
 
