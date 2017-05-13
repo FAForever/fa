@@ -129,6 +129,9 @@ Blacklist = {
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
     
+    -- OneClickWonder
+    ['c5cc7241-d9f8-4b46-8662-ad130e426a4a'] = UPGRADE,
+    
     ['12345678-3343-4bf6-9236-451244fa9999'] = BROKEN,
     ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = OBSOLETE,
     
