@@ -6,12 +6,27 @@ local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 local Prefs = import('/lua/user/prefs.lua')
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
+local EnhanceCommon = import('/lua/enhancementcommon.lua')
 
 local chatDisabled
 local overlayDisabled
 local chatChannel = 'Notify'
 local messages = {}
-local startTime = 0
+
+--[[
+ACUs = {
+    EntityID = {
+        queue = {
+            1 = enhancement
+            2 = enhancement2
+        }
+        workingOn = enhancement
+        thread = watcher
+        startTime = <int>
+    }
+}
+--]]
+local ACUs = {}
 
 function init(isReplay, parent)
     RegisterChatFunc(processNotification, chatChannel)
@@ -121,23 +136,102 @@ function round(num, idp)
   	end
 end
 
-function sendEnhancementMessage(messageTable)
-    local enh = messageTable.enh
-    if chatDisabled or not messages[enh] then return end
+function onStartEnhancement(units, enhancement)
+    if not messages[enhancement] then return end
 
-    local trigger = messageTable.trigger
-    local msg = {to = 'allies', Chat = true}
-    local text
+    local msg = {to = 'allies', Chat = true, text = 'Upgrading ' .. messages[enhancement]}
 
-    if trigger == 'started' then
-        startTime = GetGameTimeSeconds()
-        text = 'Upgrading ' .. messages[enh]
-    elseif trigger == 'cancelled' then
-        text = messages[enh] .. ' cancelled'
-    elseif trigger == 'completed' then
-        text = messages[enh] .. ' done! (' .. round(GetGameTimeSeconds() - startTime, 2) .. 's)'
+    -- Only ACU orders can make it to this point, as other enhancements aren't found in messages
+    for _, unit in units do
+        -- Start by storing entity IDs for future use
+        local id = unit:GetEntityId()
+        if not ACUs[id] then
+            ACUs[id] = {queue = {}, workingOn = false, watcher = false, startTime = 0}
+        end
+
+        local data = ACUs[id]
+        data.startTime = GetGameTimeSeconds()
+
+        if not chatDisabled then
+            SessionSendChatMessage(FindClients(), msg)
+        end
+
+        -- If we're not already working, watch this one
+        if not data.watcher then
+            data.watcher = ForkThread(watchEnhancement, id, enhancement)
+            data.workingOn = enhancement
+            table.insert(data.queue, enhancement)
+        else -- Something is already underway. Put this enhancement in the queue
+            table.insert(data.queue, enhancement)
+        end
     end
+end
 
-    msg.text = text
-    SessionSendChatMessage(FindClients(), msg)
+function onCancelledEnhancement(units)
+    local msg = {to = 'allies', Chat = true}
+
+    for _, unit in units do
+        local data = ACUs[unit:GetEntityId()]
+        if data and data.watcher then
+            local enhancement = data.workingOn
+
+            if not chatDisabled or not messages[enhancement] then
+                msg.text = messages[enhancement] .. ' cancelled'
+                SessionSendChatMessage(FindClients(), msg)
+            end
+
+            -- Kill the watcher and empty the queue
+            KillThread(data.watcher)
+            data.watcher = false
+            data.queue = {}
+            data.workingOn = false
+        end
+    end
+end
+
+-- Called from the enhancement watcher
+function onCompletedEnhancement(id, enhancement)
+    if not messages[enhancement] then return end
+
+    local msg = {to = 'allies', Chat = true}
+
+    local data = ACUs[id]
+    if data then
+        if not chatDisabled then
+            msg.text = messages[enhancement] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            SessionSendChatMessage(FindClients(), msg)
+        end
+
+        KillThread(data.watcher)
+        data.watcher = false
+
+        -- Remove the completed enhancement from the queue
+        for index, enh in data.queue do
+            if enh == enhancement then
+                table.remove(data.queue, index)
+                break
+            end
+        end
+
+        -- If there are further enhancements queued, watch the next one
+        for _, enh in data.queue do
+            data.watcher = ForkThread(watchEnhancement, id, enh)
+            data.workingOn = enh
+        end
+    end
+end
+
+function watchEnhancement(id, enhancement)
+    while true do
+        WaitSeconds(0.1)
+        local currentEnhancements = EnhanceCommon.GetEnhancements(id)
+        if currentEnhancements then
+            for slot, enh in currentEnhancements do
+                if enh == enhancement then
+                    onCompletedEnhancement(id, enhancement)
+                    return
+                end
+            end
+        end
+    end
 end
