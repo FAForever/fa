@@ -193,7 +193,7 @@ local menus = {
                 label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
-                  {
+            {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
