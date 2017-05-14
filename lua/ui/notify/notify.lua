@@ -192,6 +192,7 @@ function onCompletedEnhancement(id, enhancement)
 
         KillThread(data.watcher)
         data.watcher = false
+        data.workingOn = false
 
         -- Remove the completed enhancement from the queue
         for index, enh in data.queue do
@@ -203,8 +204,9 @@ function onCompletedEnhancement(id, enhancement)
 
         -- If there are further enhancements queued, watch the next one
         for _, enh in data.queue do
-            data.watcher = ForkThread(watchEnhancement, id, enh)
-            data.workingOn = enh
+            local unit = GetUnitById(id)
+            onStartEnhancement({unit}, enh)
+            break
         end
     end
 end
