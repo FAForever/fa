@@ -11,6 +11,8 @@ PreviousSync = {}
 UnitData = {}
 
 local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
+local notify = import('/lua/ui/notify/notify.lua')
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
     if Sync.RequestingExit then
@@ -83,5 +85,13 @@ function OnSync()
 
     if Sync.EnforceRating then
         GpgNetSend('EnforceRating')
+    end
+
+    if not table.empty(Sync.EnhanceMessage) then
+        for _, message in Sync.EnhanceMessage do
+            if message.trigger == 'completed' then
+                notify.enhancementCompleted(message.enh)
+            end
+        end
     end
 end
