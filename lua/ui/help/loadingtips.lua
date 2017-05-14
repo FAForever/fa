@@ -30,7 +30,7 @@ Tips = {
     "<LOC loadingtip_0028>It is best to build your own Air Scouts in team games rather than being dependent on teammates",
     "<LOC loadingtip_0029>Orders can be cancelled by Ctrl+Shift+Right Click",
     "<LOC loadingtip_0030>Units on Attack Move will stop and attack units in their weapon range",
-    "<LOC loadingtip_0031>Patrol and Attack Move have the same functionality but Patrol is endless",
+    "<LOC loadingtip_0031>Patrol and Attack Move have the same functionality, but Patrol is endless",
     "<LOC loadingtip_0032>T1 Mobile Artillery is often the best way to kill T1 Point Defenses",
     "<LOC loadingtip_0033>Power Generators adjacent to Static Artilleries will increase their rate of fire",
     "<LOC loadingtip_0034>Engineers make for more efficient build power than Engineering Stations",
