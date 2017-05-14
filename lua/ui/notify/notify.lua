@@ -2,6 +2,7 @@
 -- when you order and complete ACU upgrades
 
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
+local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
 local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 local Prefs = import('/lua/user/prefs.lua')
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
@@ -29,7 +30,7 @@ ACUs = {
 local ACUs = {}
 
 function init(isReplay, parent)
-    RegisterChatFunc(processNotification, chatChannel)
+    RegisterChatFunc(NotifyOverlay.processNotification, chatChannel)
     AddChatCommand('enablenotify', toggleNotify)
     AddChatCommand('disablenotify', toggleNotify)
     AddChatCommand('enablenotifychat', toggleNotifyChat)
@@ -52,20 +53,6 @@ function init(isReplay, parent)
         Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', false)
         Prefs.SavePreferences()
     end
-end
-
-function processNotification(players, msg)
-    local args = {}
-
-    for word in string.gfind(msg.text, "%S+") do
-        table.insert(args, word)
-    end
-
-    for _, k in {1, 3, 4, 5, 6, 7} do
-        args[k] = tonumber(args[k])
-    end
-
-    updateEnhancementOverlay(args)
 end
 
 function populateMessages()
@@ -142,6 +129,7 @@ function onStartEnhancement(units, enhancement)
     local msg = {to = 'allies', Chat = true, text = 'Upgrading ' .. messages[enhancement]}
 
     -- Only ACU orders can make it to this point, as other enhancements aren't found in messages
+    -- Additionally you can't give orders to a group of an ACU mixed with any other bpid, so they're all one type of ACU
     for _, unit in units do
         -- Start by storing entity IDs for future use
         local id = unit:GetEntityId()
@@ -222,6 +210,13 @@ function onCompletedEnhancement(id, enhancement)
 end
 
 function watchEnhancement(id, enhancement)
+    local data = {}
+    data.unit = GetUnitById(id)
+    data.pos = data.unit:GetPosition()
+    data.buildTime = data.unit:GetBlueprint().Enhancements[enhancement].BuildTime
+    data.msg = {to = 'allies', Notify = true}
+    data.id = id
+
     while true do
         WaitSeconds(0.1)
         local currentEnhancements = EnhanceCommon.GetEnhancements(id)
@@ -232,6 +227,11 @@ function watchEnhancement(id, enhancement)
                     return
                 end
             end
+        end
+
+        -- Handle the overlay creation and broadcast
+        if not overlayDisabled then
+            NotifyOverlay.generateEnhancementMessage(data)
         end
     end
 end
