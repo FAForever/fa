@@ -15,7 +15,6 @@ local animationLock = false
 local gameOver = false
 local activeTab = false
 local pauseBtn = false
---local infoBtn = false
 
 timeoutsRemaining = false
 
@@ -804,9 +803,8 @@ function TogglePause()
 end
 
 function ToggleGameInfo()
-    --LOG("XINNOinfo")
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
-    --
+
     local dialog = Group(GetFrame(0))
         LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
         dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
@@ -815,8 +813,8 @@ function ToggleGameInfo()
         dialog.Height:Set(background.Height)
         LayoutHelpers.FillParent(background, dialog)
     local dialog2 = Group(dialog)
-        dialog2.Width:Set(background.Width)--536)537--268
-        dialog2.Height:Set(background.Height)--400)401
+        dialog2.Width:Set(background.Width)
+        dialog2.Height:Set(background.Height)
         LayoutHelpers.AtCenterIn(dialog2, dialog)
     -----------
     -- Title --
