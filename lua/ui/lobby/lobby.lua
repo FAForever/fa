@@ -4273,16 +4273,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         -- The key, LastScenario, is referred to from GPG code we don't hook.
         if not self.desiredScenario or self.desiredScenario == "" then
-            local scenarioInfo = MapUtil.LoadScenario(Prefs.GetFromCurrentProfile("LastScenario"))
-            if scenarioInfo and scenarioInfo.type == UIUtil.requiredType then
-                self.desiredScenario = Prefs.GetFromCurrentProfile("LastScenario")
-            else
-                self.desiredScenario = UIUtil.defaultScenario
-            end
+            self.desiredScenario = Prefs.GetFromCurrentProfile("LastScenario")
         end
-        if self.desiredScenario and self.desiredScenario ~= "" then
-            SetGameOption('ScenarioFile', self.desiredScenario, true)
+        local scenarioInfo = MapUtil.LoadScenario(self.desiredScenario)
+        if not scenarioInfo or scenarioInfo.type != UIUtil.requiredType then
+            self.desiredScenario = UIUtil.defaultScenario
         end
+        SetGameOption('ScenarioFile', self.desiredScenario, true)
 
         GUI.keepAliveThread = ForkThread(
         -- Eject players who haven't sent a heartbeat in a while
