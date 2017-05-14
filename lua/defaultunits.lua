@@ -2245,29 +2245,40 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
 
         -- Send a chat message to allies according to the enhancement
-        if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-        local message = {enh = enh, trigger = 'completed'}
-        table.insert(Sync.EnhanceMessage, message)
+        local myBrain = GetArmyBrain(GetCurrentCommandSource())
+        local unitBrain = self:GetAIBrain()
+        if myBrain == unitBrain then
+            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+            local message = {enh = enh, trigger = 'completed'}
+            table.insert(Sync.EnhanceMessage, message)
+        end
     end,
 
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
+        if not legalWork then return end
 
         -- Send a chat message to allies if work is an enhancement
-        if legalWork then
+        local myBrain = GetArmyBrain(GetCurrentCommandSource())
+        local unitBrain = self:GetAIBrain()
+        if myBrain == unitBrain then
             if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
             local message = {enh = work, trigger = 'started'}
             table.insert(Sync.EnhanceMessage, message)
         end
 
-        return legalWork
+        return true
     end,
 
     OnWorkFail = function(self, work)
         -- Send a chat message to allies if work is an enhancement
-        if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-        local message = {enh = work, trigger = 'cancelled'}
-        table.insert(Sync.EnhanceMessage, message)
+        local myBrain = GetArmyBrain(GetCurrentCommandSource())
+        local unitBrain = self:GetAIBrain()
+        if myBrain == unitBrain then
+            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+            local message = {enh = work, trigger = 'cancelled'}
+            table.insert(Sync.EnhanceMessage, message)
+        end
 
         CommandUnit.OnWorkFail(self, work)
     end,
