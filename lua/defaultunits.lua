@@ -2250,6 +2250,28 @@ ACUUnit = Class(CommandUnit) {
         table.insert(Sync.EnhanceMessage, message)
     end,
 
+    OnWorkBegin = function(self, work)
+        local legalWork = CommandUnit.OnWorkBegin(self, work)
+
+        -- Send a chat message to allies if work is an enhancement
+        if legalWork then
+            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+            local message = {enh = work, trigger = 'started'}
+            table.insert(Sync.EnhanceMessage, message)
+        end
+
+        return legalWork
+    end,
+
+    OnWorkFail = function(self, work)
+        -- Send a chat message to allies if work is an enhancement
+        if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+        local message = {enh = work, trigger = 'cancelled'}
+        table.insert(Sync.EnhanceMessage, message)
+
+        CommandUnit.OnWorkFail(self, work)
+    end,
+
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())

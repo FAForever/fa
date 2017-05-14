@@ -11,7 +11,7 @@ PreviousSync = {}
 UnitData = {}
 
 local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
-local notify = import('/lua/ui/notify/notify.lua')
+local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
@@ -88,10 +88,8 @@ function OnSync()
     end
 
     if not table.empty(Sync.EnhanceMessage) then
-        for _, message in Sync.EnhanceMessage do
-            if message.trigger == 'completed' then
-                notify.enhancementCompleted(message.enh)
-            end
+        for _, messageTable in Sync.EnhanceMessage do
+            sendEnhancementMessage(messageTable)
         end
     end
 end

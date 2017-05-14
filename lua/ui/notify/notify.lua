@@ -21,7 +21,7 @@ function init(isReplay, parent)
     AddChatCommand('disablenotifychat', toggleNotifyChat)
     AddChatCommand('enablenotifyoverlay', toggleNotifyOverlay)
     AddChatCommand('disablenotifyoverlay', toggleNotifyOverlay)
-    
+
     populateMessages()
 
     chatDisabled = Prefs.GetFromCurrentProfile('Notify_Chat_Disabled')
@@ -121,9 +121,23 @@ function round(num, idp)
   	end
 end
 
-function enhancementCompleted(enh)
+function sendEnhancementMessage(messageTable)
+    local enh = messageTable.enh
     if chatDisabled or not messages[enh] then return end
 
-    msg = {to = 'allies', Chat = true, text = messages[enh] .. ' done! (' .. round(GetGameTimeSeconds() - startTime, 2) .. 's)'}
+    local trigger = messageTable.trigger
+    local msg = {to = 'allies', Chat = true}
+    local text
+
+    if trigger == 'started' then
+        startTime = GetGameTimeSeconds()
+        text = 'Upgrading ' .. messages[enh]
+    elseif trigger == 'cancelled' then
+        text = messages[enh] .. ' cancelled'
+    elseif trigger == 'completed' then
+        text = messages[enh] .. ' done! (' .. round(GetGameTimeSeconds() - startTime, 2) .. 's)'
+    end
+
+    msg.text = text
     SessionSendChatMessage(FindClients(), msg)
 end
