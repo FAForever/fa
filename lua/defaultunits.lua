@@ -2240,6 +2240,15 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    CreateEnhancement = function(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
+
+        -- Send a chat message to allies according to the enhancement
+        if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+        local message = {enh = enh, trigger = 'completed'}
+        table.insert(Sync.EnhanceMessage, message)
+    end,
+
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
