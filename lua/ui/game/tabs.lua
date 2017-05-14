@@ -79,6 +79,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'KeyBindings',
+                label = '<LOC key_binding_0000>Key Bindings',
+                tooltip = 'esc_keyBindings',
+            },
+            {
                 action = 'ShowObj',
                 label='<LOC _Show_Scenario_Info>Scenario',
                 tooltip = 'show_scenario',
@@ -115,6 +120,11 @@ local menus = {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
+            },
+            {
+                action = 'KeyBindings',
+                label = '<LOC key_binding_0000>Key Bindings',
+                tooltip = 'esc_keyBindings',
             },
             {
                 action = 'ShowObj',
@@ -160,6 +170,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'KeyBindings',
+                label = '<LOC key_binding_0000>Key Bindings',
+                tooltip = 'esc_keyBindings',
+            },
+            {
                 action = 'EndMPGame',
                 label = '<LOC _End_Game>',
                 tooltip = 'esc_quit',
@@ -197,6 +212,11 @@ local menus = {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
+            },
+            {
+                action = 'KeyBindings',
+                label = '<LOC key_binding_0000>Key Bindings',
+                tooltip = 'esc_keyBindings',
             },
             {
                 action = 'ExitMPGame',
@@ -303,6 +323,9 @@ local actions = {
     end,
     Options = function()
         import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0))
+    end,
+    KeyBindings = function()
+        import("/lua/ui/dialogs/keybindings.lua").CreateUI()
     end,
 }
 
