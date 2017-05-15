@@ -109,7 +109,6 @@ function sendEnhancementMessage(messageTable)
         onCancelledEnhancement(id, enh)
     elseif trigger == 'completed' then
         onCompletedEnhancement(id, enh)
-        text = messages[enh] .. ' done! (' .. round(GetGameTimeSeconds() - startTime, 2) .. 's)'
     end
 end
 
