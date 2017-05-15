@@ -36,6 +36,12 @@ local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
+local ignoreSelection = false
+function SetIgnoreSelection(ignore)
+    ignoreSelection = ignore
+    import('/lua/ui/game/commandmode.lua').SetIgnoreSelection(ignore)
+end
+
 -- generating hotbuild modifier shortcuts on the fly
 modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
 IN_AddKeyMapTable(modifiersKeys)
@@ -472,6 +478,10 @@ end
 -- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+    if ignoreSelection then
+        return
+    end
+
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
