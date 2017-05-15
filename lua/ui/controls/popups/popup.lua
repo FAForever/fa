@@ -52,10 +52,10 @@ Popup = Class(Group) {
         end
 
         ---- Close when the escape key is pressed.
-        --EscapeHandler.PushEscapeHandler(function()
-        --    EscapeHandler.PopEscapeHandler()
-        --    this:OnEscapePressed()
-        --end)
+        EscapeHandler.PushEscapeHandler(function()
+            EscapeHandler.PopEscapeHandler()
+            this:OnEscapePressed()
+        end)
     end,
 
     --- Close the dialog.
@@ -76,7 +76,6 @@ Popup = Class(Group) {
 
     --- Called when the dialog is closed via any method.
     OnClosed = function(self)
-        LOG("Popup.OnClosed")
         EscapeHandler.PopEscapeHandler()
     end,
 }
