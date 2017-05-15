@@ -445,6 +445,36 @@ function UpdateWindow(info)
             end
         end
     end
+
+    UpdateEnhancementIcons(info)
+end
+
+local GetEnhancementPrefix = import('/lua/ui/game/construction.lua').GetEnhancementPrefix
+function UpdateEnhancementIcons(info)
+    local unit = info.userUnit
+    local existingEnhancements
+    if unit then
+        existingEnhancements = EnhancementCommon.GetEnhancements(unit:GetEntityId())
+    end
+
+    for slot, enhancement in controls.enhancements do
+        if unit == nil or
+                (not unit:IsInCategory('COMMAND') and not unit:IsInCategory('SUBCOMMANDER')) or
+                existingEnhancements == nil or existingEnhancements[slot] == nil then
+            enhancement:Hide()
+            continue
+        end
+
+        local bp = unit:GetBlueprint()
+        local bpId = bp.BlueprintId
+        local enhancementBp = bp.Enhancements[existingEnhancements[slot]]
+        local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'
+
+        enhancement:Show()
+        enhancement:SetTexture(UIUtil.UIFile(texture))
+        enhancement.Width:Set(30)
+        enhancement.Height:Set(30)
+    end
 end
 
 function ShowROBox()
@@ -516,6 +546,16 @@ function CreateUI()
             self:SetAlpha(0, true)
         end
     end
+
+    -- This section is for the small icons showing what active enhancements an ACU has
+	controls.enhancements = {}
+	controls.enhancements['RCH'] = Bitmap(controls.bg)
+	controls.enhancements['Back'] = Bitmap(controls.bg)
+	controls.enhancements['LCH'] = Bitmap(controls.bg)
+
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
 end
 
 function OnSelection(units)
