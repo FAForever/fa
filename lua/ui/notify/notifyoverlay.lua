@@ -4,8 +4,33 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Prefs = import('/lua/user/prefs.lua')
 
+local overlayDisabled
 overlays = {}
+
+function setOverlayDisabled(bool)
+    overlayDisabled = bool
+end
+
+function getOverlayDisabled()
+    return overlayDisabled
+end
+
+function toggleNotifyOverlay(args)
+    if args[1] == 'enablenotifyoverlay' then
+        overlayDisabled = false
+        print 'Notify Overlay Enabled'
+    elseif args[1] == 'disablenotifyoverlay' then
+        overlayDisabled = true
+        print 'Notify Overlay Disabled'
+    end
+
+    if not args[2] or args[2] ~= 'once' then
+        Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', overlayDisabled)
+        Prefs.SavePreferences()
+    end
+end
 
 -- This is called when we recieve a chat message from another player in the 'Notify' chat channel
 -- These messages are generated below in onStartEnhancement
@@ -20,7 +45,9 @@ function processNotification(players, msg)
         args[k] = tonumber(args[k])
     end
 
-    updateEnhancementOverlay(args)
+    if not overlayDisabled then
+        updateEnhancementOverlay(args)
+    end
 end
 
 function round(num, idp)
@@ -39,11 +66,11 @@ function createEnhancementOverlay(id, pos)
 	overlay.Height:Set(50)
 	overlay.id = id
 	overlay.pos = pos
-	overlay.lastUpdate = GetSystemTimeSeconds()
+	overlay.lastUpdate = GameTick()
 
 	overlay:SetNeedsFrameUpdate(true)
 	overlay.OnFrame = function(self, delta)
-		if GetSystemTimeSeconds() - overlay.lastUpdate > 1 then
+		if GameTick() - overlay.lastUpdate > 1 then
 			overlays[id] = nil
 			overlay:Destroy()
 			return
@@ -94,7 +121,7 @@ function updateEnhancementOverlay(args)
 		end
 		overlay.eta:SetText("ETA " .. string.format("%.2d:%.2d", eta / 60, math.mod(eta, 60)))
 		overlay.pos = pos
-		overlay.lastUpdate = GetSystemTimeSeconds()
+		overlay.lastUpdate = GameTick()
 	end
 end
 

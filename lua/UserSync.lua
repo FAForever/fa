@@ -11,6 +11,7 @@ PreviousSync = {}
 UnitData = {}
 
 local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
+local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
@@ -84,5 +85,11 @@ function OnSync()
 
     if Sync.EnforceRating then
         GpgNetSend('EnforceRating')
+    end
+
+    if not table.empty(Sync.EnhanceMessage) then
+        for _, messageTable in Sync.EnhanceMessage do
+            sendEnhancementMessage(messageTable)
+        end
     end
 end
