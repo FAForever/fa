@@ -192,7 +192,6 @@ function AssistMex(command)
     end
 end
 
-local notify = import('/lua/ui/notify/notify.lua')
 function OnCommandIssued(command)
     if not command.Clear then
         issuedOneCommand = true
@@ -248,10 +247,6 @@ function OnCommandIssued(command)
         local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}
         SimCallback(cb, true)
         AddDefaultCommandFeedbackBlips(command.Target.Position)
-    elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
-        notify.onStartEnhancement(command.Units, command.LuaParams.Enhancement)
-    elseif command.CommandType == 'Stop' then
-        notify.onCancelledEnhancement(command.Units)
     else
         if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
             AddDefaultCommandFeedbackBlips(command.Target.Position)
