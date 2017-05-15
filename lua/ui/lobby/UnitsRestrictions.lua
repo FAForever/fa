@@ -696,7 +696,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_STEALTH_BASE>No Stealth Structures",
         "/textures/ui/common/icons/presets/stealth-base.dds")
     CreatePreset("STEALTH_LAND",
-        "<LOC restricted_units_info_STEALTH_LAND>Prevents all mobile land units that provide stealth field for nearby units or structures",
+        "<LOC restricted_units_info_STEALTH_LAND>Prevents all mobile land units that provide personal stealth or stealth field for nearby units or structures",
         "<LOC restricted_units_data_STEALTH_LAND>No Mobile Stealth",
         "/textures/ui/common/icons/presets/stealth-land.dds")
     CreatePreset("STEALTH_NAVY",
