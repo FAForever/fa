@@ -82,7 +82,7 @@ Expressions = {
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
     NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
-    AMPHIBIOUS  = "(AMPHIBIOUS + xsl0401 + xsl0303 + xel0305 + xrl0305 + url0203 + urs0201 + url0402 + url0402 + xrl0403 + ual0303 + ual0401)", -- Monkey Lord, CYBRIAN T2 Destroyer
+    AMPHIBIOUS  = "(AMPHIBIOUS + xsl0401 + xsl0303 + xel0305 + xrl0305 + url0203 + urs0201 + url0402 + url0402 + xrl0403 + uel0401 + ual0401 + url0401)", -- Monkey Lord, CYBRIAN T2 Destroyer
     SUBS        = "((NAVAL * SUBMERSIBLE) - STRUCTURE)",
     BOTS        = "(LAND * BOT)",
     BASE        = "(STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
