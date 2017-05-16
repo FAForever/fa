@@ -80,6 +80,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
+            },
+            {
                 action = 'ShowObj',
                 label='<LOC _Show_Scenario_Info>Scenario',
                 tooltip = 'show_scenario',
@@ -116,6 +121,11 @@ local menus = {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
+            },
+            {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
             },
             {
                 action = 'ShowObj',
@@ -161,6 +171,11 @@ local menus = {
                 tooltip = 'esc_options',
             },
             {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
+            },
+            {
                 action = 'EndMPGame',
                 label = '<LOC _End_Game>',
                 tooltip = 'esc_quit',
@@ -194,7 +209,12 @@ local menus = {
                 label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
-                  {
+            {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
+            },
+            {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
@@ -304,6 +324,9 @@ local actions = {
     end,
     Options = function()
         import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0))
+    end,
+    Customiser = function()
+        import('/lua/ui/notify/customiser.lua').CreateUI()
     end,
 }
 

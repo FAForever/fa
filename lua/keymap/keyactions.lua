@@ -37,6 +37,8 @@ keyActions = {
         category = 'ui', order = 17,},
     ['toggle_key_bindings'] = {action = 'UI_Lua import("/lua/ui/dialogs/keybindings.lua").CreateUI()',
         category = 'ui', order = 6,},
+    ['toggle_notify_customiser'] = {action = 'UI_Lua import("/lua/ui/notify/customiser.lua").CreateUI()',
+        category = 'ui', order = 6,},
     ['toggle_score_screen'] = {action = 'UI_Lua import("/lua/ui/game/tabs.lua").ToggleScore()',
         category = 'ui', order = 1,},
     ['quick_save'] = {action = 'UI_Lua import("/lua/ui/game/gamemain.lua").QuickSave(LOC("<LOC QuickSave>QuickSave"))',
