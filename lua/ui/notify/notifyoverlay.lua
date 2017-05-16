@@ -33,135 +33,133 @@ function toggleNotifyOverlay(args)
 end
 
 -- This is called when we recieve a chat message from another player in the 'Notify' chat channel
--- These messages are generated below in onStartEnhancement
+-- These messages are generated below in generateEnhancementMessage or sendDestroyOverlayMessage
 function processNotification(players, msg)
-    local args = {}
-
-    for word in string.gfind(msg.text, "%S+") do
-        table.insert(args, word)
-    end
-
-    for _, k in {1, 3, 4, 5, 6, 7} do
-        args[k] = tonumber(args[k])
-    end
-
+    local args = msg.data
     if not overlayDisabled then
         updateEnhancementOverlay(args)
     end
 end
 
 function round(num, idp)
-	if not idp then
-		return tonumber(string.format("%." .. (idp or 0) .. "f", num))
-	else
-  		local mult = 10 ^ (idp or 0)
-		return math.floor(num * mult + 0.5) / mult
-  	end
+    if not idp then
+        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+    else
+          local mult = 10 ^ (idp or 0)
+        return math.floor(num * mult + 0.5) / mult
+      end
 end
 
-function createEnhancementOverlay(id, pos)
-	local overlay = Bitmap(GetFrame(0))
+function createEnhancementOverlay(args)
+    local overlay = Bitmap(GetFrame(0))
 
-	overlay.Width:Set(100)
-	overlay.Height:Set(50)
-	overlay.id = id
-	overlay.pos = pos
-	overlay.lastUpdate = GameTick()
+    overlay.Width:Set(100)
+    overlay.Height:Set(50)
+    overlay.id = args.id
+    overlay.pos = args.pos
+    overlay.eta = args.eta
+    overlay.lastUpdate = GetGameTimeSeconds()
 
-	overlay:SetNeedsFrameUpdate(true)
-	overlay.OnFrame = function(self, delta)
-		if GameTick() - overlay.lastUpdate > 1 then
-			overlays[id] = nil
-			overlay:Destroy()
-			return
-		end
+    overlay:SetNeedsFrameUpdate(true)
+    overlay.OnFrame = function(self, delta)
+        local seconds = GetGameTimeSeconds()
+        if overlay.destroy or seconds - overlay.lastUpdate >= 3 then -- Timeout in case destroy message wasn't recieved
+            overlays[overlay.id] = nil
+            overlay:Destroy()
+            return
+        end
 
-		local worldView = import('/lua/ui/game/worldview.lua').viewLeft
-		local pos = worldView:Project(Vector(overlay.pos.x, overlay.pos.z, overlay.pos.y))
+        local worldView = import('/lua/ui/game/worldview.lua').viewLeft
+        local pos = worldView:Project(overlay.pos)
 
-		LayoutHelpers.AtLeftTopIn(overlay, worldView, pos.x - overlay.Width() / 2, pos.y - overlay.Height() / 2 + 1)
-	end
+        LayoutHelpers.AtLeftTopIn(overlay, worldView, pos.x - overlay.Width() / 2, pos.y - overlay.Height() / 2 + 1)
+        
+        local timeRemaining = math.ceil(overlay.eta - seconds)
+        if timeRemaining ~= overlay.lastTimeRemaining then
+            if timeRemaining >= 0 then
+                overlay.etaText:SetText("ETA " .. string.format("%.2d:%.2d", timeRemaining / 60, math.mod(timeRemaining, 60)))
+            else
+                overlay.etaText:SetText("ETA --:--")
+            end
+            overlay.lastTimeRemaining = timeRemaining
+        end
+    end
 
-	overlay.progress = UIUtil.CreateText(overlay, '0%', 12, UIUtil.bodyFont)
-	overlay.progress:SetColor('white')
+    overlay.progress = UIUtil.CreateText(overlay, args.progress .. "%", 12, UIUtil.bodyFont)
+    overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
-	LayoutHelpers.AtCenterIn(overlay.progress, overlay, 15, 0)
+    LayoutHelpers.AtCenterIn(overlay.progress, overlay, 15, 0)
 
-	overlay.eta = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
-	overlay.eta:SetColor('white')
-    overlay.eta:SetDropShadow(true)
-	LayoutHelpers.AtCenterIn(overlay.eta, overlay, -15, 0)
+    overlay.etaText = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
+    overlay.etaText:SetColor('white')
+    overlay.etaText:SetDropShadow(true)
+    LayoutHelpers.AtCenterIn(overlay.etaText, overlay, -15, 0)
 
-	return overlay
+    return overlay
 end
 
 function updateEnhancementOverlay(args)
-	local id = args[1]
-	local progress = args[2]
-	local eta = args[3]
-	local paused = args[4]
-	local pos = {x = args[5], z = args[6], y = args[7]}
+    local destroy = args.destroy
+    local id = args.id
 
-	if not overlays[id] then
-		ForkThread(
+    if not overlays[id] and not destroy then
+        ForkThread(
             function()
-                overlays[id] = createEnhancementOverlay(id, pos)
+                overlays[id] = createEnhancementOverlay(args)
             end
-		)
-		return
-	end
+        )
+        return
+    end
 
-	local overlay = overlays[id]
+    local overlay = overlays[id]
 
     -- Update an existing overlay
-	if overlay then
-		overlay.progress:SetText(progress .. "%")
-		if paused == 0 then
-			eta = math.max(0, eta - GetGameTimeSeconds())
-		end
-		overlay.eta:SetText("ETA " .. string.format("%.2d:%.2d", eta / 60, math.mod(eta, 60)))
-		overlay.pos = pos
-		overlay.lastUpdate = GameTick()
-	end
+    if overlay then
+        if destroy then
+            overlay.destroy = destroy
+            return
+        end
+        overlay.progress:SetText(args.progress .. "%")
+        overlay.eta = args.eta
+        overlay.pos = args.pos
+        overlay.lastUpdate = GetGameTimeSeconds()
+    end
 end
 
 function generateEnhancementMessage(data)
     local unit = data.unit
-    local pos = data.pos
-    local buildTime = data.buildTime
     local msg = data.msg
     local lastTick = data.last_tick
     local lastProgress = data.last_progress
-
-    local progress = unit:GetWorkProgress()
+    local lastMessage = data.last_message
 
     local tick = GameTick()
     local seconds = GetGameTimeSeconds()
-
-    -- Initial eta
-    if not data.eta then
-        data.eta = seconds + (buildTime / unit:GetBuildRate())
+    
+    if tick == lastTick then
+        return
     end
-
-    if GetIsPaused({unit}) then
-        if lastTick ~= 0 then
-            data.last_tick = 0
-            data.last_progress = 0
-            data.eta = math.max(0, data.eta - seconds)
+    
+    local progress = unit:GetWorkProgress()
+    if lastTick then
+        local eta = -1
+        if progress > lastProgress then
+            eta = seconds + ((tick - lastTick) / 10) * ((1 - progress) / (progress - lastProgress))
         end
-    elseif not lastTick or (tick - lastTick > 30) then
-        if lastTick == 0 then
-            data.eta = data.eta + seconds
+        
+        if lastMessage and (seconds - lastMessage >= 1) or math.abs(eta - data.eta) > 1 then
+            data.eta = eta
+            data.last_message = seconds
+            msg.data = {id = data.id, progress = math.floor(progress * 100), eta = eta, pos = unit:GetPosition()} 
+            SessionSendChatMessage(FindClients(), msg)
         end
-        if lastProgress and lastProgress ~= 0 then
-            data.eta = round(seconds + ((tick - lastTick) / 10) * ((1 - progress) / (progress - lastProgress)))
-        end
-
-        data.last_tick = tick
-        data.last_progress = progress
     end
+    
+    data.last_tick = tick
+    data.last_progress = progress
+end
 
-    progress = math.floor((progress * 100) + 0.5)
-    msg.text = data.id .. ' ' .. progress .. ' ' .. data.eta .. ' ' .. (GetIsPaused({unit}) and 1 or 0) .. ' ' .. pos[1] .. ' ' .. pos[2] ..  ' ' .. pos[3]
+function sendDestroyOverlayMessage(id)
+    local msg = {to = 'allies', Notify = true, data = {id = id, destroy = true}}
     SessionSendChatMessage(FindClients(), msg)
 end
