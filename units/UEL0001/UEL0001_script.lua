@@ -285,12 +285,12 @@ UEL0001 = Class(ACUUnit) {
             self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
             self:updateBuildRestrictions()
-        elseif enh =='DamageStablization' then
-            if not Buffs['UEFACUDamageStablization'] then
+        elseif enh =='DamageStabilization' then
+            if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {
-                    Name = 'UEFACUDamageStablization',
-                    DisplayName = 'UEFACUDamageStablization',
-                    BuffType = 'DamageStablization',
+                    Name = 'UEFACUDamageStabilization',
+                    DisplayName = 'UEFACUDamageStabilization',
+                    BuffType = 'DamageStabilization',
                     Stacks = 'REPLACE',
                     Duration = -1,
                     Affects = {
@@ -305,10 +305,10 @@ UEL0001 = Class(ACUUnit) {
                     },
                 }
             end
-            Buff.ApplyBuff(self, 'UEFACUDamageStablization')
-        elseif enh =='DamageStablizationRemove' then
-            if Buff.HasBuff(self, 'UEFACUDamageStablization') then
-                Buff.RemoveBuff(self, 'UEFACUDamageStablization')
+            Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
+        elseif enh =='DamageStabilizationRemove' then
+            if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
+                Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
             end
         elseif enh =='HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
