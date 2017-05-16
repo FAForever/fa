@@ -1,0 +1,9 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = "ues0304",
+    General = {
+        CommandCaps = {
+            RULEUCC_Pause = true,
+        },
+    },
+}
