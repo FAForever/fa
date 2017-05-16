@@ -1247,7 +1247,6 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
                 v = string.gsub(v, '2', '1')
                 v = string.gsub(v, '3', '1')
             end
-            platoon:Stop()
             EngineerBuildStructure(aiBrain, eng, v, baseTmpl, buildingTmpl)
             if eng.UnitBeingBuilt then
                 unitBeingBuilt = eng.UnitBeingBuilt
