@@ -174,6 +174,7 @@ end
 function watchEnhancement(id, enh)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
+    overlayData.pos = overlayData.unit:GetPosition()
     overlayData.msg = {to = 'allies', Notify = true}
     overlayData.id = id
     overlayData.eta = -1
