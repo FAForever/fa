@@ -15,6 +15,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Effect = import('/lua/maui/effecthelpers.lua')
 
 local upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
+local ModifyBuildables = import('/lua/ui/notify/enhancementqueue.lua').ModifyBuildablesForACU
 
 local unitkeygroups
 local cyclePos
@@ -205,7 +206,8 @@ function buildActionBuilding(name, modifier)
     -- Filter the values
     local selection = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
-    local buildable = EntityCategoryGetUnitList(buildableCategories)
+    local newBuildableCategories = ModifyBuildables(buildableCategories, selection)
+    local buildable = EntityCategoryGetUnitList(newBuildableCategories)
     for _, value in allValues do
         for i, buildableValue in buildable do
             if value == buildableValue then
