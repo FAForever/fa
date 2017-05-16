@@ -375,7 +375,7 @@ keyActions = {
         category = 'selection', order = 41,},
     ['select_anti_air_fighters'] = {action = 'UI_Lua import("/lua/keymap/smartSelection.lua").smartSelect("AIR HIGHALTAIR ANTIAIR -BOMBER")',
         category = 'selection', order = 42,},
-    ['select_nearest_idle_airscout'] = {action = 'UI_SelectByCategory AIR SCOUT +idle',
+    ['select_nearest_idle_airscout'] = {action = 'UI_SelectByCategory AIR SCOUT +nearest +idle',
         category = 'selection', order = 42,},
     ['select_all_tml'] = {action = 'UI_SelectByCategory STRUCTURE TACTICALMISSILEPLATFORM',
         category = 'selection', order = 43,},
