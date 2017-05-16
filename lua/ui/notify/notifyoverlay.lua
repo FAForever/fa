@@ -63,7 +63,7 @@ function createEnhancementOverlay(args)
     overlay:SetNeedsFrameUpdate(true)
     overlay.OnFrame = function(self, delta)
         local seconds = GetGameTimeSeconds()
-        if overlay.destroy or seconds - overlay.lastUpdate >= 3 then -- Timeout in case destroy message wasn't recieved
+        if overlay.destroy or seconds - overlay.lastUpdate >= 4 then -- Timeout in case destroy message wasn't recieved
             overlays[overlay.id] = nil
             overlay:Destroy()
             return
@@ -131,6 +131,7 @@ function generateEnhancementMessage(data)
     local msg = data.msg
     local lastTick = data.last_tick
     local lastProgress = data.last_progress
+    local lastPercent = data.last_percent
     local lastMessage = data.last_message
 
     local tick = GameTick()
@@ -141,22 +142,27 @@ function generateEnhancementMessage(data)
     end
     
     local progress = unit:GetWorkProgress()
+    local percent = math.floor(progress * 100)
     if lastTick then
         local eta = -1
         if progress > lastProgress then
             eta = seconds + ((tick - lastTick) / 10) * ((1 - progress) / (progress - lastProgress))
         end
         
-        if lastMessage and (seconds - lastMessage >= 1) or math.abs(eta - data.eta) > 1 then
+        local pos = unit:GetPosition()
+        
+        if lastMessage and (seconds - lastMessage >= 3) or math.abs(eta - data.eta) > 1 or VDist3Sq(pos, data.pos) > 0.0001 or percent ~= lastPercent then
             data.eta = eta
+            data.pos = pos
             data.last_message = seconds
-            msg.data = {id = data.id, progress = math.floor(progress * 100), eta = eta, pos = unit:GetPosition()} 
+            msg.data = {id = data.id, progress = percent, eta = eta, pos = pos} 
             SessionSendChatMessage(FindClients(), msg)
         end
     end
     
     data.last_tick = tick
     data.last_progress = progress
+    data.last_percent = percent
 end
 
 function sendDestroyOverlayMessage(id)
