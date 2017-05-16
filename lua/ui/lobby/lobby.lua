@@ -3622,7 +3622,7 @@ function EveryoneHasEstablishedConnections(check_observers)
         if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
             for k2, other in important do
-                if id ~= other and not table.find(peer.establishedPeers, other) then
+                if id ~= other and other ~= 999999 and not table.find(peer.establishedPeers, other) then
                     result = false
                     AddChatText(LOCF("<LOC lobui_0299>%s doesn't have an established connection to %s",
                                      peer.name,
