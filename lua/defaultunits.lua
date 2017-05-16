@@ -1688,6 +1688,7 @@ AirUnit = Class(MobileUnit) {
             EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
+            self.colliderProj = nil
         end
 
         self:DisableUnitIntel('Killed')

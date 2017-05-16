@@ -137,7 +137,7 @@ ShieldCollider = Class(Projectile) {
         vz = 10 * vz
 
         local speed = math.sqrt(vx * vx + vy * vy + vz * vz) -- The length of our vector
-        local shieldMag = math.sqrt(wx * wx + wy * vy + wz * wz) -- The length of our other vector
+        local shieldMag = math.sqrt(wx * wx + wy * wy + wz * wz) -- The length of our other vector
 
         -- Normalizing all our shield vector, so we dont need to deal with scalar nonsense
         wx = wx / shieldMag
