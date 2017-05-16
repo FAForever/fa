@@ -2246,7 +2246,7 @@ ACUUnit = Class(CommandUnit) {
         -- Send a chat message to allies according to the enhancement
         if self:GetArmy() == GetFocusArmy() then
             if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {enh = enh, trigger = 'completed', id = self:GetEntityId()}
+            local message = {enh = enh, trigger = 'completed', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
             table.insert(Sync.EnhanceMessage, message)
         end
     end,
@@ -2258,7 +2258,7 @@ ACUUnit = Class(CommandUnit) {
         -- Send a chat message to allies if work is an enhancement
         if self:GetArmy() == GetFocusArmy() then
             if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {enh = work, trigger = 'started', id = self:GetEntityId()}
+            local message = {enh = work, trigger = 'started', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
             table.insert(Sync.EnhanceMessage, message)
         end
 
@@ -2269,7 +2269,7 @@ ACUUnit = Class(CommandUnit) {
         -- Send a chat message to allies if work is an enhancement
         if self:GetArmy() == GetFocusArmy() then
             if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {enh = work, trigger = 'cancelled', id = self:GetEntityId()}
+            local message = {enh = work, trigger = 'cancelled', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
             table.insert(Sync.EnhanceMessage, message)
         end
 
