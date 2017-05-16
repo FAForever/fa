@@ -2,7 +2,7 @@
 -- File     :  /data/units/XSL0401/XSL0401_script.lua
 -- Author(s):  Jessica St. Croix, Dru Staltman, Aaron Lundquist
 -- Summary  :  Seraphim Experimental Assault Bot
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
@@ -12,6 +12,7 @@ local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
 local utilities = import('/lua/utilities.lua')
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
 XSL0401 = Class(SWalkingLandUnit) {
