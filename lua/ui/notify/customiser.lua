@@ -127,13 +127,22 @@ end
 
 -- toggles expansion or collapse of lines with specified key category only if searching is not active
 local function ToggleLines(faction)
-    for _, data in lineGroupTable do
-        if data.faction == faction then
-            if data.collapsed then
-                data.collapsed = false
-            else
-                data.collapsed = true
+    -- Set everything invisible to start
+    linesVisible = {}
+    for index, line in lineGroupTable do
+        if line.type == 'entry' then
+            if line.faction == faction then
+                if line.collapsed then
+                    line.collapsed = false
+                else
+                    line.collapsed = true
+                end
             end
+            if not line.collapsed then
+                table.insert(linesVisible, index)
+            end
+        else
+            table.insert(linesVisible, index) -- Always have non-entry lines visible
         end
     end
 
@@ -142,6 +151,8 @@ local function ToggleLines(faction)
     else
         LineGroups[faction].collapsed = true
     end
+
+    mainContainer:CalcVisible()
 end
 
 local function SelectLine(dataIndex)
@@ -342,7 +353,7 @@ function CreateLine()
         elseif data.type == 'entry' then
             line.toggle:Hide()
             line.message:SetText(data.text)
-            line.message:SetColor('ffffffff') --#ffffffff'
+            line.message:SetColor('ffffffff')
             line.message:SetFont('Arial', 16)
             line.description:SetText(data.upgrade)
             line.description:SetFont('Arial', 16)
@@ -380,7 +391,9 @@ function CreateUI()
     end
 
     lineGroupTable = FormatData()
+    linesVisible = {}
     
+    -- Set headers visible at the start
     for index, line in lineGroupTable do
         if line.type == 'header' then
             table.insert(linesVisible, index)
@@ -440,11 +453,12 @@ function CreateUI()
 
     -- Create as many lines as will fit
     local index = 1
+    messageLines = {}
     messageLines[index] = CreateLine()
     LayoutHelpers.AtTopIn(messageLines[1], mainContainer)
 
     index = index + 1
-    while messageLines[table.getsize(messageLines)].Top() + (2 * messageLines[1].Height()) < mainContainer.Bottom() do
+    while messageLines[table.getsize(messageLines)].Top() + messageLines[1].Height() < mainContainer.Bottom() do
         messageLines[index] = CreateLine()
         LayoutHelpers.Below(messageLines[index], messageLines[index-1])
         index = index + 1
@@ -471,7 +485,7 @@ function CreateUI()
     end
 
     -- Called when the scrollbar wants to set a new visible top line
-    mainContainer.ScrollSetTop = function(self, top)
+    mainContainer.ScrollSetTop = function(self, axis, top)
         top = math.floor(top)
         if top == self.top then return end
 
@@ -490,7 +504,7 @@ function CreateUI()
             if data then
                 line:Update(data, id)
             else
-                line:SetSolidColor('00000000') --#00000000
+                line:SetSolidColor('00000000')
                 line.message:SetText('')
                 line.description:SetText('')
                 line.toggle:Hide()
@@ -520,7 +534,7 @@ function FormatData()
 
     -- Reset the lines because messages might have been changed
     for faction, group in LineGroups do
-        group.actions = {}
+        group.upgrades = {}
     end
     
     -- Group upgrades and messages according to their faction
@@ -530,10 +544,11 @@ function FormatData()
                 LineGroups[faction] = {}
                 LineGroups[faction].upgrades = {}
                 LineGroups[faction].name = faction
-                LineGroups[faction].collapsed = linesCollapsed
                 LineGroups[faction].order = factions[faction] -- UEF == 1, Cybran == 2 etc
                 LineGroups[faction].text = faction
             end
+
+            LineGroups[faction].collapsed = linesCollapsed
 
             for upgrade, message in data do
                 local messageLine = {
