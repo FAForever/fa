@@ -48,7 +48,7 @@ function populateMessages()
     if prefsMessages then
         messages = prefsMessages
     else
-        messages = defaultMessages2
+        messages = defaultMessages
         Prefs.SetToCurrentProfile('Notify_Messages', messages)
     end
 end
