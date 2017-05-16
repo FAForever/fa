@@ -84,7 +84,7 @@ local function EditMessage(parent, data, line)
         if newmsg ~= 'Insert Message Here' then
             data.message = newmsg
             line.message:SetText(newmsg)
-            newMessageTable[data.faction][data.upgrade] = newmsg
+            newMessageTable[data.category][data.upgrade] = newmsg
         end
         messagePopup:Close()
     end
@@ -115,7 +115,7 @@ local function GetLineColor(lineID, data)
         return '00000000'
     elseif data.type == 'entry' then
         if data.selected then
-            return UIUtil.factionBackColor
+            return UIUtil.categoryBackColor
         elseif math.mod(lineID, 2) == 1 then
             return 'ff202020'
         else
@@ -127,12 +127,12 @@ local function GetLineColor(lineID, data)
 end
 
 -- toggles expansion or collapse of lines with specified key category only if searching is not active
-local function ToggleLines(faction)
+local function ToggleLines(category)
     -- Set everything invisible to start
     linesVisible = {}
     for index, line in lineGroupTable do
         if line.type == 'entry' then
-            if line.faction == faction then
+            if line.category == category then
                 if line.collapsed then
                     line.collapsed = false
                 else
@@ -147,10 +147,10 @@ local function ToggleLines(faction)
         end
     end
 
-    if LineGroups[faction].collapsed then
-        LineGroups[faction].collapsed = false
+    if LineGroups[category].collapsed then
+        LineGroups[category].collapsed = false
     else
-        LineGroups[faction].collapsed = true
+        LineGroups[category].collapsed = true
     end
 
     mainContainer:CalcVisible()
@@ -169,7 +169,7 @@ end
 function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
     if not bgSize then bgSize = 20 end
     if not bgColor then bgColor = 'FF343232' end
-    if not txtColor then txtColor = UIUtil.factionTextColor end
+    if not txtColor then txtColor = UIUtil.categoryTextColor end
     if not txtSize then txtSize = 18 end
     if not txt then txt = '?' end
 
@@ -255,9 +255,9 @@ function CreateLine()
                 return true
             end
         elseif self.data.type == 'header' and (event.Type == 'ButtonPress' or event.Type == 'ButtonDClick') then
-            ToggleLines(self.data.faction)
+            ToggleLines(self.data.category)
 
-            if LineGroups[self.data.faction].collapsed then
+            if LineGroups[self.data.category].collapsed then
                self.toggle.txt:SetText('+')
             else
                self.toggle.txt:SetText('-')
@@ -289,8 +289,8 @@ function CreateLine()
     LayoutHelpers.AtVerticalCenterIn(line.toggle, line)
     Tooltip.AddControlTooltip(line.toggle,
     {
-        text = '<LOC notify_0007>Toggle Faction',
-        body = '<LOC notify_0008>Toggle visibility of all messages for this faction'
+        text = '<LOC notify_0007>Toggle Category',
+        body = '<LOC notify_0008>Toggle visibility of all messages for this category'
     })
 
     -- The + on the left which brings up the assignment dialogue
@@ -333,7 +333,7 @@ function CreateLine()
         line.data = table.copy(data)
 
         if data.type == 'header' then
-            if LineGroups[self.data.faction].collapsed then
+            if LineGroups[self.data.category].collapsed then
                self.toggle.txt:SetText('+')
             else
                self.toggle.txt:SetText('-')
@@ -367,6 +367,7 @@ function CreateLine()
 end
 
 function ImportMessages()
+    local messageTable
     local prefsMessages = Prefs.GetFromCurrentProfile('Notify_Messages')
     if prefsMessages and not table.empty(prefsMessages) then
         messageTable = prefsMessages
@@ -376,6 +377,14 @@ function ImportMessages()
     end
     
     return messageTable
+end
+
+function ResetMessages()
+    WARN('ResetMessages')
+    newMessageTable = defaultMessageTable
+    Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+    lineGroupTable = FormatData()
+    mainContainer:CalcVisible()
 end
 
 function CloseUI()
@@ -418,14 +427,31 @@ function CreateUI()
 
     local offset = dialogContent.Width() / 5
 
-    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
-    closeButton.Width:Set(200)
-    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
-    LayoutHelpers.AtRightIn(closeButton, dialogContent, 10)
-    Tooltip.AddControlTooltip(closeButton, {text = 'Close Dialog', body = '<LOC notify_0002>Closes this dialog and confirms assignments of messages'})
-    closeButton.OnClick = function(self, modifiers)
+    local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _OK>"))
+    okButton.Width:Set(200)
+    LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
+    LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
+    Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0002>Closes this dialog and confirms assignments of messages'})
+    okButton.OnClick = function(self, modifiers)
         CloseUI() 
     end
+    
+    -- Button to reset everything
+    local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0009>Default Preset"))
+    defaultButton.Width:Set(200)
+    LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, 10)
+    defaultButton.OnClick = function(self, modifiers)
+        UIUtil.QuickDialog(popup, "<LOC notify_0010>Are you sure you want to reset all messages to their defaults?",
+            "<LOC _Yes>", ResetMessages,
+            "<LOC _No>", nil, nil, nil, true,
+            {escapeButton = 2, enterButton = 1, worldCover = false})
+    end
+    Tooltip.AddControlTooltip(defaultButton,
+    {
+        text = LOC("<LOC key_binding_0004>Default Preset"),
+        body = "<LOC notify_0011>Reset all messages to their defaults"
+    })
 
     -- Activate the function to have this take effect on closing
     popup.OnClosed = function(self)
@@ -437,7 +463,7 @@ function CreateUI()
     dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
-                closeButton:OnClick()
+                okButton:OnClick()
             end
         end
     end
@@ -447,7 +473,7 @@ function CreateUI()
     mainContainer.Left:Set(function() return dialogContent.Left() + 10 end)
     mainContainer.Right:Set(function() return dialogContent.Right() - 20 end)
     mainContainer.Top:Set(function() return title.Bottom() + 10 end)
-    mainContainer.Bottom:Set(function() return closeButton.Top() - 10 end)
+    mainContainer.Bottom:Set(function() return okButton.Top() - 10 end)
     mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - 10 end)
     mainContainer.top = 0
     UIUtil.CreateLobbyVertScrollbar(mainContainer)
@@ -535,60 +561,71 @@ function FormatData()
     newMessageTable = messageTable
 
     -- Reset the lines because messages might have been changed
-    for faction, group in LineGroups do
+    for category, group in LineGroups do
         group.upgrades = {}
     end
     
-    -- Group upgrades and messages according to their faction
-    for faction, data in messageTable do
-        if factions[faction] then
-            if not LineGroups[faction] then
-                LineGroups[faction] = {}
-                LineGroups[faction].upgrades = {}
-                LineGroups[faction].name = faction
-                LineGroups[faction].order = factions[faction] -- UEF == 1, Cybran == 2 etc
-                LineGroups[faction].text = faction
+    local categories = {
+        aeon = 1,
+        uef = 2,
+        cybran = 3,
+        seraphim = 4,
+        nomads = 5,
+        experimentals = 6,
+        nuke = 7,
+        arty = 8,
+    }
+    
+    -- Group upgrades and messages according to their category
+    for category, data in messageTable do
+        if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
+            if not LineGroups[category] then
+                LineGroups[category] = {}
+                LineGroups[category].upgrades = {}
+                LineGroups[category].name = category
+                LineGroups[category].order = categories[category]
+                LineGroups[category].text = category
             end
 
-            LineGroups[faction].collapsed = linesCollapsed
+            LineGroups[category].collapsed = linesCollapsed
 
             for upgrade, message in data do
                 local messageLine = {
                     upgrade = upgrade,
-                    faction = faction,
-                    order = LineGroups[faction].order,
+                    category = category,
+                    order = LineGroups[category].order,
                     text = message
                 }
-                table.insert(LineGroups[faction].upgrades, messageLine)
+                table.insert(LineGroups[category].upgrades, messageLine)
             end
         end
     end
 
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
-    for faction, data in LineGroups do
+    for category, data in LineGroups do
         if table.getsize(data.upgrades) > 0 then
             -- This is the first row
             lineData[index] = {
                 type = 'header',
                 id = index,
-                order = LineGroups[faction].order,
+                order = LineGroups[category].order,
                 count = table.getsize(data.upgrades),
-                faction = faction,
-                text = LineGroups[faction].text,
-                collapsed = LineGroups[faction].collapsed
+                category = category,
+                text = LineGroups[category].text,
+                collapsed = LineGroups[category].collapsed
             }
             
-            -- Now fill in the rest of the faction's lines
+            -- Now fill in the rest of the category's lines
             index = index + 1
             for _, line in data.upgrades do
                 lineData[index] = {
                     type = 'entry',
                     text = line.text,
                     upgrade = line.upgrade,
-                    faction = faction,
-                    order = factions[faction],
-                    collapsed = LineGroups[faction].collapsed,
+                    category = category,
+                    order = categories[category],
+                    collapsed = LineGroups[category].collapsed,
                     id = index,
                 }
                 index = index + 1
