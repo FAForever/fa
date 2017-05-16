@@ -88,12 +88,12 @@ function toggleNotifyChat(args)
 end
 
 function round(num, idp)
-	if not idp then
-		return tonumber(string.format("%." .. (idp or 0) .. "f", num))
-	else
-  		local mult = 10 ^ (idp or 0)
-		return math.floor(num * mult + 0.5) / mult
-  	end
+    if not idp then
+        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+    else
+          local mult = 10 ^ (idp or 0)
+        return math.floor(num * mult + 0.5) / mult
+      end
 end
 
 function sendEnhancementMessage(messageTable)
@@ -143,6 +143,7 @@ function onCancelledEnhancement(id, enh)
         end
 
         killWatcher(data)
+        NotifyOverlay.sendDestroyOverlayMessage(id)
     end
 end
 
@@ -158,6 +159,7 @@ function onCompletedEnhancement(id, enh)
         end
 
         killWatcher(data)
+        NotifyOverlay.sendDestroyOverlayMessage(id)
     end
 end
 
@@ -171,10 +173,9 @@ end
 function watchEnhancement(id, enh)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
-    overlayData.pos = overlayData.unit:GetPosition()
-    overlayData.buildTime = overlayData.unit:GetBlueprint().Enhancements[enh].BuildTime
     overlayData.msg = {to = 'allies', Notify = true}
     overlayData.id = id
+    overlayData.eta = -1
 
     while true do
         NotifyOverlay.generateEnhancementMessage(overlayData)
