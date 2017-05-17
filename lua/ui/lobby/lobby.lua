@@ -3644,10 +3644,11 @@ function AddChatText(text)
         LOG("text=" .. repr(text))
         return
     end
-
+    
+    local scrolledToBottom = GUI.chatPanel.top >= GUI.chatDisplay:GetItemCount()-13
+    
     GUI.chatDisplay:AppendLine(text)
-
-    if GUI.chatPanel.top >= GUI.chatDisplay:GetItemCount()-14 then
+    if scrolledToBottom then
         GUI.chatPanel:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount()-13)
     else
         GUI.newMessageArrow:Enable()
