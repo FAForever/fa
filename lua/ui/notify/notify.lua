@@ -59,9 +59,9 @@ function setupStartDisables()
     Prefs.SavePreferences()
 end
 
-function processIncomingMessage(players, args)
-    if not categoriesDisabled.All or not categoriesDisabled[args.category] then
-        SessionSendChatMessage(FindClients(), args.text)
+function processIncomingMessage(players, msg)
+    if not categoriesDisabled.All or not categoriesDisabled[msg.data.category] then
+        SessionSendChatMessage(FindClients(), msg.data.text)
     end
 end
 

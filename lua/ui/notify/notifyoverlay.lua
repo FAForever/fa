@@ -54,9 +54,8 @@ end
 -- This is called when we recieve a chat message from another player in the 'Notify' chat channel
 -- These messages are generated below in generateEnhancementMessage or sendDestroyOverlayMessage
 function processNotification(players, msg)
-    local args = msg.data
     if not overlayDisabled then
-        updateEnhancementOverlay(args)
+        updateEnhancementOverlay(msg.data)
     end
 end
 
