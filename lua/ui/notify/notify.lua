@@ -61,7 +61,12 @@ end
 
 function processIncomingMessage(players, msg)
     if not categoriesDisabled.All or not categoriesDisabled[msg.data.category] then
-        SessionSendChatMessage(FindClients(), msg.data.text)
+        local army = GetFocusArmy()
+        msg.Notify = false
+        msg.Chat = true
+        msg.to = army
+
+        SessionSendChatMessage(FindClients(army), msg)
     end
 end
 
