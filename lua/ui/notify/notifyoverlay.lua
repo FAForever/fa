@@ -5,12 +5,31 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
+local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 
 local overlayDisabled
 overlays = {}
 
+function init()
+    RegisterChatFunc(NotifyOverlay.processNotification, 'NotifyOverlay')
+    AddChatCommand('enablenotifyoverlay', NotifyOverlay.toggleNotifyOverlay)
+    AddChatCommand('disablenotifyoverlay', NotifyOverlay.toggleNotifyOverlay)
+
+    local state = Prefs.GetFromCurrentProfile('Notify_Overlay_Disabled')
+    if state == nil then
+        Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', false)
+        state = false
+    end
+
+    setOverlayDisabled(state)
+    Prefs.SavePreferences()
+end
+
 function setOverlayDisabled(bool)
     overlayDisabled = bool
+    Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', bool)
+    Prefs.SavePreferences()
 end
 
 function getOverlayDisabled()
@@ -73,7 +92,7 @@ function createEnhancementOverlay(args)
         local pos = worldView:Project(overlay.pos)
 
         LayoutHelpers.AtLeftTopIn(overlay, worldView, pos.x - overlay.Width() / 2, pos.y - overlay.Height() / 2 + 1)
-        
+
         local timeRemaining = math.ceil(overlay.eta - seconds)
         if timeRemaining ~= overlay.lastTimeRemaining then
             if timeRemaining >= 0 then
@@ -136,11 +155,11 @@ function generateEnhancementMessage(data)
 
     local tick = GameTick()
     local seconds = GetGameTimeSeconds()
-    
+
     if tick == lastTick then
         return
     end
-    
+
     local progress = unit:GetWorkProgress()
     local percent = math.floor(progress * 100)
     if lastTick then
@@ -148,24 +167,24 @@ function generateEnhancementMessage(data)
         if progress > lastProgress then
             eta = seconds + ((tick - lastTick) / 10) * ((1 - progress) / (progress - lastProgress))
         end
-        
+
         local pos = unit:GetPosition()
-        
+
         if lastMessage and (seconds - lastMessage >= 3) or math.abs(eta - data.eta) > 1 or VDist3Sq(pos, data.pos) > 0.0001 or percent ~= lastPercent then
             data.eta = eta
             data.pos = pos
             data.last_message = seconds
-            msg.data = {id = data.id, progress = percent, eta = eta, pos = pos} 
+            msg.data = {id = data.id, progress = percent, eta = eta, pos = pos}
             SessionSendChatMessage(FindClients(), msg)
         end
     end
-    
+
     data.last_tick = tick
     data.last_progress = progress
     data.last_percent = percent
 end
 
 function sendDestroyOverlayMessage(id)
-    local msg = {to = 'allies', Notify = true, data = {id = id, destroy = true}}
+    local msg = {to = 'allies', NotifyOverlay = true, data = {id = id, destroy = true}}
     SessionSendChatMessage(FindClients(), msg)
 end

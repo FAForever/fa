@@ -49,7 +49,7 @@ local function EditMessage(parent, data, line)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
     helpText.Width:Set(dialogContent.Width() - 10)
-    helpText:SetText(clarityTable[data.upgrade])
+    helpText:SetText(clarityTable[data.source])
     helpText:SetCenteredHorizontally(true)
     
     messageEntry = Bitmap(dialogContent)
@@ -84,7 +84,7 @@ local function EditMessage(parent, data, line)
         if newmsg ~= 'Insert Message Here' then
             data.message = newmsg
             line.message:SetText(newmsg)
-            newMessageTable[data.category][data.upgrade] = newmsg
+            newMessageTable[data.category][data.source] = newmsg
         end
         messagePopup:Close()
     end
@@ -303,7 +303,7 @@ function CreateLine()
     Tooltip.AddControlTooltip(line.newMessageButton,
     {
         text = LOC('<LOC notify_0003>Assign Message'),
-        body = '<LOC notify_0004>Opens a dialog that allows assigning a message for a given upgrade'
+        body = '<LOC notify_0004>Opens a dialog that allows assigning a message for a given source'
     })
     line.newMessageButton.OnMouseClick = function(self)
         line:AssignNewMessage()
@@ -320,7 +320,7 @@ function CreateLine()
     Tooltip.AddControlTooltip(line.removeMessageButton,
     {
         text = LOC('<LOC notify_0005>Remove Message'),
-        body = '<LOC notify_0006>Removes the message for this upgrade entirely'
+        body = '<LOC notify_0006>Removes the message for this source entirely'
     })
     line.removeMessageButton.OnMouseClick = function(self)
         line:RemoveMessage()
@@ -353,7 +353,7 @@ function CreateLine()
             line.message:SetText('')
         elseif data.type == 'entry' then
             line.toggle:Hide()
-            line.description:SetText(clarityTable[data.upgrade])
+            line.description:SetText(clarityTable[data.source])
             line.description:SetColor('ffffffff')
             line.description:SetFont('Arial', 16)
             line.message:SetText(data.text)
@@ -380,7 +380,6 @@ function ImportMessages()
 end
 
 function ResetMessages()
-    WARN('ResetMessages')
     newMessageTable = defaultMessageTable
     Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
     lineGroupTable = FormatData()
@@ -554,6 +553,28 @@ function CreateUI()
     mainContainer:CalcVisible()
 end
 
+function SortData(dataTable)
+    table.sort(dataTable, function(a, b)
+        if a.order ~= b.order then
+            return a.order < b.order
+        else
+            if a.category ~= b.category then
+                return string.lower(a.category) < string.lower(b.category)
+            else
+                if a.type == 'entry' and b.type == 'entry' then
+                    if a.source ~= b.source then
+                        return a.source < b.source
+                    else
+                        return string.lower(a.text) < string.lower(b.text)
+                    end
+                else
+                    return a.id < b.id
+                end
+            end
+        end
+    end)
+end
+
 -- Format the upgrades and messages into groups and lines
 function FormatData()
     local lineData = {}
@@ -562,7 +583,7 @@ function FormatData()
 
     -- Reset the lines because messages might have been changed
     for category, group in LineGroups do
-        group.upgrades = {}
+        group.sources = {}
     end
     
     local categories = {
@@ -581,7 +602,7 @@ function FormatData()
         if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
             if not LineGroups[category] then
                 LineGroups[category] = {}
-                LineGroups[category].upgrades = {}
+                LineGroups[category].sources = {}
                 LineGroups[category].name = category
                 LineGroups[category].order = categories[category]
                 LineGroups[category].text = category
@@ -589,28 +610,30 @@ function FormatData()
 
             LineGroups[category].collapsed = linesCollapsed
 
-            for upgrade, message in data do
+            for source, message in data do
                 local messageLine = {
-                    upgrade = upgrade,
+                    source = source,
                     category = category,
                     order = LineGroups[category].order,
                     text = message
                 }
-                table.insert(LineGroups[category].upgrades, messageLine)
+                table.insert(LineGroups[category].sources, messageLine)
             end
         end
     end
 
+    SortData(LineGroups)
+    
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, data in LineGroups do
-        if table.getsize(data.upgrades) > 0 then
+        if table.getsize(data.sources) > 0 then
             -- This is the first row
             lineData[index] = {
                 type = 'header',
                 id = index,
                 order = LineGroups[category].order,
-                count = table.getsize(data.upgrades),
+                count = table.getsize(data.sources),
                 category = category,
                 text = LineGroups[category].text,
                 collapsed = LineGroups[category].collapsed
@@ -618,11 +641,11 @@ function FormatData()
             
             -- Now fill in the rest of the category's lines
             index = index + 1
-            for _, line in data.upgrades do
+            for _, line in data.sources do
                 lineData[index] = {
                     type = 'entry',
                     text = line.text,
-                    upgrade = line.upgrade,
+                    source = line.source,
                     category = category,
                     order = categories[category],
                     collapsed = LineGroups[category].collapsed,
