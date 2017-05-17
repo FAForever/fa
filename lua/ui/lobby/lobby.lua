@@ -181,6 +181,19 @@ local commands = {
     whisper = ParseWhisper,
 }
 
+local numberOfChatLinesForFontSize = {
+    [9] = 18,
+    [10] = 16,
+    [11] = 15,
+    [12] = 14,
+    [13] = 13,
+    [14] = 13,
+    [15] = 12,
+    [16] = 11,
+    [17] = 11,
+    [18] = 10,
+}
+
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
@@ -1611,7 +1624,7 @@ function PublicChat(text)
             Text = text,
         }
         )
-    AddChatText("["..localPlayerName.."] " .. text)
+    AddChatText("["..localPlayerName.."] " .. text, true)
 end
 
 function PrivateChat(targetID,text)
@@ -2814,34 +2827,37 @@ function CreateUI(maxPlayers)
         function() return GUI.chatPanel.Width() - 20 end,
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
 )
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
+    local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
+    GUI.chatDisplay:SetFont(UIUtil.bodyFont, fontSize)
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
     LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
 
     GUI.chatPanel.top = 0
+    GUI.chatPanel.numberOfLines = numberOfChatLinesForFontSize[fontSize]
     GUI.chatPanel.GetScrollValues = function(self, axis)
         local size = GUI.chatDisplay:GetItemCount()
-        return 0, size, self.top, math.min(self.top + 13, size)
+        return 0, size, self.top, math.min(self.top + self.numberOfLines, size)
     end
 
     GUI.chatPanel.ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.top + math.floor(delta))
     end
     GUI.chatPanel.ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta) * 13)
+        self:ScrollSetTop(axis, self.top + math.floor(delta) * self.numberOfLines)
     end
     GUI.chatPanel.ScrollSetTop = function(self, axis, top)
         local oldTop = self.top
         top = math.floor(top)
         if top == self.top then return end
         local size = GUI.chatDisplay:GetItemCount()
-        self.top = math.max(math.min(size - 13, top), 0)
-        if oldTop > self.top then
-            GUI.chatDisplay:ShowItem(self.top)
-        else
-            GUI.chatDisplay:ShowItem(self.top+12)
+        self.top = math.max(math.min(size - self.numberOfLines, top), 0)
+        if oldTop <= self.top then
+            -- ShowItem doesn't scroll the chat if the item is already visible. If it isn't visible yet it'll put it on the top of chat.
+            -- So we scroll down all the way first and then back up if necessary and ShowItem will give us appropriate item at the top then.
+            GUI.chatDisplay:ShowItem(size)
         end
-        if self.top >= GUI.chatDisplay:GetItemCount() - 14 then
+        GUI.chatDisplay:ShowItem(self.top)
+        if self.top >= GUI.chatDisplay:GetItemCount() - (self.numberOfLines + 1) then
             GUI.newMessageArrow:Disable()
         end
     end
@@ -2857,6 +2873,12 @@ function CreateUI(maxPlayers)
     GUI.chatPanel.IsScrollable = function(self, axis)
         return true
     end
+    GUI.chatPanel.ScrollToBottom = function(self)
+        self:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount() - self.numberOfLines)
+    end
+    GUI.chatPanel.IsScrolledToBottom = function(self)
+        return self.top >= GUI.chatDisplay:GetItemCount() - self.numberOfLines
+    end
 
     local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
     GUI.newMessageArrow = newMessageArrow
@@ -2867,7 +2889,7 @@ function CreateUI(maxPlayers)
     newMessageArrow.Width:Set(25)
     newMessageArrow.Height:Set(25)
     GUI.newMessageArrow.OnClick = function(this, modifiers)
-        GUI.chatPanel:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount()-13)
+        GUI.chatPanel:ScrollToBottom()
     end
     GUI.newMessageArrow:Disable()
 
@@ -3635,18 +3657,18 @@ function EveryoneHasEstablishedConnections(check_observers)
     return result
 end
 
-function AddChatText(text)
+function AddChatText(text, scrollToBottom)
     if not GUI.chatDisplay then
         LOG("Can't add chat text -- no chat display")
         LOG("text=" .. repr(text))
         return
     end
     
-    local scrolledToBottom = GUI.chatPanel.top >= GUI.chatDisplay:GetItemCount()-13
+    local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
     
     GUI.chatDisplay:AppendLine(text)
     if scrolledToBottom then
-        GUI.chatPanel:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount()-13)
+        GUI.chatPanel:ScrollToBottom()
     else
         GUI.newMessageArrow:Enable()
     end
@@ -5090,10 +5112,16 @@ function ShowLobbyOptionsDialog()
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
+        local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
+    
         local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
         GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
+        GUI.chatPanel.numberOfLines = numberOfChatLinesForFontSize[sliderValue]
+        if isScrolledDown then
+            GUI.chatPanel:ScrollToBottom()
+        end
     end
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
