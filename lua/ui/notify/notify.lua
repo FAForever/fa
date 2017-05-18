@@ -2,6 +2,7 @@
 -- when you order and complete ACU upgrades
 
 local Prefs = import('/lua/user/prefs.lua')
+local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
@@ -17,8 +18,6 @@ function init(isReplay, parent)
     RegisterChatFunc(NotifyOverlay.processNotification, 'Notify')
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
-    
-    NotifyOverlay.init()
 
     populateMessages()
     setupStartDisables()
@@ -28,7 +27,8 @@ end
 function setupStartDisables()
     local state
 
-    for category, data in messages do
+    for key, data in messages do
+        local category = key
         if factions[category] then -- Don't make a disabler per-faction
             category = 'acus'
         end
@@ -39,10 +39,10 @@ function setupStartDisables()
         -- Handle categories that don't have a prefs entry yet
         if state == nil then
             if flag == 'acus' then -- ACU messages on by default when loading for the first time
-                Prefs.SetToCurrentProfile(flag) = false
+                Prefs.SetToCurrentProfile(flag, false)
                 state = false
             else
-                Prefs.SetToCurrentProfile(flag) = true -- Everything else to off by default
+                Prefs.SetToCurrentProfile(flag, true) -- Everything else to off by default
                 state = true
             end
         end
@@ -166,7 +166,7 @@ function onStartEnhancement(id, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' cancelled'})
+    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' cancelled'}}
 
     local data = ACUs[id]
     if data then

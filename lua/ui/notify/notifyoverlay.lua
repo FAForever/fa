@@ -12,9 +12,9 @@ local overlayDisabled
 overlays = {}
 
 function init()
-    RegisterChatFunc(NotifyOverlay.processNotification, 'NotifyOverlay')
-    AddChatCommand('enablenotifyoverlay', NotifyOverlay.toggleNotifyOverlay)
-    AddChatCommand('disablenotifyoverlay', NotifyOverlay.toggleNotifyOverlay)
+    RegisterChatFunc(processNotification, 'NotifyOverlay')
+    AddChatCommand('enablenotifyoverlay', toggleNotifyOverlay)
+    AddChatCommand('disablenotifyoverlay', toggleNotifyOverlay)
 
     local state = Prefs.GetFromCurrentProfile('Notify_Overlay_Disabled')
     if state == nil then
@@ -23,7 +23,6 @@ function init()
     end
 
     setOverlayDisabled(state)
-    Prefs.SavePreferences()
 end
 
 function setOverlayDisabled(bool)

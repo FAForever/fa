@@ -9,8 +9,10 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 
-local populateMessages = import('/lua/ui/notify/notify.lua').populateMessages
+local Notify = import('/lua/ui/notify/notify.lua')
+local populateMessages = Notify.populateMessages
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua')
+local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
 local defaultMessageTable = defaultMessages.defaultMessages
 local clarityTable = defaultMessages.clarityTable
 local Prefs = import('/lua/user/prefs.lua')
@@ -26,6 +28,11 @@ local messageLines = {}
 -- Store indexes of visible lines including headers and key entries
 local linesVisible = {}
 local linesCollapsed = true
+
+function init(isReplay, parent)
+    Notify.init(isReplay, parent)
+    NotifyOverlay.init()
+end
 
 local function EditMessage(parent, data, line)
     local dialogContent = Group(parent)
@@ -554,23 +561,14 @@ function CreateUI()
 end
 
 function SortData(dataTable)
+    WARN('SortData')
     table.sort(dataTable, function(a, b)
+        WARN('Sort function')
+        WARN(a.order .. ' - ' .. b.order)
         if a.order ~= b.order then
+            WARN('Ordering')
+            WARN(a.category .. ' - ' .. b.category)
             return a.order < b.order
-        else
-            if a.category ~= b.category then
-                return string.lower(a.category) < string.lower(b.category)
-            else
-                if a.type == 'entry' and b.type == 'entry' then
-                    if a.source ~= b.source then
-                        return a.source < b.source
-                    else
-                        return string.lower(a.text) < string.lower(b.text)
-                    end
-                else
-                    return a.id < b.id
-                end
-            end
         end
     end)
 end
@@ -624,6 +622,8 @@ function FormatData()
 
     SortData(LineGroups)
     
+    LOG(repr(LineGroups))
+    
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, data in LineGroups do
@@ -633,7 +633,6 @@ function FormatData()
                 type = 'header',
                 id = index,
                 order = LineGroups[category].order,
-                count = table.getsize(data.sources),
                 category = category,
                 text = LineGroups[category].text,
                 collapsed = LineGroups[category].collapsed
@@ -666,6 +665,8 @@ function FormatData()
         end
         data.index = i
     end
+    
+    LOG(repr(lineData))
 
     return lineData
 end

@@ -246,7 +246,7 @@ function CreateUI(isReplay)
     local hotkeyLabelsInit = import('/lua/keymap/hotkeylabels.lua').init
     hotkeyLabelsInit()
 
-    import('/lua/ui/notify/notify.lua').init(isReplay, import('/lua/ui/game/borders.lua').GetMapGroup())
+    import('/lua/ui/notify/customiser.lua').init(isReplay, import('/lua/ui/game/borders.lua').GetMapGroup())
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
