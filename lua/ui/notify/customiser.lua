@@ -56,7 +56,7 @@ local function EditMessage(parent, data, line)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
     helpText.Width:Set(dialogContent.Width() - 10)
-    helpText:SetText(clarityTable[data.source])
+    helpText:SetText(data.source)
     helpText:SetCenteredHorizontally(true)
     
     messageEntry = Bitmap(dialogContent)
@@ -106,10 +106,12 @@ local function AssignCurrentSelection(line)
     end
 end
 
-local function RemoveCurrentMessage()
+local function RemoveCurrentMessage(line)
     for _, data in lineGroupTable do
         if data.selected then
             data.message = ''
+            line.message:SetText('')
+            newMessageTable[data.category][data.source] = ''
             break
         end
     end
@@ -283,7 +285,7 @@ function CreateLine()
     line.RemoveMessage = function(self)
         if lineGroupTable[self.data.index].text then
             SelectLine(self.data.index)
-            RemoveCurrentMessage()
+            RemoveCurrentMessage(self)
         end
     end
 
@@ -360,7 +362,7 @@ function CreateLine()
             line.message:SetText('')
         elseif data.type == 'entry' then
             line.toggle:Hide()
-            line.description:SetText(clarityTable[data.source])
+            line.description:SetText(data.source)
             line.description:SetColor('ffffffff')
             line.description:SetFont('Arial', 16)
             line.message:SetText(data.text)
@@ -427,7 +429,7 @@ function CreateUI()
         RemoveInputCapture(dialogContent)
     end
 
-    local title = UIUtil.CreateText(dialogContent, LOC("<LOC notify_0001>Notify Messages"), 22)
+    local title = UIUtil.CreateText(dialogContent, LOC("<LOC notify_0000>Notify Management"), 22)
     LayoutHelpers.AtTopIn(title, dialogContent, 12)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
@@ -458,6 +460,48 @@ function CreateUI()
         text = LOC("<LOC key_binding_0004>Default Preset"),
         body = "<LOC notify_0011>Reset all messages to their defaults"
     })
+    
+    -- Button to toggle ACU notifications
+    local acuButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0001>ACUs"))
+    acuButton.Width:Set(200)
+    LayoutHelpers.Below(acuButton, title, 10)
+    LayoutHelpers.AtLeftIn(acuButton, dialogContent, 10)
+    acuButton.OnClick = function(self, modifiers)
+        Notify.toggleCategoryChat('acus')
+    end
+    Tooltip.AddControlTooltip(acuButton,
+    {
+        text = LOC("<LOC notify_0012>Toggle ACUs"),
+        body = "<LOC notify_0013>Toggles showing ACU upgrade notifications from other players"
+    })
+    
+    -- Button to toggle Experimental notifications
+    local expButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0014>Experimentals"))
+    expButton.Width:Set(200)
+    LayoutHelpers.Below(expButton, title, 10)
+    LayoutHelpers.RightOf(expButton, acuButton, 10)
+    expButton.OnClick = function(self, modifiers)
+        Notify.toggleCategoryChat('experimentals')
+    end
+    Tooltip.AddControlTooltip(expButton,
+    {
+        text = LOC("<LOC notify_0015>Toggle Experimentals"),
+        body = "<LOC notify_0016>Toggles showing Experimental-related notifications from other players"
+    })
+    
+    -- Button to toggle ACU Overlay
+    local overlayButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0017>Overlays"))
+    overlayButton.Width:Set(200)
+    LayoutHelpers.Below(overlayButton, title, 10)
+    LayoutHelpers.RightOf(overlayButton, expButton, 10)
+    overlayButton.OnClick = function(self, modifiers)
+        NotifyOverlay.toggleOverlayPermanent(false, nil)
+    end
+    Tooltip.AddControlTooltip(overlayButton,
+    {
+        text = LOC("<LOC notify_0018>Toggle Overlay"),
+        body = "<LOC notify_0019>Toggles showing ACU upgrade completion and ETA overlays"
+    })
 
     -- Activate the function to have this take effect on closing
     popup.OnClosed = function(self)
@@ -478,7 +522,7 @@ function CreateUI()
     mainContainer = Group(dialogContent)
     mainContainer.Left:Set(function() return dialogContent.Left() + 10 end)
     mainContainer.Right:Set(function() return dialogContent.Right() - 20 end)
-    mainContainer.Top:Set(function() return title.Bottom() + 10 end)
+    mainContainer.Top:Set(function() return acuButton.Bottom() + 10 end)
     mainContainer.Bottom:Set(function() return okButton.Top() - 10 end)
     mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - 10 end)
     mainContainer.top = 0
@@ -597,7 +641,7 @@ function FormatData()
 
             for source, message in data do
                 local messageLine = {
-                    source = source,
+                    source = clarityTable[source] or source,
                     category = category,
                     order = LineGroups[category].order,
                     text = message
@@ -609,9 +653,9 @@ function FormatData()
     
     -- flatten all key actions to a list separated by a header with info about key category
     local keys = {}
-    for k, v in LineGroups do
-        table.insert(keys, {key = k, order = v.order})
-        -- table.sort(v.sources, function(a, b) return a. < b. end) -- TODO: Use this line to sort sources
+    for category, data in LineGroups do
+        table.insert(keys, {key = category, order = data.order})
+        table.sort(data.sources, function(a, b) return a.source < b.source end)
     end
     table.sort(keys, function(a, b) return a.order < b.order end)
     
@@ -656,8 +700,6 @@ function FormatData()
         end
         data.index = i
     end
-    
-    LOG(repr(lineData))
 
     return lineData
 end

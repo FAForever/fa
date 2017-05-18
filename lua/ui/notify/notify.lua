@@ -7,7 +7,7 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
-local setOverlayDisabled = NotifyOverlay.setOverlayDisabled
+local toggleOverlayPermanent = NotifyOverlay.toggleOverlayPermanent
 local factions = import('/lua/factions.lua').FactionIndexMap
 
 local categoriesDisabled = {}
@@ -52,7 +52,7 @@ function setupStartDisables()
     state = Prefs.GetFromCurrentProfile('Notify_all_disabled')
     if state == nil then
         Prefs.SetToCurrentProfile('Notify_all_disabled', false)
-        state  = false
+        state = false
     end
 
     categoriesDisabled.All = state
@@ -85,7 +85,7 @@ end
 -- This overrides the individual category filters
 function toggleNotifyPermanent(bool)
     categoriesDisabled.All = bool
-    setOverlayDisabled(bool)
+    toggleOverlayPermanent(true, bool)
 
     if bool then
         print 'Notify Disabled'
@@ -103,19 +103,30 @@ end
 function toggleNotifyTemporary(args)
     if args[1] == 'enablenotify' then
         categoriesDisabled.All = false
-        setOverlayDisabled(false)
+        toggleOverlayPermanent(false, false)
         print 'Notify Enabled For Session'
     elseif args[1] == 'disablenotify' then
         categoriesDisabled.All = true
-        setOverlayDisabled(true)
+        toggleOverlayPermanent(false, true)
         print 'Notify Disabled For Session'
     end
 end
 
 -- Toggles the printing of received messages
 -- Called from the various buttons in the customiser
-function toggleCategoryChat(category, bool)
-    categoriesDisabled[category] = bool
+function toggleCategoryChat(category)
+    local msg
+    categoriesDisabled[category] = not categoriesDisabled[category]
+    
+    -- Messages seem backwards at first because categoriesDisabled true == disabled feature
+    if categoriesDisabled[category] then
+        msg = 'Disabled'
+    else
+        msg = 'Enabled'
+    end
+
+    msg = category .. msg .. '!'
+    print(msg)
 end
 
 function round(num, idp)
@@ -202,7 +213,7 @@ function watchEnhancement(id, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
     overlayData.pos = overlayData.unit:GetPosition()
-    overlayData.msg = {to = 'allies', Notify = true}
+    overlayData.msg = {to = 'allies', NotifyOverlay = true}
     overlayData.id = id
     overlayData.eta = -1
 

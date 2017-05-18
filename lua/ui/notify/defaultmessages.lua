@@ -16,7 +16,6 @@ defaultMessages = {
     },
     uef = {
         ResourceAllocation = "RAS",
-        ResourceAllocationAdvanced = "ARAS",
         AdvancedEngineering = "T2",
         T3Engineering = "T3",
         Teleporter = "Teleporter",
@@ -26,11 +25,11 @@ defaultMessages = {
         DamageStabilization = "Nano-Repair",
         LeftPod = "Left Drone",
         RightPod = "Right Drone",
+        Shield = "Shield",
         ShieldGeneratorField = "Shield Field",
     },
     cybran = {
         ResourceAllocation = "RAS",
-        ResourceAllocationAdvanced = "ARAS",
         AdvancedEngineering = "T2",
         T3Engineering = "T3",
         Teleporter = "Teleporter",

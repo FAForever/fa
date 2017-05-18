@@ -9,12 +9,13 @@ local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 
 local overlayDisabled
+local overlayLockedOut
 overlays = {}
 
 function init()
     RegisterChatFunc(processNotification, 'NotifyOverlay')
-    AddChatCommand('enablenotifyoverlay', toggleNotifyOverlay)
-    AddChatCommand('disablenotifyoverlay', toggleNotifyOverlay)
+    AddChatCommand('enablenotifyoverlay', toggleOverlayTemporary)
+    AddChatCommand('disablenotifyoverlay', toggleOverlayTemporary)
 
     local state = Prefs.GetFromCurrentProfile('Notify_Overlay_Disabled')
     if state == nil then
@@ -22,20 +23,47 @@ function init()
         state = false
     end
 
-    setOverlayDisabled(state)
+    overlayLockedOut = Prefs.GetFromCurrentProfile('Notify_all_disabled')
+    if overlayLockedOut == nil then
+        Prefs.SetToCurrentProfile('Notify_all_disabled', false)
+        overlayLockedOut = false
+    end
+
+    toggleOverlayPermanent(false, state)
 end
 
-function setOverlayDisabled(bool)
-    overlayDisabled = bool
+function destroyOverlays()
+    if overlayDisabled then
+        for _, overlay in overlays do
+            overlay.destroy = true
+        end
+    end
+end
+
+-- Called from notify.lua after the main button permanently disables things
+-- Also from the toggle button for temporary changes
+function toggleOverlayPermanent(permanent, bool)
+    if overlayLockedOut and not permanent then return end
+
+    -- Handle the toggle button from customiser.lua
+    if bool == nil then
+        overlayDisabled = not overlayDisabled
+    else
+        overlayDisabled = bool
+    end
+
+    if permanent then
+        overlayLockedOut = bool
+    end
+
     Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', bool)
     Prefs.SavePreferences()
+
+    destroyOverlays()
 end
 
-function getOverlayDisabled()
-    return overlayDisabled
-end
-
-function toggleNotifyOverlay(args)
+-- Called only by the chat commands
+function toggleOverlayTemporary(args)
     if args[1] == 'enablenotifyoverlay' then
         overlayDisabled = false
         print 'Notify Overlay Enabled'
@@ -44,10 +72,7 @@ function toggleNotifyOverlay(args)
         print 'Notify Overlay Disabled'
     end
 
-    if not args[2] or args[2] ~= 'once' then
-        Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', overlayDisabled)
-        Prefs.SavePreferences()
-    end
+    destroyOverlays()
 end
 
 -- This is called when we recieve a chat message from another player in the 'Notify' chat channel
