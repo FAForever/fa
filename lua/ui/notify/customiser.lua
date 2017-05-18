@@ -560,19 +560,6 @@ function CreateUI()
     mainContainer:CalcVisible()
 end
 
-function SortData(dataTable)
-    WARN('SortData')
-    table.sort(dataTable, function(a, b)
-        WARN('Sort function')
-        WARN(a.order .. ' - ' .. b.order)
-        if a.order ~= b.order then
-            WARN('Ordering')
-            WARN(a.category .. ' - ' .. b.category)
-            return a.order < b.order
-        end
-    end)
-end
-
 -- Format the upgrades and messages into groups and lines
 function FormatData()
     local lineData = {}
@@ -597,7 +584,7 @@ function FormatData()
     
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
-        if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
+        if categories[category] then
             if not LineGroups[category] then
                 LineGroups[category] = {}
                 LineGroups[category].sources = {}
@@ -619,15 +606,19 @@ function FormatData()
             end
         end
     end
-
-    SortData(LineGroups)
-    
-    LOG(repr(LineGroups))
     
     -- flatten all key actions to a list separated by a header with info about key category
+    local keys = {}
+    for k, v in LineGroups do
+        table.insert(keys, {key = k, order = v.order})
+        -- table.sort(v.sources, function(a, b) return a. < b. end) -- TODO: Use this line to sort sources
+    end
+    table.sort(keys, function(a, b) return a.order < b.order end)
+    
     local index = 1
-    for category, data in LineGroups do
-        if table.getsize(data.sources) > 0 then
+    for _, key in ipairs(keys) do
+        local category = key.key
+        if table.getsize(LineGroups[category].sources) > 0 then
             -- This is the first row
             lineData[index] = {
                 type = 'header',
@@ -640,7 +631,7 @@ function FormatData()
             
             -- Now fill in the rest of the category's lines
             index = index + 1
-            for _, line in data.sources do
+            for _, line in ipairs(LineGroups[category].sources) do
                 lineData[index] = {
                     type = 'entry',
                     text = line.text,
