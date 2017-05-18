@@ -584,7 +584,7 @@ function FormatData()
     
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
-        if categories[category] then
+        if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
             if not LineGroups[category] then
                 LineGroups[category] = {}
                 LineGroups[category].sources = {}
