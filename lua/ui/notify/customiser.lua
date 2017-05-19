@@ -56,7 +56,7 @@ local function EditMessage(parent, data, line)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
     helpText.Width:Set(dialogContent.Width() - 10)
-    helpText:SetText(data.source)
+    helpText:SetText(clarityTable[data.source])
     helpText:SetCenteredHorizontally(true)
     
     messageEntry = Bitmap(dialogContent)
@@ -362,7 +362,7 @@ function CreateLine()
             line.message:SetText('')
         elseif data.type == 'entry' then
             line.toggle:Hide()
-            line.description:SetText(data.source)
+            line.description:SetText(clarityTable[data.source])
             line.description:SetColor('ffffffff')
             line.description:SetFont('Arial', 16)
             line.message:SetText(data.text)
@@ -641,7 +641,7 @@ function FormatData()
 
             for source, message in data do
                 local messageLine = {
-                    source = clarityTable[source] or source,
+                    source = source,
                     category = category,
                     order = LineGroups[category].order,
                     text = message
