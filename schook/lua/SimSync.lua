@@ -114,10 +114,11 @@ function NoteFocusArmyChanged(new, old)
     --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import('/lua/SimPing.lua').OnArmyChange()
     for entityID, data in UnitData do
-        if data.OwnerArmy == old then
-            Sync.ReleaseIds[entityID] = true
-        elseif data.OwnerArmy == new then
+        if new == -1 or data.OwnerArmy == new then
             Sync.UnitData[entityID] = data.Data
+        elseif old == -1 or data.OwnerArmy == old then
+            Sync.ReleaseIds[entityID] = true
+        else
         end
     end
     SyncUnitEnhancements()
