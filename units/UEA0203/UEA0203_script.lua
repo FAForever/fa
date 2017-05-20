@@ -45,8 +45,8 @@ UEA0203 = Class(AirTransport, TAirUnit) {
         -- Since this is the only unit capable of carrying another into a transport
         -- We need to disable the weapon on that unit in case it's a LAB
         -- Use SetEnabled rather than SetOnTransport to ignore units like LABs which can fire from transports
-        local unit = self:GetCargo()
-        if unit then
+        local units = self:GetCargo()
+        if units[1] then
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
                 wep:SetEnabled(not bool)
