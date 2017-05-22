@@ -2518,7 +2518,7 @@ function HandleBuildModeKey(key)
     if capturingKeys then
         ProcessKeybinding(key)
     else
-        BuildTemplate(key)
+        return BuildTemplate(key)
     end
 end
 
