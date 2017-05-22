@@ -280,14 +280,15 @@ local function LoadDialog(parent)
     local text = '::  ' .. LOC('<LOC LOAD_0000>IN TRANSIT') .. '  ::'
     local textControl = UIUtil.CreateText(movie, text, 20, UIUtil.bodyFont)
     textControl:SetColor(color)
+    textControl:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
 
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
         tipControl:SetColor(color)
-        LayoutHelpers.CenteredBelow(tipControl, textControl, 20)
-        import('/lua/maui/effecthelpers.lua').Pulse(tipControl, 1, 0, .8)
+        tipControl:SetDropShadow(true)
+        LayoutHelpers.CenteredBelow(tipControl, textControl, 40)
         ForkThread(
             function(control)
                 local tipsTbl = import('/lua/ui/help/loadingtips.lua').Tips
@@ -295,6 +296,7 @@ local function LoadDialog(parent)
                 while WorldIsLoading() do
                     local tipText = LOCF('%s: %s', '<LOC loadingtip_0000>Quick Tip', tipsTbl[Random(1, tipsSize)])
                     control:SetText(tipText)
+                    control:SetDropShadow(true)
                     WaitSeconds(7)
                 end
             end,
@@ -385,6 +387,7 @@ function CreateWldUIProvider()
         local text = '::  ' .. LOC('<LOC LOAD_0000>IN TRANSIT') .. '  ::'
         local textControl = UIUtil.CreateText(background, text, 20, UIUtil.bodyFont)
         textControl:SetColor(color)
+        textControl:SetDropShadow(true)
         LayoutHelpers.AtCenterIn(textControl, GetFrame(0), 200)
         FlushEvents()
     end
