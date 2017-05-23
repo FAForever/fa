@@ -402,73 +402,14 @@ function CloseUI()
     end
 end
 
-function CreateUI()
-    if popup then
-        CloseUI()
-        return
-    end
-
-    lineGroupTable = FormatData()
-    linesVisible = {}
-
-    -- Set headers visible at the start
-    for index, line in lineGroupTable do
-        if line.type == 'header' then
-            table.insert(linesVisible, index)
-        end
-    end
-
-    local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(980)
-    dialogContent.Height:Set(730)
-
-    popup = Popup(GetFrame(0), dialogContent)
-    popup.OnShadowClicked = CloseUI
-    popup.OnEscapePressed = CloseUI
-    popup.OnDestroy = function(self)
-        RemoveInputCapture(dialogContent)
-    end
-
-    local title = UIUtil.CreateText(dialogContent, LOC("<LOC notify_0000>Notify Management"), 22)
-    LayoutHelpers.AtTopIn(title, dialogContent, 12)
-    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
-
-    local offset = dialogContent.Width() / 5
-
-    local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _OK>"))
-    okButton.Width:Set(200)
-    LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
-    LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
-    Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0002>Closes this dialog and confirms assignments of messages'})
-    okButton.OnClick = function(self, modifiers)
-        CloseUI()
-    end
-
-    -- Button to reset everything
-    local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0009>Default Preset"))
-    defaultButton.Width:Set(200)
-    LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, 10)
-    defaultButton.OnClick = function(self, modifiers)
-        UIUtil.QuickDialog(popup, "<LOC notify_0010>Are you sure you want to reset all messages to their defaults?",
-            "<LOC _Yes>", ResetMessages,
-            "<LOC _No>", nil, nil, nil, true,
-            {escapeButton = 2, enterButton = 1, worldCover = false})
-    end
-    Tooltip.AddControlTooltip(defaultButton,
-    {
-        text = LOC("<LOC key_binding_0004>Default Preset"),
-        body = "<LOC notify_0011>Reset all messages to their defaults"
-    })
-
-    -- Set up the toggle buttons
+function CreateMessageToggleButton(parent, prefString, category)
     local states = {
         normal   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
         active   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
         over     = UIUtil.SkinnableFile('/BUTTON/medium/_btn_over.dds'),
         disabled = UIUtil.SkinnableFile('/BUTTON/medium/_btn_dis.dds'),
     }
-
+    
     local function buttonBehaviour(self, event)
         if event.Type == 'ButtonPress' then
             if not self.checked then
@@ -491,68 +432,138 @@ function CreateUI()
         end
     end
 
+    local button = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, "", 11)
+
+    local active = Prefs.GetFromCurrentProfile(prefString)
+    button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
+
+    if not button.checked then
+        button:SetTexture(states.normal)
+    else
+        button:SetTexture(states.active)
+    end
+
+    button.category = category
+    button.HandleEvent = buttonBehaviour
+    
+    return button
+end
+
+function CreateUI()
+    if popup then
+        CloseUI()
+        return
+    end
+
+    -- Create a properly layed out table from the default messages to be used to construct this UI
+    lineGroupTable = FormatData()
+    linesVisible = {}
+
+    -- Set headers visible at the start
+    for index, line in lineGroupTable do
+        if line.type == 'header' then
+            table.insert(linesVisible, index)
+        end
+    end
+
+    -- Create the main box
+    local dialogContent = Group(GetFrame(0))
+    dialogContent.Width:Set(980)
+    dialogContent.Height:Set(730)
+
+    -- Handle using keypress to exit
+    dialogContent.HandleEvent = function(self, event)
+        if event.Type == 'KeyDown' then
+            if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
+                okButton:OnClick()
+            end
+        end
+    end
+
+    popup = Popup(GetFrame(0), dialogContent)
+    popup.OnShadowClicked = CloseUI
+    popup.OnEscapePressed = CloseUI
+    popup.OnDestroy = function(self)
+        RemoveInputCapture(dialogContent)
+    end
+    
+    -- Activate the function to have this take effect on closing
+    popup.OnClosed = function(self)
+        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+        populateMessages()
+    end
+
+    local title = UIUtil.CreateText(dialogContent, LOC("<LOC notify_0000>Notify Management"), 22)
+    LayoutHelpers.AtTopIn(title, dialogContent, 12)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
+
+    -- Button to confirm changes and exit
+    local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _OK>"))
+    okButton.Width:Set(200)
+    LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
+    LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
+    Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0002>Closes this dialog and confirms assignments of messages'})
+    okButton.OnClick = function(self, modifiers)
+        CloseUI()
+    end
+
+    -- Button to reset everything
+    local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0009>Default Preset"))
+    defaultButton.Width:Set(200)
+    LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, 10)
+    defaultButton.OnClick = function(self, modifiers)
+        UIUtil.QuickDialog(popup, "<LOC notify_0010>Are you sure you want to reset all messages to their defaults?",
+            "<LOC _Yes>", ResetMessages,
+            "<LOC _No>", nil, nil, nil, true,
+            {escapeButton = 2, enterButton = 1, worldCover = false})
+    end
+    Tooltip.AddControlTooltip(defaultButton,
+        {
+            text = LOC("<LOC key_binding_0004>Default Preset"),
+            body = "<LOC notify_0011>Reset all messages to their defaults"
+        }
+    )
+
+    -- Set up the toggle buttons
     -- Button to toggle ACU notifications
-    local acuButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0001>ACUs"), 11)
+    local acuButton = CreateMessageToggleButton(dialogContent, 'Notify_acus_Disabled', 'acus')
+    acuButton:SetText('<LOC notify_0001>ACUs')
     acuButton.Width:Set(200)
     LayoutHelpers.Below(acuButton, title, 10)
     LayoutHelpers.AtLeftIn(acuButton, dialogContent, 10)
-
-    local active = Prefs.GetFromCurrentProfile('Notify_acus_Disabled')
-    acuButton.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
-
-    if not acuButton.checked then
-        acuButton:SetTexture(states.normal)
-    else
-        acuButton:SetTexture(states.active)
-    end
-
-    acuButton.category = 'acus'
-    acuButton.HandleEvent = buttonBehaviour
     Tooltip.AddControlTooltip(acuButton,
-    {
-        text = LOC("<LOC notify_0012>Toggle ACUs"),
-        body = "<LOC notify_0013>Toggles showing ACU upgrade notifications from other players"
-    })
+        {
+            text = LOC("<LOC notify_0012>Toggle ACUs"),
+            body = "<LOC notify_0013>Toggles showing ACU upgrade notifications from other players"
+        }
+    )
 
     -- Button to toggle Experimental notifications
-    local expButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0014>Experimentals"), 11)
+    local expButton = CreateMessageToggleButton(dialogContent, 'Notify_experimentals_Disabled', 'experimentals')
+    expButton:SetText('<LOC notify_0014>Experimentals')
     expButton.Width:Set(200)
     LayoutHelpers.Below(expButton, title, 10)
     LayoutHelpers.RightOf(expButton, acuButton, 10)
-
-    active = Prefs.GetFromCurrentProfile('Notify_experimentals_Disabled')
-    expButton.checked = not active
-
-    if not expButton.checked then
-        expButton:SetTexture(states.normal)
-    else
-        expButton:SetTexture(states.active)
-    end
-
-    expButton.category = 'experimentals'
-    expButton.HandleEvent = buttonBehaviour
-
     Tooltip.AddControlTooltip(expButton,
-    {
-        text = LOC("<LOC notify_0015>Toggle Experimentals"),
-        body = "<LOC notify_0016>Toggles showing Experimental-related notifications from other players"
-    })
+        {
+            text = LOC("<LOC notify_0015>Toggle Experimentals"),
+            body = "<LOC notify_0016>Toggles showing Experimental-related notifications from other players"
+        }
+    )
 
     -- Button to toggle ACU Overlay
-    local overlayButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0017>Overlays"), 11)
+    local overlayButton = CreateMessageToggleButton(dialogContent, 'Notify_overlay_Disabled')
+    overlayButton:SetText('<LOC notify_0017>Overlays')
     overlayButton.Width:Set(200)
     LayoutHelpers.Below(overlayButton, title, 10)
     LayoutHelpers.RightOf(overlayButton, expButton, 10)
-
-    active = Prefs.GetFromCurrentProfile('Notify_overlay_Disabled')
-    overlayButton.checked = not active
-
-    if not overlayButton.checked then
-        overlayButton:SetTexture(states.normal)
-    else
-        overlayButton:SetTexture(states.active)
-    end
-
+    Tooltip.AddControlTooltip(overlayButton,
+        {
+            text = LOC("<LOC notify_0018>Toggle Overlay"),
+            body = "<LOC notify_0019>Toggles showing ACU upgrade completion and ETA overlays"
+        }
+    )
     overlayButton.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             if not self.checked then
@@ -572,27 +583,6 @@ function CreateUI()
         elseif event.Type == 'MouseExit' then
             self:OnRolloverEvent('exit')
             return true
-        end
-    end
-
-    Tooltip.AddControlTooltip(overlayButton,
-    {
-        text = LOC("<LOC notify_0018>Toggle Overlay"),
-        body = "<LOC notify_0019>Toggles showing ACU upgrade completion and ETA overlays"
-    })
-
-    -- Activate the function to have this take effect on closing
-    popup.OnClosed = function(self)
-        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
-        populateMessages()
-    end
-
-    -- Handle using keypress to exit
-    dialogContent.HandleEvent = function(self, event)
-        if event.Type == 'KeyDown' then
-            if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
-                okButton:OnClick()
-            end
         end
     end
 
