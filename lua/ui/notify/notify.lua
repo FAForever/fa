@@ -156,7 +156,7 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = 'Upgrading ' .. messages[category][source]}}
+    local msg = {to = 'allies', Notify = true, data = {category = category, text = 'Starting ' .. messages[category][source]}}
 
     -- Start by storing ACU IDs for future use
     if id then
@@ -179,10 +179,12 @@ end
 function onCancelledEnhancement(id, category, source)
     local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' cancelled'}}
 
-    local data = ACUs[id]
-    if data then
-        killWatcher(data)
-        NotifyOverlay.sendDestroyOverlayMessage(id)
+    if id then
+        local data = ACUs[id]
+        if data then
+            killWatcher(data)
+            NotifyOverlay.sendDestroyOverlayMessage(id)
+        end
     end
     
     SessionSendChatMessage(FindClients(), msg)
@@ -192,11 +194,13 @@ end
 function onCompletedEnhancement(id, category, source)
     local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' done!'}}
 
-    local data = ACUs[id]
-    if data then
-        msg.data.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
-        killWatcher(data)
-        NotifyOverlay.sendDestroyOverlayMessage(id)
+    if id then
+        local data = ACUs[id]
+        if data then
+            msg.data.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            killWatcher(data)
+            NotifyOverlay.sendDestroyOverlayMessage(id)
+        end
     end
     
     SessionSendChatMessage(FindClients(), msg)

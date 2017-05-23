@@ -222,6 +222,11 @@ Unit = Class(moho.unit_methods) {
 
         local bp = self:GetBlueprint()
 
+        -- Save common lookup info
+        self.techCategory = bp.TechCategory
+        self.layerCategory = bp.LayerCategory
+        self.factionCategory = bp.FactionCategory
+
         -- Define Economic modifications
         local bpEcon = bp.Economy
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -1880,6 +1885,8 @@ Unit = Class(moho.unit_methods) {
         end
 
         self.originalBuilder = builder
+
+        self:SendNotifyMessage('started')
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
@@ -1999,6 +2006,8 @@ Unit = Class(moho.unit_methods) {
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
+
+        self:SendNotifyMessage('completed')
 
         return true
     end,
@@ -4186,6 +4195,43 @@ Unit = Class(moho.unit_methods) {
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
+    end,
+
+    -- Utility Functions
+    SendNotifyMessage = function(self, trigger, source)
+        if self:GetArmy() == GetFocusArmy() then
+            local id
+            local unitType
+            local category
+
+            if not source then
+                local bp = self:GetBlueprint()
+                if bp.CategoriesHash.RESEARCH then
+                    local layer = self.layerCategory
+                    local tech = self.techCategory
+                    unitType = 'research' .. layer .. tech
+                    category = 'tech'
+                elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL) then -- Ensure to exclude Yolona Oss, which gets its own message
+                    unitType = 'nuke'
+                    category = 'other'
+                elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY) then
+                    unitType = 'arty'
+                    category = 'other'
+                elseif self.techCategory == 'EXPERIMENTAL' then
+                    unitType = bp.BlueprintId
+                    category = 'experimentals'
+                else
+                    return
+                end
+            else -- We are being called from the Enhancements chain (ACUs)
+                id = self:GetEntityId()
+                category = string.lower(self.factionCategory)
+            end
+
+            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+            local message = {source = source or unitType, trigger = trigger, category = category, id = id}
+            table.insert(Sync.EnhanceMessage, message)
+        end
     end,
 
     --- Deprecated functionality

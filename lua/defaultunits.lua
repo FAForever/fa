@@ -2244,35 +2244,20 @@ ACUUnit = Class(CommandUnit) {
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
 
-        -- Send a chat message to allies according to the enhancement
-        if self:GetArmy() == GetFocusArmy() then
-            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {source = enh, trigger = 'completed', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
-            table.insert(Sync.EnhanceMessage, message)
-        end
+        self:SendNotifyMessage('completed', enh)
     end,
 
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
         if not legalWork then return end
 
-        -- Send a chat message to allies if work is an enhancement
-        if self:GetArmy() == GetFocusArmy() then
-            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {source = work, trigger = 'started', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
-            table.insert(Sync.EnhanceMessage, message)
-        end
+        self:SendNotifyMessage('started', enh)
 
         return true
     end,
 
     OnWorkFail = function(self, work)
-        -- Send a chat message to allies if work is an enhancement
-        if self:GetArmy() == GetFocusArmy() then
-            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {source = work, trigger = 'cancelled', id = self:GetEntityId(), faction = string.lower(self:GetBlueprint().General.FactionName)}
-            table.insert(Sync.EnhanceMessage, message)
-        end
+        self:SendNotifyMessage('cancelled', enh)
 
         CommandUnit.OnWorkFail(self, work)
     end,

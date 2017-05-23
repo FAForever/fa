@@ -86,6 +86,18 @@ defaultMessages = {
         xsb2401 = "Yolona Oss",
         xsl0401 = "Ythotha",
     },
+    tech = {
+        researchlandtech2 = "Tech 2 Land HQ upgrade",
+        researchlandtech3 = "Tech 3 Land HQ upgrade",
+        researchairtech2 = "Tech 2 Air HQ upgrade",
+        researchairtech3 = "Tech 3 Air HQ upgrade",
+        researchnavaltech2 = "Tech 2 Naval HQ upgrade",
+        researchnavaltech3 = "Tech 3 Naval HQ upgrade",
+    },
+    other = {
+        nuke = "Nuke Silo construction",
+        arty = "Tech 3 Artillery construction",
+    },
 }
 
 -- This table maps the in-game upgrade names to more colloquial terms so that players can more easily know which message to change
@@ -143,4 +155,12 @@ clarityTable = {
     xsa0402 = "Ahwassa",
     xsb2401 = "Yolona Oss",
     xsl0401 = "Ythotha",
+    researchlandtech2 = "Tech 2 Land HQ",
+    researchlandtech3 = "Tech 3 Land HQ",
+    researchairtech2 = "Tech 2 Air HQ",
+    researchairtech3 = "Tech 3 Air HQ",
+    researchnavaltech2 = "Tech 2 Naval HQ",
+    researchnavaltech3 = "Tech 3 Naval HQ",
+    nuke = "Nuke Launcher",
+    arty = "Tech 3 Static Artillery",
 }
