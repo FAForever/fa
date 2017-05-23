@@ -1,8 +1,7 @@
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
-local PingLimit = 3 -- Maximum number of pings per army, within PingTimeout seconds
-local ExtraMarkers = 1 -- How many extra markers an army can make beyond the normal ping limit
-local PingTimeout = 15 -- How long a ping counts toward an army's limit
+local PingLimit = 1 -- Maximum number of pings per army, within PingTimeout seconds
+local PingTimeout = 1 -- How many seconds a ping counts toward an army's limit
 local PingsRemaining = {}
 local PingMarkers = {}
 MaxPingMarkers = 15
@@ -25,7 +24,7 @@ function SpawnPing(data)
         PingsRemaining[data.Owner] = PingLimit
     end
     
-    if PingsRemaining[data.Owner] > 0 or data.Marker and PingsRemaining[data.Owner] > -ExtraMarkers then
+    if PingsRemaining[data.Owner] > 0 then
         if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
             return
         elseif data.Marker and not PingMarkers[data.Owner] then
