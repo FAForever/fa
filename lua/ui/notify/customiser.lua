@@ -58,7 +58,7 @@ local function EditMessage(parent, data, line)
     helpText.Width:Set(dialogContent.Width() - 10)
     helpText:SetText(clarityTable[data.source])
     helpText:SetCenteredHorizontally(true)
-    
+
     messageEntry = Bitmap(dialogContent)
     messageEntry:SetSolidColor('FF282828')
     messageEntry.Left:Set(function() return dialogContent.Left() + 15 end)
@@ -67,7 +67,7 @@ local function EditMessage(parent, data, line)
     messageEntry.Bottom:Set(function() return okButton.Top() - 15 end)
     messageEntry.Width:Set(function() return messageEntry.Right() - messageEntry.Left() end)
     messageEntry.Height:Set(function() return messageEntry.Bottom() - messageEntry.Top() end)
-    
+
     messageEntry.text = Edit(messageEntry)
     messageEntry.text:SetForegroundColor('FFF1ECEC')
     messageEntry.text:SetBackgroundColor('04E1B44A')
@@ -384,7 +384,7 @@ function ImportMessages()
         messageTable = defaultMessageTable
         Prefs.SetToCurrentProfile('Notify_Messages', messageTable)
     end
-    
+
     return messageTable
 end
 
@@ -410,7 +410,7 @@ function CreateUI()
 
     lineGroupTable = FormatData()
     linesVisible = {}
-    
+
     -- Set headers visible at the start
     for index, line in lineGroupTable do
         if line.type == 'header' then
@@ -441,9 +441,9 @@ function CreateUI()
     LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
     Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0002>Closes this dialog and confirms assignments of messages'})
     okButton.OnClick = function(self, modifiers)
-        CloseUI() 
+        CloseUI()
     end
-    
+
     -- Button to reset everything
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0009>Default Preset"))
     defaultButton.Width:Set(200)
@@ -460,43 +460,121 @@ function CreateUI()
         text = LOC("<LOC key_binding_0004>Default Preset"),
         body = "<LOC notify_0011>Reset all messages to their defaults"
     })
-    
+
+    -- Set up the toggle buttons
+    local states = {
+        normal   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
+        active   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
+        over     = UIUtil.SkinnableFile('/BUTTON/medium/_btn_over.dds'),
+        disabled = UIUtil.SkinnableFile('/BUTTON/medium/_btn_dis.dds'),
+    }
+
+    local function buttonBehaviour(self, event)
+        if event.Type == 'ButtonPress' then
+            if not self.checked then
+                self.checked = true
+                self:SetTexture(states.active)
+            else
+                self.checked = false
+                self:SetTexture(states.normal)
+            end
+
+            Notify.toggleCategoryChat(self.category)
+
+            return true
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter')
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            return true
+        end
+    end
+
     -- Button to toggle ACU notifications
-    local acuButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0001>ACUs"))
+    local acuButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0001>ACUs"), 11)
     acuButton.Width:Set(200)
     LayoutHelpers.Below(acuButton, title, 10)
     LayoutHelpers.AtLeftIn(acuButton, dialogContent, 10)
-    acuButton.OnClick = function(self, modifiers)
-        Notify.toggleCategoryChat('acus')
+
+    local active = Prefs.GetFromCurrentProfile('Notify_acus_Disabled')
+    acuButton.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
+
+    if not acuButton.checked then
+        acuButton:SetTexture(states.normal)
+    else
+        acuButton:SetTexture(states.active)
     end
+
+    acuButton.category = 'acus'
+    acuButton.HandleEvent = buttonBehaviour
     Tooltip.AddControlTooltip(acuButton,
     {
         text = LOC("<LOC notify_0012>Toggle ACUs"),
         body = "<LOC notify_0013>Toggles showing ACU upgrade notifications from other players"
     })
-    
+
     -- Button to toggle Experimental notifications
-    local expButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0014>Experimentals"))
+    local expButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0014>Experimentals"), 11)
     expButton.Width:Set(200)
     LayoutHelpers.Below(expButton, title, 10)
     LayoutHelpers.RightOf(expButton, acuButton, 10)
-    expButton.OnClick = function(self, modifiers)
-        Notify.toggleCategoryChat('experimentals')
+
+    active = Prefs.GetFromCurrentProfile('Notify_experimentals_Disabled')
+    expButton.checked = not active
+
+    if not expButton.checked then
+        expButton:SetTexture(states.normal)
+    else
+        expButton:SetTexture(states.active)
     end
+
+    expButton.category = 'experimentals'
+    expButton.HandleEvent = buttonBehaviour
+
     Tooltip.AddControlTooltip(expButton,
     {
         text = LOC("<LOC notify_0015>Toggle Experimentals"),
         body = "<LOC notify_0016>Toggles showing Experimental-related notifications from other players"
     })
-    
+
     -- Button to toggle ACU Overlay
-    local overlayButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC notify_0017>Overlays"))
+    local overlayButton = UIUtil.CreateButton(dialogContent, states.normal, states.active, states.over, states.disabled, LOC("<LOC notify_0017>Overlays"), 11)
     overlayButton.Width:Set(200)
     LayoutHelpers.Below(overlayButton, title, 10)
     LayoutHelpers.RightOf(overlayButton, expButton, 10)
-    overlayButton.OnClick = function(self, modifiers)
-        NotifyOverlay.toggleOverlayPermanent(false, nil)
+
+    active = Prefs.GetFromCurrentProfile('Notify_overlay_Disabled')
+    overlayButton.checked = not active
+
+    if not overlayButton.checked then
+        overlayButton:SetTexture(states.normal)
+    else
+        overlayButton:SetTexture(states.active)
     end
+
+    overlayButton.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if not self.checked then
+                self.checked = true
+                self:SetTexture(states.active)
+            else
+                self.checked = false
+                self:SetTexture(states.normal)
+            end
+
+            NotifyOverlay.toggleOverlayPermanent(false, nil)
+
+            return true
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter')
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            return true
+        end
+    end
+
     Tooltip.AddControlTooltip(overlayButton,
     {
         text = LOC("<LOC notify_0018>Toggle Overlay"),
@@ -600,7 +678,7 @@ function CreateUI()
             control:ScrollLines(nil, lines)
         end
     end
-    
+
     mainContainer:CalcVisible()
 end
 
@@ -614,7 +692,7 @@ function FormatData()
     for category, group in LineGroups do
         group.sources = {}
     end
-    
+
     local categories = {
         aeon = 1,
         uef = 2,
@@ -625,7 +703,7 @@ function FormatData()
         nuke = 7,
         arty = 8,
     }
-    
+
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
         if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
@@ -650,7 +728,7 @@ function FormatData()
             end
         end
     end
-    
+
     -- flatten all key actions to a list separated by a header with info about key category
     local keys = {}
     for category, data in LineGroups do
@@ -658,7 +736,7 @@ function FormatData()
         table.sort(data.sources, function(a, b) return a.source < b.source end)
     end
     table.sort(keys, function(a, b) return a.order < b.order end)
-    
+
     local index = 1
     for _, key in ipairs(keys) do
         local category = key.key
@@ -672,7 +750,7 @@ function FormatData()
                 text = LineGroups[category].text,
                 collapsed = LineGroups[category].collapsed
             }
-            
+
             -- Now fill in the rest of the category's lines
             index = index + 1
             for _, line in ipairs(LineGroups[category].sources) do

@@ -2007,7 +2007,10 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
 
-        self:SendNotifyMessage('completed')
+        -- Don't try sending a Notify message from here if we're an ACU
+        if not self.techCategory == 'COMMAND' then
+            self:SendNotifyMessage('completed')
+        end
 
         return true
     end,
@@ -4211,10 +4214,10 @@ Unit = Class(moho.unit_methods) {
                     local tech = self.techCategory
                     unitType = 'research' .. layer .. tech
                     category = 'tech'
-                elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL) then -- Ensure to exclude Yolona Oss, which gets its own message
+                elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
                     unitType = 'nuke'
                     category = 'other'
-                elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY) then
+                elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
                     unitType = 'arty'
                     category = 'other'
                 elseif self.techCategory == 'EXPERIMENTAL' then

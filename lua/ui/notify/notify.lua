@@ -94,7 +94,6 @@ function toggleNotifyPermanent(bool)
     end
 
     Prefs.SetToCurrentProfile('Notify', bool)
-    Prefs.SetToCurrentProfile('Notify', bool)
     Prefs.SavePreferences()
 end
 
@@ -127,6 +126,10 @@ function toggleCategoryChat(category)
 
     msg = category .. msg .. '!'
     print(msg)
+
+    local flag = 'Notify_' .. category .. '_Disabled'
+    Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
+    Prefs.SavePreferences()
 end
 
 function round(num, idp)
