@@ -434,12 +434,18 @@ function CreateMessageToggleButton(parent, category)
 
     local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, "", 11)
 
-    local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. 'Disabled')
+    WARN(category)
+    WARN('Notify_' .. category .. '_Disabled')
+    local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_Disabled')
+    LOG(active)
     button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
+    LOG(button.checked)
 
     if not button.checked then
+        LOG('normal')
         button:SetTexture(states.normal)
     else
+        LOG('active')
         button:SetTexture(states.active)
     end
 
@@ -566,7 +572,7 @@ function CreateUI()
     )
 
     -- Button to toggle 'other' notifications
-    local otherButton = CreateMessageToggleButton(dialogContent, 'Notify_other_Disabled', 'other')
+    local otherButton = CreateMessageToggleButton(dialogContent, 'other', 'other')
     otherButton.label:SetText(LOC('<LOC notify_0020>Other'))
     otherButton.Width:Set(151)
     LayoutHelpers.Below(otherButton, title, 10)

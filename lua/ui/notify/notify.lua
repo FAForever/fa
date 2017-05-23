@@ -38,7 +38,7 @@ function setupStartDisables()
 
         -- Handle categories that don't have a prefs entry yet
         if state == nil then
-            if flag == 'acus' then -- ACU messages on by default when loading for the first time
+            if category == 'acus' then -- ACU messages on by default when loading for the first time
                 Prefs.SetToCurrentProfile(flag, false)
                 state = false
             else

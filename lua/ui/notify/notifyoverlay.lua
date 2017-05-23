@@ -17,9 +17,9 @@ function init()
     AddChatCommand('enablenotifyoverlay', toggleOverlayTemporary)
     AddChatCommand('disablenotifyoverlay', toggleOverlayTemporary)
 
-    local state = Prefs.GetFromCurrentProfile('Notify_Overlay_Disabled')
+    local state = Prefs.GetFromCurrentProfile('Notify_overlay_Disabled')
     if state == nil then
-        Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', false)
+        Prefs.SetToCurrentProfile('Notify_overlay_Disabled', false)
         state = false
     end
 
@@ -56,7 +56,7 @@ function toggleOverlayPermanent(permanent, bool)
         overlayLockedOut = bool
     end
 
-    Prefs.SetToCurrentProfile('Notify_Overlay_Disabled', bool)
+    Prefs.SetToCurrentProfile('Notify_overlay_Disabled', bool)
     Prefs.SavePreferences()
 
     destroyOverlays()
