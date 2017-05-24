@@ -205,7 +205,7 @@ function onCompletedEnhancement(id, category, source)
     if id then
         local data = ACUs[id]
         if data then
-            msg.data.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            msg.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
             killWatcher(data)
             NotifyOverlay.sendDestroyOverlayMessage(id)
         end
