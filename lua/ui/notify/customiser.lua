@@ -750,13 +750,13 @@ function FormatData()
         seraphim = 4,
         nomads = 5,
         experimentals = 6,
-        nuke = 7,
-        arty = 8,
+        tech = 7,
+        other = 8,
     }
 
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
-        if factions[category] or category == 'experimentals' or category == 'nuke' or category == 'arty' then
+        if factions[category] or category == 'experimentals' or category == 'tech' or category == 'other' then
             if not LineGroups[category] then
                 LineGroups[category] = {}
                 LineGroups[category].sources = {}

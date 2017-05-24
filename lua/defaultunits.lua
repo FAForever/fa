@@ -2251,13 +2251,13 @@ ACUUnit = Class(CommandUnit) {
         local legalWork = CommandUnit.OnWorkBegin(self, work)
         if not legalWork then return end
 
-        self:SendNotifyMessage('started', enh)
+        self:SendNotifyMessage('started', work)
 
         return true
     end,
 
     OnWorkFail = function(self, work)
-        self:SendNotifyMessage('cancelled', enh)
+        self:SendNotifyMessage('cancelled', work)
 
         CommandUnit.OnWorkFail(self, work)
     end,

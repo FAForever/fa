@@ -13,11 +13,14 @@ local factions = import('/lua/factions.lua').FactionIndexMap
 local categoriesDisabled = {}
 local messages = {}
 local ACUs = {}
+local Player
 
 function init(isReplay, parent)
-    RegisterChatFunc(NotifyOverlay.processNotification, 'Notify')
+    RegisterChatFunc(processIncomingMessage, 'Notify')
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
+
+    Player = Prefs.GetFromCurrentProfile('Name') or 'Unknown'
 
     populateMessages()
     setupStartDisables()
@@ -60,7 +63,9 @@ function setupStartDisables()
 end
 
 function processIncomingMessage(players, msg)
-    if not categoriesDisabled.All or not categoriesDisabled[msg.data.category] then
+    if players == Player then return end -- Don't display messages from ourselves
+
+    if not categoriesDisabled.All or not categoriesDisabled[msg.category] then
         local army = GetFocusArmy()
         msg.Notify = false
         msg.Chat = true
@@ -159,7 +164,7 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = 'Starting ' .. messages[category][source]}}
+    local msg = {to = 'allies', Notify = true, category = category, text = 'Starting ' .. messages[category][source]}
 
     -- Start by storing ACU IDs for future use
     if id then
@@ -180,7 +185,7 @@ function onStartEnhancement(id, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' cancelled'}}
+    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' cancelled'}
 
     if id then
         local data = ACUs[id]
@@ -195,7 +200,7 @@ end
 
 -- Called from the enhancement watcher
 function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' done!'}}
+    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' done!'}
 
     if id then
         local data = ACUs[id]
