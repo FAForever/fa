@@ -157,7 +157,7 @@ BaseManager = Class {
             NumAssisting = 0,           -- Number of engies assisting the conditional build
             MaxAssisting = 1,           -- Maximum units to assist the current conditional build
             Unit = false,            -- The actual unit being constructed currently
-            MainBuilder = false;     -- False if there is currently not a main conditional builder, else the unit building
+            MainBuilder = false,     -- False if there is currently not a main conditional builder, else the unit building
             Index = 0,               -- Stores the index of the current conditional being built
             WaitSecondsAfterDeath = false, -- Time to wait after conditional build's death before starting a new one.
 
@@ -184,11 +184,11 @@ BaseManager = Class {
     -- Level Table format
     -- {
     --     GroupName = Priority, -- Name not in quotes
-    --}
+    -- }
     Initialize = function(self, brain, baseName, markerName, radius, levelTable, diffultySeparate)
         self.Active = true
         if self.Initialized then
-            error('*AI ERROR: BaseManager named "'..baseName..'" has already been initialized', 2)
+            error('*AI ERROR: BaseManager named "' .. baseName .. '" has already been initialized', 2)
         end
 
         self.Initialized = true
@@ -1253,7 +1253,7 @@ BaseManager = Class {
         AirScoutingActive = function(self, val)
             self.FunctionalityStates.AirScouting = val
         end,
-   },
+    },
 
     -- Enable/Disable building of buildings and stuff
     SetBuild = function(self, buildType, val)
@@ -1425,7 +1425,7 @@ BaseManager = Class {
             self.BuildTable['MassStorage'] = val
             self.BuildTable['EnergyStorage'] = val
         end,
-   },
+    },
 
     -------------------------------------
     -- Default builders for base managers
