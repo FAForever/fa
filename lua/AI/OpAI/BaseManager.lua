@@ -218,9 +218,17 @@ BaseManager = Class {
         self:SortGroupNames() -- Force sort since no sorting when adding groups earlier
         self:ForkThread(self.UpgradeCheckThread) -- Start the thread to see if any buildings need upgrades
 
-        -- Check for a default patrol chain for engineers
+        -- Check for a default chains for engineers' patrol and scouting
         if Scenario.Chains[baseName..'_EngineerChain'] then
             self:SetDefaultEngineerPatrolChain(baseName..'_EngineerChain')
+        end
+
+        if Scenario.Chains[baseName..'_AirScoutChain'] then
+            self:SetDefaultAirScoutPatrolChain(baseName..'_AirScoutChain')
+        end
+
+        if Scenario.Chains[baseName..'_LandScoutChain'] then
+            self:SetDefaultLandScoutPatrolChain(baseName..'_LandScoutChain')
         end
     end,
 
