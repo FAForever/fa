@@ -9,6 +9,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
 local AMPlatoonHelperFunctions = import('/lua/editor/AMPlatoonHelperFunctions.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local SUtils = import('/lua/AI/sorianutilities.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
 local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -1081,6 +1082,72 @@ function BaseManagerScoutingAI(platoon)
             end
         end
         WaitSeconds(35)
+    end
+end
+
+function BaseManagerTMLAI(platoon)
+    local aiBrain = platoon:GetBrain()
+    local pData = platoon.PlatoonData
+    local baseName = pData.BaseName
+    local bManager = aiBrain.BaseManagers[baseName]
+    local unit = platoon:GetPlatoonUnits()[1]
+    unit.BaseName = baseName
+
+    if not unit then return end
+
+    platoon:Stop()
+    local bp = unit:GetBlueprint()
+    local weapon = bp.Weapon[1]
+    local maxRadius = weapon.MaxRadius
+    local minRadius = weapon.MinRadius
+
+    local simpleTargetting = true
+    if ScenarioInfo.Options.Difficulty == 3 then
+        simpleTargetting = false
+    end
+
+    unit:SetAutoMode(true)
+
+    platoon:SetPrioritizedTargetList('Attack', {
+        categories.COMMAND,
+        categories.EXPERIMENTAL,
+        categories.ENERGYPRODUCTION,
+        categories.STRUCTURE,
+        categories.TECH3 * categories.MOBILE})
+
+    while aiBrain:PlatoonExists(platoon) do
+        if BMBC.TMLsEnabled(aiBrain, baseName) then
+            local target = false
+            local blip = false
+            while unit:GetTacticalSiloAmmoCount() < 1 or not target do
+                WaitSeconds(7)
+                target = false
+                while not target do
+                    target = platoon:FindPrioritizedUnit('Attack', 'Enemy', true, unit:GetPosition(), maxRadius)
+
+                    if target then
+                        break
+                    end
+
+                    WaitSeconds(3)
+
+                    if not aiBrain:PlatoonExists(platoon) then
+                        return
+                    end
+                end
+            end
+            if not target.Dead then
+                if EntityCategoryContains(categories.STRUCTURE, target) or simpleTargetting then
+                    IssueTactical({unit}, target)
+                else
+                    targPos = SUtils.LeadTarget(platoon, target)
+                    if targPos then
+                        IssueTactical({unit}, targPos)
+                    end
+                end
+            end
+        end
+        WaitSeconds(3)
     end
 end
 
