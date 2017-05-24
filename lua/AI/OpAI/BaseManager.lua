@@ -131,7 +131,7 @@ BaseManager = Class {
             Patrolling = true,
             SeaAttacks = true,
             Shields = true,
-            TML = true,
+            TMLs = true,
             Torpedos = true,
             Walls = true,
 
@@ -215,6 +215,7 @@ BaseManager = Class {
         self:LoadDefaultBaseSupportCDRs() -- sACU things
         self:LoadDefaultBaseEngineers() -- All other Engs
         self:LoadDefaultScoutingPlatoons() -- Load in default scouts
+        self:LoadDefaultBaseTMLs() -- TMLs
         self:SortGroupNames() -- Force sort since no sorting when adding groups earlier
         self:ForkThread(self.UpgradeCheckThread) -- Start the thread to see if any buildings need upgrades
 
@@ -1244,6 +1245,7 @@ BaseManager = Class {
         end,
 
         TMLActive = function(self, val)
+            self.FunctionalityStates.TMLs = val
         end,
 
         PatrolActive = function(self, val)
@@ -1643,6 +1645,38 @@ BaseManager = Class {
             InstanceCount = 1,
         }
         self.AIBrain:PBMAddPlatoon(defaultBuilder)
+    end,
+
+    LoadDefaultBaseTMLs = function(self)
+        local defaultBuilder = {
+            BuilderName = 'BaseManager_TMLPlatoon_' .. self.BaseName,
+            PlatoonTemplate = self:CreateTMLPlatoonTemplate(),
+            Priority = 300,
+            PlatoonType = 'Any',
+            RequiresConstruction = false,
+            LocationType = self.BaseName,
+            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLAI'},
+            BuildConditions = {
+                {BMBC, 'BaseActive', {self.BaseName}},
+                {BMBC, 'TMLsEnabled', {self.BaseName}},
+            },
+            PlatoonData = {
+                BaseName = self.BaseName,
+            },
+        }
+        self.AIBrain:PBMAddPlatoon(defaultBuilder)
+    end,
+
+    CreateTMLPlatoonTemplate = function(self)
+        local faction = self.AIBrain:GetFactionIndex()
+        local template = {
+            'TMLTemplate',
+            'NoPlan',
+            {'ueb2108', 1, 1, 'Attack', 'None'},
+        }
+        template = ScenarioUtils.FactionConvert(template, faction)
+
+        return template
     end,
 
     CreateLandScoutPlatoon = function(self)
