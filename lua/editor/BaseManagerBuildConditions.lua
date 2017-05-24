@@ -452,3 +452,10 @@ function ExpansionBasesEnabled(aiBrain, baseName)
     if not bManager then return false end
     return bManager.FunctionalityStates.ExpansionBases
 end
+
+function TMLsEnabled(aiBrain, baseName)
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
+    return bManager.FunctionalityStates.TMLs
+end
+
