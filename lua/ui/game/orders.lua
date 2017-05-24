@@ -1042,7 +1042,14 @@ local function CreateCommonOrders(availableOrders, init)
         end
     end
 
-    local units = currentSelection
+    local units = {}
+    if currentSelection and table.getn(currentSelection) > 0 then
+        for unit in currentSelection do
+            if not IsDestroyed(unit) then
+                table.insert(units, unit)
+            end
+        end
+    end
     if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
             if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
