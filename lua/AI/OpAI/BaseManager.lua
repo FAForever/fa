@@ -1506,7 +1506,7 @@ BaseManager = Class {
             RequiresConstruction = false,
             LocationType = self.BaseName,
             PlatoonAddFunctions = {
-                {'/lua/ai/opai/OpBehaviors.lua', 'CDROverchargeBehavior'},
+                -- {'/lua/ai/opai/OpBehaviors.lua', 'CDROverchargeBehavior'}, -- TODO: Re-add once it doesnt interfere with BM engineer thread
                 {BMPT, 'UnitUpgradeBehavior'},
             },
             PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
