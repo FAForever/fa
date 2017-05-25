@@ -1247,25 +1247,14 @@ function UnitUpgradeThread(unit)
         unitType = 'DefaultSACU'
     end
 
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     while not unit:IsDead() do
         if not bManager then
             bManager = aiBrain.BaseManagers[unit.PlatoonData.BaseName]
         end
         if bManager then
-            -- See if unit is in the pool
-            local found = false
-            for k, v in pool:GetPlatoonUnits() do
-                if v == unit then
-                    found = true
-                    break
-                end
-            end
-
-            -- If its in the pool and needs an upgrade
             local upgradeName = bManager:UnitNeedsUpgrade(unit, unitType)
 
-            if found and upgradeName then
+            if upgradeName and not unit:IsUnitState('Building') then
                 local platoon = aiBrain:MakePlatoon('', '')
                 aiBrain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
 
@@ -1273,6 +1262,8 @@ function UnitUpgradeThread(unit)
                     TaskName = "EnhanceTask",
                     Enhancement = upgradeName
                 }
+                IssueStop({unit})
+                IssueClearCommands({unit})
                 IssueScript({unit}, order)
 
                 repeat

@@ -1509,7 +1509,7 @@ BaseManager = Class {
                 -- {'/lua/ai/opai/OpBehaviors.lua', 'CDROverchargeBehavior'}, -- TODO: Re-add once it doesnt interfere with BM engineer thread
                 {BMPT, 'UnitUpgradeBehavior'},
             },
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
+            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon'},
             BuildConditions = {
                 {BMBC, 'BaseActive', {self.BaseName}},
             },
@@ -1532,7 +1532,7 @@ BaseManager = Class {
             PlatoonAddFunctions = {
                 {BMPT, 'UnitUpgradeBehavior'},
             },
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
+            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon'},
             BuildConditions = {
                 {BMBC, 'BaseActive', {self.BaseName}},
             },
