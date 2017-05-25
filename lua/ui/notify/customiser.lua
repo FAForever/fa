@@ -43,14 +43,14 @@ local function EditMessage(parent, data, line)
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 15)
-    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
+    LayoutHelpers.AtLeftIn(cancelButton, dialogContent, -2)
     cancelButton.OnClick = function(self, modifiers)
         messagePopup:Close()
     end
 
     local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 15)
-    LayoutHelpers.AtLeftIn(okButton, dialogContent, -2)
+    LayoutHelpers.AtRightIn(okButton, dialogContent, -2)
 
     local helpText = MultiLineText(dialogContent, UIUtil.bodyFont, 20, UIUtil.fontColor)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
@@ -78,22 +78,31 @@ local function EditMessage(parent, data, line)
     messageEntry.text.Right:Set(function() return messageEntry.Right() end)
     LayoutHelpers.AtVerticalCenterIn(messageEntry.text, messageEntry)
     messageEntry.text:AcquireFocus()
-    messageEntry.text:SetText('Insert Message Here')
+    messageEntry.text:SetText(newMessageTable[data.category][data.source] or 'Insert Message Here')
     messageEntry.text:SetFont(UIUtil.titleFont, 17)
     messageEntry.text:SetMaxChars(60)
+    
+    local ClosePopup = function()
+        local newmsg = messageEntry.text:GetText()
+        if newmsg == '' then
+            newmsg = defaultMessageTable[data.category][data.source]
+        end
+        data.message = newmsg
+        line.message:SetText(newmsg)
+        newMessageTable[data.category][data.source] = newmsg
+        messagePopup:Close()
+    end
+    
+    messageEntry.text.OnEnterPressed = function(self, text)
+        ClosePopup()
+    end
+    
+    okButton.OnClick = function(self, modifiers)
+        ClosePopup()
+    end
 
     messagePopup.OnClose = function(self)
         dialogContent:AbandonKeyboardFocus()
-    end
-
-    okButton.OnClick = function(self, modifiers)
-        local newmsg = messageEntry.text:GetText()
-        if newmsg ~= 'Insert Message Here' then
-            data.message = newmsg
-            line.message:SetText(newmsg)
-            newMessageTable[data.category][data.source] = newmsg
-        end
-        messagePopup:Close()
     end
 end
 
@@ -402,7 +411,7 @@ function CloseUI()
     end
 end
 
-function CreateMessageToggleButton(parent, category)
+function CreateMessageToggleButton(parent, category, checked)
     local states = {
         normal   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
         active   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
@@ -434,8 +443,12 @@ function CreateMessageToggleButton(parent, category)
 
     local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, "", 11)
 
-    local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_Disabled')
-    button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
+    if checked == nil then
+        local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_Disabled')
+        button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
+    else
+        button.checked = checked
+    end
 
     if not button.checked then
         button:SetTexture(states.normal)
@@ -566,7 +579,7 @@ function CreateUI()
     )
 
     -- Button to toggle 'other' notifications
-    local otherButton = CreateMessageToggleButton(dialogContent, 'other', 'other')
+    local otherButton = CreateMessageToggleButton(dialogContent, 'other')
     otherButton.label:SetText(LOC('<LOC notify_0020>Other'))
     otherButton.Width:Set(151)
     LayoutHelpers.Below(otherButton, title, 10)
@@ -594,7 +607,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            NotifyOverlay.toggleOverlayPermanent(false, nil)
+            NotifyOverlay.toggleOverlayPermanent(false, not self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
@@ -613,7 +626,7 @@ function CreateUI()
     )
 
     -- Button to toggle displaying only default messages
-    local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'default')
+    local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'default', Prefs.GetFromCurrentProfile('Notify_custom_messages_disabled'))
     defaultMessagesButton.label:SetText(LOC('<LOC notify_0026>Show Defaults'))
     defaultMessagesButton.Width:Set(151)
     LayoutHelpers.Below(defaultMessagesButton, title, 10)
@@ -628,7 +641,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            -- TODO: Introduce function to convert incoming custom messages into the defaults
+            Notify.toggleDefaultMessages(self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
