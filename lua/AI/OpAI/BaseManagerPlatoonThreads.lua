@@ -487,7 +487,7 @@ function PermanentFactoryAssist(platoon)
             end
         end
         -- If the disparity between factories is more than 1, reorganize engineers
-        if not assisting or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
+        if (not assisting and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
             assisting = true
             platoon:Stop()
             IssueGuard({unit}, lowFac)

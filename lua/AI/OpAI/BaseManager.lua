@@ -515,7 +515,7 @@ BaseManager = Class {
     end,
 
     NeedPermanentFactoryAssist = function(self)
-        if self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
+        if table.getn(self:GetAllBaseFactories()) >= 1 and self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
             return true
         end
         return false
