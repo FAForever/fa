@@ -1163,7 +1163,7 @@ function checkBadClean(unit)
     local enhancementQueue = getEnhancementQueue()
     local queue = enhancementQueue[unit:GetEntityId()]
 
-    return previousModifiedCommandQueue[1].type == 'enhancementqueue' and queue and not string.find(queue.ID, 'Remove')
+    return previousModifiedCommandQueue[1].type == 'enhancementqueue' and queue and queue[1] and not string.find(queue[1].ID, 'Remove')
 end
 
 function OrderEnhancement(item, clean, destroy)

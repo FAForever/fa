@@ -2,7 +2,6 @@
 -- when you order and complete ACU upgrades
 
 local Prefs = import('/lua/user/prefs.lua')
-local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
@@ -14,13 +13,14 @@ local categoriesDisabled = {}
 local messages = {}
 local ACUs = {}
 local Player
+local customMessagesDisabled
 
 function init(isReplay, parent)
-    RegisterChatFunc(processIncomingMessage, 'Notify')
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
-
-    Player = Prefs.GetFromCurrentProfile('Name') or 'Unknown'
+    
+    local armies = GetArmiesTable()
+    Player = armies.armiesTable[armies.focusArmy].nickname or 'Unknown'
 
     populateMessages()
     setupStartDisables()
@@ -33,7 +33,7 @@ function setupStartDisables()
     for key, data in messages do
         local category = key
         if factions[category] then -- Don't make a disabler per-faction
-            category = 'acus'
+            continue
         end
 
         local flag = 'Notify_' .. category .. '_Disabled'
@@ -57,22 +57,45 @@ function setupStartDisables()
         Prefs.SetToCurrentProfile('Notify_all_disabled', false)
         state = false
     end
-
     categoriesDisabled.All = state
+    
+    state = Prefs.GetFromCurrentProfile('Notify_custom_messages_disabled')
+    if state == nil then
+        Prefs.SetToCurrentProfile('Notify_custom_messages_disabled', false)
+        state = false
+    end
+    customMessagesDisabled = state
+    
     Prefs.SavePreferences()
 end
 
-function processIncomingMessage(players, msg)
-    if players == Player then return end -- Don't display messages from ourselves
-
-    if not categoriesDisabled.All or not categoriesDisabled[msg.category] then
-        local army = GetFocusArmy()
-        msg.Notify = false
-        msg.Chat = true
-        msg.to = army
-
-        SessionSendChatMessage(FindClients(army), msg)
+function processIncomingMessage(sender, msg)
+    local category = msg.data.category
+    local source = msg.data.source
+    
+    -- Don't touch invalid messages
+    if not category or not source then
+        return true
     end
+    
+    if sender == Player or categoriesDisabled.All or categoriesDisabled[category] then
+        return false
+    end
+    
+    if customMessagesDisabled then
+        local message = defaultMessages[category][source]
+        local trigger = msg.data.trigger
+        if trigger == 'started' then
+            msg.text = 'Starting ' .. message
+        elseif trigger == 'cancelled' then
+            msg.text = message .. ' cancelled'
+        elseif trigger == 'completed' then
+            text = message .. ' done!'
+        else
+            msg.text = 'Doing abnormal things with ' .. message
+        end
+    end
+    return true
 end
 
 function populateMessages()
@@ -129,12 +152,18 @@ function toggleCategoryChat(category)
         msg = 'Enabled'
     end
 
-    msg = category .. msg .. '!'
+    msg = category .. ' ' .. msg .. '!'
     print(msg)
 
     local flag = 'Notify_' .. category .. '_Disabled'
     Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
     Prefs.SavePreferences()
+end
+
+-- Toggles between allowing custom messages or showing the defaults instead
+function toggleDefaultMessages(bool)
+    customMessagesDisabled = bool
+    Prefs.SetToCurrentProfile('Notify_custom_messages_disabled', bool)
 end
 
 function round(num, idp)
@@ -164,12 +193,12 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, category = category, text = 'Starting ' .. messages[category][source]}
+    local msg = {to = 'allies', Chat = true, Notify = true, text = 'Starting ' .. messages[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
     if id then
         if not ACUs[id] then
-            ACUs[id] = {watcher = false, startTime = 0}
+            ACUs[id] = {id = id, watcher = false, startTime = 0}
         end
 
         local data = ACUs[id]
@@ -185,13 +214,12 @@ function onStartEnhancement(id, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' cancelled'}
+    local msg = {to = 'allies', Chat = true, Notify = true, text = messages[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
         local data = ACUs[id]
         if data then
             killWatcher(data)
-            NotifyOverlay.sendDestroyOverlayMessage(id)
         end
     end
     
@@ -200,14 +228,13 @@ end
 
 -- Called from the enhancement watcher
 function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' done!'}
+    local msg = {to = 'allies', Chat = true, Notify = true, text = messages[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
         local data = ACUs[id]
         if data then
             msg.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
             killWatcher(data)
-            NotifyOverlay.sendDestroyOverlayMessage(id)
         end
     end
     
@@ -218,6 +245,7 @@ function killWatcher(data)
     if data.watcher then
         KillThread(data.watcher)
         data.watcher = false
+        NotifyOverlay.sendDestroyOverlayMessage(data.id)
     end
 end
 
