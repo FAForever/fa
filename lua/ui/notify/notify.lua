@@ -33,7 +33,7 @@ function setupStartDisables()
     for key, data in messages do
         local category = key
         if factions[category] then -- Don't make a disabler per-faction
-            continue
+            category = 'acus'
         end
 
         local flag = 'Notify_' .. category .. '_Disabled'
