@@ -45,12 +45,7 @@ end
 function toggleOverlayPermanent(permanent, bool)
     if overlayLockedOut and not permanent then return end
 
-    -- Handle the toggle button from customiser.lua
-    if bool == nil then
-        overlayDisabled = not overlayDisabled
-    else
-        overlayDisabled = bool
-    end
+    overlayDisabled = bool
 
     if permanent then
         overlayLockedOut = bool

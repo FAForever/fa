@@ -808,6 +808,12 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
+    
+    if msg.Notify then
+        if not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
+            return
+        end
+    end
 
     if type(msg) == 'string' then
         msg = { text = msg }
