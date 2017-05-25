@@ -2008,7 +2008,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
-        if not self.techCategory == 'COMMAND' then
+        if self.techCategory ~= 'COMMAND' then
             self:SendNotifyMessage('completed')
         end
 

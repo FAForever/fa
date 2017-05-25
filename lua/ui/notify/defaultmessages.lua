@@ -87,12 +87,12 @@ defaultMessages = {
         xsl0401 = "Ythotha",
     },
     tech = {
-        researchlandtech2 = "Tech 2 Land HQ upgrade",
-        researchlandtech3 = "Tech 3 Land HQ upgrade",
-        researchairtech2 = "Tech 2 Air HQ upgrade",
-        researchairtech3 = "Tech 3 Air HQ upgrade",
-        researchnavaltech2 = "Tech 2 Naval HQ upgrade",
-        researchnavaltech3 = "Tech 3 Naval HQ upgrade",
+        researchLANDTECH2 = "Tech 2 Land HQ upgrade",
+        researchLANDTECH3 = "Tech 3 Land HQ upgrade",
+        researchAIRTECH2 = "Tech 2 Air HQ upgrade",
+        researchAIRTECH3 = "Tech 3 Air HQ upgrade",
+        researchNAVALTECH2 = "Tech 2 Naval HQ upgrade",
+        researchNAVALTECH3 = "Tech 3 Naval HQ upgrade",
     },
     other = {
         nuke = "Nuke Silo construction",
