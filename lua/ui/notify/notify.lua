@@ -87,7 +87,12 @@ function processIncomingMessage(sender, msg)
         elseif trigger == 'cancelled' then
             msg.text = message .. ' cancelled'
         elseif trigger == 'completed' then
-            msg.text = message .. ' done!' -- TODO: ACUs won't display completion time in this mode
+            local time = msg.data.time
+            if time then
+                msg.text = message .. ' done! (' .. time .. 's)'
+            else
+                msg.text = message .. ' done!'
+            end
         else
             msg.text = 'Doing abnormal things with ' .. message
         end
@@ -196,7 +201,7 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, category, source)
-    local msg = {to = 'allies', Chat = true, Notify = true, text = 'Starting ' .. messages[category][source], data = {category = category, source = source, trigger = 'started'}}
+    local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
     if id then
@@ -217,7 +222,7 @@ function onStartEnhancement(id, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'allies', Chat = true, Notify = true, text = messages[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
+    local msg = {to = 'notify', Chat = true, text = messages[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
         local data = ACUs[id]
@@ -231,12 +236,14 @@ end
 
 -- Called from the enhancement watcher
 function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'allies', Chat = true, Notify = true, text = messages[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
+    local msg = {to = 'notify', Chat = true, text = messages[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
         local data = ACUs[id]
         if data then
-            msg.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            local time = round(GetGameTimeSeconds() - data.startTime, 2)
+            msg.text = messages[category][source] .. ' done! (' .. time .. 's)'
+            msg.data.time = time
             killWatcher(data)
         end
     end
