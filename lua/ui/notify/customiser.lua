@@ -115,26 +115,13 @@ local function AssignCurrentSelection(line)
     end
 end
 
-local function RemoveCurrentMessage(line)
-    for _, data in lineGroupTable do
-        if data.selected then
-            data.message = ''
-            line.message:SetText('')
-            newMessageTable[data.category][data.source] = ''
-            break
-        end
-    end
-end
-
 local function GetLineColor(lineID, data)
     if data.type == 'header' then
         return 'FF282828'
     elseif data.type == 'spacer' then
         return '00000000'
     elseif data.type == 'entry' then
-        if data.selected then
-            return UIUtil.categoryBackColor
-        elseif math.mod(lineID, 2) == 1 then
+        if math.mod(lineID, 2) == 1 then
             return 'ff202020'
         else
             return 'FF343333'
@@ -291,11 +278,13 @@ function CreateLine()
         AssignCurrentSelection(self)
     end
 
-    line.RemoveMessage = function(self)
-        if lineGroupTable[self.data.index].text then
-            SelectLine(self.data.index)
-            RemoveCurrentMessage(self)
-        end
+    line.ResetLine = function(self)
+        local category = self.data.category
+        local source = self.data.source
+
+        newMessageTable[category][source] = defaultMessageTable[category][source]
+        self.message:SetText(newMessageTable[category][source])
+        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
     end
 
     -- The dropdown button
@@ -337,11 +326,11 @@ function CreateLine()
     LayoutHelpers.AtVerticalCenterIn(line.removeMessageButton, line)
     Tooltip.AddControlTooltip(line.removeMessageButton,
     {
-        text = '<LOC notify_0004>Remove Message',
-        body = '<LOC notify_0005>Removes the message for this source entirely'
+        text = '<LOC notify_0004>Reset Message',
+        body = '<LOC notify_0005>Resets the message for this source to default'
     })
     line.removeMessageButton.OnMouseClick = function(self)
-        line:RemoveMessage()
+        line:ResetLine()
         return true
     end
 
@@ -551,7 +540,7 @@ function CreateUI()
                 self.label:SetText('Notify Disabled')
             end
 
-            Notify.toggleNotifyPermanent(self.checked)
+            Notify.toggleNotifyPermanent(not self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
