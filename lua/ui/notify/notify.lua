@@ -6,7 +6,7 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
-local toggleOverlayPermanent = NotifyOverlay.toggleOverlayPermanent
+local toggleOverlay = NotifyOverlay.toggleOverlay
 local factions = import('/lua/factions.lua').FactionIndexMap
 
 local categoriesDisabled = {}
@@ -110,7 +110,7 @@ end
 -- This overrides the individual category filters
 function toggleNotifyPermanent(bool)
     categoriesDisabled.All = bool
-    toggleOverlayPermanent(true, bool)
+    toggleOverlay(bool, true)
 
     if bool then
         print 'Notify Disabled'
@@ -127,11 +127,11 @@ end
 function toggleNotifyTemporary(args)
     if args[1] == 'enablenotify' then
         categoriesDisabled.All = false
-        toggleOverlayPermanent(false, false)
+        toggleOverlay(false, false)
         print 'Notify Enabled For Session'
     elseif args[1] == 'disablenotify' then
         categoriesDisabled.All = true
-        toggleOverlayPermanent(false, true)
+        toggleOverlay(true, false)
         print 'Notify Disabled For Session'
     end
 end
@@ -158,9 +158,14 @@ function toggleCategoryChat(category)
 end
 
 -- Toggles between allowing custom messages or showing the defaults instead
-function toggleDefaultMessages(bool)
+function toggleCustomMessages(bool)
     customMessagesDisabled = bool
     Prefs.SetToCurrentProfile('Notify_custom_disabled', bool)
+    if customMessagesDisabled then
+        print 'Custom Messages Disabled'
+    elseif not customMessagesDisabled then
+        print 'Custom Messages Enabled'
+    end
 end
 
 function round(num, idp)

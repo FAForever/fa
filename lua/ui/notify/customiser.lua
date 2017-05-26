@@ -632,7 +632,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            NotifyOverlay.toggleOverlayPermanent(false, not self.checked)
+            NotifyOverlay.toggleOverlay(not self.checked, false)
 
             return true
         elseif event.Type == 'MouseEnter' then
@@ -666,7 +666,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            Notify.toggleDefaultMessages(self.checked)
+            Notify.toggleCustomMessages(not self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
