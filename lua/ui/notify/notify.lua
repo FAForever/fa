@@ -87,7 +87,7 @@ function processIncomingMessage(sender, msg)
         elseif trigger == 'cancelled' then
             msg.text = message .. ' cancelled'
         elseif trigger == 'completed' then
-            text = message .. ' done!' -- TODO: ACUs won't display completion time in this mode
+            msg.text = message .. ' done!' -- TODO: ACUs won't display completion time in this mode
         else
             msg.text = 'Doing abnormal things with ' .. message
         end
