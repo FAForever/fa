@@ -2343,7 +2343,6 @@ function CreateSlotsUI(makeLabel)
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
         newSlot.KinderCountry = flag
         flag.Width:Set(COLUMN_WIDTHS[2])
-        flag.Height:Set(newSlot.Height)
         newSlot:AddChild(flag)
 
         -- TODO: Factorise this boilerplate.
