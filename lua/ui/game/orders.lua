@@ -966,7 +966,11 @@ local function AddOrder(orderInfo, slot, batchMode)
         checkbox.buttonText:SetText(orderInfo.ButtonTextFunc(checkbox))
         checkbox.buttonText:SetColor('ffffffff')
         checkbox.buttonText:SetDropShadow(true)
-        LayoutHelpers.AtBottomIn(checkbox.buttonText, checkbox)
+        if orderKeys[orderInfo.helpText] then
+            LayoutHelpers.AtTopIn(checkbox.buttonText, checkbox)
+        else
+            LayoutHelpers.AtBottomIn(checkbox.buttonText, checkbox)
+        end
         LayoutHelpers.AtHorizontalCenterIn(checkbox.buttonText, checkbox)
         checkbox.buttonText:DisableHitTest()
         checkbox.buttonText:SetNeedsFrameUpdate(true)
