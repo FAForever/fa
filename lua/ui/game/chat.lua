@@ -33,6 +33,7 @@ local defOptions = { all_color = 1,
         allies_color = 2,
         priv_color = 3,
         link_color = 4,
+        notify_color = 8,
         font_size = 14,
         fade_time = 15,
         win_alpha = 1,
@@ -57,13 +58,14 @@ end
 table.insert(FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 
-local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb'}
+local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42'}
 
 local ToStrings = {
     to = {text = '<LOC chat_0000>to', caps = '<LOC chat_0001>To', colorkey = 'all_color'},
     allies = {text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'allies_color'},
     all = {text = '<LOC chat_0004>to all:', caps = '<LOC chat_0005>To All:', colorkey = 'all_color'},
     private = {text = '<LOC chat_0006>to you:', caps = '<LOC chat_0007>To You:', colorkey = 'priv_color'},
+    notify = {text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'notify_color'},
 }
 
 function SetLayout()
@@ -303,7 +305,7 @@ function SetupChatScroll()
 
     local function IsValidEntry(entryData)
         if entryData.camera then
-            return ChatOptions.links
+            return ChatOptions.links and ChatOptions[entryData.armyID]
         end
 
         return ChatOptions[entryData.armyID]
@@ -806,10 +808,8 @@ function ReceiveChatFromSim(sender, msg)
         return
     end
     
-    if msg.Notify then
-        if not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
-            return
-        end
+    if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
+        return
     end
 
     if type(msg) == 'string' then
@@ -1285,6 +1285,7 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Allies>', key = 'allies_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC _Private>', key = 'priv_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
+                {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
                 {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},

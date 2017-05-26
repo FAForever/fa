@@ -78,16 +78,16 @@ local function EditMessage(parent, data, line)
     messageEntry.text.Right:Set(function() return messageEntry.Right() end)
     LayoutHelpers.AtVerticalCenterIn(messageEntry.text, messageEntry)
     messageEntry.text:AcquireFocus()
-    messageEntry.text:SetText(newMessageTable[data.category][data.source] or 'Insert Message Here')
+    messageEntry.text:SetText(data.text or 'Insert Message Here')
     messageEntry.text:SetFont(UIUtil.titleFont, 17)
     messageEntry.text:SetMaxChars(60)
 
-    local ClosePopup = function()
+    local function ClosePopup()
         local newmsg = messageEntry.text:GetText()
         if newmsg == '' then
             newmsg = defaultMessageTable[data.category][data.source]
         end
-        data.message = newmsg
+        data.text = newmsg
         line.message:SetText(newmsg)
         newMessageTable[data.category][data.source] = newmsg
         messagePopup:Close()
