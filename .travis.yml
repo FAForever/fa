@@ -7,5 +7,11 @@ env:
 install:
  - "sudo apt-get install lua5.2"
 
-script:
+script: 
+ - echo -e 'travis_fold:start:Start Migration Base Test' && echo 'Test'
+ - echo -e 'travis_fold:end:Start Migration Base Test'
+ - echo -e 'travis_fold:start:Start Migration Base Test' && echo 'Test'
+ - echo -e 'travis_fold:end:Start Migration Base Test'
+ - echo 'Build ..' && echo -e 'travis_fold:start:script.build'
+ - echo -e 'travis_fold:start:script.build'
  - "bash ./run_lua_tests.sh"
