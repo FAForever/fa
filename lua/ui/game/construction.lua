@@ -1132,6 +1132,8 @@ function OnRolloverHandler(button, state)
             UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
         elseif item.type == 'enhancement' then
             UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
+        elseif item.type == 'enhancementqueue' then
+            UnitViewDetail.ShowEnhancement(item.enhancement, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
         end
     else
         UnitViewDetail.Hide()
@@ -2301,7 +2303,7 @@ function IntegrateEnhancements()
                 return
             end
 
-            local newCommand = {icon = enhancement.Icon, id = enhancement.UnitID, type = 'enhancementqueue', name = enhancement.Name}
+            local newCommand = {icon = enhancement.Icon, id = enhancement.UnitID, type = 'enhancementqueue', name = enhancement.Name, enhancement = enhancement}
             if not found[enhancement.ID] and not string.find(enhancement.ID, 'Remove') then
                 table.insert(modifiedCommandQueue, currCount, newCommand)
                 currCount = currCount + 1
@@ -2357,7 +2359,7 @@ function SetSecondaryDisplay(type)
 
                 for _, item in modifiedCommandQueue do
                     if item.type == 'enhancementqueue' then
-                        table.insert(data, {type = 'enhancementqueue', unitID = item.id, icon = item.icon, name = item.name})
+                        table.insert(data, {type = 'enhancementqueue', unitID = item.id, icon = item.icon, name = item.name, enhancement = item.enhancement})
                     else
                         newStack = {type = 'queuestack', id = item.id, count = item.displayCount or item.count, position = index}
                         if lastStack and lastStack.id == newStack.id then
