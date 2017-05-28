@@ -75,7 +75,7 @@ function processIncomingMessage(sender, msg)
         return true
     end
 
-    if categoriesDisabled.All or categoriesDisabled[category] then
+    if categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
         return false
     end
 
