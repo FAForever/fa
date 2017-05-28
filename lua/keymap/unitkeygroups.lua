@@ -174,6 +174,7 @@ unitkeygroups = {
     },
     ["Upgrades"] = {
         "_upgrade",
+        "T3_Mobile_AA",
         "T3_Heavy_Air_Transport",
         "T3_Torpedo_Bomber",
     },
@@ -556,6 +557,12 @@ unitkeygroups = {
         "ual0205",
         "uel0205",
         "url0205",
+    },
+    ["T3_Mobile_AA"] = {
+        "dalk003",
+        "delk002",
+        "drlk001",
+        "dslk004",
     },
     ["T2_Engineer"] = {
         "ual0208",
