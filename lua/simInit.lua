@@ -57,6 +57,22 @@ function SetupSession()
     -- from the scenario script.
     ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
 
+    --Check if ShareOption is valid, and if not then set it to ShareUntilDeath
+    local shareOption = ScenarioInfo.Options.Share
+    local globalOptions = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+    local shareOptions = {}
+    for _,globalOption in globalOptions do
+        if globalOption.key == 'Share' then
+            for _,value in globalOption.values do
+                shareOptions[value.key] = true
+            end
+            break
+        end
+    end
+    if not shareOptions[shareOption] then
+        ScenarioInfo.Options.Share = 'ShareUntilDeath'
+    end
+
     -- if build/enhancement restrictions chosen, set them up
     local buildRestrictions, enhRestrictions = nil, {}
 
