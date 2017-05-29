@@ -14,6 +14,8 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Effect = import('/lua/maui/effecthelpers.lua')
 
+local upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
+
 local unitkeygroups
 local cyclePos
 local cycleThread = false
@@ -481,12 +483,25 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
-        local cmd = bp.General.UpgradesTo
+        local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
 
         SelectUnits({unit})
-        if cmd and EntityCategoryContains(buildableCategories, cmd) then
-            IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
-        else
+        local success = false
+        if type(cmd) == "table" then -- Issue the first upgrade command that we may build
+            for k,v in cmd do
+                if EntityCategoryContains(buildableCategories, v) then
+                    IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
+                    success = true
+                    break
+                end
+            end
+        elseif type(cmd) == "string" then -- Direct upgrade path
+            if EntityCategoryContains(buildableCategories, cmd) then
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
+                success = true
+            end
+        end
+        if not success then
             result = false
         end
     end
