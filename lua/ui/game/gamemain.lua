@@ -474,6 +474,7 @@ end
 -- @param added: Which units were added to the old selection
 -- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
+local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
@@ -481,6 +482,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged
+    end
+    if not upgradeTab then
+        upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
     end
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
@@ -496,11 +500,25 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         end
 
         -- This bit is for the Hotbuild labels
-        local upgradesTo = newSelection[1]:GetBlueprint().General.UpgradesTo
-        if upgradesTo then
-            if upgradesTo:len(upgradesTo) < 7 then
-                upgradesTo = nil
+        local bp = newSelection[1]:GetBlueprint()
+        local upgradesTo = nil
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
+        if potentialUpgrades then
+            if type(potentialUpgrades) == "string" then 
+                upgradesTo = potentialUpgrades
+            elseif type(potentialUpgrades) == "table" then 
+                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
+                for _, v in potentialUpgrades do
+                    if EntityCategoryContains(buildableCategories, v) then
+                        upgradesTo = v
+                        break
+                    end
+                end
             end
+        end
+
+        if upgradesTo and upgradesTo:len() < 7 then
+            upgradesTo = nil
         end
         local isFactory = newSelection[1]:IsInCategory("FACTORY")
         hotkeyLabelsOnSelectionChanged(upgradesTo, isFactory)
