@@ -2060,6 +2060,11 @@ local function UpdateGame()
 
     SetRuleTitleText(gameInfo.GameOptions.GameRules or "")
     SetGameTitleText(gameInfo.GameOptions.Title or LOC("<LOC lobui_0427>FAF Game Lobby"))
+    
+    if not singlePlayer and isHost and GUI.autoTeams then
+        GUI.autoTeams:SetState(gameInfo.GameOptions.AutoTeams,true)
+        Tooltip.DestroyMouseoverDisplay()
+    end
 end
 
 --- Update the game quality display
