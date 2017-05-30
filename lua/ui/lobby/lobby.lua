@@ -2140,6 +2140,9 @@ local OptionUtils = {
     -- Set all game options to their default values.
     SetDefaults = function()
         local options = {}
+        for index, option in teamOpts do
+            options[option.key] = option.values[option.default].key or option.values[option.default]
+        end
         for index, option in globalOpts do
             -- Exception to make AllowObservers work because the engine requires
             -- the keys to be bool. Custom options should use 'True' or 'False'
@@ -2153,7 +2156,9 @@ local OptionUtils = {
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
-
+        
+        options.RestrictedCategories = {}
+        
         SetGameOptions(options)
     end
 }
@@ -5471,7 +5476,11 @@ end
 -- Load the given preset
 function LoadPreset(presetIndex)
     local preset = LoadPresetsList()[presetIndex]
-
+    
+    if not preset.GameOptions.RestrictedCategories then
+        preset.GameOptions.RestrictedCategories = {}
+    end
+    
     SetGameOptions(preset.GameOptions, true)
 
     rehostPlayerOptions = preset.PlayerOptions
