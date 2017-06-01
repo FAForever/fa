@@ -65,6 +65,20 @@ Blacklist = {
     -- Hotkey Labels
     ['e338e34e-58da-11e6-8b77-86f30ca893d3'] = INTEGRATED,
 
+    -- Nofity
+    ['3d098ad8-adb1-4c5d-8daa-a42418274de2'] = INTEGRATED,
+    ['aa5655fa-7ea0-4e3e-81b7-75695c2df6c9'] = INTEGRATED,
+    ['92f87e13-813c-4585-80d3-f8adbc4a00be'] = INTEGRATED,
+    ['b943ea7c-cdbd-40ef-9f9a-9d04b3cb122d'] = INTEGRATED,
+    ['65283e07-a667-4163-9b2c-cc46ad28d5e6'] = INTEGRATED,
+    ['20cc4f02-e4ec-4399-8ab8-35e7f40f1f77'] = INTEGRATED,
+    ['7e6da3ed-8399-45ea-b50a-01a2e5f7483c'] = INTEGRATED,
+    ['b83ac057-cf56-40d7-b5e4-376dd45422b6'] = INTEGRATED,
+    ['96333e77-7a0c-4627-a802-d2e9692843bb'] = INTEGRATED,
+    ['4767b4d5-e74e-489a-8542-3e993dd452b3'] = INTEGRATED,
+    ['3501ac36-6f32-4299-9bdb-e323f37a55a2'] = INTEGRATED,
+    ['5218d937-4112-4e86-9f09-dd18era0629c'] = INTEGRATED,
+
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0
     ['63472293-f7d7-4b77-ba7b-d04ad09f63de'] = INTEGRATED,
@@ -100,19 +114,6 @@ Blacklist = {
     ['ecbf6277-24e3-437a-b968-EcoManager-v5'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v6'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v7'] = UPGRADE,
-
-    -- Nofity (Old broken ones)
-    ['3d098ad8-adb1-4c5d-8daa-a42418274de2'] = UPGRADE,
-    ['aa5655fa-7ea0-4e3e-81b7-75695c2df6c9'] = UPGRADE,
-    ['92f87e13-813c-4585-80d3-f8adbc4a00be'] = UPGRADE,
-    ['b943ea7c-cdbd-40ef-9f9a-9d04b3cb122d'] = UPGRADE,
-    ['65283e07-a667-4163-9b2c-cc46ad28d5e6'] = UPGRADE,
-    ['20cc4f02-e4ec-4399-8ab8-35e7f40f1f77'] = UPGRADE,
-    ['7e6da3ed-8399-45ea-b50a-01a2e5f7483c'] = UPGRADE,
-    ['b83ac057-cf56-40d7-b5e4-376dd45422b6'] = UPGRADE,
-    ['96333e77-7a0c-4627-a802-d2e9692843bb'] = UPGRADE,
-    ['4767b4d5-e74e-489a-8542-3e993dd452b3'] = UPGRADE,
-    ['3501ac36-6f32-4299-9bdb-e323f37a55a2'] = UPGRADE,
 
     -- Supreme economy (old ones)
     ['f8d8c95a-71e7-4978-921e-8765beb328e8'] = UPGRADE,
