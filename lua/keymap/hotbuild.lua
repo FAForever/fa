@@ -410,6 +410,8 @@ function buildActionTemplate(modifier)
                 if event.Modifiers.Middle then
                     ClearBuildTemplates()
                     local tempTemplate = table.deepcopy(template.templateData)
+                    template.templateData[1] = tempTemplate[2]
+                    template.templateData[2] = tempTemplate[1]
                     for i = 3, table.getn(template.templateData) do
                         local index = i
                         template.templateData[index][3] = 0 - tempTemplate[index][4]
