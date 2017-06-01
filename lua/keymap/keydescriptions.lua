@@ -418,4 +418,13 @@ keyDescriptions = {
     ['t3_siege_tank'] = '<LOC key_desc_0374>build T3 Siege Tank',
     ['t3_mobile_shield_generator'] = '<LOC key_desc_0375>build T3 Mobile Shield Generator',
     ['t3_submarine_hunter'] = '<LOC key_desc_0377>build T3 Submarine Hunter',
+    ['t3_mobile_aa'] = '<LOC key_desc_0379>build T3 Mobile Anti Air',
+    ['t2_support_factory'] = '<LOC key_desc_0380>build T2 Support Factory',
+    ['t2_support_land_factory'] = '<LOC key_desc_0381>build T2 Support Land Factory',
+    ['t2_support_air_factory'] = '<LOC key_desc_0382>build T2 Support Air Factory',
+    ['t2_support_naval_factory'] = '<LOC key_desc_0383>build T2 Support Naval Factory',
+    ['t3_support_factory'] = '<LOC key_desc_0384>build T3 Support Factory',
+    ['t3_support_land_factory'] = '<LOC key_desc_0385>build T3 Support Land Factory',
+    ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
+    ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 }
