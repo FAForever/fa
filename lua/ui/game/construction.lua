@@ -1307,6 +1307,8 @@ function OnClickHandler(button, modifiers)
                     if event.Modifiers.Middle then
                         ClearBuildTemplates()
                         local tempTemplate = table.deepcopy(activeTemplate)
+                        activeTemplate[1] = tempTemplate[2]
+                        activeTemplate[2] = tempTemplate[1]
                         for i = 3, table.getn(activeTemplate) do
                             local index = i
                             activeTemplate[index][3] = 0 - tempTemplate[index][4]
