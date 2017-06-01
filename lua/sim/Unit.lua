@@ -1445,7 +1445,7 @@ Unit = Class(moho.unit_methods) {
 
         local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
-        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
         local pos = self:GetPosition()
         local layer = self:GetCurrentLayer()
 
