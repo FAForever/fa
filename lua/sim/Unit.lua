@@ -1299,7 +1299,7 @@ Unit = Class(moho.unit_methods) {
             self:AddXP(DEFAULT_XP)
         end
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "kills", 1)
     end,
 
     DoDeathWeapon = function(self)
