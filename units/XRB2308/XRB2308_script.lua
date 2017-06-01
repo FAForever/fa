@@ -26,6 +26,10 @@ XRB2308 = Class(CStructureUnit) {
     end,
 
     StartSinkingFromBuild = function(self)
+        -- do not start sinking when unit is below water surface already
+        local position = self:GetPosition()
+        if GetSurfaceHeight(position[1], position[3]) > position[2] then return end
+
         -- Add sinking effect for the duration of the sinking
         local army = self:GetArmy()
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
