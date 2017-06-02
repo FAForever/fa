@@ -90,6 +90,7 @@ Callbacks.CapMex = function(data, units)
     if mex:GetCurrentLayer() == 'Seabed' then return end
 
     local pos = mex:GetPosition()
+    if mex:GetCurrentLayer() == 'Seabed' then return end
     local msid
     local builder
 
