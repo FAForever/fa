@@ -107,6 +107,7 @@ MapBlacklist = {
     ['adaptive_fields_of_great_phoenix.v0001'] = true,
     ['adaptive_ians_cross.v0001'] = true,
     ['adaptive_setons_clutch.v0001'] = true,
+    ['adaptive_twilight_hill.v0001'] = true,
     ['adaptive_twin_rivers.v0001'] = true,
     ['adaptive_point_of_reach.v0001'] = true,
     ['adaptive_waters_of_random_noobs.v0001'] = true,
