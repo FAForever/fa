@@ -22,8 +22,8 @@ local AITaunts = {
     {49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64}, -- Seraphim
 }
 
--- Unused - Deprecated
 function T4Timeout(aiBrain)
+    SPEW('Uveso Debugger: [sorianutilities.lua '..debug.getinfo(1).currentline..'] - function T4Timeout(aiBrain) called')
     WaitSeconds(30)
     aiBrain.T4Building = false
 end
@@ -41,30 +41,6 @@ function split(str, delimiter)
     return result
 end
 
-function GiveAwayMyCrap(aiBrain)
-    local giveTo = false
-    for k, v in ArmyBrains do
-        if not v:IsDefeated() and v.BrainType == 'Human' and IsAlly(aiBrain:GetArmyIndex(), v:GetArmyIndex()) then
-            giveTo = v:GetArmyIndex()
-            break
-        end
-    end
-    if giveTo then
-        local myUnits = aiBrain:GetListOfUnits(categories.ALLUNITS, false)
-        for k,v in myUnits do
-            if not v.Dead then
-                if v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
-                    v.PlatoonHandle:Stop()
-                    v.PlatoonHandle:PlatoonDisbandNoAssign()
-                end
-                IssueStop({v})
-                IssueClearCommands({v})
-                ChangeUnitArmy(v,giveTo)
-            end
-        end
-    end
-end
-
 -- -----------------------------------------------------
 --    Function: XZDistanceTwoVectorsSq
 --    Args:
@@ -78,30 +54,6 @@ end
 function XZDistanceTwoVectorsSq(v1, v2)
     if not v1 or not v2 then return false end
     return VDist2Sq(v1[1], v1[3], v2[1], v2[3])
-end
-
--- Small function the draw intel points on the map for debugging
-function DrawIntel(aiBrain)
-    threatColor = {
-        -- ThreatType = { ARGB value }
-        StructuresNotMex = 'ff00ff00', -- Green
-        Commander = 'ff00ffff', -- Cyan
-        Experimental = 'ffff0000', -- Red
-        Artillery = 'ffffff00', -- Yellow
-        Land = 'ffff9600', -- Orange
-    }
-    while true do
-        if aiBrain:GetArmyIndex() == GetFocusArmy() then
-            for k, v in aiBrain.InterestList.HighPriority do
-                if threatColor[v.Type] then
-                    DrawCircle(v.Position, 1, threatColor[v.Type])
-                    DrawCircle(v.Position, 3, threatColor[v.Type])
-                    DrawCircle(v.Position, 5, threatColor[v.Type])
-                end
-            end
-        end
-        WaitSeconds(2)
-    end
 end
 
 function AICheckForWeakEnemyBase(aiBrain)
@@ -354,133 +306,6 @@ function AIHandleLandIntel(aiBrain, intel)
     aiBrain.BaseMonitor.ActiveAlerts = aiBrain.BaseMonitor.ActiveAlerts + 1
 end
 
--- Unused
-function AIMicro(aiBrain, platoon, target, threatatLocation, mySurfaceThreat)
-    local friendlyThreat = aiBrain:GetThreatAtPosition(platoon:GetPlatoonPosition(), 1, true, 'AntiSurface', aiBrain:GetArmyIndex()) - mySurfaceThreat
-    if mySurfaceThreat + friendlyThreat > threatatLocation * 3 or table.getn(platoon:GetPlatoonUnits()) > 14 then
-        platoon:AggressiveMoveToLocation(target:GetPosition())
-    -- elseif threatatLocation * 2 > mySurfaceThreat + friendlyThreat then
-    --  OrderedRetreat(aiBrain, platoon)
-    else
-        CircleAround(aiBrain, platoon, target)
-    end
-end
-
--- Unused
-function CircleAround(aiBrain, platoon, target)
-    platPos = platoon:GetPlatoonPosition()
-    ePos = target:GetPosition()
-    if not platPos or not ePos then
-        return false
-    elseif VDist2Sq(platPos[1], platPos[3], ePos[1], ePos[3]) > 2500 then
-        IssueMove(platoon, ePos)
-        return
-    end
-    local platterheight = GetTerrainHeight(platPos[1], platPos[3])
-    if platterheight < GetSurfaceHeight(platPos[1], platPos[3]) then
-        platterheight = GetSurfaceHeight(platPos[1], platPos[3])
-    end
-    vert = math.abs(platPos[1] - ePos[1])
-    horz = math.abs(platPos[3] - ePos[3])
-    local leftright
-    local updown
-    local movePos = {}
-    if vert > horz then
-        if ePos[3] > platPos[3] then
-            leftright = -1
-        else
-            leftright = 1
-        end
-        if ePos[1] > platPos[1] then
-            updown = 1
-        else
-            updown = -1
-        end
-        movePos[1] = { platPos[1], ePos[2], ePos[3] + (16 * leftright) }
-        movePos[2] = { ePos[1] + (16 * updown), ePos[2], ePos[3] + (16 * leftright) }
-        movePos[3] = { ePos[1] + (16 * updown), ePos[2], ePos[3] - (16 * leftright) }
-        for k,v in movePos do
-            local terheight = GetTerrainHeight(v[1], v[3])
-            local _, slope = GetSlopeAngle(platPos, v, platterheight, terheight)
-            --  If its in water
-            if terheight < GetSurfaceHeight(v[1], v[3]) then
-                platoon:AggressiveMoveToLocation(target:GetPosition())
-                return
-            --  If the slope is too high
-            elseif slope > .75 then
-                platoon:AggressiveMoveToLocation(target:GetPosition())
-                return
-            end
-        end
-
-        platoon:MoveToLocation(movePos[1], false)
-        platoon:MoveToLocation(movePos[2], false)
-        platoon:MoveToLocation(movePos[3], false)
-    else
-        if ePos[3] > platPos[3] then
-            leftright = 1
-        else
-            leftright = -1
-        end
-        if ePos[1] > platPos[1] then
-            updown = -1
-        else
-            updown = 1
-        end
-        movePos[1] = { ePos[1] + (16 * updown), ePos[2], platPos[3] }
-        movePos[2] = { ePos[1] + (16 * updown), ePos[2], ePos[3] + (16 * leftright) }
-        movePos[3] = { ePos[1] - (16 * updown), ePos[2], ePos[3] + (16 * leftright) }
-        for k,v in movePos do
-            local terheight = GetTerrainHeight(v[1], v[3])
-            local _, slope = GetSlopeAngle(platPos, v, platterheight, terheight)
-            --  If its in water
-            if terheight < GetSurfaceHeight(v[1], v[3]) then
-                platoon:AggressiveMoveToLocation(target:GetPosition())
-                return
-            --  If the slope is too high
-            elseif slope > .75 then
-                platoon:AggressiveMoveToLocation(target:GetPosition())
-                return
-            end
-        end
-
-        platoon:MoveToLocation(movePos[1], false)
-        platoon:MoveToLocation(movePos[2], false)
-        platoon:MoveToLocation(movePos[3], false)
-    end
-    WaitSeconds(5)
-end
-
--- Unused
-function OrderedRetreat(aiBrain, platoon)
-    local bestBase = false
-    local bestBaseName = ""
-    local bestDistSq = 999999999
-    local platPos = platoon:GetPlatoonPosition()
-
-    for baseName, base in aiBrain.BuilderManagers do
-        local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
-
-        if distSq < bestDistSq then
-            bestBase = base
-            bestBaseName = baseName
-            bestDistSq = distSq
-        end
-    end
-
-    if bestBase then
-        AIAttackUtils.GetMostRestrictiveLayer(platoon)
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), bestBase.Position, 200)
-        IssueClearCommands(platoon)
-
-        if path and table.getn(path) > 1 then
-            platoon:MoveToLocation(path[1], false)
-        elseif path and table.getn(path) == 1 and VDist2Sq(path[1][1], path[1][3], platPos[1], platPos[3]) < 100 then
-            IssueGuard(platoon, platPos)
-        end
-    end
-end
-
 -- -----------------------------------------------------
 --    Function: GetThreatAtPosition
 --    Args:
@@ -554,7 +379,6 @@ function ThreatBugcheck(aiBrain)
     end
     return false
 end
-
 
 -- -----------------------------------------------------
 --    Function: CheckForMapMarkers
@@ -632,7 +456,7 @@ function AddCustomUnitSupport(aiBrain)
     -- FAF addition end
 end
 
--- Unused
+-- Unused (used for Nomads)
 function AddCustomFactionSupport(aiBrain)
     aiBrain.CustomFactions = {}
     for i, m in __active_mods do
@@ -692,6 +516,8 @@ function GetEngineerFaction(engineer)
         return 'Cybran'
     elseif EntityCategoryContains(categories.SERAPHIM, engineer) then
         return 'Seraphim'
+    elseif EntityCategoryContains(categories.NOMADS, engineer) then
+        return 'Nomads'
     else
         return false
     end
@@ -1064,38 +890,6 @@ function LeadTarget(platoon, target)
     return {Tpos2[1] - newx, 0, Tpos2[3] - newy}
 end
 
--- Unused
-function LeadTargetArtillery(platoon, unit, target)
-    position = platoon:GetPlatoonPosition()
-    mainweapon = unit:GetBlueprint().Weapon[1]
-    pos = target:GetPosition()
-    Tpos1 = {pos[1], 0, pos[3]}
-    WaitSeconds(1)
-    pos = target:GetPosition()
-    Tpos2 = {pos[1], 0, pos[3]}
-    xmove = (Tpos1[1] - Tpos2[1])
-    ymove = (Tpos1[3] - Tpos2[3])
-    dist1 = VDist2Sq(position[1], position[3], Tpos1[1], Tpos1[3])
-    dist2 = VDist2Sq(position[1], position[3], Tpos2[1], Tpos2[3])
-    dist1 = math.sqrt(dist1)
-    dist2 = math.sqrt(dist2)
-    --  get firing angle, gravity constant = 100m/s = 5.12 MU/s
-    firingangle1 = math.deg(math.asin((5.12 * dist1) / (mainweapon.MuzzleVelocity * mainweapon.MuzzleVelocity)) / 2)
-    firingangle2 = math.deg(math.asin((5.12 * dist2) / (mainweapon.MuzzleVelocity * mainweapon.MuzzleVelocity)) / 2)
-    --  convert angle for high arc
-    if mainweapon.BallisticArc == 'RULEUBA_HighArc' then
-        firingangle1 = 90 - firingangle1
-        firingangle2 = 90 - firingangle2
-    end
-    --  get flight time
-    time1 = mainweapon.MuzzleVelocity * math.deg(math.sin(firingangle1)) / 2.56
-    time2 = mainweapon.MuzzleVelocity * math.deg(math.sin(firingangle2)) / 2.56
-    newtime = time2 - (time1 - time2)
-    newx = xmove * newtime
-    newy = ymove * newtime
-    return {Tpos2[1] - newx, 0, Tpos2[3] - newy}
-end
-
 -- -----------------------------------------------------
 --    Function: CheckBlockingTerrain
 --    Args:
@@ -1187,52 +981,7 @@ function GetSlopeAngle(pos, targetPos, posHeight, targetHeight)
     return angle, slope
 end
 
--- Unused - Deprecated
-function MajorLandThreatExists(aiBrain)
-    local StartX, StartZ = aiBrain:GetArmyStartPos()
-    local numET2 = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.STRATEGIC * categories.TECH2, Vector(StartX,0,StartZ), 360, 'Enemy')
-    local numET3Art = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, Vector(StartX,0,StartZ), 900, 'Enemy')
-    local numENuke = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.NUKE * categories.SILO, Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local numET4Art = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.STRATEGIC * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local numET4Sat = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * categories.ORBITALSYSTEM * categories.EXPERIMENTAL, Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local numET4Exp = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL), Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local numET4AExp = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local numEDef = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR), Vector(StartX,0,StartZ), 150, 'Enemy')
-    local retcat = false
-    if numET4Art > 0 then
-        retcat = categories.STRUCTURE * categories.STRATEGIC * categories.EXPERIMENTAL -- 'STRUCTURE STRATEGIC EXPERIMENTAL'
-    elseif numET4Sat > 0 then
-        retcat = categories.STRUCTURE * categories.ORBITALSYSTEM * categories.EXPERIMENTAL -- 'STRUCTURE ORBITALSYSTEM EXPERIMENTAL'
-    elseif numENuke > 0 then
-        retcat = categories.STRUCTURE * categories.NUKE * categories.SILO -- 'STRUCTURE NUKE SILO'
-    elseif numET4Exp > 0 then
-        retcat = categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL) -- 'EXPERIMENTAL LAND + NAVAL'
-    elseif numET4AExp > 0 then
-        retcat = categories.EXPERIMENTAL * categories.AIR -- 'EXPERIMENTAL AIR'
-    elseif numET3Art > 0 then
-        retcat = categories.STRUCTURE * categories.ARTILLERY * categories.TECH3 -- 'STRUCTURE ARTILLERY TECH3'
-    elseif numET2 > 0 then
-        retcat = categories.STRUCTURE * categories.STRATEGIC * categories.TECH2 -- 'STRUCTURE STRATEGIC TECH2'
-    elseif numEDef > 0 then
-        retcat = categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR)
-    end
-    return retcat
-end
 
--- Unused - Deprecated
-function MajorAirThreatExists(aiBrain)
-    local StartX, StartZ = aiBrain:GetArmyStartPos()
-    local numET4Exp = aiBrain:GetUnitsAroundPoint(categories.EXPERIMENTAL * categories.AIR, Vector(StartX,0,StartZ), 100000, 'Enemy')
-    local retcat = false
-    for k,v in numET4Exp do
-        if v:GetFractionComplete() == 1 then
-            retcat = categories.EXPERIMENTAL * categories.AIR -- 'EXPERIMENTAL AIR'
-            break
-        end
-    end
-
-    return retcat
-end
 
 -- -----------------------------------------------------
 --    Function: GetGuards
@@ -1687,4 +1436,51 @@ function TimeConvert(temptime)
     end
     returntext = hours..':'..minutes..':'..seconds
     return returntext
+end
+
+-- Small function the draw intel points on the map for debugging
+function DrawIntel(aiBrain)
+    threatColor = {
+        -- ThreatType = { ARGB value }
+        StructuresNotMex = 'ff00ff00', -- Green
+        Commander = 'ff00ffff', -- Cyan
+        Experimental = 'ffff0000', -- Red
+        Artillery = 'ffffff00', -- Yellow
+        Land = 'ffff9600', -- Orange
+    }
+    while true do
+        if aiBrain:GetArmyIndex() == GetFocusArmy() then
+            for k, v in aiBrain.InterestList.HighPriority do
+                if threatColor[v.Type] then
+                    DrawCircle(v.Position, 1, threatColor[v.Type])
+                    DrawCircle(v.Position, 3, threatColor[v.Type])
+                    DrawCircle(v.Position, 5, threatColor[v.Type])
+                end
+            end
+        end
+        WaitSeconds(2)
+    end
+end
+
+-- Deprecated functions / unused
+function GiveAwayMyCrap(aiBrain)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function GiveAwayMyCrap() called.')
+end
+function AIMicro(aiBrain, platoon, target, threatatLocation, mySurfaceThreat)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function AIMicro() called.')
+end
+function CircleAround(aiBrain, platoon, target)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function CircleAround() called.')
+end
+function OrderedRetreat(aiBrain, platoon)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function OrderedRetreat() called.')
+end
+function LeadTargetArtillery(platoon, unit, target)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function LeadTargetArtillery() called.')
+end
+function MajorLandThreatExists(aiBrain)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function MajorLandThreatExists() called.')
+end
+function MajorAirThreatExists(aiBrain)
+    WARN('[sorianutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function MajorAirThreatExists() called.')
 end
