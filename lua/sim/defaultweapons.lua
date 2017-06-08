@@ -980,7 +980,9 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if self:BeenDestroyed() then return end
         DefaultProjectileWeapon.OnEnableWeapon(self)
         self:SetWeaponEnabled(true)
-        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, false)
+        if self:CanOvercharge() then
+            self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, false)
+        end
         self.unit:BuildManipulatorSetEnabled(false)
         self.AimControl:SetEnabled(true)
         self.AimControl:SetPrecedence(20)
@@ -1018,7 +1020,15 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
             else
-                self:OnDisableWeapon()
+                self:ForkThread(function()
+                    while self.enabled and not self:CanOvercharge() do
+                        WaitSeconds(0.1)
+                    end
+                    
+                    if self.enabled then
+                        self:OnGotTarget()
+                    end
+                end)
             end
         end,
 
