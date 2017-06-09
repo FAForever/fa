@@ -1055,7 +1055,6 @@ function PopulateMapList()
     end
 end
 
-
 function GUI_OldMap(over)
     local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
     local dialogContent = Group(GUI)
@@ -1081,9 +1080,6 @@ function GUI_OldMap(over)
         OldMapPopup:Close()
     end
 end
-
-
-
 
 function mapIsOutdated()
     local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
