@@ -5090,6 +5090,7 @@ lobui_0769="Linksklick auf ACU Symbol um deine Position zu bestimmen oder mit ei
 lobui_0770="Rechtsklick auf ACU Symbol zum öffnen oder schließen der Startpositionen."
 lobui_0771="Linksklick auf ACU Symbol um deine Position zu bestimmen."
 lobui_0772="Kartenvorschau"
+lobui_0773="Die ausgewählte Karte ist veraltet und/oder unausgeglichen. Bitte aktualisieren!"
 main_menu_0000="Forged Alliance"
 main_menu_0001="Mehrspieler-LAN"
 main_menu_0002="Zurück ins Spiel"

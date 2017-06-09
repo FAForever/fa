@@ -671,6 +671,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     SetupOptionsPanel(OptionGroup, curOptions)
 
     selectButton.OnClick = function(self, modifiers)
+        local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
+        obsoleteFilterFactory.SelectedKey = 1
+        local obsoleteFilter = obsoleteFilterFactory:Build()
+        if obsoleteFilter ~= nil then
+            if not obsoleteFilter(selectedScenario) then
+                GUI_OldMap(over)
+            end
+        end
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
@@ -683,6 +691,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     mapList.OnKeySelect = OnMapChanged
     mapList.OnClick = OnMapChanged
     mapList.OnDoubleClick = function(self, row)
+        local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
+        obsoleteFilterFactory.SelectedKey = 1
+        local obsoleteFilter = obsoleteFilterFactory:Build()
+        if obsoleteFilter ~= nil then
+            if not obsoleteFilter(selectedScenario) then
+                GUI_OldMap(over)
+            end
+        end
         mapList:SetSelection(row)
         PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
@@ -696,6 +712,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     return popup
 end
+
 
 function RefreshOptions(skipRefresh)
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
@@ -1063,5 +1080,32 @@ function PopulateMapList()
     if reselectRow then
         mapList:OnClick(reselectRow -1, true)
         mapList:ShowItem(reselectRow -1)
+    end
+end
+
+
+function GUI_OldMap(over)
+    local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(900)
+    dialogContent.Height:Set(100)
+
+    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local OldMapPopup = Popup(GUI, dialogContent)
+    OldMapPopup.OnClosed = function()
+        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
+    end
+
+    -- Title --
+    local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0773>The currently selected map is outdated and/or unbalanced. Please download the latest version from the map vault."), 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+
+    -- OK button --
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtCenterIn(OkButton, dialogContent, 20)
+    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
+    OkButton.OnClick = function()
+        OldMapPopup:Close()
     end
 end
