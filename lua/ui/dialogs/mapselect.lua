@@ -671,13 +671,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     SetupOptionsPanel(OptionGroup, curOptions)
 
     selectButton.OnClick = function(self, modifiers)
-        local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
-        obsoleteFilterFactory.SelectedKey = 1
-        local obsoleteFilter = obsoleteFilterFactory:Build()
-        if obsoleteFilter ~= nil then
-            if not obsoleteFilter(selectedScenario) then
-                GUI_OldMap(over)
-            end
+        if mapIsOutdated() then
+            GUI_OldMap(over)
         end
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
@@ -691,13 +686,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     mapList.OnKeySelect = OnMapChanged
     mapList.OnClick = OnMapChanged
     mapList.OnDoubleClick = function(self, row)
-        local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
-        obsoleteFilterFactory.SelectedKey = 1
-        local obsoleteFilter = obsoleteFilterFactory:Build()
-        if obsoleteFilter ~= nil then
-            if not obsoleteFilter(selectedScenario) then
-                GUI_OldMap(over)
-            end
+        if mapIsOutdated() then
+            GUI_OldMap(over)
         end
         mapList:SetSelection(row)
         PreloadMap(row)
@@ -1108,4 +1098,14 @@ function GUI_OldMap(over)
     OkButton.OnClick = function()
         OldMapPopup:Close()
     end
+end
+
+
+
+
+function mapIsOutdated()
+    local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
+    obsoleteFilterFactory.SelectedKey = 1
+    local obsoleteFilter = obsoleteFilterFactory:Build()
+    return not obsoleteFilter(selectedScenario)
 end
