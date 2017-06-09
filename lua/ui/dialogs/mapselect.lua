@@ -1020,7 +1020,18 @@ function PopulateMapList()
                 passedFiltering = passedFiltering and string.lower(sceninfo.name):find(string.lower(nameFilter:GetText()))
             end
         end
-
+        -- hide maps that are not on the blacklist but have newer versions available if obsolete maps are hidden
+        if currentFilters['map_obsolete'] ~= nil and sceninfo.map_version ~= nil then
+            for _,comparisionlist in scenarios do
+                if LOC(sceninfo.name) == LOC(comparisionlist.name) then
+                    if sceninfo.map_version < (comparisionlist.map_version or 1) then
+                        passedFiltering = false
+                        break
+                    end
+                end
+            end
+        end
+        
         if passedFiltering then
             -- Make sure we finish up with the right map selected.
             scenarioKeymap[count] = i
