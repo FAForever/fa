@@ -82,7 +82,6 @@ function PingUpdate()
 end
 
 function CreateUI()
-    ConExecute('ren_shownetworkstats true')
     if not SessionIsMultiplayer() then
         return
     end
@@ -90,6 +89,8 @@ function CreateUI()
         CloseWindow()
         return
     end
+
+    ConExecute('ren_shownetworkstats true')
 
     local _,isSession = UIUtil.GetNetworkBool()
     if not isSession then return end
