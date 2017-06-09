@@ -7883,6 +7883,7 @@ lobui_0769="ЛКМ по иконке БМК чтобы переместить с
 lobui_0770="ПКМ по иконке БМК чтобы открыть или закрыть слот"
 lobui_0771="ЛКМ по иконке БМК чтобы переместить себя"
 lobui_0772="Пред. просмотр карты"
+lobui_0773="The currently selected map is outdated and/or unbalanced. Please download the latest version from the map vault."
 
 # uimod_0010 in earlier but not sure if it should be changed
 uimod_0016="Включен игровой мод"

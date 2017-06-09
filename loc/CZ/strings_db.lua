@@ -5325,6 +5325,7 @@ lobui_0769="Klikni levým na ikonu ACU pro přesunutí sebe nebo prohození hrá
 lobui_0770="Klikni pravým na ikonu ACU pro zavření nebo otevření pozice."
 lobui_0771="Klikni levým na ikonu ACU pro přesunutí sebe."
 lobui_0772="Náhled Mapy"
+lobui_0773="The currently selected map is outdated and/or unbalanced. Please download the latest version from the map vault."
 main_menu_0000="Vytvořené spojenectví"
 main_menu_0001="Více hráčů přes LAN"
 main_menu_0002="Návrat do hry"

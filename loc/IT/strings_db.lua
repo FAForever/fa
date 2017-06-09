@@ -7685,7 +7685,7 @@ lobui_0769="Left click ACU icon to move yourself or swap players."
 lobui_0770="Right click ACU icon to close or open the slot."
 lobui_0771="Left click ACU icon to move yourself."
 lobui_0772="Map Preview"
-
+lobui_0773="The currently selected map is outdated and/or unbalanced. Please download the latest version from the map vault."
 lobui_0592="Permetti osservatori"
 lobui_0593="Gli osservatori sono permessi dopo che il gioco e iniziato?"
 lobui_0594="Osservatori permessi"
