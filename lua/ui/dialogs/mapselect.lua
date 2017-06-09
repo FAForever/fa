@@ -264,6 +264,9 @@ function InitFilters()
             SelectedKey = 1 -- Enable obsolete map filtering by default.
         }
     }
+    savedFilterState['map_obsolete'] = {
+        SelectedKey = 1 -- Enable obsolete map filtering by default.
+    }
 
     -- savedFilterState is an array of tables of filter options
     for filterKey, v in savedFilterState do
