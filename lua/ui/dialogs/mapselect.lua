@@ -1030,7 +1030,7 @@ function PopulateMapList()
                 passedFiltering = passedFiltering and string.lower(sceninfo.name):find(string.lower(nameFilter:GetText()))
             end
         end
-        
+
         if passedFiltering then
             -- Make sure we finish up with the right map selected.
             scenarioKeymap[count] = i
