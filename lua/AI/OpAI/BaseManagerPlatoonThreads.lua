@@ -1151,6 +1151,9 @@ function BaseManagerTMLAI(platoon)
     end
 end
 
+function BaseManagerNukeAI(platoon)
+end
+
 function AMUnlockBuildTimer(platoon)
     ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
 end
