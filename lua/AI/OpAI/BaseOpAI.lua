@@ -371,8 +371,8 @@ OpAI = Class {
 
                     -- All keeptable children must be found to be kept as well.
                     if found then
-                        found = false
                         for num,name in keepTable do
+                            found = false
                             for cNun,cName in v.ChildrenType do
                                 -- child name found; move to the next
                                 if cName == name then
