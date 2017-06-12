@@ -404,11 +404,20 @@ OpAI = Class {
 
         OverrideTemplateSize = function(self, quantity)
             for k,v in self.ChildrenHandles do
-                local overrideNum = math.floor(quantity / (table.getn(v.ChildBuilder.PlatoonTemplate) - 2))
-                for sNum,sData in v.ChildBuilder.PlatoonTemplate do
-                    if sNum >= 3 then
-                        sData[2] = 1
-                        sData[3] = overrideNum
+                if type(quantity) == 'table' then
+                    for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+                        if sNum >= 3 then
+                            sData[2] = 1
+                            sData[3] = quantity[sNum - 2] or 1
+                        end
+                    end
+                else
+                    local overrideNum = math.floor(quantity / (table.getn(v.ChildBuilder.PlatoonTemplate) - 2))
+                    for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+                        if sNum >= 3 then
+                            sData[2] = 1
+                            sData[3] = overrideNum
+                        end
                     end
                 end
             end
