@@ -459,3 +459,9 @@ function TMLsEnabled(aiBrain, baseName)
     return bManager.FunctionalityStates.TMLs
 end
 
+function NukesEnabled(aiBrain, baseName)
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
+    return bManager.FunctionalityStates.Nukes
+end
+
