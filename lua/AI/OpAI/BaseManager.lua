@@ -127,7 +127,7 @@ BaseManager = Class {
             Intel = true,
             LandAttacks = true,
             LandScouting = false,
-            Nukes = true,
+            Nukes = false,
             Patrolling = true,
             SeaAttacks = true,
             Shields = true,
@@ -216,6 +216,7 @@ BaseManager = Class {
         self:LoadDefaultBaseEngineers() -- All other Engs
         self:LoadDefaultScoutingPlatoons() -- Load in default scouts
         self:LoadDefaultBaseTMLs() -- TMLs
+        self:LoadDefaultBaseNukes() -- Nukes
         self:SortGroupNames() -- Force sort since no sorting when adding groups earlier
         self:ForkThread(self.UpgradeCheckThread) -- Start the thread to see if any buildings need upgrades
 
@@ -1248,6 +1249,10 @@ BaseManager = Class {
             self.FunctionalityStates.TMLs = val
         end,
 
+        NukeActive = function(self, val)
+            self.FunctionalityStates.Nukes = val
+        end,
+
         PatrolActive = function(self, val)
             self.FunctionalityStates.Patrolling = val
         end,
@@ -1667,12 +1672,44 @@ BaseManager = Class {
         self.AIBrain:PBMAddPlatoon(defaultBuilder)
     end,
 
+    LoadDefaultBaseNukes = function(self)
+        local defaultBuilder = {
+            BuilderName = 'BaseManager_NukePlatoon_' .. self.BaseName,
+            PlatoonTemplate = self:CreateNukePlatoonTemplate(),
+            Priority = 400,
+            PlatoonType = 'Any',
+            RequiresConstruction = false,
+            LocationType = self.BaseName,
+            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukeAI'},
+            BuildConditions = {
+                {BMBC, 'BaseActive', {self.BaseName}},
+                {BMBC, 'NukesEnabled', {self.BaseName}},
+            },
+            PlatoonData = {
+                BaseName = self.BaseName,
+            },
+        }
+        self.AIBrain:PBMAddPlatoon(defaultBuilder)
+    end,
+
     CreateTMLPlatoonTemplate = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
             'TMLTemplate',
             'NoPlan',
             {'ueb2108', 1, 1, 'Attack', 'None'},
+        }
+        template = ScenarioUtils.FactionConvert(template, faction)
+
+        return template
+    end,
+
+    CreateNukePlatoonTemplate = function(self)
+        local faction = self.AIBrain:GetFactionIndex()
+        local template = {
+            'NukeTemplate',
+            'NoPlan',
+            {'ueb2305', 1, 1, 'Attack', 'None'},
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
