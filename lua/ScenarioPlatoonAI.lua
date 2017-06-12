@@ -588,8 +588,9 @@ function SplitPatrolThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChains then
+            local num = table.getn(data.PatrolChains)
             for _, v in platoon:GetPlatoonUnits() do
-                local chain = Random(1, table.getn(data.PatrolChains))
+                local chain = Random(1, num)
                 ScenarioFramework.GroupPatrolChain({v}, data.PatrolChains[chain])
             end
         else
