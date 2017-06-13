@@ -651,6 +651,11 @@ function CreateChatEdit()
     LayoutHelpers.AtVerticalCenterIn(group.chatBubble, group.edit)
 
     group.edit.OnNonTextKeyPressed = function(self, charcode, event)
+        local UTF = import('/lua/UTF.lua').UTF
+        local ccc = UTF(charcode)
+        if ccc ~= '' then
+		self:SetText(self:GetText() .. ccc)
+	end
         GUI.bg.curTime = 0
         local function RecallCommand(entryNumber)
             self:SetText(commandHistory[self.recallEntry].text)
