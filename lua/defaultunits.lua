@@ -1889,8 +1889,10 @@ AirTransport = Class(AirUnit, BaseTransport) {
         if self:BeenDestroyed() then return end
 
         for _, unit in self.cargo or {} do
-            unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-            unit:OnKilled(self, 'Normal', 0)
+            if not unit.Dead then
+                unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
+                unit:OnKilled(self, 'Normal', 0)
+            end
         end
     end,
 }
