@@ -3001,6 +3001,11 @@ function CreateUI(maxPlayers)
 
     --- Handle up/down arrow presses for the chat box.
     GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
+		local UTF = import('/lua/UTF.lua').UTF
+		local ccc = UTF(keyCode)
+		if ccc ~= '' then
+			self:SetText(self:GetText() .. ccc)
+		end
         if commandQueue and table.getsize(commandQueue) > 0 then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then
