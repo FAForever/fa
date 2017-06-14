@@ -287,8 +287,8 @@ Scenario = {
     --[[-----------------------------------------------------------------]]--
         ['OST_BasicLandAttack_T2AeonHoverTanks'] = {
             'OST_BasicLandAttack_T2AeonHoverTanks', '',
-            { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0201', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
         },
 
@@ -325,6 +325,22 @@ Scenario = {
             { 'xel0305', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0307', 1, 5, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2HoverAttack1'] = {
+            'OST_BasicLandAttack_T2HoverAttack1', '',
+            { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2HoverAttack2'] = {
+            'OST_BasicLandAttack_T2HoverAttack2', '',
+            { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
+            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2HoverAttack3'] = {
+            'OST_BasicLandAttack_T2HoverAttack3', '',
+            { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
+            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
         },
 
     --[[------[ CYBRAN SPECIFIC ]------]]--
@@ -382,11 +398,6 @@ Scenario = {
         },
 
     --[[------[ SERAPHIM SPECIFIC ]------]]--
-        ['OST_BasicLandAttack_T2SeraphimHoverAttack'] = {
-            'OST_BasicLandAttack_T2SeraphimHoverAttack', '',
-            { 'xsl0203', -1, 1, 'attack', 'AttackFormation' },
-            { 'xsl0205', -1, 1, 'attack', 'AttackFormation' },
-        },
         ['OST_BasicLandAttack_T3SeraphimMobileAA'] = {
             'OST_BasicLandAttack_T3SeraphimMobileAA', '',
             { 'dslk004', -1, 1, 'attack', 'GrowthFormation' },
@@ -1669,6 +1680,102 @@ Scenario = {
                         },
                         ChildrenType = {'MobileHeavyArtillery', 'MobileShields', 'HeavyBots', 'MobileFlak'},
                     },
+                    ['OSB_Child_BasicLandAttack_T2HoverAttack1'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2HoverAttack1',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 2, 4, 0},
+                                {'default_brain','2','4','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'AmphibiousTanks', 'MobileFlak'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T2HoverAttack2'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2HoverAttack2',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 2, 4, 0},
+                                {'default_brain','2','4','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'AmphibiousTanks', 'MobileShields'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T2HoverAttack3'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2HoverAttack3',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 2, 4, 0},
+                                {'default_brain','2','4','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'AmphibiousTanks', 'MobileFlak', 'MobileShields'},
+                    },
                     -- Cybran Stuff --
                     ['OSB_Child_BasicLandAttack_T2MobileBombsStealth'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T2MobileBombsStealth',
@@ -1932,38 +2039,6 @@ Scenario = {
                     },
 
                     -- Seraphim Stuff --
-                    ['OSB_Child_BasicLandAttack_T2SeraphimHoverAttack'] =  {
-                        PlatoonTemplate = 'OST_BasicLandAttack_T2SeraphimHoverAttack',
-                        Priority = 498,
-                        InstanceCount = 5,
-                        LocationType = 'MAIN',
-                        PlatoonType = 'Land',
-                        RequiresConstruction = true,
-                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
-                            {'default_platoon'},
-                            {'default_platoon'}
-                        },
-                        BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
-                            },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
-                            },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4, 0},
-                                {'default_brain','4','0'}
-                            },
-                        },
-                        PlatoonData = {
-                            {type = 5, name = 'AMPlatoons', value = {
-                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
-                            }},
-                        },
-                        ChildrenType = {'AmphibiousTanks', 'MobileFlak'},
-                    },
                     ['OSB_Child_BasicLandAttack_T3SeraphimMobileAA'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3SeraphimMobileAA',
                         Priority = 499,
