@@ -238,19 +238,21 @@ mapFilters = {
         FilterFactory = {
             SelectedKey = 1,
             Filters = {
-                function(scenInfo) 
-                    local newestVersion = true
-                    if scenInfo.map_version ~= nil then
-                        for _,comparisionlist in scenarios do
-                            if LOC(scenInfo.name) == LOC(comparisionlist.name) then
-                                if scenInfo.map_version < (comparisionlist.map_version or 1) then
-                                    newestVersion = false
-                                    break
+                function(scenInfo)
+                    if scenInfo.Outdated then
+                        return false
+                    end
+                    local version = scenInfo.map_version or 0
+                    for _,comparisionlist in scenarios do
+                        if scenInfo.name == comparisionlist.name then
+                            if comparisionlist.map_version then
+                                if version < comparisionlist.map_version then
+                                    return false
                                 end
                             end
                         end
                     end
-                    return not (scenInfo.Outdated or not newestVersion)
+                    return true
                 end
             },
             Build = function(self)
