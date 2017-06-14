@@ -1076,7 +1076,7 @@ end
 function GUI_OldMap(over)
     local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(900)
+    dialogContent.Width:Set(1000)
     dialogContent.Height:Set(100)
 
     local Changelog = import('/lua/ui/lobby/changelog.lua')
