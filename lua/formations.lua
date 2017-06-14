@@ -546,28 +546,19 @@ local NineWideNavalAttackFormation = {
 -- ==============================================
 -- ============ Sub Growth Formation===========
 -- ==============================================
--- === Three Wide Growth Subs Formation ===
-local ThreeWideSubGrowthFormation = {
+-- === Four Wide Growth Subs Formation ===
+local FourWideSubGrowthFormation = {
     LineBreak = 0.5,
-    { Subs, Subs, Subs, },
-    { Subs, Subs, Subs, },
+    { Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs },
 }
 
--- === Five Wide Subs Formation ===
-local FiveWideSubGrowthFormation = {
+-- === Six Wide Subs Formation ===
+local SixWideSubGrowthFormation = {
     LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs, },
-    { Subs, Subs, Subs, Subs, Subs, },
-    { Subs, Subs, Subs, Subs, Subs, },
-}
-
--- === Seven Wide Subs Formation ===
-local SevenWideSubGrowthFormation = {
-    LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs, },
-    { Subs, Subs, Subs, Subs, Subs, },
-    { Subs, Subs, Subs, Subs, Subs, },
-    { Subs, Subs, Subs, Subs, Subs, },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
 
@@ -575,28 +566,28 @@ local SevenWideSubGrowthFormation = {
 -- ============ Sub Attack Formation===========
 -- ==============================================
 
--- === Five Wide Subs Formation ===
-local FiveWideSubAttackFormation = {
+-- === Four Wide Subs Formation ===
+local FourWideSubAttackFormation = {
     LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs },
 }
 
--- === Seven Wide Subs Formation ===
-local SevenWideSubAttackFormation = {
+-- === Six Wide Subs Formation ===
+local SixWideSubAttackFormation = {
     LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
--- === Nine Wide Subs Formation ===
-local NineWideSubAttackFormation = {
+-- === Eight Wide Subs Formation ===
+local EightWideSubAttackFormation = {
     LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
 local EightNavalFormation = {
@@ -671,16 +662,16 @@ function AttackFormation(formationUnits)
     local seaArea = math.max(seaUnitsList.AreaTotal, subUnitsList.AreaTotal)
     if seaArea <= 10 then
         seaBlock = FiveWideNavalAttackFormation
-        subBlock = FiveWideSubGrowthFormation
+        subBlock = FourWideSubAttackFormation
     elseif seaArea <= 25 then
         seaBlock = SevenWideNavalAttackFormation
-        subBlock = SevenWideSubAttackFormation
+        subBlock = SixWideSubAttackFormation
     elseif seaArea <= 50 then
         seaBlock = NineWideNavalAttackFormation
-        subBlock = NineWideSubAttackFormation
+        subBlock = EightWideSubAttackFormation
     else
         seaBlock = NineWideNavalAttackFormation
-        subBlock = NineWideSubAttackFormation
+        subBlock = EightWideSubAttackFormation
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
@@ -728,16 +719,16 @@ function GrowthFormation(formationUnits)
     local seaArea = math.max(seaUnitsList.AreaTotal, subUnitsList.AreaTotal)
     if seaArea <= 9 then
         seaBlock = ThreeNavalGrowthFormation
-        subBlock = ThreeWideSubGrowthFormation
+        subBlock = FourWideSubGrowthFormation
     elseif seaArea <= 25 then
         seaBlock = FiveNavalGrowthFormation
-        subBlock = FiveWideSubGrowthFormation
+        subBlock = FourWideSubGrowthFormation
     elseif seaArea <= 49 then
         seaBlock = SevenNavalGrowthFormation
-        subBlock = SevenWideSubGrowthFormation
+        subBlock = SixWideSubGrowthFormation
     else
         seaBlock = SevenNavalGrowthFormation
-        subBlock = SevenWideSubGrowthFormation
+        subBlock = SixWideSubGrowthFormation
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
@@ -856,8 +847,8 @@ function GuardFormation(formationUnits)
     for _, bp in blueprints do
         largestFootprint = math.max(largestFootprint, math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ))
     end
-    local scale = 3 / math.min(largestFootprint + 2, 8)
     
+    local scale = 3 / math.min(largestFootprint + 2, 8) -- A distance of 1 in formation coordinates is translated to (largestFootprint + 2) world units.
     local rotate = false
     local sizeMult = 0.4
     local remainingUnits = table.getn(formationUnits)
@@ -868,7 +859,8 @@ function GuardFormation(formationUnits)
     local unitsPerShield = 0
     local nextShield = 0
 
-    -- make circle around center point
+    -- Form concentric circles around the assisted unit
+    -- Most of the numbers after this point are arbitrary. Don't go looking for the significance of 0.19 or the like because there is none.
     while remainingUnits > 0 do
         if unitCount > ringChange then
             ringChange = ringChange + 6
@@ -883,7 +875,7 @@ function GuardFormation(formationUnits)
             
             if ringCount == 1 then
                 shieldsInRing = math.min(ringChange, remainingShields)
-            elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then -- This is arbitrary but seems to give a good distrubution.
+            elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then
                 shieldsInRing = math.min(ringChange / 2, remainingShields)
             elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.13 then
             shieldsInRing = math.min(ringChange / 3, remainingShields)
