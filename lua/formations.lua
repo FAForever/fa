@@ -51,30 +51,30 @@ local RemainingCategory = { 'RemainingCategory', }
 
 -- === LAND CATEGORIES ===
 local DirectFire = ((categories.DIRECTFIRE - categories.CONSTRUCTION)) * categories.LAND
-local Construction = (categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) * categories.LAND
-local Artillery = ((categories.ARTILLERY + categories.INDIRECTFIRE) - categories.ANTIAIR) * categories.LAND
-local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE)) * categories.LAND
+local Artillery = ((categories.ARTILLERY + categories.INDIRECTFIRE)) * categories.LAND
+local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + Artillery)) * categories.LAND
+local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
-local DFExp = DirectFire * categories.EXPERIMENTAL
 local ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
 
 -- === TECH LEVEL LAND CATEGORIES ===
 local LandCategories = {
-    Experimentals = DFExp,
-    
     Shields = ShieldCat,
     
     Bot1 = (DirectFire * categories.TECH1) * categories.BOT - categories.SCOUT,
     Bot2 = (DirectFire * categories.TECH2) * categories.BOT - categories.SCOUT,
     Bot3 = (DirectFire * categories.TECH3) * categories.BOT - categories.SCOUT,
+    Bot4 = (DirectFire * categories.EXPERIMENTAL) * categories.BOT - categories.SCOUT,
 
     Tank1 = (DirectFire * categories.TECH1) - categories.BOT - categories.SCOUT,
     Tank2 = (DirectFire * categories.TECH2) - categories.BOT - categories.SCOUT,
     Tank3 = (DirectFire * categories.TECH3) - categories.BOT - categories.SCOUT,
+    Tank4 = (DirectFire * categories.EXPERIMENTAL) - categories.BOT - categories.SCOUT,
 
     Art1 = Artillery * categories.TECH1,
     Art2 = Artillery * categories.TECH2,
     Art3 = Artillery * categories.TECH3,
+    Art4 = Artillery * categories.EXPERIMENTAL,
 
     AA1 = AntiAir * categories.TECH1,
     AA2 = AntiAir * categories.TECH2,
@@ -82,30 +82,31 @@ local LandCategories = {
 
     Com1 = Construction * categories.TECH1,
     Com2 = Construction * categories.TECH2,
-    Com3 = Construction - (categories.TECH1 + categories.TECH2),
+    Com3 = Construction - (categories.TECH1 + categories.TECH2 + categories.EXPERIMENTAL),
+    Com4 = Construction * categories.EXPERIMENTAL,
 
     Util1 = (UtilityCat * categories.TECH1) + categories.OPERATION,
     Util2 = UtilityCat * categories.TECH2,
     Util3 = UtilityCat * categories.TECH3,
+    Util4 = UtilityCat * categories.EXPERIMENTAL,
 
-    RemainingCategory = categories.LAND - (DirectFire + Construction + Artillery + AntiAir + UtilityCat + DFExp + ShieldCat)
+    RemainingCategory = categories.LAND - (DirectFire + Construction + Artillery + AntiAir + UtilityCat + ShieldCat)
 }
 
 -- === SUB GROUP ORDERING ===
-local Bots = { 'Bot3', 'Bot2', 'Bot1', }
-local Tanks = { 'Tank3', 'Tank2', 'Tank1', }
-local DF = { 'Tank3', 'Bot3', 'Tank2', 'Bot2', 'Tank1', 'Bot1', }
-local Art = { 'Art3', 'Art2', 'Art1', }
-local T1Art = { 'Art1', 'Art2', 'Art3', }
+local Bots = { 'Bot4', 'Bot3', 'Bot2', 'Bot1', }
+local Tanks = { 'Tank4', 'Tank3', 'Tank2', 'Tank1', }
+local DF = { 'Tank4', 'Bot4', 'Tank3', 'Bot3', 'Tank2', 'Bot2', 'Tank1', 'Bot1', }
+local Art = { 'Art4', 'Art3', 'Art2', 'Art1', }
+local T1Art = { 'Art1', 'Art2', 'Art3', 'Art4', }
 local AA = { 'AA3', 'AA2', 'AA1', }
-local Util = { 'Util3', 'Util2', 'Util1', }
-local Com = { 'Com3', 'Com2', 'Com1', }
+local Util = { 'Util4', 'Util3', 'Util2', 'Util1', }
+local Com = { 'Com4', 'Com3', 'Com2', 'Com1', }
 local Shield = { 'Shields', }
-local Experimental = { 'Experimentals', }
 
 -- === LAND BLOCK TYPES =
-local DFFirst = { Experimental, DF, T1Art, AA, Shield, Com, Util, RemainingCategory }
-local TankFirst = { Experimental, Tanks, Bots, Art, AA, Shield, Com, Util, RemainingCategory }
+local DFFirst = { DF, T1Art, AA, Shield, Com, Util, RemainingCategory }
+local TankFirst = { Tanks, Bots, Art, AA, Shield, Com, Util, RemainingCategory }
 local ShieldFirst = { Shield, AA, T1Art, DF, Com, Util, RemainingCategory }
 local AAFirst = { AA, DF, T1Art, Art, Shield, Com, Util, RemainingCategory }
 local ArtFirst = { Art, AA, DF, Shield, Com, Util, RemainingCategory }
@@ -192,7 +193,7 @@ local EightWideAttackFormationBlock = {
 }
 
 -- === Travelling Block ===
-local TravelSlot = { Experimental, Bots, Tanks, AA, Art, Shield, Util, Com }
+local TravelSlot = { Bots, Tanks, AA, Art, Shield, Util, Com }
 local TravelFormationBlock = {
     HomogenousRows = true,
     UtilBlocks = true,
@@ -1446,14 +1447,13 @@ end
 function CategorizeUnits(formationUnits)
     local unitsList = {
         Land = {
-            Bot1 = {}, Bot2 = {}, Bot3 = {},
-            Tank1 = {}, Tank2 = {}, Tank3 = {},
-            Art1 = {}, Art2 = {}, Art3 = {},
+            Bot1 = {}, Bot2 = {}, Bot3 = {}, Bot4 = {},
+            Tank1 = {}, Tank2 = {}, Tank3 = {}, Tank4 = {},
+            Art1 = {}, Art2 = {}, Art3 = {}, Art4 = {},
             AA1 = {}, AA2 = {}, AA3 = {},
-            Com1 = {}, Com2 = {}, Com3 = {},
-            Util1 = {}, Util2 = {}, Util3 = {},
+            Com1 = {}, Com2 = {}, Com3 = {}, Com4 = {},
+            Util1 = {}, Util2 = {}, Util3 = {}, Util4 = {},
             Shields = {},
-            Experimentals = {},
             RemainingCategory = {},
             
             UnitTotal = 0,
