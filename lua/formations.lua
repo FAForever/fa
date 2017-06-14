@@ -363,7 +363,7 @@ local AirCategories = {
 
     AExper = ExperimentalAir,
 
-    RemainingCategory = categories.AIR
+    RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir)
 }
 
 -- === SUB GROUP ORDERING ===
@@ -916,6 +916,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(formationBlock)
     local i = 1
+    local rowNum = 1
     local whichRow = 1
     local whichCol = 1
     local currRowLen = table.getn(formationBlock[whichRow])
@@ -927,6 +928,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
 
     while unitsList.UnitTotal >= i do
         if whichCol > currRowLen then
+            rowNum = rowNum + 1
             if whichRow == numRows then
                 whichRow = 1
                 formationLength = formationLength + 1 + (formationBlock.RowBreak or 0) + (formationBlock.LineBreak or 0)
@@ -940,7 +942,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             evenRowLen = math.mod(currRowLen, 2) == 0
         end
         
-        if occupiedSpaces[formationLength] and occupiedSpaces[formationLength][whichCol] then
+        if occupiedSpaces[rowNum] and occupiedSpaces[rowNum][whichCol] then
             whichCol = whichCol + 1
             continue
         end
@@ -967,7 +969,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                                 end
                                 local blocked = false
                                 for y = 0, size - 1, 1 do
-                                    local yPos = formationLength + y + y * (formationBlock.LineBreak or 0)
+                                    local yPos = rowNum + y
                                     if not occupiedSpaces[yPos] then
                                         continue
                                     end
@@ -1002,7 +1004,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             end
                             offsetY = (size - 1) / 2 * (1 + (formationBlock.LineBreak or 0))
                             for y = 0, size - 1, 1 do
-                                local yPos = formationLength + y + y * (formationBlock.LineBreak or 0)
+                                local yPos = rowNum + y
                                 if not occupiedSpaces[yPos] then
                                     occupiedSpaces[yPos] = {}
                                 end
@@ -1167,10 +1169,7 @@ function GetChevronPosition(chevronPos, currCol, currRowLen, formationLen)
     end
     local yPos = -offset
     yPos = yPos + (formationLen * -1.5)
-    local firstBlockOffset = -2
-    if math.mod(currRowLen, 2) == 1 then
-        firstBlockOffset = -1
-    end
+    local firstBlockOffset = math.mod(currRowLen, 2) - 1
     local blockOff = math.floor(currCol/2) * 2
     if math.mod(currCol, 2) == 1 then
         blockOff = -blockOff
