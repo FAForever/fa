@@ -385,11 +385,26 @@ local InitialChevronBlock = {
     { ChevronSlot, ChevronSlot },
 }
 
-local StaggeredChevronBlock = {
-    RepeatAllRows = true,
+local AttackChevronBlock = {
+    RepeatAllRows = false,
     HomogenousBlocks = true,
+    { ChevronSlot, },
+    { ChevronSlot, },
     { ChevronSlot, ChevronSlot, ChevronSlot, },
-    { ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+}
+
+local GrowthChevronBlock = {
+    RepeatAllRows = false,
+    HomogenousBlocks = true,
+    { ChevronSlot, },
+    { ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
 }
 
 
@@ -677,8 +692,7 @@ function AttackFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    local airUnitsList = CategorizeAirUnits(formationUnits)
-    BlockBuilderAir(airUnitsList, StaggeredChevronBlock)
+    BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
 
     return FormationPos
 end
@@ -714,10 +728,11 @@ function GrowthFormation(formationUnits)
     BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
 
     local seaUnitsList = unitsList.Naval
-    local seaBlock
-    local subBlock
     local subUnitsList = unitsList.Subs
     local seaArea = math.max(seaUnitsList.AreaTotal, subUnitsList.AreaTotal)
+    local seaBlock
+    local subBlock
+    
     if seaArea <= 9 then
         seaBlock = ThreeNavalGrowthFormation
         subBlock = FourWideSubGrowthFormation
@@ -734,8 +749,7 @@ function GrowthFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    local airUnitsList = CategorizeAirUnits(formationUnits)
-    BlockBuilderAir(airUnitsList, StaggeredChevronBlock)
+    BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
 
     return FormationPos
 end
@@ -1041,7 +1055,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             rowType = type
                         end
                         
-                        table.insert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, categoryTable[group], formationLength, true})
+                        table.insert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
                         inserted = true
                         
                         groupData.Count = groupData.Count - 1
@@ -1086,32 +1100,18 @@ end
 
 
 -- ============ AIR BLOCK BUILDING =============
-function BlockBuilderAir(unitsList, airBlock)
+function BlockBuilderAir(unitsList, airBlock, spacing)
+    spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(airBlock)
     local i = 1
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
     local currRowLen = table.getn(airBlock[whichRow])
-    local longestRow = 1
-    local longestLength = 0
     local chevronSize = airBlock.ChevronSize or 5
-    while i < numRows do
-        if table.getn(airBlock[i]) > longestLength then
-            longestLength = table.getn(airBlock[i])
-            longestRow = i
-        end
-        i = i + 1
-    end
     local chevronType = false
     local formationLength = 0
-    local spacing = 1
 
-    if unitsList.AExper > 0 then
-        spacing = 2
-    end
-
-    i = 1
     while unitsList.UnitTotal >= i do
         if chevronPos > chevronSize then
             chevronPos = 1
@@ -1140,14 +1140,29 @@ function BlockBuilderAir(unitsList, airBlock)
             end
             for numGroup, group in type do
                 if not airBlock.HomogenousBlocks or chevronType == false or chevronType == type then
-                    if unitsList[group] > 0 then
+                    local fs = 0
+                    local size = 0
+                    local groupData = nil
+                    for k, v in unitsList[group] do
+                        size = unitsList.FootprintSizes[k]
+                        if v.Count > 0 then
+                            fs = k
+                            groupData = v
+                            break
+                        end
+                    end
+                    if groupData then
                         local xPos, yPos = GetChevronPosition(chevronPos, whichCol, currRowLen, formationLength)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos*spacing, yPos*spacing, AirCategories[group], yPos, true})
-                        unitsList[group] = unitsList[group] - 1
+                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, yPos, true})
                         inserted = true
+                        
+                        groupData.Count = groupData.Count - 1
+                        if groupData.Count <= 0 then
+                            unitsList[group][fs] = nil
+                        end
                         break
                     end
                 end
@@ -1162,23 +1177,21 @@ function BlockBuilderAir(unitsList, airBlock)
 end
 
 function GetChevronPosition(chevronPos, currCol, currRowLen, formationLen)
-    local offset = math.floor(chevronPos/2) * .375
+    local offset = math.floor(chevronPos / 2) * .75
     local xPos = offset
     if math.mod(chevronPos, 2) == 0 then
-        xPos = -1 * offset
+        xPos = -offset
     end
-    local yPos = -offset
-    yPos = yPos + (formationLen * -1.5)
-    local firstBlockOffset = math.mod(currRowLen, 2) - 1
-    local blockOff = math.floor(currCol/2) * 2
+    local yPos = -offset + math.floor(currCol / 2) * 2.25
+    yPos = yPos - formationLen * 1.5
+    --local firstBlockOffset = (math.mod(currRowLen, 2) - 1) * 1.875
+    local blockOff = math.floor(currCol / 2) * 3.75
     if math.mod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
-    xPos = xPos + blockOff + firstBlockOffset
+    xPos = xPos + blockOff --+ firstBlockOffset
     return xPos, yPos
 end
-
-
 
 
 
@@ -1333,35 +1346,6 @@ end
 
 
 -- ========= UNIT SORTING ==========
-function CategorizeAirUnits(formationUnits)
-    local unitsList = {
-        -- Air Lists
-        Ground1 = 0, Ground2 = 0, Ground3 = 0,
-        Trans1 = 0, Trans2 = 0, Trans3 = 0,
-        Bomb1 = 0, Bomb2 = 0, Bomb3 = 0,
-        AA1 = 0, AA2 = 0, AA3 = 0,
-        AN1 = 0, AN2 = 0, AN3 = 0,
-        AIntel1 = 0, AIntel2 = 0, AIntel3 = 0,
-        AExper = 0,
-        RemainingCategory = 0,
-        UnitTotal = 0,
-    }
-    for i, u in formationUnits do
-        for aircat, _ in AirCategories do
-            if EntityCategoryContains(AirCategories[aircat], u) then
-                unitsList[aircat] = unitsList[aircat] + 1
-                if aircat == "RemainingCategory" then
-                    WARN('*FORMATION DEBUG: Missed unit: ' .. u:GetUnitId())
-                end
-                unitsList.UnitTotal = unitsList.UnitTotal + 1
-                break
-            end
-        end
-    end
-    -- LOG('UnitsList=', repr(unitsList))
-    return unitsList
-end
-
 function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
@@ -1374,9 +1358,9 @@ function CalculateSizes(unitsList)
         },
         
         Air = {
-            GridSizeFraction = 0,
+            GridSizeFraction = 1.75,
             GridSizeAbsolute = 2,
-            MinSeparationFraction = 1,
+            MinSeparationFraction = 1.75,
         },
         
         Naval = {
