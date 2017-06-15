@@ -823,38 +823,43 @@ function CircleFormation(formationUnits)
 end
 
 function GuardFormation(formationUnits)
-    -- Not worth checking the last formation because GuardFormation is almost never called repeatedly with the same units.
-    FormationPos = {}
-    LastFormation = 'GuardFormation'
-    LastUnits = formationUnits
-    LastUnitCount = table.getn(formationUnits)
+    -- Not worth caching the last formation because GuardFormation is almost never called repeatedly with the same units.
+    local FormationPos = {}
     
     local shieldCategory = ShieldCat
     local nonShieldCategory = categories.ALLUNITS - shieldCategory
-    local blueprints = {}
+    local footprintCounts = {}
+    local remainingUnits = table.getn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
         if EntityCategoryContains(ShieldCat, u) then
             remainingShields = remainingShields + 1
         end
     
-        local bp = u:GetBlueprint()
-        if not blueprints[bp.BlueprintId] then
-            blueprints[bp.BlueprintId] = bp
-        end
+        local fs = u:GetFootPrintSize()
+        footprintCounts[fs] = (footprintCounts[fs] or 0) + 1
+    end
+    
+    local numSizes = 0
+    for _ in footprintCounts do
+        numSizes = numSizes + 1
     end
     
     local largestFootprint = 0
-    for _, bp in blueprints do
-        largestFootprint = math.max(largestFootprint, math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ))
+    local smallestFootprint = 9999
+    local minCount = remainingUnits / numSizes -- This could theoretically divide by 0, but it wouldn't be a problem because the result would never be used.
+    for fs, count in footprintCounts do
+        largestFootprint = math.max(largestFootprint, fs)
+        if count >= minCount then
+            smallestFootprint = math.min(smallestFootprint, fs)
+        end
     end
     
-    local scale = 3 / math.min(largestFootprint + 2, 8) -- A distance of 1 in formation coordinates is translated to (largestFootprint + 2) world units.
+    local ringSpacing = (smallestFootprint + 2) / (largestFootprint + 2) -- A distance of 1 in formation coordinates is translated to (largestFootprint + 2) world units.
     local rotate = false
-    local sizeMult = 0.4
-    local remainingUnits = table.getn(formationUnits)
+    local sizeMult = 0
     local ringChange = 0
-    local ringCount = 0
+    local ringCount = 1
     local unitCount = 1
     local shieldsInRing = 0
     local unitsPerShield = 0
@@ -864,22 +869,18 @@ function GuardFormation(formationUnits)
     -- Most of the numbers after this point are arbitrary. Don't go looking for the significance of 0.19 or the like because there is none.
     while remainingUnits > 0 do
         if unitCount > ringChange then
-            ringChange = ringChange + 6
-            if remainingUnits < ringChange * 1.33 then
-                ringChange = remainingUnits
+            unitCount = 1
+            ringCount = ringCount + 1
+            sizeMult = ringCount * ringSpacing
+            ringChange = ringCount * 6
+            if remainingUnits < ringChange * 1.167 then
+                ringChange = remainingUnits -- It looks better to squeeze a few more units into the last ring than add a ring with only one or two units.
             end
             
-            ringCount = ringCount + 1
-            sizeMult = sizeMult + math.max(2 - ringCount / 5, 1) * scale
-            
-            unitCount = 1
-            
-            if ringCount == 1 then
-                shieldsInRing = math.min(ringChange, remainingShields)
-            elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then
+            if ringCount == 2 or remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then
                 shieldsInRing = math.min(ringChange / 2, remainingShields)
             elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.13 then
-            shieldsInRing = math.min(ringChange / 3, remainingShields)
+                shieldsInRing = math.min(ringChange / 3, remainingShields)
             else
                 shieldsInRing = 0
             end
@@ -890,12 +891,11 @@ function GuardFormation(formationUnits)
                 nextShield = unitsPerShield - 0.01 -- Rounding error could result in missing a shield if nextShield is supposed to equal ringChange.
             end
         end
-        local ringFraction = unitCount/ringChange
-        offsetX = sizeMult * math.sin(lerp(ringFraction, 0.0, math.pi * 2.0))
-        offsetY = -sizeMult * math.cos(lerp(ringFraction, 0.0, math.pi * 2.0))
-        -- LOG('*FORMATION DEBUG: X=' .. offsetX .. ', Y=' .. offsetY)
+        local ringPosition = unitCount / ringChange * math.pi * 2.0
+        offsetX = sizeMult * math.sin(ringPosition)
+        offsetY = -sizeMult * math.cos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            table.insert(FormationPos, { offsetX, offsetY, ShieldCat, 0, rotate })
+            table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
