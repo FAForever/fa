@@ -48,7 +48,7 @@ function populateMessages()
     if prefsMessages then
         messages = prefsMessages
     else
-        messages = defaultMessages
+        messages = defaultMessages2
         Prefs.SetToCurrentProfile('Notify_Messages', messages)
     end
 end
@@ -98,22 +98,23 @@ end
 
 function sendEnhancementMessage(messageTable)
     local enh = messageTable.enh
-    if not messages[enh] then return end
+    local faction = messageTable.faction
+    if not messages[faction][enh] then return end
 
     local id = messageTable.id
     local trigger = messageTable.trigger
 
     if trigger == 'started' then
-        onStartEnhancement(id, enh)
+        onStartEnhancement(id, faction, enh)
     elseif trigger == 'cancelled' then
-        onCancelledEnhancement(id, enh)
+        onCancelledEnhancement(id, faction, enh)
     elseif trigger == 'completed' then
-        onCompletedEnhancement(id, enh)
+        onCompletedEnhancement(id, faction, enh)
     end
 end
 
-function onStartEnhancement(id, enh)
-    local msg = {to = 'allies', Chat = true, text = 'Upgrading ' .. messages[enh]}
+function onStartEnhancement(id, faction, enh)
+    local msg = {to = 'allies', Chat = true, text = 'Upgrading ' .. messages[faction][enh]}
 
     -- Start by storing entity IDs for future use
     if not ACUs[id] then
@@ -133,8 +134,8 @@ function onStartEnhancement(id, enh)
     end
 end
 
-function onCancelledEnhancement(id, enh)
-    local msg = {to = 'allies', Chat = true, text = messages[enh] .. ' cancelled'}
+function onCancelledEnhancement(id, faction, enh)
+    local msg = {to = 'allies', Chat = true, text = messages[faction][enh] .. ' cancelled'}
 
     local data = ACUs[id]
     if data then
@@ -148,13 +149,13 @@ function onCancelledEnhancement(id, enh)
 end
 
 -- Called from the enhancement watcher
-function onCompletedEnhancement(id, enh)
+function onCompletedEnhancement(id, faction, enh)
     local msg = {to = 'allies', Chat = true}
 
     local data = ACUs[id]
     if data then
         if not chatDisabled then
-            msg.text = messages[enh] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            msg.text = messages[faction][enh] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
             SessionSendChatMessage(FindClients(), msg)
         end
 
