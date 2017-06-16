@@ -110,7 +110,7 @@ local TankFirst = { Tanks, Bots, Art, AA, Shield, Com, Util, RemainingCategory }
 local ShieldFirst = { Shield, AA, T1Art, DF, Com, Util, RemainingCategory }
 local AAFirst = { AA, DF, T1Art, Art, Shield, Com, Util, RemainingCategory }
 local ArtFirst = { Art, AA, DF, Shield, Com, Util, RemainingCategory }
-local T1ArtFirst = { T1Art, AA, DF, Shield, Com, Util, RemainingCategory }
+local T1ArtFirst = { T1Art, DF, AA, Shield, Com, Util, RemainingCategory }
 local UtilFirst = { Util, AA, T1Art, DF, Shield, Com, RemainingCategory }
 
 
@@ -163,15 +163,15 @@ local SevenWideAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, },
     -- second Row
-    { DFFirst, ShieldFirst, DFFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, },
+    { DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, },
     -- third row
-    { UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, UtilFirst, },
+    { DFFirst, UtilFirst, AAFirst, DFFirst, AAFirst, UtilFirst, DFFirst, },
     -- fourth row
-    { AAFirst, ShieldFirst, AAFirst, T1ArtFirst, ShieldFirst, AAFirst, DFFirst, },
+    { DFFirst, ShieldFirst, AAFirst, T1ArtFirst, AAFirst, ShieldFirst, DFFirst, },
     -- fifth row
-    { DFFirst, AAFirst, T1ArtFirst, T1ArtFirst, AAFirst, T1ArtFirst, DFFirst, },
+    { DFFirst, T1ArtFirst, AAFirst, ShieldFirst, AAFirst, T1ArtFirst, DFFirst, },
     -- sixth row
-    { UtilFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, UtilFirst, },
+    { ArtFirst, UtilFirst, ArtFirst, AAFirst, ArtFirst, UtilFirst, ArtFirst, },
 }
 
 -- === 8 Wide Attack Block ===
@@ -179,15 +179,15 @@ local EightWideAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, },
     -- second Row
-    { DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, },
+    { DFFirst, ShieldFirst, DFFirst, ShieldFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, },
     -- third row
-    { UtilFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, UtilFirst, },
+    { DFFirst, UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, UtilFirst, DFFirst, },
     -- fourth row
-    { DFFirst, AAFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, },
+    { DFFirst, ShieldFirst, T1ArtFirst, AAFirst, AAFirst, T1ArtFirst, ShieldFirst, DFFirst, },
     -- fifth row
     { DFFirst, T1ArtFirst, AAFirst, T1ArtFirst, T1ArtFirst, AAFirst, T1ArtFirst, DFFirst, },
     -- sixth row
-    { UtilFirst, AAFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, AAFirst, UtilFirst, },
+    { DFFirst, ShieldFirst, UtilFirst, ShieldFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, },
     -- seventh row
     { DFFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, DFFirst, },
 }
@@ -209,7 +209,7 @@ local TwoRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, AAFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, AAFirst, UtilFirst },
+    { AAFirst, UtilFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, UtilFirst, AAFirst },
 }
 
 -- === 3 Row Attack Block - 10 units wide ===
@@ -217,9 +217,9 @@ local ThreeRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, AAFirst, ShieldFirst, UtilFirst },
+    { AAFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, AAFirst },
     -- third row
-    { DFFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, ArtFirst, AAFirst, DFFirst },
+    { DFFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, DFFirst },
 }
 
 -- === 4 Row Attack Block - 12 units wide ===
@@ -227,11 +227,11 @@ local FourRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
+    { DFFirst, ShieldFirst, DFFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, DFFirst, ShieldFirst, DFFirst },
     -- third row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
+    { DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst },
     -- fourth row
-    { AAFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, AAFirst },
+    { AAFirst, ShieldFirst, DFFirst, ArtFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, ArtFirst, DFFirst, ShieldFirst, AAFirst },
 }
 
 -- === 5 Row Attack Block - 14 units wide ===
@@ -239,11 +239,11 @@ local FiveRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
+    { UtilFirst, ShieldFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, ShieldFirst, UtilFirst },
     -- third row
     { DFFirst, AAFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, DFFirst },
     -- fourth row
-    { AAFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, AAFirst },
+    { AAFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst },
     -- five row
     { ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst },
 }
@@ -253,13 +253,13 @@ local SixRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
+    { UtilFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, UtilFirst },
     -- third row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
+    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
     -- fourth row
-    { AAFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, AAFirst },
+    { AAFirst, ShieldFirst, AAFirst, DFFirst, AAFirst, AAFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, AAFirst, AAFirst, DFFirst, AAFirst, ShieldFirst, AAFirst },
     -- fifth row
-    { UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, UtilFirst },
+    { DFFirst, AAFirst, DFFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, AAFirst, AAFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, DFFirst, AAFirst, DFFirst },
     -- sixth row
     { AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst },
 }
@@ -269,58 +269,39 @@ local SevenRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
+    { UtilFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, UtilFirst },
     -- third row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
+    { DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, DFFirst, DFFirst },
     -- fourth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst },
+    { DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst },
     -- fifth row
     { UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, UtilFirst },
     -- sixth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst },
+    { DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, UtilFirst, DFFirst, ShieldFirst, AAFirst, AAFirst, ShieldFirst, DFFirst, UtilFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst },
     -- seventh row
-    { ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst },
+    { ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst },
 }
 
--- === 8 Row Attack Block - 18 units wide ===
+-- === 8 Row Attack Block - 20 units wide ===
 local EightRowAttackFormationBlock = {
     -- first row
     { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
     -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
+    { DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst },
     -- third row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst },
+    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
     -- fourth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst },
+    { DFFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, DFFirst },
     -- fifth row
-    { UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, UtilFirst },
+    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, AAFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst },
     -- sixth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst },
+    { UtilFirst, ShieldFirst, ArtFirst, ShieldFirst, ArtFirst, UtilFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, UtilFirst, ArtFirst, ShieldFirst, ArtFirst, ShieldFirst, UtilFirst },
     -- seventh row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, DFFirst, DFFirst, DFFirst },
+    { DFFirst, AAFirst, DFFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, DFFirst, AAFirst, DFFirst },
     -- eight row
-    { AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst },
+    { AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst },
 }
 
--- === 9 Row Attack Block - 18+ units wide ===
-local NineRowAttackFormationBlock = {
-    -- first row
-    { DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst, DFFirst },
-    -- second row
-    { UtilFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, DFFirst, DFFirst, ShieldFirst, UtilFirst },
-    -- third row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst },
-    -- fourth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst },
-    -- fifth row
-    { UtilFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, DFFirst, AAFirst, UtilFirst },
-    -- sixth row
-    { AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, AAFirst, ShieldFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst, DFFirst, ShieldFirst, AAFirst },
-    -- seventh row
-    { DFFirst, AAFirst, DFFirst, DFFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, DFFirst, DFFirst, DFFirst },
-    -- eight row
-    { AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst },
-}
 -- =========================================
 -- ================ AIR DATA ===============
 -- =========================================
@@ -717,10 +698,8 @@ function AttackFormation(formationUnits)
         landBlock = SixRowAttackFormationBlock
     elseif landUnitsList.AreaTotal <= 126 then -- 18 wide
         landBlock = SevenRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 160 then -- 20 wide
+    else -- 20 wide
         landBlock = EightRowAttackFormationBlock
-    else
-        landBlock = NineRowAttackFormationBlock
     end
     BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
 
@@ -775,8 +754,6 @@ function GrowthFormation(formationUnits)
         landBlock = SixWideAttackFormationBlock
     elseif landUnitsList.AreaTotal <= 42 then
         landBlock = SevenWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 56 then
-        landBlock = EightWideAttackFormationBlock
     else
         landBlock = EightWideAttackFormationBlock
     end
@@ -985,18 +962,19 @@ end
 function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(formationBlock)
-    local i = 1
     local rowNum = 1
     local whichRow = 1
     local whichCol = 1
     local currRowLen = table.getn(formationBlock[whichRow])
+    local rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
+    currRowLen = currRowLen - rowModifier
     local evenRowLen = math.mod(currRowLen, 2) == 0
     local rowType = false
     local formationLength = 0
     local inserted = false
     local occupiedSpaces = {}
 
-    while unitsList.UnitTotal >= i do
+    while unitsList.UnitTotal > 0 do
         if whichCol > currRowLen then
             rowNum = rowNum + 1
             if whichRow == numRows then
@@ -1008,6 +986,12 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             whichCol = 1
             rowType = false
             currRowLen = table.getn(formationBlock[whichRow])
+            if occupiedSpaces[rowNum] then
+                rowModifier = 0
+            else
+                rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
+            end
+            currRowLen = currRowLen - rowModifier
             evenRowLen = math.mod(currRowLen, 2) == 0
         end
         
@@ -1016,7 +1000,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             continue
         end
         
-        local currColSpot = GetColSpot(currRowLen, whichCol) -- Translate whichCol to correct spot in row
+        local currColSpot = GetColSpot(currRowLen + rowModifier, whichCol + rowModifier) -- Translate whichCol to correct spot in row
         local currSlot = formationBlock[whichRow][currColSpot]
         for _, type in currSlot do
             if inserted then
@@ -1032,7 +1016,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                         size = unitsList.FootprintSizes[k]
                         evenSize = math.mod(size, 2) == 0
                         if v.Count > 0 then
-                            if size > 1 and IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen) then
+                            if size > 1 and IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, unitsList.UnitTotal) then
                                 continue
                             end
                             fs = k
@@ -1089,7 +1073,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             end
         end
         if inserted then
-            i = i + 1
+            unitsList.UnitTotal = unitsList.UnitTotal - 1
             inserted = false
         end
         whichCol = whichCol + 1
@@ -1098,14 +1082,32 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     return FormationPos
 end
 
-function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen)
+function GetLandRowModifer(unitsList, categoryTable, currRowLen)
+    if unitsList.UnitTotal >= currRowLen or math.mod(unitsList.UnitTotal, 2) == math.mod(currRowLen, 2) then
+        return 0
+    end
+    
+    local sizeTotal = 0
+    for group, _ in categoryTable do
+        for fs, data in unitsList[group] do
+            sizeTotal = sizeTotal + unitsList.FootprintSizes[fs] * data.Count
+        end
+    end
+    if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
+        return 1
+    else
+        return 0
+    end
+end
+
+function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
     local evenRowLen = math.mod(currRowLen, 2) == 0
     local evenSize = math.mod(size, 2) == 0
     
-    if whichCol == 1 and (not evenRowLen) and evenSize then -- Don't put an even-sized unit in the middle of an odd-length row
+    if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
         return true
     end
-    if whichCol > currRowLen - math.floor(size / 2) * 2 and size <= math.floor(currRowLen / 4) then -- Don't put a large unit at the end of a row unless the row is too narrow
+    if whichCol > currRowLen - math.floor(size / 2) * 2 and size <= math.floor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
         return true
     end
     for y = 0, size - 1, 1 do
