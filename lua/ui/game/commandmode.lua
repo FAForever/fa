@@ -13,6 +13,9 @@ local Orders = import('/lua/ui/game/orders.lua')
 local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
 local Prefs = import('/lua/user/prefs.lua')
 
+local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
+local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
+local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
 
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
@@ -80,6 +83,11 @@ local issuedOneCommand = false
 local startBehaviors = {}
 local endBehaviors = {}
 
+local ignoreSelection = false
+function SetIgnoreSelection(ignore)
+    ignoreSelection = ignore
+end
+
 function OnCommandModeBeat()
     if issuedOneCommand and not IsKeyDown('Shift') then
         EndCommandMode(true)
@@ -116,6 +124,10 @@ function GetCommandMode()
 end
 
 function EndCommandMode(isCancel)
+    if ignoreSelection then
+        return
+    end
+
     modeData.isCancel = isCancel or false
     for i,v in endBehaviors do
         v(commandMode, modeData)
@@ -192,7 +204,6 @@ function AssistMex(command)
     end
 end
 
-
 function OnCommandIssued(command)
     if not command.Clear then
         issuedOneCommand = true
@@ -248,6 +259,12 @@ function OnCommandIssued(command)
         local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}
         SimCallback(cb, true)
         AddDefaultCommandFeedbackBlips(command.Target.Position)
+    elseif command.Clear == true and command.CommandType ~= 'Stop' and table.getn(command.Units) == 1 and checkBadClean(command.Units[1]) then
+        watchForQueueChange(command.Units[1])
+    elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
+        EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
+    elseif command.CommandType == 'Stop' then
+        EnhancementQueueFile.clearEnhancements(command.Units)
     else
         if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
             AddDefaultCommandFeedbackBlips(command.Target.Position)
