@@ -4865,7 +4865,10 @@ end
 
 function SetGameTitleText(title)
     GUI.titleText:SetColor("B9BFB9")
-    GUI.titleText:SetText(title or LOC("<LOC lobui_0427>FAF Game Lobby"))
+    if title == '' then
+        title = LOC("<LOC lobui_0427>FAF Game Lobby")
+    end
+    GUI.titleText:SetText(title)
 end
 
 function ShowTitleDialog()
