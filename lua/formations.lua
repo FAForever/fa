@@ -197,7 +197,6 @@ local TravelSlot = { Bots, Tanks, AA, Art, Shield, Util, Com }
 local TravelFormationBlock = {
     HomogenousRows = true,
     UtilBlocks = true,
-    RowBreak = 0.5,
     { TravelSlot, TravelSlot, },
     { TravelSlot, TravelSlot, },
     { TravelSlot, TravelSlot, },
@@ -415,12 +414,12 @@ local GrowthChevronBlock = {
 
 local LightAttackNaval = categories.LIGHTBOAT
 local FrigateNaval = categories.FRIGATE
-local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + categories.xss0304 -- TODO: Deal with categories instead of hard-coding xss0304
+local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.NUKESUB * categories.ANTINAVY - categories.NUKE)
 local DestroyerNaval = categories.DESTROYER
 local CruiserNaval = categories.CRUISER
 local BattleshipNaval = categories.BATTLESHIP
 local CarrierNaval = categories.NAVALCARRIER
-local NukeSubNaval = categories.NUKESUB - categories.xss0304 -- TODO: See above
+local NukeSubNaval = categories.NUKESUB - SubNaval
 local MobileSonar = categories.MOBILESONAR
 local DefensiveBoat = categories.DEFENSIVEBOAT
 local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
@@ -467,26 +466,32 @@ local NukeSubs = { 'NukeSubCount', }
 local Carriers = { 'CarrierCount', }
 local Sonar = {'MobileSonarCount', }
 
--- === LAND BLOCK TYPES =
+-- === NAVAL BLOCK TYPES =
 local FrigatesFirst = { Frigates, Destroyers, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local DestroyersFirst = { Destroyers, Frigates, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local CruisersFirst = { Cruisers, Carriers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
 local BattleshipsFirst = { Battleships, Destroyers, Frigates, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local CarriersFirst = { Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
+
+local LargestFirstDF = { Battleships, Carriers, Destroyers, Cruisers, Frigates, NukeSubs, Sonar, RemainingCategory }
+local SmallestFirstDF = { Frigates, Destroyers, Cruisers, Sonar, Battleships, Carriers, NukeSubs, RemainingCategory }
+local LargestFirstAA = { Carriers, Battleships, Cruisers, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
+local SmallestFirstAA = { Cruisers, Frigates, Destroyers, Sonar, Carriers, Battleships, NukeSubs, RemainingCategory }
+
 local Subs = { Subs, NukeSubs, RemainingCategory }
 local SonarFirst = { Sonar, Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
 
--- === LAND BLOCKS ===
+-- === NAVAL BLOCKS ===
 
 -- === Three Naval Growth Formation Block ==
 local ThreeNavalGrowthFormation = {
     LineBreak = 0.5,
     -- first row
-    { FrigatesFirst, FrigatesFirst, FrigatesFirst, },
+    { FrigatesFirst, FrigatesFirst, FrigatesFirst },
     -- second row
-    { DestroyersFirst, SonarFirst, DestroyersFirst, },
+    { LargestFirstDF, SonarFirst, LargestFirstDF },
     -- third row
-    { DestroyersFirst, CruisersFirst, DestroyersFirst, },
+    { DestroyersFirst, CruisersFirst, DestroyersFirst },
 }
 
 -- === Five Naval Growth Formation Block ==
@@ -495,13 +500,13 @@ local FiveNavalGrowthFormation = {
     -- first row
     { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
     -- second row
-    { FrigatesFirst, SonarFirst, DestroyersFirst, SonarFirst, FrigatesFirst },
+    { FrigatesFirst, LargestFirstDF, DestroyersFirst, LargestFirstDF, FrigatesFirst },
     -- third row
-    { DestroyersFirst, SonarFirst, BattleshipsFirst, SonarFirst, DestroyersFirst },
+    { DestroyersFirst, SmallestFirstDF, SonarFirst, SmallestFirstDF, DestroyersFirst },
     -- fourth row
-    { DestroyersFirst, SonarFirst, CarriersFirst, SonarFirst, DestroyersFirst },
+    { DestroyersFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, DestroyersFirst },
     -- fifth row
-    { DestroyersFirst, SonarFirst, CarriersFirst, SonarFirst, DestroyersFirst },
+    { DestroyersFirst, SmallestFirstAA, CruisersFirst, SmallestFirstAA, DestroyersFirst },
 
 }
 
@@ -511,17 +516,32 @@ local SevenNavalGrowthFormation = {
     -- first row
     { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
     -- second row
-    { FrigatesFirst, FrigatesFirst, SonarFirst, DestroyersFirst, SonarFirst, FrigatesFirst, FrigatesFirst },
+    { FrigatesFirst, SmallestFirstDF, DestroyersFirst, DestroyersFirst, DestroyersFirst, SmallestFirstDF, FrigatesFirst },
     -- third row
-    { DestroyersFirst, DestroyersFirst, SonarFirst, BattleshipsFirst, SonarFirst, DestroyersFirst, DestroyersFirst },
+    { DestroyersFirst, DestroyersFirst, LargestFirstDF, SonarFirst, LargestFirstDF, DestroyersFirst, DestroyersFirst },
     -- fourth row
-    { DestroyersFirst, BattleshipsFirst, SonarFirst, CarriersFirst, SonarFirst, BattleshipsFirst, DestroyersFirst },
+    { DestroyersFirst, SmallestFirstAA, SmallestFirstAA, CruisersFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst },
     -- fifth row
-    { DestroyersFirst, CruisersFirst, SonarFirst, BattleshipsFirst, SonarFirst, CruisersFirst, DestroyersFirst },
+    { DestroyersFirst, CruisersFirst, LargestFirstAA, DestroyersFirst, LargestFirstAA, CruisersFirst, DestroyersFirst },
     -- sixth row
-    { DestroyersFirst, CruisersFirst, SonarFirst, CarriersFirst, SonarFirst, CruisersFirst, DestroyersFirst },
+    { DestroyersFirst, SmallestFirstAA, SmallestFirstAA, SonarFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst },
     -- seventh row
-    { DestroyersFirst, CruisersFirst, SonarFirst, CarriersFirst, SonarFirst, CruisersFirst, DestroyersFirst },
+    { DestroyersFirst, CruisersFirst, LargestFirstDF, CruisersFirst, LargestFirstDF, CruisersFirst, DestroyersFirst },
+}
+
+-- === Nine Naval Growth Formation Block ==
+local NineNavalGrowthFormation = {
+    LineBreak = 0.5,
+    -- first row
+    { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
+    -- second row
+    { FrigatesFirst, LargestFirstDF, SonarFirst, LargestFirstDF, DestroyersFirst, LargestFirstDF, SonarFirst, LargestFirstDF, FrigatesFirst },
+    -- third row
+    { SmallestFirstDF, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, SonarFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, SmallestFirstDF },
+    -- fourth row
+    { DestroyersFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, DestroyersFirst },
+    -- fifth row
+    { DestroyersFirst, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, CruisersFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, DestroyersFirst },
 }
 
 -- ==============================================
@@ -534,18 +554,18 @@ local FiveWideNavalAttackFormation = {
     -- first row
     { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst},
     -- second row
-    { DestroyersFirst, SonarFirst, CarriersFirst, SonarFirst, DestroyersFirst},
+    { DestroyersFirst, LargestFirstDF, CruisersFirst, LargestFirstDF, DestroyersFirst},
 }
 
 -- === Seven Wide Naval Attack Formation Block ==
 local SevenWideNavalAttackFormation = {
     LineBreak = 0.5,
     -- first row
-    { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, },
+    { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
     -- second row
-    { DestroyersFirst, BattleshipsFirst, SonarFirst, BattleshipsFirst, SonarFirst, BattleshipsFirst, DestroyersFirst},
-        -- third row
-    { DestroyersFirst, CruisersFirst, CarriersFirst, CarriersFirst, CruisersFirst, CruisersFirst, DestroyersFirst},
+    { DestroyersFirst, SonarFirst, LargestFirstDF, DestroyersFirst, LargestFirstDF, SonarFirst, DestroyersFirst },
+    -- third row
+    { SmallestFirstDF, SmallestFirstAA, SmallestFirstDF, CruisersFirst, SmallestFirstDF, SmallestFirstAA, SmallestFirstDF },
 }
 
 -- === Nine Wide Naval Attack Formation Block ==
@@ -554,9 +574,24 @@ local NineWideNavalAttackFormation = {
     -- first row
     { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
     -- second row
-    { DestroyersFirst, DestroyersFirst, SonarFirst, BattleshipsFirst, BattleshipsFirst, BattleshipsFirst, SonarFirst, DestroyersFirst, DestroyersFirst },
+    { DestroyersFirst, LargestFirstDF, SonarFirst, LargestFirstDF, DestroyersFirst, LargestFirstDF, SonarFirst, LargestFirstDF, DestroyersFirst },
     -- third row
-    { DestroyersFirst, CruisersFirst, SonarFirst, CarriersFirst, CarriersFirst, CarriersFirst, SonarFirst, CruisersFirst, DestroyersFirst },
+    { SmallestFirstDF, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, SonarFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, SmallestFirstDF },
+    -- fourth row
+    { DestroyersFirst, SmallestFirstDF, CruisersFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, CruisersFirst, SmallestFirstDF, DestroyersFirst },
+}
+
+-- === Eleven Wide Naval Attack Formation Block ==
+local ElevenWideNavalAttackFormation = {
+    LineBreak = 0.5,
+    -- first row
+    { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
+    -- second row
+    { DestroyersFirst, DestroyersFirst, LargestFirstDF, SmallestFirstDF, LargestFirstDF, DestroyersFirst, LargestFirstDF, SmallestFirstDF, LargestFirstDF, DestroyersFirst, DestroyersFirst },
+    -- third row
+    { SmallestFirstDF, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, SmallestFirstAA, SonarFirst, SmallestFirstAA, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, SmallestFirstDF },
+    -- fourth row
+    { DestroyersFirst, SmallestFirstAA, LargestFirstDF, SonarFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, SonarFirst, LargestFirstDF, SmallestFirstAA, DestroyersFirst },
 }
 
 -- ==============================================
@@ -575,6 +610,15 @@ local SixWideSubGrowthFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs },
+}
+
+-- === Eight Wide Subs Formation ===
+local EightWideSubGrowthFormation = {
+    LineBreak = 0.5,
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
 
@@ -604,6 +648,15 @@ local EightWideSubAttackFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+}
+
+-- === Ten Wide Subs Formation ===
+local TenWideSubAttackFormation = {
+    LineBreak = 0.5,
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
+    { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
 local EightNavalFormation = {
@@ -672,22 +725,24 @@ function AttackFormation(formationUnits)
     BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
 
     local seaUnitsList = unitsList.Naval
+    local subUnitsList = unitsList.Subs
+    local seaArea = seaUnitsList.AreaTotal
+    local subArea = subUnitsList.AreaTotal
     local seaBlock
     local subBlock
-    local subUnitsList = unitsList.Subs
-    local seaArea = math.max(seaUnitsList.AreaTotal, subUnitsList.AreaTotal)
-    if seaArea <= 10 then
+    
+    if seaArea <= 10 and subArea <= 8 then
         seaBlock = FiveWideNavalAttackFormation
         subBlock = FourWideSubAttackFormation
-    elseif seaArea <= 25 then
+    elseif seaArea <= 21 and subArea <= 18 then
         seaBlock = SevenWideNavalAttackFormation
         subBlock = SixWideSubAttackFormation
-    elseif seaArea <= 50 then
+    elseif seaArea <= 36 and subArea <= 32 then
         seaBlock = NineWideNavalAttackFormation
         subBlock = EightWideSubAttackFormation
     else
-        seaBlock = NineWideNavalAttackFormation
-        subBlock = EightWideSubAttackFormation
+        seaBlock = ElevenWideNavalAttackFormation
+        subBlock = TenWideSubAttackFormation
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
@@ -729,22 +784,23 @@ function GrowthFormation(formationUnits)
 
     local seaUnitsList = unitsList.Naval
     local subUnitsList = unitsList.Subs
-    local seaArea = math.max(seaUnitsList.AreaTotal, subUnitsList.AreaTotal)
+    local seaArea = seaUnitsList.AreaTotal
+    local subArea = subUnitsList.AreaTotal
     local seaBlock
     local subBlock
     
-    if seaArea <= 9 then
+    if seaArea <= 9 and subArea <= 12 then
         seaBlock = ThreeNavalGrowthFormation
         subBlock = FourWideSubGrowthFormation
-    elseif seaArea <= 25 then
+    elseif seaArea <= 25 and subArea <= 20 then
         seaBlock = FiveNavalGrowthFormation
         subBlock = FourWideSubGrowthFormation
-    elseif seaArea <= 49 then
+    elseif seaArea <= 49 and subArea <= 42 then
         seaBlock = SevenNavalGrowthFormation
         subBlock = SixWideSubGrowthFormation
     else
-        seaBlock = SevenNavalGrowthFormation
-        subBlock = SixWideSubGrowthFormation
+        seaBlock = NineNavalGrowthFormation
+        subBlock = EightWideSubGrowthFormation
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
@@ -945,11 +1001,10 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             rowNum = rowNum + 1
             if whichRow == numRows then
                 whichRow = 1
-                formationLength = formationLength + 1 + (formationBlock.RowBreak or 0) + (formationBlock.LineBreak or 0)
             else
                 whichRow = whichRow + 1
-                formationLength = formationLength + 1 + (formationBlock.LineBreak or 0)
             end
+            formationLength = formationLength + 1 + (formationBlock.LineBreak or 0)
             whichCol = 1
             rowType = false
             currRowLen = table.getn(formationBlock[whichRow])
@@ -963,11 +1018,11 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
         
         local currColSpot = GetColSpot(currRowLen, whichCol) -- Translate whichCol to correct spot in row
         local currSlot = formationBlock[whichRow][currColSpot]
-        for numType, type in currSlot do
+        for _, type in currSlot do
             if inserted then
                 break
             end
-            for numGroup, group in type do
+            for _, group in type do
                 if not formationBlock.HomogenousRows or (rowType == false or rowType == type) then
                     local fs = 0
                     local size = 0
@@ -976,30 +1031,9 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                     for k, v in unitsList[group] do
                         size = unitsList.FootprintSizes[k]
                         evenSize = math.mod(size, 2) == 0
-                        if v.Count > 0 then --and (whichCol + (size - 1) * 2 <= currRowLen or currRowLen < size * 2) then
-                            if size > 1 then
-                                if whichCol == 1 and not evenRowLen and evenSize then -- Don't put an even-sized unit in the middle of an odd-length row
-                                    continue
-                                end
-                                local blocked = false
-                                for y = 0, size - 1, 1 do
-                                    local yPos = rowNum + y
-                                    if not occupiedSpaces[yPos] then
-                                        continue
-                                    end
-                                    for x = 0, size - 1, 1 do
-                                        if occupiedSpaces[yPos][whichCol + x * 2] then
-                                            blocked = true
-                                            break
-                                        end
-                                    end
-                                    if blocked then
-                                        break
-                                    end
-                                end
-                                if blocked then
-                                    continue
-                                end
+                        if v.Count > 0 then
+                            if size > 1 and IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen) then
+                                continue
                             end
                             fs = k
                             groupData = v
@@ -1017,21 +1051,8 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                                 offsetX = (size - 1) / 2
                             end
                             offsetY = (size - 1) / 2 * (1 + (formationBlock.LineBreak or 0))
-                            for y = 0, size - 1, 1 do
-                                local yPos = rowNum + y
-                                if not occupiedSpaces[yPos] then
-                                    occupiedSpaces[yPos] = {}
-                                end
-                                if whichCol == 1 and evenRowLen == evenSize then
-                                    for x = 0, size - 1, 1 do
-                                        occupiedSpaces[yPos][whichCol + x] = true
-                                    end
-                                else
-                                    for x = 0, (size - 1) * 2, 2 do
-                                        occupiedSpaces[yPos][whichCol + x] = true
-                                    end
-                                end
-                            end
+                            
+                            OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
                         end
                         
                         local xPos
@@ -1075,6 +1096,59 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     end
 
     return FormationPos
+end
+
+function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen)
+    local evenRowLen = math.mod(currRowLen, 2) == 0
+    local evenSize = math.mod(size, 2) == 0
+    
+    if whichCol == 1 and (not evenRowLen) and evenSize then -- Don't put an even-sized unit in the middle of an odd-length row
+        return true
+    end
+    if whichCol > currRowLen - math.floor(size / 2) * 2 and size <= math.floor(currRowLen / 4) then -- Don't put a large unit at the end of a row unless the row is too narrow
+        return true
+    end
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            continue
+        end
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
+    local evenRowLen = math.mod(currRowLen, 2) == 0
+    local evenSize = math.mod(size, 2) == 0
+    
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            occupiedSpaces[yPos] = {}
+        end
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                occupiedSpaces[yPos][whichCol + x] = true
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                occupiedSpaces[yPos][whichCol + x] = true
+            end
+        end
+    end
 end
 
 function GetColSpot(rowLen, col)
