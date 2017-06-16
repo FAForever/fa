@@ -9,15 +9,11 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 
-local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
-local keyNames = import('/lua/keymap/keyNames.lua').keyNames
-local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
-local keyCategoryOrder = import('/lua/keymap/keycategories.lua').keyCategoryOrder
-local KeyMapper = import('/lua/keymap/keymapper.lua')
-
 local populateMessages = import('/lua/ui/notify/notify.lua').populateMessages
+local defaultMessages = import('/lua/ui/notify/defaultmessages.lua')
+local defaultMessageTable = defaultMessages.defaultMessages
+local clarityTable = defaultMessages.clarityTable
 local Prefs = import('/lua/user/prefs.lua')
-local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages2
 local factions = import('/lua/factions.lua').FactionIndexMap
 local newMessageTable = {}
 local lineGroupTable = {}
@@ -31,10 +27,10 @@ local messageLines = {}
 local linesVisible = {}
 local linesCollapsed = true
 
-local function EditMessage(parent, data)
+local function EditMessage(parent, data, line)
     local dialogContent = Group(parent)
-    dialogContent.Height:Set(170)
-    dialogContent.Width:Set(400)
+    dialogContent.Height:Set(150)
+    dialogContent.Width:Set(900)
 
     local messagePopup = Popup(popup, dialogContent)
 
@@ -49,19 +45,19 @@ local function EditMessage(parent, data)
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 15)
     LayoutHelpers.AtLeftIn(okButton, dialogContent, -2)
 
-    local helpText = MultiLineText(dialogContent, UIUtil.bodyFont, 16, UIUtil.fontColor)
+    local helpText = MultiLineText(dialogContent, UIUtil.bodyFont, 20, UIUtil.fontColor)
     LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
     helpText.Width:Set(dialogContent.Width() - 10)
-    helpText:SetText(data.upgrade)
+    helpText:SetText(clarityTable[data.upgrade])
     helpText:SetCenteredHorizontally(true)
     
     messageEntry = Bitmap(dialogContent)
     messageEntry:SetSolidColor('FF282828')
-    messageEntry.Left:Set(function() return dialogContent.Left() + 63 end)
-    messageEntry.Right:Set(function() return dialogContent.Right() - 6 end)
-    messageEntry.Top:Set(function() return title.Bottom() + 10 end)
-    messageEntry.Bottom:Set(function() return title.Bottom() + 40 end)
+    messageEntry.Left:Set(function() return dialogContent.Left() + 15 end)
+    messageEntry.Right:Set(function() return dialogContent.Right() - 15 end)
+    messageEntry.Top:Set(function() return helpText.Bottom() + 15 end)
+    messageEntry.Bottom:Set(function() return okButton.Top() - 15 end)
     messageEntry.Width:Set(function() return messageEntry.Right() - messageEntry.Left() end)
     messageEntry.Height:Set(function() return messageEntry.Bottom() - messageEntry.Top() end)
     
@@ -75,24 +71,29 @@ local function EditMessage(parent, data)
     messageEntry.text.Right:Set(function() return messageEntry.Right() end)
     LayoutHelpers.AtVerticalCenterIn(messageEntry.text, messageEntry)
     messageEntry.text:AcquireFocus()
-    messageEntry.text:SetText('')
+    messageEntry.text:SetText('Insert Message Here')
     messageEntry.text:SetFont(UIUtil.titleFont, 17)
-    messageEntry.text:SetMaxChars(20)
+    messageEntry.text:SetMaxChars(60)
 
     messagePopup.OnClose = function(self)
         dialogContent:AbandonKeyboardFocus()
     end
 
     okButton.OnClick = function(self, modifiers)
-        data.message = messageEntry.text
+        local newmsg = messageEntry.text:GetText()
+        if newmsg ~= 'Insert Message Here' then
+            data.message = newmsg
+            line.message:SetText(newmsg)
+            newMessageTable[data.faction][data.upgrade] = newmsg
+        end
         messagePopup:Close()
     end
 end
 
-local function AssignCurrentSelection()
+local function AssignCurrentSelection(line)
     for _, data in lineGroupTable do
         if data.selected then
-            EditMessage(popup, data)
+            EditMessage(popup, data, line)
             break
         end
     end
@@ -208,49 +209,49 @@ end
 
 -- Create a line with dynamically updating UI elements based on type of data line
 function CreateLine()
-    local keyBindingWidth = 210
+    local keyBindingWidth = 280
     local line = Bitmap(mainContainer)
     line.Left:Set(mainContainer.Left)
     line.Right:Set(mainContainer.Right)
     line.Height:Set(20)
 
     -- Preset key
-    line.message = UIUtil.CreateText(line, '', 16, "Arial")
-    line.message:DisableHitTest()
-    line.message:SetAlpha(0.9)
-
-    -- Preset description
     line.description = UIUtil.CreateText(line, '', 16, "Arial")
     line.description:DisableHitTest()
-    line.description:SetClipToWidth(true)
-    line.description.Width:Set(line.Right() - line.Left() - keyBindingWidth)
     line.description:SetAlpha(0.9)
 
-    line.Height:Set(function() return line.message.Height() + 4 end)
+    -- Preset description
+    line.message = UIUtil.CreateText(line, '', 16, "Arial")
+    line.message:DisableHitTest()
+    line.message:SetClipToWidth(true)
+    line.message.Width:Set(line.Right() - line.Left() - keyBindingWidth)
+    line.message:SetAlpha(0.9)
+
+    line.Height:Set(function() return line.description.Height() + 4 end)
     line.Width:Set(function() return line.Right() - line.Left() end)
 
-    LayoutHelpers.AtLeftIn(line.description, line, keyBindingWidth)
-    LayoutHelpers.AtVerticalCenterIn(line.description, line)
-    LayoutHelpers.AtRightIn(line.message, line, line.Width() - keyBindingWidth + 30)
+    LayoutHelpers.AtLeftIn(line.message, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.message, line)
+    LayoutHelpers.AtRightIn(line.description, line, line.Width() - keyBindingWidth + 30)
+    LayoutHelpers.AtVerticalCenterIn(line.description, line)
 
     line.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             line:SetAlpha(0.9)
-            line.message:SetAlpha(1.0)
             line.description:SetAlpha(1.0)
+            line.message:SetAlpha(1.0)
             PlaySound(Sound({Cue = "UI_Menu_Rollover_Sml", Bank = "Interface"}))
         elseif event.Type == 'MouseExit' then
             line:SetAlpha(1.0)
-            line.message:SetAlpha(0.9)
             line.description:SetAlpha(0.9)
+            line.message:SetAlpha(0.9)
         elseif self.data.type == 'entry' then
             if event.Type == 'ButtonPress' then
                 SelectLine(self.data.index)
                 return true
             elseif event.Type == 'ButtonDClick' then
                 SelectLine(self.data.index)
-                AssignCurrentSelection()
+                AssignCurrentSelection(self)
                 return true
             end
         elseif self.data.type == 'header' and (event.Type == 'ButtonPress' or event.Type == 'ButtonDClick') then
@@ -269,7 +270,7 @@ function CreateLine()
 
     line.AssignNewMessage = function(self)
         SelectLine(self.data.index)
-        AssignCurrentSelection()
+        AssignCurrentSelection(self)
     end
 
     line.RemoveMessage = function(self)
@@ -283,7 +284,7 @@ function CreateLine()
     line.toggle = CreateToggle(line,
          'FF1B1A1A',
          UIUtil.factionTextColor,
-         line.message.Height() + 4, 18, '+')
+         line.description.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.toggle, line, keyBindingWidth - 30)
     LayoutHelpers.AtVerticalCenterIn(line.toggle, line)
     Tooltip.AddControlTooltip(line.toggle,
@@ -296,7 +297,7 @@ function CreateLine()
     line.newMessageButton = CreateToggle(line,
          '645F5E5E',
          'FFAEACAC',
-         line.message.Height() + 4, 18, '+')
+         line.description.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.newMessageButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.newMessageButton, line)
     Tooltip.AddControlTooltip(line.newMessageButton,
@@ -313,7 +314,7 @@ function CreateLine()
     line.removeMessageButton = CreateToggle(line,
          '645F5E5E',
          'FFAEACAC',
-         line.message.Height() + 4, 18, 'x')
+         line.description.Height() + 4, 18, 'x')
     LayoutHelpers.AtRightIn(line.removeMessageButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.removeMessageButton, line)
     Tooltip.AddControlTooltip(line.removeMessageButton,
@@ -340,24 +341,24 @@ function CreateLine()
             line.toggle:Show()
             line.newMessageButton:Hide()
             line.removeMessageButton:Hide()
-            line.description:SetText(data.text)
-            line.description:SetFont(UIUtil.titleFont, 16)
-            line.description:SetColor(UIUtil.factionTextColor)
-            line.message:SetText('')
+            line.message:SetText(data.text)
+            line.message:SetFont(UIUtil.titleFont, 16)
+            line.message:SetColor(UIUtil.factionTextColor)
+            line.description:SetText('')
         elseif data.type == 'spacer' then
             line.toggle:Hide()
             line.newMessageButton:Hide()
             line.removeMessageButton:Hide()
-            line.message:SetText('')
             line.description:SetText('')
+            line.message:SetText('')
         elseif data.type == 'entry' then
             line.toggle:Hide()
-            line.message:SetText(data.text)
-            line.message:SetColor('ffffffff')
-            line.message:SetFont('Arial', 16)
-            line.description:SetText(data.upgrade)
+            line.description:SetText(clarityTable[data.upgrade])
+            line.description:SetColor('ffffffff')
             line.description:SetFont('Arial', 16)
-            line.description:SetColor(UIUtil.fontColor)
+            line.message:SetText(data.text)
+            line.message:SetFont('Arial', 16)
+            line.message:SetColor(UIUtil.fontColor)
             line.removeMessageButton:Show()
             line.newMessageButton:Show()
         end
@@ -370,7 +371,7 @@ function ImportMessages()
     if prefsMessages and not table.empty(prefsMessages) then
         messageTable = prefsMessages
     else
-        messageTable = defaultMessages
+        messageTable = defaultMessageTable
         Prefs.SetToCurrentProfile('Notify_Messages', messageTable)
     end
     
@@ -505,8 +506,8 @@ function CreateUI()
                 line:Update(data, id)
             else
                 line:SetSolidColor('00000000')
-                line.message:SetText('')
                 line.description:SetText('')
+                line.message:SetText('')
                 line.toggle:Hide()
                 line.newMessageButton:Hide()
                 line.removeMessageButton:Hide()
@@ -531,6 +532,7 @@ end
 function FormatData()
     local lineData = {}
     local messageTable = ImportMessages()
+    newMessageTable = messageTable
 
     -- Reset the lines because messages might have been changed
     for faction, group in LineGroups do
