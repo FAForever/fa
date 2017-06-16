@@ -166,7 +166,6 @@ local sortBy = {
         'Missile',
         'TacticalMissile',
         'TacticalNukeMissile',
-        'DamageStablization', -- TODO fix a typo in ACU/SCU blueprints
         'DamageStabilization',
         'DamageStabilizationAdvanced',
         'BlastAttack',

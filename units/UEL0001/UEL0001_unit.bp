@@ -395,7 +395,7 @@ UnitBlueprint {
             },
             Slot = 'LCH',
         },
-        DamageStablization = {
+        DamageStabilization = {
             BuildCostEnergy = 24000,
             BuildCostMass = 800,
             BuildTime = 800,
@@ -417,7 +417,7 @@ UnitBlueprint {
                 'UEL0001',
             },
         },
-        DamageStablizationRemove = {
+        DamageStabilizationRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
@@ -426,10 +426,10 @@ UnitBlueprint {
             },
             Icon = 'dsu',
             Name = '<LOC enhancements_0040>Remove Nano-Repair System',
-            Prerequisite = 'DamageStablization',
+            Prerequisite = 'DamageStabilization',
             RemoveEnhancements = {
-                'DamageStablization',
-                'DamageStablizationRemove',
+                'DamageStabilization',
+                'DamageStabilizationRemove',
             },
             Slot = 'LCH',
         },
