@@ -21,6 +21,7 @@ defaultKeyMap = {
     ['Alt-RightArrow']      = 'switch_skin_up',
 
     ['F1']                  = 'toggle_key_bindings',
+    ['Ctrl-Alt-F1']         = 'toggle_notify_customiser',
     ['F2']                  = 'toggle_score_screen',
     ['F3']                  = 'quick_save',
     ['F4']                  = 'toggle_diplomacy_screen',
