@@ -561,6 +561,7 @@ function FindClients(id)
     return result
 end
 
+local RunChatCommand = import('/lua/ui/notify/commands.lua').RunChatCommand
 function CreateChatEdit()
     local parent = GUI.bg:GetClientGroup()
     local group = Group(parent)
@@ -714,6 +715,20 @@ function CreateChatEdit()
     end
 
     group.edit.OnEnterPressed = function(self, text)
+        -- Analyse for any commands entered for Notify toggling
+        if string.len(text) > 1 and string.sub(text, 1, 1) == "/" then
+            local args = {}
+
+            for word in string.gfind(string.sub(text, 2), "%S+") do
+                table.insert(args, string.lower(word))
+            end
+
+            -- We've done the command, exit without sending the message to other players
+            if RunChatCommand(args) then
+                return
+            end
+        end
+
         GUI.bg.curTime = 0
         if group.camData:IsDisabled() then
             group.camData:Enable()

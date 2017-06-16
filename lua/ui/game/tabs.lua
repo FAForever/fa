@@ -84,6 +84,11 @@ local menus = {
                 tooltip = 'esc_keyBindings',
             },
             {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
+            },
+            {
                 action = 'ShowObj',
                 label='<LOC _Show_Scenario_Info>Scenario',
                 tooltip = 'show_scenario',
@@ -125,6 +130,11 @@ local menus = {
                 action = 'KeyBindings',
                 label = '<LOC key_binding_0000>Key Bindings',
                 tooltip = 'esc_keyBindings',
+            },
+            {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
             },
             {
                 action = 'ShowObj',
@@ -175,6 +185,11 @@ local menus = {
                 tooltip = 'esc_keyBindings',
             },
             {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
+            },
+            {
                 action = 'EndMPGame',
                 label = '<LOC _End_Game>',
                 tooltip = 'esc_quit',
@@ -207,6 +222,11 @@ local menus = {
                 action = 'ShowGameInfo',
                 label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
+            },
+            {
+                action = 'Customiser',
+                label = '<LOC notify_0000>Notify Customiser',
+                tooltip = 'esc_customiser',
             },
             {
                 action = 'Options',
@@ -326,6 +346,9 @@ local actions = {
     end,
     KeyBindings = function()
         import("/lua/ui/dialogs/keybindings.lua").CreateUI()
+    end,
+    Customiser = function()
+        import('/lua/ui/notify/customiser.lua').CreateUI()
     end,
 }
 
