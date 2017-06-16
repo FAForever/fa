@@ -248,7 +248,7 @@ function buildActionBuilding(name, modifier)
             local stayTime = options.hotbuild_cycle_reset_time / 2000.0
             local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
             WaitSeconds(stayTime)
-            if (not cycleMap:IsHidden()) then
+            if not cycleMap:IsHidden() then
                 Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
             end
             WaitSeconds(fadeTime)
