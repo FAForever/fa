@@ -6,21 +6,17 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
-local toggleOverlayPermanent = NotifyOverlay.toggleOverlayPermanent
+local toggleOverlay = NotifyOverlay.toggleOverlay
 local factions = import('/lua/factions.lua').FactionIndexMap
 
 local categoriesDisabled = {}
 local messages = {}
 local ACUs = {}
-local Player
 local customMessagesDisabled
 
 function init(isReplay, parent)
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
-    
-    local armies = GetArmiesTable()
-    Player = armies.armiesTable[armies.focusArmy].nickname or 'Unknown'
 
     populateMessages()
     setupStartDisables()
@@ -36,7 +32,7 @@ function setupStartDisables()
             category = 'acus'
         end
 
-        local flag = 'Notify_' .. category .. '_Disabled'
+        local flag = 'Notify_' .. category .. '_disabled'
         state = Prefs.GetFromCurrentProfile(flag)
 
         -- Handle categories that don't have a prefs entry yet
@@ -49,7 +45,7 @@ function setupStartDisables()
                 state = true
             end
         end
-        categoriesDisabled.category = state
+        categoriesDisabled[category] = state
     end
 
     state = Prefs.GetFromCurrentProfile('Notify_all_disabled')
@@ -58,30 +54,31 @@ function setupStartDisables()
         state = false
     end
     categoriesDisabled.All = state
-    
-    state = Prefs.GetFromCurrentProfile('Notify_custom_messages_disabled')
+
+    state = Prefs.GetFromCurrentProfile('Notify_custom_disabled')
     if state == nil then
-        Prefs.SetToCurrentProfile('Notify_custom_messages_disabled', false)
+        Prefs.SetToCurrentProfile('Notify_custom_disabled', false)
         state = false
     end
     customMessagesDisabled = state
-    
+
     Prefs.SavePreferences()
 end
 
+-- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
 function processIncomingMessage(sender, msg)
     local category = msg.data.category
     local source = msg.data.source
-    
+
     -- Don't touch invalid messages
     if not category or not source then
         return true
     end
-    
-    if sender == Player or categoriesDisabled.All or categoriesDisabled[category] then
+
+    if categoriesDisabled.All or categoriesDisabled[category] then
         return false
     end
-    
+
     if customMessagesDisabled then
         local message = defaultMessages[category][source]
         local trigger = msg.data.trigger
@@ -90,7 +87,7 @@ function processIncomingMessage(sender, msg)
         elseif trigger == 'cancelled' then
             msg.text = message .. ' cancelled'
         elseif trigger == 'completed' then
-            text = message .. ' done!'
+            msg.text = message .. ' done!' -- TODO: ACUs won't display completion time in this mode
         else
             msg.text = 'Doing abnormal things with ' .. message
         end
@@ -113,7 +110,7 @@ end
 -- This overrides the individual category filters
 function toggleNotifyPermanent(bool)
     categoriesDisabled.All = bool
-    toggleOverlayPermanent(true, bool)
+    toggleOverlay(bool, true)
 
     if bool then
         print 'Notify Disabled'
@@ -121,7 +118,7 @@ function toggleNotifyPermanent(bool)
         print 'Notify Enabled'
     end
 
-    Prefs.SetToCurrentProfile('Notify', bool)
+    Prefs.SetToCurrentProfile('Notify_all_disabled', bool)
     Prefs.SavePreferences()
 end
 
@@ -130,11 +127,11 @@ end
 function toggleNotifyTemporary(args)
     if args[1] == 'enablenotify' then
         categoriesDisabled.All = false
-        toggleOverlayPermanent(false, false)
+        toggleOverlay(false, false)
         print 'Notify Enabled For Session'
     elseif args[1] == 'disablenotify' then
         categoriesDisabled.All = true
-        toggleOverlayPermanent(false, true)
+        toggleOverlay(true, false)
         print 'Notify Disabled For Session'
     end
 end
@@ -144,7 +141,7 @@ end
 function toggleCategoryChat(category)
     local msg
     categoriesDisabled[category] = not categoriesDisabled[category]
-    
+
     -- Messages seem backwards at first because categoriesDisabled true == disabled feature
     if categoriesDisabled[category] then
         msg = 'Disabled'
@@ -155,15 +152,20 @@ function toggleCategoryChat(category)
     msg = category .. ' ' .. msg .. '!'
     print(msg)
 
-    local flag = 'Notify_' .. category .. '_Disabled'
+    local flag = 'Notify_' .. category .. '_disabled'
     Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
     Prefs.SavePreferences()
 end
 
 -- Toggles between allowing custom messages or showing the defaults instead
-function toggleDefaultMessages(bool)
+function toggleCustomMessages(bool)
     customMessagesDisabled = bool
-    Prefs.SetToCurrentProfile('Notify_custom_messages_disabled', bool)
+    Prefs.SetToCurrentProfile('Notify_custom_disabled', bool)
+    if customMessagesDisabled then
+        print 'Custom Messages Disabled'
+    elseif not customMessagesDisabled then
+        print 'Custom Messages Enabled'
+    end
 end
 
 function round(num, idp)
@@ -175,6 +177,7 @@ function round(num, idp)
     end
 end
 
+-- This function processes messages sent from the sim from unit.lua and defaultunits.lua
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
     local category = messageTable.category
@@ -222,7 +225,7 @@ function onCancelledEnhancement(id, category, source)
             killWatcher(data)
         end
     end
-    
+
     SessionSendChatMessage(FindClients(), msg)
 end
 
@@ -237,7 +240,7 @@ function onCompletedEnhancement(id, category, source)
             killWatcher(data)
         end
     end
-    
+
     SessionSendChatMessage(FindClients(), msg)
 end
 

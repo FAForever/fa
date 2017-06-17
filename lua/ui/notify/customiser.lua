@@ -81,7 +81,7 @@ local function EditMessage(parent, data, line)
     messageEntry.text:SetText(newMessageTable[data.category][data.source] or 'Insert Message Here')
     messageEntry.text:SetFont(UIUtil.titleFont, 17)
     messageEntry.text:SetMaxChars(60)
-    
+
     local ClosePopup = function()
         local newmsg = messageEntry.text:GetText()
         if newmsg == '' then
@@ -92,11 +92,11 @@ local function EditMessage(parent, data, line)
         newMessageTable[data.category][data.source] = newmsg
         messagePopup:Close()
     end
-    
+
     messageEntry.text.OnEnterPressed = function(self, text)
         ClosePopup()
     end
-    
+
     okButton.OnClick = function(self, modifiers)
         ClosePopup()
     end
@@ -115,26 +115,13 @@ local function AssignCurrentSelection(line)
     end
 end
 
-local function RemoveCurrentMessage(line)
-    for _, data in lineGroupTable do
-        if data.selected then
-            data.message = ''
-            line.message:SetText('')
-            newMessageTable[data.category][data.source] = ''
-            break
-        end
-    end
-end
-
 local function GetLineColor(lineID, data)
     if data.type == 'header' then
         return 'FF282828'
     elseif data.type == 'spacer' then
         return '00000000'
     elseif data.type == 'entry' then
-        if data.selected then
-            return UIUtil.categoryBackColor
-        elseif math.mod(lineID, 2) == 1 then
+        if math.mod(lineID, 2) == 1 then
             return 'ff202020'
         else
             return 'FF343333'
@@ -291,11 +278,13 @@ function CreateLine()
         AssignCurrentSelection(self)
     end
 
-    line.RemoveMessage = function(self)
-        if lineGroupTable[self.data.index].text then
-            SelectLine(self.data.index)
-            RemoveCurrentMessage(self)
-        end
+    line.ResetLine = function(self)
+        local category = self.data.category
+        local source = self.data.source
+
+        newMessageTable[category][source] = defaultMessageTable[category][source]
+        self.message:SetText(newMessageTable[category][source])
+        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
     end
 
     -- The dropdown button
@@ -337,11 +326,11 @@ function CreateLine()
     LayoutHelpers.AtVerticalCenterIn(line.removeMessageButton, line)
     Tooltip.AddControlTooltip(line.removeMessageButton,
     {
-        text = '<LOC notify_0004>Remove Message',
-        body = '<LOC notify_0005>Removes the message for this source entirely'
+        text = '<LOC notify_0004>Reset Message',
+        body = '<LOC notify_0005>Resets the message for this source to default'
     })
     line.removeMessageButton.OnMouseClick = function(self)
-        line:RemoveMessage()
+        line:ResetLine()
         return true
     end
 
@@ -411,12 +400,12 @@ function CloseUI()
     end
 end
 
-function CreateMessageToggleButton(parent, category, checked)
+function CreateMessageToggleButton(parent, category, size)
     local states = {
-        normal   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
-        active   = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
-        over     = UIUtil.SkinnableFile('/BUTTON/medium/_btn_over.dds'),
-        disabled = UIUtil.SkinnableFile('/BUTTON/medium/_btn_dis.dds'),
+        normal   = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_up.dds'),
+        active   = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_down.dds'),
+        over     = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_over.dds'),
+        disabled = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_dis.dds'),
     }
 
     local function buttonBehaviour(self, event)
@@ -443,12 +432,8 @@ function CreateMessageToggleButton(parent, category, checked)
 
     local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, "", 11)
 
-    if checked == nil then
-        local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_Disabled')
-        button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
-    else
-        button.checked = checked
-    end
+    local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_disabled')
+    button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
 
     if not button.checked then
         button:SetTexture(states.normal)
@@ -538,9 +523,49 @@ function CreateUI()
         }
     )
 
+    -- Button to toggle Notify as a whole
+    local notifyButton = CreateMessageToggleButton(dialogContent, 'all', 'large')
+    notifyButton.label:SetText(LOC('<LOC notify_0029>Experimentals'))
+    LayoutHelpers.AtBottomIn(notifyButton, dialogContent, -2)
+    LayoutHelpers.AtHorizontalCenterIn(notifyButton, dialogContent, 10)
+    notifyButton.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if not self.checked then
+                self.checked = true
+                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_down.dds'))
+                self.label:SetText('Notify Enabled')
+            else
+                self.checked = false
+                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_up.dds'))
+                self.label:SetText('Notify Disabled')
+            end
+
+            Notify.toggleNotifyPermanent(not self.checked)
+
+            return true
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter')
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            return true
+        end
+    end
+    if notifyButton.checked then
+        notifyButton.label:SetText(LOC('<LOC notify_0029>Notify Enabled'))
+    else
+        notifyButton.label:SetText(LOC('<LOC notify_0030>Notify Disabled'))
+    end
+    Tooltip.AddControlTooltip(notifyButton,
+        {
+            text = "<LOC notify_0031>Toggle Notify",
+            body = "<LOC notify_0032>Toggles all aspects of Notify functionality, leaving subsettings intact for when you want to re-enable the feature"
+        }
+    )
+
     -- Set up the toggle buttons
     -- Button to toggle ACU notifications
-    local acuButton = CreateMessageToggleButton(dialogContent, 'acus')
+    local acuButton = CreateMessageToggleButton(dialogContent, 'acus', 'medium')
     acuButton.label:SetText(LOC('<LOC notify_0011>ACUs'))
     acuButton.Width:Set(151)
     LayoutHelpers.Below(acuButton, title, 10)
@@ -553,7 +578,7 @@ function CreateUI()
     )
 
     -- Button to toggle Experimental notifications
-    local expButton = CreateMessageToggleButton(dialogContent, 'experimentals')
+    local expButton = CreateMessageToggleButton(dialogContent, 'experimentals', 'medium')
     expButton.label:SetText(LOC('<LOC notify_0014>Experimentals'))
     expButton.Width:Set(151)
     LayoutHelpers.Below(expButton, title, 10)
@@ -566,7 +591,7 @@ function CreateUI()
     )
 
     -- Button to toggle tech notifications
-    local techButton = CreateMessageToggleButton(dialogContent, 'tech')
+    local techButton = CreateMessageToggleButton(dialogContent, 'tech', 'medium')
     techButton.label:SetText(LOC('<LOC notify_0017>Tech'))
     techButton.Width:Set(151)
     LayoutHelpers.Below(techButton, title, 10)
@@ -579,7 +604,7 @@ function CreateUI()
     )
 
     -- Button to toggle 'other' notifications
-    local otherButton = CreateMessageToggleButton(dialogContent, 'other')
+    local otherButton = CreateMessageToggleButton(dialogContent, 'other', 'medium')
     otherButton.label:SetText(LOC('<LOC notify_0020>Other'))
     otherButton.Width:Set(151)
     LayoutHelpers.Below(otherButton, title, 10)
@@ -592,7 +617,7 @@ function CreateUI()
     )
 
     -- Button to toggle ACU Overlay
-    local overlayButton = CreateMessageToggleButton(dialogContent, 'overlay')
+    local overlayButton = CreateMessageToggleButton(dialogContent, 'overlay', 'medium')
     overlayButton.label:SetText(LOC('<LOC notify_0023>Overlays'))
     overlayButton.Width:Set(151)
     LayoutHelpers.Below(overlayButton, title, 10)
@@ -607,7 +632,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            NotifyOverlay.toggleOverlayPermanent(false, not self.checked)
+            NotifyOverlay.toggleOverlay(not self.checked, false)
 
             return true
         elseif event.Type == 'MouseEnter' then
@@ -626,8 +651,8 @@ function CreateUI()
     )
 
     -- Button to toggle displaying only default messages
-    local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'default', Prefs.GetFromCurrentProfile('Notify_custom_messages_disabled'))
-    defaultMessagesButton.label:SetText(LOC('<LOC notify_0026>Show Defaults'))
+    local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'custom', 'medium')
+    defaultMessagesButton.label:SetText(LOC('<LOC notify_0026>Show Custom'))
     defaultMessagesButton.Width:Set(151)
     LayoutHelpers.Below(defaultMessagesButton, title, 10)
     LayoutHelpers.RightOf(defaultMessagesButton, overlayButton, 10)
@@ -641,7 +666,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
             end
 
-            Notify.toggleDefaultMessages(self.checked)
+            Notify.toggleCustomMessages(not self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
@@ -654,8 +679,8 @@ function CreateUI()
     end
     Tooltip.AddControlTooltip(defaultMessagesButton,
         {
-            text = "<LOC notify_0027>Toggle Show Defaults",
-            body = "<LOC notify_0028>Toggles displaying default messages instead of other players' customised ones"
+            text = "<LOC notify_0027>Toggle Custom",
+            body = "<LOC notify_0028>Toggles displaying custom messages from other players instead of default ones"
         }
     )
 
@@ -664,7 +689,7 @@ function CreateUI()
     mainContainer.Left:Set(function() return dialogContent.Left() + 10 end)
     mainContainer.Right:Set(function() return dialogContent.Right() - 20 end)
     mainContainer.Top:Set(function() return acuButton.Bottom() + 10 end)
-    mainContainer.Bottom:Set(function() return okButton.Top() - 10 end)
+    mainContainer.Bottom:Set(function() return okButton.Top() - 24 end)
     mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - 10 end)
     mainContainer.top = 0
     UIUtil.CreateLobbyVertScrollbar(mainContainer)

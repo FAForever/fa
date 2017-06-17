@@ -17,23 +17,19 @@ function init()
     AddChatCommand('enablenotifyoverlay', toggleOverlayTemporary)
     AddChatCommand('disablenotifyoverlay', toggleOverlayTemporary)
 
-    local state = Prefs.GetFromCurrentProfile('Notify_overlay_Disabled')
+    local state = Prefs.GetFromCurrentProfile('Notify_overlay_disabled')
     if state == nil then
-        Prefs.SetToCurrentProfile('Notify_overlay_Disabled', false)
+        Prefs.SetToCurrentProfile('Notify_overlay_disabled', false)
         state = false
     end
 
     overlayLockedOut = Prefs.GetFromCurrentProfile('Notify_all_disabled')
-    if overlayLockedOut == nil then
-        Prefs.SetToCurrentProfile('Notify_all_disabled', false)
-        overlayLockedOut = false
-    end
 
-    toggleOverlayPermanent(false, state)
+    toggleOverlay(state, false)
 end
 
 function destroyOverlays()
-    if overlayDisabled then
+    if overlayDisabled or overlayLockedOut then
         for _, overlay in overlays do
             overlay.destroy = true
         end
@@ -42,17 +38,19 @@ end
 
 -- Called from notify.lua after the main button permanently disables things
 -- Also from the toggle button for temporary changes
-function toggleOverlayPermanent(permanent, bool)
-    if overlayLockedOut and not permanent then return end
-
-    overlayDisabled = bool
-
-    if permanent then
+function toggleOverlay(bool, lockout)
+    if lockout then
         overlayLockedOut = bool
+    else
+        overlayDisabled = bool
+        Prefs.SetToCurrentProfile('Notify_overlay_disabled', bool)
+        Prefs.SavePreferences()
+        if not overlayDisabled then
+            print 'Notify Overlay Enabled'
+        elseif overlayDisabled then
+            print 'Notify Overlay Disabled'
+        end
     end
-
-    Prefs.SetToCurrentProfile('Notify_overlay_Disabled', bool)
-    Prefs.SavePreferences()
 
     destroyOverlays()
 end
@@ -73,7 +71,7 @@ end
 -- This is called when we recieve a chat message from another player in the 'Notify' chat channel
 -- These messages are generated below in generateEnhancementMessage or sendDestroyOverlayMessage
 function processNotification(players, msg)
-    if not overlayDisabled then
+    if not overlayDisabled and not overlayLockedOut then
         updateEnhancementOverlay(msg.data)
     end
 end
