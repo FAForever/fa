@@ -7,17 +7,20 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
-local setOverlayDisabled = NotifyOverlay.setOverlayDisabled
+local toggleOverlayPermanent = NotifyOverlay.toggleOverlayPermanent
 local factions = import('/lua/factions.lua').FactionIndexMap
 
 local categoriesDisabled = {}
 local messages = {}
 local ACUs = {}
+local Player
 
 function init(isReplay, parent)
-    RegisterChatFunc(NotifyOverlay.processNotification, 'Notify')
+    RegisterChatFunc(processIncomingMessage, 'Notify')
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
+
+    Player = Prefs.GetFromCurrentProfile('Name') or 'Unknown'
 
     populateMessages()
     setupStartDisables()
@@ -38,7 +41,7 @@ function setupStartDisables()
 
         -- Handle categories that don't have a prefs entry yet
         if state == nil then
-            if flag == 'acus' then -- ACU messages on by default when loading for the first time
+            if category == 'acus' then -- ACU messages on by default when loading for the first time
                 Prefs.SetToCurrentProfile(flag, false)
                 state = false
             else
@@ -52,7 +55,7 @@ function setupStartDisables()
     state = Prefs.GetFromCurrentProfile('Notify_all_disabled')
     if state == nil then
         Prefs.SetToCurrentProfile('Notify_all_disabled', false)
-        state  = false
+        state = false
     end
 
     categoriesDisabled.All = state
@@ -60,7 +63,9 @@ function setupStartDisables()
 end
 
 function processIncomingMessage(players, msg)
-    if not categoriesDisabled.All or not categoriesDisabled[msg.data.category] then
+    if players == Player then return end -- Don't display messages from ourselves
+
+    if not categoriesDisabled.All or not categoriesDisabled[msg.category] then
         local army = GetFocusArmy()
         msg.Notify = false
         msg.Chat = true
@@ -85,7 +90,7 @@ end
 -- This overrides the individual category filters
 function toggleNotifyPermanent(bool)
     categoriesDisabled.All = bool
-    setOverlayDisabled(bool)
+    toggleOverlayPermanent(true, bool)
 
     if bool then
         print 'Notify Disabled'
@@ -93,7 +98,6 @@ function toggleNotifyPermanent(bool)
         print 'Notify Enabled'
     end
 
-    Prefs.SetToCurrentProfile('Notify', bool)
     Prefs.SetToCurrentProfile('Notify', bool)
     Prefs.SavePreferences()
 end
@@ -103,19 +107,34 @@ end
 function toggleNotifyTemporary(args)
     if args[1] == 'enablenotify' then
         categoriesDisabled.All = false
-        setOverlayDisabled(false)
+        toggleOverlayPermanent(false, false)
         print 'Notify Enabled For Session'
     elseif args[1] == 'disablenotify' then
         categoriesDisabled.All = true
-        setOverlayDisabled(true)
+        toggleOverlayPermanent(false, true)
         print 'Notify Disabled For Session'
     end
 end
 
 -- Toggles the printing of received messages
 -- Called from the various buttons in the customiser
-function toggleCategoryChat(category, bool)
-    categoriesDisabled[category] = bool
+function toggleCategoryChat(category)
+    local msg
+    categoriesDisabled[category] = not categoriesDisabled[category]
+    
+    -- Messages seem backwards at first because categoriesDisabled true == disabled feature
+    if categoriesDisabled[category] then
+        msg = 'Disabled'
+    else
+        msg = 'Enabled'
+    end
+
+    msg = category .. msg .. '!'
+    print(msg)
+
+    local flag = 'Notify_' .. category .. '_Disabled'
+    Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
+    Prefs.SavePreferences()
 end
 
 function round(num, idp)
@@ -145,7 +164,7 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = 'Upgrading ' .. messages[category][source]}}
+    local msg = {to = 'allies', Notify = true, category = category, text = 'Starting ' .. messages[category][source]}
 
     -- Start by storing ACU IDs for future use
     if id then
@@ -166,12 +185,14 @@ function onStartEnhancement(id, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' cancelled'}}
+    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' cancelled'}
 
-    local data = ACUs[id]
-    if data then
-        killWatcher(data)
-        NotifyOverlay.sendDestroyOverlayMessage(id)
+    if id then
+        local data = ACUs[id]
+        if data then
+            killWatcher(data)
+            NotifyOverlay.sendDestroyOverlayMessage(id)
+        end
     end
     
     SessionSendChatMessage(FindClients(), msg)
@@ -179,13 +200,15 @@ end
 
 -- Called from the enhancement watcher
 function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'allies', Notify = true, data = {category = category, text = messages[category][source] .. ' done!'}}
+    local msg = {to = 'allies', Notify = true, category = category, text = messages[category][source] .. ' done!'}
 
-    local data = ACUs[id]
-    if data then
-        msg.data.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
-        killWatcher(data)
-        NotifyOverlay.sendDestroyOverlayMessage(id)
+    if id then
+        local data = ACUs[id]
+        if data then
+            msg.text = messages[category][source] .. ' done! (' .. round(GetGameTimeSeconds() - data.startTime, 2) .. 's)'
+            killWatcher(data)
+            NotifyOverlay.sendDestroyOverlayMessage(id)
+        end
     end
     
     SessionSendChatMessage(FindClients(), msg)
@@ -202,7 +225,7 @@ function watchEnhancement(id, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
     overlayData.pos = overlayData.unit:GetPosition()
-    overlayData.msg = {to = 'allies', Notify = true}
+    overlayData.msg = {to = 'allies', NotifyOverlay = true}
     overlayData.id = id
     overlayData.eta = -1
 
