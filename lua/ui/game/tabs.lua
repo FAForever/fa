@@ -85,7 +85,7 @@ local menus = {
             },
             {
                 action = 'Customiser',
-                label = '<LOC notify_0000>Notify Customiser',
+                label = '<LOC notify_0000>Notify Management',
                 tooltip = 'esc_customiser',
             },
             {
