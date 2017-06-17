@@ -369,12 +369,27 @@ local AttackChevronBlock = {
     RepeatAllRows = false,
     HomogenousBlocks = true,
     { ChevronSlot, },
-    { ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, }, -- 1 -> 3 at 20 units
     { ChevronSlot, ChevronSlot, ChevronSlot, },
-    { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 3 -> 5 at 60 units
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 5 -> 7 at 170 units
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 7 -> 9 at 390 units
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 9 -> 11 at 760 units
 }
 
 local GrowthChevronBlock = {
@@ -382,9 +397,25 @@ local GrowthChevronBlock = {
     HomogenousBlocks = true,
     { ChevronSlot, },
     { ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, }, -- 1 -> 3 at 25 units
     { ChevronSlot, ChevronSlot, ChevronSlot, },
     { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 3 -> 5 at 95 units
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 5 -> 7 at 255 units
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
+    { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 7 -> 9 at 545 units
 }
 
 
@@ -1179,7 +1210,6 @@ end
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(airBlock)
-    local i = 1
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
@@ -1187,13 +1217,44 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     local chevronSize = airBlock.ChevronSize or 5
     local chevronType = false
     local formationLength = 0
+    
+    if unitsList.AreaTotal > unitsList.UnitTotal then -- If there are any units of size > 1 deal with them here
+        local largeUnitPositions = GetLargeAirPositions(unitsList, airBlock)
+        for _, data in largeUnitPositions do
+            local currSlot = airBlock[data.row][data.col]
+            for _, type in currSlot do
+                for _, group in type do
+                    for fs, groupData in unitsList[group] do
+                        size = unitsList.FootprintSizes[fs]
+                        if groupData.Count > 0 and size == data.size then
+                            table.insert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
+                            groupData.Count = groupData.Count - 1
+                            if groupData.Count <= 0 then
+                                unitsList[group][fs] = nil
+                            end
+                            unitsList.UnitTotal = unitsList.UnitTotal - 1
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+        chevronPos = 2
+    end
 
-    while unitsList.UnitTotal >= i do
+    while unitsList.UnitTotal > 0 do
         if chevronPos > chevronSize then
-            chevronPos = 1
+            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+                chevronPos = 2
+            else
+                chevronPos = 1
+            end
             chevronType = false
-            if whichCol == currRowLen then
-                if whichRow == numRows then
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+                if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
                         currRowLen = table.getn(airBlock[whichRow])
@@ -1208,19 +1269,18 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                 whichCol = whichCol + 1
             end
         end
+        
         local currSlot = airBlock[whichRow][whichCol]
         local inserted = false
-        for numType, type in currSlot do
+        for _, type in currSlot do
             if inserted then
                 break
             end
-            for numGroup, group in type do
+            for _, group in type do
                 if not airBlock.HomogenousBlocks or chevronType == false or chevronType == type then
                     local fs = 0
-                    local size = 0
                     local groupData = nil
                     for k, v in unitsList[group] do
-                        size = unitsList.FootprintSizes[k]
                         if v.Count > 0 then
                             fs = k
                             groupData = v
@@ -1228,11 +1288,11 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                         end
                     end
                     if groupData then
-                        local xPos, yPos = GetChevronPosition(chevronPos, whichCol, currRowLen, formationLength)
+                        local xPos, yPos = GetChevronPosition(chevronPos, whichCol, formationLength)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, yPos, true})
+                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
                         inserted = true
                         
                         groupData.Count = groupData.Count - 1
@@ -1245,27 +1305,98 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
             end
         end
         if inserted then
-            i = i + 1
+            unitsList.UnitTotal = unitsList.UnitTotal - 1
         end
         chevronPos = chevronPos + 1
     end
     return FormationPos
 end
 
-function GetChevronPosition(chevronPos, currCol, currRowLen, formationLen)
-    local offset = math.floor(chevronPos / 2) * .75
-    local xPos = offset
-    if math.mod(chevronPos, 2) == 0 then
-        xPos = -offset
+function GetLargeAirPositions(unitsList, airBlock)
+    local sizeCounts = {}
+    for fs, count in unitsList.FootprintCounts do
+        local size = unitsList.FootprintSizes[fs]
+        if size > 1 then
+            sizeCounts[size] = (sizeCounts[size] or 0) + count
+        end
     end
-    local yPos = -offset + math.floor(currCol / 2) * 2.25
-    yPos = yPos - formationLen * 1.5
-    --local firstBlockOffset = (math.mod(currRowLen, 2) - 1) * 1.875
-    local blockOff = math.floor(currCol / 2) * 3.75
+    
+    local numRows = table.getn(airBlock)
+    local whichRow = 0
+    local whichCol = 0
+    local currRowLen = 0
+    local wideRow = false
+    local formationLength = -1
+    local results = {}
+    local numResults = 0
+    for size, count in sizeCounts do
+        local radius = size / 2
+        while count > 0 do
+            if whichCol >= currRowLen or count == 1 then
+                if whichRow >= numRows then
+                    if airBlock.RepeatAllRows then
+                        whichRow = 1
+                        currRowLen = table.getn(airBlock[whichRow])
+                    end
+                else
+                    whichRow = whichRow + 1
+                    currRowLen = table.getn(airBlock[whichRow])
+                end
+                formationLength = formationLength + 1
+                whichCol = 1
+                local x, y = GetChevronPosition(1, currRowLen, formationLength)
+                wideRow = math.abs(x) >= radius
+            else
+                whichCol = whichCol + 2
+            end
+            
+            if count == 2 and whichCol == 1 and wideRow then
+                continue
+            end
+            
+            local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
+            if whichCol ~= 1 and math.abs(xPos) < radius then
+                continue
+            end
+            
+            -- Exponential complexity isn't fun but this should run in under 0.03 seconds on a slow CPU with 500 CZARs.
+            local blocked = false
+            for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
+                local data = results[i]
+                if VDist2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
+                    blocked = true
+                    break
+                end
+            end
+            if not blocked then
+                table.insert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
+                count = count - 1
+                numResults = numResults + 1
+                if whichCol ~= 1 then
+                    table.insert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
+                    count = count - 1
+                    numResults = numResults + 1
+                end
+            end
+        end
+    end
+    return results
+end
+
+function GetChevronPosition(chevronPos, currCol, formationLen)
+    local offset = math.floor(chevronPos / 2)
+    local xPos = offset * 0.5
+    if math.mod(chevronPos, 2) == 0 then
+        xPos = -xPos
+    end
+    local column = math.floor(currCol / 2)
+    local yPos = (-offset + column * column) * 0.86603
+    yPos = yPos - formationLen * 1.73205
+    local blockOff = math.floor(currCol / 2) * 2.5
     if math.mod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
-    xPos = xPos + blockOff --+ firstBlockOffset
+    xPos = xPos + blockOff
     return xPos, yPos
 end
 
@@ -1434,9 +1565,9 @@ function CalculateSizes(unitsList)
         },
         
         Air = {
-            GridSizeFraction = 1.75,
+            GridSizeFraction = 1.3,
             GridSizeAbsolute = 2,
-            MinSeparationFraction = 1.75,
+            MinSeparationFraction = 1,
         },
         
         Naval = {
