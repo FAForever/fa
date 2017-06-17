@@ -4220,9 +4220,7 @@ Unit = Class(moho.unit_methods) {
             if not source then
                 local bp = self:GetBlueprint()
                 if bp.CategoriesHash.RESEARCH then
-                    local layer = self.layerCategory
-                    local tech = self.techCategory
-                    unitType = string.lower('research' .. layer .. tech)
+                    unitType = string.lower('research' .. self.layerCategory .. self.techCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
                     unitType = 'nuke'
