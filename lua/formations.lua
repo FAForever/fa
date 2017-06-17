@@ -129,7 +129,6 @@ local Shield = { 'Shields', }
 
 -- === LAND BLOCK TYPES =
 local DFFirst = { DF, T1Art, AA, Shield, Com, Util, RemainingCategory }
-local TankFirst = { Tanks, Bots, Art, AA, Shield, Com, Util, RemainingCategory }
 local ShieldFirst = { Shield, AA, DF, T1Art, Com, Util, RemainingCategory }
 local AAFirst = { AA, DF, T1Art, Shield, Com, Util, RemainingCategory }
 local ArtFirst = { Art, AA, DF, Shield, Com, Util, RemainingCategory }
@@ -213,18 +212,6 @@ local EightWideAttackFormationBlock = {
     { DFFirst, ShieldFirst, UtilFirst, ShieldFirst, ShieldFirst, UtilFirst, ShieldFirst, DFFirst, },
     -- seventh row
     { DFFirst, ArtFirst, AAFirst, ArtFirst, ArtFirst, AAFirst, ArtFirst, DFFirst, },
-}
-
--- === Travelling Block ===
-local TravelSlot = { Bots, Tanks, AA, Art, Shield, Util, Com }
-local TravelFormationBlock = {
-    HomogenousRows = true,
-    UtilBlocks = true,
-    { TravelSlot, TravelSlot, },
-    { TravelSlot, TravelSlot, },
-    { TravelSlot, TravelSlot, },
-    { TravelSlot, TravelSlot, },
-    { TravelSlot, TravelSlot, },
 }
 
 -- === 2 Row Attack Block - 8 units wide ===
@@ -384,13 +371,6 @@ local EngAir = { 'AEngineer', }
 
 -- === Air Block Arrangement ===
 local ChevronSlot = { AntiAir, ExperAir, AntiNavy, GroundAttack, Bombers, Intel, Transports, EngAir, RemainingCategory }
-local InitialChevronBlock = {
-    RepeatAllRows = false,
-    HomogenousBlocks = true,
-    ChevronSize = 3,
-    { ChevronSlot },
-    { ChevronSlot, ChevronSlot },
-}
 
 local AttackChevronBlock = {
     RepeatAllRows = false,
@@ -464,15 +444,6 @@ local DefensiveBoat = categories.DEFENSIVEBOAT
 local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
                         CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
 
--- Naval formation blocks
-local NavalSpacing = 1.2
-local StandardNavalBlock = {
-    { { {0, 0}, }, { 'Carriers', 'Battleships', 'Cruisers', 'Destroyers', 'Frigates', 'Submarines' }, },
-    { { {-1, 1.5}, {1, 1.5}, }, { 'Destroyers', 'Cruisers', 'Frigates', 'Submarines'}, },
-    { { {-2.5, 0}, {2.5, 0}, }, { 'Cruisers', 'Battleships', 'Destroyers', 'Frigates', 'Submarines' }, },
-    { { {-1, -1.5}, {1, -1.5}, }, { 'Frigates', 'Battleships', 'Submarines' }, },
-    { { {-3, 2}, {3, 2}, {-3, 0}, {3, 0}, }, { 'Submarines', }, },
-}
 
 -- === TECH LEVEL LAND CATEGORIES ===
 local NavalCategories = {
@@ -509,14 +480,10 @@ local Sonar = {'MobileSonarCount', }
 local FrigatesFirst = { Frigates, Destroyers, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local DestroyersFirst = { Destroyers, Frigates, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local CruisersFirst = { Cruisers, Carriers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
-local BattleshipsFirst = { Battleships, Destroyers, Frigates, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
-local CarriersFirst = { Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
-
 local LargestFirstDF = { Battleships, Carriers, Destroyers, Cruisers, Frigates, NukeSubs, Sonar, RemainingCategory }
 local SmallestFirstDF = { Frigates, Destroyers, Cruisers, Sonar, Battleships, Carriers, NukeSubs, RemainingCategory }
 local LargestFirstAA = { Carriers, Battleships, Cruisers, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
 local SmallestFirstAA = { Cruisers, Frigates, Destroyers, Sonar, Carriers, Battleships, NukeSubs, RemainingCategory }
-
 local Subs = { Subs, NukeSubs, RemainingCategory }
 local SonarFirst = { Sonar, Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
 
@@ -698,22 +665,6 @@ local TenWideSubAttackFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
 
-local EightNavalFormation = {
-    LineBreak = 0.5,
-    { FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst, FrigatesFirst },
-    -- second row
-    { DestroyersFirst, CruisersFirst, CruisersFirst, BattleshipsFirst, BattleshipsFirst, CruisersFirst, CruisersFirst, DestroyersFirst },
-    -- third row
-    { DestroyersFirst, BattleshipsFirst, CruisersFirst, CruisersFirst, CruisersFirst, CruisersFirst, BattleshipsFirst, DestroyersFirst },
-    -- fourth row
-    { DestroyersFirst, CruisersFirst, CarriersFirst, CarriersFirst, CarriersFirst, CarriersFirst, CruisersFirst, DestroyersFirst },
-}
-
-local EightNavalSubFormation = {
-    LineBreak = 0.5,
-    { Subs, Subs, Subs, Subs, Subs, Subs, Subs },
-}
-
 -- ============ Formation Pickers ============
 function PickBestTravelFormationIndex(typeName, distance)
     if typeName == 'AirFormations' then
@@ -840,73 +791,6 @@ function GrowthFormation(formationUnits)
     BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
 
     CacheResults(FormationPos, formationUnits, 'GrowthFormation')
-    return FormationPos
-end
-
-function BlockFormation(formationUnits) -- Doesn't appear to ever be used
-
-    FormationPos = {}
-
-    local rotate = true
-    local smallUnitsList = {}
-    local largeUnitsList = {}
-    local smallUnits = 0
-    local largeUnits = 0
-
-    for i, u in formationUnits do
-        local footPrintSize = u:GetFootPrintSize()
-        if footPrintSize > 3  then
-            largeUnitsList[largeUnits] = { u }
-            largeUnits = largeUnits + 1
-        else
-            smallUnitsList[smallUnits] = { u }
-            smallUnits = smallUnits + 1
-        end
-    end
-
-    local n = smallUnits + largeUnits
-    local width = math.ceil(math.sqrt(n))
-    local length = n / width
-
-    -- Put small units (Size 1 through 3) in front of the formation
-    for i in smallUnitsList do
-        local offsetX = ((math.mod(i, width)  - math.floor(width/2)) * 2) + 1
-        local offsetY = (math.floor(i/width) - math.floor(length/2)) * 2
-        local delay = 0.1 + (math.floor(i/width) * 3)
-        table.insert(FormationPos, { offsetX, -offsetY, categories.ALLUNITS, delay, rotate })
-    end
-
-    -- Put large units (Size >= 4) in the back of the formation
-    for i in largeUnitsList do
-        local adjIndex = smallUnits + i
-        local offsetX = ((math.mod(adjIndex, width)  - math.floor(width/2)) * 2) + 1
-        local offsetY = (math.floor(adjIndex/width) - math.floor(length/2)) * 2
-        local delay = 0.1 + (math.floor(adjIndex/width) * 3)
-        table.insert(FormationPos, { offsetX, -offsetY, categories.ALLUNITS, delay, rotate })
-    end
-
-    return FormationPos
-end
-
--- local function for performing lerp
-local function lerp(alpha, a, b)
-    return a + ((b-a) * alpha)
-end
-
-function CircleFormation(formationUnits) -- Doesn't appear to ever be used
-    FormationPos = {}
-
-    local rotate = false
-    local numUnits = table.getn(formationUnits)
-    local sizeMult = 2.0 + math.max(1.0, numUnits / 3.0)
-
-    -- make circle around center point
-    for i in formationUnits do
-        offsetX = sizeMult * math.sin(lerp(i/numUnits, 0.0, math.pi * 2.0))
-        offsetY = sizeMult * math.cos(lerp(i/numUnits, 0.0, math.pi * 2.0))
-        table.insert(FormationPos, { offsetX, offsetY, categories.ALLUNITS, 0, rotate })
-    end
-
     return FormationPos
 end
 
@@ -1411,154 +1295,6 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
 end
 
 
-
--- =========== NAVAL UNIT BLOCKS ============
-function NavalBlocks(unitsList, navyType) -- Doesn't appear to ever be used
-    local Carriers = true
-    local Battleships = true
-    local Cruisers = true
-    local Destroyers = true
-    local unitNum = 1
-    for i, v in navyType do
-        for k, u in v[2] do
-            if u == 'Carriers' and Carriers and unitsList.CarrierCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.CarrierCount ~= 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, categories.NAVAL * categories.AIRSTAGINGPLATFORM * (categories.TECH3 + categories.EXPERIMENTAL), 0, true })
-                        unitsList.CarrierCount = unitsList.CarrierCount - 1
-                        unitNum = unitNum + 1
-                    end
-                end
-                Carriers = false
-                break
-            elseif u == 'Battleships' and Battleships and unitsList.BattleshipCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.BattleshipCount ~= 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, BattleshipNaval, 0, true })
-                        unitsList.BattleshipCount = unitsList.BattleshipCount - 1
-                        unitNum = unitNum + 1
-                    end
-                end
-                Battleships = false
-                break
-            elseif u == 'Cruisers' and Cruisers and unitsList.CruiserCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.CruiserCount ~= 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, CruiserNaval, 0, true })
-                        unitNum = unitNum + 1
-                        unitsList.CruiserCount = unitsList.CruiserCount - 1
-                    end
-                end
-                Cruisers = false
-                break
-            elseif u == 'Destroyers' and Destroyers and unitsList.DestroyerCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.DestroyerCount > 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, DestroyerNaval, 0, true })
-                        unitNum = unitNum + 1
-                        unitsList.DestroyerCount = unitsList.DestroyerCount - 1
-                    end
-                end
-                Destroyers = false
-                break
-            elseif u == 'Frigates' and unitsList.FrigateCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.FrigateCount > 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, FrigateNaval, 0, true })
-                        unitNum = unitNum + 1
-                        unitsList.FrigateCount = unitsList.FrigateCount - 1
-                    end
-                end
-                break
-            elseif u == 'Frigates' and unitsList.LightCount > 0 then
-                for j, coord in v[1] do
-                    if unitsList.LightCount > 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, LightAttackNaval, 0, true })
-                        unitNum = unitNum + 1
-                        unitsList.LightCount = unitsList.LightCount - 1
-                    end
-                end
-                break
-            elseif u == 'Submarines' and unitsList.SubCount > 0 then
-                for j, coord in v[1] do
-                    if (unitsList.SubCount + unitsList.NukeSubCount) > 0 then
-                        table.insert(FormationPos, { coord[1]*NavalSpacing, coord[2]*NavalSpacing, SubNaval + NukeSubNaval, 0, true })
-                        unitNum = unitNum + 1
-                        unitsList.SubCount = unitsList.SubCount - 1
-                    end
-                end
-                break
-            end
-        end
-    end
-
-    local sideTable = { 0, -2, 2 }
-    local sideIndex = 1
-    local length = -3
-
-    i = unitNum
-
-    -- Figure out how many left we have to assign
-    local numLeft = unitsList.UnitTotal - i + 1
-    if numLeft == 2 then
-        sideIndex = 2
-    end
-
-    while i <= unitsList.UnitTotal do
-        if unitsList.CarrierCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, categories.NAVAL * categories.AIRSTAGINGPLATFORM * (categories.TECH3 + categories.EXPERIMENTAL), 0, true  })
-            unitNum = unitNum + 1
-            unitsList.CarrierCount = unitsList.CarrierCount - 1
-        elseif unitsList.BattleshipCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, BattleshipNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.BattleshipCount = unitsList.BattleshipCount - 1
-        elseif unitsList.CruiserCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, CruiserNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.CruiserCount = unitsList.CruiserCount - 1
-        elseif unitsList.DestroyerCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, DestroyerNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.DestroyerCount = unitsList.DestroyerCount - 1
-        elseif unitsList.FrigateCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, FrigateNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.FrigateCount = unitsList.FrigateCount - 1
-        elseif unitsList.LightCount > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, LightAttackNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.LightCount = unitsList.LightCount - 1
-        elseif (unitsList.SubCount + unitsList.NukeSubCount) > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, SubNaval + NukeSubNaval, 0, true })
-            unitNum = unitNum + 1
-            unitsList.SubCount = unitsList.SubCount - 1
-        elseif (unitsList.MobileSonarCount) > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, MobileSonar + DefensiveBoat, 0, true })
-            unitNum = unitNum + 1
-            unitsList.MobileSonarCount = unitsList.MobileSonarCount - 1
-        elseif (unitsList.RemainingCategory) > 0 then
-            table.insert(FormationPos, { sideTable[sideIndex]*NavalSpacing, length*NavalSpacing, NavalCategories.RemainingCategory, 0, true })
-            unitNum = unitNum + 1
-            unitsList.RemainingCategory = unitsList.RemainingCategory - 1
-        end
-
-        -- Figure out the next viable location for the naval unit
-        numLeft = numLeft - 1
-        sideIndex = sideIndex + 1
-        if sideIndex == 4 then
-            length = length - 2
-            if numLeft == 2 then
-                sideIndex = 2
-            else
-                sideIndex = 1
-            end
-        end
-
-        i = i + 1
-    end
-    return FormationPos
-end
 
 
 
