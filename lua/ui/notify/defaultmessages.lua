@@ -16,7 +16,6 @@ defaultMessages = {
     },
     uef = {
         ResourceAllocation = "RAS",
-        ResourceAllocationAdvanced = "ARAS",
         AdvancedEngineering = "T2",
         T3Engineering = "T3",
         Teleporter = "Teleporter",
@@ -30,7 +29,6 @@ defaultMessages = {
     },
     cybran = {
         ResourceAllocation = "RAS",
-        ResourceAllocationAdvanced = "ARAS",
         AdvancedEngineering = "T2",
         T3Engineering = "T3",
         Teleporter = "Teleporter",
