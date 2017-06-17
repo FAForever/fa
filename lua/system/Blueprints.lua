@@ -478,6 +478,17 @@ function PreModBlueprints(all_bps)
             }
         end
 
+        -- Create new keys so that unit scripting can more easily reference the most common data needed
+        for _, category in pairs({'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'}) do -- Use Pairs() top check the strings in this order
+            bp.TechCategory = category
+        end
+
+        for _, category in {'LAND', 'AIR', 'NAVAL'} do
+            bp.LayerCategory = category
+        end
+
+        bp.FactionCategory = string.upper(bp.General.FactionName)
+
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues
