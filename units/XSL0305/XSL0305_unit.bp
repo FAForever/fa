@@ -46,6 +46,7 @@ UnitBlueprint {
         'TECH3',
         'DIRECTFIRE',
         'INDIRECTFIRE',
+        'SNIPER',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',
