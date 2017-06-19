@@ -724,6 +724,18 @@ options = {
                     inc = 10,
                 },
             },
+            {
+                title = "<LOC OPTIONS_0281>Show hotkeylabels for hotbuild and order keys",
+                key = 'show_hotkeylabels',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
         },
     },
     video = {
