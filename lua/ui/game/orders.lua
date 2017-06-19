@@ -966,7 +966,7 @@ local function AddOrder(orderInfo, slot, batchMode)
         checkbox.buttonText:SetText(orderInfo.ButtonTextFunc(checkbox))
         checkbox.buttonText:SetColor('ffffffff')
         checkbox.buttonText:SetDropShadow(true)
-        if orderKeys[orderInfo.helpText] then
+        if Prefs.GetFromCurrentProfile('options').show_hotkeylabels and orderKeys[orderInfo.helpText] then
             LayoutHelpers.AtTopIn(checkbox.buttonText, checkbox)
         else
             LayoutHelpers.AtBottomIn(checkbox.buttonText, checkbox)

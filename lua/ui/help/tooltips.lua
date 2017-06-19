@@ -831,6 +831,14 @@ Tooltips = {
         title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
         description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
     },
+    options_minimum_reclaim_amount = {
+        title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
+        description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
+    },
+    options_show_hotkeylabels = {
+        title = "<LOC OPTIONS_0281>Show hotkeylabels for hotbuild and order keys",
+        description = "<LOC OPTIONS_0282>Shows the shortcut keys you use for hotbuild on top of the unit images in the construction tab and keys for orders on the order buttons",
+    },
     -- **********************
     -- ** Lobby Strings
     -- **********************

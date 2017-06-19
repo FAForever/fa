@@ -4,8 +4,13 @@
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Prefs = import('/lua/user/prefs.lua')
 
 function addLabel(control, parent, key)
+    if not Prefs.GetFromCurrentProfile('options').show_hotkeylabels then
+        return
+    end
+
     control.hotbuildKeyBg = Bitmap(parent)
     control.hotbuildKeyBg.Depth:Set(99)
     control.hotbuildKeyBg.Height:Set(20)
