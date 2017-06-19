@@ -30,7 +30,7 @@ function UTF(unicode)
     error 'Unicode cannot be greater than U+10FFFF!'
 end
 
-function InsertChar1(str, chr, pos)
+function InsertChar(str, chr, pos)
     local byteArrayOfText={}
     str:gsub(".", function(c) table.insert(byteArrayOfText,c) end)
     local addPos = 0
@@ -45,7 +45,8 @@ function InsertChar1(str, chr, pos)
     return str:sub(1, pos+addPos) .. chr .. str:sub(pos+addPos+1)
 end
 
-function InsertChar2(str, chr, pos)
+--[[
+function InsertChar2(str, chr, pos)      -- analog fun like InsertChar, without array, but logical less intelligible. for possible future use
     local offset = 0
     local posWithUnicodeChars = 1
     local skipSecondByteOfUnicodeChar = false
@@ -65,6 +66,7 @@ function InsertChar2(str, chr, pos)
     )
    return str:sub(1, pos+offset) .. chr .. str:sub(pos+offset+1)
 end
+]]
 
 function AddUnicodeCharToEditText(edit, unicode)
     if unicode <= 0x7F then return "" end
@@ -77,7 +79,7 @@ function AddUnicodeCharToEditText(edit, unicode)
             return
         end
         local pos = edit:GetCaretPosition()
-        text = InsertChar1(text, unicodeChar, pos)
+        text = InsertChar(text, unicodeChar, pos)
         edit:SetText(text)
         --edit:SetText(text .. unicodeChar)
         edit:SetCaretPosition(pos + 1)
