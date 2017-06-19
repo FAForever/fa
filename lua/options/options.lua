@@ -433,7 +433,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0213>Use Factional UI Font Color",
+                title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
                 key = 'faction_font_color',
                 type = 'toggle',
                 default = true,
