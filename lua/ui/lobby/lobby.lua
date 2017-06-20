@@ -46,7 +46,6 @@ local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 
 local IsSyncReplayServer = false
 
--- dk0x unicode
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
 
 if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
