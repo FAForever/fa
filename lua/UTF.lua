@@ -27,7 +27,8 @@ function UTF(unicode)
         return string.char(Byte0, Byte1, Byte2, Byte3);
     end;
 
-    error 'Unicode cannot be greater than U+10FFFF!'
+    WARN('Unicode cannot be greater than U+10FFFF! (UTF('.. unicode ..'))')
+    return ""
 end
 
 function InsertChar(str, chr, pos)
@@ -81,7 +82,6 @@ function AddUnicodeCharToEditText(edit, unicode)
         local pos = edit:GetCaretPosition()
         text = InsertChar(text, unicodeChar, pos)
         edit:SetText(text)
-        --edit:SetText(text .. unicodeChar)
         edit:SetCaretPosition(pos + 1)
     end
 end
