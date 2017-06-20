@@ -27,7 +27,7 @@ function UTF(unicode)
         return string.char(Byte0, Byte1, Byte2, Byte3);
     end;
 
-    error 'Unicode cannot be greater than U+10FFFF!'
+    WARN('Unicode cannot be greater than U+10FFFF!')
 end
 
 function InsertChar(str, chr, pos)
