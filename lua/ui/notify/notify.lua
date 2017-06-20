@@ -132,11 +132,11 @@ end
 function toggleNotifyTemporary(args)
     if args[1] == 'enablenotify' then
         categoriesDisabled.All = false
-        toggleOverlay(false, false)
+        toggleOverlay(false, true)
         print 'Notify Enabled For Session'
     elseif args[1] == 'disablenotify' then
         categoriesDisabled.All = true
-        toggleOverlay(true, false)
+        toggleOverlay(true, true)
         print 'Notify Disabled For Session'
     end
 end
@@ -166,6 +166,7 @@ end
 function toggleCustomMessages(bool)
     customMessagesDisabled = bool
     Prefs.SetToCurrentProfile('Notify_custom_disabled', bool)
+    NotifyOverlay.toggleCustomMessages(bool)
     if customMessagesDisabled then
         print 'Custom Messages Disabled'
     elseif not customMessagesDisabled then
@@ -214,7 +215,7 @@ function onStartEnhancement(id, category, source)
 
         -- If we're not already working, watch this one
         if not data.watcher then
-            data.watcher = ForkThread(watchEnhancement, id, source)
+            data.watcher = ForkThread(watchEnhancement, id, messages[category][source], category, source)
         end
     end
 
@@ -259,12 +260,11 @@ function killWatcher(data)
     end
 end
 
-function watchEnhancement(id, source)
+function watchEnhancement(id, text, category, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
     overlayData.pos = overlayData.unit:GetPosition()
-    overlayData.msg = {to = 'allies', NotifyOverlay = true}
-    overlayData.id = id
+    overlayData.msg = {to = 'allies', NotifyOverlay = true, data = {id = id, text = text, category = category, source = source}}
     overlayData.eta = -1
 
     while true do

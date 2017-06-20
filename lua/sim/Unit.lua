@@ -902,6 +902,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnGiven = function(self, newUnit)
+        self:SendNotifyMessage('transferred')
         self:DoUnitCallbacks('OnGiven', newUnit)
     end,
 
@@ -4239,9 +4240,19 @@ Unit = Class(moho.unit_methods) {
                 category = string.lower(self.factionCategory)
             end
 
-            if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-            local message = {source = source or unitType, trigger = trigger, category = category, id = id}
-            table.insert(Sync.EnhanceMessage, message)
+            if trigger == 'transferred' then
+                if not Sync.EnhanceMessage then return end
+                for index, msg in Sync.EnhanceMessage do
+                    if msg.source == (source or unitType) and msg.trigger == 'completed' and msg.category == category then
+                        table.remove(Sync.EnhanceMessage, index)
+                        break
+                    end
+                end
+            else
+                if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id}
+                table.insert(Sync.EnhanceMessage, message)
+            end
         end
     end,
 
