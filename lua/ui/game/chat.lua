@@ -21,7 +21,6 @@ local UIMain = import('/lua/ui/uimain.lua')
 <LOC chat_win_0002>Chat (%d - %d of %d lines)
 --]]
 
--- dk0x unicode
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
 
 local CHAT_INACTIVITY_TIMEOUT = 15  -- in seconds
