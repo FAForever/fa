@@ -2,6 +2,7 @@
 
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -10,6 +11,7 @@ local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 
 local overlayDisabled
 local overlayLockedOut
+local customMessagesDisabled
 overlays = {}
 
 function init()
@@ -22,10 +24,11 @@ function init()
         Prefs.SetToCurrentProfile('Notify_overlay_disabled', false)
         state = false
     end
+    overlayDisabled = state
+
+    customMessagesDisabled = Prefs.GetFromCurrentProfile('Notify_custom_disabled')
 
     overlayLockedOut = Prefs.GetFromCurrentProfile('Notify_all_disabled')
-
-    toggleOverlay(state, false)
 end
 
 function destroyOverlays()
@@ -68,7 +71,18 @@ function toggleOverlayTemporary(args)
     destroyOverlays()
 end
 
--- This is called when we recieve a chat message from another player in the 'Notify' chat channel
+function toggleCustomMessages(bool)
+    customMessagesDisabled = bool
+    for _, overlay in overlays do
+        if customMessagesDisabled then
+            overlay.name = defaultMessages[overlay.category][overlay.source]
+        else
+            overlay.name = overlay.customName
+        end
+    end
+end
+
+-- This is called when we recieve a chat message from another player in the 'NotifyOverlay' chat channel
 -- These messages are generated below in generateEnhancementMessage or sendDestroyOverlayMessage
 function processNotification(players, msg)
     if not overlayDisabled and not overlayLockedOut then
@@ -90,10 +104,19 @@ function createEnhancementOverlay(args)
 
     overlay.Width:Set(100)
     overlay.Height:Set(50)
+    overlay.customName = args.text
+    overlay.category = args.category
+    overlay.source = args.source
     overlay.id = args.id
     overlay.pos = args.pos
     overlay.eta = args.eta
     overlay.lastUpdate = GetGameTimeSeconds()
+    
+    if customMessagesDisabled then
+        overlay.name = defaultMessages[overlay.category][overlay.source]
+    else
+        overlay.name = overlay.customName
+    end
 
     overlay:SetNeedsFrameUpdate(true)
     overlay.OnFrame = function(self, delta)
@@ -120,15 +143,15 @@ function createEnhancementOverlay(args)
         end
     end
 
-    overlay.progress = UIUtil.CreateText(overlay, args.progress .. "%", 12, UIUtil.bodyFont)
+    overlay.progress = UIUtil.CreateText(overlay, overlay.name .. " " .. args.progress .. "%", 12, UIUtil.bodyFont)
     overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
-    LayoutHelpers.AtCenterIn(overlay.progress, overlay, 15, 0)
+    LayoutHelpers.AtCenterIn(overlay.progress, overlay, -15, 0)
 
     overlay.etaText = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
     overlay.etaText:SetColor('white')
     overlay.etaText:SetDropShadow(true)
-    LayoutHelpers.AtCenterIn(overlay.etaText, overlay, -15, 0)
+    LayoutHelpers.AtCenterIn(overlay.etaText, overlay, 15, 0)
 
     return overlay
 end
@@ -154,7 +177,7 @@ function updateEnhancementOverlay(args)
             overlay.destroy = destroy
             return
         end
-        overlay.progress:SetText(args.progress .. "%")
+        overlay.progress:SetText(overlay.name .. " " .. args.progress .. "%")
         overlay.eta = args.eta
         overlay.pos = args.pos
         overlay.lastUpdate = GetGameTimeSeconds()
@@ -190,7 +213,7 @@ function generateEnhancementMessage(data)
             data.eta = eta
             data.pos = pos
             data.last_message = seconds
-            msg.data = {id = data.id, progress = percent, eta = eta, pos = pos}
+            msg.data = table.merged(msg.data, {progress = percent, eta = eta, pos = pos})
             SessionSendChatMessage(FindClients(), msg)
         end
     end
