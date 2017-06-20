@@ -30,24 +30,31 @@ function UTF(unicode)
     WARN('Unicode cannot be greater than U+10FFFF! (UTF('.. unicode ..'))')
     return ""
 end
-
 function InsertChar(str, chr, pos)
+    -- if we insert char to start or end of text just glue chr and str
+    if pos == 0 then return chr .. str end 
+    if pos == STR_Utf8Len(str) then return str .. chr end
+    -- otherwise lets calculate how many bytes contain chars before position
     local byteArrayOfText={}
-    str:gsub(".", function(c) table.insert(byteArrayOfText,c) end)
-    local addPos = 0
-    local posWithUnicodeChars = 1
+    str:gsub(".", function(c) table.insert(byteArrayOfText,c) end)  -- split str to bytes and add it to byteArrayOfText
+    local offsetInBytes = 0  -- offset in bytes (add it to pos future)
+    local posWithUnicodeChars = 1  -- normaly iteration position by char 
     while posWithUnicodeChars <= pos do
         -- first byte always >=0xC0 (192). look at function UTF(unicode) local Byte0 = 0xC0 + ...
-        if string.byte(byteArrayOfText[posWithUnicodeChars+addPos]) >= 192 then 
-            addPos = addPos + 1
+        if string.byte(byteArrayOfText[posWithUnicodeChars+offsetInBytes]) >= 192 then    -- and if we have there unicode char
+            offsetInBytes = offsetInBytes + 1  -- add offset (because unicode char contain 2 bytes)
         end
         posWithUnicodeChars = posWithUnicodeChars + 1
     end
-    return str:sub(1, pos+addPos) .. chr .. str:sub(pos+addPos+1)
+    return str:sub(1, pos+offsetInBytes) .. chr .. str:sub(pos+offsetInBytes+1) -- split str and add chr between parts
 end
 
 --[[
-function InsertChar2(str, chr, pos)      -- analog fun like InsertChar, without array, but logical less intelligible. for possible future use
+function InsertChar2(str, chr, pos)
+    -- if we insert char to start or end of text just glue chr and str
+    if pos == 0 then return chr .. str end 
+    if pos == STR_Utf8Len(str) then return str .. chr end
+    -- otherwise lets calculate how many bytes contain chars before position
     local offset = 0
     local posWithUnicodeChars = 1
     local skipSecondByteOfUnicodeChar = false
@@ -65,7 +72,7 @@ function InsertChar2(str, chr, pos)      -- analog fun like InsertChar, without 
             end
         end
     )
-   return str:sub(1, pos+offset) .. chr .. str:sub(pos+offset+1)
+   return str:sub(1, pos+offset) .. chr .. str:sub(pos+offset+1) -- split str and add chr between parts
 end
 ]]
 
