@@ -46,7 +46,7 @@ function InsertChar(str, chr, pos)
         end
         posWithUnicodeChars = posWithUnicodeChars + 1
     end
-    return str:sub(1, pos+offsetInBytes) .. chr .. str:sub(pos+offsetInBytes+1)
+    return str:sub(1, pos+offsetInBytes) .. chr .. str:sub(pos+offsetInBytes+1) -- split str and add chr between parts
 end
 
 --[[
@@ -72,7 +72,7 @@ function InsertChar2(str, chr, pos)
             end
         end
     )
-   return str:sub(1, pos+offset) .. chr .. str:sub(pos+offset+1)
+   return str:sub(1, pos+offset) .. chr .. str:sub(pos+offset+1) -- split str and add chr between parts
 end
 ]]
 
