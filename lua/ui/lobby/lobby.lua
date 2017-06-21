@@ -46,6 +46,8 @@ local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 
 local IsSyncReplayServer = false
 
+local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+
 if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
@@ -2978,6 +2980,7 @@ function CreateUI(maxPlayers)
 
     --- Handle up/down arrow presses for the chat box.
     GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
+        AddUnicodeCharToEditText(self, keyCode)
         if commandQueue and table.getsize(commandQueue) > 0 then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then

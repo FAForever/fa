@@ -21,6 +21,8 @@ local UIMain = import('/lua/ui/uimain.lua')
 <LOC chat_win_0002>Chat (%d - %d of %d lines)
 --]]
 
+local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+
 local CHAT_INACTIVITY_TIMEOUT = 15  -- in seconds
 local savedParent = false
 local chatHistory = {}
@@ -651,6 +653,7 @@ function CreateChatEdit()
     LayoutHelpers.AtVerticalCenterIn(group.chatBubble, group.edit)
 
     group.edit.OnNonTextKeyPressed = function(self, charcode, event)
+        AddUnicodeCharToEditText(self, charcode)
         GUI.bg.curTime = 0
         local function RecallCommand(entryNumber)
             self:SetText(commandHistory[self.recallEntry].text)
