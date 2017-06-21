@@ -226,7 +226,6 @@ function WrapText(text, lineWidth, advanceFunction)
                     letterWidth = advanceFunction(letter)
                     if wordWidth + letterWidth > lineWidth then
                         result[curLine] = STR_Utf8SubString(word, startIndex, letterIndex - startIndex)
-                        LOG(result[curLine])
                         curLine = curLine + 1
                         startIndex = letterIndex
                         pos = 0
