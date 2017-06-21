@@ -165,11 +165,6 @@ local menus = {
         },
         lan = {
             {
-                action = 'RehostGame',
-                label = '<LOC _Rehost_Game>Rehost Game',
-                tooltip = 'esc_rehost',
-            },
-            {
                 action = 'ShowObj',
                 label='<LOC _Show_Scenario_Info>Scenario',
                 tooltip = 'show_scenario',
@@ -315,7 +310,7 @@ local actions = {
     ExitSPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
             "<LOC _Yes>", function()
-                ExitApplication()
+                EscapeHandler.SafeQuit()
             end,
             "<LOC _Save>", ExitGameSaveWindow,
             "<LOC _No>", nil,

@@ -538,7 +538,13 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
             "<LOC lobby_0000>Exit game lobby?",
             "<LOC _Yes>", function()
                 ReturnToMenu(false)
-                EscapeHandler.PopEscapeHandler()
+                if HasCommandLineArg("/gpgnet") then
+                    -- Quit to desktop
+                    EscapeHandler.SafeQuit()
+                else
+                    -- Back to main menu
+                    EscapeHandler.PopEscapeHandler()
+                end
             end,
 
             -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
@@ -2970,7 +2976,13 @@ function CreateUI(maxPlayers)
     GUI.chatEdit.OnEscPressed = function(self, text)
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        EscapeHandler.HandleEsc(true)
+        if HasCommandLineArg("/gpgnet") then
+            -- Quit to desktop
+            EscapeHandler.HandleEsc(true)
+        else
+            -- Back to main menu
+            GUI.exitButton.OnClick()
+        end
 
         -- Don't clear the textbox, either.
         return true
@@ -3223,10 +3235,20 @@ function CreateUI(maxPlayers)
 
     -- Exit Button
     GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/', LOC("<LOC tooltipui0285>Exit"))
-    GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 33)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, 7)
+    if HasCommandLineArg("/gpgnet") then
+        -- Quit to desktop
+        GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
+        Tooltip.AddButtonTooltip(GUI.exitButton, 'esc_exit')
+    else
+        -- Back to main menu
+        GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
+        Tooltip.AddButtonTooltip(GUI.exitButton, 'esc_quit')
+    end
+
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
+
 
     -- Small buttons are 100 wide, 44 tall
 
