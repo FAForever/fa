@@ -423,7 +423,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     LayoutHelpers.AtTopIn(bg.title, bg, 28)
 
     -- set controls that are global to the dialog
-    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    if HasCommandLineArg("/gpgnet") then
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_FAF>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
+    else
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        Tooltip.AddButtonTooltip(bg.continueBtn, 'PostScore_Quit')
+    end
+
     LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
     LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
     bg.continueBtn:UseAlphaHitTest(false)
@@ -455,9 +462,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     bg.continueBtn.OnClick = function(self, modifiers)
         hotstats.clean_view()
         ConExecute("ren_Oblivion false")
-        EscapeHandler.SafeQuit()
+        if HasCommandLineArg("/gpgnet") then
+            -- Quit to desktop
+            EscapeHandler.SafeQuit()
+        else
+            -- Back to main menu
+            ExitGame()
+        end
     end
-    Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
 
      -- Rehost button in case of failure
     if showCampaign and not operationVictoryTable.success then
