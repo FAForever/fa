@@ -235,7 +235,7 @@ function WrapText(text, lineWidth, advanceFunction)
                     wordWidth = wordWidth + letterWidth
                 end
                 local sLen = STR_Utf8Len(word)
-                result[curLine] = STR_Utf8SubString(word, startIndex, sLen - startIndex - 1)
+                result[curLine] = STR_Utf8SubString(word, startIndex, sLen - startIndex + 1)
                 pos = wordWidth
                 if wordWidth + spaceWidth < lineWidth then
                     result[curLine] = result[curLine] .. " "
