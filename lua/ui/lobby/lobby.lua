@@ -537,13 +537,13 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
         local quitDialog = UIUtil.QuickDialog(GUI,
             "<LOC lobby_0000>Exit game lobby?",
             "<LOC _Yes>", function()
-                ReturnToMenu(false)
+                EscapeHandler.PopEscapeHandler()
                 if HasCommandLineArg("/gpgnet") then
                     -- Quit to desktop
                     EscapeHandler.SafeQuit()
                 else
                     -- Back to main menu
-                    EscapeHandler.PopEscapeHandler()
+                    ReturnToMenu(false)
                 end
             end,
 
