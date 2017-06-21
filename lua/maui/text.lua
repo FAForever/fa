@@ -171,14 +171,14 @@ function WrapText(text, lineWidth, advanceFunction)
     for packedWord in string.gfind(text, "[^ \t]+") do
         local words = {}
         local lfStartIndex = string.find(packedWord, "\n")  -- the first line feed in the text (if any), prime the while pump
-        local bytes = string.len(packedWord) -- the number of bytes in the packed word
+        local bytes = STR_Utf8Len(packedWord) -- the number of bytes in the packed word
         local curIndex = 1
         if lfStartIndex then
             -- split out new lines from packedWords and make them their own entry in the table
             while lfStartIndex do
                 if lfStartIndex - curIndex > 0 then
                     -- found a word before this line feed, so get it and push in to the word list
-                    table.insert(words, string.sub(packedWord, curIndex, lfStartIndex - 1))
+                    table.insert(words, STR_Utf8SubString(packedWord, curIndex, lfStartIndex - 1 - curIndex))
                 end
                 -- add the line feed to the word list
                 table.insert(words, "\n")
@@ -188,7 +188,7 @@ function WrapText(text, lineWidth, advanceFunction)
                 lfStartIndex = string.find(packedWord, "\n", curIndex)
                 -- pick up any trailing word
                 if not lfStartIndex and curIndex < bytes then
-                    table.insert(words, string.sub(packedWord, curIndex, bytes))
+                    table.insert(words, STR_Utf8SubString(packedWord, curIndex, bytes - curIndex))
                 end
             end
         else
@@ -220,10 +220,13 @@ function WrapText(text, lineWidth, advanceFunction)
                 local lineWidth = lineWidthFunc(curLine)
                 local startIndex = 1
                 local letterIndex = 1
-                for letter in string.gfind(word, ".") do
+                local letter = ""
+                for letterIndex = 1, STR_Utf8Len(word) do
+                    letter = STR_Utf8SubString(word, letterIndex, 1)
                     letterWidth = advanceFunction(letter)
                     if wordWidth + letterWidth > lineWidth then
-                        result[curLine] = string.sub(word, startIndex, letterIndex - 1)
+                        result[curLine] = STR_Utf8SubString(word, startIndex, letterIndex - startIndex)
+                        LOG(result[curLine])
                         curLine = curLine + 1
                         startIndex = letterIndex
                         pos = 0
@@ -231,10 +234,9 @@ function WrapText(text, lineWidth, advanceFunction)
                         lineWidth = lineWidthFunc(curLine)
                     end
                     wordWidth = wordWidth + letterWidth
-                    letterIndex = letterIndex + 1
                 end
-
-                result[curLine] = string.sub(word, startIndex)
+                local sLen = STR_Utf8Len(word)
+                result[curLine] = STR_Utf8SubString(word, startIndex, sLen - startIndex - 1)
                 pos = wordWidth
                 if wordWidth + spaceWidth < lineWidth then
                     result[curLine] = result[curLine] .. " "
