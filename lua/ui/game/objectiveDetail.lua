@@ -527,6 +527,13 @@ function Refresh()
         local sortedCom = {}
         local sortedFail = {}
         for k, ObjData in Objectives do
+            -- Hide information about incompleted or failed bonus objectives
+            if ObjData.type == 'bonus' and ObjData.complete ~= 'complete' then
+                ObjData.title = hidtitle
+                ObjData.description = hiddesc
+                ObjData.progress = ''
+                ObjData.actionImage = '/dialogs/objective-unit/help-lg-graphics_bmp.dds'
+            end
             if ObjData.complete ~= 'incomplete' then
                 if ObjData.complete == 'complete' then
                     table.insert(sortedCom, ObjData)
@@ -539,11 +546,6 @@ function Refresh()
                 elseif ObjData.type == 'secondary' then
                     table.insert(sortedSec, ObjData)
                 elseif ObjData.type == 'bonus' then
-                    if ObjData.complete ~= 'complete' then
-                        ObjData.title = hidtitle
-                        ObjData.description = hiddesc
-                        ObjData.actionImage = '/dialogs/objective-unit/help-lg-graphics_bmp.dds'
-                    end
                     table.insert(sortedBon, ObjData)
                 end
             end
