@@ -286,7 +286,7 @@ Scenario = {
         ['OST_NavalAttacks_TropBoatPlatoon'] = {
             'OST_NavalAttacks_TropBoatPlatoon',
             '',
-            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- TorpedoBoats
+            { 'xes0102', -1, 1, 'attack', 'AttackFormation' }, -- TorpedoBoats
         },
         ['OST_NavalAttacks_BattleCruiserPlatoon'] = {
             'OST_NavalAttacks_BattleCruiserPlatoon',
