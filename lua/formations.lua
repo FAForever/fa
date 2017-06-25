@@ -1309,71 +1309,73 @@ function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
 
-    local types = {
+    local typeGroups = {
         Land = {
             GridSizeFraction = 2.75,
             GridSizeAbsolute = 2,
             MinSeparationFraction = 2.25,
+            Types = {'Land'}
         },
 
         Air = {
             GridSizeFraction = 1.3,
             GridSizeAbsolute = 2,
             MinSeparationFraction = 1,
+            Types = {'Air'}
         },
 
-        Naval = {
-            GridSizeFraction = 2,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 1.25,
-        },
-
-        Subs = {
-            GridSizeFraction = 2,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 1.25,
+        Sea = {
+            GridSizeFraction = 1.75,
+            GridSizeAbsolute = 4,
+            MinSeparationFraction = 1.15,
+            Types = {'Naval', 'Subs'}
         },
     }
 
-    for type in types do
-        local largestForType = 1
+    for group, data in typeGroups do
+        local groupFootprintCounts = {}
+        local largestForGroup = 1
         local numSizes = 0
-        for fs, _ in unitsList[type].FootprintCounts do
-            largestFootprint = math.max(largestFootprint, fs)
-            largestForType = math.min(largestForType, fs)
-            numSizes = numSizes + 1
-        end
-        if numSizes > 0 then
-            local minCount = unitsList[type].UnitTotal / numSizes
-
+        local unitTotal = 0
+        for _, type in data.Types do
+            unitTotal = unitTotal + unitsList[type].UnitTotal
             for fs, count in unitsList[type].FootprintCounts do
-                if count >= minCount then
-                    smallestFootprints[type] = math.min(smallestFootprints[type] or 99999, fs)
+                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
+                largestFootprint = math.max(largestFootprint, fs)
+                largestForGroup = math.max(largestForGroup, fs)
+                numSizes = numSizes + 1
+            end
+        end
+
+        smallestFootprints[group] = largestForGroup
+        if numSizes > 0 then
+            local minCount = unitTotal / 2
+            local smallerUnitCount = 0
+            for fs, count in groupFootprintCounts do
+                smallerUnitCount = smallerUnitCount + count
+                if smallerUnitCount >= minCount then
+                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
+                    break
                 end
             end
         end
-        smallestFootprints[type] = smallestFootprints[type] or largestForType
     end
 
-    -- This bit is so surface naval units and subs have the same grid size.
-    local navalGridSize = math.max(smallestFootprints.Naval * types.Naval.GridSizeFraction, smallestFootprints.Naval + types.Naval.GridSizeAbsolute)
-    local subGridSize = math.max(smallestFootprints.Subs * types.Subs.GridSizeFraction, smallestFootprints.Subs + types.Subs.GridSizeAbsolute)
-    local seaGridSize = math.max(navalGridSize, subGridSize)
-    local gridSizes = {Naval = seaGridSize, Subs = seaGridSize}
+    for group, data in typeGroups do
+        local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
+        for _, type in data.Types do
+            local unitData = unitsList[type]
 
-    for type, spacing in types do
-        local unitData = unitsList[type]
-        local gridSize = gridSizes[type] or math.max(smallestFootprints[type] * spacing.GridSizeFraction, smallestFootprints[type] + spacing.GridSizeAbsolute)
+             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
+             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
+             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
+            unitData.Scale = gridSize / (largestFootprint + 2)
 
-         -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
-         -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
-         -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
-        unitData.Scale = gridSize / (largestFootprint + 2)
-
-        for fs, count in unitData.FootprintCounts do
-            local size = math.ceil(fs * spacing.MinSeparationFraction / gridSize)
-            unitData.FootprintSizes[fs] = size
-            unitData.AreaTotal = unitData.AreaTotal + count * size * size
+            for fs, count in unitData.FootprintCounts do
+                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
+                unitData.FootprintSizes[fs] = size
+                unitData.AreaTotal = unitData.AreaTotal + count * size * size
+            end
         end
     end
 
@@ -1463,7 +1465,7 @@ function CategorizeUnits(formationUnits)
                     unitsList[type].FootprintCounts[fs] = (unitsList[type].FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG - Missed unit: ' .. u:GetUnitId())
+                        LOG('*FORMATION DEBUG: Unit ' .. u:GetUnitId() .. ' does not match any ' .. type .. ' categories.')
                     end
                     unitsList[type].UnitTotal = unitsList[type].UnitTotal + 1
                     identified = true
@@ -1476,7 +1478,7 @@ function CategorizeUnits(formationUnits)
             end
         end
         if not identified then
-            WARN('*FORMATION DEBUG - Unable to determine unit type: ' .. u:GetUnitId())
+            WARN('*FORMATION DEBUG: Unit ' .. u:GetUnitId() .. ' was excluded from the formation because its layer could not be determined.')
         end
     end
 
