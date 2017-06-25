@@ -144,10 +144,16 @@ Scenario = {
 
 
         -- Mixed
-        ['OST_NavalAttacks_T2SubmarinePlatoon'] = {
-            'OST_NavalAttacks_T2SubmarinePlatoon',
+        ['OST_NavalAttacks_T2SubmarinePlatoon1'] = {
+            'OST_NavalAttacks_T2SubmarinePlatoon1',
             '',
             { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+        },
+        ['OST_NavalAttacks_T2SubmarinePlatoon2'] = {
+            'OST_NavalAttacks_T2SubmarinePlatoon2',
+            '',
+            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
         },
         ['OST_NavalAttacks_UtilityPlatoon'] = {
             'OST_NavalAttacks_UtilityPlatoon',
@@ -797,8 +803,8 @@ Scenario = {
 
 
                     -- Mixed
-                    ['OSB_Child_NavalAttacks_T2SubmarinePlatoon'] =  {
-                        PlatoonTemplate = 'OST_NavalAttacks_T2SubmarinePlatoon',
+                    ['OSB_Child_NavalAttacks_T2SubmarinePlatoon1'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T2SubmarinePlatoon1',
                         Priority = 696,
                         InstanceCount = 1,
                         LocationType = 'MAIN',
@@ -828,6 +834,38 @@ Scenario = {
                             }},
                         },
                         ChildrenType = {'T2Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T2SubmarinePlatoon2'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T2SubmarinePlatoon2',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 2, 3, 0 },
+                                {'default_brain', '2','3', 0 }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'T2Submarines', 'Submarines'},
                     },
                     ['OSB_Child_NavalAttacks_UtilityPlatoon'] =  {
                         PlatoonTemplate = 'OST_NavalAttacks_UtilityPlatoon',
