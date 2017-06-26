@@ -725,7 +725,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0281>Show hotkeylabels for hotbuild and order keys",
+                title = "<LOC OPTIONS_0281>Hotkey Labels",
                 key = 'show_hotkeylabels',
                 type = 'toggle',
                 default = true,
