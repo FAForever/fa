@@ -277,10 +277,9 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     local maxRange = false
     local turretPitch = nil
-    local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
     if platoon.MovementLayer == 'Water' then
 
-        if string.find(per, 'sorian') then
+        if aiBrain.Sorian then
             maxRange, selectedWeaponArc, turretPitch = GetNavalPlatoonMaxRangeSorian(aiBrain, platoon)
         else
             maxRange, selectedWeaponArc = GetNavalPlatoonMaxRange(aiBrain, platoon)
@@ -310,7 +309,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
                 end
             else
                 local bestPos
-                if string.find(per, 'sorian') then
+                if aiBrain.Sorian then
                     bestPos = CheckNavalPathingSorian(aiBrain, platoon, {threat[1], 0, threat[2]}, maxRange, selectedWeaponArc, turretPitch)
                 else
                     bestPos = CheckNavalPathing(aiBrain, platoon, {threat[1], 0, threat[2]}, maxRange, selectedWeaponArc)
@@ -1277,10 +1276,8 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
     local finalPath = {}
     local testPath = false
 
-    local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-
     #If it is a Sorian AI or Duncane AI and not a water unit.
-    if (string.find(per, 'sorian') or DiskGetFileInfo('/lua/AI/altaiutilities.lua')) and platoonLayer != "Water" then
+    if (aiBrain.Sorian or aiBrain.Duncan) and platoonLayer != "Water" then
         testPath = true
     end
 

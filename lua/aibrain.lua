@@ -97,6 +97,14 @@ AIBrain = Class(moho.aibrain_methods) {
                 ScenarioInfo.ArmySetup[self.Name].AIPersonality = string.sub(per, 1, cheatPos - 1)
             end
 
+            if string.find(per, 'sorian') then
+                self.Sorian = true
+            end
+
+            if DiskGetFileInfo('/lua/AI/altaiutilities.lua') then
+                self.Duncan = true
+            end
+
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
             self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
             self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
@@ -111,11 +119,13 @@ AIBrain = Class(moho.aibrain_methods) {
             }
 
             -- Flag enemy starting locations with threat?
-            if ScenarioInfo.type == 'skirmish' and string.find(per, 'sorian') then
-                -- Gives the initial threat a type so initial land platoons will actually attack it.
-                self:AddInitialEnemyThreatSorian(200, 0.005, 'Economy')
-            elseif ScenarioInfo.type == 'skirmish' then
-                self:AddInitialEnemyThreat(200, 0.005)
+            if ScenarioInfo.type == 'skirmish' then
+                if self.Sorian then
+                    -- Gives the initial threat a type so initial land platoons will actually attack it.
+                    self:AddInitialEnemyThreatSorian(200, 0.005, 'Economy')
+                else
+                    self:AddInitialEnemyThreat(200, 0.005)
+                end
             end
         end
         self.UnitBuiltTriggerList = {}
@@ -507,7 +517,6 @@ AIBrain = Class(moho.aibrain_methods) {
 
             WaitSeconds(10) -- Wait for commander explosion, then transfer units.
             local selfIndex = self:GetArmyIndex()
-            local SorianAI = string.find(ScenarioInfo.ArmySetup[self.Name].AIPersonality, 'sorian') -- Am I a Sorian AI?
             local shareOption = ScenarioInfo.Options.Share
             local victoryOption = ScenarioInfo.Options.Victory
             local BrainCategories = {Enemies = {}, Civilians = {}, Allies = {}}
@@ -528,7 +537,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Used to remove unique platoon handles from Sorian AI units
             local function RemovePlatoonHandleFromUnit(units)
-                if not SorianAI then return end
+                if not self.Sorian then return end
 
                 for _, unit in units do
                     if not unit.Dead then
@@ -930,9 +939,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
 
         -- Begin the base monitor process
-        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-
-        if string.find(per, 'sorian') then
+        if self.Sorian then
             local spec = {
                 DefaultDistressRange = 200,
                 AlertLevel = 8,
@@ -947,7 +954,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         self.DeadBaseThread = self:ForkThread(self.DeadBaseMonitor)
-        if string.find(per, 'sorian') then
+        if self.Sorian then
             self.EnemyPickerThread = self:ForkThread(self.PickEnemySorian)
         else
             self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
@@ -3986,9 +3993,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     DoAIPing = function(self, pingData)
-        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-
-        if string.find(per, 'sorian') then
+        if self.Sorian then
             if pingData.Type then
                 SUtils.AIHandlePing(self, pingData)
             end
