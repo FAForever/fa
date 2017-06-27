@@ -714,10 +714,9 @@ function AIOutnumbered(aiBrain, bool)
     local myTeam = ScenarioInfo.ArmySetup[aiBrain.Name].Team
     #LOG('*AI DEBUG: '..aiBrain.Nickname..' I am on team '..myTeam)
     local largestEnemyTeam = false
-    local teams = {0,0,0,0}
+    local teams = {0,0,0,0,0,0,0,0}
 
-    local cheatAI = string.find(aiBrain.Nickname, 'AIx:')
-    if cheatAI then
+    if aiBrain.CheatEnabled then
         teams[myTeam] = teams[myTeam] + (1 * cheatAdjustment)
     else
         teams[myTeam] = teams[myTeam] + 1
@@ -727,8 +726,7 @@ function AIOutnumbered(aiBrain, bool)
         if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             #LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
-            cheatAI = string.find(v.Nickname, 'AIx:')
-            if cheatAI then
+            if v.CheatEnabled then
                 teams[armyTeam] = teams[armyTeam] + (1 * cheatAdjustment)
             else
                 teams[armyTeam] = teams[armyTeam] + 1
