@@ -247,6 +247,9 @@ function Kill(Type, Complete, Title, Description, Target)
     end
 
     objective.OnUnitKilled = function(unit)
+        if not objective.Active then
+            return
+        end
         Target.killed = Target.killed + 1
 
         local progress = string.format('(%s/%s)', Target.killed, Target.total)
