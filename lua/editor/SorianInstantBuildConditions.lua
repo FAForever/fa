@@ -281,10 +281,9 @@ function LessThanEconTrend(aiBrain, mTrend, eTrend)
     end
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     local cheatmult = tonumber(ScenarioInfo.Options.CheatMult) or 2
-    local cheatAI = string.find(aiBrain.Nickname, 'AIx:')
-    if cheatAI and (econ.MassTrend < mTrend * cheatmult and econ.EnergyTrend < eTrend * cheatmult) then
+    if aiBrain.CheatEnabled and (econ.MassTrend < mTrend * cheatmult and econ.EnergyTrend < eTrend * cheatmult) then
         return true
-    elseif not cheatAI and (econ.MassTrend < mTrend and econ.EnergyTrend < eTrend) then
+    elseif not aiBrain.CheatEnabled and (econ.MassTrend < mTrend and econ.EnergyTrend < eTrend) then
         return true
     else
         return false
