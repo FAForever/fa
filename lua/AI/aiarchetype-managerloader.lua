@@ -52,8 +52,6 @@ function ExecutePlan(aiBrain)
     if not aiBrain.BuilderManagers.MAIN.FactoryManager:HasBuilderList() then
         aiBrain:SetResourceSharing(true)
 
-        local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-
         if aiBrain.Sorian then
             aiBrain:SetupUnderEnergyStatTriggerSorian(0.1)
             aiBrain:SetupUnderMassStatTriggerSorian(0.1)
