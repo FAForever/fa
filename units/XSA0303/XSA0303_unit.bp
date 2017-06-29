@@ -114,7 +114,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsa0303_desc>Air-Superiority Fighter',
+    Description = '<LOC xsa0303_desc>Air Superiority Fighter',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
@@ -220,7 +220,7 @@ UnitBlueprint {
         VisionRadius = 32,
     },
     Interface = {
-        HelpText = '<LOC xsa0303_help>Air-Superiority Fighter',
+        HelpText = '<LOC xsa0303_help>Air Superiority Fighter',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.95,
