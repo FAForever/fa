@@ -435,13 +435,15 @@ function UIFile(filespec, checkMods)
         end
 
         if not found then
-            SPEW('[uiutil.lua, function UIFile()] - Unable to find file:'.. origPath .. filespec)
+            -- don't print error message if "filespec" is a valid path
+            if not DiskGetFileInfo(filespec) then
+                SPEW('[uiutil.lua, function UIFile()] - Unable to find file:'.. origPath .. filespec)
+            end
             found = filespec
         end
 
         UIFileCache[origPath .. filespec] = found
     end
-
     return UIFileCache[origPath .. filespec]
 end
 
