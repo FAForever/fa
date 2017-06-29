@@ -1587,8 +1587,14 @@ function CreateTemplateOptionMenu(button, templateObj)
                 local controls = {}
                 for _, entry in theTemplate.templateData do
                     if type(entry) == 'table' then
-                        if not contents[entry[1]] then
-                            contents[entry[1]] = true
+                        if entry.id then
+                            if not contents[entry.id] then
+                                contents[entry.id] = true
+                            end
+                        else
+                            if not contents[entry[1]] then
+                                contents[entry[1]] = true
+                            end
                         end
                     end
                 end
