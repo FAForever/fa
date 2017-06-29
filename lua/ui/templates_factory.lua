@@ -1,5 +1,6 @@
 local Prefs = import('/lua/user/prefs.lua')
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
+local UIUtil = import('/lua/ui/uiutil.lua')
 
 -- Utils
 function GetInitialName()
@@ -20,13 +21,11 @@ end
 
 function GetInitialIcon(buildQueue)
     for _, entry in buildQueue do
-        if type(entry) != 'table' then continue end
-        if DiskGetFileInfo('/textures/ui/common/icons/units/'..entry.id..'_icon.dds') then
-            return entry.id
-        else
-            return false
+        if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry.id .. '_icon.dds', true) then
+            return entry.id -- Original or modded unit found
         end
     end
+    return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
 -- Main functions
