@@ -12,6 +12,7 @@ Blacklist = {
     ['C707618F-D9B3-43CE-A181-1AC80D582078'] = HARMFUL, -- PWN Desync
     ['EF3ADDB4-9D34-437F-B1C8-440DAF896802'] = HARMFUL, -- UI Mass Fab Manager FA by Goom (Causes UI lag because it uses polling rather than interrupts)
     ['b2cde810-15d0-4bfa-af66-ec2d6ecd561d'] = HARMFUL, -- UI Idle Engineers by camelCase (Causes UI lag because it uses polling rather than interrupts)
+    ['b0d9ac94-c5e6-11e5-9912-ba0be0483c18'] = HARMFUL, -- Reveal Positions (Breaks the UI and gives cheaty info when players have random positions/factions)
 
     -- Auto-adjust netlag (causes desyncs due to interesting race conditions).
     ['9033139e-2701-4ac1-b330-ec984ebc23f9'] = HARMFUL,
@@ -99,6 +100,7 @@ Blacklist = {
     ['4767b4d5-e74e-489a-8542-3e993dd452b3'] = INTEGRATED,
     ['3501ac36-6f32-4299-9bdb-e323f37a55a2'] = INTEGRATED,
     ['5218d937-4112-4e86-9f09-dd18era0629c'] = INTEGRATED,
+    ['48feb6b3-47f3-4ce7-80a4-e161ca188950'] = INTEGRATED,
 
  -- Upgrade --
     -- Ally overflow (old, broken versions)
@@ -117,6 +119,10 @@ Blacklist = {
     ['ecbf6277-24e3-437a-b968-EcoManager-v5'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v6'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v7'] = UPGRADE,
+
+    -- Selection Cost UI (old versions that break the UI)
+    ['2018eaac-e8ed-11e4-b02c-1681e6b88ec4'] = UPGRADE,
+    ['2018eaac-e8ed-11e4-b02c-1681e6b88ec5'] = UPGRADE,
 
     -- Supreme economy (old ones)
     ['f8d8c95a-71e7-4978-921e-8765beb328e8'] = UPGRADE,
