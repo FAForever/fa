@@ -12,6 +12,8 @@ local factions = import('/lua/factions.lua').FactionIndexMap
 local categoriesDisabled = {}
 local messages = {}
 local ACUs = {}
+local messageCounts = {}
+local messageLimits = {tech = 1, other = 1, experimentals = 1}
 local customMessagesDisabled
 
 function init(isReplay, parent)
@@ -69,6 +71,7 @@ end
 function processIncomingMessage(sender, msg)
     local category = msg.data.category
     local source = msg.data.source
+    local trigger = msg.data.trigger
 
     -- Don't touch invalid messages
     if not category or not source then
@@ -79,9 +82,34 @@ function processIncomingMessage(sender, msg)
         return false
     end
 
+    if messageLimits[category] then
+        if not messageCounts[sender] then
+            messageCounts[sender] = {}
+        end
+        if not messageCounts[sender][category] then
+            messageCounts[sender][category] = {}
+        end
+        if not messageCounts[sender][category][source] then
+            messageCounts[sender][category][source] = {}
+        end
+
+        if trigger == 'cancelled' then
+            local count = (messageCounts[sender][category][source]['started'] or 0) - 1
+            messageCounts[sender][category][source]['started'] = count
+            if count >= messageLimits[category] then
+                return false
+            end
+        else
+            local count = (messageCounts[sender][category][source][trigger] or 0) + 1
+            messageCounts[sender][category][source][trigger] = count
+            if count > messageLimits[category] then
+                return false
+            end
+        end
+    end
+
     if customMessagesDisabled then
         local message = defaultMessages[category][source]
-        local trigger = msg.data.trigger
         if trigger == 'started' then
             msg.text = 'Starting ' .. message
         elseif trigger == 'cancelled' then

@@ -2047,6 +2047,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnFailedToBeBuilt = function(self)
+        self:SendNotifyMessage('cancelled')
         self:ForkThread(function()
             WaitTicks(1)
             self:Destroy()
