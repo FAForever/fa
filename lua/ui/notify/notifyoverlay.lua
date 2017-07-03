@@ -7,7 +7,6 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
-local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 
 local overlayDisabled
 local overlayLockedOut
@@ -15,7 +14,7 @@ local customMessagesDisabled
 overlays = {}
 
 function init()
-    RegisterChatFunc(processNotification, 'NotifyOverlay')
+    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(processNotification, 'NotifyOverlay') -- Imported here to avoid loading the file before the game is fully initialized
     AddChatCommand('enablenotifyoverlay', toggleOverlayTemporary)
     AddChatCommand('disablenotifyoverlay', toggleOverlayTemporary)
 

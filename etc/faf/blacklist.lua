@@ -120,10 +120,6 @@ Blacklist = {
     ['ecbf6277-24e3-437a-b968-EcoManager-v6'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v7'] = UPGRADE,
 
-    -- Selection Cost UI (old versions that break the UI)
-    ['2018eaac-e8ed-11e4-b02c-1681e6b88ec4'] = UPGRADE,
-    ['2018eaac-e8ed-11e4-b02c-1681e6b88ec5'] = UPGRADE,
-
     -- Supreme economy (old ones)
     ['f8d8c95a-71e7-4978-921e-8765beb328e8'] = UPGRADE,
     ['89BF1572-9EA8-11DC-1313-635F56D89591'] = UPGRADE,
