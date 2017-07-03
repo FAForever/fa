@@ -1,3 +1,100 @@
+Patch 3686 (Upcoming)
+============================
+### Lobby
+- Changed "Hide Obsolete" filter in map selection to be enabled by default
+- Hide maps if a newer version is available locally
+- Fixed the title change option locking if you enter an empty string
+- Fixed lobby chat not behaving as expected when multi-line messages are entered
+- Allowed lobby chat to correctly handle variable font sizes
+- Fixed lobby flags being stretched
+- Fixed lobby presets not handling unit restrictions correctly
+- Fixed lobby autoteams button not syncing with the selected game options correctly
+- Added a warning to the host if they have selected an outdated map, asking them to update it
+
+### Gameplay
+- New Feature: Integrated a vastly improved version of the popular Notify mod
+    - Notify Features
+        - Notify started as a way to allow ACU upgrade progress to be communicated nicely to the team. FAF has taken it to the next level.
+        - Support for sending notifications about ACU upgrades, Factory Tech upgrades (HQs), Experimental construction, and Nuke and T3 Artillery construction
+        - By default, you will see notifications about ACU upgrades only, as well as an ETA overlay at the location of the upgrading ACUs
+        - Toggles available to define which types of messages you want to see come in from allies
+        - Notify messages limited to only show the first of each HQ type, Experimental (Non game-ender), Nuke, or T3 Artillery to avoid spamming the chat with notifications late-game
+    - Notify UI
+        - Selecting a friendly ACU will show any upgrades that ACU has completed for each slot above the UI in the bottom left corner
+        - There is an in-game customisation menu UI. It can be accessed via the main menu, or with a key bind. Default binding is CTRL-ALT-F1
+        - Full customisation of all Notify messages is enabled, including resetting to default
+        - All message types are broadcast at all times. The menu allows you to customise which messages you see, using toggle buttons at the top of the customiser.
+        - Colour of notify messages can be changed inside the chat window
+    - Upgrade Queuing
+        - ACU Upgrades can now be queued up the same as any other construction project
+        - Unfortunately, due to an engine limitation, upgrades cannot be UN-queued (You can only stop the ACU, cancelling the in progress work orders)
+        - ACUs can queue buildings from an uncompleted tech level if the upgrade is queued
+        - Hotbuild has the ability to correctly access the uncompleted tech level buildings tooltip
+    - Blacklisted all previous Notify mod versions
+- Significantly improved unit formations
+    - Changed land and naval formations to give large units extra space instead of forcing the whole group to spread out
+    - Moved submarines so they sit between surface vessels instead of directly under them
+    - Changed air formation shape to spread units out more evenly and make large formations wider instead of a long line
+    - Made guard formation denser so more units can stay close to the target
+    - Changed shield distribution in guard formation to more efficiently cover the target and other guarding units
+    - Fixed several unit filter issues that caused units to get the wrong positions or even be excluded from a formation altogether
+    - Rearranged land and naval formations to give some units better positions
+- Improved spread attack. It now handles most order types.
+- Changed the timeout on player attention pings to be per-player instead of on a global cooldown
+- Fixed and optimised TML leading for AIs
+
+### Bugs
+- Fixed an error caused by empty gunships
+- Fixed the spacing when tiling rotated templates being off in some situations
+- Fixed a bug which caused only one engineer of a group ordered to rebuild a wreck to actually attempt the task
+- Fixed HARMS sinking more than once in some situations
+- Fixed deleted orders reappearing if spread command is used
+- Added safeguards against a rare exploit which allowed bypassing of the share conditions
+- Fixed orders bugging out sometimes if units in the selection died
+- Fixed an error caused by a czar dying with units in the hold
+- Prevented air units sometimes sinking below the map after bouncing off a shield
+- Fixed game exit behaviour sometimes erroring or throwing logspam
+- Fixed Czar targeting hover units with depth charges
+
+### UI
+- Fixed ShowNetworkStats not closing in some situations
+- Fixed the construction menu pause button not changing colour with factional skins
+- Added an option to have fonts change colour according to faction
+- Fixed observers not seeing the correct unit regen number for units with veterancy, upgrades, or other regen changes
+- Detail view no longer shows a cost/tick breakdown for some units incorrectly
+- Made loading screen hints more readable by adding a drop shadow effect
+- Fixed a bug causing build mode to exit when a template is ordered
+- Added a hotbuild key for T3 Mobile AA
+- Fixed a hotbuild bug causing errors when certain units were upgraded
+- Fixed hotbuild key label for support factory upgrades being on the wrong icon
+- Fixed zoom pop key action not functioning
+- Fixed reclaim overlay sometimes showing reclaim out of the playable areas
+- Put silo count/capactity label at the top of the button to avoid it being obscured by the hotkey label
+- Added an option to disable hotkey labels
+
+### Other
+- Updated mods blacklist
+- Updated maps blacklist
+- Fixed an issue with offline COOP not working as intended
+- Significant improvements and bugfixes for COOP AI capabilities
+- Properly hide failed bonus objectives in COOP
+- Optimised Sorian-AI-related code a little
+- Optimised AIX-related code a little
+- Fixed kill objectives not working as intended in COOP
+- Fixed Torpedo Boat ID being incorrect from an AI perspective, causing them not to work properly
+- Added additional AI Naval platoon templates
+
+### Contributors
+- CookieNoob
+- Crispweed
+- Crotalus
+- IceDreamer
+- MrNukealizer
+- speed2
+- TheKeyBlue
+- Uveso
+
+
 Patch 3684 (27th May 2017)
 ============================
 ### Other
