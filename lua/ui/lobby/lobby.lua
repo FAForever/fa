@@ -5790,6 +5790,7 @@ function InitHostUtils()
                 index = index + 1
             end
 
+            HostUtils.SetPlayerNotReady(playerSlot)
             local ownerID = gameInfo.PlayerOptions[playerSlot].OwnerID
             gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
             gameInfo.PlayerOptions[playerSlot] = nil
