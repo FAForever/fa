@@ -59,8 +59,6 @@ XEB2402 = Class(TAirFactoryUnit) {
                 self.Satellite:AttachTo(self, 'Attachpoint01')
             end
 
-            self.Trash:Add(self.Satellite)
-
             -- Create warning lights and other VFX
             local army = self:GetArmy()
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
