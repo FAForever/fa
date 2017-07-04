@@ -902,7 +902,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnGiven = function(self, newUnit)
-        self:SendNotifyMessage('transferred')
+        newUnit:SendNotifyMessage('transferred')
         self:DoUnitCallbacks('OnGiven', newUnit)
     end,
 
@@ -1727,6 +1727,10 @@ Unit = Class(moho.unit_methods) {
     OnDestroy = function(self)
         self.Dead = true
 
+        if self:GetFractionComplete() < 1 then
+            self:SendNotifyMessage('cancelled')
+        end
+
         -- Clear out our sync data
         UnitData[self:GetEntityId()] = false
         Sync.UnitData[self:GetEntityId()] = false
@@ -2047,7 +2051,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnFailedToBeBuilt = function(self)
-        self:SendNotifyMessage('cancelled')
         self:ForkThread(function()
             WaitTicks(1)
             self:Destroy()
@@ -4244,7 +4247,7 @@ Unit = Class(moho.unit_methods) {
             if trigger == 'transferred' then
                 if not Sync.EnhanceMessage then return end
                 for index, msg in Sync.EnhanceMessage do
-                    if msg.source == (source or unitType) and msg.trigger == 'completed' and msg.category == category then
+                    if msg.source == (source or unitType) and msg.trigger == 'completed' and msg.category == category and msg.id == id then
                         table.remove(Sync.EnhanceMessage, index)
                         break
                     end
