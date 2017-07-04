@@ -132,6 +132,7 @@ function OnFirstUpdate()
             end
         end
     end
+    UIUtil.UpdateCurrentSkin()
 end
 
 function CreateUI(isReplay)
