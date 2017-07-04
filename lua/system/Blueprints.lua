@@ -500,7 +500,7 @@ function PreModBlueprints(all_bps)
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
         local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
-                       (bp.CategoriesHash.MOBILE and (bp.CategoriesHash.LAND or bp.CategoriesHash.NAVAL) and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE or bp.CategoriesHash.ENGINEER)) or
+                       (bp.CategoriesHash.MOBILE and (bp.CategoriesHash.LAND or bp.CategoriesHash.NAVAL) and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE or bp.CategoriesHash.ENGINEER) or bp.CategoriesHash.ANTINAVY) or
                        (bp.CategoriesHash.STRUCTURE and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE) and (bp.CategoriesHash.DEFENSE or bp.CategoriesHash.ARTILLERY)) or bp.CategoriesHash.DUMMYGSRWEAPON
                        )
 

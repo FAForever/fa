@@ -1,8 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 130,
-        GuardRadius = 65,
-        GuardScanRadius = 80,
     },
     Audio = {
         AmbientMove = Sound {
@@ -339,7 +337,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
-            TargetCheckInterval = 2,
+            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
