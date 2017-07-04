@@ -16,6 +16,15 @@ XEA0002 = Class(TAirUnit) {
     Weapons = {
         OrbitalDeathLaserWeapon = Class(TOrbitalDeathLaserBeamWeapon){},
     },
+    
+    OnDestroy = function(self)
+        -- If we were destroyed without triggering OnKilled and our parent exists, notify that we just died
+        if not self.IsDying and self.Parent then
+            self.Parent.Satellite = nil
+        end
+
+        TAirUnit.OnDestroy(self)
+    end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.IsDying then
