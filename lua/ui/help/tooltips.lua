@@ -990,6 +990,10 @@ Tooltips = {
         title='<LOC lobui_0752>Rerun CPU Benchmark',
         description='<LOC lobui_0753>Recalculates your CPU rating.'
     },
+    lob_close_empty_slots = {
+        title='<LOC lobui_0774>Close/Open Empty Slots',
+        description='<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
+    },
     map_type = {
         title = "<LOC lobui_0583>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
