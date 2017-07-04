@@ -3341,10 +3341,54 @@ function CreateUI(maxPlayers)
             AssignAutoTeams()
         end
     end
+    
+    -- CLOSE/OPEN EMPTY SLOTS BUTTON --
+    GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
+    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 0, 47)
+    Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
+    if not isHost then
+        GUI.closeEmptySlots:Hide()
+        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -40, 47)
+    else
+        GUI.closeEmptySlots.OnClick = function(self, modifiers)
+            if lobbyComm:IsHost() then
+                if modifiers.Ctrl then
+                    for slot = 1,numOpenSlots do
+                        HostUtils.SetSlotClosed(slot, false)
+                    end
+                    return
+                end
+                local openSpot = false
+                for slot = 1,numOpenSlots do
+                    openSpot = openSpot or not (gameInfo.PlayerOptions[slot] or gameInfo.ClosedSlots[slot])
+                end
+                if modifiers.Right and gameInfo.AdaptiveMap then
+                    for slot = 1,numOpenSlots do
+                        if openSpot then
+                            if not (gameInfo.PlayerOptions[slot] or gameInfo.ClosedSlots[slot]) then
+                                HostUtils.SetSlotClosedSpawnMex(slot)
+                            end
+                        else
+                            if gameInfo.ClosedSlots[slot] and gameInfo.SpawnMex[slot] then
+                                HostUtils.SetSlotClosed(slot, false)
+                            end
+                        end
+                    end
+                else
+                    for slot = 1,numOpenSlots do
+                        if not gameInfo.SpawnMex[slot] then
+                            HostUtils.SetSlotClosed(slot, openSpot)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
 
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
-    LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.defaultOptions, 40, 47)
+    LayoutHelpers.RightOf(GUI.becomeObserver, GUI.closeEmptySlots, -19)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
@@ -3364,7 +3408,7 @@ function CreateUI(maxPlayers)
 
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
-    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -19)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
 
     -- Observer List
@@ -3406,6 +3450,7 @@ function CreateUI(maxPlayers)
         -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
         -- nop, instead of needing to keep checking if UI controls actually exist...
 
+        GUI.closeEmptySlots:Hide()
         GUI.becomeObserver:Hide()
         GUI.autoTeams:Hide()
         GUI.defaultOptions:Hide()
