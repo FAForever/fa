@@ -1388,6 +1388,7 @@ local function AssignRandomStartSpots()
     end
 
     local AutoTeams = gameInfo.GameOptions.AutoTeams
+    local positionGroups = {}
     local teams = {}
 
     -- Used to actualise the virtual teams produced by the "Team -" no-team team.
@@ -1395,6 +1396,7 @@ local function AssignRandomStartSpots()
     for i = 1, numAvailStartSpots do
         if not gameInfo.ClosedSlots[i] then
             local team = nil
+            local group = nil
 
             if AutoTeams == 'lvsr' then
                 local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
@@ -1424,7 +1426,14 @@ local function AssignRandomStartSpots()
                 team = gameInfo.AutoTeams[i]
             else -- none
                 team = gameInfo.PlayerOptions[i].Team
+                group = 1
             end
+
+            group = group or team
+            if not positionGroups[group] then
+                positionGroups[group] = {}
+            end
+            table.insert(positionGroups[group], i)
 
             if team ~= nil then
                 -- Team 1 secretly represents "No team", so give them a real team (but one that
@@ -1437,6 +1446,8 @@ local function AssignRandomStartSpots()
             end
         end
     end
+    gameInfo.GameOptions.RandomPositionGroups = positionGroups
+
     -- shuffle the array for randomness.
     for i, team in teams do
         teams[i] = table.shuffle(team)

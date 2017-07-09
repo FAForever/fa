@@ -33,32 +33,27 @@ doscript '/lua/SimSync.lua'
 
 function ShuffleStartPositions()
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
-    local teams = {}
-    local armies = {}
-    local t, marker
-
-    for name, army in ScenarioInfo.ArmySetup do
-        if not army.Civilian then
-            marker = markers[name]
-            if marker and marker.position then
-                t = teams[army.Team]
-                if not t then
-                    t = {starts={}, names={}}
-                    teams[army.Team] = t
-                end
-                table.insert(t.starts, marker.position)
-                table.insert(t.names, name)
-            end
-        end
+    local positionGroups = ScenarioInfo.Options.RandomPositionGroups
+    local positions = {}
+    if not positionGroups then
+        return
     end
 
-    local pos
-    for _, t in teams do
-        if t.starts[1] then
-            t.starts = table.shuffle(t.starts)
-            for _, name in t.names do
-                pos = table.remove(t.starts, 1)
-                ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers[name].position = pos
+    for _, group in positionGroups do
+        for _, num in group do
+            local name = 'ARMY_' .. num
+            local marker = markers[name]
+            if marker and marker.position then
+                positions[num] = {pos = marker.position, name = name}
+            end
+        end
+
+        local shuffledGroup = table.shuffle(group)
+        for i = 1, table.getn(group) do
+            local pos = positions[shuffledGroup[i]].pos
+            local name = positions[group[i]].name
+            if pos and markers[name] then
+                markers[name].position = pos
             end
         end
     end
