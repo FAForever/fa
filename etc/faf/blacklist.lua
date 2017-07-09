@@ -12,7 +12,6 @@ Blacklist = {
     ['C707618F-D9B3-43CE-A181-1AC80D582078'] = HARMFUL, -- PWN Desync
     ['EF3ADDB4-9D34-437F-B1C8-440DAF896802'] = HARMFUL, -- UI Mass Fab Manager FA by Goom (Causes UI lag because it uses polling rather than interrupts)
     ['b2cde810-15d0-4bfa-af66-ec2d6ecd561d'] = HARMFUL, -- UI Idle Engineers by camelCase (Causes UI lag because it uses polling rather than interrupts)
-    ['b0d9ac94-c5e6-11e5-9912-ba0be0483c18'] = HARMFUL, -- Reveal Positions (Breaks the UI and gives cheaty info when players have random positions/factions)
 
     -- Auto-adjust netlag (causes desyncs due to interesting race conditions).
     ['9033139e-2701-4ac1-b330-ec984ebc23f9'] = HARMFUL,
