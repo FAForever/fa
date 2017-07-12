@@ -10,6 +10,8 @@ Patch 3686 (Upcoming)
 - Fixed lobby presets not handling unit restrictions correctly
 - Fixed lobby autoteams button not syncing with the selected game options correctly
 - Added a warning to the host if they have selected an outdated map, asking them to update it
+- Fixed observers being unable to click the observer/player toggle button after being moved to observer while ready
+- Added a button to close all unoccupied open slots or open all closed slots
 
 ### Gameplay
 - New Feature: Integrated a vastly improved version of the popular Notify mod
@@ -20,11 +22,11 @@ Patch 3686 (Upcoming)
         - Toggles available to define which types of messages you want to see come in from allies
         - Notify messages limited to only show the first of each HQ type, Experimental (Non game-ender), Nuke, or T3 Artillery to avoid spamming the chat with notifications late-game
     - Notify UI
-        - Selecting a friendly ACU will show any upgrades that ACU has completed for each slot above the UI in the bottom left corner
+        - Selecting your ACU will show any upgrades it has completed for each slot above the UI in the bottom left corner
         - There is an in-game customisation menu UI. It can be accessed via the main menu, or with a key bind. Default binding is CTRL-ALT-F1
         - Full customisation of all Notify messages is enabled, including resetting to default
         - All message types are broadcast at all times. The menu allows you to customise which messages you see, using toggle buttons at the top of the customiser.
-        - Colour of notify messages can be changed inside the chat window
+        - Colour of Notify messages can be changed inside the chat window
     - Upgrade Queuing
         - ACU Upgrades can now be queued up the same as any other construction project
         - Unfortunately, due to an engine limitation, upgrades cannot be UN-queued (You can only stop the ACU, cancelling the in progress work orders)
@@ -55,6 +57,10 @@ Patch 3686 (Upcoming)
 - Prevented air units sometimes sinking below the map after bouncing off a shield
 - Fixed game exit behaviour sometimes erroring or throwing logspam
 - Fixed Czar targeting hover units with depth charges
+- Fixed only one Overcharge shot being fired when multiple Overcharge commands are queued
+- Fixed Novax Center being unable to build a replacement satellite after a satellite is destroyed blocking a nuke
+- Fixed Novax satellite disappearing before hitting the ground after the control center is destroyed
+- Fixed subs stopping too close to their targets when given an Attack Move order
 
 ### UI
 - Fixed ShowNetworkStats not closing in some situations
@@ -71,10 +77,13 @@ Patch 3686 (Upcoming)
 - Fixed reclaim overlay sometimes showing reclaim out of the playable areas
 - Put silo count/capactity label at the top of the button to avoid it being obscured by the hotkey label
 - Added an option to disable hotkey labels
+- Fixed factory templates not displaying icons for mod units
+- Fixed missing UI elements in replays or when the Use Factional UI Skin option is disabled
 
 ### Other
 - Updated mods blacklist
 - Updated maps blacklist
+- Random spawn locations are no longer accurate in the UI to prevent UI mods from cheating
 - Fixed an issue with offline COOP not working as intended
 - Significant improvements and bugfixes for COOP AI capabilities
 - Properly hide failed bonus objectives in COOP
@@ -83,6 +92,7 @@ Patch 3686 (Upcoming)
 - Fixed kill objectives not working as intended in COOP
 - Fixed Torpedo Boat ID being incorrect from an AI perspective, causing them not to work properly
 - Added additional AI Naval platoon templates
+- Removed the hyphen from "Air Superiority Fighter" unit type to make it the same across all factions
 
 ### Contributors
 - CookieNoob
@@ -90,6 +100,7 @@ Patch 3686 (Upcoming)
 - Crotalus
 - IceDreamer
 - MrNukealizer
+- PhilipJFry
 - speed2
 - TheKeyBlue
 - Uveso
