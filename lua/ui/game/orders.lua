@@ -19,6 +19,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
+local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -205,6 +206,12 @@ function ClearCommands(units)
     local cb = {Func = 'ClearCommands'}
 
     if units then
+        EnhancementQueue.clearEnhancements(units)
+        ForkThread(function() -- Wait a tick for the callback to do its job then refresh the UI to remove ghost enhancement orders
+            WaitSeconds(0.1)
+            import('/lua/ui/game/construction.lua').RefreshUI()
+        end)
+
         local ids = {}
         for _, u in units do
             table.insert(ids, u:GetEntityId())
