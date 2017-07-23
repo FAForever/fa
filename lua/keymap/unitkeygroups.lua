@@ -73,7 +73,6 @@ unitkeygroups = {
     ["Pgen"] = {
         "Power_Generator",
         "Hydrocarbon_Power_Plant",
-        "Energy_Storage",
 
         "T2_Heavy_Tank",
 
