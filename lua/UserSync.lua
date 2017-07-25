@@ -98,4 +98,8 @@ function OnSync()
     if Sync.NewPlayableArea then
         SetPlayableArea(Sync.NewPlayableArea)
     end
+
+    if Sync.StartPositions then
+        import('/lua/ui/game/worldview.lua').MarkStartPositions(Sync.StartPositions)
+    end
 end

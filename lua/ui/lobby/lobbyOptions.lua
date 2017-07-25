@@ -34,6 +34,21 @@ teamOptions =
                 help = "<LOC lobui_0082>Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable",
                 key = 'balanced_flex',
             },
+            {
+                text = "<LOC lobui_0776>Random (Revealed)",
+                help = "<LOC lobui_0777>Spawn everyone in random locations which are labeled",
+                key = 'random_reveal',
+            },
+            {
+                text = "<LOC lobui_0778>Optimal balance (Revealed)",
+                help = "<LOC lobui_0779>Teams will be optimally balanced, labeled random start locations",
+                key = 'balanced_reveal',
+            },
+            {
+                text = "<LOC lobui_0780>Flexible balance (Revealed)",
+                help = "<LOC lobui_0781>Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable, labeled random start locations",
+                key = 'balanced_flex_reveal',
+            },
         },
     },
     {

@@ -31,7 +31,9 @@ end
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-function ShuffleStartPositions()
+local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
+
+function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
     local positionGroups = ScenarioInfo.Options.RandomPositionGroups
     local positions = {}
@@ -54,6 +56,10 @@ function ShuffleStartPositions()
             local name = positions[group[i]].name
             if pos and markers[name] then
                 markers[name].position = pos
+
+                if syncNewPositions then
+                    syncStartPositions[name] = pos
+                end
             end
         end
     end
@@ -165,9 +171,13 @@ function SetupSession()
     Scenario = ScenarioInfo.Env.Scenario
 
     local spawn = ScenarioInfo.Options.TeamSpawn
-    if spawn and table.find({'random', 'balanced', 'balanced_flex'}, spawn) then
-        -- prevents players from knowing start positions at start
-        ShuffleStartPositions()
+    if spawn and table.find({'random_reveal', 'balanced_reveal', 'balanced_flex_reveal'}, spawn) then
+        -- Shuffles positions like normal but syncs the new positions to the UI
+        syncStartPositions = {}
+        ShuffleStartPositions(true)
+    elseif spawn and table.find({'random', 'balanced', 'balanced_flex'}, spawn) then
+        -- Prevents players from knowing start positions at start
+        ShuffleStartPositions(false)
     end
 
     LOG('Loading script file: ', ScenarioInfo.script)
@@ -269,6 +279,10 @@ function BeginSession()
 
     --for off-map prevention
     OnStartOffMapPreventionThread()
+
+    if syncStartPositions then
+        Sync.StartPositions = syncStartPositions
+    end
 end
 
 -- forks a thread that performs off-map prevention
