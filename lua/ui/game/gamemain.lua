@@ -303,8 +303,7 @@ local function LoadDialog(parent)
                 local tipsTbl = import('/lua/ui/help/loadingtips.lua').Tips
                 local tipsSize = table.getn(tipsTbl)
                 while WorldIsLoading() do
-                    local tipText = LOCF('%s', tipsTbl[Random(1, tipsSize)])
-                    control:SetText(tipText)
+                    control:SetText(LOC(tipsTbl[Random(1, tipsSize)]))
                     control:SetDropShadow(true)
                     WaitSeconds(7)
                 end
