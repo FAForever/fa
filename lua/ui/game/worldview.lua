@@ -8,7 +8,9 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
+local Factions = import('/lua/factions.lua').Factions
 
 MapControls = {}
 
@@ -18,6 +20,113 @@ viewRight = false
 secondaryView = false
 tertiaryView = false
 local parentForFrame = false
+
+positionMarkers = {}
+
+local function CreatePositionMarker(army, worldView)
+    local data = positionMarkers[army]
+    if not data then return end
+
+    positionMarkers[army].views = data.views + 1
+
+    local marker = Bitmap(worldView)
+    marker:DisableHitTest()
+    marker.Depth:Set(13)
+    marker:SetSolidColor('black')
+    marker:SetNeedsFrameUpdate(true)
+    marker.army = data.army
+    marker.pos = data.pos
+
+    marker.frame = Bitmap(marker)
+    marker.frame:DisableHitTest()
+    LayoutHelpers.FillParentFixedBorder(marker.frame, marker, -2)
+    marker.frame:SetSolidColor(data.color)
+    marker.frame.Depth:Set(marker:Depth() - 1)
+
+    marker.name = UIUtil.CreateText(marker, data.name, 12, UIUtil.bodyFont)
+	marker.name:DisableHitTest()
+    marker.name:SetColor('white')
+
+    if Factions[data.faction] then
+        marker.icon = Bitmap(marker, UIUtil.UIFile(Factions[data.faction].LargeIcon))
+        marker.icon:DisableHitTest()
+        marker.icon.Width:Set(marker.name.Height())
+        marker.icon.Height:Set(marker.name.Height())
+        LayoutHelpers.LeftOf(marker.icon, marker.name, 2)
+        LayoutHelpers.AtVerticalCenterIn(marker.icon, marker)
+
+        LayoutHelpers.AtCenterIn(marker.name, marker, 0, marker.icon:Width() / 2)
+        marker.Width:Set(marker.icon:Width() + marker.name:Width() + 6)
+        marker.Height:Set(marker.name:Height() + 4)
+    else
+        LayoutHelpers.AtCenterIn(marker.name, marker, 0, 0)
+        marker.Width:Set(marker.name:Width() + 4)
+        marker.Height:Set(marker.name:Height() + 4)
+    end
+
+    marker.OnDestroy = function(self)
+        local views = positionMarkers[self.army].views
+        if views then
+            positionMarkers[self.army].views = views - 1
+        end
+    end
+
+    -- If we leave hit test enabled on the marker and ignore every event except a click, it still interferes with using the middle mouse button to pan the map.
+    -- That often happens even if the cursor is nowhere near the marker, so it's unusable. This way isn't pretty, but at least it works correctly.
+    local oldWVHandleEvent = worldView.HandleEvent
+    worldView.HandleEvent = function(self, event)
+        if marker and event.Type == 'ButtonPress' and not event.Modifiers.Middle and marker.frame:HitTest(event.MouseX, event.MouseY) then
+            if positionMarkers[marker.army].views == 1 then
+                positionMarkers[marker.army] = nil
+            end
+            marker:Destroy()
+            marker = false
+            return true
+        end
+        oldWVHandleEvent(self, event)
+    end
+
+    marker.OnFrame = function(self, delta)
+        if not worldView:IsHidden() then
+            local pos = worldView:Project(self.pos)
+            LayoutHelpers.AtLeftTopIn(self, worldView, pos.x - self.Width() / 2, pos.y - self.Height() / 2)
+
+            if (self:Left() < worldView:Left() or self:Top() < worldView:Top() or self:Right() > worldView:Right() or self:Bottom() > worldView:Bottom()) then
+                if not self:IsHidden() then
+                    self:Hide()
+                end
+            elseif self:IsHidden() then
+                self:Show()
+            end
+        end
+    end
+ 
+end
+
+function MarkStartPositions(startPositions) 
+    if not startPositions then return end
+
+    local armyInfo = GetArmiesTable()
+    local armiesTable = armyInfo.armiesTable
+    local focusArmy = armyInfo.focusArmy
+
+    for armyId, armyData in armiesTable do
+        if not armyData.civilian and startPositions[armyData.name] and (focusArmy == -1 or IsEnemy(armyId, focusArmy)) then
+            local pos = startPositions[armyData.name]
+            local name = armyData.nickname
+            local faction = armyData.faction + 1
+            local color = armyData.color
+
+            positionMarkers[armyId] = {army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0}
+
+            for viewName, view in MapControls do
+                if viewName ~= 'MiniMap' then
+                    CreatePositionMarker(armyId, view)
+                end
+            end
+        end
+    end
+end
 
 function CreateMainWorldView(parent, mapGroup, mapGroupRight)    
     if viewLeft then    
@@ -197,6 +306,12 @@ end
 function RegisterWorldView(view)
     if not MapControls[view._cameraName] then MapControls[view._cameraName] = {} end
     MapControls[view._cameraName] = view
+
+    if view._cameraName ~= 'MiniMap' then
+        for army, data in positionMarkers do
+            CreatePositionMarker(army, view)
+        end
+    end
 end
 
 function UnregisterWorldView(view)

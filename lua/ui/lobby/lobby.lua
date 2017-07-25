@@ -1462,7 +1462,7 @@ local function AssignRandomStartSpots()
         end
     end
 
-    if teamSpawn == 'random' then
+    if teamSpawn == 'random' or teamSpawn == 'random_reveal' then
         s = autobalance_random(ratingTable, teams)
         q = autobalance_quality(s)
         rearrangePlayers{setup=s, quality=q}
@@ -1490,7 +1490,7 @@ local function AssignRandomStartSpots()
     end
 
     local n_random = 0
-    local frac = teamSpawn == 'balanced_flex' and 0.95 or 1
+    local frac = (teamSpawn == 'balanced_flex' or teamSpawn == 'balanced_flex_reveal') and 0.95 or 1
     -- add 100 random compositions and keep 3 with at least <frac%> of best quality
     for i=1, 100 do
         s = autobalance_random(ratingTable, teams)
@@ -1503,7 +1503,7 @@ local function AssignRandomStartSpots()
         end
     end
 
-    if teamSpawn == 'balanced_flex' then
+    if teamSpawn == 'balanced_flex' or teamSpawn == 'balanced_flex_reveal' then
         setups = table.shuffle(setups)
     end
 
