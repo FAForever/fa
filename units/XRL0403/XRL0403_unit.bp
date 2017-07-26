@@ -278,6 +278,7 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
+        LayerChangeOffsetHeight = -2.5,
         MaxAcceleration = 2,
         MaxSpeed = 2,
         MaxSpeedReverse = 1,
