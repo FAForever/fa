@@ -487,7 +487,7 @@ function RefreshModsList()
         mod.title = GetModNameVersion(mod)
         if mod.ui_only then
             mod.type = 'UI'
-        elseif mod.ui_only == false then
+        else
             mod.type = 'GAME'
         end
 
