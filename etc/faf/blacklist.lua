@@ -100,6 +100,7 @@ Blacklist = {
     ['3501ac36-6f32-4299-9bdb-e323f37a55a2'] = INTEGRATED,
     ['5218d937-4112-4e86-9f09-dd18era0629c'] = INTEGRATED,
     ['48feb6b3-47f3-4ce7-80a4-e161ca188950'] = INTEGRATED,
+    ['5048d937-1733-4e86-9f09-dd7384a0629c'] = INTEGRATED,
 
  -- Upgrade --
     -- Ally overflow (old, broken versions)
