@@ -101,6 +101,7 @@ Blacklist = {
     ['3501ac36-6f32-4299-9bdb-e323f37a55a2'] = INTEGRATED,
     ['5218d937-4112-4e86-9f09-dd18era0629c'] = INTEGRATED,
     ['48feb6b3-47f3-4ce7-80a4-e161ca188950'] = INTEGRATED,
+    ['5d1c89e8-3c1e-472a-8ebc-a0d0484969b5'] = INTEGRATED,
 
  -- Upgrade --
     -- Ally overflow (old, broken versions)
@@ -134,13 +135,13 @@ Blacklist = {
     ['7749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
-    
+
     -- OneClickWonder
     ['c5cc7241-d9f8-4b46-8662-ad130e426a4a'] = UPGRADE,
-    
+
     ['12345678-3343-4bf6-9236-451244fa9999'] = BROKEN,
     ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = OBSOLETE,
-    
+
     ['D49b27d4-7252-42b8-b39e-ac04cc195adb'] = INCOMPATIBLE,
     ['728e8d44-98e9-11e5-8994-feff819cdc9f'] = INCOMPATIBLE,
     ['55394440-5DC8-11E3-91ED-66546288709B'] = INCOMPATIBLE,
