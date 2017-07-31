@@ -12,6 +12,7 @@ Patch 3686 (Upcoming)
 - Added a warning to the host if they have selected an outdated map, asking them to update it
 - Fixed observers being unable to click the observer/player toggle button after being moved to observer while ready
 - Added a button to close all unoccupied open slots or open all closed slots
+- Fixed a bug where the mod manager UI could break if the host has a mod with an incomplete info file
 
 ### Gameplay
 - New Feature: Integrated a vastly improved version of the popular Notify mod
@@ -44,6 +45,7 @@ Patch 3686 (Upcoming)
 - Improved spread attack. It now handles most order types.
 - Changed the timeout on player attention pings to be per-player instead of on a global cooldown
 - Fixed and optimised TML leading for AIs
+- Increased the depth at which Megalith and Ythotha appear to be submerged in water instead of walking on land
 
 ### Bugs
 - Fixed an error caused by empty gunships
@@ -61,6 +63,8 @@ Patch 3686 (Upcoming)
 - Fixed Novax Center being unable to build a replacement satellite after a satellite is destroyed blocking a nuke
 - Fixed Novax satellite disappearing before hitting the ground after the control center is destroyed
 - Fixed subs stopping too close to their targets when given an Attack Move order
+- Fixed a bug that caused Hives (and possibly other Cybran units) to instantly capture a unit in some situations
+- Increased Cybran SACU projectile lifetime so it can hit targets at the edge of its upgraded range
 
 ### UI
 - Fixed ShowNetworkStats not closing in some situations
@@ -84,6 +88,7 @@ Patch 3686 (Upcoming)
 - Updated mods blacklist
 - Updated maps blacklist
 - Random spawn locations are no longer accurate in the UI to prevent UI mods from cheating
+- New random spawn modes have been added which mark opponents' spawn locations so all players can see where everyone is
 - Fixed an issue with offline COOP not working as intended
 - Significant improvements and bugfixes for COOP AI capabilities
 - Properly hide failed bonus objectives in COOP
