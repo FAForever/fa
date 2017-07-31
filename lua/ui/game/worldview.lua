@@ -31,6 +31,8 @@ local function CreatePositionMarker(army, worldView)
 
     local marker = Bitmap(worldView)
     marker:DisableHitTest()
+    marker.Left:Set(-1000)
+    marker.Top:Set(-1000)
     marker.Depth:Set(13)
     marker:SetSolidColor('black')
     marker:SetNeedsFrameUpdate(true)
