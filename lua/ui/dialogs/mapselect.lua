@@ -26,6 +26,7 @@ local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/lobby/ModsManager.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local RequiredMods = import('/lua/ui/dialogs/requiredmods.lua')
 
 local scenarios = nil
 local selectedScenario = false
@@ -426,6 +427,7 @@ function PreloadMap(row)
         MapUtil.ValidateScenarioOptions(advOptions)
         RefreshOptions(false)
         preview:SetScenario(scen)
+        scen.Playable = RequiredMods.IsPlayable(scen)
         SetDescription(scen)
     else
         WARN("No scenario map file defined")
@@ -439,9 +441,26 @@ end
 
 -- Called when the selected map is changed.
 local OnMapChanged = function(self, row, noSound)
+    local oldScenario = selectedScenario
     mapList:SetSelection(row)
     PreloadMap(row)
-    local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface"})
+    local scen = scenarios[scenarioKeymap[row+1]]
+    if scen.notNew then
+        return
+    else
+        scen.notNew = true
+        oldScenario.notNew = false
+    end
+    local sound = nil
+    if scen.Playable then
+        sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface"})
+    else
+        if scen.requiredModsMissing then
+            RequiredMods.CreateInitialDialog(dialogContent, scen)
+        end
+        sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+
+    end
     if not noSound then
         PlaySound(sound)
     end
@@ -652,7 +671,9 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
                 cancelButton:OnClick()
                 return true
             elseif event.KeyCode == UIUtil.VK_ENTER then
-                selectButton:OnClick()
+                if not selectButton:IsDisabled() then
+                    selectButton:OnClick()
+                end
                 return true
             end
         end
@@ -679,6 +700,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     cancelButton.OnClick = function(self, modifiers)
+        selectedScenario.notNew = false
         exitBehavior()
         ResetFilters()
     end
@@ -693,6 +715,9 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
         selectedScenario = scen
+        if not scen.Playable then
+            return
+        end
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
@@ -995,6 +1020,35 @@ function SetDescription(scen)
         description:AddItem(LOC("<LOC lobui_0758>AI Markers: No"))
     end
 
+    if scen.RequiredMods and table.getn(scen.RequiredMods) > 0 then
+        description:AddItem(LOC("Required Mods: "))
+        local spacing = "    "
+        
+        local modMissing = false
+        local availableCount, missingCount = RequiredMods.CountAvailableMods(scen)
+        
+        if availableCount == 0 then
+            description:AddItem(spacing .. missingCount .. " missing")
+            modMissing = true
+        elseif availableCount == table.getn(scen.RequiredMods) then
+            description:AddItem(spacing .. LOC("All mods available"))
+        else
+            description:AddItem(spacing .. availableCount .. " available and " .. missingCount .. " missing")
+            modMissing = true
+        end
+        
+        local showRequiredModsDialog = function(self, row, event)
+            RequiredMods.CreateDialog(dialogContent, scen)        
+        end
+        
+        if modMissing then
+            scen.requiredModsMissing = true
+            errors = true
+        end
+        description.OnClick = showRequiredModsDialog
+        description.OnDoubleClick = showRequiredModsDialog
+    end
+    
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
