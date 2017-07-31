@@ -46,6 +46,7 @@ Patch 3686 (Upcoming)
 - Changed the timeout on player attention pings to be per-player instead of on a global cooldown
 - Fixed and optimised TML leading for AIs
 - Increased the depth at which Megalith and Ythotha appear to be submerged in water instead of walking on land
+- Reverted the Energy hotbuild cycling through to Storage, in response to popular demand.
 
 ### Bugs
 - Fixed an error caused by empty gunships
@@ -67,6 +68,7 @@ Patch 3686 (Upcoming)
 - Increased Cybran SACU projectile lifetime so it can hit targets at the edge of its upgraded range
 
 ### UI
+- Added full support for UTF character set in the lobby and game chat. This enables Russian, Chinese, Japanese, and all manner of other characters.
 - Fixed ShowNetworkStats not closing in some situations
 - Fixed the construction menu pause button not changing colour with factional skins
 - Added an option to have fonts change colour according to faction
@@ -83,6 +85,7 @@ Patch 3686 (Upcoming)
 - Added an option to disable hotkey labels
 - Fixed factory templates not displaying icons for mod units
 - Fixed missing UI elements in replays or when the Use Factional UI Skin option is disabled
+- Removed "Quick Tip" prefix from the tips which show on the loading screen
 
 ### Other
 - Updated mods blacklist
