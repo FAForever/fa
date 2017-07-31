@@ -2930,100 +2930,8 @@ function CreateUI(maxPlayers)
     chatBG.Width:Set(GUI.chatPanel.Width() - 16)
     chatBG.Height:Set(24)
 
-    GUI.chatEdit = Edit(GUI.chatPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
-    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - 9)
-    GUI.chatEdit.Height:Set(22)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
-    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:ShowBackground(false)
-    GUI.chatEdit:SetDropShadow(true)
-    GUI.chatEdit:AcquireFocus()
-
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatPanel, -15, -2, 0)
-
-    GUI.chatEdit:SetMaxChars(200)
-    GUI.chatEdit.OnCharPressed = function(self, charcode)
-        if charcode == UIUtil.VK_TAB then
-            return true
-        end
-
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
-        end
-    end
-
-    -- We work extremely hard to keep keyboard focus on the chat box, otherwise users can trigger
-    -- in-game keybindings in the lobby.
-    -- That would be very bad. We should probably instead just not assign those keybindings yet...
-    GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
-    end
-
-    local commandQueueIndex = 0
-    local commandQueue = {}
-    GUI.chatEdit.OnEnterPressed = function(self, text)
-        if text ~= "" then
-            GpgNetSend('Chat', text)
-            table.insert(commandQueue, 1, text)
-            commandQueueIndex = 0
-            if string.sub(text, 1, 1) == '/' then
-                local spaceStart = string.find(text, " ") or string.len(text) + 1
-                local comKey = string.sub(text, 2, spaceStart - 1)
-                local params = string.sub(text, spaceStart + 1)
-                local commandFunc = commands[string.lower(comKey)]
-                if not commandFunc then
-                    AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
-                    return
-                end
-
-                commandFunc(params)
-            else
-                PublicChat(text)
-            end
-        end
-    end
-
-    GUI.chatEdit.OnEscPressed = function(self, text)
-        -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
-        -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") then
-            -- Quit to desktop
-            EscapeHandler.HandleEsc(true)
-        else
-            -- Back to main menu
-            GUI.exitButton.OnClick()
-        end
-
-        -- Don't clear the textbox, either.
-        return true
-    end
-
-    --- Handle up/down arrow presses for the chat box.
-    GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
-        AddUnicodeCharToEditText(self, keyCode)
-        if commandQueue and table.getsize(commandQueue) > 0 then
-            if keyCode == 38 then
-                if commandQueue[commandQueueIndex + 1] then
-                    commandQueueIndex = commandQueueIndex + 1
-                    self:SetText(commandQueue[commandQueueIndex])
-                end
-            end
-            if keyCode == 40 then
-                if commandQueueIndex ~= 1 then
-                    if commandQueue[commandQueueIndex - 1] then
-                        commandQueueIndex = commandQueueIndex - 1
-                        self:SetText(commandQueue[commandQueueIndex])
-                    end
-                else
-                    commandQueueIndex = 0
-                    self:ClearText()
-                end
-            end
-        end
-    end
+    -- Set up the chat edit buttons and functions
+    setupChatEdit(GUI.chatPanel)
 
     ---------------------------------------------------------------------------
     -- Option display
@@ -3509,6 +3417,103 @@ function CreateUI(maxPlayers)
 
     if not singlePlayer then
         CreateCPUMetricUI()
+    end
+end
+
+function setupChatEdit(chatPanel)
+    GUI.chatEdit = Edit(chatPanel)
+    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
+    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - 9)
+    GUI.chatEdit.Height:Set(22)
+    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
+    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
+    GUI.chatEdit:ShowBackground(false)
+    GUI.chatEdit:SetDropShadow(true)
+    GUI.chatEdit:AcquireFocus()
+
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, -2, 0)
+
+    GUI.chatEdit:SetMaxChars(200)
+    GUI.chatEdit.OnCharPressed = function(self, charcode)
+        if charcode == UIUtil.VK_TAB then
+            return true
+        end
+
+        local charLim = self:GetMaxChars()
+        if STR_Utf8Len(self:GetText()) >= charLim then
+            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+            PlaySound(sound)
+        end
+    end
+
+    -- We work extremely hard to keep keyboard focus on the chat box, otherwise users can trigger
+    -- in-game keybindings in the lobby.
+    -- That would be very bad. We should probably instead just not assign those keybindings yet...
+    GUI.chatEdit.OnLoseKeyboardFocus = function(self)
+        GUI.chatEdit:AcquireFocus()
+    end
+
+    local commandQueueIndex = 0
+    local commandQueue = {}
+    GUI.chatEdit.OnEnterPressed = function(self, text)
+        if text ~= "" then
+            GpgNetSend('Chat', text)
+            table.insert(commandQueue, 1, text)
+            commandQueueIndex = 0
+            if string.sub(text, 1, 1) == '/' then
+                local spaceStart = string.find(text, " ") or string.len(text) + 1
+                local comKey = string.sub(text, 2, spaceStart - 1)
+                local params = string.sub(text, spaceStart + 1)
+                local commandFunc = commands[string.lower(comKey)]
+                if not commandFunc then
+                    AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
+                    return
+                end
+
+                commandFunc(params)
+            else
+                PublicChat(text)
+            end
+        end
+    end
+
+    GUI.chatEdit.OnEscPressed = function(self, text)
+        -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
+        -- the escape handling mechanism.
+        if HasCommandLineArg("/gpgnet") then
+            -- Quit to desktop
+            EscapeHandler.HandleEsc(true)
+        else
+            -- Back to main menu
+            GUI.exitButton.OnClick()
+        end
+
+        -- Don't clear the textbox, either.
+        return true
+    end
+
+    --- Handle up/down arrow presses for the chat box.
+    GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
+        AddUnicodeCharToEditText(self, keyCode)
+        if commandQueue and table.getsize(commandQueue) > 0 then
+            if keyCode == 38 then
+                if commandQueue[commandQueueIndex + 1] then
+                    commandQueueIndex = commandQueueIndex + 1
+                    self:SetText(commandQueue[commandQueueIndex])
+                end
+            end
+            if keyCode == 40 then
+                if commandQueueIndex ~= 1 then
+                    if commandQueue[commandQueueIndex - 1] then
+                        commandQueueIndex = commandQueueIndex - 1
+                        self:SetText(commandQueue[commandQueueIndex])
+                    end
+                else
+                    commandQueueIndex = 0
+                    self:ClearText()
+                end
+            end
+        end
     end
 end
 
