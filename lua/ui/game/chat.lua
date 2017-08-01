@@ -653,7 +653,9 @@ function CreateChatEdit()
     LayoutHelpers.AtVerticalCenterIn(group.chatBubble, group.edit)
 
     group.edit.OnNonTextKeyPressed = function(self, charcode, event)
-        AddUnicodeCharToEditText(self, charcode)
+        if AddUnicodeCharToEditText(self, charcode) then
+            return
+        end
         GUI.bg.curTime = 0
         local function RecallCommand(entryNumber)
             self:SetText(commandHistory[self.recallEntry].text)
@@ -788,6 +790,24 @@ function CreateChatEdit()
     group.edit:AcquireFocus()
 
     return group
+end
+
+function ChatPageUp(mod)
+    if GUI.bg:IsHidden() then
+        ForkThread(function() ToggleChat() end)
+    else
+        local newTop = GUI.chatContainer.top - mod
+        GUI.chatContainer:ScrollSetTop(nil, newTop)
+    end
+end
+
+function ChatPageDown(mod)
+    local oldTop = GUI.chatContainer.top
+    local newTop = GUI.chatContainer.top + mod
+    GUI.chatContainer:ScrollSetTop(nil, newTop)
+    if GUI.bg:IsHidden() or oldTop == GUI.chatContainer.top then
+        ForkThread(function() ToggleChat() end)
+    end
 end
 
 function ReceiveChat(sender, msg)

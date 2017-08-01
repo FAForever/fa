@@ -31,6 +31,7 @@
 -- AcquireFocus()
 
 local Control = import('control.lua').Control
+local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
 
 Edit = Class(moho.edit_methods, Control) {
 
@@ -140,6 +141,7 @@ Edit = Class(moho.edit_methods, Control) {
     
     -- called when non text keys (that don't affect text editing) are pressed, passes in the windows VK key code
     OnNonTextKeyPressed = function(self, keycode, modifiers)
+        AddUnicodeCharToEditText(self, keycode)
     end,
     
     -- called when a character key is pressed, before it is entered in to the dialog. If the function returns "true" 
