@@ -3494,7 +3494,9 @@ function setupChatEdit(chatPanel)
 
     --- Handle up/down arrow presses for the chat box.
     GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
-        AddUnicodeCharToEditText(self, keyCode)
+        if AddUnicodeCharToEditText(self, keyCode) then
+            return
+        end
         if commandQueue and table.getsize(commandQueue) > 0 then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then

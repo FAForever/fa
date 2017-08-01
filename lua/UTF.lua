@@ -42,18 +42,20 @@ end
 
 
 function AddUnicodeCharToEditText(edit, unicode)
-    if unicode <= 0x7F then return "" end
+    if unicode <= 0x7F then return false end
     local unicodeChar = UTF(unicode)
     if unicodeChar ~= "" then 
         local text = edit:GetText()
         local charLim = edit:GetMaxChars()
         if STR_Utf8Len(text) >= charLim then
             PlaySound(Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',}))
-            return
+            return true
         end
         local pos = edit:GetCaretPosition()
         text = InsertChar(text, unicodeChar, pos)
         edit:SetText(text)
         edit:SetCaretPosition(pos + 1)
+        return true
     end
+    return false
 end
