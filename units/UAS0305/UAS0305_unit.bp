@@ -117,7 +117,7 @@ UnitBlueprint {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
+            RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
