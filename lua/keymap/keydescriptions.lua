@@ -314,7 +314,7 @@ keyDescriptions = {
     ['torpedo'] = '<LOC key_desc_0272>build Torpedo defenses + T3 Heavy bots + ASF + Battleships',
     ['arties'] = '<LOC key_desc_0273>build Artilleries defenses + T3 Strategic Bombers + Aircraft Carriers + Battlecruiser',
     ['tml'] = '<LOC key_desc_0274>build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
-    ['upgrades'] = '<LOC key_desc_0275>build upgrades + T3 Air Transport + T3 torpedo bomber',
+    ['upgrades'] = '<LOC key_desc_0275>build Upgrades + T3 Mobile Anti Air + T3 Air Transport + T3 torpedo bomber',
 
     -- Extra
     ['land_factory'] = '<LOC key_desc_0276>build Land Factory',
