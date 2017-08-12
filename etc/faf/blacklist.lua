@@ -102,6 +102,8 @@ Blacklist = {
     ['48feb6b3-47f3-4ce7-80a4-e161ca188950'] = INTEGRATED,
     ['5048d937-1733-4e86-9f09-dd7384a0629c'] = INTEGRATED,
     ['5d1c89e8-3c1e-472a-8ebc-a0d0484969b5'] = INTEGRATED,
+    ['e39e4070-275e-47cb-a1cd-20872ef906ad'] = INTEGRATED,
+    ['5048d937-4872-4e86-9f09-dd1806a0629c'] = INTEGRATED,
 
  -- Upgrade --
     -- Ally overflow (old, broken versions)
@@ -120,6 +122,8 @@ Blacklist = {
     ['ecbf6277-24e3-437a-b968-EcoManager-v5'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v6'] = UPGRADE,
     ['ecbf6277-24e3-437a-b968-EcoManager-v7'] = UPGRADE,
+    ['ecbf6277-24e3-597a-b968-EcoManager-v8'] = UPGRADE,
+    ['ecbf6277-24e3-597a-b968-EcoManager-v10'] = UPGRADE,
 
     -- Supreme economy (old ones)
     ['f8d8c95a-71e7-4978-921e-8765beb328e8'] = UPGRADE,
@@ -145,7 +149,6 @@ Blacklist = {
     ['D49b27d4-7252-42b8-b39e-ac04cc195adb'] = INCOMPATIBLE,
     ['728e8d44-98e9-11e5-8994-feff819cdc9f'] = INCOMPATIBLE,
     ['55394440-5DC8-11E3-91ED-66546288709B'] = INCOMPATIBLE,
-    ['5048d937-4872-4e86-9f09-dd1806a0629c'] = INCOMPATIBLE,
     ['2bc59538-fc2c-4a18-964b-85322e9562a2'] = INCOMPATIBLE,
     ['022E3DB4-9C00-4ED7-9876-4866D316E009'] = INCOMPATIBLE,
 }
