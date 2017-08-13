@@ -147,8 +147,8 @@ UnitBlueprint {
     General = {
         BuildBones = {
             BuildEffectBones = {
-                'ConstuctBeam01', -- No, this is not spelled incorrectly...
-                'ConstuctBeam02',
+                'ConstructBeam01',
+                'ConstructBeam02',
             },
         },
         Category = 'Defense',
