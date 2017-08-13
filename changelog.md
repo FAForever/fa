@@ -1,4 +1,4 @@
-Patch 3686 (Upcoming)
+Patch 3686 (13th August 2017)
 ============================
 ### Lobby
 - Changed "Hide Obsolete" filter in map selection to be enabled by default
@@ -47,6 +47,7 @@ Patch 3686 (Upcoming)
 - Fixed and optimised TML leading for AIs
 - Increased the depth at which Megalith and Ythotha appear to be submerged in water instead of walking on land
 - Reverted the Energy hotbuild cycling through to Storage, in response to popular demand.
+- T3 Sonar can now be given assist commands. Primarily useful so they can guard a unit and stay with it.
 
 ### Bugs
 - Fixed an error caused by empty gunships
@@ -66,9 +67,10 @@ Patch 3686 (Upcoming)
 - Fixed subs stopping too close to their targets when given an Attack Move order
 - Fixed a bug that caused Hives (and possibly other Cybran units) to instantly capture a unit in some situations
 - Increased Cybran SACU projectile lifetime so it can hit targets at the edge of its upgraded range
+- Fixed some instances of transported units not dying when their transport dies
 
 ### UI
-- Added full support for UTF character set in the lobby and game chat. This enables Russian, Chinese, Japanese, and all manner of other characters.
+- Added full support for UTF character set in the lobby, game chat, and other typing interfaces. This enables Russian, Chinese, Japanese, and all manner of other characters.
 - Fixed ShowNetworkStats not closing in some situations
 - Fixed the construction menu pause button not changing colour with factional skins
 - Added an option to have fonts change colour according to faction
@@ -86,6 +88,7 @@ Patch 3686 (Upcoming)
 - Fixed factory templates not displaying icons for mod units
 - Fixed missing UI elements in replays or when the Use Factional UI Skin option is disabled
 - Removed "Quick Tip" prefix from the tips which show on the loading screen
+- Added T3 MAA to the hotkey description
 
 ### Other
 - Updated mods blacklist
@@ -106,7 +109,9 @@ Patch 3686 (Upcoming)
 - CookieNoob
 - Crispweed
 - Crotalus
+- dk0x
 - IceDreamer
+- JaggedAppliance
 - MrNukealizer
 - PhilipJFry
 - speed2
