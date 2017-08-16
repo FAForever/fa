@@ -1,3 +1,12 @@
+Patch 3688
+============================
+### Other
+- Changed Salvation to be categorized as an experimental instead of a t3 building
+
+### Contributors
+- CookieNoob
+
+
 Patch 3686 (13th August 2017)
 ============================
 ### Lobby
