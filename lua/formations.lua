@@ -739,7 +739,7 @@ function AttackFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
+    BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
 
     CacheResults(FormationPos, formationUnits, 'AttackFormation')
     return FormationPos
@@ -1285,14 +1285,14 @@ end
 
 function GetChevronPosition(chevronPos, currCol, formationLen)
     local offset = math.floor(chevronPos / 2)
-    local xPos = offset * 0.5
+    local xPos = offset * 0.4
     if math.mod(chevronPos, 2) == 0 then
         xPos = -xPos
     end
     local column = math.floor(currCol / 2)
     local yPos = (-offset + column * column) * 0.86603
     yPos = yPos - formationLen * 1.73205
-    local blockOff = math.floor(currCol / 2) * 2.5
+    local blockOff = math.floor(currCol / 2) * 2
     if math.mod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
