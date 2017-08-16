@@ -1,3 +1,12 @@
+Patch 3691 (Upcoming)
+============================
+### Other
+- Changed Salvation to be categorized as an experimental instead of a t3 building
+
+### Contributors
+- CookieNoob
+
+
 Patch 3690 (15th November 2017)
 ============================
 ### Bugs
