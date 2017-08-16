@@ -36,7 +36,7 @@ UnitBlueprint {
             Level5 = 15,
         },
     },
-    BuildIconSortPriority = 140,
+    BuildIconSortPriority = 150,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
@@ -45,7 +45,7 @@ UnitBlueprint {
         'AEON',
         'STRUCTURE',
         'STRATEGIC',
-        'TECH3',
+        'EXPERIMENTAL',
         'INDIRECTFIRE',
         'ARTILLERY',
         'DRAGBUILD',
@@ -53,7 +53,6 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
-        'SORTSTRATEGIC',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -180,7 +179,7 @@ UnitBlueprint {
     SizeX = 3,
     SizeY = 2.7,
     SizeZ = 3.6,
-    StrategicIconName = 'icon_structure3_artillery',
+    StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 180,
     Veteran = {
         Level1 = 50,
