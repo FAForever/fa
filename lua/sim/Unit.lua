@@ -2400,11 +2400,19 @@ Unit = Class(moho.unit_methods) {
         local function DisableOneIntel(disabler, intel)
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
+                local intel_bp = self:GetBlueprint().Intel
+                if intel_bp.AlwaysActiveIntel then
+                    for _, inteltype in intel_bp.ActiveIntel do
+                        if intel == inteltype then
+                            return
+                        end
+                    end
+                end
                 self:DisableIntel(intel)
 
                 -- Handle the cloak FX timing
                 if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
+                    if disabler ~= 'NotInitialized' and intel_bp[intel] then
                         self:UpdateCloakEffect(false, intel)
                     end
                 end
