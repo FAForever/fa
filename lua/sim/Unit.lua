@@ -2848,6 +2848,14 @@ Unit = Class(moho.unit_methods) {
         if self.LayerChangeTrigger then
             self:LayerChangeTrigger(new, old)
         end
+        
+        if new == 'Seabed' then
+            if self:GetBlueprint().Intel.OmniRadius == 0 then
+                self:DisableIntel('Vision')
+            end
+        else
+            self:EnableIntel('Vision')
+        end
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
