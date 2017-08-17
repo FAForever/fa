@@ -21,6 +21,11 @@ Tooltips = {
         description = "",
         keyID = "attack",
     },
+    attack_move = {
+        title = "<LOC tooltipui0010>Attack Move",
+        description = "<LOC tooltipui0011>Move units toward target while engaging all enemies they encounter. Engineers will reclaim everything along the way instead. Factories can't use this button but you can use the shortcut instead : Alt + RMB",
+        keyID = "attackmove",
+    },
     patrol = {
         title = "<LOC tooltipui0004>Patrol",
         description = "",
@@ -592,6 +597,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0078>Tooltip Delay",
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
+    options_loading_tips = {
+        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
+    },
     options_persistent_built_mode = {
         title = "<LOC OPTIONS_0205>Persistent Build Mode",
         description = "<LOC OPTIONS_0206>Toggles whether build mode is cancelled after pressing a key for a unit",
@@ -798,6 +807,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
         description = "<LOC OPTIONS_0220>When on, the UI skin will change to match the faction you are playing",
     },
+    options_faction_font_color = {
+        title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
+        description = "<LOC OPTIONS_0280>When on, the UI font color will change to match the faction you are playing",
+    },
     options_hotbuild_cycle_preview = {
         title = "<LOC OPTIONS_0247>Enable Cycle Preview for Hotbuild",
         description = "<LOC OPTIONS_0248>When on, you can cycle the Hotbuild preview",
@@ -814,6 +827,14 @@ Tooltips = {
         title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
         description = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
     },
+    options_minimum_reclaim_amount = {
+        title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
+        description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
+    },
+    options_show_hotkeylabels = {
+        title = "<LOC OPTIONS_0281>Hotkey Labels",
+        description = "<LOC OPTIONS_0282>Displays associated keybindings on the buttons for commands and building units or structures"
+   },
     -- **********************
     -- ** Lobby Strings
     -- **********************
@@ -965,6 +986,10 @@ Tooltips = {
         title='<LOC lobui_0752>Rerun CPU Benchmark',
         description='<LOC lobui_0753>Recalculates your CPU rating.'
     },
+    lob_close_empty_slots = {
+        title='<LOC lobui_0774>Close/Open Empty Slots',
+        description='<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
+    },
     map_type = {
         title = "<LOC lobui_0583>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
@@ -980,7 +1005,7 @@ Tooltips = {
     lob_UnitCap_375 = {
         title = "<LOC lobui_0721>375",
         description = "<LOC lobui_0722>375 units per player may be in play",
-    },    
+    },
     lob_UnitCap_625 = {
         title = "<LOC lobui_0723>625",
         description = "<LOC lobui_0724>625 units per player may be in play",
@@ -988,7 +1013,7 @@ Tooltips = {
     lob_UnitCap_875 = {
         title = "<LOC lobui_0725>875",
         description = "<LOC lobui_0726>875 units per player may be in play",
-    },    
+    },
     lob_click_LargeMapPreview = {
         title = "<LOC lobui_0618>Large Preview",
         description = "<LOC lobui_0619>Click to show a large map preview showing all the mass and hydrocarbon spots",
@@ -1065,7 +1090,7 @@ Tooltips = {
         title = '<LOC MAPSEL_0035>Hide Obsolete',
         description = '<LOC MAPSEL_0036>Hides maps which have been replaced by new versions',
     },
-    
+
     -- **********************
     -- ** Profile Strings
     -- **********************
@@ -1890,15 +1915,15 @@ Tooltips = {
     restricted_units_supportfactory = {
         title = "<LOC tooltipui0670>No Support Factories",
         description = "<LOC tooltipui0671>Prevents players from building fresh Support Factories, effectively disabling the 'Engiemod' changes"
-    },    
+    },
     restricted_units_t3mobileaa = {
         title = "<LOC tooltipui0672>No T3 Mobile Anti-Air",
         description = "<LOC tooltipui0673>Prevents players being able to build the new T3 MAA units"
-    },  
+    },
     restricted_units_wall = {
         title = "<LOC tooltipui0674>No Walls",
         description = "<LOC tooltipui0675>Prevents players being able to build Walls"
-    },      
+    },
     restricted_units_engineeringstation = {
         title = "<LOC tooltipui0676>No Engineering Stations",
         description = "<LOC tooltipui0677>Removes the Kennel and Hive"
@@ -1906,19 +1931,19 @@ Tooltips = {
     restricted_units_superarty = {
         title = "<LOC tooltipui0678>No Super-Artillery",
         description = "<LOC tooltipui0679>Removes Salvation, Mavor and Scathis"
-    }, 
+    },
     restricted_units_paragon = {
         title = "<LOC tooltipui0680>No Paragon",
         description = "<LOC tooltipui0681>Removes the Paragon, the Aeon Experimental Infinite Resource Generator"
-    }, 
+    },
     restricted_units_satellite = {
         title = "<LOC tooltipui0682>No Satellite",
         description = "<LOC tooltipui0683>Removes the UEF Novax Satellite"
-    }, 
+    },
     restricted_units_teleport = {
         title = "<LOC tooltipui0684>No Teleporting",
         description = "<LOC tooltipui0685>Removes the ability to upgrade ACUs and sACUs with Teleporters"
-    }, 
+    },
     restricted_units_billy = {
         title = "<LOC tooltipui0686>No Billy",
         description = "<LOC tooltipui0687>Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
@@ -1931,7 +1956,7 @@ Tooltips = {
         title = "<LOC tooltipui0694>Lobby Presets",
         description = "<LOC tooltipui0695>Save and load presets for game settings and maps"
     },
-    
+
     -- **********************
     -- ** Strategic overlay
     -- **********************
@@ -2051,10 +2076,6 @@ Tooltips = {
     options_gui_template_rotator = {
         title = '<LOC OPTIONS_0229>Template Rotation',
         description = '<LOC OPTIONS_0256>Allows build templates to be rotated with the middle mouse button.',
-    },
-    options_gui_scu_manager = {
-        title = '<LOC OPTIONS_0230>SCU Manager',
-        description = '<LOC OPTIONS_0257>Allows SCUs to be upgraded automatically or in a single click.',
     },
     options_gui_draggable_queue = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',

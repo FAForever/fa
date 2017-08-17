@@ -5,7 +5,7 @@
 ///
 /// Summary  :  Effect file for mesh rendering.
 ///
-/// Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+/// Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////
@@ -42,9 +42,9 @@
 ///////////////////////////////////////
 
 #ifdef DIRECT3D10
-	typedef uint4 anim_t;
+    typedef uint4 anim_t;
 #else
-	typedef float4 anim_t;
+    typedef float4 anim_t;
 #endif
 
 ///////////////////////////////////////
@@ -105,56 +105,56 @@ float3 NormalMappedPhongCoeff = float3(0.6,0.80,0.90);
 
 sampler1D hypsometricSampler = sampler_state
 {
-	Texture   = (hypsometricTexture);
-	MipFilter = POINT;
-	MinFilter = POINT;
-	MagFilter = POINT;
-	AddressU  = CLAMP;
-	AddressV  = CLAMP;
+    Texture   = (hypsometricTexture);
+    MipFilter = POINT;
+    MinFilter = POINT;
+    MagFilter = POINT;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
 };
 
 samplerCUBE environmentSampler = sampler_state
 {
     Texture   = (environmentTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D dissolveSampler = sampler_state
 {
     Texture   = (dissolveTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D shadowSampler = sampler_state
 {
-	Texture   = (shadowTexture);
-	MipFilter = POINT;
-	MinFilter = POINT;
-	MagFilter = POINT;
-	AddressU  = CLAMP;
-	AddressV  = CLAMP;
+    Texture   = (shadowTexture);
+    MipFilter = POINT;
+    MinFilter = POINT;
+    MagFilter = POINT;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
 };
 
 sampler2D shadowPCFSampler = sampler_state
 {
-	Texture		= (shadowTexture);
-	MipFilter	= LINEAR;
-	MinFilter	= LINEAR;
-	MagFilter	= LINEAR;
-	AddressU	= BORDER;
-	AddressV	= BORDER;
+    Texture		= (shadowTexture);
+    MipFilter	= LINEAR;
+    MinFilter	= LINEAR;
+    MagFilter	= LINEAR;
+    AddressU	= BORDER;
+    AddressV	= BORDER;
 #ifndef DIRECT3D10
-	BorderColor = 0xFFFFFFFF;
+    BorderColor = 0xFFFFFFFF;
 #else
-	BorderColor = float4(1,1,1,1);
+    BorderColor = float4(1,1,1,1);
 #endif
 
 };
@@ -162,81 +162,81 @@ sampler2D shadowPCFSampler = sampler_state
 sampler2D albedoSampler = sampler_state
 {
     Texture   = (albedoTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D normalsSampler = sampler_state
 {
     Texture   = (normalsTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D specularSampler = sampler_state
 {
     Texture   = (specularTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D lookupSampler = sampler_state
 {
     Texture   = (lookupTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D secondarySampler = sampler_state
 {
     Texture   = (secondaryTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = WRAP;
-	AddressV  = WRAP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 sampler2D anisotropicSampler = sampler_state
 {
     Texture = (anisotropicTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = CLAMP;
-	AddressV  = CLAMP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
 };
 
 sampler2D insectSampler = sampler_state
 {
     Texture = (insectTexture);
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU  = CLAMP;
-	AddressV  = CLAMP;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
 };
 
 sampler2D falloffSampler = sampler_state
 {
     Texture   = (lookupTexture);
-	MipFilter = NONE;
-	MinFilter = POINT;
-	MagFilter = POINT;
-	AddressU  = CLAMP;
-	AddressV  = CLAMP;
+    MipFilter = NONE;
+    MinFilter = POINT;
+    MagFilter = POINT;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
 };
 
 ///////////////////////////////////////
@@ -424,10 +424,10 @@ float4x4 ComputeWorldMatrix( int index, float3 row0, float3 row1, float3 row2, f
 /// Computes the shadow texture coordinate of a point given in world space.
 float4 ComputeShadowTexcoord( float4 worldPosition)
 {
-	float4 texcoord = mul( worldPosition, shadowMatrix);
-	texcoord.x = ( +texcoord.x + texcoord.w ) * 0.5;
-	texcoord.y = ( -texcoord.y + texcoord.w ) * 0.5;
-	texcoord.z /= texcoord.w;
+    float4 texcoord = mul( worldPosition, shadowMatrix);
+    texcoord.x = ( +texcoord.x + texcoord.w ) * 0.5;
+    texcoord.y = ( -texcoord.y + texcoord.w ) * 0.5;
+    texcoord.z /= texcoord.w;
 
     return texcoord;
 }
@@ -459,15 +459,15 @@ float4 ComputeScrolledTexcoord( float4 texcoord, float4 material)
 float ComputeShadowStandard( float4 shadowCoords)
 {
 #ifdef SELF_SHADOW
-	shadowCoords.xy /= shadowCoords.w;
-	
+    shadowCoords.xy /= shadowCoords.w;
+
     // Standard shadow map comparison
-	float shadow = 1.0f;
+    float shadow = 1.0f;
     if( shadowsEnabled && shadowCoords.z > tex2D( shadowSampler, shadowCoords.xy ).r + shadowBias  )
-	{
-		shadow = 0.0f;
-	}
-	return shadow;
+    {
+        shadow = 0.0f;
+    }
+    return shadow;
 #else
     return 1;
 #endif
@@ -478,49 +478,49 @@ float ComputeShadowStandard( float4 shadowCoords)
 float ComputeShadowPCF( float4 shadowCoords)
 {
 #ifdef SELF_SHADOW
-	shadowCoords.xy /= shadowCoords.w;
-	
-	// *** PCF Percentage Closer Filtering *** 
-	// If we only support 1024x1024 shadow maps we can take out the 
-	// 'shadowSize' var dependancy. and use a lookup table. 
-	// Would make this function faster. 
-	//
-	// Altered PCF Kernal:
-	//
-	//          4
-	//          
-	//      .---1---.
-	//      |       |
-	//   2  0   X   |  3
-	//      |       |
-	//      '-------'
-	// 
-	// 
+    shadowCoords.xy /= shadowCoords.w;
 
-	float shadow = 0.0f;
-	float texel	 = 1.0f / shadowSize;
-	float offset = texel; // make this larger if you want a bigger 'blur'.
-	
-	float depthArray[5];
-	depthArray[0] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( -(texel * 0.5f),	0.0f ) ).r;
-	depthArray[1] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( 0.0f,  -(texel * 0.5f)) ).r;
-	depthArray[2] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( -offset,			0.0f ) ).r;
-	depthArray[3] = tex2D( shadowPCFSampler, shadowCoords.xy + float2(  offset,			0.0f ) ).r;
-	depthArray[4] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( 0.0f,		  offset ) ).r;
-	
-	// Sample each of them checking whether the pixel under test is shadowed or not
-	for( int i = 0; i < 5; i++ )
-	{
-		float A = depthArray[i] + shadowBias;
-		float B = (shadowCoords.z - 0.001f);
-		if( A > B )
-		{
-			shadow += 1.0f;
-		}
-	}
-	
-	// Get the average
-	return shadow * (1.0f / 5.0f);
+    // *** PCF Percentage Closer Filtering ***
+    // If we only support 1024x1024 shadow maps we can take out the
+    // 'shadowSize' var dependancy. and use a lookup table.
+    // Would make this function faster.
+    //
+    // Altered PCF Kernal:
+    //
+    //          4
+    //
+    //      .---1---.
+    //      |       |
+    //   2  0   X   |  3
+    //      |       |
+    //      '-------'
+    //
+    //
+
+    float shadow = 0.0f;
+    float texel	 = 1.0f / shadowSize;
+    float offset = texel; // make this larger if you want a bigger 'blur'.
+
+    float depthArray[5];
+    depthArray[0] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( -(texel * 0.5f),	0.0f ) ).r;
+    depthArray[1] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( 0.0f,  -(texel * 0.5f)) ).r;
+    depthArray[2] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( -offset,			0.0f ) ).r;
+    depthArray[3] = tex2D( shadowPCFSampler, shadowCoords.xy + float2(  offset,			0.0f ) ).r;
+    depthArray[4] = tex2D( shadowPCFSampler, shadowCoords.xy + float2( 0.0f,		  offset ) ).r;
+
+    // Sample each of them checking whether the pixel under test is shadowed or not
+    for( int i = 0; i < 5; i++ )
+    {
+        float A = depthArray[i] + shadowBias;
+        float B = (shadowCoords.z - 0.001f);
+        if( A > B )
+        {
+            shadow += 1.0f;
+        }
+    }
+
+    // Get the average
+    return shadow * (1.0f / 5.0f);
 #else
     return 1;
 #endif
@@ -529,15 +529,15 @@ float ComputeShadowPCF( float4 shadowCoords)
 float ComputeShadow( float4 shadowCoords, uniform bool hiDefFiltering )
 {
 #ifdef SELF_SHADOW
-	// If we are allowed to use hiDefFiltering then allow ShadowPCF
-	if( hiDefFiltering )
-	{
-		return shadowBlur ? (shadowsEnabled ? ComputeShadowPCF( shadowCoords) : 1.0f) : ComputeShadowStandard( shadowCoords);
-	}
-	else
-	{
-		return ComputeShadowStandard( shadowCoords);
-	}
+    // If we are allowed to use hiDefFiltering then allow ShadowPCF
+    if( hiDefFiltering )
+    {
+        return shadowBlur ? (shadowsEnabled ? ComputeShadowPCF( shadowCoords) : 1.0f) : ComputeShadowStandard( shadowCoords);
+    }
+    else
+    {
+        return ComputeShadowStandard( shadowCoords);
+    }
 #else
     return 1;
 #endif
@@ -606,7 +606,7 @@ DEPTH_VERTEX DepthVS(
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-	vertex.depth = vertex.position.z;
+    vertex.depth = vertex.position.z;
 
     vertex.texcoord0 = texcoord0;
 
@@ -635,7 +635,7 @@ DEPTH_VERTEX SeraphimBuildDepthVS(
     position *= 0.25 + (material.y * 0.75);
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-	vertex.depth = vertex.position.z;
+    vertex.depth = vertex.position.z;
 
     vertex.texcoord0 = texcoord0;
 
@@ -667,7 +667,7 @@ DEPTH_VERTEX UndulatingDepthVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     float sinSq = sin( 0.05 * time - dot(windDirection,row3.xyz));
     sinSq *= sinSq;
-   
+
     vertex.position.xyz += weight * sinSq * windDirection;
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
     vertex.depth = vertex.position.z / vertex.position.w;
@@ -695,12 +695,12 @@ SILHOUETTE_VERTEX SilhouetteVS(
 )
 {
     SILHOUETTE_VERTEX vertex = (SILHOUETTE_VERTEX)0;
-    
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-        
+
     return vertex;
 }
 
@@ -733,12 +733,12 @@ CLUTTER_VERTEX ClutterVS(
     vertex.texcoord0 = texcoord0;
     vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
     vertex.dissolve = 0.003922 * anim.z;
-    
+
     float3x3 rotationMatrix = (float3x3)worldMatrix;
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-    
+
     return vertex;
 }
 
@@ -769,26 +769,26 @@ CLUTTER_VERTEX UndulatingClutterVS(
 
     float sinSq = sin( 0.0625 * time - dot( windDirection, row3.xyz));
     sinSq *= sinSq;
-    
+
     vertex.position.xyz += weight * sinSq * windDirection;
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-    
+
     vertex.texcoord0 = texcoord0;
     vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
     vertex.dissolve = 0.003922 * anim.z;
-    
+
     float3x3 rotationMatrix = (float3x3)worldMatrix;
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-    
+
     return vertex;
 }
 
 /// CartographicVS
 ///
-/// 
+///
 CARTOGRAPHIC_VERTEX CartographicVS(
     float3 position : POSITION0,
     float3 normal : NORMAL,
@@ -806,28 +806,28 @@ CARTOGRAPHIC_VERTEX CartographicVS(
 )
 {
     CARTOGRAPHIC_VERTEX vertex = (CARTOGRAPHIC_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix(anim.y+boneIndex[0],row0,row1,row2,row3);
-    
+
     vertex.position = mul(float4(position,1),worldMatrix);
     vertex.elevation = vertex.position.y;
-	
+
     vertex.position = mul(vertex.position,mul(viewMatrix,projMatrix));
-	vertex.texcoord = texcoord0;
+    vertex.texcoord = texcoord0;
     vertex.color = color;
-	
+
     float3x3 R = (float3x3)worldMatrix;
     vertex.normal = mul(normal,R);
     vertex.tangent = mul(tangent,R);
     vertex.binormal = mul(binormal,R);
-    
+
     return vertex;
 }
 
 /// CartographicVS
 ///
-/// 
+///
 CARTOGRAPHIC_VERTEX CartographicFeedbackVS(
     float3 position : POSITION0,
     float3 normal : NORMAL,
@@ -845,17 +845,17 @@ CARTOGRAPHIC_VERTEX CartographicFeedbackVS(
 )
 {
     CARTOGRAPHIC_VERTEX vertex = (CARTOGRAPHIC_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix(anim.y+boneIndex[0],row0,row1,row2,row3);
-    
+
     vertex.position = mul(float4(position,1),worldMatrix);
     vertex.elevation = vertex.position.y;
-	
+
     vertex.position = mul(vertex.position,mul(viewMatrix,projMatrix));
-	vertex.texcoord = texcoord0;
+    vertex.texcoord = texcoord0;
     vertex.color = color;
-	
+
     return vertex;
 }
 
@@ -879,8 +879,8 @@ FLAT_VERTEX FlatVS(
 )
 {
     FLAT_VERTEX vertex = (FLAT_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -912,9 +912,9 @@ VERTEXNORMAL_VERTEX VertexNormalVS(
     float4 material : TEXCOORD6,
     float4 color : COLOR0
 )
-{	
+{
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -953,8 +953,8 @@ NORMALMAPPED_VERTEX NormalMappedVS(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -973,7 +973,7 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-	
+
     return vertex;
 }
 
@@ -998,8 +998,8 @@ NORMALMAPPED_VERTEX UnitFalloffVS(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -1018,13 +1018,13 @@ NORMALMAPPED_VERTEX UnitFalloffVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-	
+
     return vertex;
 }
 
 /// UndulatingNormalMappedVS
 ///
-/// Normal mapped lighting with 
+/// Normal mapped lighting with
 NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
@@ -1042,15 +1042,15 @@ NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
-    
+    CompatSwizzle(color);
+
     float weight = 0.003 * position.y;
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
     float sinSq = sin( 0.05 * time - dot(windDirection, row3.xyz));
     sinSq *= sinSq;
-   
+
     vertex.position.xyz += weight * sinSq * windDirection;
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
@@ -1091,15 +1091,15 @@ NORMALMAPPED_VERTEX BloatingNormalMappedVS(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-   	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float weight = 0.003 * position.y;
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     float3 direction = normalize(position);
     position += 2 * length(direction.xz) * sin( 0.1 * time + length(row3.xz)) * direction;
-    
-    vertex.position = mul( float4(position,1), worldMatrix);   
+
+    vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
@@ -1136,14 +1136,14 @@ VERTEXNORMAL_VERTEX BloatingVertexNormalVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
-    
+    CompatSwizzle(color);
+
     float weight = 0.003 * position.y;
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     float3 direction = normalize(position);
     position += 2 * length(direction.xz) * sin( 0.1 * time + length(row3.xz)) * direction;
-    
+
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = vertex.position.y - surfaceElevation;
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
@@ -1178,19 +1178,19 @@ NORMALMAPPED_VERTEX WreckageVS_HighFidelity(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-   	CompatSwizzle(color);
- 
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    vertex.position = mul( float4(position,1), worldMatrix);    
+    vertex.position = mul( float4(position,1), worldMatrix);
 
     float3 nvert = normalize(vertex.position.xyz);
     float s = nvert * 0.15;
     float r = length(vertex.position.xyz);  // Distance of vert from origin
     float phi = frac( 0.01 * length(row3) );
-     
+
     vertex.position.x += sin( 14.5 * r * nvert.z + phi) * s;
     vertex.position.y += cos( 10.8 * r * nvert.x + phi) * s;
-    vertex.position.z += sin( 20.5 * r * nvert.y + phi) * s;       
+    vertex.position.z += sin( 20.5 * r * nvert.y + phi) * s;
 
     // The rest is just the typical normal mapped vertex shader (sans scrolling)
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
@@ -1231,7 +1231,7 @@ VERTEXNORMAL_VERTEX WreckageVS_LowFidelity(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1277,7 +1277,7 @@ EFFECT_VERTEX EffectVS(
 )
 {
     EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1311,10 +1311,10 @@ NORMALMAPPED_VERTEX AeonBuildVS(
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
-    
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    
+
     position *= max(material.y, 0.75);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -1324,7 +1324,7 @@ NORMALMAPPED_VERTEX AeonBuildVS(
 
     vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
     vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
-    
+
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
@@ -1333,7 +1333,7 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-    
+
     return vertex;
 }
 
@@ -1361,7 +1361,7 @@ VERTEXNORMAL_VERTEX AeonBuildLoFiVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
     position *= max(material.y, 0.75);
@@ -1406,14 +1406,14 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
     anim_t anim : TEXCOORD5,
     float4 material : TEXCOORD6,
     float4 color : COLOR0,
-    float1 colorLookup : TEXCOORD7    
+    float1 colorLookup : TEXCOORD7
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
-    
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    
+
     position *= 0.25 + (material.y * 0.75);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -1423,7 +1423,7 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
 
     vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
     vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
-    
+
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
@@ -1432,7 +1432,7 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-    
+
     return vertex;
 }
 
@@ -1443,7 +1443,7 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
 VERTEXNORMAL_VERTEX SeraphimBuildLofiVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
-    float3 UnusedTangent : TANGENT,   
+    float3 UnusedTangent : TANGENT,
     float3 UnusedBinormal : BINORMAL,
     float4 texcoord0 : TEXCOORD0,
     int boneIndex[4] : BLENDINDICES,
@@ -1455,12 +1455,12 @@ VERTEXNORMAL_VERTEX SeraphimBuildLofiVS(
     float4 material : TEXCOORD6,
     float4 color : COLOR0
 )
-{	
+{
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    
+
     position *= 0.25 + (material.y * 0.75);
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = vertex.position.y - surfaceElevation;
@@ -1499,7 +1499,7 @@ VERTEXNORMAL_VERTEX PositionNormalOffsetVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     int bone = anim.y + boneIndex[0];
 
@@ -1544,8 +1544,8 @@ VERTEXNORMAL_VERTEX EffectVertexNormalHiFiVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
-	
+    CompatSwizzle(color);
+
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -1565,7 +1565,7 @@ VERTEXNORMAL_VERTEX EffectVertexNormalHiFiVS(
     vertex.texcoord0.y += (vertex.material.x * texYshift0);
     vertex.texcoord0.zw += (vertex.material.x * texXshift1);
     vertex.texcoord0.zw += (vertex.material.x * texYshift1);
-	
+
     return vertex;
 }
 
@@ -1593,7 +1593,7 @@ VERTEXNORMAL_VERTEX EffectVertexNormalLoFiVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1651,7 +1651,7 @@ EFFECT_VERTEX FourUVTexShiftScaleVS(
 )
 {
     EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1664,7 +1664,7 @@ EFFECT_VERTEX FourUVTexShiftScaleVS(
     vertex.texcoord1 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
-    
+
     vertex.texcoord0.xy *= texScale0;
     vertex.texcoord0.zw *= texScale1;
     vertex.texcoord1.xy *= texScale2;
@@ -1710,7 +1710,7 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
 )
 {
     EFFECT_NORMALMAPPED_VERTEX vertex = (EFFECT_NORMALMAPPED_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1730,7 +1730,7 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
-    
+
     vertex.texcoord0.xy *= texScale0;
     vertex.texcoord0.zw *= texScale1;
     vertex.texcoord1.xy *= texScale2;
@@ -1777,7 +1777,7 @@ EFFECT_VERTEX ShieldPositionNormalOffsetVS(
 )
 {
     EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     int bone = anim.y + boneIndex[0];
 
@@ -1837,7 +1837,7 @@ LOFIEFFECT_VERTEX ThreeUVTexShiftScaleLoFiVS(
 )
 {
     LOFIEFFECT_VERTEX vertex = (LOFIEFFECT_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
 
@@ -1851,7 +1851,7 @@ LOFIEFFECT_VERTEX ThreeUVTexShiftScaleLoFiVS(
     vertex.texcoord2 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
-    
+
     vertex.texcoord0.xy *= texScale0;
     vertex.texcoord1.xy *= texScale1;
     vertex.texcoord2.xy *= texScale2;
@@ -1889,10 +1889,10 @@ SHIELDIMPACT_VERTEX ShieldImpactVS(
     uniform float texcoord2XOffset,
     uniform float fadeTime
 
-)       
+)
 {
     SHIELDIMPACT_VERTEX vertex = (SHIELDIMPACT_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
     vertex.position = mul( float4(position,1), worldMatrix);
@@ -1908,7 +1908,7 @@ SHIELDIMPACT_VERTEX ShieldImpactVS(
     // Texcoord 1, Interpolated uv shifting
     vertex.texcoord0.x += texcoord0Xshift * vertex.material.x;
     vertex.texcoord0.y += texcoord0YOffset + (lerp(texcoord0Ybshift, texcoord0Yeshift, vertex.material.x/fadeTime ) * vertex.material.x);
-    
+
     // Texcoord 1, shift and scale
     vertex.texcoord1.xy *= texcoord1Scale;
     vertex.texcoord1.x += texcoord1Xshift * vertex.material.x;
@@ -1941,16 +1941,16 @@ VERTEXNORMAL_VERTEX CommandFeedbackVS(
 )
 {
     VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
-	CompatSwizzle(color);
+    CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    float lodScale = mul(lodBasis,float4(worldMatrix[3].xyz,1));  
+    float lodScale = mul(lodBasis,float4(worldMatrix[3].xyz,1));
     position *= lerp( 1, 15, (lodScale - 10.5 ) * 0.001 );
-    float age = time - material.x;	 
-    float t = saturate( age / material.y );     
+    float age = time - material.x;
+    float t = saturate( age / material.y );
     position *= lerp( 1.0, scaleTo, t );
-	
-	vertex.position = mul( float4(position,1), worldMatrix);
+
+    vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = vertex.position.y - surfaceElevation;
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
@@ -1988,30 +1988,30 @@ float4 DepthPS( DEPTH_VERTEX vertex, uniform bool clipTest) : COLOR0
 ///
 float4 CartographicPS( CARTOGRAPHIC_VERTEX vertex, uniform bool hypsometric) : COLOR0
 {
-	clip(vertex.elevation-surfaceElevation);
+    clip(vertex.elevation-surfaceElevation);
 
-	float3 normal = normalize(vertex.normal);
-			
-	float3 color = vertex.color.rgb;
-	if ( hypsometric )
-	{		
-		float elevation = ( vertex.elevation - minimumElevation ) / ( maximumElevation - minimumElevation );
-		
-		clip(tex2D(albedoSampler,vertex.texcoord.xy).a-0.5);
-		color = tex1D(hypsometricSampler,elevation).rgb;
-		
-		float tone = dot(normal,normalize(float3(-1,3,-1)));
-		float  ca = 0.25;
-		float cd0 = ( tone > 0.21 ) ? 0.25 : 0.0;
-		float cd1 = ( tone > 0.66 ) ? 0.50 : 0.0;
-		float  cs = ( tone > 0.95 ) ? 0.10 : 0.0;
-		color = ca * color + cd0 * color + cd1 * color + cs;
-		
-		return float4(color,1);
-	}
+    float3 normal = normalize(vertex.normal);
 
-	float edge = clamp(1-saturate(dot(normal,float3(0,1,0))),0.5,1.0);
-		
+    float3 color = vertex.color.rgb;
+    if ( hypsometric )
+    {
+        float elevation = ( vertex.elevation - minimumElevation ) / ( maximumElevation - minimumElevation );
+
+        clip(tex2D(albedoSampler,vertex.texcoord.xy).a-0.5);
+        color = tex1D(hypsometricSampler,elevation).rgb;
+
+        float tone = dot(normal,normalize(float3(-1,3,-1)));
+        float  ca = 0.25;
+        float cd0 = ( tone > 0.21 ) ? 0.25 : 0.0;
+        float cd1 = ( tone > 0.66 ) ? 0.50 : 0.0;
+        float  cs = ( tone > 0.95 ) ? 0.10 : 0.0;
+        color = ca * color + cd0 * color + cd1 * color + cs;
+
+        return float4(color,1);
+    }
+
+    float edge = clamp(1-saturate(dot(normal,float3(0,1,0))),0.5,1.0);
+
     return float4(color,edge);
 }
 
@@ -2020,7 +2020,7 @@ float4 CartographicPS( CARTOGRAPHIC_VERTEX vertex, uniform bool hypsometric) : C
 ///
 float4 CartographicFeedbackPS( CARTOGRAPHIC_VERTEX vertex, uniform bool hypsometric) : COLOR0
 {
-	clip(vertex.elevation-surfaceElevation);
+    clip(vertex.elevation-surfaceElevation);
     float4 color = tex2D(albedoSampler,vertex.texcoord.xy);
     return float4(color.rgb,1);
 }
@@ -2030,11 +2030,11 @@ float4 CartographicFeedbackPS( CARTOGRAPHIC_VERTEX vertex, uniform bool hypsomet
 ///
 float4 CartographicGlowPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 {
-	clip(vertex.elevation-surfaceElevation);
+    clip(vertex.elevation-surfaceElevation);
 
-	float3 normal = normalize(vertex.normal);
-	float edge = 1-saturate(dot(normal,float3(0,1,0)));
-	
+    float3 normal = normalize(vertex.normal);
+    float edge = 1-saturate(dot(normal,float3(0,1,0)));
+
     return float4(0,0,0,0.2*edge*edge);
 }
 
@@ -2043,8 +2043,8 @@ float4 CartographicGlowPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 ///
 float4 CartographicPlacePS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 {
-	clip(vertex.elevation-surfaceElevation);
-	float3 color = vertex.color.rgb;
+    clip(vertex.elevation-surfaceElevation);
+    float3 color = vertex.color.rgb;
     return float4(color,0.125);
 }
 
@@ -2053,8 +2053,8 @@ float4 CartographicPlacePS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 ///
 float4 CartographicBuildPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 {
-	clip(vertex.elevation-surfaceElevation);
-	float3 color = saturate(vertex.color.rgb + float3(0.1,0.1,0.1));
+    clip(vertex.elevation-surfaceElevation);
+    float3 color = saturate(vertex.color.rgb + float3(0.1,0.1,0.1));
     return float4(color,0.4);
 }
 
@@ -2063,11 +2063,11 @@ float4 CartographicBuildPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 ///
 float4 CartographicShieldPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 {
-	float tone  = saturate(dot(normalize(vertex.normal),normalize(float3(-1,3,-1))));
+    float tone  = saturate(dot(normalize(vertex.normal),normalize(float3(-1,3,-1))));
 
-	tone = pow(tone,80);
-	float3 color = lerp(float3(0,0,0),float3(1,1,1),tone);
-	
+    tone = pow(tone,80);
+    float3 color = lerp(float3(0,0,0),float3(1,1,1),tone);
+
     return float4(color,0.4*tone);
 }
 
@@ -2075,18 +2075,18 @@ float4 CartographicShieldPS( CARTOGRAPHIC_VERTEX vertex) : COLOR0
 ///
 /// Flat pixel shader (no lighting)
 float4 FlatPS( FLAT_VERTEX vertex,
-			   uniform bool alphaTestEnable, 
-			   uniform int alphaFunc, 
-			   uniform int alphaRef ) : COLOR0
+               uniform bool alphaTestEnable,
+               uniform int alphaFunc,
+               uniform int alphaRef ) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
     float4 color = vertex.color * tex2D( albedoSampler, vertex.texcoord0.xy);
-	float alpha = mirrored ? 0.5 : vertex.material.g * color.a;
-    
+    float alpha = mirrored ? 0.5 : vertex.material.g * color.a;
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
     return float4( color.rgb, alpha);
 }
@@ -2094,11 +2094,11 @@ float4 FlatPS( FLAT_VERTEX vertex,
 /// VertexNormalPS_HighFidelity
 ///
 /// Lighting using vertex normals only.
-float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex, 
-								    uniform bool hiDefShadows,
-								    uniform bool alphaTestEnable, 
-								    uniform int alphaFunc, 
-								    uniform int alphaRef ) : COLOR0
+float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
+                        		    uniform bool hiDefShadows,
+                        		    uniform bool alphaTestEnable,
+                        		    uniform int alphaFunc,
+                        		    uniform int alphaRef ) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -2107,12 +2107,12 @@ float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
     float dotLightNormal = dot(sunDirection,vertex.normal);
     float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
-	float alpha = mirrored ? 0.5 : vertex.material.g * albedo.a;
+    float alpha = mirrored ? 0.5 : vertex.material.g * albedo.a;
     float3 color = vertex.color.rgb * albedo.rgb * light;
-    
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
     return float4(color.rgb,alpha);
 }
@@ -2121,18 +2121,18 @@ float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
 ///
 /// Lighting using vertex normals only.
 float4 VertexNormalPS_LowFidelity(VERTEXNORMAL_VERTEX vertex,
-								  uniform bool alphaTestEnable, 
-								  uniform int alphaFunc, 
-								  uniform int alphaRef ) : COLOR0
+                        		  uniform bool alphaTestEnable,
+                        		  uniform int alphaFunc,
+                        		  uniform int alphaRef ) : COLOR0
 {
     float4 albedo = tex2D(albedoSampler,vertex.texcoord0.xy);
     float3 light = ComputeLight(dot(sunDirection,vertex.normal),1);
     float3 color = 2 * light.rgb * light.rgb * albedo.rgb;
 
-	float alpha = albedo.a*vertex.material.g;  
+    float alpha = albedo.a*vertex.material.g;
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
     return float4(color,alpha);
 }
@@ -2154,23 +2154,23 @@ float4 ColorMaskPS_LowFidelity(VERTEXNORMAL_VERTEX vertex) : COLOR0
 ///
 /// Lighting using vertex normals only with dissolve.
 float4 ClutterPS( CLUTTER_VERTEX vertex,
-				  uniform bool alphaTestEnable, 
-				  uniform int alphaFunc, 
-				  uniform int alphaRef ) : COLOR0
+                  uniform bool alphaTestEnable,
+                  uniform int alphaFunc,
+                  uniform int alphaRef ) : COLOR0
 {
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    
+
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float  dissolve = saturate( vertex.dissolve * ( 0.5 * tex2D( dissolveSampler, vertex.texcoord0).a + 0.5));
-    
+
     float dotLightNormal = dot(sunDirection,normal);
     float3 light = ComputeLight( dotLightNormal, 1.0);
 
-	float alpha = dissolve * albedo.a;
+    float alpha = dissolve * albedo.a;
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
     return float4( albedo.rgb * light, alpha);
 }
@@ -2178,90 +2178,141 @@ float4 ClutterPS( CLUTTER_VERTEX vertex,
 /// NormalMappedPS
 ///
 /// Lighting using normal maps.
-float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex, 
-					   uniform bool maskAlbedo, 
-					   uniform bool glow, 
-					   uniform bool hiDefShadows,
-					   uniform bool alphaTestEnable, 
-					   uniform int alphaFunc, 
-					   uniform int alphaRef ) : COLOR0
+float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
+                       uniform bool maskAlbedo,
+                       uniform bool glow,
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable,
+                       uniform int alphaFunc,
+                       uniform int alphaRef ) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
-		
+
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-    
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
     if ( maskAlbedo )
-    	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
     else
         albedo.rgb = albedo.rgb * vertex.color.rgb;
 
-	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-	float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
-	float3 phongMultiplicative = float3( 2 * environment * specular.r);
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
 
-	float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
 
-	float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
 
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
-	return float4( color.rgb, alpha );
+    return float4( color.rgb, alpha );
+}
+
+/// NomadsNormalMappedPS
+///
+/// Lighting using normal maps
+float4 NomadsNormalMappedPS( NORMALMAPPED_VERTEX vertex,
+                       uniform bool maskAlbedo,
+                       uniform bool glow,
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable,
+                       uniform int alphaFunc,
+                       uniform int alphaRef ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    if ( maskAlbedo )
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
+
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+#ifdef DIRECT3D10
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+#endif
+
+    //increasing the alpha creates more glow
+    alpha = alpha * 1.5;
+
+    //subtracting the alpha from the color cancels out the oversaturation created when the glowy parts of the frame are blurred and added to the frame
+    color.rgb = color.rgb - (float3(alpha, alpha, alpha) * 0.4);
+
+    return float4( color.rgb, alpha );
 }
 
 /// New UEF PS
-float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex, 
-					   uniform bool maskAlbedo, 
-					   uniform bool glow, 
-					   uniform bool hiDefShadows,
-					   uniform bool alphaTestEnable, 
-					   uniform int alphaFunc, 
-					   uniform int alphaRef ) : COLOR0
+float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
+                       uniform bool maskAlbedo,
+                       uniform bool glow,
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable,
+                       uniform int alphaFunc,
+                       uniform int alphaRef ) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
-		
+
   float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
   float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
   float dotLightNormal = dot(sunDirection,normal);
 
   float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
   float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-    
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
   if ( maskAlbedo )
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
   else
     albedo.rgb = albedo.rgb * vertex.color.rgb;
   float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
   //light = light * (0.9 - (light * 0.125));
   //float3 lightpow = (light.r + light.g + light.b) / 3;
   //light = light * lightpow;
-	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-	float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
-	float3 phongMultiplicative = environment * specular.r * light * 0.5;
-	
-	float emissive = glowMultiplier * specular.b * 0.02;
-  
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
+    float3 phongMultiplicative = environment * specular.r * light * 0.5;
+
+    float emissive = glowMultiplier * specular.b * 0.02;
+
   float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
   float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
-	//float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+    //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
   //color = phongMultiplicative;
-  
-	#ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+
+    #ifdef DIRECT3D10
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
   #endif
-  	return float4( color.rgb, alpha );
+    return float4( color.rgb, alpha );
 }
 
 /// MapImagerPS0
@@ -2269,15 +2320,15 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
 ///
 float4 MapImagerPS0( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
-	float3x3 rotationMatrix = float3x3(vertex.binormal,vertex.tangent,vertex.normal);
-	float3 normal = ComputeNormal(normalsSampler,vertex.texcoord0.zw,rotationMatrix);
+    float3x3 rotationMatrix = float3x3(vertex.binormal,vertex.tangent,vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler,vertex.texcoord0.zw,rotationMatrix);
 
-	float4 albedo = tex2D(albedoSampler,vertex.texcoord0.xy);
-	float mask = tex2D(specularSampler,vertex.texcoord0.xy).b;
-	float shade = lerp(saturate(dot(sunDirection,normal)),1,mask);
-	albedo.rgb = float3(1,1,1) * shade * (albedo.rgb + albedo.aaa) + float3(0.02,0.02,0.02);
-	
-	return float4(albedo.rgb,0);
+    float4 albedo = tex2D(albedoSampler,vertex.texcoord0.xy);
+    float mask = tex2D(specularSampler,vertex.texcoord0.xy).b;
+    float shade = lerp(saturate(dot(sunDirection,normal)),1,mask);
+    albedo.rgb = float3(1,1,1) * shade * (albedo.rgb + albedo.aaa) + float3(0.02,0.02,0.02);
+
+    return float4(albedo.rgb,0);
 }
 
 /// MapImagerPS1
@@ -2286,7 +2337,7 @@ float4 MapImagerPS0( NORMALMAPPED_VERTEX vertex) : COLOR0
 float4 MapImagerPS1( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
     float4 specular = tex2D(specularSampler,vertex.texcoord0.xy);
-	return float4(0,0,0,specular.b+glowMinimum);
+    return float4(0,0,0,specular.b+glowMinimum);
 }
 
 /// AlbedoPreviewPS
@@ -2320,13 +2371,13 @@ float4 LightingPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 
 /// BlackenedNormalMappedPS
 ///
-float4 BlackenedNormalMappedPS( NORMALMAPPED_VERTEX vertex, 
-								uniform bool maskAlbedo, 
-								uniform bool glow, 
-								uniform bool hiDefShadows,
-								uniform bool alphaTestEnable, 
-								uniform int alphaFunc, 
-								uniform int alphaRef ) : COLOR0
+float4 BlackenedNormalMappedPS( NORMALMAPPED_VERTEX vertex,
+                        		uniform bool maskAlbedo,
+                        		uniform bool glow,
+                        		uniform bool hiDefShadows,
+                        		uniform bool alphaTestEnable,
+                        		uniform int alphaFunc,
+                        		uniform int alphaRef ) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
@@ -2340,46 +2391,46 @@ float4 BlackenedNormalMappedPS( NORMALMAPPED_VERTEX vertex,
     albedo.rgb = dot(albedo.rgb, float3(.1,.1,.1));
 
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     if ( maskAlbedo )
-    	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
     else
         albedo.rgb = albedo.rgb * vertex.color.rgb;
 
-	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-	float3 phongAdditive = pow( phongAmount, 8) * specular.g;
-	float3 phongMultiplicative = float3( 2 * environment * specular.r);
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
 
     float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
 
-	float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
-    
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
-	return float4( color, alpha);
+    return float4( color, alpha);
 }
 
 float4 BlackenedLoFiPS( VERTEXNORMAL_VERTEX vertex,
-						uniform bool alphaTestEnable, 
-						uniform int alphaFunc, 
-						uniform int alphaRef ) : COLOR0
+                        uniform bool alphaTestEnable,
+                        uniform int alphaFunc,
+                        uniform int alphaRef ) : COLOR0
 {
     float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
     color.rgb = dot(color.rgb, float3(.1,.1,.1));
     float3 light = ComputeLight( dot(sunDirection,vertex.normal), 1);
 
     color.rgb *= light;
-	color.a = vertex.material.g * color.a;
-    
+    color.a = vertex.material.g * color.a;
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( color.a, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( color.a, alphaFunc, alphaRef );
 #endif
     return color;
 }
@@ -2409,7 +2460,7 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     else
         color *= specular.b * 2;
 
-	return float4( color, glowMinimum );
+    return float4( color, glowMinimum );
 }
 
 float4 WreckagePS_LowFidelity(VERTEXNORMAL_VERTEX vertex) : COLOR0
@@ -2435,23 +2486,23 @@ float4 NormalMappedTerrainPS( NORMALMAPPED_VERTEX vertex ) : COLOR
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     albedo.rgb = albedo.rgb * vertex.color.rgb;
     float3 light = ComputeLight( dotLightNormal, 1);
-	float alpha = mirrored ? 0.5 : glowMinimum;
+    float alpha = mirrored ? 0.5 : glowMinimum;
 
     float3 color = light * albedo.rgb;
-    
-	return float4(color,alpha);
+
+    return float4(color,alpha);
 }
 
 /// AlphaFadePS
 ///
 ///
-float4 AlphaFadePS( VERTEXNORMAL_VERTEX vertex, 
-					uniform float timeFade, 
-					uniform float fadeMultiplier, 
-					uniform bool hiDefShadows,
-					uniform bool alphaTestEnable, 
-					uniform int alphaFunc, 
-					uniform int alphaRef ) : COLOR0
+float4 AlphaFadePS( VERTEXNORMAL_VERTEX vertex,
+                    uniform float timeFade,
+                    uniform float fadeMultiplier,
+                    uniform bool hiDefShadows,
+                    uniform bool alphaTestEnable,
+                    uniform int alphaFunc,
+                    uniform int alphaRef ) : COLOR0
 {
     float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
 
@@ -2459,44 +2510,44 @@ float4 AlphaFadePS( VERTEXNORMAL_VERTEX vertex,
     float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
     color = float4( color.rgb * light, color.a * vertex.material.y );
-	color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
+    color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
 
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( color.a, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( color.a, alphaFunc, alphaRef );
 #endif
-	return color;
+    return color;
 }
 
-float4 AlphaFadeLoFiPS( VERTEXNORMAL_VERTEX vertex, 
-						uniform float timeFade, 
-						uniform float fadeMultiplier,
-						uniform bool alphaTestEnable, 
-						uniform int alphaFunc, 
-						uniform int alphaRef ) : COLOR0
+float4 AlphaFadeLoFiPS( VERTEXNORMAL_VERTEX vertex,
+                        uniform float timeFade,
+                        uniform float fadeMultiplier,
+                        uniform bool alphaTestEnable,
+                        uniform int alphaFunc,
+                        uniform int alphaRef ) : COLOR0
 {
     float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
     float3 light = ComputeLight( dot(sunDirection,vertex.normal), 1);
 
     color = float4( color.rgb * light, color.a * vertex.material.y );
-	color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
-    
+    color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( color.a, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( color.a, alphaFunc, alphaRef );
 #endif
-	return color;
+    return color;
 }
 
 float4 CommandFeedbackPS0( VERTEXNORMAL_VERTEX vertex, uniform bool fade ) : COLOR0
 {
     float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
-	return float4(color.rgb, fade ? saturate(color.a * vertex.material.x) : color.a );
+    return float4(color.rgb, fade ? saturate(color.a * vertex.material.x) : color.a );
 }
 
 float4 CommandFeedbackPS1( VERTEXNORMAL_VERTEX vertex, uniform float glow) : COLOR0
 {
-	return float4(0,0,0,glow);
+    return float4(0,0,0,glow);
 }
 
 /// AlphaFadeTexShiftScalePS
@@ -2507,8 +2558,8 @@ float4 AlphaFadeTexShiftScalePS( EFFECT_VERTEX vertex, uniform float texScale, u
     float2 texcoord = texScale * vertex.texcoord0;
     texcoord.y += vertex.material.x * timeCoeff;
 
-	float4 color = tex2D( albedoSampler, texcoord);
-	color.a *= tex2D( normalsSampler, vertex.texcoord0).g;//specularSampler
+    float4 color = tex2D( albedoSampler, texcoord);
+    color.a *= tex2D( normalsSampler, vertex.texcoord0).g;//specularSampler
     color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
 
     return color;
@@ -2517,14 +2568,14 @@ float4 AlphaFadeTexShiftScalePS( EFFECT_VERTEX vertex, uniform float texScale, u
 /// NukeHeadPS
 ///
 ///
-float4 NukeHeadPS( EFFECT_VERTEX vertex, 
-				   uniform float texScale, 
-				   uniform float timeCoeff, 
-				   uniform float timeFade, 
-				   uniform float fadeMultiplier,
-				   uniform bool alphaTestEnable, 
-				   uniform int alphaFunc, 
-				   uniform int alphaRef ) : COLOR
+float4 NukeHeadPS( EFFECT_VERTEX vertex,
+                   uniform float texScale,
+                   uniform float timeCoeff,
+                   uniform float timeFade,
+                   uniform float fadeMultiplier,
+                   uniform bool alphaTestEnable,
+                   uniform int alphaFunc,
+                   uniform int alphaRef ) : COLOR
 {
     float2 texcoord = vertex.texcoord0;
     float cTime = vertex.material.x;
@@ -2539,7 +2590,7 @@ float4 NukeHeadPS( EFFECT_VERTEX vertex,
     float2 texcoord4 = 0.25 * vertex.texcoord0;
     texcoord4.y += cTime * timeCoeff * 0.1;
 
-	float4 color = tex2D( albedoSampler, texcoord);
+    float4 color = tex2D( albedoSampler, texcoord);
     float4 color2 = tex2D( normalsSampler, texcoord2);
     float4 color3 = tex2D( normalsSampler, texcoord3);
     float4 color4 = tex2D( normalsSampler, texcoord4);
@@ -2563,11 +2614,11 @@ float4 NukeHeadPS( EFFECT_VERTEX vertex,
             outColor.a = 0;
     }
 
-	outColor.a *= color2.g;
+    outColor.a *= color2.g;
 
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( outColor.a, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( outColor.a, alphaFunc, alphaRef );
 #endif
     return outColor;
 }
@@ -2597,24 +2648,24 @@ float4 NormalMappedMetalPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadow
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-	float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
-	float4 anisoAmount = tex2D( anisotropicSampler, anisoLookup);
+    float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
+    float4 anisoAmount = tex2D( anisotropicSampler, anisoLookup);
 
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
-	float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
+    float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = ComputeLight( dotLightNormal, shadow);
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
 
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
-	return float4( color, alpha );
+    return float4( color, alpha );
 }
 
 /// AeonPS
@@ -2630,26 +2681,26 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
 
-	float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 3) * specular.g;
+    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 3) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
-    
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
 
-	return float4( color, alpha );
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+
+    return float4( color, alpha );
 }
 
 //NewAeonPS
@@ -2663,35 +2714,35 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	  float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-    
+      float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
     //albedo.rgb = (0.8 * specular.r) -  albedo.rgb;
-    
-  	// Calculate lighting and shadows
+
+    // Calculate lighting and shadows
     float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-    
+
     light = (light * 0.5) * pow((1 - specular.a), 8);
     //light = light * (0.8 - (light * 0.125));
     //float3 lightpow = (light.r + light.g + light.b) / 3;
-    //light = light * lightpow * lightpow * lightpow;  
-        
+    //light = light * lightpow * lightpow * lightpow;
+
     // Calculate Specular and Reflection
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-  	float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 5) * light *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 2;
+    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 5) * light *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 2;
     float3 phongMultiplicative = specular.r * light * environment * (1 - specular.a) * 1.2;
     float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b)/3;
     float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b)/3;
-    
+
     // Does the rest of the stuff
-  	float emissive = glowMultiplier * specular.b;
-  	float3 color = (albedo.rgb * 0.125) + (emissive + (light * albedo.rgb)) + phongAdditive + phongMultiplicative;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = (albedo.rgb * 0.125) + (emissive + (light * albedo.rgb)) + phongAdditive + phongMultiplicative;
     color += vertex.color.rgb * specular.a;
     float teamColGlowCompensation = ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
     //alpha = 0;
     //color = light;
-  	return float4( color, alpha );
+    return float4( color, alpha );
 }
 
 /// AeonCZARPS
@@ -2707,35 +2758,35 @@ float4 AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLO
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
 
-	float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
-    
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
+
     float2 texcoord = vertex.texcoord0.xy * 60;
     texcoord.x -= vertex.material.x * 0.16;
     texcoord.y -= vertex.material.x * 0.01;
     float2 texcoord2 = vertex.texcoord0.xy * 30;
     texcoord2.x += vertex.material.x * 0.08;
-    texcoord2.y -= vertex.material.x * 0.005;    
-    float3 secondary = tex2D( secondarySampler, texcoord ); 
-    float3 secondary2 = tex2D( secondarySampler, texcoord2 ); 
+    texcoord2.y -= vertex.material.x * 0.005;
+    float3 secondary = tex2D( secondarySampler, texcoord );
+    float3 secondary2 = tex2D( secondarySampler, texcoord2 );
     color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
-    
-	float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g )* (1-albedo.a))+ glowMinimum;
-	return float4( color, alpha );
+
+    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g )* (1-albedo.a))+ glowMinimum;
+    return float4( color, alpha );
 }
 
 /// UnitFalloffPS
@@ -2751,36 +2802,36 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
-    
+
     float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-	
-	// Calculate lookup into falloff ramp
-	float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
-	float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x)); 
-	
-	// Calculate specular highlights based on current sun direction
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    // Calculate lookup into falloff ramp
+    float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
+    float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x));
+
+    // Calculate specular highlights based on current sun direction
     float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-	float3 phongAdditive = float3 (0.5,0.6,0.7) * pow( specularAmount, 9) * specular.g;
-	
-	// Calculate environment map reflection
+    float3 phongAdditive = float3 (0.5,0.6,0.7) * pow( specularAmount, 9) * specular.g;
+
+    // Calculate environment map reflection
     environment *= specular.r * fallOff.a;
-	
-	// Calculate lighting and shadows
+
+    // Calculate lighting and shadows
     float shadow = 0; // ComputeShadow( vertex.shadow, hiDefShadows);
-    
+
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = light + ( 1 - light ) * shadowFill;
-	
-	// Determine our final output color
-	float3 color = diffuse.rgb * light;
-	color += environment + phongAdditive;							
-	color += (fallOff.rgb * diffuse.a);										
-    
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum; 
-	return float4( color, alpha );
+
+    // Determine our final output color
+    float3 color = diffuse.rgb * light;
+    color += environment + phongAdditive;
+    color += (fallOff.rgb * diffuse.a);
+
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    return float4( color, alpha );
 }
 
 //New SeraPS
@@ -2791,66 +2842,66 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
-    
+
     float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	  float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal)) * specular.r;
-	
-  	// Calculate lookup into falloff ramp
-  	float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
-  	//float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x)); 
-	  
+      float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal)) * specular.r;
+
+    // Calculate lookup into falloff ramp
+    float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
+    //float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x));
+
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    
+
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = light * (0.8 - (light * 0.125)) * (1 - diffuse.a) * 0.125;
-    
-	  // Calculate specular highlights based on current sun direction
+
+      // Calculate specular highlights based on current sun direction
     float reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-	  float3 phongAdditive = pow( specularAmount, 30) * specular.g * light * pow(diffuse.rgb * 5, 2) * 2.0;
+      float3 phongAdditive = pow( specularAmount, 30) * specular.g * light * pow(diffuse.rgb * 5, 2) * 2.0;
     float phongMultiplicativeAmount = (diffuse.r + diffuse.g + diffuse.b) / 3;
-    phongMultiplicativeAmount = pow(phongMultiplicativeAmount * 10, 0.3) * 2; 
-	  float3 phongMultiplicative = (light + 0.03) * specular.r * (1.0 - (phongMultiplicativeAmount * 0.25)) * environment * (1 - (diffuse.a * 0.5) ) * 15;
-  	float3 defaultphongMultiplicative = (phongMultiplicative.r + phongMultiplicative.b + phongMultiplicative.b) / 3;
+    phongMultiplicativeAmount = pow(phongMultiplicativeAmount * 10, 0.3) * 2;
+      float3 phongMultiplicative = (light + 0.03) * specular.r * (1.0 - (phongMultiplicativeAmount * 0.25)) * environment * (1 - (diffuse.a * 0.5) ) * 15;
+    float3 defaultphongMultiplicative = (phongMultiplicative.r + phongMultiplicative.b + phongMultiplicative.b) / 3;
     defaultphongMultiplicative *= (float3(0.5, 0.7, 0.9) + phongMultiplicative) * 1;
     float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b) / 3;
     float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b) / 3;
-	
+
     float3 teamColSpec = (NdotV * vertex.color.rgb) * 1;
     float3 fallOff = lerp( teamColSpec, 0, 1 - diffuse.a );
-    
-  	// Determine our final output color
-  	float3 color = (fallOff.rgb * 2) + defaultphongMultiplicative + phongAdditive + specular.b;															
+
+    // Determine our final output color
+    float3 color = (fallOff.rgb * 2) + defaultphongMultiplicative + phongAdditive + specular.b;
     //color = teamColSpec;
     float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColGlow = (pow(diffuse.a * 1.5, 2) * (1.0 - teamColGlow)) * 0.05;
-    //float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.6 * (1.4 - teamColGlowCompensation)) + (phongMultiplicativeGlow + phongAdditiveGlow) * 0.2;  
-  	float alpha = mirrored ? 0.5 : specular.b + glowMinimum + teamColGlow +((phongMultiplicativeGlow + phongAdditiveGlow) * 0.07);
-    //alpha = 0; 
-  	return float4( color, alpha );
+    //float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.6 * (1.4 - teamColGlowCompensation)) + (phongMultiplicativeGlow + phongAdditiveGlow) * 0.2;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + teamColGlow +((phongMultiplicativeGlow + phongAdditiveGlow) * 0.07);
+    //alpha = 0;
+    return float4( color, alpha );
 }
 
 float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
-    
+
     float4 diffuse = tex2D(albedoSampler,vertex.texcoord0.xy);
     float4 specular = tex2D(specularSampler,vertex.texcoord0.xy);
-    
+
     diffuse.rgb = specular.ggg * specular.rrr * ( 1 - diffuse.rgb );
     diffuse.rgb = lerp(vertex.color,diffuse.rgb,specular.g);
-    
+
     float3 normal = normalize(vertex.normal);
-    
+
     float3 reflected = reflect(-normalize(vertex.viewDirection),normal);
     float highlight = pow(saturate(dot(reflected,sunDirection)),5);
-    
+
     float dotLightNormal = dot(sunDirection,normal);
-	float3 light = ComputeLight(dotLightNormal,sunDirection);
-	float3 color = diffuse.rgb * light + highlight.rrr;
-	
+    float3 light = ComputeLight(dotLightNormal,sunDirection);
+    float3 color = diffuse.rgb * light + highlight.rrr;
+
     return float4(color.rgb,0);
 }
 
@@ -2865,10 +2916,10 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
-   
+
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     // Fade in team color at 90% complete
     float3 teamColor = vertex.color.rgb;
@@ -2877,23 +2928,23 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-	float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
-	float emissive = glowMultiplier * specular.b;
+    float emissive = glowMultiplier * specular.b;
 
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
-	
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
 
-	return float4( color, alpha);
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+
+    return float4( color, alpha);
 }
 
 float4 AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
-{   
+{
     // Diffuse texture
     float4 texcoord = vertex.texcoord0;
     texcoord.y += vertex.material.x * 0.00162;
@@ -2910,8 +2961,8 @@ float4 AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     // Custom normal mapping
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
     float3 normal = tex2D( normalsSampler, vertex.texcoord0.zw ).gaa;
-    normal = lerp( normal, tex2D( secondarySampler, vertex.texcoord0 * 7 ).baa, 0.5); 
-    normal = lerp( normal, diffuse, 0.5); 
+    normal = lerp( normal, tex2D( secondarySampler, vertex.texcoord0 * 7 ).baa, 0.5);
+    normal = lerp( normal, diffuse, 0.5);
     normal = 2 * normal - 1;
     normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
     normal = normalize( mul( normal, rotationMatrix));
@@ -2926,8 +2977,8 @@ float4 AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     // Fade out 95% complete
     float percentComplete = vertex.material.y;
     float alpha = (percentComplete >= 0.95) ? (1.0 - ((percentComplete - 0.95) * 20)) * (color.r * 2) : color.r * 2;
-	
-	return float4( color, alpha );
+
+    return float4( color, alpha );
 }
 
 /// AeonBuildPuddlePS
@@ -2948,24 +2999,24 @@ float4 AeonBuildPuddlePS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows)
     float4 albedo = tex2D( albedoSampler, texcoord );
 
     float4 specular = tex2D( specularSampler, texcoord );
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
 
-	float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = 0.4 * lightMultiplier * light + ( 1 - light ) * shadowFill;
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
 
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
-	return float4( color, alpha );
+    return float4( color, alpha );
 }
 
 float4 AeonBuildPuddleLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
@@ -2974,7 +3025,7 @@ float4 AeonBuildPuddleLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     //return albedo;
-	float3 environment = texCUBE( environmentSampler, reflect( -sunDirection, vertex.normal) );
+    float3 environment = texCUBE( environmentSampler, reflect( -sunDirection, vertex.normal) );
     return float4( albedo.rgb + (environment * 0.15), 1);
 }
 
@@ -2989,24 +3040,24 @@ float4 CybranBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     float dotLightNormal = dot(sunDirection,normal);
-	float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
-	float4 anisoAmount = tex2D( insectSampler, anisoLookup);
-	float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
+    float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
+    float4 anisoAmount = tex2D( insectSampler, anisoLookup);
+    float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
     phongAdditive *= ( 1 - specular.a);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = 2 * sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = lightMultiplier * light + ( 1 - light ) * shadowFill;
 
-	float emissive = glowMultiplier * specular.b;
+    float emissive = glowMultiplier * specular.b;
     float3 teamColor = vertex.color.rgb;
     teamColor *= (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
     albedo.rgb = lerp( teamColor, albedo.rgb, 1 - specular.a );
 
-	float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
+    float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
 
     // Adjust the transparency of the unit so that it is 40% visible, until the unit is 70% complete
     float alpha = (vertex.material.y >= 0.7) ? 0.4 + (0.6 * ((vertex.material.y - 0.7) * 3.33)) : 0.4;
@@ -3042,22 +3093,22 @@ float4 CybranBuildOverlayPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
-    
+
     float4 texcoord = vertex.texcoord0;
-    texcoord.y += vertex.material.x * 0.005;   
+    texcoord.y += vertex.material.x * 0.005;
     float buildFractionMul = (vertex.material.y - 0.9) * 10;
-    
+
     float4 uvaddress = tex2D( secondarySampler, texcoord * 0.5 ) * 0.03;
     float2 texcoord2 = vertex.texcoord0.xy + lerp( uvaddress.rb, 0, buildFractionMul );
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw + lerp( uvaddress.rb, 0, buildFractionMul ), rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
-    
+
     // Calculate lookup into falloff ramp
     float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
-    float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.depth.y));      
-    
+    float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.depth.y));
+
     float4 diffuse = tex2D( albedoSampler, texcoord2);
     float4 specular = tex2D( specularSampler, texcoord2);
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal)) * specular.r * fallOff.a;
@@ -3066,7 +3117,7 @@ float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) :
     float3 color = diffuse.rgb * ( sunAmbient + ( 1 - sunAmbient ) * shadowFill) ;
     color += environment + (fallOff.rgb * diffuse.a);
 
-	return float4( color, max(vertex.material.y, 0.25) );
+    return float4( color, max(vertex.material.y, 0.25) );
 }
 
 /// UEFBuildPS
@@ -3075,9 +3126,9 @@ float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) :
 float4 UEFBuildHiFiPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
-    
+
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    
+
     float4 texcoord = vertex.texcoord0;
     float4 texcoord2 = texcoord * 5;
     texcoord2.y += vertex.material.x * 0.062;
@@ -3085,26 +3136,26 @@ float4 UEFBuildHiFiPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     float4 albedo = tex2D( albedoSampler, texcoord.xy);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float4 specular = tex2D( specularSampler, texcoord.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
     float4 secondary = tex2D( secondarySampler, texcoord2.xy * 10);
-	
+
     float3 teamColor = vertex.color.rgb;
     teamColor *= (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
     albedo.rgb = lerp( teamColor, albedo.rgb, 1 - specular.a );
-	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-	float3 phongAdditive = pow( phongAmount, 8) * specular.g;
-	float3 phongMultiplicative = float3( 2 * environment * specular.r);
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
 
     float3 light = ComputeLight( dot(sunDirection,normal), ComputeShadow( vertex.shadow, hiDefShadows));
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
 
     float1 t = min(max(frac( 0.02 * time), 0.35), 0.7);
     float3 current = lerp(color+secondary.rgb,float3(0,0,1),t);
     float3 outColor =  lerp( current, color, vertex.material.y);
 
-	return float4( outColor, max(vertex.material.y, 0.5));
+    return float4( outColor, max(vertex.material.y, 0.5));
 }
 
 float4 UEFBuildLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
@@ -3113,8 +3164,8 @@ float4 UEFBuildLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
     float4 specular = tex2D( specularSampler, vertex.texcoord0);
     albedo.rgb = lerp( vertex.color.rgb * vertex.material.y * 0.25, albedo.rgb, saturate(1 - specular.a) );
     float3 light = ComputeLight( dot(sunDirection,vertex.normal), 1);
-	float4 color = ( saturate( 2 * light.rgb * light.rgb * albedo.rgb ) + ((1 - vertex.material.y) * float3( 0, 0, 1 )), max(vertex.material.y, 0.5));
-	return color;
+    float4 color = ( saturate( 2 * light.rgb * light.rgb * albedo.rgb ) + ((1 - vertex.material.y) * float3( 0, 0, 1 )), max(vertex.material.y, 0.5));
+    return color;
 }
 
 /// UEFBuildOverlayPS
@@ -3124,14 +3175,14 @@ float4 UEFBuildOverlayHiFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 {
     float4 xshift = tex2D( secondarySampler, vertex.texcoord0.xy );
     float4 yshift = tex2D( secondarySampler, vertex.texcoord0.zw );
-	
+
     // Fade the overlay mask alpha to 0 in the last 5% of building
     float alpha = max((xshift.a + yshift.a) * (1.0 - vertex.material.y), 0.25);
     alpha *= (vertex.material.y >= 0.95) ? 1.0 - ((vertex.material.y - 0.95) * 20) : 1.0;
 
     return float4(xshift.rgb + yshift.rgb, alpha);
 }
-  
+
 float4 UEFBuildOverlayLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 {
     float4 xshift = tex2D( secondarySampler, vertex.texcoord0.xy );
@@ -3142,7 +3193,7 @@ float4 UEFBuildOverlayLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
     alpha = max(alpha, 0.25);
 
     return float4(xshift.rgb + yshift.rgb, alpha);
-}  
+}
 
 /// UEFBuildCubePS
 ///
@@ -3150,7 +3201,7 @@ float4 UEFBuildOverlayLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 float4 UEFBuildCubePS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
-    
+
     float4 texcoord = vertex.texcoord0;
     texcoord.x += vertex.material.x * 0.012;
     texcoord.y += vertex.material.x * 0.062;
@@ -3159,8 +3210,8 @@ float4 UEFBuildCubePS( NORMALMAPPED_VERTEX vertex) : COLOR0
 
     float4 albedo = tex2D( albedoSampler, texcoord.xy * 0.025);
     float4 secondary = tex2D( secondarySampler, texcoord2.xy * 50);
-    
-	float3 color = albedo.rgb;
+
+    float3 color = albedo.rgb;
     float percentComplete = vertex.material.y;
     float3 outColor = color;
 
@@ -3168,8 +3219,8 @@ float4 UEFBuildCubePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     float3 current = lerp( color + secondary, colorMod1, max(frac( 0.05 * time), 0.35));
     outColor =  lerp( current, color, percentComplete);
 
-	return float4( outColor, max(percentComplete, 0.5) * albedo.a);
-} 
+    return float4( outColor, max(percentComplete, 0.5) * albedo.a);
+}
 
 float4 UEFBuildCubeLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
 {
@@ -3179,8 +3230,8 @@ float4 UEFBuildCubeLoFiPS( VERTEXNORMAL_VERTEX vertex) : COLOR0
     float3 current = lerp( albedo.rgb + secondary, float3( 0, 0, 1.0 ), 0.65 );
     float3 outColor = lerp( current, albedo.rgb, saturate(vertex.material.y));
 
-	return float4( outColor, max(vertex.material.y, 0.5) * albedo.a);
-} 
+    return float4( outColor, max(vertex.material.y, 0.5) * albedo.a);
+}
 
 /// NormalMappedInsectPS
 ///
@@ -3195,26 +3246,26 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-	float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
-	float4 anisoAmount = tex2D( insectSampler, anisoLookup);
+    float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
+    float4 anisoAmount = tex2D( insectSampler, anisoLookup);
 
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
-	float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
+    float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
   phongAdditive *= ( 1 - specular.a);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = 2 * sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = lightMultiplier * light + ( 1 - light ) * shadowFill;
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
-    
-	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
 
-	return float4( color, alpha);
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+
+    return float4( color, alpha);
 }
 
 //New CybranPS
@@ -3229,26 +3280,26 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     //Textures'n Stuff
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-  	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-  
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
     albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
-    
+
     //Lighting, Specularity and Reflection
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
     light = light * 1.2;
     float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-  	float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
-    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 2);       
-  	 
-  	float emissive = glowMultiplier * specular.b;
+    float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
+    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 2);
   
+    float emissive = glowMultiplier * specular.b;
+
     //Finish it
-    float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;   
+    float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
     //color = phongAdditive;
     //alpha = 0;
-  	return float4( color, alpha);
+    return float4( color, alpha);
 }
 
 /// ShieldPS
@@ -3259,10 +3310,10 @@ float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
     if ( 1 == mirrored ) clip(vertex.depth);
 
     float4 colorMask = tex2D( albedoSampler, vertex.texcoord0.xy);
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
     float3 normal = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
     normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
-	float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
+    float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
 
     // Combine albedo and normal sampler for a final color
     float4 color = float4( mul( albedo.rgr, normal.rgb ) + float3( 0, 0, 0.25), 1.0);
@@ -3285,7 +3336,7 @@ float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
     }
 
     color.rgb += float3( 0, 0, 0.15 );
-    
+
     // Adjust color of shield based on its health percentage
     float4 colorMod1 = lerp(float4( 0.5, 0.0, 0.0, 0.05 ), color, 0.5);
     colorMod1 = lerp( color, colorMod1 + color, sin(frac( 0.06 * time) * 3.14) );
@@ -3301,19 +3352,19 @@ float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
 float4 ShieldLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 {
     float3 color = float3( 0.0, 0.0, 0.3);
-	float4 colormask = tex2D( albedoSampler, vertex.texcoord0.xy);
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord1.xy );
-	float4 secondary = tex2D( secondarySampler, vertex.texcoord2.xy);
-	float4 specular = tex2D( specularSampler, vertex.texcoord2.xy);
-     
+    float4 colormask = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord1.xy );
+    float4 secondary = tex2D( secondarySampler, vertex.texcoord2.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord2.xy);
+
     color.rgb += albedo.r + secondary.b;
     float alpha = colormask.b * 0.7;
-    
+
     if( specular.g <= albedo.g )
         alpha += 0.2;
     else
         alpha += 0.1;
-    
+
     color.rgb += float3( 0, 0, 0.15 ) + colormask.bbb;
 
     alpha *= colormask.a;
@@ -3327,11 +3378,11 @@ float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     float4 albedo2 = tex2D( albedoSampler, vertex.texcoord0.zw );
     float3 specular = tex2D( specularSampler, vertex.texcoord1.xy );
     float3 specular2 = tex2D( specularSampler, vertex.texcoord1.zw );
-    
+
     // Color wackiness
     float3 color2 = (albedo2.b * specular2.g * 3 );
     float3 color3 = specular2.g * albedo.a;
@@ -3345,36 +3396,36 @@ float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 
     finalColor += (albedo.r + albedo2.r) * 0.1;
     finalColor -= (1 - albedo.a);
-    
+
     float clradd = (finalColor.r + finalColor.g + finalColor.b);
-    
+
     if (clradd < 0.1)
     {
-		finalColor = float3( 0.15, 0.15, 0.3 );
+        finalColor = float3( 0.15, 0.15, 0.3 );
     }
-    else 
+    else
     {
-		if (clradd > 0.1) 
-		{
-			if (clradd < 0.2)
-				finalColor = specular.b;
-		}
-	}
-	
-	finalColor += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
- 
-    // Alpha 
+        if (clradd > 0.1)
+        {
+            if (clradd < 0.2)
+                finalColor = specular.b;
+        }
+    }
+
+    finalColor += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
+
+    // Alpha
     alpha += (albedo.r + albedo2.r) * 0.2;
-	
+
     return float4(finalColor, alpha);
 }
 
 float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
-    
+
     // Texture samplers
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     float4 albedo2 = tex2D( albedoSampler, vertex.texcoord1.xy );
     float3 specular = tex2D( specularSampler, vertex.texcoord2.xy );
 
@@ -3395,7 +3446,7 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
 
     // Texture samplers
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     float3 specular = tex2D( specularSampler, vertex.texcoord0.zw );
     float3 specular2 = tex2D( specularSampler, vertex.texcoord1.xy );
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw * 4, rotationMatrix);
@@ -3419,14 +3470,14 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float3 colorMod2 = lerp( finalColor, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
     finalColor = lerp( colorMod1, finalColor, vertex.material.y);
 
-	float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
+    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
     return float4( lerp( colorMod1, finalColor, vertex.material.y), alpha);
 }
 
 float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 {
     // Texture samplers
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     float4 specular = tex2D( specularSampler, vertex.texcoord1.xy );
     float3 specular2 = tex2D( specularSampler, vertex.texcoord2.xy );
 
@@ -3440,48 +3491,48 @@ float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 ///
 float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
-    if ( 1 == mirrored ) 
-		clip(vertex.depth);
-	
-	float4 normal_pixel = tex2D( normalsSampler, vertex.texcoord1.zw ); 
+    if ( 1 == mirrored )
+        clip(vertex.depth);
+
+    float4 normal_pixel = tex2D( normalsSampler, vertex.texcoord1.zw );
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw, rotationMatrix );
-    float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );  
-    float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1); 
+    float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );
+    float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
     float4 specular = tex2D( specularSampler, texcoord );
 
     float m = abs( normal_pixel.g - 0.5 );
-	const float max_brightness = 0.453;
-	float dp = abs( cos(dot( float4(0,1,0,0), normal )) );
-	float channel_color = max_brightness - clamp((1.0 - dp), 0, max_brightness );
-	float t = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
-	float time_cutoff = 0.753;
-	float dp2 = abs(dot(vertex.viewDirection,normal));
-	
-	///If we are not close enough to the top of the shield dome...
-	if( t < time_cutoff )
-	{
-		m = 1.0;	/// This alpha multiple won't change alpha (So we are not fading to near transparency yet).
-	}
-	else
-	{
-		// NOTE: From right to left in the equation.
-		// Get a percentage multiple of how close we are to the top of the dome from the
-		// point where we want to start an alpha gradient to (close to) transparency. Using that
-		// we mutliply by 0.7 in order to get a percentage of a percentage multiple that is less than one.
-		// Then that is all subtracted from one, the closer we are to the top of the dome, the more we 
-		// are subtracting 0.7 from 1.0 and the closer our final percentage multiple is to 0.4, where the 
-		// final percentage multiple ('m') starts out at one. 0.7 is used to ensure that we do not go to complete
-		// transparency and retain some feeling of a sphere around the top area of the dome.
-		m = 1.0 - 0.7 * (t - time_cutoff) / (1.0 - time_cutoff);	
-	}
-	
-	///Compute the final translucency value.
-	float alpha = m *( dp2 * 0.3 + channel_color )*1.75;
+    const float max_brightness = 0.453;
+    float dp = abs( cos(dot( float4(0,1,0,0), normal )) );
+    float channel_color = max_brightness - clamp((1.0 - dp), 0, max_brightness );
+    float t = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
+    float time_cutoff = 0.753;
+    float dp2 = abs(dot(vertex.viewDirection,normal));
 
-	// Multiples(0.425,0.76274,1.0) are to give a blue tint. The dot product of the normal and the world up vector is squared
-	// so that the blue and whitish color fade off in an exponential gradient.
-	return  float4( 0.425 * dp * dp * specular.r, 0.76274 * dp * dp * specular.g, 1.0 * dp * dp * specular.b, alpha );
+    ///If we are not close enough to the top of the shield dome...
+    if( t < time_cutoff )
+    {
+        m = 1.0;	/// This alpha multiple won't change alpha (So we are not fading to near transparency yet).
+    }
+    else
+    {
+        // NOTE: From right to left in the equation.
+        // Get a percentage multiple of how close we are to the top of the dome from the
+        // point where we want to start an alpha gradient to (close to) transparency. Using that
+        // we mutliply by 0.7 in order to get a percentage of a percentage multiple that is less than one.
+        // Then that is all subtracted from one, the closer we are to the top of the dome, the more we
+        // are subtracting 0.7 from 1.0 and the closer our final percentage multiple is to 0.4, where the
+        // final percentage multiple ('m') starts out at one. 0.7 is used to ensure that we do not go to complete
+        // transparency and retain some feeling of a sphere around the top area of the dome.
+        m = 1.0 - 0.7 * (t - time_cutoff) / (1.0 - time_cutoff);
+    }
+
+    ///Compute the final translucency value.
+    float alpha = m *( dp2 * 0.3 + channel_color )*1.75;
+
+    // Multiples(0.425,0.76274,1.0) are to give a blue tint. The dot product of the normal and the world up vector is squared
+    // so that the blue and whitish color fade off in an exponential gradient.
+    return  float4( 0.425 * dp * dp * specular.r, 0.76274 * dp * dp * specular.g, 1.0 * dp * dp * specular.b, alpha );
 }
 
 /// ShieldFillPS()
@@ -3499,11 +3550,11 @@ float4 ShieldImpactPS( SHIELDIMPACT_VERTEX vertex, uniform float fadeTime, unifo
 
     float alphaFade = saturate( 1.0f - ( vertex.material.x - fadeTime) * fadeMul);
 
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
     float4 normal = tex2D( specularSampler, vertex.texcoord1.xy );
-    float alphaMask = tex2D( specularSampler, vertex.texcoord2.xy ).a; 
+    float alphaMask = tex2D( specularSampler, vertex.texcoord2.xy ).a;
 
-    float3 color =  float3( 0, 0, 0.5) + normal.r; 
+    float3 color =  float3( 0, 0, 0.5) + normal.r;
     float alpha = alphaMask * albedo.g * (normal.r + normal.g) * alphaFade;
 
     return float4( color, alpha );
@@ -3532,7 +3583,7 @@ float4 PhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     tc1.x += 0.005 * vertex.material.x;
     tc1.y += 0.02 * vertex.material.x;
     float4 lookup = tex2D( lookupSampler, tc1);
-    
+
     float2 tc2 = vertex.texcoord0.xy * 4;
     tc2.y += 0.008 * vertex.material.x;
     tc2.x -= 0.008 * vertex.material.x;
@@ -3555,7 +3606,7 @@ float4 SeraphimPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     tc1.x += 0.005 * vertex.material.x;
     tc1.y += 0.02 * vertex.material.x;
     float4 lookup = tex2D( secondarySampler, tc1);
-    
+
     float2 tc2 = vertex.texcoord0.xy * 4;
     tc2.y += 0.008 * vertex.material.x;
     tc2.x -= 0.008 * vertex.material.x;
@@ -3581,12 +3632,12 @@ float4 EffectPS( EFFECT_VERTEX vertex ) : COLOR
     texcoord.y += vertex.material.x * 0.0008;
     texcoord.y *= 3;
 
-	float4 color = tex2D( albedoSampler, texcoord);
-	float alpha = 1.0 - tex2D( albedoSampler, vertex.texcoord0 ).a;
+    float4 color = tex2D( albedoSampler, texcoord);
+    float alpha = 1.0 - tex2D( albedoSampler, vertex.texcoord0 ).a;
 
     alpha *= saturate( 1.0f - ( vertex.material.x - 180) * 0.025);
 
-	return float4( color.xyz, alpha);
+    return float4( color.xyz, alpha);
 }
 
 /// EffectFadePS
@@ -3600,9 +3651,9 @@ float4 EffectFadePS( EFFECT_VERTEX vertex, uniform float timeFade, uniform float
     float3 light = ComputeLight( dotLightNormal, 1);
 
     color = float4( color.rgb * light, color.a * vertex.material.y );
-	color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
-    
-	return color;
+    color.a *= saturate( 1.0f - ( vertex.material.x - timeFade) * fadeMultiplier);
+
+    return color;
 }
 
 /// ExplosionPS()
@@ -3615,9 +3666,9 @@ float expfadeMul            =  0.035;
 float expfadeMul2           =  0.120;
 
 float4 ExplosionPS( EFFECT_VERTEX vertex,
-					uniform bool alphaTestEnable, 
-					uniform int alphaFunc, 
-					uniform int alphaRef ) : COLOR0
+                    uniform bool alphaTestEnable,
+                    uniform int alphaFunc,
+                    uniform int alphaRef ) : COLOR0
 {
     // Get our texture cood, precalc fadetime
     float2 t = vertex.texcoord0;
@@ -3625,10 +3676,10 @@ float4 ExplosionPS( EFFECT_VERTEX vertex,
 
     // Sample the AlbedoSampler texture and shift in different directions
     t.y += vertex.material.x * 0.0036;      // Modify our texture cood by scalar
-	float4 c = tex2D( albedoSampler, t );   // Sample our current pixel at texture cood
+    float4 c = tex2D( albedoSampler, t );   // Sample our current pixel at texture cood
 
     t.y += vertex.material.x * 0.018;
-	float4 d = tex2D( specularSampler, t );
+    float4 d = tex2D( specularSampler, t );
 
     // Add our sampled colors together and save off
     c = lerp(c, d, d.a);
@@ -3644,7 +3695,7 @@ float4 ExplosionPS( EFFECT_VERTEX vertex,
     d = c + e;
 
     // Alpha out our texture overtime
-	float alpha = saturate( 1.0f - fade * expfadeMul2);
+    float alpha = saturate( 1.0f - fade * expfadeMul2);
 
     // Dissolve textue based on current alpha value and the noise in NormalSampler texture
     if( fade >= 0 )
@@ -3654,25 +3705,25 @@ float4 ExplosionPS( EFFECT_VERTEX vertex,
         else
             alpha = 0;
     }
-    
+
 #ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
     return float4( d.xyz, alpha );
 }
 
 float4 TwoTexShiftScalePS( VERTEXNORMAL_VERTEX vertex, uniform float colorMul, uniform float alpha ) : COLOR
-{ 
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+{
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 normal = tex2D( normalsSampler, vertex.shadow.xy);
 
     return float4( (albedo.rgb + normal.rgb) * colorMul * albedo.a, alpha);
 }
 
 float4 TexSubAlphaMaskStaticLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float colorMul, uniform float alphaMul ) : COLOR
-{ 
-	float4 albedo = tex2D( albedoSampler, vertex.texcoord0);
+{
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0);
     float4 normal = tex2D( normalsSampler, vertex.texcoord1);
     float alphaMask = tex2D( albedoSampler, vertex.texcoord2).a;
 
@@ -3701,14 +3752,14 @@ float4 GlassAlphaPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows ) : C
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
     //return float4( environment, 0.5);
 
-	float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
+    float2 anisoLookup = float2( dot( reflect( sunDirection, normal), -vertex.viewDirection), dotLightNormal);
 
-  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
-	float4 phongAdditive = specular.g + float4( 0.5 * specular.r * environment, 0);
+    float4 phongAdditive = specular.g + float4( 0.5 * specular.r * environment, 0);
     phongAdditive *= ( 1 - specular.a);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
@@ -3716,10 +3767,10 @@ float4 GlassAlphaPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows ) : C
     light = lightMultiplier * light + ( 1 - light ) * shadowFill;
     //return float4( light, 0.2);
 
-	float emissive = glowMultiplier * specular.b;
-	float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light ) + phongAdditive.rgb;
 
-	float alpha = mirrored ? albedo.a: albedo.a + specular.b + phongAdditive.a;
+    float alpha = mirrored ? albedo.a: albedo.a + specular.b + phongAdditive.a;
 
     return float4(color, alpha);
 }
@@ -3751,10 +3802,10 @@ technique AlbedoPreview
     pass P0
     {
         AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 AlbedoPreviewPS();        
+        PixelShader = compile ps_2_0 AlbedoPreviewPS();
     }
 }
 
@@ -3767,8 +3818,8 @@ technique NormalsPreview
     pass P0
     {
         AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 NormalsPreviewPS();
     }
@@ -3781,9 +3832,9 @@ technique LightingPreview
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 LightingPreviewPS();
     }
@@ -3796,10 +3847,10 @@ technique Depth
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
 #endif
@@ -3816,10 +3867,10 @@ technique SeraphimBuildDepth
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
 #endif
@@ -3836,10 +3887,10 @@ technique DepthClip
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
 #endif
@@ -3856,10 +3907,10 @@ technique UndulatingDepthClip
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-        
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
 #endif
@@ -3880,9 +3931,9 @@ technique Occlude
     /// an "occluding" pixel.
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Occlude )
+        AlphaState( AlphaBlend_Disable_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Occlude )
 
         VertexShader = compile vs_1_1 SilhouetteVS();
         PixelShader = null;
@@ -3897,15 +3948,15 @@ technique Silhouette
 {
     /// First pass
     ///
-    /// Set bit 1 everywhere there is an "occluded" pixel.  Bit 0 is set for all occluders.  Therefore, 
+    /// Set bit 1 everywhere there is an "occluded" pixel.  Bit 0 is set for all occluders.  Therefore,
     /// the value 0x03 will exist in the stencil buffer for all occluder and occluded
     /// overlaps.
     pass P0
     {
         AlphaState( AlphaBlend_Disable_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_CW )
         DepthState( Depth_SilhouetteP0 )
-        
+
         VertexShader = compile vs_1_1 SilhouetteVS();
         PixelShader = null;
     }
@@ -3917,8 +3968,8 @@ technique Silhouette
     /// keep the value 0x03 which will serve as the acutal silhouette in the stencil buffer.
     pass P1
     {
-		DepthState( Depth_SilhouetteP1 )
-        
+        DepthState( Depth_SilhouetteP1 )
+
         VertexShader = compile vs_1_1 SilhouetteVS();
         PixelShader = null;
     }
@@ -3929,20 +3980,20 @@ technique Silhouette
 ///
 technique CartographicFeedback
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x7F;
-		AlphaFunc = Greater;
+        AlphaRef = 0x7F;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 CartographicFeedbackVS();
@@ -3955,20 +4006,20 @@ technique CartographicFeedback
 ///
 technique CartographicFeature
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x7F;
-		AlphaFunc = Greater;
+        AlphaRef = 0x7F;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 CartographicVS();
@@ -3981,25 +4032,25 @@ technique CartographicFeature
 ///
 technique CartographicUnit
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
         VertexShader = compile vs_1_1 CartographicVS();
         PixelShader = compile ps_2_0 CartographicPS(false);
     }
     pass P1
     {
-		AlphaState( AlphaBlend_Disable_Write_A )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Disable )
-        
+        AlphaState( AlphaBlend_Disable_Write_A )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
         VertexShader = compile vs_1_1 CartographicVS();
         PixelShader = compile ps_2_0 CartographicGlowPS();
     }
@@ -4010,15 +4061,15 @@ technique CartographicUnit
 ///
 technique CartographicPlace
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 CartographicVS();
         PixelShader = compile ps_2_0 CartographicPlacePS();
@@ -4030,15 +4081,15 @@ technique CartographicPlace
 ///
 technique CartographicBuild
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 CartographicVS();
         PixelShader = compile ps_2_0 CartographicBuildPS();
@@ -4050,20 +4101,20 @@ technique CartographicBuild
 ///
 technique CartographicShield
 <
-    int renderStage = 0;    
+    int renderStage = 0;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		ColorWriteEnable = 0x07;
-		
-		AlphaBlendEnable = true;
-		SrcBlend = SrcAlpha;
-		DestBlend = InvSrcAlpha;
+        ColorWriteEnable = 0x07;
 
-		ZEnable = true;
-		ZWriteEnable = false;		
+        AlphaBlendEnable = true;
+        SrcBlend = SrcAlpha;
+        DestBlend = InvSrcAlpha;
+
+        ZEnable = true;
+        ZWriteEnable = false;
 
         VertexShader = compile vs_1_1 CartographicVS();
         PixelShader = compile ps_2_0 CartographicShieldPS();
@@ -4076,20 +4127,20 @@ technique CartographicShield
 technique Flat
 <
     string depthTechnique = "DepthClip";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x7F;
-		AlphaFunc = Greater;
+        AlphaRef = 0x7F;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 FlatVS();
@@ -4107,32 +4158,32 @@ technique VertexNormal_HighFidelity
     string abstractTechnique = "VertexNormal";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaFunc = Greater;
-		AlphaRef = 0x23;
+        AlphaRef = 0x23;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
-		PixelShader = compile ps_2_a VertexNormalPS_HighFidelity(true, true, d3d_Greater, 0x23 );
+        PixelShader = compile ps_2_a VertexNormalPS_HighFidelity(true, true, d3d_Greater, 0x23 );
     }
 }
 
 technique VertexNormal_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "VertexNormal";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
@@ -4143,14 +4194,14 @@ technique VertexNormal_MedFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaFunc = Greater;
-		AlphaRef = 0x23;
+        AlphaRef = 0x23;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4172,14 +4223,14 @@ technique VertexNormal_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaRef = 0x23;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4193,54 +4244,54 @@ technique VertexNormal_LowFidelity
 technique NormalMappedAlpha_HighFidelity
 <
     int fidelity = FIDELITY_HIGH;
-    
+
     string abstractTechnique = "NormalMappedAlpha";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
+        PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
     }
 }
 
 technique NormalMappedAlpha_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "NormalMappedAlpha";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
@@ -4251,25 +4302,25 @@ technique NormalMappedAlpha_MedFidelity
 technique NormalMappedAlpha_LowFidelity
 <
     int fidelity = FIDELITY_LOW;
-    
+
     string abstractTechnique = "NormalMappedAlpha";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4283,54 +4334,54 @@ technique NormalMappedAlpha_LowFidelity
 technique NormalMappedAlphaNoShadow_HighFidelity
 <
     int fidelity = FIDELITY_HIGH;
-    
+
     string abstractTechnique = "NormalMappedAlphaNoShadow";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
+        PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
     }
 }
 
 technique NormalMappedAlphaNoShadow_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "NormalMappedAlphaNoShadow";
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
@@ -4341,25 +4392,25 @@ technique NormalMappedAlphaNoShadow_MedFidelity
 technique NormalMappedAlphaNoShadow_LowFidelity
 <
     int fidelity = FIDELITY_LOW;
-    
+
     string abstractTechnique = "NormalMappedAlphaNoShadow";
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4374,54 +4425,54 @@ technique NormalMappedAlphaNoShadow_LowFidelity
 technique UndulatingNormalMappedAlpha_HighFidelity
 <
     int fidelity = FIDELITY_HIGH;
-    
+
     string abstractTechnique = "UndulatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-	
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 UndulatingNormalMappedVS();
-		PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
+        PixelShader = compile ps_2_a NormalMappedPS(false,false,true,  true, d3d_Greater, 0x80 );
     }
 }
 
 technique UndulatingNormalMappedAlpha_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "UndulatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 UndulatingNormalMappedVS();
@@ -4432,25 +4483,25 @@ technique UndulatingNormalMappedAlpha_MedFidelity
 technique UndulatingNormalMappedAlpha_LowFidelity
 <
     int fidelity = FIDELITY_LOW;
-    
+
     string abstractTechnique = "UndulatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4464,25 +4515,25 @@ technique UndulatingNormalMappedAlpha_LowFidelity
 technique BloatingNormalMappedAlpha_HighFidelity
 <
     int fidelity = FIDELITY_HIGH;
-    
+
     string abstractTechnique = "BloatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 BloatingNormalMappedVS();
@@ -4493,25 +4544,25 @@ technique BloatingNormalMappedAlpha_HighFidelity
 technique BloatingNormalMappedAlpha_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "BloatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 BloatingNormalMappedVS();
@@ -4522,25 +4573,25 @@ technique BloatingNormalMappedAlpha_MedFidelity
 technique BloatingNormalMappedAlpha_LowFidelity
 <
     int fidelity = FIDELITY_LOW;
-    
+
     string abstractTechnique = "BloatingNormalMappedAlpha";
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "UndulatingDepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
-#ifndef DIRECT3D10	
+#ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 BloatingVertexNormalVS();
@@ -4554,25 +4605,25 @@ technique BloatingNormalMappedAlpha_LowFidelity
 technique BlackenedNormalMappedAlpha_HighFidelity
 <
     int fidelity = FIDELITY_HIGH;
-    
+
     string abstractTechnique = "BlackenedNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
@@ -4583,25 +4634,25 @@ technique BlackenedNormalMappedAlpha_HighFidelity
 technique BlackenedNormalMappedAlpha_MedFidelity
 <
     int fidelity = FIDELITY_MEDIUM;
-    
+
     string abstractTechnique = "BlackenedNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
@@ -4612,25 +4663,25 @@ technique BlackenedNormalMappedAlpha_MedFidelity
 technique BlackenedNormalMappedAlpha_LowFidelity
 <
     int fidelity = FIDELITY_LOW;
-    
+
     string abstractTechnique = "BlackenedNormalMappedAlpha";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x80;
-		AlphaFunc = Greater;
+        AlphaRef = 0x80;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -4646,18 +4697,18 @@ technique NormalMappedGlow_HighFidelity
     int fidelity = FIDELITY_HIGH;
 
     string abstractTechnique = "NormalMappedGlow";
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "Depth";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
@@ -4675,24 +4726,24 @@ technique MapImager_LowFi
 <
     string abstractTechnique = "MapImager";
     int fidelity = FIDELITY_LOW;
-    
+
     int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 MapImagerPS0();
     }
     pass P1
     {
-		AlphaState( AlphaBlend_Disable_Write_A )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_A )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 MapImagerPS1();
@@ -4704,7 +4755,7 @@ technique NormalMappedGlow_MedFidelity
     string abstractTechnique = "NormalMappedGlow";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -4712,9 +4763,9 @@ technique NormalMappedGlow_MedFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
@@ -4730,7 +4781,7 @@ technique NormalMappedGlow_LowFidelity
     string abstractTechnique = "NormalMappedGlow";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicFeature";    
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -4738,9 +4789,9 @@ technique NormalMappedGlow_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
@@ -4762,12 +4813,12 @@ technique Clutter
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
-#ifndef DIRECT3D10	
-		AlphaTestEnable = true;
+#ifndef DIRECT3D10
+        AlphaTestEnable = true;
         AlphaRef = 0x70;
         AlphaFunc = Greater;
 #endif
@@ -4788,12 +4839,12 @@ technique UnderwaterClutter
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
 #ifndef DIRECT3D10
-		AlphaTestEnable = true;
+        AlphaTestEnable = true;
         AlphaRef = 0x70;
         AlphaFunc = Greater;
 #endif
@@ -4814,12 +4865,12 @@ technique UndulatingClutter
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
 #ifndef DIRECT3D10
-		AlphaTestEnable = true;
+        AlphaTestEnable = true;
         AlphaRef = 0x70;
         AlphaFunc = Greater;
 #endif
@@ -4840,12 +4891,12 @@ technique UnderwaterUndulatingClutter
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
 #ifndef DIRECT3D10
-		AlphaTestEnable = true;
+        AlphaTestEnable = true;
         AlphaRef = 0x70;
         AlphaFunc = Greater;
 #endif
@@ -4868,12 +4919,12 @@ technique NormalMappedTerrain
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
 #ifndef DIRECT3D10
-		AlphaTestEnable = false;
+        AlphaTestEnable = false;
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
@@ -4888,17 +4939,17 @@ technique Unit_HighFidelity
 <
     string abstractTechnique = "Unit";
     int fidelity = FIDELITY_HIGH;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
-{        
+{
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
         PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true, false,0,0 );
@@ -4909,17 +4960,17 @@ technique Unit_MedFidelity
 <
     string abstractTechnique = "Unit";
     int fidelity = FIDELITY_MEDIUM;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
-{        
+{
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
         PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
@@ -4930,17 +4981,17 @@ technique Unit_LowFidelity
 <
     string abstractTechnique = "Unit";
     int fidelity = FIDELITY_LOW;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
@@ -4961,18 +5012,18 @@ technique AlphaFade_HighFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaRef = 0x23;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
-		PixelShader = compile ps_2_a AlphaFadePS( 2.0, 0.145, true,  true, d3d_Greater, 0x23 );
+        PixelShader = compile ps_2_a AlphaFadePS( 2.0, 0.145, true,  true, d3d_Greater, 0x23 );
     }
 }
 
@@ -4987,14 +5038,14 @@ technique AlphaFade_MedFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaRef = 0x23;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -5013,14 +5064,14 @@ technique AlphaFade_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -5030,22 +5081,22 @@ technique AlphaFade_LowFidelity
 
 technique CommandFeedback
 <
-    string cartographicTechnique = "CartographicFeedback";    
-    
+    string cartographicTechnique = "CartographicFeedback";
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_LIFETIME;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Disable )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 CommandFeedbackVS(0.7);
@@ -5055,22 +5106,22 @@ technique CommandFeedback
 
 technique RallyPoint
 <
-    string cartographicTechnique = "CartographicFeedback";    
-    
+    string cartographicTechnique = "CartographicFeedback";
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_LIFETIME;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Disable )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 CommandFeedbackVS(0.7);
@@ -5080,22 +5131,22 @@ technique RallyPoint
 
 technique CommandFeedback2
 <
-    string cartographicTechnique = "CartographicFeedback";    
-    
+    string cartographicTechnique = "CartographicFeedback";
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
     int parameter = PARAM_LIFETIME;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Disable )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
         AlphaRef = 0x23;
-		AlphaFunc = Greater;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 CommandFeedbackVS(1.1);
@@ -5105,41 +5156,41 @@ technique CommandFeedback2
 
 technique CommandFeedback3
 <
-    string cartographicTechnique = "CartographicFeedback";    
-    
+    string cartographicTechnique = "CartographicFeedback";
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;    
+    int parameter = PARAM_UNUSED;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Disable )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
         VertexShader = compile vs_1_1 VertexNormalVS();
-		PixelShader = compile ps_2_0 CommandFeedbackPS0(false);
+        PixelShader = compile ps_2_0 CommandFeedbackPS0(false);
     }
 }
 
 technique CommandFeedback4
 <
-    string cartographicTechnique = "CartographicFeedback";    
-    
+    string cartographicTechnique = "CartographicFeedback";
+
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;    
+    int parameter = PARAM_UNUSED;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-		
-		DepthBias = -0.0001;
-	
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        DepthBias = -0.0001;
+
         VertexShader = compile vs_1_1 VertexNormalVS();
-		PixelShader = compile ps_2_0 CommandFeedbackPS0(false);
+        PixelShader = compile ps_2_0 CommandFeedbackPS0(false);
     }
 }
 
@@ -5151,17 +5202,17 @@ technique UnitPlace_LowFidelity
     int fidelity = FIDELITY_LOW;
 
     string abstractTechnique = "UnitPlace";
-    string cartographicTechnique = "CartographicPlace";    
+    string cartographicTechnique = "CartographicPlace";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
-    
+
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 UnitPlacePS();
@@ -5177,16 +5228,16 @@ technique UnitFormationPreview_LowFidelity
     string abstractTechnique = "UnitFormationPreview";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicPlace";    
+    string cartographicTechnique = "CartographicPlace";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 UnitPlacePS(); // Just use UnitPlace for now
@@ -5200,8 +5251,8 @@ technique Metal_HighFidelity
 <
     string abstractTechnique = "Metal";
     int fidelity = FIDELITY_HIGH;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5210,7 +5261,7 @@ technique Metal_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a NormalMappedMetalPS(true);
     }
@@ -5220,8 +5271,8 @@ technique Metal_MedFidelity
 <
     string abstractTechnique = "Metal";
     int fidelity = FIDELITY_MEDIUM;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5230,7 +5281,7 @@ technique Metal_MedFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 NormalMappedMetalPS(false);
     }
@@ -5240,8 +5291,8 @@ technique Metal_LowFidelity
 <
     string abstractTechnique = "Metal";
     int fidelity = FIDELITY_LOW;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5249,7 +5300,7 @@ technique Metal_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
@@ -5264,8 +5315,8 @@ technique Insect_HighFidelity
 <
     string abstractTechnique = "Insect";
     int fidelity = FIDELITY_HIGH;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5274,7 +5325,7 @@ technique Insect_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_a NormalMappedInsectPS(true);
         PixelShader = compile ps_2_a NormalMappedInsectPS_02(true);
@@ -5285,8 +5336,8 @@ technique Insect_MedFidelity
 <
     string abstractTechnique = "Insect";
     int fidelity = FIDELITY_MEDIUM;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5295,7 +5346,7 @@ technique Insect_MedFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_0 NormalMappedInsectPS(false);
         PixelShader = compile ps_2_a NormalMappedInsectPS(true);
@@ -5306,8 +5357,8 @@ technique Insect_LowFidelity
 <
     string abstractTechnique = "Insect";
     int fidelity = FIDELITY_LOW;
-    
-    string cartographicTechnique = "CartographicUnit";    
+
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5315,9 +5366,9 @@ technique Insect_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
     }
@@ -5331,18 +5382,18 @@ technique Aeon_HighFidelity
     string abstractTechnique = "Aeon";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 
-		string environment = "<aeon>";
+        string environment = "<aeon>";
 >
 {
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_a AeonPS(true);
         PixelShader = compile ps_2_a AeonPS_02(true);
@@ -5354,7 +5405,7 @@ technique Aeon_MedFidelity
     string abstractTechnique = "Aeon";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5363,7 +5414,7 @@ technique Aeon_MedFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_0 AeonPS(false);
         PixelShader = compile ps_2_a AeonPS(true);
@@ -5375,7 +5426,7 @@ technique Aeon_LowFidelity
     string abstractTechnique = "Aeon";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5383,9 +5434,9 @@ technique Aeon_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
     }
@@ -5402,18 +5453,18 @@ technique Seraphim_HighFidelity
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 
-	string environment = "<seraphim>";
+    string environment = "<seraphim>";
 
 >
 {
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 UnitFalloffVS();
         //PixelShader = compile ps_2_a UnitFalloffPS(true);
         PixelShader = compile ps_2_a UnitFalloffPS_02(true);
@@ -5427,17 +5478,17 @@ technique Seraphim_MedFidelity
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 
-	string environment = "<seraphim>";
+    string environment = "<seraphim>";
 >
 {
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 UnitFalloffVS();
         //PixelShader = compile ps_2_0 UnitFalloffPS(false);
         PixelShader = compile ps_2_a UnitFalloffPS_02(true);
@@ -5451,9 +5502,9 @@ technique Seraphim_LowFidelity
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
-	string environment = "<seraphim>";
-    
+
+    string environment = "<seraphim>";
+
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
@@ -5461,7 +5512,7 @@ technique Seraphim_LowFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 LowFiUnitFalloffPS();
     }
@@ -5476,7 +5527,7 @@ technique AeonCZAR_HighFidelity
     string abstractTechnique = "AeonCZAR";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5485,7 +5536,7 @@ technique AeonCZAR_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a AeonCZARPS(true);
     }
@@ -5496,7 +5547,7 @@ technique AeonCZAR_MedFidelity
     string abstractTechnique = "AeonCZAR";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5505,7 +5556,7 @@ technique AeonCZAR_MedFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 AeonPS(false);
     }
@@ -5516,7 +5567,7 @@ technique AeonCZAR_LowFidelity
     string abstractTechnique = "AeonCZAR";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -5524,9 +5575,9 @@ technique AeonCZAR_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
-        
+
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
     }
@@ -5540,24 +5591,24 @@ technique AeonBuild_HighFidelity
     string abstractTechnique = "AeonBuild";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_CW )
         AlphaState( AlphaBlend_Disable_Write_RGB )
-        
+
         VertexShader = compile vs_1_1 AeonBuildVS();
         PixelShader = compile ps_2_a AeonBuildPS(true);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 AeonBuildVS();
         PixelShader = compile ps_2_0 AeonBuildOverlayPS();
     }
@@ -5568,24 +5619,24 @@ technique AeonBuild_MedFidelity
     string abstractTechnique = "AeonBuild";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_CW )
         AlphaState( AlphaBlend_Disable_Write_RGB )
-       
+
         VertexShader = compile vs_1_1 AeonBuildVS();
         PixelShader = compile ps_2_0 AeonBuildPS(false);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 AeonBuildVS();
         PixelShader = compile ps_2_0 AeonBuildOverlayPS();
     }
@@ -5596,15 +5647,15 @@ technique AeonBuild_LowFidelity
     string abstractTechnique = "AeonBuild";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 AeonBuildLoFiVS(1,1,0,0,0,0);
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
@@ -5626,8 +5677,8 @@ technique AeonBuildPuddle_HighFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a AeonBuildPuddlePS(true);
@@ -5646,11 +5697,11 @@ technique AeonBuildPuddle_MedFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_0 AeonBuildPuddlePS(false);
+        PixelShader = compile ps_2_0 AeonBuildPuddlePS(false);
     }
 }
 
@@ -5666,9 +5717,9 @@ technique AeonBuildPuddle_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 1, 1, -0.002, 0.0042, 0, 0 );
         PixelShader = compile ps_2_0 AeonBuildPuddleLoFiPS();
     }
@@ -5682,25 +5733,25 @@ technique CybranBuild_HighFidelity
     string abstractTechnique = "CybranBuild";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a CybranBuildPS(true);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
         PixelShader = compile ps_2_0 CybranBuildOverlayPS();
     }
@@ -5711,25 +5762,25 @@ technique CybranBuild_MedFidelity
     string abstractTechnique = "CybranBuild";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_0 CybranBuildPS(false);
+        PixelShader = compile ps_2_0 CybranBuildPS(false);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
         PixelShader = compile ps_2_0 CybranBuildOverlayPS();
     }
@@ -5740,24 +5791,24 @@ technique CybranBuild_LowFidelity
     string abstractTechnique = "CybranBuild";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 CybranBuildLoFiPS();
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
         PixelShader = compile ps_2_0 CybranBuildOverlayPS();
     }
@@ -5773,16 +5824,16 @@ technique SeraphimBuild_MedFidelity
 
     string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "SeraphimBuildDepth";
-     
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;    
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 SeraphimBuildVS();
         PixelShader = compile ps_2_0 SeraphimBuildPS(false);
     }
@@ -5795,16 +5846,16 @@ technique SeraphimBuild_LowFidelity
 
     string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "SeraphimBuildDepth";
-     
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;    
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 SeraphimBuildLofiVS();
         PixelShader = compile ps_2_0 CybranBuildLoFiPS();
     }
@@ -5818,25 +5869,25 @@ technique UEFBuild_HighFidelity
     string abstractTechnique = "UEFBuild";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a UEFBuildHiFiPS(true);
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		         
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalHiFiVS( 16.0, 8.0, 0.0192, 0.0176, -0.0122, -0.0122 );
         PixelShader = compile ps_2_0 UEFBuildOverlayHiFiPS();
     }
@@ -5847,25 +5898,25 @@ technique UEFBuild_MedFidelity
     string abstractTechnique = "UEFBuild";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 UEFBuildHiFiPS(false);
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalHiFiVS( 16.0, 8.0, 0.0192, 0.0176, -0.0122, -0.0122 );
         PixelShader = compile ps_2_0 UEFBuildOverlayHiFiPS();
     }
@@ -5876,24 +5927,24 @@ technique UEFBuild_LowFidelity
     string abstractTechnique = "UEFBuild";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicBuild";    
+    string cartographicTechnique = "CartographicBuild";
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 UEFBuildLoFiPS();
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 16, 8, 0.0192, 0.0176, -0.05, -0.05 );
         PixelShader = compile ps_2_0 UEFBuildOverlayLoFiPS();
@@ -5911,15 +5962,15 @@ technique UEFBuildCube_MedFidelity
     int fidelity = FIDELITY_MEDIUM;
 
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 UEFBuildCubePS();
@@ -5932,14 +5983,14 @@ technique UEFBuildCube_LowFidelity
     int fidelity = FIDELITY_LOW;
 
     string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;    
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 0.025, 50, 0.0012, 0.0062, -0.25, -0.0062);
         PixelShader = compile ps_2_0 UEFBuildCubeLoFiPS();
@@ -5953,8 +6004,8 @@ technique Wreckage_MedFidelity
 <
     string abstractTechnique = "Wreckage";
     int fidelity = FIDELITY_MEDIUM;
-    
-    string cartographicTechnique = "CartographicFeature";    
+
+    string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
@@ -5962,7 +6013,7 @@ technique Wreckage_MedFidelity
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_2_0 WreckageVS_HighFidelity();
         PixelShader = compile ps_2_0 WreckagePS();
@@ -5973,16 +6024,16 @@ technique Wreckage_LowFidelity
 <
     string abstractTechnique = "Wreckage";
     int fidelity = FIDELITY_LOW;
-    
-    string cartographicTechnique = "CartographicFeature";    
+
+    string cartographicTechnique = "CartographicFeature";
     int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
 >
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
-	
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 WreckageVS_LowFidelity();
         PixelShader = compile ps_2_0 WreckagePS_LowFidelity();
     }
@@ -5990,31 +6041,31 @@ technique Wreckage_LowFidelity
 
 /// Phase Shield
 ///
-/// 
+///
 technique PhaseShield_HighFidelity
 <
     string abstractTechnique = "PhaseShield";
     int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-	
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
@@ -6022,35 +6073,35 @@ technique PhaseShield_HighFidelity
 
 /// SeraphimPersonalShield
 ///
-/// 
+///
 technique SeraphimPersonalShield_MedFidelity
 <
     string abstractTechnique = "SeraphimPersonalShield";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    
+
     int parameter = PARAM_LIFETIME;
-    
-	string environment = "<seraphim>";
+
+    string environment = "<seraphim>";
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-	
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 UnitFalloffVS();
         //PixelShader = compile ps_2_a UnitFalloffPS(true);
         PixelShader = compile ps_2_a UnitFalloffPS_02(true);
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 SeraphimPhaseShieldPS();
     }
@@ -6058,34 +6109,34 @@ technique SeraphimPersonalShield_MedFidelity
 
 /// SeraphimPersonalShield
 ///
-/// 
+///
 technique SeraphimPersonalShield_LowFidelity
 <
     string abstractTechnique = "SeraphimPersonalShield";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicUnit";    
+    string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    
+
     int parameter = PARAM_LIFETIME;
-    
+
     string environment = "<seraphim>";
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-	
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 LowFiUnitFalloffPS();
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
@@ -6096,25 +6147,25 @@ technique PhaseShield_MedFidelity
     string abstractTechnique = "PhaseShield";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-        
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
@@ -6125,25 +6176,25 @@ technique PhaseShield_LowFidelity
     string abstractTechnique = "PhaseShield";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
 >
-{        
+{
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-  
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
@@ -6157,16 +6208,16 @@ technique ShieldUEF_MedFidelity
     string abstractTechnique = "ShieldUEF";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_None )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
         PixelShader = compile ps_2_0 ShieldPS();
@@ -6178,16 +6229,16 @@ technique ShieldUEF_LowFidelity
     string abstractTechnique = "ShieldUEF";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_None )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1, 3, 32, 0, 0, 0.0003, 0.005, -0.001, -0.005 );
         PixelShader = compile ps_2_0 ShieldLoFiPS();
@@ -6202,25 +6253,25 @@ technique ShieldCybran_MedFidelity
     string abstractTechnique = "ShieldCybran";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
         VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
     }
     pass P1
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 ShieldPositionNormalOffsetVS( 0.01, 1,1,4,1, 0.01,0, -0.002,0, 0,0.0012, 0.001,-0.003 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
@@ -6232,16 +6283,16 @@ technique ShieldCybran_LowFidelity
     string abstractTechnique = "ShieldCybran";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,2,1, 0,0, 0,0.002, 0.001,-0.003 );
         PixelShader = compile ps_2_0 ShieldCybranLoFiPS(0.24);
@@ -6255,16 +6306,16 @@ technique ShieldAeon_MedFidelity
     string abstractTechnique = "ShieldAeon";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
         PixelShader = compile ps_2_0 ShieldAeonPS();
@@ -6276,16 +6327,16 @@ technique ShieldAeon_LowFidelity
     string abstractTechnique = "ShieldAeon";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,12,8, 0,0, 0,0.032, 0.012,-0.032 );
         PixelShader = compile ps_2_0 ShieldAeonLoFiPS( 0.5 );
@@ -6300,20 +6351,20 @@ technique ShieldSeraphim_MedFidelity
     string abstractTechnique = "ShieldSeraphim";
     int fidelity = FIDELITY_MEDIUM;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 
-	string environment = "<seraphim>";
+    string environment = "<seraphim>";
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
-		
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-    
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
         VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
         PixelShader = compile ps_2_0 ShieldSeraphimPS();
     }
@@ -6324,20 +6375,20 @@ technique ShieldSeraphim_LowFidelity
     string abstractTechnique = "ShieldSeraphim";
     int fidelity = FIDELITY_LOW;
 
-    string cartographicTechnique = "CartographicShield";    
+    string cartographicTechnique = "CartographicShield";
     int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
     int parameter = PARAM_FRACTIONHEALTH;
 
-	string environment = "<seraphim>";
+    string environment = "<seraphim>";
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
-		
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-    
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,12,8, 0,0, 0,0.032, 0.012,-0.032 );
         PixelShader = compile ps_2_0 ShieldAeonLoFiPS( 0.5 );
     }
@@ -6355,10 +6406,10 @@ technique ShieldFill
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable )
-		
+        AlphaState( AlphaBlend_Disable_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = false;
 #endif
@@ -6376,9 +6427,9 @@ technique ShieldImpact
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_One_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldImpactVS( -0.003, -0.1, -0.085 , -0.15 , 0.25, 0, 0, 0.0, 2.0 );
         PixelShader = compile ps_2_0 ShieldImpactPS( 2.0, 0.2 );
@@ -6393,9 +6444,9 @@ technique CybranShieldImpact
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		RasterizerState( Rasterizer_Cull_None )
-		DepthState( Depth_Enable_LessEqual_Write_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldImpactVS( 0, 0, 0, 0, 1, -0.003, -0.06, -0.01, 1 );
         PixelShader = compile ps_2_0 CybranShieldImpactPS( 6.0, 0.15, 4.5 );
@@ -6415,8 +6466,8 @@ technique Effect
 {
     pass P0
     {
-		RasterizerState( Rasterizer_Cull_CW )
-		
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 EffectPS();
     }
@@ -6434,14 +6485,14 @@ technique Explosion
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		RasterizerState( Rasterizer_Cull_CW )
-		DepthState( Depth_Enable_Less )
-		
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
 #ifndef DIRECT3D10
-		AlphaTestEnable = true;
-		AlphaRef = 0x40;
-		AlphaFunc = Greater;
+        AlphaTestEnable = true;
+        AlphaRef = 0x40;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 EffectVS();
@@ -6461,19 +6512,19 @@ technique Cloud_HighFidelity
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable )
-		RasterizerState( Rasterizer_Cull_CW )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable )
+        RasterizerState( Rasterizer_Cull_CW )
 
 #ifndef DIRECT3D10
-		AlphaTestEnable = false;
+        AlphaTestEnable = false;
 #endif
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_a EffectFadePS( 180.0, 0.025, true);
-	}
+    }
 }
 
 technique Cloud_MedFidelity
@@ -6485,19 +6536,19 @@ technique Cloud_MedFidelity
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable )
-		RasterizerState( Rasterizer_Cull_CW )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable )
+        RasterizerState( Rasterizer_Cull_CW )
 
 #ifndef DIRECT3D10
-		AlphaTestEnable = false;
+        AlphaTestEnable = false;
 #endif
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 EffectFadePS( 180.0, 0.025, false);
-	}
+    }
 }
 
 technique Cloud_LowFidelity
@@ -6509,19 +6560,19 @@ technique Cloud_LowFidelity
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable )
+        RasterizerState( Rasterizer_Cull_CW )
+
 #ifndef DIRECT3D10
-		AlphaTestEnable = false;
+        AlphaTestEnable = false;
 #endif
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 EffectFadePS( 180.0, 0.025, false);
-	}
+    }
 }
 
 /// OuterCloud
@@ -6533,15 +6584,15 @@ technique OuterCloud
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable_Less_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable_Less_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 AlphaFadeTexShiftScalePS( 1.0, -0.008, 180.0, 0.025);
-	}
+    }
 }
 
 /// NukeUEF
@@ -6554,21 +6605,21 @@ technique NukeUEF
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable )
+        RasterizerState( Rasterizer_Cull_CW )
+
 #ifndef DIRECT3D10
         AlphaTestEnable = true;
-		AlphaRef = 0x0F;
-		AlphaFunc = Greater;
+        AlphaRef = 0x0F;
+        AlphaFunc = Greater;
 #endif
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 NukeHeadPS( 1.0, 0.018, 50.0, 0.015,  true, d3d_Greater, 0x0F );
-	}
+    }
 }
 
 /// NukeEMP
@@ -6580,15 +6631,15 @@ technique NukeEMP
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		DepthState( Depth_Enable_Less_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_Less_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 AlphaFadeTexShiftScalePS( 1.0, -0.008, 180.0, 0.025);
-	}
+    }
 }
 
 /// NukeQuantum
@@ -6600,15 +6651,15 @@ technique NukeQuantum
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RBA )
-		DepthState( Depth_Enable_Less_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RBA )
+        DepthState( Depth_Enable_Less_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 EffectVS();
         PixelShader = compile ps_2_0 AlphaFadeTexShiftScalePS( 0.5, -0.006, 150.0, 0.025);
-	}
+    }
 }
 
 technique PhalanxEffect
@@ -6617,15 +6668,15 @@ technique PhalanxEffect
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_One_InvSrcAlpha_Write_RGBA )
-		DepthState( Depth_Enable_Less_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
-		
+    pass P0
+    {
+        AlphaState( AlphaBlend_One_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_Less_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 1, 1, -0.05, 0, -0.05, -0.025 );
         PixelShader = compile ps_2_0 TwoTexShiftScalePS( 0.2, 0.2 );
-	}
+    }
 }
 
 technique UEFQuantumGate
@@ -6634,15 +6685,15 @@ technique UEFQuantumGate
     int parameter = PARAM_UNUSED;
 >
 {
-	pass P0
-	{
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-		DepthState( Depth_Enable_Less_Write_None )
-		RasterizerState( Rasterizer_Cull_None )
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_Less_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1, 4, 1, 0, 0.025, 0.025, 0.025, 0, 0 );
         PixelShader = compile ps_2_0 TexSubAlphaMaskStaticLoFiPS( 1, 0.4 );
-	}
+    }
 }
 
 /// EditorMarker
@@ -6656,8 +6707,8 @@ technique EditorMarker
 {
     pass P0
     {
-		AlphaState( AlphaBlend_Disable_Write_RGB )
-		DepthState( Depth_Enable )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        DepthState( Depth_Enable )
         RasterizerState( Rasterizer_Cull_CW )
 
 #ifndef DIRECT3D10
@@ -6671,7 +6722,7 @@ technique EditorMarker
 
 /// Glass shader
 ///
-/// 
+///
 technique GlassAlpha_MedFidelity
 <
     string abstractTechnique = "GlassAlpha";
@@ -6683,12 +6734,12 @@ technique GlassAlpha_MedFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-		PixelShader = compile ps_2_0 GlassAlphaPS(false);
+        PixelShader = compile ps_2_0 GlassAlphaPS(false);
     }
 }
 
@@ -6703,12 +6754,12 @@ technique GlassAlpha_LowFidelity
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-		DepthState( Depth_Enable_LessEqual_Write_None )
-		RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 VertexNormalVS();
-		PixelShader = compile ps_2_0 GlassAlphaLoFiPS();
+        PixelShader = compile ps_2_0 GlassAlphaLoFiPS();
     }
 }
 
@@ -6719,7 +6770,7 @@ technique GlassAlpha_LowFidelity
 
 // STRUCTS
 
-struct NOMADBUILD_VERTEX
+struct NOMADSBUILD_VERTEX
 {
     float4 position : POSITION0;
     float3 normal : TEXCOORD3;
@@ -6735,7 +6786,7 @@ struct NOMADBUILD_VERTEX
 
 // VERTEX SHADERS ---------------------------------------------------------------------------------------------
 
-NOMADBUILD_VERTEX NOMADBuildVS(
+NOMADSBUILD_VERTEX NOMADSBuildVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
     float3 tangent : TANGENT0,
@@ -6752,11 +6803,11 @@ NOMADBUILD_VERTEX NOMADBuildVS(
     float1 colorLookup : TEXCOORD7
 )
 {
-    NOMADBUILD_VERTEX vertex = (NOMADBUILD_VERTEX)0;
+    NOMADSBUILD_VERTEX vertex = (NOMADSBUILD_VERTEX)0;
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    
+
     vertex.position = mul( float4(position,1), worldMatrix);
 
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
@@ -6782,7 +6833,7 @@ NOMADBUILD_VERTEX NOMADBuildVS(
 
 // SAMPLERS --------------------------------------------------------------------------------------------------
 
-// This sampler is for sampling the nomad noise cube texture
+// This sampler is for sampling the nomads noise cube texture
 sampler3D NoiseCubeSampler = sampler_state
 {
     texture = (lookupTexture);
@@ -6834,7 +6885,7 @@ float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
     float2 tc3 = vertex.texcoord0.xy * 0.001 ;
     tc3.x -= 0.001 * vertex.material.x;
-	tc3.y  = 4;
+    tc3.y  = 4;
     float4 lookup3 = tex2D( lookupSampler, tc3);
 
     float electricity =  lookup.r * lookup2.b * 2;
@@ -6845,7 +6896,7 @@ float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 }
 
 // The factory build rect
-float4 NomadFactoryBuildHologramPS( NOMADBUILD_VERTEX vertex ) : COLOR0
+float4 NomadsFactoryBuildHologramPS( NOMADSBUILD_VERTEX vertex ) : COLOR0
 {
     // The holographic colour
     float3 holo = float3(1.0, 0.5, 0.0);
@@ -6859,20 +6910,20 @@ float4 StunnedUnit( VERTEXNORMAL_VERTEX vertex ) : COLOR
 }
 
 // creates an orange see through version of the unit
-float4 NomadBuildHologramPS( NOMADBUILD_VERTEX vertex,
+float4 NomadsBuildHologramPS( NOMADSBUILD_VERTEX vertex,
                     uniform bool FadeAlmostDone ) : COLOR0
 {
     // The holographic colour
     float3 holo = float3(1.0, 0.5, 0.0);
-        
+
     //Alpha channel, fade in til 5% completion, fade out from 90% again. The other shaders start to fade in at 90% so this is a nice overlap
     float alpha = 0.22;
-	if (vertex.material.y < 0.5)
-	{
-	    alpha = alpha * (vertex.material.y / 0.5);
-	}
+    if (vertex.material.y < 0.5)
+    {
+        alpha = alpha * (vertex.material.y / 0.5);
+    }
     else if (FadeAlmostDone && vertex.material.y > 0.9)
-	{
+    {
         alpha = alpha * (10 * (1 - vertex.material.y));
     }
 
@@ -6880,12 +6931,12 @@ float4 NomadBuildHologramPS( NOMADBUILD_VERTEX vertex,
 }
 
 // creates the noise effect
-float4 NomadBuildNoisePS( NOMADBUILD_VERTEX vertex,
+float4 NomadsBuildNoisePS( NOMADSBUILD_VERTEX vertex,
                     uniform bool FadeAlmostDone ) : COLOR0
 {
     // The holographic colour
     float3 holo = float3(1.0f, 0.5f, 0.0f);
-    
+
     // 3d noise
     float4 noisy = 1.0f;
     float noiselayer = ((vertex.material.x/4.0f) % 4.0f);
@@ -6894,21 +6945,21 @@ float4 NomadBuildNoisePS( NOMADBUILD_VERTEX vertex,
 
     //Alpha channel
     float alpha = 0.5f;
-	if (vertex.material.y < 0.5)
-	{
-	    alpha = alpha * (vertex.material.y / 0.5);
-	}
+    if (vertex.material.y < 0.5)
+    {
+        alpha = alpha * (vertex.material.y / 0.5);
+    }
     else if (FadeAlmostDone && vertex.material.y > 0.9)
-	{
+    {
         alpha = alpha * (10 * (1 - vertex.material.y));
     }
-    	
+    
     return float4(holo, alpha) * noisy;
 }
 
 
 // This applies texture fade in
-float4 NomadBuildPS( NORMALMAPPED_VERTEX vertex,
+float4 NomadsBuildPS( NORMALMAPPED_VERTEX vertex,
                      uniform bool hiDefShadows ) : COLOR0
 {
     clip(vertex.material.y - 0.9f);
@@ -6940,33 +6991,33 @@ float4 NomadBuildPS( NORMALMAPPED_VERTEX vertex,
     float4 holo = float4(float3(1.0f, 0.5f, 0.0f) * light, 0.0f);
 
     //interpolate between holographic and normal textured unit
-    
+
     // Start at 90% completion
     float interpolate = 0.0f;
     if (vertex.material.y > 0.9) {
         interpolate = 10*(vertex.material.y - 0.9);
     }
-    
+
     float4 color = lerp(holo, float4(textured, 1.0f), interpolate);
 
     return color;
 }
 
-/// Nomad powered armor
+/// Nomads powered armor
 ///
-float4 NomadPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+float4 NomadsPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
 //    float4 color = float4( 1, 0.4, 0.18, 0.5);
     float4 color = float4( 0.4, 0.6, 0.18, 0.5);
 
     float2 tc = vertex.texcoord0.xy * 0.1; // duration, speed and size?
     tc.x -= 0.0015 * vertex.material.x * (2 - vertex.material.y); // speed
-	tc.y = tc.y * 8;  // shape of the effects, squares -> lines
-	
+    tc.y = tc.y * 8;  // shape of the effects, squares -> lines
+
     float4 lookup = tex2D( lookupSampler, tc);
     float4 glowpulse = float4(lookup.ggg, min(lookup.g, 0.65) );
 
-	// Adjust color of armor effect based on its health percentage, going to white-ish with low alpha channel
+    // Adjust color of armor effect based on its health percentage, going to white-ish with low alpha channel
 //    float4 colorMod1 = float4( color.r * 0.8, color.g * 2, color.b * 2.7, color.a * 0.4 );
     float4 colorMod1 = float4( color.r * 2, color.g * 1.333, color.b * 2.7, color.a * 0.4 );
     color = lerp( colorMod1, color, vertex.material.y );
@@ -6974,9 +7025,9 @@ float4 NomadPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     return color * glowpulse;
 }
 
-/// Nomad personal shield
+/// Nomads personal shield
 ///
-float4 NomadPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+float4 NomadsPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
     float4 baseshellcolor = float4( 0.9, 0.5, 0.1, 0.6);
 
@@ -7002,7 +7053,7 @@ float4 NomadPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 /// Bubble shield
 ///
-float4 ShieldNomadPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsPS( EFFECT_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -7013,13 +7064,13 @@ float4 ShieldNomadPS( EFFECT_VERTEX vertex ) : COLOR
     float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
 
     // the alpha value (0 -> 1) controls how transparent the shield is.
-	float alpha = 0.28;
+    float alpha = 0.28;
     float4 color = float4( mul( albedo.r , normal.r), mul( albedo.g , normal.g), mul( albedo.b , normal.b), alpha);
-	
-	// using the specular (noise map) to create noise on the shield by manipulating the alpha value
-	float noiseFactor = 0.2;
+
+    // using the specular (noise map) to create noise on the shield by manipulating the alpha value
+    float noiseFactor = 0.2;
     color.a = color.a * ((1 - noiseFactor) * (specular.r + specular.g + specular.b));
-	
+
     // Adjust color of shield based on its health percentage
     float4 colorMod1 = float4( color.r * 0.5, color.g * 0.9, color.b * 0.9, color.a * 0.8 );
     color = lerp( colorMod1, color, vertex.material.y );
@@ -7027,7 +7078,7 @@ float4 ShieldNomadPS( EFFECT_VERTEX vertex ) : COLOR
     return color;
 }
 
-float4 ShieldNomadLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 {
     float3 color = float3( 1, 0.53, 0.24);
     float4 colormask = tex2D( albedoSampler, vertex.texcoord0.xy);
@@ -7109,16 +7160,18 @@ technique CybranPhaseShield_HighFidelity
     }
 }
 
-// NOMAD build effect technique
-// Orange holographic style with fade to unit texture
-technique NOMADBuild_MediumFidelity
+
+// ====================================================================================================================================================================
+// All nomads shader techniques
+
+technique NOMADSBuild_MediumFidelity
 <
-    string abstractTechnique = "NomadBuild";
+    string abstractTechnique = "NomadsBuild";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -7133,8 +7186,8 @@ technique NOMADBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(true);
     }
     pass P1
     {
@@ -7144,7 +7197,7 @@ technique NOMADBuild_MediumFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P2
     {
@@ -7153,19 +7206,19 @@ technique NOMADBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
-technique NOMADBuild_LowFidelity
+technique NOMADSBuild_LowFidelity
 <
-    string abstractTechnique = "NomadBuild";
+    string abstractTechnique = "NomadsBuild";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
@@ -7181,7 +7234,7 @@ technique NOMADBuild_LowFidelity
         ZWriteEnable = true;
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadBuildPS(true);
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
     }
     pass P1
     {
@@ -7190,21 +7243,21 @@ technique NOMADBuild_LowFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(true);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
     }
 }
 
 // Orange holographic style
-// Like NOMADBuild but without fade to texture
+// Like NOMADSBuild but without fade to texture
 technique OrangeHolo_HighFidelity
 <
-    string abstractTechnique = "NomadBuild2";
+    string abstractTechnique = "NomadsBuild2";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
@@ -7219,8 +7272,8 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildHologramPS(false);
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramPS(false);
     }
     pass P1
     {
@@ -7229,21 +7282,21 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadBuildNoisePS(false);
-    } 
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(false);
+    }
 }
 
 // Orange holographic style
 // Factory build rect
-technique NomadFactoryBuildRect_HighFidelity
+technique NomadsFactoryBuildRect_HighFidelity
 <
-    string abstractTechnique = "NomadFactoryBuildRect";
+    string abstractTechnique = "NomadsFactoryBuildRect";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
     string depthTechnique = "Depth";
-    
+
     // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
     int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_UNUSED;
@@ -7258,16 +7311,16 @@ technique NomadFactoryBuildRect_HighFidelity
         ZEnable = true;
         ZWriteEnable = true;
 
-        VertexShader = compile vs_1_1 NOMADBuildVS();
-        PixelShader = compile ps_2_a NomadFactoryBuildHologramPS();
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsFactoryBuildHologramPS();
     }
 }
 
 // NOMAD UNIT
 // Don't forget to also update the personal shield techniques!
-technique NomadUnit_HighFidelity
+technique NomadsUnit_HighFidelity
 <
-    string abstractTechnique = "NomadUnit";
+    string abstractTechnique = "NomadsUnit";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7282,19 +7335,19 @@ technique NomadUnit_HighFidelity
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a NormalMappedPS(
-		    true,  // mask albedo
-			true,  // glow
-			true,  // hi def shadows
-			false, // alpha test enable
-			0, // alpha func
-			0 // alpha ref
-		);
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
     }
 }
 
-technique NomadUnit_MedFidelity
+technique NomadsUnit_MedFidelity
 <
-    string abstractTechnique = "NomadUnit";
+    string abstractTechnique = "NomadsUnit";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7312,9 +7365,9 @@ technique NomadUnit_MedFidelity
     }
 }
 
-technique NomadUnit_LowFidelity
+technique NomadsUnit_LowFidelity
 <
-    string abstractTechnique = "NomadUnit";
+    string abstractTechnique = "NomadsUnit";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7333,9 +7386,9 @@ technique NomadUnit_LowFidelity
     }
 }
 
-technique NomadUnitStunned_HighFidelity
+technique NomadsUnitStunned_HighFidelity
 <
-    string abstractTechnique = "NomadUnitStunned";
+    string abstractTechnique = "NomadsUnitStunned";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7350,13 +7403,13 @@ technique NomadUnitStunned_HighFidelity
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a NormalMappedPS(
-		    true,  // mask albedo
-			true,  // glow
-			true,  // hi def shadows
-			false, // alpha test enable
-			0, // alpha func
-			0 // alpha ref
-		);
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
     }
     pass P1
     {
@@ -7368,9 +7421,9 @@ technique NomadUnitStunned_HighFidelity
     }
 }
 
-technique NomadUnitStunned_MedFidelity
+technique NomadsUnitStunned_MedFidelity
 <
-    string abstractTechnique = "NomadUnitStunned";
+    string abstractTechnique = "NomadsUnitStunned";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7396,9 +7449,9 @@ technique NomadUnitStunned_MedFidelity
     }
 }
 
-technique NomadUnitStunned_LowFidelity
+technique NomadsUnitStunned_LowFidelity
 <
-    string abstractTechnique = "NomadUnitStunned";
+    string abstractTechnique = "NomadsUnitStunned";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicUnit";
@@ -7419,9 +7472,9 @@ technique NomadUnitStunned_LowFidelity
 
 /// Nomads powered armor
 /// Don't forget to also update the unit shader techniques (if the P0 pass is changed)!
-technique NomadPowerArmor_HighFidelity
+technique NomadsPowerArmor_HighFidelity
 <
-    string abstractTechnique = "NomadPowerArmor";
+    string abstractTechnique = "NomadsPowerArmor";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicShield";
@@ -7444,13 +7497,13 @@ technique NomadPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
-technique NomadPowerArmor_MedFidelity
+technique NomadsPowerArmor_MedFidelity
 <
-    string abstractTechnique = "NomadPowerArmor";
+    string abstractTechnique = "NomadsPowerArmor";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicShield";
@@ -7473,13 +7526,13 @@ technique NomadPowerArmor_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
-technique NomadPowerArmor_LowFidelity
+technique NomadsPowerArmor_LowFidelity
 <
-    string abstractTechnique = "NomadPowerArmor";
+    string abstractTechnique = "NomadsPowerArmor";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicShield";
@@ -7502,15 +7555,15 @@ technique NomadPowerArmor_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPowerArmorPS();
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
     }
 }
 
 /// Nomad personal shield
 ///
-technique NomadPhaseShield_HighFidelity
+technique NomadsPhaseShield_HighFidelity
 <
-    string abstractTechnique = "NomadPhaseShield";
+    string abstractTechnique = "NomadsPhaseShield";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicShield";
@@ -7533,13 +7586,13 @@ technique NomadPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
-technique NomadPhaseShield_MedFidelity
+technique NomadsPhaseShield_MedFidelity
 <
-    string abstractTechnique = "NomadPhaseShield";
+    string abstractTechnique = "NomadsPhaseShield";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicShield";
@@ -7562,13 +7615,13 @@ technique NomadPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
-technique NomadPhaseShield_LowFidelity
+technique NomadsPhaseShield_LowFidelity
 <
-    string abstractTechnique = "NomadPhaseShield";
+    string abstractTechnique = "NomadsPhaseShield";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicShield";
@@ -7591,15 +7644,15 @@ technique NomadPhaseShield_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadPhaseShieldPS();
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
 /// Nomad Shield
 ///
-technique ShieldNomad_MedFidelity
+technique ShieldNomads_MedFidelity
 <
-    string abstractTechnique = "ShieldNomad";
+    string abstractTechnique = "ShieldNomads";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicShield";
@@ -7613,27 +7666,27 @@ technique ShieldNomad_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-		VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
-		    1,  // ?
-			1,  // size and number of albedo's simultaniously
-			32,  // ?
-			6,  // ?
-			0,  // ?
-			0,  // ?
- 			0.001,  // albedo rotation
-			0.008,  // albedo speed top to bottom
-			0,  // rotation Y axis of secondary texture
-			0,  // speed of secondary texture (top to bottom)
-			0,  // rotating (Y axis)
-			0.004   // speed of specular texture (top to bottom)
-		);
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+            1,  // ?
+            1,  // size and number of albedo's simultaniously
+            32,  // ?
+            6,  // ?
+            0,  // ?
+            0,  // ?
+            0.001,  // albedo rotation
+            0.008,  // albedo speed top to bottom
+            0,  // rotation Y axis of secondary texture
+            0,  // speed of secondary texture (top to bottom)
+            0,  // rotating (Y axis)
+            0.004   // speed of specular texture (top to bottom)
+        );
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
-technique ShieldNomad_LowFidelity
+technique ShieldNomads_LowFidelity
 <
-    string abstractTechnique = "ShieldNomad";
+    string abstractTechnique = "ShieldNomads";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicShield";
@@ -7648,23 +7701,23 @@ technique ShieldNomad_LowFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS(
-		    1,  // ?
-			1,  // size and number of albedo's simultaniously
-			32,  // ?
-			6,  // ?
-			0,  // ?
-			0,  // ?
- 			0.001,  // albedo rotation
-			0.008,  // albedo speed top to bottom
-			0  // rotation Y axis of secondary texture
-		);
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+            1,  // ?
+            1,  // size and number of albedo's simultaniously
+            32,  // ?
+            6,  // ?
+            0,  // ?
+            0,  // ?
+            0.001,  // albedo rotation
+            0.008,  // albedo speed top to bottom
+            0  // rotation Y axis of secondary texture
+        );
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
     }
 }
 
-technique ShieldNomadStealth_MedFidelity
+technique ShieldNomadsStealth_MedFidelity
 <
-    string abstractTechnique = "StealthShieldNomad";
+    string abstractTechnique = "StealthShieldNomads";
     int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicShield";
@@ -7678,27 +7731,27 @@ technique ShieldNomadStealth_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-		VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
-		    1,  // ?
-			3,  // size and number of albedo's simultaniously
-			32,  // ?
-			6,  // ?
-			0,  // ?
-			0,  // ?
- 			0.005,  // albedo rotation
-			0.04,  // albedo speed top to bottom
-			0,  // rotation Y axis of secondary texture
-			0,  // speed of secondary texture (top to bottom)
-			0,  // rotating (Y axis)
-			0.006   // speed of specular texture (top to bottom)
-		);
-        PixelShader = compile ps_2_0 ShieldNomadPS();
+        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+            1,  // ?
+            3,  // size and number of albedo's simultaniously
+            32,  // ?
+            6,  // ?
+            0,  // ?
+            0,  // ?
+            0.005,  // albedo rotation
+            0.04,  // albedo speed top to bottom
+            0,  // rotation Y axis of secondary texture
+            0,  // speed of secondary texture (top to bottom)
+            0,  // rotating (Y axis)
+            0.006   // speed of specular texture (top to bottom)
+        );
+        PixelShader = compile ps_2_0 ShieldNomadsPS();
     }
 }
 
-technique ShieldNomadStealth_LowFidelity
+technique ShieldNomadsStealth_LowFidelity
 <
-    string abstractTechnique = "StealthShieldNomad";
+    string abstractTechnique = "StealthShieldNomads";
     int fidelity = FIDELITY_LOW;
 
     string cartographicTechnique = "CartographicShield";
@@ -7713,17 +7766,352 @@ technique ShieldNomadStealth_LowFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS(
-		    1,  // ?
-			3,  // size and number of albedo's simultaniously
-			32,  // ?
-			6,  // ?
-			0,  // ?
-			0,  // ?
- 			0.005,  // albedo rotation
-			0.04,  // albedo speed top to bottom
-			0  // rotation Y axis of secondary texture
-		);
-        PixelShader = compile ps_2_0 ShieldNomadLoFiPS();
+            1,  // ?
+            3,  // size and number of albedo's simultaniously
+            32,  // ?
+            6,  // ?
+            0,  // ?
+            0,  // ?
+            0.005,  // albedo rotation
+            0.04,  // albedo speed top to bottom
+            0  // rotation Y axis of secondary texture
+        );
+        PixelShader = compile ps_2_0 ShieldNomadsLoFiPS();
+    }
+}
+
+// ====================================================================================================================================================================
+// all nomads techniques using a changed pixel shader and with the 's' added
+
+// NOMAD UNIT
+// Don't forget to also update the personal shield techniques!
+technique NomadsUnit2_HighFidelity
+<
+    string abstractTechnique = "NomadsUnit2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
+    }
+}
+
+technique NomadsUnit2_MedFidelity
+<
+    string abstractTechnique = "NomadsUnit2";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
+    }
+}
+
+technique NomadsUnit2_LowFidelity
+<
+    string abstractTechnique = "NomadsUnit2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique NomadsUnitStunned2_HighFidelity
+<
+    string abstractTechnique = "NomadsUnitStunned2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
+            true,  // mask albedo
+            true,  // glow
+            true,  // hi def shadows
+            false, // alpha test enable
+            0, // alpha func
+            0 // alpha ref
+        );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique NomadsUnitStunned2_MedFidelity
+<
+    string abstractTechnique = "NomadsUnitStunned2";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique NomadsUnitStunned2_LowFidelity
+<
+    string abstractTechnique = "NomadsUnitStunned2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+/// Nomads powered armor
+/// Don't forget to also update the unit shader techniques (if the P0 pass is changed)!
+technique NomadsPowerArmor2_HighFidelity
+<
+    string abstractTechnique = "NomadsPowerArmor2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
+    }
+}
+
+technique NomadsPowerArmor2_MedFidelity
+<
+    string abstractTechnique = "NomadsPowerArmor2";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
+    }
+}
+
+technique NomadsPowerArmor2_LowFidelity
+<
+    string abstractTechnique = "NomadsPowerArmor2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
+    }
+}
+
+/// Nomad personal shield
+///
+technique NomadsPhaseShield2_HighFidelity
+<
+    string abstractTechnique = "NomadsPhaseShield2";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
+    }
+}
+
+technique NomadsPhaseShield2_MedFidelity
+<
+    string abstractTechnique = "NomadsPhaseShield2";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
+    }
+}
+
+technique NomadsPhaseShield2_LowFidelity
+<
+    string abstractTechnique = "NomadsPhaseShield2";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
+        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
     }
 }
 
@@ -7770,7 +8158,7 @@ technique ShieldNomadStealth_LowFidelity
 // Glow overlau for nomad build shader
 //float4 NomadBuildGlowPS( FLAT_VERTEX vertex ) : COLOR0
 //{
-//    
+//
 //    float3 color = float3(1.0f, 0.5f, 0.0f);
 //    float alpha = 0.2f * (1.0f - vertex.material.y);
 //    return float4( color.rgb, alpha );

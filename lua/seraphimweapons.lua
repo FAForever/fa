@@ -105,7 +105,7 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         local pos = self.unit:GetPosition()
-        local TerrainType = GetTerrainType( pos.x,pos.z )
+        local TerrainType = GetTerrainType(pos.x,pos.z)
         local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName]
         if effectTable ~= nil then
             local army = self.unit:GetArmy()
@@ -208,7 +208,7 @@ SDFExperimentalPhasonLaser = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.SChargeExperimentalPhasonLaser,
     FxUpackingChargeEffectScale = 1,
 
-    PlayFxWeaponUnpackSequence = function( self )
+    PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit:GetArmy()
             local bp = self:GetBlueprint()
@@ -237,7 +237,7 @@ SDFUltraChromaticBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.SChargeUltraChromaticBeamGenerator,
     FxUpackingChargeEffectScale = 1,
 
-    PlayFxWeaponUnpackSequence = function( self )
+    PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit:GetArmy()
             local bp = self:GetBlueprint()
@@ -287,5 +287,5 @@ SDFSniperShotSniperMode = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SDFSniperShotMuzzleFlash,
 }
 
-SB0OhwalliExperimentalStrategicBombWeapon = Class( DefaultProjectileWeapon) {
+SB0OhwalliExperimentalStrategicBombWeapon = Class(DefaultProjectileWeapon) {
 }

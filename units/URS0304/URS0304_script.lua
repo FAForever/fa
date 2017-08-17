@@ -1,14 +1,9 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URS0304/URS0304_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Strategic Missile Submarine Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
---Bugfix by IceDreamer: Force stealth energy drain on at completion
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/URS0304/URS0304_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Cybran Strategic Missile Submarine Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
 local CybranWeapons = import('/lua/cybranweapons.lua')
@@ -24,12 +19,11 @@ URS0304 = Class(CSubUnit) {
         Torpedo01 = Class(CANTorpedoLauncherWeapon){},
         Torpedo02= Class(CANTorpedoLauncherWeapon){},
     },
---Bugfix begins
-	OnStopBeingBuilt = function(self, builder, layer)
-		CSubUnit.OnStopBeingBuilt(self, builder, layer)
-		self:SetMaintenanceConsumptionActive()
-	end,
---Bugfix ends	
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CSubUnit.OnStopBeingBuilt(self, builder, layer)
+        self:SetMaintenanceConsumptionActive()
+    end,
 }
 
 TypeClass = URS0304

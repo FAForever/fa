@@ -104,7 +104,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYSONAR',
     },
-    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -253,7 +252,7 @@ UnitBlueprint {
     SelectionThickness = 0.7,
     SizeSphere = 1.6,
     SizeX = 1,
-    SizeY = 0.5,
+    SizeY = 0.3,
     SizeZ = 1,
     StrategicIconName = 'icon_bomber2_antinavy',
     StrategicIconSortPriority = 65,

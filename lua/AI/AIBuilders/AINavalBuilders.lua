@@ -33,8 +33,8 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 1 } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -56,11 +56,11 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-					'T1SeaFactory',
-					'T1AADefense',
-                    'T1SeaFactory',    
-					'T1Sonar',
-					#'T1NavalDefense',					
+                    'T1SeaFactory',
+                    'T1AADefense',
+                    'T1SeaFactory',
+                    'T1Sonar',
+                    #'T1NavalDefense',
                 }
             }
         }
@@ -71,8 +71,8 @@ BuilderGroup {
         Priority = 0, #DUNCAN - was 922
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 1 } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -104,8 +104,8 @@ BuilderGroup {
         Priority = 0, #DUNCAN - was 922
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 1 } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -144,9 +144,9 @@ BuilderGroup {
         Priority = 985,
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 1 } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL' } },
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 1 } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL' } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3'}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
@@ -168,13 +168,13 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-					'T1SeaFactory',
-					'T1AADefense',
                     'T1SeaFactory',
-					'T1SeaFactory',					
-					'T1AADefense',	
-					'T1Sonar',
-					#'T1NavalDefense',	
+                    'T1AADefense',
+                    'T1SeaFactory',
+                    'T1SeaFactory',
+                    'T1AADefense',
+                    'T1Sonar',
+                    #'T1NavalDefense',
                     'T1SeaFactory',
                 }
             }
@@ -186,11 +186,11 @@ BuilderGroup {
         Priority = 850,
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 2 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
-			{ MIBC, 'MapGreaterThan', { 512, 512 }},
-            { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },            
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 2 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
+            { MIBC, 'MapGreaterThan', { 512, 512 }},
+            { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -212,9 +212,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-					'T1AADefense',
-                    #'T1NavalDefense', 
-					'T1Sonar',
+                    'T1AADefense',
+                    #'T1NavalDefense',
+                    'T1Sonar',
                 }
             }
         }
@@ -225,9 +225,9 @@ BuilderGroup {
         Priority = 0, #DUNCAN - was 850
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 2 } },
-			{ MIBC, 'MapGreaterThan', { 512, 512 }},
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 2 } },
+            { MIBC, 'MapGreaterThan', { 512, 512 }},
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -259,9 +259,9 @@ BuilderGroup {
         Priority =  0, #DUNCAN - was 850
         InstanceCount = 1,
         BuilderConditions = {
-			#DUNCAN - Added to limit expansions
-			{ UCBC, 'NavalBaseCount', { '<', 2 } },
-			{ MIBC, 'MapGreaterThan', { 512, 512 }},
+            #DUNCAN - Added to limit expansions
+            { UCBC, 'NavalBaseCount', { '<', 2 } },
+            { MIBC, 'MapGreaterThan', { 512, 512 }},
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -297,7 +297,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MOBILE NAVAL'}},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MOBILE NAVAL'}},
             #{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH2, ENGINEER TECH3' } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},

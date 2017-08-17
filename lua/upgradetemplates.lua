@@ -73,9 +73,9 @@ StructureUpgradeTemplates =
 
         #Shield
         { 'ueb4202', 'ueb4301'},
-		
-		#Engineering Station
-		{ 'xeb0104', 'xeb0204'},
+
+        #Engineering Station
+        { 'xeb0104', 'xeb0204'},
 
     },
 
@@ -139,10 +139,10 @@ StructureUpgradeTemplates =
         { 'urb4204', 'urb4205'},
         { 'urb4205', 'urb4206'},
         { 'urb4206', 'urb4207'},
-		
-		#Engineering Station
-		{ 'xrb0104', 'xrb0204'},
-		{ 'xrb0204', 'xrb0304'},
+
+        #Engineering Station
+        { 'xrb0104', 'xrb0204'},
+        { 'xrb0204', 'xrb0304'},
     },
 
     # seraphim structure upgrades

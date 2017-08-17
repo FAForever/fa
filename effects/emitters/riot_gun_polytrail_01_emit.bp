@@ -1,12 +1,12 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'riot_gun_polytrail_01',
-	Lifetime = -1.00,
+    BlueprintId = 'riot_gun_polytrail_01',
+    Lifetime = -1.00,
     TrailLength = 5,
     Size = 0.075,
     SortOrder = 0,
     BlendMode = 3,
     TextureRepeatRate = 0,
     LODCutoff = 160,
-	RampTexture = [[/textures/particles/riotgun_munition_01.dds]],
-	RepeatTexture = [[/textures/particles/ramp_phalanx_munition_01.dds]],
+    RampTexture = [[/textures/particles/riotgun_munition_01.dds]],
+    RepeatTexture = [[/textures/particles/ramp_phalanx_munition_01.dds]],
 }

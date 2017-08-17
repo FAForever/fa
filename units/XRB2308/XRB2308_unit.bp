@@ -15,9 +15,14 @@ UnitBlueprint {
             Cue = 'URB_Destroy_Huge',
             LodCutoff = 'UnitMove_LodCutoff',
         },
-        DoneBeingBuilt = Sound {
+        Deploy = Sound {
             Bank = 'XRB',
             Cue = 'XRB2308_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        DoneBeingBuilt = Sound {
+            Bank = 'Explosions',
+            Cue = 'Expl_Water_Lrg_01',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {
@@ -54,7 +59,6 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = -2.7,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -71,7 +75,7 @@ UnitBlueprint {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
         },
-        AnimationPermOpen = '/units/xrb2308/xrb2308_aopen.sca',
+        AnimationDeploy = '/units/xrb2308/xrb2308_aopen.sca',
         IdleEffects = {
             Water = {
                 Effects = {
@@ -180,6 +184,7 @@ UnitBlueprint {
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        SinkSpeed = 0.5,
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 3,
@@ -284,9 +289,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true,  #from false
-            Sub = true,  #from false
-            Water = true,  #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

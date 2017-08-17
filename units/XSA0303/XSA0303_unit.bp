@@ -104,11 +104,9 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
     },
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = -0.2,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF',
         EconomyThreatLevel = 0,
         Health = 1775,
         MaxHealth = 1775,
@@ -116,7 +114,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsa0303_desc>Air-Superiority Fighter',
+    Description = '<LOC xsa0303_desc>Air Superiority Fighter',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
@@ -222,7 +220,7 @@ UnitBlueprint {
         VisionRadius = 32,
     },
     Interface = {
-        HelpText = '<LOC xsa0303_help>Air-Superiority Fighter',
+        HelpText = '<LOC xsa0303_help>Air Superiority Fighter',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.95,
@@ -250,9 +248,9 @@ UnitBlueprint {
     SelectionSizeZ = 1,
     SelectionThickness = 0.45,
     SizeSphere = 2,
-    SizeX = 1,
+    SizeX = 1.2,
     SizeY = 0.3,
-    SizeZ = 1,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_fighter3_antiair',
     StrategicIconSortPriority = 55,
     Transport = {

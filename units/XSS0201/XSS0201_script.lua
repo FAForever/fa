@@ -21,7 +21,7 @@ XSS0201 = Class(SSubUnit) {
         Torpedo1 = Class(SANAnaitTorpedo) {},
         AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense) {},
     },
-    
+
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep1 = self:GetWeaponByLabel('FrontTurret')
         local bp1 = wep1:GetBlueprint()
@@ -33,8 +33,8 @@ XSS0201 = Class(SSubUnit) {
         end
         for k, v in wep1.Beams do
             v.Beam:Disable()
-        end     
-        
+        end
+
         local wep2 = self:GetWeaponByLabel('BackTurret')
         local bp2 = wep2:GetBlueprint()
         if bp2.Audio.BeamStop then
@@ -49,8 +49,8 @@ XSS0201 = Class(SSubUnit) {
 
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-    
-    OnMotionVertEventChange = function( self, new, old )
+
+    OnMotionVertEventChange = function(self, new, old)
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetWeaponEnabledByLabel('FrontTurret', true)

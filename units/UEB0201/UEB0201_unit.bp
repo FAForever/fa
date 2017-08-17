@@ -65,8 +65,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 11,
-        Health = 9000,
-        MaxHealth = 9000,
+        Health = 8000,
+        MaxHealth = 8000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -140,7 +140,7 @@ UnitBlueprint {
         BuildCostMass = 1410,
         BuildRate = 40,
         BuildTime = 2600,
-        DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'ueb0201',
         },
@@ -150,7 +150,7 @@ UnitBlueprint {
             'BUILTBYTIER2FACTORY UEF MOBILE LAND',
             'BUILTBYLANDTIER2FACTORY UEF MOBILE CONSTRUCTION',
         },
-        StorageEnergy = 0,        
+        StorageEnergy = 0,
         StorageMass = 160,
     },
     Footprint = {

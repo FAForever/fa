@@ -57,21 +57,21 @@ local connectedTo = {}
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
-    
+
     local factionData = import('/lua/factions.lua')
-    
+
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
             result.Faction = index
             break
         end
     end
-    
+
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""	
-	result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""	
-	result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
-	result.PL = math.floor(result.MEAN - 3 * result.DEV)
+    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
+    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
+    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
 end
@@ -166,17 +166,17 @@ local function CheckForLaunch()
     if playercount < requiredPlayers then
        return
     end
-	
-	local allRatings = {}
-	for k,v in gameInfo.PlayerOptions do
-		if v.Human and v.PL then
-			allRatings[v.PlayerName] = v.PL
-		end
-	end
-	gameInfo.GameOptions['Ratings'] = allRatings
+
+    local allRatings = {}
+    for k,v in gameInfo.PlayerOptions do
+        if v.Human and v.PL then
+            allRatings[v.PlayerName] = v.PL
+        end
+    end
+    gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
-    lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
+    lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
     LOG(repr(gameInfo))
     lobbyComm:LaunchGame(gameInfo)
 end
@@ -265,7 +265,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerID = myID
 
         -- Ok, I'm connected to the host. Now request to become a player
-        lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
+        lobbyComm:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
     end
 
     lobbyComm.DataReceived = function(self,data)
@@ -274,7 +274,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         if lobbyComm:IsHost() then
             # Host Messages
             if data.Type == 'AddPlayer' then
-                HostAddPlayer( data.SenderID, data.PlayerInfo )
+                HostAddPlayer(data.SenderID, data.PlayerInfo)
             end
         else
             # Non-Host Messages
@@ -324,7 +324,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                gameInfo.PlayerOptions[slot] = nil        
+                gameInfo.PlayerOptions[slot] = nil
             end
         end
     end
@@ -363,9 +363,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-	
-	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+
+    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
+    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
 
 
     lobbyComm:HostGame()
@@ -391,8 +391,8 @@ end
 
 function DisconnectFromPeer(uid)
     LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then 
-        table.remove(connectedTo, uid)         
+    if wasConnected(uid) then
+        table.remove(connectedTo, uid)
     end
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)

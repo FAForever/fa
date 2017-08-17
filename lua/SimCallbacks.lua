@@ -1,5 +1,5 @@
----- 
----- 
+----
+----
 ---- This module contains the Sim-side lua functions that can be invoked
 ---- from the user side.  These need to validate all arguments against
 ---- cheats and exploits.
@@ -79,11 +79,14 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
+local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
 Callbacks.CapMex = function(data, units)
     local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
     if not units[1] then return end
+
     local mex = GetEntityById(data.target)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
+
     if mex:GetCurrentLayer() == 'Seabed' then return end
 
     local pos = mex:GetPosition()
@@ -100,10 +103,19 @@ Callbacks.CapMex = function(data, units)
 
     if not builder then return end
 
-    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x+2, pos.y, pos.z), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z+2), msid, {})
-    IssueBuildMobile({builder}, Vector(pos.x-2, pos.y, pos.z), msid, {})
+    local locations = {
+        up = Vector(pos.x, pos.y, pos.z - 2),
+        down = Vector(pos.x, pos.y, pos.z + 2),
+        left = Vector(pos.x - 2, pos.y, pos.z),
+        right = Vector(pos.x + 2, pos.y, pos.z),
+    }
+
+    for key, location in locations do
+        if CanBuildInSpot(mex, msid, location) then
+            IssueBuildMobile({builder}, location, msid, {})
+        end
+    end
+
     IssueGuard(units, builder)
 end
 
@@ -163,7 +175,7 @@ Callbacks.OnControlGroupAssign = function(units)
                 for i,v in ScenarioInfo.ControlGroupUnits do
                    if unit == v then
                         table.remove(ScenarioInfo.ControlGroupUnits, i)
-                   end 
+                   end
                 end
             end
         end
@@ -172,7 +184,7 @@ Callbacks.OnControlGroupAssign = function(units)
         if not ScenarioInfo.ControlGroupUnits then
             ScenarioInfo.ControlGroupUnits = {}
         end
-        
+
         -- add units to list
         local entities = {}
         for k,v in units do
@@ -183,7 +195,7 @@ Callbacks.OnControlGroupAssign = function(units)
         -- remove units on death
         for k,v in entities do
             SimTriggers.CreateUnitDeathTrigger(OnUnitKilled, v)
-            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes   
+            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes
         end
     end
 end
@@ -230,4 +242,11 @@ function IsInvalidAssist(unit, target)
     else
         return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
+end
+
+Callbacks.AttackMove = function(data, units)
+    if data.Clear then
+        IssueClearCommands(units)
+    end
+    IssueAggressiveMove(units, data.Target)
 end

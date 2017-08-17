@@ -22,6 +22,7 @@ Strings = {
     ['NoConfig'] = "<LOC lob_0003>No valid game configurations found.",
     ['NoObservers'] = "<LOC lob_0004>Observers not allowed.",
     ['KickedByHost'] = "<LOC lob_0005>Kicked by host.",
+    ['GameLaunched'] = "<LOC lob_0008>Game was launched.",
     ['NoLaunchLimbo'] = "<LOC lob_0006>No clients allowed in limbo at launch",
     ['HostLeft'] = "<LOC lob_0007>Host abandoned lobby",
 }

@@ -1,11 +1,8 @@
---****************************************************************************
---**
---**  File     :  /lua/sim/defaultbufffield.lua
---**  Author(s):  Brute51
---**
---**  Summary  :  Low level buff field class (version 3)
---**
---****************************************************************************
+------------------------------------------------------
+--  File     :  /lua/sim/defaultbufffield.lua
+--  Author(s):  Brute51
+--  Summary  :  Low level buff field class (version 3)
+------------------------------------------------------
 
 local Buff = import('/lua/sim/Buff.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -14,15 +11,12 @@ BuffFieldBlueprints = {
 }
 
 BuffField = Class(Entity) {
+    -- Change these in an inheriting class if you want
+    FieldVisualEmitter = '', -- the FX on the unit that carries the buff field
 
-    -- change these in an inheriting class if you want
-    FieldVisualEmitter = '',   -- the FX on the unit that carries the buff field
-
-    -- ----------------------------------------------------------------------------------------------------------
     -- EVENTS
-
-    OnCreated = function(self)    
-        -- fires when the field is initalised
+    OnCreated = function(self)
+        -- Fires when the field is initalised
         local bp = self:GetBlueprint()
         if bp.InitiallyEnabled then
             self:Enable()
@@ -30,23 +24,22 @@ BuffField = Class(Entity) {
     end,
 
     OnEnabled = function(self)
-        -- fires when the field begins to work
-
-        -- show field FX
+        -- Fires when the field begins to work
+        -- Show field FX
         if self.FieldVisualEmitter and type(self.FieldVisualEmitter) == 'string' and self.FieldVisualEmitter ~= '' then
             local Owner = self:GetOwner()
             if not Owner.BuffFieldEffectsBag then
                 Owner.BuffFieldEffectsBag = {}
             end
             self.Emitter = CreateAttachedEmitter(Owner, 0, Owner:GetArmy(), self.FieldVisualEmitter)
-            table.insert( Owner.BuffFieldEffectsBag, self.Emitter)
+            table.insert(Owner.BuffFieldEffectsBag, self.Emitter)
         end
     end,
 
     OnDisabled = function(self)
-        -- fires when the field stops working
+        -- Fires when the field stops working
 
-        -- remove field FX
+        -- Remove field FX
         local Owner = self:GetOwner()
         if self.Emitter and Owner.BuffFieldEffectsBag then
             for k, v in Owner.BuffFieldEffectsBag do
@@ -59,9 +52,7 @@ BuffField = Class(Entity) {
         end
     end,
 
-    -- ----------------------------------------------------------------------------------------------------------
     -- ACTUAL CODE (dont change anything)
-
     __init = function(self, spec)
         Entity.__init(self, spec)
         self.Name = spec.Name or 'NoName'
@@ -75,29 +66,30 @@ BuffField = Class(Entity) {
     end,
 
     OnCreate = function(self)
-        --LOG('Buffield: ['..repr(BuffFieldName)..'] OnCreate')
-
         local Owner = self:GetOwner()
         local bp = self:GetBlueprint()
 
-        -- verifying blueprint
+        -- Verifying blueprint
         if not bp.Name or type(bp.Name) ~= 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
-        if type(bp.Buffs) == 'string' then bp.Buffs = { bp.Buffs } end
+        if type(bp.Buffs) == 'string' then bp.Buffs = {bp.Buffs} end
         if table.getn(bp.Buffs) < 1 then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
+
         if not bp.Duration then
             WARN('BuffField: [..repr(bp.Name)..] Duration must be specified for a buff field buff.')
         end
+
         if not bp.Stacks ~= "REPLACE" then
             WARN('BuffField: [..repr(bp.Name)..] You almost certainly want buff fields to be Stack-type REPLACE.')
         end
 
-        for k, v in bp.Buffs do
+        for _, v in bp.Buffs do
             if not Buffs[v] then
                 WARN('BuffField: [..repr(bp.Name)..] the field uses a buff that doesn\'t exist! '..repr(v))
                 return
             end
         end
+
         if not bp.Radius or bp.Radius <= 0 then
             WARN('BuffField: [..repr(bp.Name)..] Invalid radius or radius not set!')
             return
@@ -149,7 +141,7 @@ BuffField = Class(Entity) {
             end
         end
 
-        -- event stuff
+        -- Event stuff
         Entity.OnCreate(self)
 
         if bp.DisableInTransport then
@@ -177,9 +169,7 @@ BuffField = Class(Entity) {
     end,
 
     Enable = function(self)
-        --LOG('Buffield: ['..repr(self.Name)..'] enable')
         if not self:IsEnabled() then
-            --LOG('Buffield: ['..repr(self.Name)..'] enabling buff field')
             local Owner = self:GetOwner()
             local bp = self:GetBlueprint()
 
@@ -193,7 +183,6 @@ BuffField = Class(Entity) {
     end,
 
     Disable = function(self)
-        --LOG('Buffield: ['..repr(self.Name)..'] disable')
         if self:IsEnabled() then
             local Owner = self:GetOwner()
             Owner:SetMaintenanceConsumptionInactive()
@@ -203,7 +192,7 @@ BuffField = Class(Entity) {
         end
     end,
 
-    -- applies the buff to any unit in range each 5 seconds
+    -- Applies the buff to any unit in range each 5 seconds
     -- Owner is the unit that carries the field. This is a bit weird to have it like this but its the result of
     -- of the forkthread in the enable function.
     FieldThread = function(Owner, self)
@@ -219,15 +208,12 @@ BuffField = Class(Entity) {
                 end
             end
 
-            WaitSeconds(4.9) -- this should be anything but 5 (of the other wait) to help spread the cpu load
+            WaitSeconds(4.9) -- This should be anything but 5 (of the other wait) to help spread the cpu load
         end
     end,
 
-    -- ============================================================================================
-
-    -- these 2 are a bit weird. they are supposed to disable the enabled fields when on a transport and re-enable the
+    -- These 2 are a bit weird. they are supposed to disable the enabled fields when on a transport and re-enable the
     -- fields that were enabled and leave the disabled fields off.
-
     DisableInTransport = function(Owner, Transport)
         for k, field in Owner.BuffFields do
             if not field.DisabledForTransporting then
@@ -236,7 +222,7 @@ BuffField = Class(Entity) {
                 if Enabled then
                     field:Disable()
                 end
-                field.DisabledForTransporting = true -- to make sure the above is done once even if we have 2 fields or more
+                field.DisabledForTransporting = true -- To make sure the above is done once even if we have 2 fields or more
             end
         end
     end,
@@ -254,8 +240,8 @@ BuffField = Class(Entity) {
 }
 
 
--- this function is for registering new buff fields. Don't remove.
-function BuffFieldBlueprint( bpData)
+-- This function is for registering new buff fields. Don't remove.
+function BuffFieldBlueprint(bpData)
     if not bpData.Name then
         WARN('BuffFieldBlueprint: Encountered blueprint with no name, ignoring it.')
     elseif bpData.Merge then
@@ -264,7 +250,7 @@ function BuffFieldBlueprint( bpData)
             WARN('BuffFieldBlueprint: Trying to merge blueprint "'..bpData.Name..'" with a non-existing one.')
         else
             bpData.Merge = nil
-            BuffFieldBlueprints[bpData.Name] = table.merged( BuffFieldBlueprints[bpData.Name], bpData )
+            BuffFieldBlueprints[bpData.Name] = table.merged(BuffFieldBlueprints[bpData.Name], bpData)
         end
     else
         -- Adding new blueprint if it doesn't exist yet

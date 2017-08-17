@@ -25,7 +25,7 @@ local style = {
 function SetLayout()
     local GUI = import('/lua/ui/game/economy.lua').GUI
     local parent = import('/lua/ui/game/economy.lua').savedParent
-    
+
     GUI.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'))
     GUI.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'),
         UIUtil.UIFile('/game/tab-l-btn/tab-open_btn_up.dds'),
@@ -35,31 +35,31 @@ function SetLayout()
         UIUtil.UIFile('/game/tab-l-btn/tab-open_btn_dis.dds'))
     LayoutHelpers.AtLeftTopIn(GUI.collapseArrow, GetFrame(0), -3, 22)
     GUI.collapseArrow.Depth:Set(function() return GUI.bg.Depth() + 10 end)
-    
+
     GUI.bg.panel:SetTexture(UIUtil.UIFile('/game/resource-panel/resources_panel_bmp.dds'))
     LayoutHelpers.AtLeftTopIn(GUI.bg.panel, GUI.bg)
-    
+
     GUI.bg.Height:Set(GUI.bg.panel.Height)
     GUI.bg.Width:Set(GUI.bg.panel.Width)
     LayoutHelpers.AtLeftTopIn(GUI.bg, parent, 16, 3)
     GUI.bg:DisableHitTest()
-    
+
     GUI.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
     GUI.bg.leftBracketGlow:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-energy-l_bmp.dds'))
-    
+
     GUI.bg.leftBracket.Right:Set(function() return GUI.bg.panel.Left() + 10 end)
     GUI.bg.leftBracketGlow.Left:Set(function() return GUI.bg.leftBracket.Left() + 12 end)
-    
+
     GUI.bg.leftBracket.Depth:Set(GUI.bg.panel.Depth)
     GUI.bg.leftBracketGlow.Depth:Set(function() return GUI.bg.leftBracket.Depth() - 1 end)
-    
+
     LayoutHelpers.AtVerticalCenterIn(GUI.bg.leftBracket, GUI.bg.panel)
     LayoutHelpers.AtVerticalCenterIn(GUI.bg.leftBracketGlow, GUI.bg.panel)
-    
+
     GUI.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
     GUI.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
     GUI.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
-    
+
     GUI.bg.rightGlowTop.Top:Set(function() return GUI.bg.Top() + 2 end)
     GUI.bg.rightGlowTop.Left:Set(function() return GUI.bg.Right() - 12 end)
     GUI.bg.rightGlowBottom.Bottom:Set(function() return GUI.bg.Bottom() - 2 end)
@@ -67,10 +67,10 @@ function SetLayout()
     GUI.bg.rightGlowMiddle.Top:Set(GUI.bg.rightGlowTop.Bottom)
     GUI.bg.rightGlowMiddle.Bottom:Set(function() return math.max(GUI.bg.rightGlowTop.Bottom(), GUI.bg.rightGlowBottom.Top()) end)
     GUI.bg.rightGlowMiddle.Right:Set(function() return GUI.bg.rightGlowTop.Right() end)
-    
+
     LayoutResourceGroup(GUI.mass, 'mass')
     LayoutResourceGroup(GUI.energy, 'energy')
-    
+
     LayoutHelpers.AtLeftTopIn(GUI.mass, GUI.bg, 14, 9)
     LayoutHelpers.Below(GUI.energy, GUI.mass, 4)
 end
@@ -86,31 +86,31 @@ function LayoutResourceGroup(group, groupType)
     end
     group.icon.Height:Set(36)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
-    
+
     LayoutHelpers.AtCenterIn(group.warningBG, group, 0, -2)
-    
+
     group.storageBar.Width:Set(100)
     group.storageBar.Height:Set(10)
     group.storageBar._bar:SetTexture(UIUtil.UIFile(style[groupType].barTexture))
     LayoutHelpers.AtLeftTopIn(group.storageBar, group, 22, 2)
-    
+
     LayoutHelpers.Below(group.curStorage, group.storageBar)
     LayoutHelpers.AtLeftIn(group.curStorage, group.storageBar)
     group.curStorage:SetColor(style[groupType].textColor)
-    
+
     LayoutHelpers.Below(group.maxStorage, group.storageBar)
     LayoutHelpers.AtRightIn(group.maxStorage, group.storageBar)
     LayoutHelpers.ResetLeft(group.maxStorage)
     group.maxStorage:SetColor(style[groupType].textColor)
-    
+
     group.storageTooltipGroup.Left:Set(group.storageBar.Left)
     group.storageTooltipGroup.Right:Set(group.storageBar.Right)
     group.storageTooltipGroup.Top:Set(group.storageBar.Top)
     group.storageTooltipGroup.Bottom:Set(group.maxStorage.Bottom)
-    
+
     LayoutHelpers.RightOf(group.rate, group.storageBar, 4)
     LayoutHelpers.AtVerticalCenterIn(group.rate, group)
-    
+
     LayoutHelpers.AtRightIn(group.income, group, 2)
     LayoutHelpers.AtTopIn(group.income, group)
     group.income:SetColor('ffb7e75f')
@@ -134,7 +134,7 @@ function LayoutResourceGroup(group, groupType)
     else
         group.reclaimTotal:SetColor('FFF8C000')
     end
-    
+
     group.Height:Set(25)
     group.Width:Set(296)
 end

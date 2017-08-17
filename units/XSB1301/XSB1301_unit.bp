@@ -54,8 +54,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 56,
-        Health = 9720,
-        MaxHealth = 9720,
+        Health = 7000,
+        MaxHealth = 7000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -241,7 +241,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 240,
     Weapon = {
         {
-            Damage = 8000,
+            Damage = 5500,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',

@@ -50,7 +50,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYCOUNTERINTEL',
         'SORTINTEL',
-		'NAVAL', #for shipwreck mod
+        'NAVAL', #for shipwreck mod
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -139,7 +139,7 @@ UnitBlueprint {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
+            RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,

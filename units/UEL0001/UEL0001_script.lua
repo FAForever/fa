@@ -4,6 +4,7 @@
 -- Summary  :  UEF Commander Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 local Shield = import('/lua/shield.lua').Shield
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
@@ -20,10 +21,8 @@ UEL0001 = Class(ACUUnit) {
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
         OverCharge = Class(TDFOverchargeWeapon) {},
         AutoOverCharge = Class(TDFOverchargeWeapon) {},
-        TacMissile = Class(TIFCruiseMissileLauncher) {
-        },
-        TacNukeMissile = Class(TIFCruiseMissileLauncher) {
-        },
+        TacMissile = Class(TIFCruiseMissileLauncher) {},
+        TacNukeMissile = Class(TIFCruiseMissileLauncher) {},
     },
 
     __init = function(self)
@@ -40,11 +39,11 @@ UEL0001 = Class(ACUUnit) {
         self.HasLeftPod = false
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        ACUUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        ACUUnit.OnStopBeingBuilt(self, builder, layer)
         if self:BeenDestroyed() then return end
         self.Animator = CreateAnimator(self)
         self.Animator:SetPrecedence(0)
@@ -68,14 +67,14 @@ UEL0001 = Class(ACUUnit) {
         end
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         else
-            EffectUtil.CreateUEFCommanderBuildSliceBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )        
-        end           
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        end
     end,
 
     RebuildPod = function(self, PodNumber)
@@ -240,10 +239,10 @@ UEL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-            self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-            if Buff.HasBuff( self, 'UEFACUT2BuildRate' ) then
-                Buff.RemoveBuff( self, 'UEFACUT2BuildRate' )
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
+                Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
             -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
             self:updateBuildRestrictions()
@@ -280,18 +279,18 @@ UEL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            if Buff.HasBuff( self, 'UEFACUT3BuildRate' ) then
-                Buff.RemoveBuff( self, 'UEFACUT3BuildRate' )
+            if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
+                Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
-            self:AddBuildRestriction( categories.UEF * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
             self:updateBuildRestrictions()
-        elseif enh =='DamageStablization' then
-            if not Buffs['UEFACUDamageStablization'] then
+        elseif enh =='DamageStabilization' then
+            if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {
-                    Name = 'UEFACUDamageStablization',
-                    DisplayName = 'UEFACUDamageStablization',
-                    BuffType = 'DamageStablization',
+                    Name = 'UEFACUDamageStabilization',
+                    DisplayName = 'UEFACUDamageStabilization',
+                    BuffType = 'DamageStabilization',
                     Stacks = 'REPLACE',
                     Duration = -1,
                     Affects = {
@@ -306,14 +305,14 @@ UEL0001 = Class(ACUUnit) {
                     },
                 }
             end
-            Buff.ApplyBuff(self, 'UEFACUDamageStablization')
-        elseif enh =='DamageStablizationRemove' then
-            if Buff.HasBuff( self, 'UEFACUDamageStablization' ) then
-                Buff.RemoveBuff( self, 'UEFACUDamageStablization' )
+            Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
+        elseif enh =='DamageStabilizationRemove' then
+            if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
+                Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
             end
         elseif enh =='HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
-            wep:AddDamageMod(bp.ZephyrDamageMod)        
+            wep:AddDamageMod(bp.ZephyrDamageMod)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -367,7 +366,7 @@ UEL0001 = Class(ACUUnit) {
             self:RemoveNukeSiloAmmo(amt or 0)
             self:StopSiloBuild()
         end
-    end
+    end,
 }
 
 TypeClass = UEL0001

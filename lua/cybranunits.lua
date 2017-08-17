@@ -1,15 +1,10 @@
---****************************************************************************
---**
---**  File     :  /lua/cybranunits.lua
---**  Author(s):
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-----------------------------------------------------------------------------
--- CYBRAN DEFAULT UNITS
-----------------------------------------------------------------------------
+-----------------------------------------------------------------
+-- File     :  /lua/cybranunits.lua
+-- Author(s):
+-- Summary  :
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
+
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -32,15 +27,12 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local CreateCybranBuildBeams = EffectUtil.CreateCybranBuildBeams
 
----------------------------------------------------------------
---  AIR FACTORY STRUCTURES
----------------------------------------------------------------
+-- AIR FACTORY STRUCTURES
 CAirFactoryUnit = Class(AirFactoryUnit) {
-
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
-        WaitSeconds( 0.1 )
-        EffectUtil.CreateCybranFactoryBuildEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag )
+        WaitSeconds(0.1)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -72,34 +64,23 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
-
 }
 
----------------------------------------------------------------
---  AIR STAGING STRUCTURES
----------------------------------------------------------------
+-- AIR STAGING STRUCTURES
 CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
----------------------------------------------------------------
---  AIR UNITS
----------------------------------------------------------------
+-- AIR UNITS
 CAirUnit = Class(AirUnit) {}
 
----------------------------------------------------------------
---  WALL  STRUCTURES
----------------------------------------------------------------
+-- WALL STRUCTURES
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
----------------------------------------------------------------
---  CONSTRUCTION UNITS
----------------------------------------------------------------
+-- CONSTRUCTION UNITS
 CConstructionUnit = Class(ConstructionUnit){
-
-
-    OnStopBeingBuilt = function(self,builder,layer)
-        ConstructionUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         -- If created with F2 on land, then play the transform anim.
-        if(self:GetCurrentLayer() == 'Water') then
+        if self:GetCurrentLayer() == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,
@@ -110,17 +91,16 @@ CConstructionUnit = Class(ConstructionUnit){
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
             end
-            if (old ~= 'None') then
+            if old ~= 'None' then
                 self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, (new == 'Water'))
             end
         end
     end,
 
     TransformThread = function(self, water)
-
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
-            self.Trash:Add( self.TransformManipulator )
+            self.Trash:Add(self.TransformManipulator)
         end
 
         if water then
@@ -136,18 +116,15 @@ CConstructionUnit = Class(ConstructionUnit){
         end
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        local buildbots = EffectUtil.SpawnBuildBots( self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
+        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
 }
 
----------------------------------------------------------------
---  ENERGY CREATION UNITS
----------------------------------------------------------------
+-- ENERGY CREATION UNITS
 CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
-
-    OnStopBeingBuilt = function(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
@@ -157,20 +134,15 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
     end,
 }
 
----------------------------------------------------------------
 -- ENERGY STORAGE STRUCTURES
----------------------------------------------------------------
 CEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
----------------------------------------------------------------
---  LAND FACTORY STRUCTURES
----------------------------------------------------------------
+-- LAND FACTORY STRUCTURES
 CLandFactoryUnit = Class(LandFactoryUnit) {
-
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
-        WaitSeconds( 0.1 )
-        EffectUtil.CreateCybranFactoryBuildEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag )
+        WaitSeconds(0.1)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -207,43 +179,28 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
     end,
 }
 
----------------------------------------------------------------
---  LAND UNITS
----------------------------------------------------------------
+-- LAND UNITS
 CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
----------------------------------------------------------------
---  MASS COLLECTION UNITS
----------------------------------------------------------------
+-- MASS COLLECTION UNITS
 CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
----------------------------------------------------------------
---   MASS FABRICATION UNITS
----------------------------------------------------------------
+--  MASS FABRICATION UNITS
 CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
----------------------------------------------------------------
---   MASS STORAGE UNITS
----------------------------------------------------------------
+--  MASS STORAGE UNITS
 CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
----------------------------------------------------------------
---  RADAR STRUCTURES
----------------------------------------------------------------
+-- RADAR STRUCTURES
 CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
----------------------------------------------------------------
---  SONAR STRUCTURES
----------------------------------------------------------------
+-- SONAR STRUCTURES
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
----------------------------------------------------------------
---  SEA FACTORY STRUCTURES
----------------------------------------------------------------
+-- SEA FACTORY STRUCTURES
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
-
-    StartBuildingEffects = function( self, unitBeingBuilt, order )
-        self.BuildEffectsBag:Add( self:ForkThread( EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag ) )
+    StartBuildingEffects = function(self, unitBeingBuilt, order)
+        self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag))
     end,
 
     OnPaused = function(self)
@@ -260,8 +217,8 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
@@ -296,70 +253,47 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 }
 
----------------------------------------------------------------
---  SEA UNITS
----------------------------------------------------------------
+-- SEA UNITS
 CSeaUnit = Class(SeaUnit) {}
 
-
----------------------------------------------------------------
---  SHIELD LAND UNITS
----------------------------------------------------------------
+-- SHIELD LAND UNITS
 CShieldLandUnit = Class(ShieldLandUnit) {}
 
----------------------------------------------------------------
---  SHIELD STRUCTURES
----------------------------------------------------------------
+-- SHIELD STRUCTURES
 CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
----------------------------------------------------------------
---  STRUCTURES
----------------------------------------------------------------
+-- STRUCTURES
 CStructureUnit = Class(StructureUnit) {}
 
----------------------------------------------------------------
---  SUBMARINE UNITS
----------------------------------------------------------------
+-- SUBMARINE UNITS
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
----------------------------------------------------------------
---  TRANSPORT BEACON UNITS
----------------------------------------------------------------
+-- TRANSPORT BEACON UNITS
 CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
----------------------------------------------------------------
---  WALKING LAND UNITS
----------------------------------------------------------------
+-- WALKING LAND UNITS
 CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
----------------------------------------------------------------
---  WALL  STRUCTURES
----------------------------------------------------------------
+-- WALL STRUCTURES
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
----------------------------------------------------------------
---  CIVILIAN STRUCTURES
----------------------------------------------------------------
+-- CIVILIAN STRUCTURES
 CCivilianStructureUnit = Class(CStructureUnit) {}
 
----------------------------------------------------------------
---  QUANTUM GATE UNITS
----------------------------------------------------------------
+-- QUANTUM GATE UNITS
 CQuantumGateUnit = Class(QuantumGateUnit) {}
 
----------------------------------------------------------------
---  RADAR JAMMER UNITS
----------------------------------------------------------------
+-- RADAR JAMMER UNITS
 CRadarJammerUnit = Class(RadarJammerUnit) {}
 
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
-        LandFactoryUnit.OnStopBeingBuilt(self,builder,layer)
+        LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
-        
+
         self.Spawn = CreateUnitHPR(
             buildUnit,
             aiBrain.Name,
@@ -371,20 +305,20 @@ CConstructionEggUnit = Class(CStructureUnit) {
                 self.Trash:Add(self.OpenAnimManip)
                 self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
                 self:PlaySound(bp.Audio['EggOpen'])
-                
+
                 WaitFor(self.OpenAnimManip)
 
                 self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
                 self.Trash:Add(self.EggSlider)
                 self:PlaySound(bp.Audio['EggSink'])
-                
+
                 WaitFor(self.EggSlider)
 
                 self:Destroy()
             end
         )
     end,
-    
+
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Spawn then overkillRatio = 1.1 end
         CStructureUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -392,16 +326,14 @@ CConstructionEggUnit = Class(CStructureUnit) {
 }
 
 
---TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
-----------------------------------------------------------------------------------------------------------------------------
---  CConstructionStructureUnit
-----------------------------------------------------------------------------------------------------------------------------
+-- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
+-- CConstructionStructureUnit
 CConstructionStructureUnit = Class(CStructureUnit) {
     OnCreate = function(self)
-        ---- Structure stuff
+        -- Structure stuff
         CStructureUnit.OnCreate(self)
 
-        ----Construction stuff
+        -- Construction stuff
         self.EffectsBag = {}
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
@@ -422,34 +354,34 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         self.BuildingUnit = false
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
+    OnStartBuild = function(self, unitBeingBuilt, order)
         local unitid = self:GetBlueprint().General.UpgradesTo
 
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
 
-        CStructureUnit.OnStartBuild(self,unitBeingBuilt, order)
+        CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CStructureUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        CStructureUnit.OnStopBeingBuilt(self, builder, layer)
         -- If created with F2 on land, then play the transform anim.
-        if(self:GetCurrentLayer() == 'Water') then
+        if self:GetCurrentLayer() == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        local buildbots = EffectUtil.SpawnBuildBots( self, unitBeingBuilt, table.getn(self:GetBlueprint().General.BuildBones.BuildEffectBones), self.BuildEffectsBag )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self:GetBlueprint().General.BuildBones.BuildEffectBones), self.BuildEffectsBag)
         if buildbots then
-            EffectUtil.CreateCybranEngineerBuildEffects( self, self:GetBlueprint().General.BuildBones.BuildEffectBones, buildbots, self.BuildEffectsBag )
+            EffectUtil.CreateCybranEngineerBuildEffects(self, self:GetBlueprint().General.BuildBones.BuildEffectBones, buildbots, self.BuildEffectsBag)
         else
-            EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
-    ---- This will only be called if not in StructureUnit's upgrade state
+    -- This will only be called if not in StructureUnit's upgrade state
     OnStopBuild = function(self, unitBeingBuilt)
         CStructureUnit.OnStopBuild(self, unitBeingBuilt)
 
@@ -466,8 +398,8 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     OnPaused = function(self)
-        --When factory is paused take some action
-        self:StopUnitAmbientSound( 'ConstructLoop' )
+        -- When factory is paused take some action
+        self:StopUnitAmbientSound('ConstructLoop')
         CStructureUnit.OnPaused(self)
         if self.BuildingUnit then
             CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
@@ -476,7 +408,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
-            self:PlayUnitAmbientSound( 'ConstructLoop' )
+            self:PlayUnitAmbientSound('ConstructLoop')
             CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         CStructureUnit.OnUnpaused(self)
@@ -502,12 +434,11 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     OnPrepareArmToBuild = function(self)
         CStructureUnit.OnPrepareArmToBuild(self)
 
-        --LOG( 'OnPrepareArmToBuild' )
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread( self.WaitForBuildAnimation, self, true )
+                ForkThread(self.WaitForBuildAnimation, self, true)
             end
         end
     end,
@@ -530,28 +461,25 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         end
     end,
 
-    CreateReclaimEffects = function( self, target )
-        EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.ReclaimEffectsBag )
+    CreateReclaimEffects = function(self, target)
+        EffectUtil.PlayReclaimEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
-    CreateCaptureEffects = function( self, target )
-        EffectUtil.PlayCaptureEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.CaptureEffectsBag )
+    CreateCaptureEffects = function(self, target)
+        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 }
 
-----------------------------------------------------------------------------------------------------------------------------
---  CCommandUnit
---
---  Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
-----------------------------------------------------------------------------------------------------------------------------
+-- CCommandUnit
+-- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
 CCommandUnit = Class(CommandUnit) {
     OnScriptBitSet = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:StopUnitAmbientSound( 'ActiveLoop' )
+        if bit == 8 then -- Cloak toggle
+            self:StopUnitAmbientSound('ActiveLoop')
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
             self:DisableUnitIntel('ToggleBit8', 'RadarStealth')
@@ -562,8 +490,8 @@ CCommandUnit = Class(CommandUnit) {
     end,
 
     OnScriptBitClear = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:PlayUnitAmbientSound( 'ActiveLoop' )
+        if bit == 8 then -- Cloak toggle
+            self:PlayUnitAmbientSound('ActiveLoop')
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
             self:EnableUnitIntel('ToggleBit8', 'RadarStealth')

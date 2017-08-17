@@ -30,7 +30,7 @@ UEA0203 = Class(AirTransport, TAirUnit) {
             -- XMAX, XMIN, YMAX, YMIN, ZMAX, ZMIN, TURNMULT, TURNSPEED
             value:SetThrustingParam(-0.0, 0.0, -0.25, 0.25, -0.1, 0.1, 1.0, 0.25)
         end
-        
+
         for k, v in self.EngineManipulators do
             self.Trash:Add(v)
         end
@@ -45,8 +45,8 @@ UEA0203 = Class(AirTransport, TAirUnit) {
         -- Since this is the only unit capable of carrying another into a transport
         -- We need to disable the weapon on that unit in case it's a LAB
         -- Use SetEnabled rather than SetOnTransport to ignore units like LABs which can fire from transports
-        local unit = self:GetCargo()
-        if unit then
+        local units = self:GetCargo()
+        for _, unit in units do
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
                 wep:SetEnabled(not bool)

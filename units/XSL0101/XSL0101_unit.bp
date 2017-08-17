@@ -1,5 +1,5 @@
 UnitBlueprint {
-	ResolvePath = true,
+    ResolvePath = true,
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',

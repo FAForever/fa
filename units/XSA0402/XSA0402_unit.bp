@@ -93,10 +93,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 15,
-            Level2 = 30,
-            Level3 = 45,
-            Level4 = 60,
-            Level5 = 75,
+            Level2 = 50,
+            Level3 = 90,
+            Level4 = 125,
+            Level5 = 160,
         },
     },
     BuildIconSortPriority = 10,
@@ -108,7 +108,7 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'AIR',
-	'BOMBER',
+    'BOMBER',
         'HIGHALTAIR',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
@@ -310,7 +310,7 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -336,7 +336,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.0714,
-	    RenderFireClock = true,
+        RenderFireClock = true,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

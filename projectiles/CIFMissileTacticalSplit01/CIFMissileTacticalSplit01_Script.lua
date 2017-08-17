@@ -11,26 +11,26 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.5)
         self:SetDamage(25)
         self.invincible = true
-        self:ForkThread( self.DelayForDestruction )
+        self:ForkThread(self.DelayForDestruction)
     end,
 
     # Give the projectile enough time to get out of the explosion
-    DelayForDestruction = function( self )
+    DelayForDestruction = function(self)
         self.CanTakeDamage = false
         WaitSeconds(0.3)
         self.invincible = false
         self.CanTakeDamage = true
-        self:SetDestroyOnWater( true )
+        self:SetDestroyOnWater(true)
         self:TrackTarget(true)
         self:SetTurnRate(80)
         self:SetMaxSpeed(15)#25
         self:SetAcceleration(6)#25
     end,
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.invincible then
             CLOATacticalChildMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
         end
-    end,    
+    end,
 }
 TypeClass = CIFMissileTacticalSplit01

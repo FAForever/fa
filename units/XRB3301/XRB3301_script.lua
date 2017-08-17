@@ -23,17 +23,17 @@ XRB3301 = Class(CRadarUnit) {
 
     OnStopBeingBuilt = function(self)
         CRadarUnit.OnStopBeingBuilt(self)
-        ChangeState( self, self.ExpandingVision )
+        ChangeState(self, self.ExpandingVision)
 
         if self.OmniEffectsBag then
             for k, v in self.OmniEffectsBag do
                 v:Destroy()
             end
         end
-		self.OmniEffectsBag = {}
+        self.OmniEffectsBag = {}
 
         for k, v in CSoothSayerAmbient do
-            table.insert( self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v) )
+            table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v))
         end
     end,
 
@@ -76,12 +76,12 @@ XRB3301 = Class(CRadarUnit) {
                 for k, v in self.OmniEffectsBag do
                     v:Destroy()
                 end
-		        self.OmniEffectsBag = {}
-		    end
-            for k, v in CSoothSayerAmbient do
-                table.insert( self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v) )
+                self.OmniEffectsBag = {}
             end
-            ChangeState( self, self.ExpandingVision )
+            for k, v in CSoothSayerAmbient do
+                table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v))
+            end
+            ChangeState(self, self.ExpandingVision)
         end
     end,
 
@@ -92,9 +92,9 @@ XRB3301 = Class(CRadarUnit) {
                 for k, v in self.OmniEffectsBag do
                     v:Destroy()
                 end
-		        self.OmniEffectsBag = {}
-		    end
-            ChangeState( self, self.ContractingVision )
+                self.OmniEffectsBag = {}
+            end
+            ChangeState(self, self.ContractingVision)
         end
     end,
 

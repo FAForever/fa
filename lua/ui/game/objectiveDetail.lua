@@ -30,25 +30,25 @@ function Create()
 
     local function GetBGTextures(bgtype)
         if bgtype == 'title' then
-             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'), 
+             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds'),
              UIUtil.UIFile('/dialogs/objective-log-btn-bar/tab_bmp.dds')
         elseif bgtype == 'bottom' then
-             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_up.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_select.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_over.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_select.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_up.dds'), 
+             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_up.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_select.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_over.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_select.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_up.dds'),
              UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar-bottom_btn_up.dds')
         else
-             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_up.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_select.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_over.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_select.dds'), 
-             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_up.dds'), 
+             return UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_up.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_select.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_over.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_select.dds'),
+             UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_up.dds'),
              UIUtil.UIFile('/dialogs/objective-log-btn-bar/bar_btn_up.dds')
         end
     end
@@ -56,29 +56,29 @@ function Create()
     LayoutHelpers.AtHorizontalCenterIn(GUI.bg, frame)
     LayoutHelpers.AtTopIn(GUI.bg, frame, 30)
     GUI.bg.Depth:Set(frame:GetTopmostDepth() + 1)
-    
+
     --GUI.wc = UIUtil.CreateWorldCover(GUI.bg)
-    
+
     GUI.bg.bottom = Bitmap(GUI.bg, UIUtil.UIFile('/dialogs/objective-log-02/panel_bmp_b.dds'))
     GUI.bg.bottom.Left:Set(GUI.bg.Left)
     GUI.bg.bottom.Bottom:Set(function() return frame.Bottom() - 30 end)
     GUI.bg.bottom.Depth:Set(GUI.bg.Depth)
-    
-    
+
+
     GUI.bg.middle = Bitmap(GUI.bg, UIUtil.UIFile('/dialogs/objective-log-02/panel_bmp_m.dds'))
     GUI.bg.middle.Left:Set(GUI.bg.Left)
     GUI.bg.middle.Top:Set(GUI.bg.Bottom)
     GUI.bg.middle.Depth:Set(GUI.bg.Depth)
     GUI.bg.middle.Bottom:Set(GUI.bg.bottom.Top)
     GUI.bg.middle.Height:Set(function() return GUI.bg.bottom.Top() - GUI.bg.Bottom() end)
-    
+
     GUI.closeBtn = UIUtil.CreateButtonStd(GUI.bg, "/widgets02/small", "<LOC _Close>", 16)
     GUI.closeBtn.Right:Set(function() return GUI.bg.bottom.Right() - 70 end)
     GUI.closeBtn.Bottom:Set(function() return GUI.bg.bottom.Bottom() - 28 end)
     GUI.closeBtn.OnClick = function(self, modifiers)
         ToggleDisplay()
     end
-    
+
     GUI.bg.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
@@ -86,25 +86,25 @@ function Create()
             end
         end
     end
-    
+
     GUI.logContainer = Group(GUI.bg)
     GUI.logContainer.Height:Set(function() return GUI.bg.middle.Height() + 20 end)
     GUI.logContainer.Width:Set(571)
     GUI.logContainer.top = 0
-    
+
     local titleText = ''
     if isCampaign then
         titleText = '<LOC tooltipui0058>'
     else
         titleText = '<LOC sel_map_0000>'
     end
-    
+
     GUI.title = UIUtil.CreateText(GUI.bg, LOC(titleText), 20)
     LayoutHelpers.AtLeftTopIn(GUI.title, GUI.bg, 30, 25)
-    
+
     LayoutHelpers.AtLeftTopIn(GUI.logContainer, GUI.bg, 48, 89)
     UIUtil.CreateVertScrollbarFor(GUI.logContainer)
-    
+
     local function CreateObjectiveElements()
         if GUI.logEntries then
             for i, v in GUI.logEntries do
@@ -130,7 +130,7 @@ function Create()
                 end
             end
         end
-        
+
         local function CreateElement(index)
             GUI.logEntries[index] = {}
             GUI.logEntries[index].bg = Checkbox(GUI.logContainer,GetBGTextures('title'))
@@ -138,22 +138,22 @@ function Create()
             GUI.logEntries[index].bg.Left:Set(GUI.logContainer.Left)
             GUI.logEntries[index].bg.Right:Set(GUI.logContainer.Right)
             GUI.logEntries[index].bg.Height:Set(64)
-            
+
             GUI.logEntries[index].icon = Button(GUI.logEntries[1].bg)
             GUI.logEntries[index].icon:SetSolidColor('00000000')
             GUI.logEntries[index].icon:DisableHitTest()
             GUI.logEntries[index].icon.Height:Set(48)
             GUI.logEntries[index].icon.Width:Set(48)
-            
+
             GUI.logEntries[index].title = UIUtil.CreateText(GUI.logEntries[1].bg, '', 14, "Arial")
             GUI.logEntries[index].title:DisableHitTest()
-            
+
             GUI.logEntries[index].time = UIUtil.CreateText(GUI.logEntries[1].bg, '', 12, "Arial")
             GUI.logEntries[index].time:DisableHitTest()
-            
+
             GUI.logEntries[index].status = UIUtil.CreateText(GUI.logEntries[1].bg, '', 12, "Arial")
             GUI.logEntries[index].status:DisableHitTest()
-            
+
             LayoutHelpers.AtLeftIn(GUI.logEntries[index].icon, GUI.logEntries[index].bg, 25)
             LayoutHelpers.AtVerticalCenterIn(GUI.logEntries[index].icon, GUI.logEntries[index].bg)
             GUI.logEntries[index].title.Top:Set(function() return GUI.logEntries[index].icon.Top() + 0 end)
@@ -161,10 +161,10 @@ function Create()
             LayoutHelpers.Below(GUI.logEntries[index].time, GUI.logEntries[index].title)
             LayoutHelpers.Below(GUI.logEntries[index].status, GUI.logEntries[index].time)
         end
-        
+
         CreateElement(1)
         LayoutHelpers.AtTopIn(GUI.logEntries[1].bg, GUI.logContainer)
-            
+
         local index = 2
         while GUI.logEntries[table.getsize(GUI.logEntries)].bg.Top() + (2 * GUI.logEntries[1].bg.Height()) < GUI.logContainer.Bottom() do
             CreateElement(index)
@@ -173,13 +173,13 @@ function Create()
         end
     end
     CreateObjectiveElements()
-    
+
     local numLines = function() return table.getsize(GUI.logEntries) end
-    
+
     local function DataSize()
         return table.getn(ObjectiveLogData)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -264,14 +264,16 @@ function Create()
                     local time = LOCF("%s %02d:%02d:%02d", prefixStr,
                         math.floor(timeMinutes / 60), math.mod(timeMinutes, 60), math.mod(timeSeconds, 60))
                     line.time:SetText(time)
-                    if data.Status then
-                        if data.Status == 'complete' then
-                            status = "<LOC objui_0003>Complete"
+                    if data.complete == 'complete' then
+                        status = "<LOC objui_0003>Complete"
+                    elseif data.complete == 'incomplete' then
+                        if data.hidden then
+                            status = '<LOC objui_0005>Incomplete'
                         else
-                            status = "<LOC objui_0004>Failed"
+                            status = data.progress or '<LOC objui_0005>Incomplete'
                         end
                     else
-                        status = data.progress or '<LOC objui_0005>Incomplete'
+                        status = "<LOC objui_0004>Failed"
                     end
                     line.status:SetText(LOC(status))
                 end
@@ -301,47 +303,47 @@ function Create()
             GUI.logContainer:CalcVisible()
         end
     end
-    
+
     GUI.detailsContainer = Group(GUI.bg)
     GUI.detailsContainer.Height:Set(103)
     GUI.detailsContainer.Width:Set(571)
     GUI.detailsContainer.top = 0
-    
+
     LayoutHelpers.AtLeftTopIn(GUI.detailsContainer, GUI.bg.bottom, 48, 21)
     UIUtil.CreateVertScrollbarFor(GUI.detailsContainer)
-    
+
     GUI.detailEntries[1] = {}
     GUI.detailEntries[1].bg = Bitmap(GUI.detailsContainer)
-    
-    
+
+
     GUI.detailEntries[1].Text = UIUtil.CreateText(GUI.detailEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtLeftTopIn(GUI.detailEntries[1].Text, GUI.detailsContainer)
     GUI.detailEntries[1].Text.Width:Set(60)
     GUI.detailEntries[1].Text:DisableHitTest()
-    
+
     LayoutHelpers.FillParent(GUI.detailEntries[1].bg, GUI.detailEntries[1].Text)
     GUI.detailEntries[1].bg.Right:Set(GUI.detailsContainer.Right)
-        
+
     local index = 2
     while GUI.detailEntries[table.getsize(GUI.detailEntries)].Text.Bottom() + GUI.detailEntries[1].Text.Height() < GUI.detailsContainer.Bottom() do
         GUI.detailEntries[index] = {}
         GUI.detailEntries[index].bg = Bitmap(GUI.detailsContainer)
-        
+
         GUI.detailEntries[index].Text = UIUtil.CreateText(GUI.detailEntries[index].bg, '', 14, "Arial")
         LayoutHelpers.Below(GUI.detailEntries[index].Text, GUI.detailEntries[index-1].Text)
         GUI.detailEntries[index].Text:DisableHitTest()
-        
+
         LayoutHelpers.FillParent(GUI.detailEntries[index].bg, GUI.detailEntries[index].Text)
         GUI.detailEntries[index].bg.Right:Set(GUI.detailsContainer.Right)
         index = index + 1
     end
-    
+
     local numDescLines = table.getsize(GUI.detailEntries)
-    
+
     local function DetailSize()
         return table.getn(ObjectiveDetails)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -375,7 +377,7 @@ function Create()
     GUI.detailsContainer.IsScrollable = function(self, axis)
         return true
     end
-    
+
     -- determines what controls should be visible or not
     GUI.detailsContainer.CalcVisible = function(self)
         local function SetTextLine(control, data)
@@ -397,7 +399,7 @@ function Create()
             end
         end
     end
-    
+
     GUI.logContainer:CalcVisible()
     WinMgr.AddWindow({id = WIN_ID, closeFunc = ToggleDisplay})
 end
@@ -418,13 +420,11 @@ function SetDetailTable(id)
     for i, v in titleData do
         table.insert(ObjectiveDetails, {text = v, type = 'title', color = 'ffe4e95f'})
     end
-    local progtext = ObjectiveLogData[id].progress
-    if ObjectiveLogData[id].Status then
-        if ObjectiveLogData[id].Status == 'complete' then
-            progtext = '<LOC objui_0003>'
-        else
-            progtext = '<LOC objui_0004>'
-        end
+    local progtext = ObjectiveLogData[id].progress or ''
+    if ObjectiveLogData[id].complete == 'complete' then
+        progtext = '<LOC objui_0003>'
+    elseif ObjectiveLogData[id].complete == 'failed' then
+        progtext = '<LOC objui_0004>'
     end
     table.insert(ObjectiveDetails, {text = LOC(progtext), type = 'desc', color = 'ffe4e95f'})
     for i, v in descData do
@@ -447,7 +447,7 @@ function OpenToElement(id)
     else
         GUI.logContainer:ScrollSetTop(nil, entryNum-1)
         GUI.logContainer:CalcVisible()
-        for i, v in GUI.logEntries do 
+        for i, v in GUI.logEntries do
             if v.bg.id == entryNum then
                 v.bg:SetCheck(true)
                 break
@@ -461,7 +461,7 @@ function SetupObjectiveDetail(parent)
 end
 
 function ToggleDisplay()
-    if GUI.bg then 
+    if GUI.bg then
         GUI.bg:SetHidden(not GUI.bg:IsHidden())
         if not GUI.bg:IsHidden() then
             Refresh()
@@ -483,9 +483,8 @@ end
 
 function GetTargetImages(data)
     # look for an image to display
-    
-    local overrideImage = data.targetImage
-    
+    local overrideImage = UIUtil.UIFile(data.actionImage)
+
     if (overrideImage) then
         return overrideImage, overrideImage, overrideImage, overrideImage
     else
@@ -504,7 +503,7 @@ function GetTargetImages(data)
             return GameCommon.GetCachedUnitIconFileNames(blueprint)
         elseif iconName then
             return iconName, iconName, iconName, iconName
-        end         
+        end
     end
 
     local questionMark = UIUtil.UIFile('/dialogs/objective-unit/help-lg-graphics_bmp.dds')
@@ -514,27 +513,40 @@ end
 function Refresh()
     local primtitle = '<LOC SCORE_0037>'
     local sectitle = '<LOC SCORE_0040>'
+    local bontitle = '<LOC SCORE_0041>Bonus Objectives'
+    local hidtitle = '<LOC SCORE_0042>'
+    local hiddesc = '<LOC SCORE_0048>'
     local comtitle = '<LOC objui_0003>'
     local failtitle = '<LOC objui_0004>'
     local mapinfo = '<LOC sel_map_0000>'
     if isCampaign then
-        Widgets = import('/lua/ui/game/objectives2.lua').Widgets
+        local Objectives = table.deepcopy(import('/lua/ui/game/objectives2.lua').GetCurrentObjectiveTable())
         local sortedPrim = {}
         local sortedSec = {}
+        local sortedBon = {}
         local sortedCom = {}
         local sortedFail = {}
-        for i, v in Widgets do
-            if v.ObjData.Status then
-                if v.ObjData.Status == 'complete' then
-                    table.insert(sortedCom, v.ObjData)
+        for k, ObjData in Objectives do
+            -- Hide information about incompleted or failed bonus objectives
+            if ObjData.type == 'bonus' and ObjData.complete ~= 'complete' then
+                ObjData.title = hidtitle
+                ObjData.description = hiddesc
+                ObjData.progress = ''
+                ObjData.actionImage = '/dialogs/objective-unit/help-lg-graphics_bmp.dds'
+            end
+            if ObjData.complete ~= 'incomplete' then
+                if ObjData.complete == 'complete' then
+                    table.insert(sortedCom, ObjData)
                 else
-                    table.insert(sortedFail, v.ObjData)
+                    table.insert(sortedFail, ObjData)
                 end
             else
-                if v.ObjData.type == 'primary' then
-                    table.insert(sortedPrim, v.ObjData)
-                else
-                    table.insert(sortedSec, v.ObjData)
+                if ObjData.type == 'primary' then
+                    table.insert(sortedPrim, ObjData)
+                elseif ObjData.type == 'secondary' then
+                    table.insert(sortedSec, ObjData)
+                elseif ObjData.type == 'bonus' then
+                    table.insert(sortedBon, ObjData)
                 end
             end
         end
@@ -543,7 +555,7 @@ function Refresh()
             return (t1.EndTime or t1.StartTime) > (t2.EndTime or t2.StartTime)
         end
         if table.getn(sortedPrim) > 0 then
-            ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffe9e45f'}
+            ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffff0000'}
             index = index + 1
             table.sort(sortedPrim, SortFunc)
             for i, v in sortedPrim do
@@ -552,10 +564,19 @@ function Refresh()
             end
         end
         if table.getn(sortedSec) > 0 then
-            ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'ffe9aa5f'}
+            ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'fffff700'}
             index = index + 1
             table.sort(sortedSec, SortFunc)
             for i, v in sortedSec do
+                ObjectiveLogData[index] = table.deepcopy(v)
+                index = index + 1
+            end
+        end
+        if table.getn(sortedBon) > 0 then
+            ObjectiveLogData[index] = {type = 'title', title = bontitle, color = 'ffba00ff'}
+            index = index + 1
+            table.sort(sortedBon, SortFunc)
+            for i, v in sortedBon do
                 ObjectiveLogData[index] = table.deepcopy(v)
                 index = index + 1
             end
@@ -591,7 +612,7 @@ function Refresh()
         local invalidOptions = {
             ScenarioFile=true,
         }
-        ObjectiveLogData[2] = {title = mapinfo.name, HideIcon = true, type = 'setting', 
+        ObjectiveLogData[2] = {title = mapinfo.name, HideIcon = true, type = 'setting',
             description = mapinfo.description, progress = retText}
         local index = 3
         for i, v in mapinfo.Options do
@@ -639,8 +660,8 @@ end
   StartTime = '150',
   targets={ { BlueprintId="ueb1103", Type="Blueprint" } },
   title="<LOC E01_M01_OBJ_010_121>Build Three Mass Extractors",
-  type="primary"    
-  
+  type="primary"
+
   CheatsEnabled="true",
   FogOfWar="explored",
   GameSpeed="adjustable",
@@ -649,5 +670,5 @@ end
   TeamSpawn="fixed",
   Timeouts="3",
   UnitCap="750",
-  Victory="sandbox"    
+  Victory="sandbox"
 --]]

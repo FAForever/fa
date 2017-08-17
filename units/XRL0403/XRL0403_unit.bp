@@ -10,7 +10,7 @@ UnitBlueprint {
             'Right_Leg02_B01',
             'Right_Leg01_B01',
             'Right_Turret_Barrel',
-            'Left_Turret_Barrel',            
+            'Left_Turret_Barrel',
         },
     },
     Audio = {
@@ -63,10 +63,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 10,
-            Level2 = 20,
-            Level3 = 30,
-            Level4 = 40,
-            Level5 = 50,
+            Level2 = 65,
+            Level3 = 120,
+            Level4 = 180,
+            Level5 = 235,
         },
     },
     BuildIconSortPriority = 30,
@@ -80,9 +80,10 @@ UnitBlueprint {
         'LAND',
         'EXPERIMENTAL',
         'CONSTRUCTION',
-	'FACTORY',
+    'FACTORY',
         'DIRECTFIRE',
         'ANTIAIR',
+        'SNIPER',
         'NEEDMOBILEBUILD',
         'SONAR',
         'VISIBLETORECON',
@@ -220,7 +221,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 437500,
         BuildCostMass = 37500,
-        BuildRate = 180,
+        BuildRate = 45,
         BuildTime = 18750,
         BuildableCategory = {
             'xrl0002',
@@ -277,6 +278,7 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
+        LayerChangeOffsetHeight = -2.5,
         MaxAcceleration = 2,
         MaxSpeed = 2,
         MaxSpeedReverse = 1,
@@ -352,7 +354,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -442,7 +444,7 @@ UnitBlueprint {
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {

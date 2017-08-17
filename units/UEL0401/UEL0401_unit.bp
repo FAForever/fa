@@ -17,14 +17,14 @@ UnitBlueprint {
             'Turret_Right02',
             'UEL0401',
         },
-		AddTargetBones = {
+        AddTargetBones = {
             'Turret_Left01_Barrel02',
             'Turret_Left02_Barrel02',
             'Turret_Right01_Barrel02',
             'Turret_Right02_Barrel02',
-			'Attachpoint3',
-			'Turret_Left_AA',
-			'Turret_Right_AA',
+            'Attachpoint3',
+            'Turret_Left_AA',
+            'Turret_Right_AA',
         },
     },
     Audio = {
@@ -97,10 +97,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 15,
-            Level2 = 30,
-            Level3 = 45,
-            Level4 = 60,
-            Level5 = 75,
+            Level2 = 35,
+            Level3 = 55,
+            Level4 = 75,
+            Level5 = 95,
         },
     },
     BuildIconSortPriority = 10,

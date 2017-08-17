@@ -273,7 +273,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER CYBRAN',
         },
         MaintenanceConsumptionPerSecondEnergy = 0,
-	MaxBuildDistance = 10,
+    MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
@@ -752,7 +752,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = '/projectiles/CDFLaserDisintegrator03/CDFLaserDisintegrator03_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.30,
+            ProjectileLifetimeUsesMultiplier = 2.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

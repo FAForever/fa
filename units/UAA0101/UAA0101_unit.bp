@@ -90,8 +90,8 @@ UnitBlueprint {
         'SCOUT',
         'VISIBLETORECON',
         'RECLAIMABLE',
-		'OVERLAYRADAR',
-		'OVERLAYSONAR',
+        'OVERLAYRADAR',
+        'OVERLAYSONAR',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -106,10 +106,10 @@ UnitBlueprint {
     },
     Description = '<LOC uaa0101_desc>Air Scout',
     Display = {
-	Abilities = {
+    Abilities = {
             '<LOC ability_radar>Radar',
             '<LOC ability_sonar>Sonar',
-	},
+    },
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
@@ -215,8 +215,8 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 42,
-	RadarRadius = 65,
-	SonarRadius = 30,
+    RadarRadius = 65,
+    SonarRadius = 30,
     },
     Interface = {
         HelpText = '<LOC uaa0101_help>Air Scout',

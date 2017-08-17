@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/sim/Projectile.lua
---**  Author(s):  John Comes, Gordon Duclos
---**
---**  Summary  :  Base Projectile Definition
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------
+--  File     :  /lua/sim/Projectile.lua
+--  Author(s):  John Comes, Gordon Duclos
+--  Summary  :  Base Projectile Definition
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Explosion = import('/lua/defaultexplosions.lua')
@@ -14,9 +11,6 @@ local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
 Projectile = Class(moho.projectile_methods, Entity) {
-
-
-    -- Brute51 - Added support for initialdamage AND changed lower case d in damageData to uppercase for consistency sake (I spent many hours on these kinds of issues...)
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
         self.DamageData.DamageAmount = DamageData.DamageAmount
@@ -39,12 +33,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
             local radius = DamageData.DamageRadius
             if radius and radius > 0 then
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-
-                    -- Brute51: Removed "1" in GetPosition()   ==>   DamageArea(instigator, self:GetPosition(1), radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
                     DamageArea(instigator, self:GetPosition(), radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
-
                 else
-
                     -- DoT damage - check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
@@ -62,7 +52,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, DamageData.DamageAmount, DamageData.DamageType)
                 else
-
                     -- DoT damage - check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
@@ -85,9 +74,10 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self,spec)
+    __init = function(self, spec)
     end,
-    __post_init = function(self,spec)
+
+    __post_init = function(self, spec)
     end,
 
     DestroyOnImpact = true,
@@ -140,7 +130,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             MetaImpactRadius = nil,
         }
         self.Trash = TrashBag()
-		local bp = self:GetBlueprint()
+        local bp = self:GetBlueprint()
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
         local snd = self:GetBlueprint().Audio.ExistLoop
@@ -150,7 +140,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         if bp.Physics.TrackTargetGround and bp.Physics.TrackTargetGround == true then
             local pos = self:GetCurrentTargetPosition()
-            pos[2] = GetSurfaceHeight( pos[1], pos[3] )
+            pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
         end
     end,
@@ -158,7 +148,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
     OnCollisionCheck = function(self, other)
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
-
         if self:GetArmy() == other:GetArmy() then return false end
 
         local dnc_cats = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
@@ -174,7 +163,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         for _, p in {{self, other}, {other, self}} do
             dnc = p[1]:GetBlueprint().DoNotCollideList
             if dnc then
-                for k, v in dnc do
+                for _, v in dnc do
                     if EntityCategoryContains(ParseEntityCategory(v), p[2]) then
                         return false
                     end
@@ -190,7 +179,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if bp then
             self:DoTakeDamage(instigator, amount, vector, damageType)
         else
-            self:OnKilled(instigator, damageType )
+            self:OnKilled(instigator, damageType)
         end
     end,
 
@@ -201,32 +190,32 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        -- check for valid projectile
+        -- Check for valid projectile
         if not self or self:BeenDestroyed() then
             return
         end
         local health = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health <= 0 ) then
-            if( damageType == 'Reclaimed' ) then
+        if health <= 0 then
+            if damageType == 'Reclaimed' then
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
+
                 -- Calculate the excess damage amount
                 local excess = health - amount
                 local maxHealth = self:GetBlueprint().Defense.MaxHealth or 10
-                if(excess < 0 and maxHealth > 0) then
+                if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-                --self:Kill(instigator, damageType, excessDamageRatio)
                 self:OnKilled(instigator, damageType, excessDamageRatio)
             end
         end
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        self:CreateImpactEffects( self:GetArmy(), self.FxOnKilled, self.FxOnKilledScale )
+        self:CreateImpactEffects(self:GetArmy(), self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
 
@@ -234,46 +223,45 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if damageData.MetaImpactRadius and damageData.MetaImpactAmount then
             local pos = self:GetPosition()
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
-            MetaImpact( self, pos, damageData.MetaImpactRadius, damageData.MetaImpactAmount )
+            MetaImpact(self, pos, damageData.MetaImpactRadius, damageData.MetaImpactAmount)
         end
     end,
 
-    CreateImpactEffects = function( self, army, EffectTable, EffectScale )
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
-        --LOG ('Effect Table = 'repr(EffectTable))
-        for k, v in EffectTable do
-			if self.FxImpactTrajectoryAligned then
-				emit = CreateEmitterAtBone(self,-2,army,v)
-			else
-				emit = CreateEmitterAtEntity(self,army,v)
-			end
+        for _, v in EffectTable do
+            if self.FxImpactTrajectoryAligned then
+                emit = CreateEmitterAtBone(self, -2, army, v)
+            else
+                emit = CreateEmitterAtEntity(self, army, v)
+            end
             if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end
     end,
 
-    CreateTerrainEffects = function( self, army, EffectTable, EffectScale )
+    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtBone(self,-2,army,v)
+        for _, v in EffectTable do
+            emit = CreateEmitterAtBone(self, -2, army, v)
             if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end
     end,
 
-    GetTerrainEffects = function( self, TargetType, ImpactEffectType )
+    GetTerrainEffects = function(self, TargetType, ImpactEffectType)
         local pos = self:GetPosition()
         local TerrainType = nil
 
         if ImpactEffectType then
-            TerrainType = GetTerrainType( pos.x,pos.z )
+            TerrainType = GetTerrainType(pos.x, pos.z)
             if TerrainType.FXImpact[TargetType][ImpactEffectType] == nil then
-			    TerrainType = GetTerrainType( -1, -1 )
-		    end
+                TerrainType = GetTerrainType(-1, -1)
+            end
         else
-            TerrainType = GetTerrainType( -1, -1 )
+            TerrainType = GetTerrainType(-1, -1)
             ImpactEffectType = 'Default'
         end
 
@@ -285,42 +273,37 @@ Projectile = Class(moho.projectile_methods, Entity) {
             return false
         end
 
-        -- if this unit category is on the weapon's do-not-collide list, skip!
-		local weaponBP = firingWeapon:GetBlueprint()
-		if weaponBP.DoNotCollideList then
-			for k, v in pairs(weaponBP.DoNotCollideList) do
-				if EntityCategoryContains(ParseEntityCategory(v), self) then
-					return false
-				end
-			end
-		end
+        -- If this unit category is on the weapon's do-not-collide list, skip!
+        local weaponBP = firingWeapon:GetBlueprint()
+        if weaponBP.DoNotCollideList then
+            for k, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
         return true
     end,
 
-    -- create some cool explosions when we get destroyed
-    --
+    -- Create some cool explosions when we get destroyed
     OnImpact = function(self, targetType, targetEntity)
-        --LOG('*DEBUG: ', self:GetBlueprint().BlueprintId, ' IMPACT, TYPE = ', repr(targetType), ' DestroyOnImpact = ',self.DestroyOnImpact)
-
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
         local instigator = self:GetLauncher()
         if instigator == nil then
             instigator = self
         end
-
         local damageData = self.DamageData
 
         -- Do Damage
-        self:DoDamage( instigator, damageData, targetEntity)
+        self:DoDamage(instigator, damageData, targetEntity)
 
         -- Meta-Impact
-        self:DoMetaImpact( damageData )
+        self:DoMetaImpact(damageData)
 
         -- Buffs (Stun, etc)
         self:DoUnitImpactBuffs(targetEntity)
 
-        --LOG('Projectile impacted with: ' .. targetType)
         -- Possible 'target' values are:
         --  'Unit'
         --  'Terrain'
@@ -333,23 +316,22 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'UnitUnderwater'
         --  'Projectile'
         --  'ProjectileUnderWater
-        --
         local ImpactEffects = {}
         local ImpactEffectScale = 1
         local army = self:GetArmy()
         local bp = self:GetBlueprint()
         local bpAud = bp.Audio
 
-        --Sounds for all other impacts, ie: Impact<TargetTypeName>
+        -- Sounds for all other impacts, ie: Impact<TargetTypeName>
         local snd = bpAud['Impact'..targetType]
         if snd then
             self:PlaySound(snd)
-            --Generic Impact Sound
+            -- Generic Impact Sound
         elseif bpAud.Impact then
             self:PlaySound(bpAud.Impact)
         end
 
-        --ImpactEffects
+        -- ImpactEffects
         if targetType == 'Water' then
             ImpactEffects = self.FxImpactWater
             ImpactEffectScale = self.FxWaterHitScale
@@ -365,7 +347,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         elseif targetType == 'Terrain' then
             ImpactEffects = self.FxImpactLand
             ImpactEffectScale = self.FxLandHitScale
-            if( self.FxImpactLandScorch ) then
+            if self.FxImpactLandScorch then
                 Explosion.CreateRandomScorchSplatAtObject(self, self.FxImpactLandScorchScale, 150, 20, army)
             end
         elseif targetType == 'Air' then
@@ -387,9 +369,10 @@ Projectile = Class(moho.projectile_methods, Entity) {
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
-        local TerrainEffects = self:GetTerrainEffects( targetType, self:GetBlueprint().Display.ImpactEffects.Type)
-        self:CreateImpactEffects( army, ImpactEffects, ImpactEffectScale )
-        self:CreateTerrainEffects( army, TerrainEffects, self:GetBlueprint().Display.ImpactEffects.Scale or 1 )
+        local TerrainEffects = self:GetTerrainEffects(targetType, self:GetBlueprint().Display.ImpactEffects.Type)
+        self:CreateImpactEffects(army, ImpactEffects, ImpactEffectScale)
+        self:CreateTerrainEffects(army, TerrainEffects, self:GetBlueprint().Display.ImpactEffects.Scale or 1)
+
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
             self:ForkThread(self.ImpactTimeoutThread, timeout)
@@ -398,7 +381,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
-    OnImpactDestroy = function( self, targetType, targetEntity )
+    OnImpactDestroy = function(self, targetType, targetEntity)
         if self.DestroyOnImpact or not targetEntity or
             (not self.DestroyOnImpact and targetEntity and not EntityCategoryContains(categories.ANTIMISSILE * categories.ALLPROJECTILES, targetEntity)) then
             self:Destroy()
@@ -410,35 +393,29 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self:Destroy()
     end,
 
-
-    --When this projectile impacts with the target, do any buffs that have been passed to it.
+    -- When this projectile impacts with the target, do any buffs that have been passed to it.
     DoUnitImpactBuffs = function(self, target)
         local data = self.DamageData
-		--check for buff
-		if data.Buffs then
-		    --check for valid target
-			for k, v in data.Buffs do
-				if v.Add.OnImpact == true then
-					if ( v.AppliedToTarget ~= true ) or ( v.Radius and (v.Radius > 0) ) then
-						target = self:GetLauncher()
-					end
-                    --NOTE:
-					--Removed permisions check since is already done in unit.lua
-					--if not EntityCategoryContains((ParseEntityCategory(v.TargetDisallow) or ''), target)
-					--and EntityCategoryContains((ParseEntityCategory(v.TargetAllow) or categories.ALLUNITS), target) then
-
-					--Check for target validity
+        -- Check for buff
+        if data.Buffs then
+            -- Check for valid target
+            for k, v in data.Buffs do
+                if v.Add.OnImpact == true then
+                    if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
+                        target = self:GetLauncher()
+                    end
+                    -- Check for target validity
                     if target and IsUnit(target) then
-					    if ( v.Radius and (v.Radius > 0) ) then
-						    --This is a radius buff
-						    --get the position of the projectile
-						    target:AddBuff(v, self:GetPosition())
-					    else
-					        --This is a single target buff
-						    target:AddBuff(v)
-					    end
-				    end
-			    end
+                        if v.Radius and v.Radius > 0 then
+                            -- This is a radius buff
+                            -- get the position of the projectile
+                            target:AddBuff(v, self:GetPosition())
+                        else
+                            -- This is a single target buff
+                            target:AddBuff(v)
+                        end
+                    end
+                end
             end
         end
     end,
@@ -496,13 +473,12 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
     OnLostTarget = function(self)
         local bp = self:GetBlueprint().Physics
-        if (bp.TrackTarget and bp.TrackTarget == true) then
-            if (bp.OnLostTargetLifetime) then
+        if bp.TrackTarget and bp.TrackTarget == true then
+            if bp.OnLostTargetLifetime then
                 self:SetLifetime(bp.OnLostTargetLifetime)
             else
                 self:SetLifetime(0.5)
             end
         end
     end,
-
 }

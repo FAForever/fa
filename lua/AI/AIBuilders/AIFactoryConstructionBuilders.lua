@@ -31,12 +31,12 @@ BuilderGroup {
     # =======================================
     #     Land Factory Builders - Initial
     # =======================================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Land Factory Builder - Initial',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1500,  #DUNCAN - was 1000
         BuilderConditions = {
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, #DUNCAN - added 
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, #DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -59,12 +59,12 @@ BuilderGroup {
     # ======================================
     #     Air Factory Builders - Initial
     # ======================================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Air Factory Builder - Initial',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1500, #DUNCAN - was 1000
         BuilderConditions = {
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, #DUNCAN - added 
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, #DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -87,7 +87,7 @@ BuilderGroup {
     # ============================
     #     Air Factory Builders
     # ============================
-    Builder {        
+    Builder {
         BuilderName = 'T2 Air Factory Builder Higher Pri',
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 775,
@@ -112,7 +112,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {        
+    Builder {
         BuilderName = 'T3 Air Factory Builder Higher Pri',
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 775,
@@ -161,7 +161,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryConstructionLandHigherPriority',
     BuildersType = 'EngineerBuilder',
-    Builder {        
+    Builder {
         BuilderName = 'T2 Land Factory Builder Higher Pri',
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 750,
@@ -185,7 +185,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {        
+    Builder {
         BuilderName = 'T3 Land Factory Builder Higher Pri',
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 750,
@@ -212,7 +212,7 @@ BuilderGroup {
         BuilderName = 'CDR T1 Land Factory Higher Pri',
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 905, #DUNCAN - was 900
-        BuilderConditions = {                        
+        BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.0} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
@@ -236,7 +236,7 @@ BuilderGroup {
     # =============================
     #     Land Factory Builders
     # =============================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Land Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 905,
@@ -280,11 +280,11 @@ BuilderGroup {
             }
         }
     },
-    
+
     # ============================
     #     Air Factory Builders
     # ============================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Air Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 905,
@@ -337,7 +337,7 @@ BuilderGroup {
     # =============================
     #     Land Factory Builders
     # =============================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Land Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 900,
@@ -379,11 +379,11 @@ BuilderGroup {
             }
         }
     },
-    
+
     # ============================
     #     Air Factory Builders
     # ============================
-    Builder {        
+    Builder {
         BuilderName = 'T1 Air Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 900,
@@ -464,8 +464,8 @@ BuilderGroup {
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, #DUNCAN - Added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, #DUNCAN - Added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'ENERGYPRODUCTION TECH3' }},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'GATE TECH3 STRUCTURE' }},
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Gate' } },

@@ -206,7 +206,7 @@ UnitBlueprint {
             'BUILTBYTIER2ENGINEER DEFENSE UEF',
             'BUILTBYTIER2ENGINEER INDIRECTFIRE UEF',
         },
-        MaintenanceConsumptionPerSecondEnergy = 0, -- from 15 to counter build bug
+        MaintenanceConsumptionPerSecondEnergy = 15,
         StorageEnergy = 200,
         StorageMass = 30,
         TeleportEnergyMod = 0.15,

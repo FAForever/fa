@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/shield.lua
---**  Author(s):  John Comes, Gordon Duclos
---**
---**  Summary  : Shield lua module
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------
+--  File     :  /lua/shield.lua
+--  Author(s):  John Comes, Gordon Duclos
+--  Summary  : Shield lua module
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Overspill = import('/lua/overspill.lua')
@@ -29,7 +26,7 @@ local DEFAULT_OPTIONS = {
     PassOverkillDamage = false,
 }
 
-Shield = Class(moho.shield_methods,Entity) {
+Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
         spec.Size = spec.ShieldSize
@@ -38,10 +35,10 @@ Shield = Class(moho.shield_methods,Entity) {
         local spec = table.assimilate(spec, DEFAULT_OPTIONS)
         spec.Owner = owner
 
-        _c_CreateShield(self,spec)
+        _c_CreateShield(self, spec)
     end,
 
-    OnCreate = function(self,spec)
+    OnCreate = function(self, spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
         self.MeshBp = spec.Mesh
@@ -56,7 +53,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self,spec.ShieldMaxHealth)
+        self:SetHealth(self, spec.ShieldMaxHealth)
         self:SetType('Bubble')
         self:SetSpillOverDmgMod(spec.SpillOverDamageMod or 0.15)
 
@@ -71,7 +68,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetVizToAllies('Always')
         self:SetVizToNeutrals('Intel')
 
-        self:AttachBoneTo(-1,spec.Owner,-1)
+        self:AttachBoneTo(-1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
@@ -112,7 +109,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.SpillOverDmgMod = math.max(dmgMod, 0)
     end,
 
-    UpdateShieldRatio = function(self, value)        
+    UpdateShieldRatio = function(self, value)
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
         else
@@ -129,49 +126,45 @@ Shield = Class(moho.shield_methods,Entity) {
     -- under the shield. The default is to always absorb as much as possible
     -- but the reason this function exists is to allow flexible implementations
     -- like shields that only absorb partial damage (like armor).
-    OnGetDamageAbsorption = function(self,instigator,amount,type)
-        --LOG('absorb: ', math.min( self:GetHealth(), amount ))
-
+    OnGetDamageAbsorption = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * ( 1.0 - ArmyGetHandicap(self:GetArmy()) )
-        return math.min( self:GetHealth(), amount )
+        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
+        return math.min(self:GetHealth(), amount)
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if not ( IsEnemy(self:GetArmy(),firingWeapon.unit:GetArmy()) ) then
+            if not (IsEnemy(self:GetArmy(), firingWeapon.unit:GetArmy())) then
                 return false
             end
         end
-        --Check DNC list
+        -- Check DNC list
         if weaponBP.DoNotCollideList then
-            for k, v in pairs(weaponBP.DoNotCollideList) do
+            for _, v in pairs(weaponBP.DoNotCollideList) do
                 if EntityCategoryContains(ParseEntityCategory(v), self) then
                     return false
                 end
             end
-        end  
+        end
 
         return true
     end,
 
-    GetOverkill = function(self,instigator,amount,type)
-        --LOG('absorb: ', math.min( self:GetHealth(), amount ))
-
+    GetOverkill = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * ( 1.0 - ArmyGetHandicap(self:GetArmy()) )
+        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
         local finalVal =  amount - self:GetHealth()
         if finalVal < 0 then
             finalVal = 0
         end
         return finalVal
-    end,    
+    end,
 
     OnDamage = function(self, instigator, amount, vector, dmgType)
         -- Only called when a shield is directly impacted, so not for Personal Shields
@@ -199,9 +192,9 @@ Shield = Class(moho.shield_methods,Entity) {
                 end
             else
                 self:UpdateShieldRatio(0)
-            end		
-        end	
-        -- Only do overspill on events where we have an instigator. 
+            end
+        end
+        -- Only do overspill on events where we have an instigator.
         -- "Force" damage events from stratbombs are one example
         -- where we don't.
         if doOverspill and IsEntity(instigator) then
@@ -224,17 +217,17 @@ Shield = Class(moho.shield_methods,Entity) {
     CreateImpactEffect = function(self, vector)
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity { Owner = self.Owner }
-        Warp( ImpactMesh, self:GetPosition())        
+        local ImpactMesh = Entity {Owner = self.Owner}
+        Warp(ImpactMesh, self:GetPosition())
 
         if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
-            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
+            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
         end
 
-        for k, v in self.ImpactEffects do
-            CreateEmitterAtBone( ImpactMesh, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
+        for _, v in self.ImpactEffects do
+            CreateEmitterAtBone(ImpactMesh, -1, army, v):OffsetEmitter(0, 0, OffsetLength)
         end
 
         WaitSeconds(5)
@@ -252,14 +245,25 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     -- Return true to process this collision, false to ignore it.
-    OnCollisionCheck = function(self,other)
+    OnCollisionCheck = function(self, other)
         if other:GetArmy() == -1 then
             return false
         end
 
-        -- allow strategic nuke missile to penetrate shields
-        if EntityCategoryContains( categories.STRATEGIC, other ) and
-            EntityCategoryContains( categories.MISSILE, other ) then
+        if EntityCategoryContains(categories.SHIELDCOLLIDE, other) then
+            if other.ShieldImpacted then
+                return false
+            else
+                if other and not other:BeenDestroyed() then
+                    other:OnImpact('Shield', self)
+                    return false
+                end
+            end
+        end
+
+        -- Allow strategic nuke missile to penetrate shields
+        if EntityCategoryContains(categories.STRATEGIC, other) and
+            EntityCategoryContains(categories.MISSILE, other) then
             return false
         end
 
@@ -267,7 +271,7 @@ Shield = Class(moho.shield_methods,Entity) {
             return true
         end
 
-        return IsEnemy(self:GetArmy(),other:GetArmy())
+        return IsEnemy(self:GetArmy(), other:GetArmy())
     end,
 
     TurnOn = function(self)
@@ -299,19 +303,19 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape( 'Sphere', 0, 0, 0, self.Size/2)
+        self:SetCollisionShape('Sphere', 0, 0, 0, self.Size / 2)
 
         self:SetMesh(self.MeshBp)
-        self:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
+        self:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
         self:SetDrawScale(self.Size)
 
         if self.MeshZ == nil then
-            self.MeshZ = Entity { Owner = self.Owner }
+            self.MeshZ = Entity {Owner = self.Owner}
             self.MeshZ:SetMesh(self.MeshZBp)
-            Warp( self.MeshZ, self.Owner:GetPosition() )
+            Warp(self.MeshZ, self.Owner:GetPosition())
             self.MeshZ:SetDrawScale(self.Size)
-            self.MeshZ:AttachBoneTo(-1,self.Owner,-1)
-            self.MeshZ:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
+            self.MeshZ:AttachBoneTo(-1, self.Owner, -1)
+            self.MeshZ:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
 
             self.MeshZ:SetVizToFocusPlayer('Always')
             self.MeshZ:SetVizToEnemies('Intel')
@@ -329,27 +333,25 @@ Shield = Class(moho.shield_methods,Entity) {
         local shieldbp = self.Owner:GetBlueprint().Defense.Shield
         local shieldRadius = shieldbp.ShieldSize
         local aiBrain = owner:GetAIBrain()
-        local otherShields = aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally' )
+        local otherShields = aiBrain:GetUnitsAroundPoint((categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally')
         local rechargeTime = time + ((table.getn(otherShields) - 1) * .2 * time)
-        if rechargeTime > (time * 3) then
+        if rechargeTime > time * 3 then
             rechargeTime = time
-        else
         end
         while curProgress < rechargeTime do
             local fraction = self.Owner:GetResourceConsumed()
-            curProgress = curProgress + ( fraction / 10 )
-            curProgress = math.min( curProgress, rechargeTime )
+            curProgress = curProgress + (fraction / 10)
+            curProgress = math.min(curProgress, rechargeTime)
 
             local workProgress = curProgress / rechargeTime
 
-            self:UpdateShieldRatio( workProgress )
+            self:UpdateShieldRatio(workProgress)
             WaitTicks(1)
-        end    
+        end
     end,
 
     OnState = State {
         Main = function(self)
-
             -- If the shield was turned off; use the recharge time before turning back on
             if self.OffHealth >= 0 then
                 self.Owner:SetMaintenanceConsumptionActive()
@@ -361,15 +363,14 @@ Shield = Class(moho.shield_methods,Entity) {
                     self.Owner.Trash:Add(self.RegenThread)
                 end
             end
-
             self.Owner:OnShieldEnabled()
 
             -- We are no longer turned off
             self.OffHealth = -1
-            
+
             self:UpdateShieldRatio(-1)
             self:CreateShieldMesh()
-            
+
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
 
@@ -446,7 +447,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self.Owner:OnShieldDisabled()
             self.Owner:PlayUnitSound('ShieldOff')
-            
+
             -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
@@ -509,24 +510,24 @@ PersonalBubble = Class(Shield) {
 
         self.ShieldSize = spec.ShieldSize
 
-        --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
+        -- Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
         self:SetCollisionShape('None')
         self:SetType('Personal')
     end,
-    
+
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         -- We want all personal shields to pass overkill damage, including this one
         -- Was handled by self.PassOverkillDamage bp value, now defunct
         if self.Owner ~= instigator then
-            local overkill = self:GetOverkill(instigator,amount,dmgType)    
+            local overkill = self:GetOverkill(instigator, amount, dmgType)
             if self.Owner and IsUnit(self.Owner) and overkill > 0 then
                 self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
             end
         end
-        
+
         Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
     end,
-    
+
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
         self:SetCollisionShape('None')
@@ -574,7 +575,6 @@ PersonalBubble = Class(Shield) {
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 TransportShield = Class(Shield) {
-
     -- Yes it says contents, but this includes the generating transport too
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
@@ -639,8 +639,7 @@ TransportShield = Class(Shield) {
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
 PersonalShield = Class(Shield){
-
-    OnCreate = function(self,spec)
+    OnCreate = function(self, spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
 
@@ -657,7 +656,7 @@ PersonalShield = Class(Shield){
         self:SetType('Personal')
 
         self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self,spec.ShieldMaxHealth)
+        self:SetHealth(self, spec.ShieldMaxHealth)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -670,7 +669,7 @@ PersonalShield = Class(Shield){
         self:SetVizToAllies('Always')
         self:SetVizToNeutrals('Always')
 
-        self:AttachBoneTo(-1,spec.Owner,-1)
+        self:AttachBoneTo(-1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
@@ -679,30 +678,30 @@ PersonalShield = Class(Shield){
 
         ChangeState(self, self.OnState)
     end,
-    
-    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)        
+
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         -- We want all personal shields to pass overkill damage
         -- Was handled by self.PassOverkillDamage bp value, now defunct
         if self.Owner ~= instigator then
-            local overkill = self:GetOverkill(instigator,amount,dmgType)    
+            local overkill = self:GetOverkill(instigator, amount, dmgType)
             if self.Owner and IsUnit(self.Owner) and overkill > 0 then
                 self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
             end
         end
-        
+
         Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
     end,
 
     CreateImpactEffect = function(self, vector)
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactEnt = Entity { Owner = self.Owner }
+        local ImpactEnt = Entity {Owner = self.Owner}
 
-        Warp( ImpactEnt, self:GetPosition())
-        ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
+        Warp(ImpactEnt, self:GetPosition())
+        ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
 
         for k, v in self.ImpactEffects do
-            CreateEmitterAtBone( ImpactEnt, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
+            CreateEmitterAtBone(ImpactEnt, -1, army, v):OffsetEmitter(0, 0, OffsetLength)
         end
         WaitSeconds(1)
 
@@ -713,7 +712,7 @@ PersonalShield = Class(Shield){
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
         self:SetCollisionShape('None')
-        self.Owner:SetMesh(self.OwnerShieldMesh,true)
+        self.Owner:SetMesh(self.OwnerShieldMesh, true)
     end,
 
     RemoveShield = function(self)
@@ -728,11 +727,9 @@ PersonalShield = Class(Shield){
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
-
 }
 
 AntiArtilleryShield = Class(Shield) {
-
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
         self:SetType('AntiArtillery')
@@ -752,7 +749,7 @@ AntiArtilleryShield = Class(Shield) {
                     return false
                 end
             end
-        end          
+        end
         if bp.ArtilleryShieldBlocks then
             return true
         end
@@ -760,7 +757,7 @@ AntiArtilleryShield = Class(Shield) {
     end,
 
     -- Return true to process this collision, false to ignore it.
-    OnCollisionCheck = function(self,other)
+    OnCollisionCheck = function(self, other)
         if other:GetArmy() == -1 then
             return false
         end
@@ -769,7 +766,7 @@ AntiArtilleryShield = Class(Shield) {
             return true
         end
 
-        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self:GetArmy(),other:GetArmy()) then
+        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self:GetArmy(), other:GetArmy()) then
             return true
         end
 

@@ -17,23 +17,23 @@ local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
 #Below, changed from ALandUnit to AHoverLandUnit
 UAL0205 = Class(AHoverLandUnit, SlowHover) {
     KickupBones = {},
-    
+
     Weapons = {
         AAGun = Class(AAATemporalFizzWeapon) {
             ChargeEffectMuzzles = {'Muzzle_R01', 'Muzzle_L01'},
-            
+
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter( self.unit, 'Muzzle_R01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter( self.unit, 'Muzzle_L01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         },
     },
-    
+
     OnCreate = function(self)
         AHoverLandUnit.OnCreate(self)
         self.Trash:Add(CreateSlaver(self, 'Barrel_L', 'Barrel_R'))
-    end,    
+    end,
 }
 
 TypeClass = UAL0205

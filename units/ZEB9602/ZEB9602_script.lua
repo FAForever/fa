@@ -12,7 +12,7 @@ local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
 
 ZEB9602 = Class(TAirFactoryUnit) {
-    
+
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
@@ -53,7 +53,7 @@ ZEB9602 = Class(TAirFactoryUnit) {
             dir = dir * -1
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
         self.ArmSlider1:SetGoal(0, 0, 0)

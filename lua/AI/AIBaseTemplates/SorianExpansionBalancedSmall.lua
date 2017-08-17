@@ -15,7 +15,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1BalancedUpgradeBuildersExpansion',
         'SorianT2BalancedUpgradeBuildersExpansion',
-        
+
         # Engineer Builders
         'SorianEngineerFactoryBuilders',
         'SorianT1EngineerBuilders',
@@ -23,29 +23,29 @@ BaseBuilderTemplate {
         'SorianT3EngineerBuilders',
         'SorianEngineerFactoryConstruction',
         'SorianLandInitialFactoryConstruction',
-		
-		# SCU Upgrades
-		'SorianSCUUpgrades',
 
-        # Extractor building        
+        # SCU Upgrades
+        'SorianSCUUpgrades',
+
+        # Extractor building
         'SorianEngineerMassBuildersLowerPri - Rush',
-		
+
         # Build some power, but not much
         'SorianEngineerEnergyBuildersExpansions',
-		
+
         # ==== DEFENSES ==== #
         'SorianT1LightDefenses',
         'SorianT2LightDefenses',
         'SorianT3LightDefenses',
-		
-		'SorianT2ArtilleryFormBuilders',
-		#'SorianT3ArtilleryFormBuilders',
-		#'SorianT4ArtilleryFormBuilders',
-		'SorianAirStagingExpansion',
-		'SorianT2MissileDefenses',
-		
-		'SorianMassAdjacencyDefenses',
-        
+
+        'SorianT2ArtilleryFormBuilders',
+        #'SorianT3ArtilleryFormBuilders',
+        #'SorianT4ArtilleryFormBuilders',
+        'SorianAirStagingExpansion',
+        'SorianT2MissileDefenses',
+
+        'SorianMassAdjacencyDefenses',
+
         # ==== LAND UNIT BUILDERS ==== #
         'SorianT1LandFactoryBuilders',
         'SorianT2LandFactoryBuilders',
@@ -53,8 +53,8 @@ BaseBuilderTemplate {
         'SorianFrequentLandAttackFormBuilders',
         'SorianMassHunterLandFormBuilders',
         'SorianMiscLandFormBuilders',
-		'SorianUnitCapLandAttackFormBuilders',
-        
+        'SorianUnitCapLandAttackFormBuilders',
+
         'SorianT1ReactionDF',
         'SorianT2ReactionDF',
         'SorianT3ReactionDF',
@@ -65,32 +65,32 @@ BaseBuilderTemplate {
         'SorianT3AirFactoryBuilders',
         'SorianFrequentAirAttackFormBuilders',
         'SorianMassHunterAirFormBuilders',
-        
-		'SorianUnitCapAirAttackFormBuilders',
+
+        'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
-        
+
         #'SorianTransportFactoryBuilders',
-		
-		'SorianExpResponseFormBuilders',
-        
+
+        'SorianExpResponseFormBuilders',
+
         'SorianT1AntiAirBuilders',
         'SorianT2AntiAirBuilders',
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
-		
-		# ===== STRATEGIES ====== #
-		
-		'SorianParagonStrategyExp',
-		'SorianWaterMapLowLand',
-		
-		# == STRATEGY PLATOONS == #
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
+
+        # ===== STRATEGIES ====== #
+
+        'SorianParagonStrategyExp',
+        'SorianWaterMapLowLand',
+
+        # == STRATEGY PLATOONS == #
+
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
     },
-    NonCheatBuilders = {        
+    NonCheatBuilders = {
         'SorianLandScoutFactoryBuilders',
         'SorianLandScoutFormBuilders',
-        
+
         'SorianRadarEngineerBuilders',
         'SorianRadarUpgradeBuildersExpansion',
     },
@@ -101,14 +101,14 @@ BaseBuilderTemplate {
             Tech3 = 10,
             SCU = 1,
         },
-        
+
         FactoryCount = {
             Land = 4,
             Air = 1,
             Sea = 0,
             Gate = 0,
         },
-        
+
         MassToFactoryValues = {
             T1Value = 6,
             T2Value = 15,
@@ -119,14 +119,14 @@ BaseBuilderTemplate {
         if markerType != 'Start Location' and markerType != 'Expansion Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not (personality == 'sorianrush' or personality == 'sorianadaptive') then
             return 0
         end
 
         local threatCutoff = 10 # value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
+        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 500
         elseif distance > 500 then
@@ -136,7 +136,7 @@ BaseBuilderTemplate {
         else # within 250
             return 250
         end
-		
+
         return 0
     end,
 }

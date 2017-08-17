@@ -15,7 +15,7 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
         '/effects/emitters/nuke_munition_launch_trail_04_emit.bp',
         '/effects/emitters/nuke_munition_launch_trail_06_emit.bp',
     },
-    
+
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp'

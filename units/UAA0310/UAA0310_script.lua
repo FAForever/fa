@@ -15,7 +15,7 @@ local explosion = import('/lua/defaultexplosions.lua')
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',
-    
+
     Weapons = {
         QuantumBeamGeneratorWeapon = Class(AQuantumBeamGenerator){},
         SonicPulseBattery1 = Class(AAAZealotMissileWeapon) {},

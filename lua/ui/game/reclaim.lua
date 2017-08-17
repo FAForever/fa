@@ -6,11 +6,15 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
 local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
+local MinAmount = options.minimum_reclaim_amount or 10
+
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
 local LabelPool = {} -- Stores labels up too MaxLabels
 local OldZoom
 local OldPosition
 local ReclaimChanged = true
+local PlayableArea
+local OutsidePlayableAreaReclaim = {}
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
@@ -19,10 +23,44 @@ function UpdateReclaim(syncTable)
     for id, data in syncTable do
         if not data.mass then
             Reclaim[id] = nil
+            OutsidePlayableAreaReclaim[id] = nil
         else
-            Reclaim[id] = data
+            data.inPlayableArea = InPlayableArea(data.position)
+            if data.inPlayableArea then
+                Reclaim[id] = data
+                OutsidePlayableAreaReclaim[id] = nil
+            else
+                Reclaim[id] = nil
+                OutsidePlayableAreaReclaim[id] = data
+            end
         end
     end
+end
+
+function SetPlayableArea(rect)
+    ReclaimChanged = true
+    PlayableArea = rect
+    
+    local newReclaim = {}
+    local newOutsidePlayableAreaReclaim = {}
+    local ReclaimLists = {Reclaim, OutsidePlayableAreaReclaim}
+    for _,reclaimList in ReclaimLists do 
+        for id,r in reclaimList do
+            r.inPlayableArea = InPlayableArea(r.position)
+            if r.inPlayableArea then
+                newReclaim[id] = r
+            else
+                newOutsidePlayableAreaReclaim[id] = r
+            end
+        end
+    end
+    Reclaim = newReclaim
+    OutsidePlayableAreaReclaim = newOutsidePlayableAreaReclaim
+end
+
+function updateMinAmount(value)
+    MinAmount = value
+    ReclaimChanged = true
 end
 
 function updateMaxLabels(value)
@@ -37,6 +75,13 @@ end
 function OnScreen(view, pos)
     local proj = view:Project(Vector(pos[1], pos[2], pos[3]))
     return not (proj.x < 0 or proj.y < 0 or proj.x > view.Width() or proj.y > view:Height())
+end
+
+function InPlayableArea(pos)
+    if PlayableArea then
+        return not (pos[1] < PlayableArea[1] or pos[3] < PlayableArea[2] or pos[1] > PlayableArea[3] or pos[3] > PlayableArea[4])
+    end
+    return true
 end
 
 local WorldLabel = Class(Group) {
@@ -118,18 +163,12 @@ function UpdateLabels()
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
 
-    local offScreenReclaimIndex = 1
-    local offScreenReclaims = {}
-
     -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
         r.onScreen = OnScreen(view, r.position)
-        if r.onScreen then
+        if r.onScreen and r.mass >= MinAmount then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
-        else
-            offScreenReclaims[offScreenReclaimIndex] = r
-            offScreenReclaimIndex = offScreenReclaimIndex + 1
         end
     end
 
@@ -228,7 +267,6 @@ local CommandGraphActive = false
 function OnCommandGraphShow(bool)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
-    local options = Prefs.GetFromCurrentProfile('options')
 
     CommandGraphActive = bool
     if CommandGraphActive then

@@ -34,13 +34,13 @@ function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
 
             --Spawn bases
             while table.getn(ScenarioInfo.LoadBalance.SpawnGroups) > 0 do
-                local base, name, uncapturable = unpack(table.remove( ScenarioInfo.LoadBalance.SpawnGroups, 1))
-                base:SpawnGroup( name, uncapturable, true )
+                local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
+                base:SpawnGroup(name, uncapturable, true)
             end
 
             --Spawn units
             while table.getn(ScenarioInfo.LoadBalance.PlatoonGroups) > 0 do
-                local strArmy, strGroup, formation, callback = unpack(table.remove( ScenarioInfo.LoadBalance.PlatoonGroups, 1))
+                local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
                 CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
             end
 
@@ -115,7 +115,7 @@ function AreaToRect(strArea)
     return Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4])
 end
 
-function InRect( vectorPos, rect )
+function InRect(vectorPos, rect)
     return vectorPos[1] > rect.x0 and vectorPos[1] < rect.x1 and
            vectorPos[3] > rect.y0 and vectorPos[3] < rect.y1
 end
@@ -287,7 +287,7 @@ function CreateArmySubGroup(strArmy,strGroup,...)
                 if arg['n'] >= 1 then
                     platoonList, tblResult, treeResult = CreateSubGroup(tblNode.Units[strName], strArmy, unpack(arg))
                 else
-                    platoonList, tblResult, treeResult = CreatePlatoons( strArmy, tblNode.Units[strName] )
+                    platoonList, tblResult, treeResult = CreatePlatoons(strArmy, tblNode.Units[strName])
                 end
             end
         end
@@ -314,7 +314,7 @@ function CreateSubGroup(tblNode, strArmy, strGroup, ...)
                 if arg['n'] >= 1 then
                     platoonList, tblResult, treeResult = CreateSubGroup(tblNode.Units[strName], strArmy, unpack(arg))
                 else
-                    platoonList, tblResult, treeResult = CreatePlatoons( strArmy, tblNode.Units[strName] )
+                    platoonList, tblResult, treeResult = CreatePlatoons(strArmy, tblNode.Units[strName])
                 end
             end
         end
@@ -325,10 +325,10 @@ end
 ----[  CreateInitialArmyGroup                                                     ]--
 ----[                                                                             ]--
 function CreateInitialArmyGroup(strArmy, createCommander)
-    local tblGroup = CreateArmyGroup( strArmy, 'INITIAL')
+    local tblGroup = CreateArmyGroup(strArmy, 'INITIAL')
     local cdrUnit = false
 
-    if createCommander and ( tblGroup == nil or 0 == table.getn(tblGroup) ) then
+    if createCommander and (tblGroup == nil or 0 == table.getn(tblGroup)) then
         local factionIndex = GetArmyBrain(strArmy):GetFactionIndex()
         local initialUnitName = import('/lua/factions.lua').Factions[factionIndex].InitialUnit
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
@@ -413,7 +413,7 @@ function CreateResources()
 --            if not ScenarioInfo.MapData.Decals then
 --                ScenarioInfo.MapData.Decals = {}
 --            end
---            table.insert( ScenarioInfo.MapData.Decals, CreateDecal(
+--            table.insert(ScenarioInfo.MapData.Decals, CreateDecal(
 --                tblData.position, -- position
 --                0, -- heading
 --                albedo, "", -- TEX1, TEX2
@@ -422,7 +422,7 @@ function CreateResources()
 --                lod, -- LOD
 --                0, -- DURACTION
 --                -1 -- ARMY
---            ) )
+--            ))
             CreateSplat(
                 tblData.position,           -- Position
                 0,                          -- Heading (rotation)
@@ -460,7 +460,7 @@ function InitializeArmies()
 
             --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
 
-            SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
+            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
 
             --GetArmyBrain(strArmy):InitializePlatoonBuildManager()
             --LoadArmyPBMBuilders(strArmy)
@@ -477,15 +477,15 @@ function InitializeArmies()
             if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
                 local commander = (not ScenarioInfo.ArmySetup[strArmy].Civilian)
                 local cdrUnit
-                tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup( strArmy, commander)
+                tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup(strArmy, commander)
                 if commander and cdrUnit and ArmyBrains[iArmy].Nickname then
-                    cdrUnit:SetCustomName( ArmyBrains[iArmy].Nickname )
+                    cdrUnit:SetCustomName(ArmyBrains[iArmy].Nickname)
                 end
             end
 
             local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
             if wreckageGroup then
-                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup )
+                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
                 for num,unit in tblResult do
                     unit:CreateWreckageProp(0)
                     unit:Destroy()
@@ -561,33 +561,33 @@ function InitializeScenarioArmies()
 
         if tblData then
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-            SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
+            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
             if tblData.faction ~= nil then
                 if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
-                    SetArmyFactionIndex( strArmy, factionIndex - 1 )
+                    SetArmyFactionIndex(strArmy, factionIndex - 1)
                 else
                     local factionIndex = math.min(math.max(tblData.faction, 0), table.getsize(factions.Factions))
-                    SetArmyFactionIndex( strArmy, factionIndex )
+                    SetArmyFactionIndex(strArmy, factionIndex)
                     GetArmyBrain(strArmy):SetCurrentPlan()
                 end
             end
 
             if tblData.color ~= nil then
-                SetArmyColorIndex( strArmy, tblData.color)
+                SetArmyColorIndex(strArmy, tblData.color)
             end
 
             if tblData.personality ~= nil then
-                SetArmyAIPersonality( strArmy, tblData.personality)
+                SetArmyAIPersonality(strArmy, tblData.personality)
             end
 
             if bCreateInitial then
-                tblGroups[strArmy] = CreateInitialArmyGroup( strArmy )
+                tblGroups[strArmy] = CreateInitialArmyGroup(strArmy)
             end
 
             local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
             if wreckageGroup then
-                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup )
+                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
                 for num,unit in tblResult do
                     unit:CreateWreckageProp(0)
                     unit:Destroy()
@@ -615,7 +615,7 @@ end
 ----[ AssignOrders                                                                ]--
 ----[                                                                             ]--
 ----[                                                                             ]--
-function AssignOrders( strQueue, tblUnit, target)
+function AssignOrders(strQueue, tblUnit, target)
     local tblOrder = Scenario.Orders[ strQueue ]
     for i, order in pairs(tblOrder) do
         order.cmd(tblUnit,target)
@@ -625,8 +625,8 @@ end
 
 ----[ SpawnPlatoon                                                                ]--
 ----[ Spawns unit group and assigns to platoon it is a part of                    ]--
-function SpawnPlatoon( strArmy, strGroup )
-    local tblNode = FindUnitGroup( strGroup, Scenario.Armies[strArmy].Units )
+function SpawnPlatoon(strArmy, strGroup)
+    local tblNode = FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     if nil == tblNode then
         error('SCENARIO UTILITIES WARNING: No Group found for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
         return false
@@ -651,13 +651,13 @@ function SpawnPlatoon( strArmy, strGroup )
     return platoonList[platoonName], platoonList, tblResult, treeResult
 end
 
-function SpawnTableOfPlatoons( strArmy, strGroup )
+function SpawnTableOfPlatoons(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
-                                                              FindUnitGroup( strGroup, Scenario.Armies[strArmy].Units))
+                                                              FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
     end
@@ -683,7 +683,7 @@ function CountChildUnits(tblNode)
     return count
 end
 
-function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, treeResult, balance )
+function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, treeResult, balance)
     tblResult = tblResult or {}
     platoonList = platoonList or {}
     treeResult = treeResult or {}
@@ -742,7 +742,7 @@ function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, 
                                                                          platoonList, currPlatoon, treeResult[strName], balance)
 
         else
-            unit = CreateUnitHPR( tblData.type,
+            unit = CreateUnitHPR(tblData.type,
                                  strArmy,
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
@@ -779,7 +779,7 @@ function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, 
                     if tblData.type == currTemplate[i][1] and
                             platoonList[currPlatoon].squadCounter[i] < currTemplate[i][3] then
                         platoonList[currPlatoon].squadCounter[i] = platoonList[currPlatoon].squadCounter[i] + 1
-                        brain:AssignUnitsToPlatoon(platoonList[currPlatoon],{unit},currTemplate[i][4],currTemplate[i][5] )
+                        brain:AssignUnitsToPlatoon(platoonList[currPlatoon],{unit},currTemplate[i][4],currTemplate[i][5])
                         inserted = true
                     end
                     i = i + 1
@@ -819,7 +819,7 @@ function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
-                                                              FindUnitGroup( strGroup, Scenario.Armies[strArmy].Units ), nil, nil, nil, nil, balance )
+                                                              FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units), nil, nil, nil, nil, balance)
 
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
@@ -846,7 +846,7 @@ function CreateArmyTree(strArmy, strGroup)
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
-                                                              FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units) )
+                                                              FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
     end
@@ -896,7 +896,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                 SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
             end
         else
-            unit = CreateUnitHPR( tblData.type,
+            unit = CreateUnitHPR(tblData.type,
                                  strArmy,
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
@@ -936,14 +936,14 @@ function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLe
     return plat
 end
 
-function FlattenTreeGroup( strArmy, strGroup, tblData, unitGroup )
-    tblData = tblData or FindUnitGroup( strGroup, Scenario.Armies[strArmy].Units )
+function FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
+    tblData = tblData or FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     unitGroup = unitGroup or {}
     for strName, tblData in pairs(tblData.Units) do
         if 'GROUP' == tblData.type then
-            FlattenTreeGroup( strArmy, strGroup, tblData, unitGroup )
+            FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
         else
-            table.insert( unitGroup, tblData )
+            table.insert(unitGroup, tblData)
         end
     end
     return unitGroup
@@ -1102,7 +1102,7 @@ function UpdateGivenOSB(builderEdit, builderData)
         while squadNum <= table.getn(builderEdit.PlatoonTemplate) do
             if builderEdit.PlatoonTemplate[squadNum][2] < 0 then
                 local num = builderEdit.PlatoonTemplate[squadNum][2] * builderData.PlatoonData.PlatoonMultiplier
-                builderEdit.PlatoonTemplate[squadNum][2] = -( math.ceil( math.abs( num ) ) )
+                builderEdit.PlatoonTemplate[squadNum][2] = -(math.ceil(math.abs(num)))
             end
             squadNum = squadNum + 1
         end
@@ -1278,7 +1278,7 @@ function LoadOSB(buildName, strArmy, builderData)
             end
 
             -- Set buildout to
-            if (v.BuildTimeOut and v.BuildTimeOut < 0 ) or ( spec.PlatoonTemplate[3] and spec.PlatoonTemplate[3][2] < 0 ) then
+            if (v.BuildTimeOut and v.BuildTimeOut < 0) or (spec.PlatoonTemplate[3] and spec.PlatoonTemplate[3][2] < 0) then
                 spec.GenerateTimeOut = true
             end
             spec.BuildTimeOut = v.BuildTimeOut
@@ -1453,6 +1453,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xra0305'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xrl0305'
+            elseif template[i][1] == 'uel0307' then
+                template[i][1] = 'url0306'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ur')
             end
@@ -1497,7 +1499,7 @@ function SplitUpdateOSBName(buildName)
         local pos2 = string.find(buildName, '_', pos+1)
         if pos2 then
             childPart = string.sub(buildName, pos+1, pos2-1)
-            location = string.sub(buildName, pos2+1 )
+            location = string.sub(buildName, pos2+1)
         else
             childPart = string.sub(buildName, pos+1)
         end
@@ -1532,7 +1534,7 @@ function SplitOSBName(buildName)
         local pos2 = string.find(buildName, '_', pos+1)
         if pos2 then
             location = string.sub(buildName, pos+1, pos2-1)
-            childPart = string.sub(buildName, pos2+1 )
+            childPart = string.sub(buildName, pos2+1)
         else
             location = string.sub(buildName, pos+1)
         end

@@ -7,7 +7,7 @@ ProjectileBlueprint {
     },
     Physics = {
         MinBounceCount = 1,
-        MaxBounceCount = 3,    
+        MaxBounceCount = 3,
         DestroyOnWater = true,
         InitialSpeed = 8,
         Lifetime = 0.8,

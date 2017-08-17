@@ -68,9 +68,13 @@ function SetInvincible(area, invinBool)
                 table.insert(unitTable, unit)
             end
         end
-        ScenarioFramework.FlagUnkillableSelect(1, unitTable)
+        for _, v in ScenarioInfo.HumanPlayers do
+            ScenarioFramework.FlagUnkillableSelect(v, unitTable)
+        end
     else
-        ScenarioFramework.UnflagUnkillable(1)
+        for _, v in ScenarioInfo.HumanPlayers do
+            ScenarioFramework.UnflagUnkillable(v)
+        end
     end
 end
 

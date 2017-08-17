@@ -10,7 +10,7 @@ NukeAOE = Class() {
         self.Ticks = ticks
         self.TotalTime = totalTime
     end,
-    
+
     DoNukeDamage = function(self, instigator, pos, brain, army, damageType)
         if self.TotalTime == 0 then
             import('/lua/sim/DamageArea.lua').DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true, brain, army)
@@ -18,7 +18,7 @@ NukeAOE = Class() {
             ForkThread(self.SlowNuke, self, instigator, pos)
         end
     end,
-    
+
     SlowNuke = function(self, instigator, pos)
         local ringWidth = (self.Radius / self.Ticks)
         local tickLength = (self.TotalTime / self.Ticks)

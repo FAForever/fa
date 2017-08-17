@@ -265,7 +265,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                     end
                 )
             end
-            
+
             -- Pick a faction movie table of the default one
             local movies = {}
             if operationVictoryTable.opData.opMovies.postOpMovies.factionDependant then
@@ -292,9 +292,9 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
             movie.curMovie = 1
 
             local height = 6 * textArea:GetRowHeight()
-            textArea.Height:Set( height )
-            textArea.Top:Set( function() return movie.Bottom() end )
-            textArea.Width:Set( function() return movie.Width() / 2 end )
+            textArea.Height:Set(height)
+            textArea.Top:Set(function() return movie.Bottom() end)
+            textArea.Width:Set(function() return movie.Width() / 2 end)
             LayoutHelpers.AtHorizontalCenterIn(textArea,parent)
             textArea.Depth:Set(function() return movie.Depth() + 5 end)
 
@@ -321,14 +321,14 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                     -- Play sfx and voice sounds only if available
                     if movies[movie.curMovie].sfx and movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ),
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}),
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     elseif movies[movie.curMovie].sfx then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank} ))
+                                  Sound({Cue = movies[movie.curMovie].sfx, Bank = movies[movie.curMovie].sfxBank}))
                     elseif movies[movie.curMovie].voice then
                         movie:Set(movies[movie.curMovie].vid,
-                                  Sound( {Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank} ))
+                                  Sound({Cue = movies[movie.curMovie].voice, Bank = movies[movie.curMovie].voiceBank}))
                     else
                         movie:Set(movies[movie.curMovie].vid)
                     end
@@ -423,71 +423,83 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     LayoutHelpers.AtTopIn(bg.title, bg, 28)
 
     -- set controls that are global to the dialog
-    bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-	LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
-	LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
-	bg.continueBtn:UseAlphaHitTest(false)
+    if HasCommandLineArg("/gpgnet") then
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_FAF>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
+    else
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        Tooltip.AddButtonTooltip(bg.continueBtn, 'PostScore_Quit')
+    end
 
-	bg.continueBtn.glow = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-	LayoutHelpers.AtCenterIn(bg.continueBtn.glow, bg.continueBtn)
-	bg.continueBtn.glow:SetAlpha(0)
-	bg.continueBtn.glow:DisableHitTest()
+    LayoutHelpers.AtRightIn(bg.continueBtn, bg, -10)
+    LayoutHelpers.AtBottomIn(bg.continueBtn, bg, 20)
+    bg.continueBtn:UseAlphaHitTest(false)
+
+    bg.continueBtn.glow = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    LayoutHelpers.AtCenterIn(bg.continueBtn.glow, bg.continueBtn)
+    bg.continueBtn.glow:SetAlpha(0)
+    bg.continueBtn.glow:DisableHitTest()
 
     bg.continueBtn.pulse = Bitmap(bg.continueBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-	LayoutHelpers.AtCenterIn(bg.continueBtn.pulse, bg.continueBtn)
-	bg.continueBtn.pulse:DisableHitTest()
-	bg.continueBtn.pulse:SetAlpha(.5)
+    LayoutHelpers.AtCenterIn(bg.continueBtn.pulse, bg.continueBtn)
+    bg.continueBtn.pulse:DisableHitTest()
+    bg.continueBtn.pulse:SetAlpha(.5)
 
     EffectHelpers.Pulse(bg.continueBtn.pulse, 2, .5, 1)
 
     bg.continueBtn.OnRolloverEvent = function(self, event)
-	   	if event == 'enter' then
-			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-			self.label:SetColor('black')
-		elseif event == 'down' then
-			self.label:SetColor('black')
-		else
-			EffectHelpers.FadeOut(self.glow, .25, 1, 0)
-			self.label:SetColor('FFbadbdb')
-		end
-	end
+        if event == 'enter' then
+            EffectHelpers.FadeIn(self.glow, .25, 0, 1)
+            self.label:SetColor('black')
+        elseif event == 'down' then
+            self.label:SetColor('black')
+        else
+            EffectHelpers.FadeOut(self.glow, .25, 1, 0)
+            self.label:SetColor('FFbadbdb')
+        end
+    end
 
     bg.continueBtn.OnClick = function(self, modifiers)
-	    hotstats.clean_view()
+        hotstats.clean_view()
         ConExecute("ren_Oblivion false")
-        EscapeHandler.SafeQuit()
+        if HasCommandLineArg("/gpgnet") then
+            -- Quit to desktop
+            EscapeHandler.SafeQuit()
+        else
+            -- Back to main menu
+            ExitGame()
+        end
     end
-    Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
 
      -- Rehost button in case of failure
     if showCampaign and not operationVictoryTable.success then
         bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-    	LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
-    	bg.continueBtn:UseAlphaHitTest(false)
+        LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
+        bg.continueBtn:UseAlphaHitTest(false)
 
-    	bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
-    	bg.rehostBtn.glow:SetAlpha(0)
-    	bg.rehostBtn.glow:DisableHitTest()
+        bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+        LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
+        bg.rehostBtn.glow:SetAlpha(0)
+        bg.rehostBtn.glow:DisableHitTest()
 
         bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-    	LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
-    	bg.rehostBtn.pulse:DisableHitTest()
-    	bg.rehostBtn.pulse:SetAlpha(.5)
+        LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
+        bg.rehostBtn.pulse:DisableHitTest()
+        bg.rehostBtn.pulse:SetAlpha(.5)
 
         EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
 
         bg.rehostBtn.OnRolloverEvent = function(self, event)
-    	   	if event == 'enter' then
-    			EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-    			self.label:SetColor('black')
-    		elseif event == 'down' then
-    			self.label:SetColor('black')
-    		else
-    			EffectHelpers.FadeOut(self.glow, .25, 1, 0)
-    			self.label:SetColor('FFbadbdb')
-    		end
-    	end
+            if event == 'enter' then
+                EffectHelpers.FadeIn(self.glow, .25, 0, 1)
+                self.label:SetColor('black')
+            elseif event == 'down' then
+                self.label:SetColor('black')
+            else
+                EffectHelpers.FadeOut(self.glow, .25, 1, 0)
+                self.label:SetColor('FFbadbdb')
+            end
+        end
 
         bg.rehostBtn.OnClick = function(self, modifiers)
             ConExecute("ren_Oblivion false")
@@ -865,10 +877,13 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local obTable = import('/lua/ui/game/objectives2.lua').GetCurrentObjectiveTable()
             local hasPrimaries = false
             local hasSecondaries = false
+            local hasBonuses = false
             if obTable then
                 for key, objective in obTable do
                     local compStr
                     local compColor = 'ffff0000'
+                    local objTitle = objective.title
+                    local objDescription = objective.description
                     if objective.complete == 'complete' then
                         compStr = "<LOC SCORE_0038>Accomplished"
                         compColor = 'ff00ff00'
@@ -883,8 +898,17 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                         hasPrimaries = true
                     elseif objective.type == 'secondary' then
                         hasSecondaries = true
+                    elseif objective.type == 'bonus' then
+                        hasBonuses = true
                     end
-                    table.insert(tempObjectives, {title = LOC(objective.title), complete = LOC(compStr), completeColor = compColor, type = objective.type})
+                    -- Show title and description of hidden objectives only if they're completed
+                    if objective.hidden and objective.complete ~= 'complete' then
+                        objTitle = "<LOC SCORE_0042>Not Discovered"
+                        objDescription = "<LOC SCORE_0048>This objective will be revealed only after it's completion"
+                        compStr = "<LOC SCORE_0054>Incomplete"
+                        compColor = 'ff0000ff'
+                    end
+                    table.insert(tempObjectives, {title = LOC(objTitle), description = objDescription, complete = LOC(compStr), completeColor = compColor, type = objective.type})
                 end
             end
 
@@ -901,6 +925,15 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 table.insert(sortedObjectives, {title = LOC("<LOC SCORE_0040>Secondary Objectives"), type = 'header'})
                 for i, v in tempObjectives do
                     if v.type == 'secondary' then
+                        table.insert(sortedObjectives, v)
+                    end
+                end
+            end
+
+            if hasBonuses then
+                table.insert(sortedObjectives, {title = LOC("<LOC SCORE_0041>Bonus Objectives"), type = 'header'})
+                for i, v in tempObjectives do
+                    if v.type == 'bonus' then
                         table.insert(sortedObjectives, v)
                     end
                 end
@@ -1003,6 +1036,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                         line.title:SetFont(UIUtil.bodyFont, 14)
                         line.result:SetText(data.complete or "<LOC key_binding_0001>No action text")
                         line.result:SetColor(data.completeColor)
+                        Tooltip.AddControlTooltip(line.bg, {text = data.title, body = data.description})
                     end
                 end
                 for i, v in objEntries do

@@ -44,7 +44,7 @@ end
 #
 ##############################################################################################################
 function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
-    local num = Random( minNumber, maxNumber)
+    local num = Random(minNumber, maxNumber)
     if higherThan < num and lowerThan > num then
         return true
     end
@@ -252,21 +252,21 @@ end
 #
 ##############################################################################################################
 function ReclaimablesInArea(aiBrain, locType)
-	#DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
+    #DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
     if aiBrain:GetEconomyStoredRatio('MASS') > .7 then
         return false
     end
-    
-	#DUNCAN - who cares about energy for reclaming?
+
+    #DUNCAN - who cares about energy for reclaming?
     #if aiBrain:GetEconomyStoredRatio('ENERGY') > .9 then
     #    return false
     #end
-    
-    local ents = AIUtils.AIGetReclaimablesAroundLocation( aiBrain, locType )
+
+    local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
     if ents and table.getn(ents) > 0 then
         return true
     end
-    
+
     return false
 end
 
@@ -277,7 +277,7 @@ end
 # parameter 1: string   locType     = "MAIN"
 #
 ##############################################################################################################
-function CheckAvailableGates( aiBrain, locType )
+function CheckAvailableGates(aiBrain, locType)
     local pos, rad
     if aiBrain:PBMHasPlatoonList() then
         for k,v in aiBrain.PBM.Locations do
@@ -294,7 +294,7 @@ function CheckAvailableGates( aiBrain, locType )
     if not pos then
         return false
     end
-    local gates = GetOwnUnitsAroundPoint( aiBrain, categories.GATE, pos, rad )
+    local gates = GetOwnUnitsAroundPoint(aiBrain, categories.GATE, pos, rad)
     if not gates then
         return false
     else
@@ -343,7 +343,7 @@ end
 function ArmyNeedsTransports(aiBrain)
     if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0  then
         return true
-    end    
+    end
     return false
 end
 
@@ -381,7 +381,7 @@ end
 #
 ##############################################################################################################
 function CDRRunningAway(aiBrain)
-    local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
+    local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
     for k,v in units do
         if not v.Dead and v.Running then
             return true
@@ -400,7 +400,7 @@ end
 ##############################################################################################################
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
-    if aiBrain.CheatEnabled and ( 0.5 * num ) < time then
+    if aiBrain.CheatEnabled and (0.5 * num) < time then
         return true
     elseif num < time then
         return true
@@ -416,7 +416,7 @@ end
 #
 ##############################################################################################################
 function LessThanGameTime(aiBrain, num)
-    return ( not GreaterThanGameTime( aiBrain, num ) )
+    return (not GreaterThanGameTime(aiBrain, num))
 end
 
 ##############################################################################################################
@@ -448,31 +448,31 @@ function NotPreBuilt(aiBrain)
 end
 
 #DUNCAN - added to check the map.
-function MapCheck(aiBrain, mapname, check) 
-	if (ScenarioInfo.name == mapname) == check then
-		return true
-	end
-	return false
-end 
+function MapCheck(aiBrain, mapname, check)
+    if (ScenarioInfo.name == mapname) == check then
+        return true
+    end
+    return false
+end
 
 #DUNCAN - added to check for islands
-function IsIsland(aiBrain, check) 
-		
-	if not aiBrain.islandCheck then 
-		local startX, startZ = aiBrain:GetArmyStartPos()
-		aiBrain.isIsland = false
-		aiBrain.islandMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
-		aiBrain.islandCheck = true
-		if aiBrain.islandMarker then
-			aiBrain.isIsland = true
-		end
-	end
+function IsIsland(aiBrain, check)
 
-	if check == aiBrain.isIsland then
-		return true
-	else
-		return false
-	end
+    if not aiBrain.islandCheck then
+        local startX, startZ = aiBrain:GetArmyStartPos()
+        aiBrain.isIsland = false
+        aiBrain.islandMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        aiBrain.islandCheck = true
+        if aiBrain.islandMarker then
+            aiBrain.isIsland = true
+        end
+    end
+
+    if check == aiBrain.isIsland then
+        return true
+    else
+        return false
+    end
 end
 
 
@@ -484,14 +484,14 @@ end
 # parameter 2: integer  sizeZ           = "sizeZ"
 #
 ##############################################################################################################
-function MapGreaterThan(aiBrain, sizeX, sizeZ)	
-	local mapSizeX, mapSizeZ = GetMapSize()
-	if mapSizeX > sizeX or mapSizeZ > sizeZ then
-		#LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-		return true
-	end
-	#LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-	return false
+function MapGreaterThan(aiBrain, sizeX, sizeZ)
+    local mapSizeX, mapSizeZ = GetMapSize()
+    if mapSizeX > sizeX or mapSizeZ > sizeZ then
+        #LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+        return true
+    end
+    #LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+    return false
 end
 
 ##############################################################################################################
@@ -502,14 +502,14 @@ end
 # parameter 2: integer  sizeZ           = "sizeZ"
 #
 ##############################################################################################################
-function MapLessThan(aiBrain, sizeX, sizeZ)	
-	local mapSizeX, mapSizeZ = GetMapSize()	
-	if mapSizeX < sizeX and mapSizeZ < sizeZ then
-		#LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-		return true
-	end
-	#LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-	return false
+function MapLessThan(aiBrain, sizeX, sizeZ)
+    local mapSizeX, mapSizeZ = GetMapSize()
+    if mapSizeX < sizeX and mapSizeZ < sizeZ then
+        #LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+        return true
+    end
+    #LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
+    return false
 end
 
 

@@ -1,12 +1,12 @@
--- ****************************************************************************
+-----------------------------------------------------------------
 -- **
--- **  File     :  /cdimage/units/UAL0001/UAL0001_script.lua
--- **  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+-- File     :  /cdimage/units/UAL0001/UAL0001_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
 -- **
--- **  Summary  :  Aeon Commander Script
+-- Summary  :  Aeon Commander Script
 -- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local AWeapons = import('/lua/aeonweapons.lua')
@@ -33,24 +33,24 @@ UAL0001 = Class(ACUUnit) {
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:SetupBuildBones()
         self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)        
-        self:HideBone('Left_Upgrade', true)            
+        self:HideBone('Right_Upgrade', true)
+        self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        ACUUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        ACUUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetWeaponEnabledByLabel('RightDisruptor', true)
+        self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:ForkThread(self.GiveInitialResources)
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        EffectUtil.CreateAeonCommanderBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
-    end,  
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+    end,
 
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
@@ -109,7 +109,7 @@ UAL0001 = Class(ACUUnit) {
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
-            
+
         if not Buffs['AeonACUT2BuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonACUT2BuildRate',
@@ -140,9 +140,9 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-            if Buff.HasBuff( self, 'AeonACUT2BuildRate' ) then
-                Buff.RemoveBuff( self, 'AeonACUT2BuildRate' )
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
+                Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
          end
         -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
         self:updateBuildRestrictions()
@@ -182,9 +182,9 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction( categories.AEON * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-            if Buff.HasBuff( self, 'AeonACUT3BuildRate' ) then
-                Buff.RemoveBuff( self, 'AeonACUT3BuildRate' )
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
+                Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
          end
         -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
         self:updateBuildRestrictions()

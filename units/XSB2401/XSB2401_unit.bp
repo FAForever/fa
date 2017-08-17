@@ -195,7 +195,7 @@ UnitBlueprint {
             RULEUCC_Patrol = false,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
+            RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,

@@ -168,28 +168,28 @@ Filters = {
                 title = 'T1',
                 key = 't1',
                 sortFunc = function(unitID)
-                    return table.find(__blueprints[unitID].Categories, 'TECH1')
+                    return __blueprints[unitID].CategoriesHash.TECH1
                 end,
             },
             {
                 title = 'T2',
                 key = 't2',
                 sortFunc = function(unitID)
-                    return table.find(__blueprints[unitID].Categories, 'TECH2')
+                    return __blueprints[unitID].CategoriesHash.TECH2
                 end,
             },
             {
                 title = 'T3',
                 key = 't3',
                 sortFunc = function(unitID)
-                    return table.find(__blueprints[unitID].Categories, 'TECH3')
+                    return __blueprints[unitID].CategoriesHash.TECH3
                 end,
             },
             {
                 title = 'Exp.',
                 key = 't4',
                 sortFunc = function(unitID)
-                    return table.find(__blueprints[unitID].Categories, 'EXPERIMENTAL')
+                    return __blueprints[unitID].CategoriesHash.EXPERIMENTAL
                 end,
             },
         },

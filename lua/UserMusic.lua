@@ -15,7 +15,7 @@ local BattleCues = {
 
 -- List of peace cues to cycle through
 local PeaceCues = {
-    Sound( { Cue = 'Base_Building', Bank = 'Music' } ),
+    Sound({ Cue = 'Base_Building', Bank = 'Music' }),
 }
 
 -- How many battle events do we receive before switching to battle music
@@ -89,7 +89,7 @@ function StartBattleMusic()
 
             StartPeaceMusic()
         end
-    )
+)
 end
 
 function StartPeaceMusic()

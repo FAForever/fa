@@ -1,4 +1,791 @@
+Patch 3686 (13th August 2017)
+============================
+### Lobby
+- Changed "Hide Obsolete" filter in map selection to be enabled by default
+- Hide maps if a newer version is available locally
+- Fixed the title change option locking if you enter an empty string
+- Fixed lobby chat not behaving as expected when multi-line messages are entered
+- Allowed lobby chat to correctly handle variable font sizes
+- Fixed lobby flags being stretched
+- Fixed lobby presets not handling unit restrictions correctly
+- Fixed lobby autoteams button not syncing with the selected game options correctly
+- Added a warning to the host if they have selected an outdated map, asking them to update it
+- Fixed observers being unable to click the observer/player toggle button after being moved to observer while ready
+- Added a button to close all unoccupied open slots or open all closed slots
+- Fixed a bug where the mod manager UI could break if the host has a mod with an incomplete info file
+
+### Gameplay
+- New Feature: Integrated a vastly improved version of the popular Notify mod
+    - Notify Features
+        - Notify started as a way to allow ACU upgrade progress to be communicated nicely to the team. FAF has taken it to the next level.
+        - Support for sending notifications about ACU upgrades, Factory Tech upgrades (HQs), Experimental construction, and Nuke and T3 Artillery construction
+        - By default, you will see notifications about ACU upgrades only, as well as an ETA overlay at the location of the upgrading ACUs
+        - Toggles available to define which types of messages you want to see come in from allies
+        - Notify messages limited to only show the first of each HQ type, Experimental (Non game-ender), Nuke, or T3 Artillery to avoid spamming the chat with notifications late-game
+    - Notify UI
+        - Selecting your ACU will show any upgrades it has completed for each slot above the UI in the bottom left corner
+        - There is an in-game customisation menu UI. It can be accessed via the main menu, or with a key bind. Default binding is CTRL-ALT-F1
+        - Full customisation of all Notify messages is enabled, including resetting to default
+        - All message types are broadcast at all times. The menu allows you to customise which messages you see, using toggle buttons at the top of the customiser.
+        - Colour of Notify messages can be changed inside the chat window
+    - Upgrade Queuing
+        - ACU Upgrades can now be queued up the same as any other construction project
+        - Unfortunately, due to an engine limitation, upgrades cannot be UN-queued (You can only stop the ACU, cancelling the in progress work orders)
+        - ACUs can queue buildings from an uncompleted tech level if the upgrade is queued
+        - Hotbuild has the ability to correctly access the uncompleted tech level buildings tooltip
+    - Blacklisted all previous Notify mod versions
+- Significantly improved unit formations
+    - Changed land and naval formations to give large units extra space instead of forcing the whole group to spread out
+    - Moved submarines so they sit between surface vessels instead of directly under them
+    - Changed air formation shape to spread units out more evenly and make large formations wider instead of a long line
+    - Made guard formation denser so more units can stay close to the target
+    - Changed shield distribution in guard formation to more efficiently cover the target and other guarding units
+    - Fixed several unit filter issues that caused units to get the wrong positions or even be excluded from a formation altogether
+    - Rearranged land and naval formations to give some units better positions
+- Improved spread attack. It now handles most order types.
+- Changed the timeout on player attention pings to be per-player instead of on a global cooldown
+- Fixed and optimised TML leading for AIs
+- Increased the depth at which Megalith and Ythotha appear to be submerged in water instead of walking on land
+- Reverted the Energy hotbuild cycling through to Storage, in response to popular demand.
+- T3 Sonar can now be given assist commands. Primarily useful so they can guard a unit and stay with it.
+
+### Bugs
+- Fixed an error caused by empty gunships
+- Fixed the spacing when tiling rotated templates being off in some situations
+- Fixed a bug which caused only one engineer of a group ordered to rebuild a wreck to actually attempt the task
+- Fixed HARMS sinking more than once in some situations
+- Fixed deleted orders reappearing if spread command is used
+- Added safeguards against a rare exploit which allowed bypassing of the share conditions
+- Fixed orders bugging out sometimes if units in the selection died
+- Fixed an error caused by a czar dying with units in the hold
+- Prevented air units sometimes sinking below the map after bouncing off a shield
+- Fixed game exit behaviour sometimes erroring or throwing logspam
+- Fixed Czar targeting hover units with depth charges
+- Fixed only one Overcharge shot being fired when multiple Overcharge commands are queued
+- Fixed Novax Center being unable to build a replacement satellite after a satellite is destroyed blocking a nuke
+- Fixed Novax satellite disappearing before hitting the ground after the control center is destroyed
+- Fixed subs stopping too close to their targets when given an Attack Move order
+- Fixed a bug that caused Hives (and possibly other Cybran units) to instantly capture a unit in some situations
+- Increased Cybran SACU projectile lifetime so it can hit targets at the edge of its upgraded range
+- Fixed some instances of transported units not dying when their transport dies
+
+### UI
+- Added full support for UTF character set in the lobby, game chat, and other typing interfaces. This enables Russian, Chinese, Japanese, and all manner of other characters.
+- Fixed ShowNetworkStats not closing in some situations
+- Fixed the construction menu pause button not changing colour with factional skins
+- Added an option to have fonts change colour according to faction
+- Fixed observers not seeing the correct unit regen number for units with veterancy, upgrades, or other regen changes
+- Detail view no longer shows a cost/tick breakdown for some units incorrectly
+- Made loading screen hints more readable by adding a drop shadow effect
+- Fixed a bug causing build mode to exit when a template is ordered
+- Added a hotbuild key for T3 Mobile AA
+- Fixed a hotbuild bug causing errors when certain units were upgraded
+- Fixed hotbuild key label for support factory upgrades being on the wrong icon
+- Fixed zoom pop key action not functioning
+- Fixed reclaim overlay sometimes showing reclaim out of the playable areas
+- Put silo count/capactity label at the top of the button to avoid it being obscured by the hotkey label
+- Added an option to disable hotkey labels
+- Fixed factory templates not displaying icons for mod units
+- Fixed missing UI elements in replays or when the Use Factional UI Skin option is disabled
+- Removed "Quick Tip" prefix from the tips which show on the loading screen
+- Added T3 MAA to the hotkey description
+
+### Other
+- Updated mods blacklist
+- Updated maps blacklist
+- Random spawn locations are no longer accurate in the UI to prevent UI mods from cheating
+- New random spawn modes have been added which mark opponents' spawn locations so all players can see where everyone is
+- Fixed an issue with offline COOP not working as intended
+- Significant improvements and bugfixes for COOP AI capabilities
+- Properly hide failed bonus objectives in COOP
+- Optimised Sorian-AI-related code a little
+- Optimised AIX-related code a little
+- Fixed kill objectives not working as intended in COOP
+- Fixed Torpedo Boat ID being incorrect from an AI perspective, causing them not to work properly
+- Added additional AI Naval platoon templates
+- Removed the hyphen from "Air Superiority Fighter" unit type to make it the same across all factions
+
+### Contributors
+- CookieNoob
+- Crispweed
+- Crotalus
+- dk0x
+- IceDreamer
+- JaggedAppliance
+- MrNukealizer
+- PhilipJFry
+- speed2
+- TheKeyBlue
+- Uveso
+
+
+Patch 3684 (27th May 2017)
+============================
+### Other
+- Fixed a bug where split trees from groups were worth less than they should have been
+- Fixed a typo which broke some FX on the Ythotha
+
+### Balance
+- Janus
+    - Corrected miscalculation in total damage. Fire pulse count decreased 15 -> 10
+- Reclaim
+    - Time taken to reclaim unit wrecks doubled. Props and living units unaffected
+    - Increased value of split trees by 25% to compensate for it taking longer to reclaim them
+- T1 Land/Air Factory + T2 Land/Air Support
+    - Aeon Health increased 3100 -> 3200
+    - Cybran
+        - Health increased 2500 -> 2750
+        - Regen increased 6 -> 9
+- T1 Naval Factory
+    - Aeon Health increased 3100 -> 3700
+    - UEF Health increased 4000 -> 4500
+    - Cybran
+        - Health increased 2500 -> 3200
+        - Regen increased 6 -> 10
+    - Seraphim Health increased 3500 -> 4000
+- T2 Land/Air HQ + T3 Land/Air Support
+    - Aeon Health increased 6200 -> 6400
+    - Cybran
+        - Health increased 5000 -> 5500
+- T2 Naval Support
+    - Aeon Health increased 5000 -> 6400
+    - UEF Health increased 6500 -> 8000
+    - Cybran
+        - Health increased 4000 -> 5500
+        - Regen increased 12 -> 20
+    - Seraphim Health increased 5500 -> 7000
+- T2 Naval HQ
+    - Aeon Health increased 10000 -> 12800
+    - UEF Health increased 13000 -> 16000
+    - Cybran
+        - Health increased 8000 -> 11000
+        - Regen increased 30 -> 40
+    - Seraphim Health increased 11000 -> 14000
+- T3 Land/Air HQ
+    - Aeon Health increased 12400 -> 12800
+    - Cybran
+        - Health increased 10000 -> 11000
+- T3 Naval Support
+    - Aeon Health decreased 13000 -> 12800
+    - UEF Health decreased 17000 -> 16000
+    - Cybran Regen increased 30 -> 40
+    - Seraphim Health decreased 15000 -> 14000
+- T3 Naval HQ
+    - Aeon Health increased 20000 -> 21000
+    - Cybran Health increased 16000 -> 17000
+    - Seraphim Health increased 22000 -> 23000
+- Hydrocarbon
+    - Cybran Regen decreased 6 -> 5
+- Mass Storage
+    - Cybran Regen drecreased 4 -> 3
+- Seraphim ACU Second Gun Upgrade
+    - Mass cost increased 3500 -> 4800
+    - Energy cost decreased 300000 -> 270000
+    - Damage bonus increased 400 -> 750
+    - Damage radius increased 2 -> 2.7
+- Veterancy
+    - Increased veterancy regen values for Experimentals across the board
+    - Fixed longstanding bug causing Veterancy to heal far too much health
+    - Introduced new veterancy mechanics to allow fine control over instant heal effect
+    - Old system: 1st Vet = Heal for max HP * 0.1. 2nd Vet = Heal for max HP * 0.2 ... etc
+    - New system: Unchanged for ACUs. Other units heal max HP * 0.1 each time
+- MMLs
+    - Aeon
+        - Missile HP increased 1 -> 2
+        - Missile motion parameters changed to be slower
+    - UEF
+        - Now fires 3 missiles in a salvo, 1.8 seconds apart, every 10 seconds
+        - Effective DPS increased 60 -> 90
+    - Seraphim
+        - Missile motion parameters changed to be faster
+        - MuzzleVelocity increased 3 -> 4
+        - RateOfFire increased 0.15 -> 0.1666. Firing cycle from 1 shot every 6.7s to one shot every 6 seconds
+        - Effective DPS increased 60.4 -> 67.5
+- Sparky
+    - Reintroduced Energy drain of 15 for running Jammer
+- Novax Satellite
+    - Crash damage decreased 3000 -> 1000
+- UEF T1 Bomber
+    - Bomb DoT Duration increased 1.5 -> 4.2. Damage remains the same, just more spread out in time
+T2 Static Flak
+    - Aeon MuzzleVelocity increased 30 -> 35
+    - UEF MuzzleVelocity increased 25 -> 35
+    - Cybran MuzzleVelocity increased 20 -> 30
+    - Seraphim
+        - MuzzleVelocity increased 25 -> 35
+        - AOE increased 3 -> 4
+        - FiringRandomness decreased 2.5 -> 2
+- Crab Eggs
+    - Corrected T3 Engineer Egg to match new values for the main unit from previous patches
+    - BuildTime of all eggs reduced by 50%
+- Megalith
+    - BuildRate decreased 180 -> 45
+    - Combined with egg changes, effectively doubles egg build time, and reduces Megalith reclaim rate to 25% of before
+- Aurora
+    - FiringRandomnessWhileMoving increased 0.1 -> 0.3
+- Harbinger
+    - BuildRate increased 3 -> 5
+- Aeon ACU
+    - First Shield upgrade recharge time increased 65 -> 90
+
+### Contributors
+- Crotalus
+- IceDreamer
+- JaggedAppliance
+- MrNukealizer
+- Petricpwnz
+
+
+Patch 3682 (16th May 2017)
+============================
+### Bugs
+- Fixed a typo that is probably responsible for the rare sim freeze bug that has been happening since 3680
+
+### Gameplay
+- Fixed several unit restriction settings restricting units that did not make sense
+- Hotbuild power generators key now also cycles through to power storage
+- Fixed hotbuild select nearest scout not selecting the nearest one, and not selecting spy planes
+
+### UI
+- Added a new button to the F10/Main Options dropdown ingame to access the key bindings popup directly in case you remapped F1
+- Updated the wording of several loading tips
+
+### Other
+- Removed the old nomads shader
+- Fixed a typo that broke the vanilla COOP missions
+
+### Contributors
+- CookieNoob
+- Fast-Thick-Pants
+- Hussar
+- IceDreamer
+- PhilipJFry
+- Speed2
+
+### Special Thanks
+- MrNukealizer
+
+
+Patch 3681 (12th May 2017)
+============================
+### Bugs
+- Fixed always loading the default or last map, which broke COOP
+- Fixed a typo which broke All Faction Templates
+
+### Other
+- Reverted the changes to lobby text showing faction colours due to community feedback. This feature will reappear as an option in the future.
+
+### Contributors
+- IceDreamer
+- MrNukealizer
+
+
+Patch 3680 (11th May 2017)
+============================
+### Gameplay
+- New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit's momentum and angle of approach. Some of the crash damage is transferred to the shield. Unit wrecks can only bounce once. Doesn't affect Experimentals.
+- Allow units in a transport which is shot down to leave wrecks at the crash site
+- Allow the Novax to build a new Satellite if the old one dies. This can only happen if it is impacted by a Nuke or ctrl-k'ed
+- Introduced code to slightly improve the way Tempest and Atlantis behave, particularly in being able to fire, in shallow waters
+- Enabled fire states on TML and SML structures and units. This allows you to command multiple launchers to fire simultaneously at multiple targets
+- Increased reconnect timeout from 45 to 90 seconds to better allow router reboots
+- HARMS now sinks to a greater depth on completion
+- Assist-Mex-To-Cap is now on by default
+
+### Bugs
+- Fixed ACU reclaiming while shooting
+- Fixed ACU building while shooting
+- Fixed Auto-Overcharge stopping working randomly until toggled
+- Fixed Auto-Overcharge firing while building
+- Fixed SML hitboxes so some are no longer immune to T2 PGen explosions
+- Increased Beetle hitbox size and declared new targetbones to stop everything missing it if it strafes
+- Fixed two move-while-building exploits
+- Gave Force damage to several AOE weapons so they now kill trees properly
+- Fixed ambient movement sounds continuing to play for sinking units
+- Fixed air units occasionally granting infinite intel at the crash site
+- Fixed unit restrictions not updating correctly when HQs are transferred between players
+- Fixed ancient bug which didn't deselect factory units properly, leading to accidental pausing of those units
+- Fixed the 'Select Onscreen Land/Air/Navy' hotkey also selecting the factories of that type
+- Fixed the Mex Cap feature somehow allowing storage to be built inside units built via upgrade
+- Fixed bug where the Aeon shields didn't visually rotate properly
+- Fixed adjacency visual effect being placed on the water surface when dealing with underwater mexes or hydros
+- Fixed ships sometimes sinking through land
+- Attempted a safety check to try and fix Aeon T2 shields getting the shield up despite having been destroyed in construction
+- Fixed cluster bombers (Janus etc) gaining a new target halfway through a bombing run
+
+### Lobby
+- Fixed 'Random' faction using 'Random - Unbalanced' tooltip
+- Allow filtering of 13-16 player maps in map selection
+- Fixed 'Autoteams: Manual' resulting in all players being allied
+- Fixed autobalance functions crashing when used with uneven team numbers
+- Improved the ping/cpu display column, splitting it into two. The ping column only shows when it matters.
+- Observers are now kicked before checking connection issues when Allow Observers is false. This means they will no longer stall game launch if one or more have a connection issue.
+- Improved performance of Unit Manager, as well as layout, tooltips, and some icons
+- Fixed faction selector panel not updating properly
+- Removed ability for people to spam the lobby chat with the observer button
+- Fixed several cases of CPU rating not being broadcast properly
+- Added a 'New Message' button to the lobby which jumps to bottom of chat, and disabled the chat auto-hopping to bottom with every new message, if you have scrolled up
+- Fixed the number of active mods not updating for non-hosts when they enable/disable a UI mod
+- Fixed double clicking various elements in the lobby bypassing various restrictions
+- Added a tooltip to the map preview top right
+
+### UI
+- Added new option to change the minimum reclaim label size shown in the overlay
+- Enabled the STOP button for shields which can be upgraded
+- Removed the tech level tick from Mass Storage strategic icon to match energy storage
+- Fixed hotkey labels not moving properly when scrolling the build menu
+- Pause button is now visible and active in the Enhancements and Selection tabs
+- Allowed multiple nuke pings to display simultaneously
+- Corrected several incorrect tooltips on SCUs
+- You can now search for bindings or actions in the F1 key binding menu
+- The buttons for adding and removing key bindings have been moved to be on the same line as the binding
+- Added Hotbuild Preset button. This will automatically set your bindings to the Hotbuild Preset. There is also a button to set back to Default Preset.
+- Fixed Hotbuild conflicting with other binds
+- Fixed keys being able to be bound to two actions at once
+- Keybinding UI will now auto-assign shift-bindings to match a newly bound action, if the shift-bind is not in use
+- Fixed hotbuild labels in the construction UI not updating when they are re-assigned
+- Lots of text around the UI will now change colour to reflect your faction skin again
+- New Feature: Helpful tips and tricks will now show briefly on the loading screen
+- Fixed language changes not always taking effect on game restart properly
+- Removed nonfunctional language change hotloader
+- Fixed buttons with a countdown not counting down
+
+### Balance
+- Increased Auto-Overcharge rate of fire from 3.3s to 5s
+
+### Other
+- Added some mods to blacklist
+- Allowed hooking of schook files to help future patch mechanism
+- Allow hot-reloading of UI files with EnableDiskWatch
+- Uncapped max framerate for people with monitor refresh rates >100
+- Fixed desync in COOP
+- Allow Salem death sound on land in COOP
+- Allowed restricted units to be captured in COOP
+- Added a new objective type to COOP
+- Added a new icon for the Kill or Capture objective in COOP
+- Objective tooltip in COOP now coloured according to faction skin
+- Various other extensive COOP-only changes
+- Added CZ translation file
+- Added PL translation file
+- Improved RU translations
+- Improved SP translations
+
+### Contributors
+- CookieNoob
+- Crotalus
+- Duk3Luk3
+- Exotic-Retard
+- Hussar
+- IceDreamer
+- IDragonfire
+- PhilipJFry
+- Speed2
+- TheKeyBlue
+- ThomasHiatt
+- Uveso
+
+### Special Thanks
+- Jackherer (French translations)
+- UnicornNoob (Russian translations)
+
+
+Patch 3677 (3rd May, 2017)
+============================
+- Added code to log and potentially fix an issue with army index assignment which may be causing rating irregularities
+
+### Contributors
+- Duk3Luk3
+
+
+Patch 3676 (27th February, 2017)
+============================
+### Other
+- Fixed wall segements giving full veterancy points. They give 0.1 per segment now to prevent abuse
+- Changed the colours for the Hotbuild labels to make them clearer. Ctrl-SHORTCUT is now blue, and Alt-SHORTCUT is green
+- Introduced UI elements for Attack-Move. Now shows a special cursor on pressing Alt, and has a new UI button which emulates the Alt-RMB command as closely as possible
+- Stretched orders UI by 1 slot to make room for Attack-Move and other future additions or modded orders
+
+### Balance
+- Janus
+    - Initial damage per bomblet increased 15 -> 20 (Overall impact 300 -> 400)
+- T3 Naval Support
+    - Aeon Health increased 10000 -> 13000
+    - UEF Health increased 13000 -> 17000
+    - Cybran
+        - Health increased 8000 -> 11000
+        - Regen increased 15 -> 30
+    - Seraphim Health increased 10000 -> 15000
+- T2 UEF Naval Support
+    - Health increased 6000 -> 6500
+- Mass Storage
+    - Aeon Health increased 600 -> 1000
+    - UEF Health increased 760 -> 1200
+    - Cybran
+        - Health increased 500 -> 800
+        - Regen increased 1 -> 4
+    - Seraphim Health increased 600 -> 1100
+- Seraphim Buildings
+    - T1
+        - Factory Health increased 3100 -> 3500
+        - Power Generator Health increased 600 -> 650
+        - Hydrocarbon Health increased 1600 -> 1700
+        - Mass Extractor Health increased 600 -> 650
+        - Wall Health increased 2000 -> 2500
+    - T2
+        - Air/Land HQ Health increased 6200 -> 7000
+        - Naval HQ Health increased 10000 -> 11000
+        - Air/Land Support Health increased 3100 -> 3500
+        - Naval Support Health increased 5000 -> 5500
+        - Power Generator Health increased 1900 -> 2000
+        - Mass Extractor Health increased 1900 -> 2000
+    - T3
+        - Air/Land HQ Health increased 12400 -> 14000
+        - Naval HQ Health increased 20000 -> 22000
+        - Air/Land Support Health increased 6200 -> 7000
+        - Naval Support Health increased 10000 -> 15000
+        - Power Generator Health increased 6200 -> 7000
+        - Mass Extractor Health increased 6200 -> 7000
+- Cybran Buildings
+    - T1
+        - Factory Regen increased 3 -> 6
+        - Power Generator Regen increased 1 -> 2
+        - Mass Extractor Regen increased 1 -> 2
+        - Hydrocarbon Regen increased 1 -> 6
+        - Wall Regen increased 3 -> 6
+    - T2
+        - Air/Land HQ Regen increased 10 -> 20
+        - Naval HQ Regen increased 15 -> 30
+        - Air/Land Support Regen increased 3 -> 6
+        - Naval Support Regen increased 6 -> 12
+        - Power Generator Regen increased 3 -> 6
+        - Mass Extractor Regen increased 3 -> 6
+    - T3
+        - Air/Land HQ Regen increased 20 -> 40
+        - Naval HQ Regen increased 30 -> 60
+        - Air/Land Support Regen increased 10 -> 20
+        - Naval Support Regen increased 15 -> 30
+        - Power Generator Regen increased 10 -> 20
+        - Mass Extractor Regen increased 10 -> 20
+- T2 Radar
+    - Intel maintenance cost decreased 250 -> 200
+
+### Contributors
+- IceDreamer
+- JaggedAppliance
+- PhilipJFry
+
+
+Patch 3675 (5th February, 2017)
+============================
+- Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on
+
+
+Patch 3674 (5th February, 2017)
+============================
+http://content.faforever.com/patchnotes/3674.html
+
+### Lobby
+- Use default map from file. This allows coop, tutorials, and other mods to have an easier time
+- Allow factions to be restricted per slot
+
+### Other
+- Updated maps blacklist
+- Introduced wider support for the addition of new factions into the game
+- Fixed Ythotha spawning energy storm on give in coop
+- Updated unit cap code so it can be changed by coop
+- Fixed score data not being synced on coop game end
+- Added new buildrate icon in the unit detail view
+
+### Balance
+- Stun mechanics no longer affect flying Air Units
+- Stun mechanics now apply in a sphere rather than a cylinder
+- Ythotha
+    - Changed various aspects of the unit to make it easier to micro
+    - UniformScale decreased 0.05 -> 0.042
+    - TurnRate increased 40 -> 60
+    - SizeX decreased 3.5 -> 3.2
+    - SizeY decreased 8.5 -> 7.5
+    - Eye weapon MaxRadius increased 45 -> 47
+    - Gatling arm weapon MaxRadius increased 45 -> 47
+    - Medium cannon weapon MaxRadius increased 45 -> 47
+    - AA
+        - MaxRadius increased 45 -> 47
+        - AOE increased 1.5 -> 4
+        - Can shoot at a slightly greater angle to eliminate blindspots',
+        - Added UseFiringSolutionInsteadOfAimBone = true for better AA performance',
+    - Added ACU as higher priority target on the DeathBall
+    - Various changes to weapon arcs and targeting angles
+- T1 Factories
+    - Land
+        - Aeon
+            - Health decreased 3700 -> 3100
+        - UEF
+            - Health decreased 4100 -> 4000
+        - Cybran
+            - Health decreased 3500 -> 2500
+            - Regen increased 0 -> 3
+        - Seraphim
+            - Health decreased 3700 -> 3100
+    - Air
+        - Aeon
+            - Health decreased 3700 -> 3100
+        - UEF
+            - Health decreased 4100 -> 4000
+        - Cybran
+            - Health decreased 3500 -> 2500
+            - Regen increased 0 -> 3
+        - Seraphim
+            - Health decreased 3700 -> 3100
+    - Naval
+        - Aeon
+            - Health decreased 4400 -> 3100
+        - UEF
+            - Health decreased 4800 -> 4000
+        - Cybran
+            - Health decreased 4200 -> 2500
+            - Regen increased 0 -> 3
+        - Seraphim
+            - Health decreased 4600 -> 3100
+- T2 HQs
+    - Land
+        - Aeon
+            - Health decreased 8200 -> 6200
+        - UEF
+            - Health decreased 9000 -> 8000
+        - Cybran
+            - Health decreased 7800 -> 5000
+            - Regen increased 0 -> 10
+        - Seraphim
+            - Health decreased 8200 -> 6200
+    - Air
+        - Aeon
+            - Health decreased 8200 -> 6200
+        - UEF
+            - Health decreased 9000 -> 8000
+        - Cybran
+            - Health decreased 7800 -> 5000
+            - Regen increased 0 -> 10
+        - Seraphim
+            - Health decreased 8600 -> 6200
+    - Naval
+        - Aeon
+            - Health decreased 16000 -> 10000
+        - UEF
+            - Health decreased 18000 -> 13000
+        - Cybran
+            - Health decreased 15000 -> 8000
+            - Regen increased 0 -> 15
+        - Seraphim
+            - Health decreased 17000 -> 10000
+- T3 HQs
+    - Land
+        - Aeon
+            - Health decreased 20000 -> 12400
+        - UEF
+            - Health decreased 22000 -> 16000
+        - Cybran
+            - Health decreased 19000 -> 10000
+            - Regen increased 0 -> 20
+        - Seraphim
+            - Health decreased 21000 -> 12400
+    - Air
+        - Aeon
+            - Health decreased 20000 -> 12400
+        - UEF
+            - Health decreased 22000 -> 16000
+        - Cybran
+            - Health decreased 19000 -> 10000
+            - Regen increased 0 -> 20
+        - Seraphim
+            - Health decreased 21000 -> 12400
+    - Naval
+        - Aeon
+            - Health decreased 37500 -> 20000
+        - UEF
+            - Health decreased 40000 -> 26000
+        - Cybran
+            - Health decreased 34000 -> 16000
+            - Regen increased 0 -> 30
+        - Seraphim
+            - Health decreased 38000 -> 20000
+- T2 Support
+    - Land
+        - Aeon
+            - Health decreased 4100 -> 3100
+        - UEF
+            - Health decreased 4500 -> 4000
+        - Cybran
+            - Health decreased 3900 -> 2500
+            - Regen increased 0 -> 3
+        - Seraphim
+            - Health decreased 4100 -> 3100
+    - Air
+        - Aeon
+            - Health decreased 4100 -> 3100
+        - UEF
+            - Health decreased 4500 -> 4000
+        - Cybran
+            - Health decreased 3900 -> 2500
+            - Regen increased 0 -> 3
+        - Seraphim
+            - Health decreased 4300 -> 3100
+    - Naval
+        - Aeon
+            - Health decreased 8000 -> 5000
+        - UEF
+            - Health decreased 9000 -> 6000
+        - Cybran
+            - Health decreased 7500 -> 4000
+            - Regen increased 0 -> 6
+        - Seraphim
+            - Health decreased 8500 -> 5000
+- T3 Support
+    - Land
+        - Aeon
+            - Health decreased 10000 -> 6200
+        - UEF
+            - Health decreased 11000 -> 8000
+        - Cybran
+            - Health decreased 9500 -> 5000
+            - Regen increased 0 -> 10
+        - Seraphim
+            - Health decreased 10500 -> 6200
+    - Air
+        - Aeon
+            - Health decreased 10000 -> 6200
+        - UEF
+            - Health decreased 11000 -> 8000
+        - Cybran
+            - Health decreased 9500 -> 5000
+            - Regen increased 0 -> 10
+        - Seraphim
+            - Health decreased 10500 -> 6200
+    - Naval
+        - Aeon
+            - Health decreased 18750 -> 10000
+        - UEF
+            - Health decreased 20000 -> 13000
+        - Cybran
+            - Health decreased 17000 -> 8000
+            - Regen increased 0 -> 15
+        - Seraphim
+            - Health decreased 19000 -> 10000
+- T3 Power Generator
+    - Death damage decreased 8000 -> 5500
+    - Aeon
+        - Health decreased 9720 -> 6200
+    - UEF
+        - Health decreased 9720 -> 9000
+    - Cybran
+        - Health decreased 9720 -> 6000
+        - Regen increased 0 -> 10
+    - Seraphim
+        - Health decreased 9720 -> 6200
+- T2 Power Generator
+    - Aeon
+        - Health decreased 2160 -> 1900
+    - UEF
+        - Health increased 2160 -> 2500
+    - Cybran
+        - Health decreased 2160 -> 1800
+        - Regen increased 0 -> 3
+    - Seraphim
+        - Health decreased 2160 -> 1900
+- T1 Power Generator
+    - UEF Health increased 600 -> 760
+    - Cybran
+        - Health decreased 600 -> 500
+        - Regen increased 0 -> 1
+- Hydrocarbon
+    - UEF Health increased 1600 -> 1800
+    - Cybran
+        - Health decreased 1600 -> 1400
+        - Regen increased 0 -> 1
+- T3 Mex
+    - Aeon
+        - Health decreased 8400 -> 6200
+    - UEF
+        - Health increased 8400 -> 9000
+    - Cybran
+        - Health decreased 8400 -> 6000
+        - Regen increased 0 -> 10
+    - Seraphim
+        - Health decreased 8400 -> 6200
+- T2 Mex
+    - Aeon
+        - Health decreased 3000 -> 1900
+    - UEF
+        - Health decreased 3000 -> 2500
+    - Cybran
+        - Health decreased 3000 -> 1800
+        - Regen increased 0 -> 3
+    - Seraphim
+        - Health decreased 3000 -> 1900
+- T1 Mex
+    - UEF Health increased 600 -> 760
+    - Cybran
+        - Health decreased 600 -> 500
+        - Regen increased 0 -> 1
+- Mass Storage
+    - Aeon Health decreased 1600 -> 600
+    - UEF Health decreased 1600 -> 760
+    - Cybran
+        - Health decreased 1600 -> 500
+        - Regen increased 0 -> 1
+    - Seraphim Health decreased 1600 -> 600
+- Walls
+    - Aeon/Seraphim Health decreased 4000 -> 2000
+    - UEF Health decreased 4000 -> 3000
+    - Cybran
+        - Health decreased 4000 -> 1500
+        - Regen increased 0 -> 3
+    - BuildTime increased 10 -> 20
+- Janus
+    - Fire lifetime increased 4.2 -> 6
+    - Initial damage per bomblet decreased 30 -> 15 (Overall impact 600 -> 300)
+
+### Contributors
+- CookieNoob
+- Exotic-Retard
+- IceDreamer
+- JaggedAppliance
+- Speed2
+- TheKeyBlue
+- ZockyZock
+
+
+Patch 3672 (January 24th, 2017)
+============================
+- Fixed non-default team balance option breaking the anti-rating-bug code
+
+
+Patch 3671 (January 19th, 2017)
+============================
+- Fixed an unintentional bug with hosting games with an AI introduced with the rating bug fixes below
+
+
+Patch 3670 (January 17th, 2017)
+============================
+- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end
+
+
+Patch 3669 (January 17th, 2017)
+============================
+- Reverted that last one for a bit to fix an idiot bug
+
+
+Patch 3668 (January 17th, 2017)
+============================
+- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end
+
+
+Hotfix Patch 3667 (December 22nd, 2016)
+============================
+- Fixed a typo which was setting the default labels to show onscreen to 10 rather than 1000
+
+
 Hotfix Patch 3666 (December 21st, 2016)
+============================
 - The negative reaction of the community to the new Hotbuild bindings as defaults was severely underestimated. Attempting to reverse the change.
 
 
@@ -182,10 +969,10 @@ Patch 3662 (November 9th, 2016)
     - Buildtime decreased 800 -> 700
 - Mercy
     - Allow Mercy to land the same as other aircraft. Air maneuverability increased to allow it.
-    
+
 ### Other
 - Updated map blacklist
-        
+
 ### Contributors
 - CookieNoob
 - Crotalus
@@ -210,7 +997,7 @@ Patch 3660 (October 24th, 2016)
 - Added new unit share conditions for interesting new gameplay. "Full Share" and "Share Until Death" have been joined by "Traitors", which gifts all your units to the player who killed you (Very interesting for FFA games), "Defectors", which is the opposite of Full Share, gifting your units to the highest scoring enemy, and "Civilian Desertion", which gifts your units to a neutral civilian AI, if there is one.
 - Improved the tooltip when hovering over your score in the lobby. It will now show a more detailed explanation including your rating deviation
 - Fixed the position of the load button in Skirmish mode when launching offline
-- Fixed 'Odd vs Even' autoteam button for random faction being the same as the 'Top vs Bottom' 
+- Fixed 'Odd vs Even' autoteam button for random faction being the same as the 'Top vs Bottom'
 - Fixed new players joining a lobby being unable to see closed slots as being closed
 - Fixed auto team settings not working for games with >8 players
 - Changed 'Remove Player' to 'Kick Player' for clarity

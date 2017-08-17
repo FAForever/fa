@@ -1,18 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/buffdefinition.lua
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /lua/sim/buffdefinition.lua
+-- Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 import('/lua/sim/AdjacencyBuffs.lua')
-import('/lua/sim/CheatBuffs.lua') # Buffs for AI Cheating
+import('/lua/sim/CheatBuffs.lua') -- Buffs for AI Cheating
 
-
-##################################################################
-## VETERANCY BUFFS - UNIT MAX HEALTH ONLY
-##################################################################
-
+-- VETERANCY BUFFS - UNIT MAX HEALTH ONLY
 BuffBlueprint {
     Name = 'VeterancyMaxHealth1',
     DisplayName = 'VeterancyMaxHealth1',
@@ -21,7 +15,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNotFill = true,
             Add = 0,
             Mult = 1.1,
         },
@@ -36,7 +30,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNotFill = true,
             Add = 0,
             Mult = 1.2,
         },
@@ -51,7 +45,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNotFill = true,
             Add = 0,
             Mult = 1.3,
         },
@@ -66,7 +60,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNotFill = true,
             Add = 0,
             Mult = 1.4,
         },
@@ -81,91 +75,14 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNotFill = true,
             Add = 0,
             Mult = 1.5,
         },
     },
 }
 
-##################################################################
-## VETERANCY BUFFS - UNIT HEALTH
-##################################################################
-
-BuffBlueprint {
-    Name = 'VeterancyHealth1',
-    DisplayName = 'VeterancyHealth1',
-    BuffType = 'VETERANCYHEALTH',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        MaxHealth = {
-            Add = 0,
-            Mult = 1.1,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyHealth2',
-    DisplayName = 'VeterancyHealth2',
-    BuffType = 'VETERANCYHEALTH',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        MaxHealth = {
-            Add = 0,
-            Mult = 1.2,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyHealth3',
-    DisplayName = 'VeterancyHealth3',
-    BuffType = 'VETERANCYHEALTH',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        MaxHealth = {
-            Add = 0,
-            Mult = 1.3,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyHealth4',
-    DisplayName = 'VeterancyHealth4',
-    BuffType = 'VETERANCYHEALTH',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        MaxHealth = {
-            Add = 0,
-            Mult = 1.4,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyHealth5',
-    DisplayName = 'VeterancyHealth5',
-    BuffType = 'VETERANCYHEALTH',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        MaxHealth = {
-            Add = 0,
-            Mult = 1.5,
-        },
-    },
-}
-
-##################################################################
-## VETERANCY BUFFS - UNIT REGEN
-##################################################################
-
+-- VETERANCY BUFFS - UNIT REGEN
 BuffBlueprint {
     Name = 'VeterancyRegen1',
     DisplayName = 'VeterancyRegen1',

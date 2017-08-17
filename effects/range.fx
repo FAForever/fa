@@ -29,7 +29,7 @@ technique Cast
   pass FrontFace
   {
     CullMode = CCW;
-    
+
     ColorWriteEnable = 0x00;
 
     ZWriteEnable = false;
@@ -52,7 +52,7 @@ technique Cast
   pass BackFace
   {
     CullMode = CW;
-    
+
     ColorWriteEnable = 0x00;
 
     ZWriteEnable = false;

@@ -9,7 +9,7 @@ local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoG
 
 XSL0101 = Class(SWalkingLandUnit) {
     Weapons = {
-		LaserTurret = Class(SDFPhasicAutoGunWeapon) {
+        LaserTurret = Class(SDFPhasicAutoGunWeapon) {
             OnWeaponFired = function(self)
                 self.unit:RevealUnit()
 
@@ -49,7 +49,7 @@ XSL0101 = Class(SWalkingLandUnit) {
 
         -- Ensure weapon state
         self:SetWeaponEnabledByLabel('LaserTurret', true)
-        
+
         -- Toggle stealth off
         self:SetMaintenanceConsumptionInactive()
         self:DisableUnitIntel('ToggleBit5', 'RadarStealth')

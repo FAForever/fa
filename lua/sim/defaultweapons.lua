@@ -62,7 +62,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                     dist = tpDist
                 end
             end
-            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs( dist / (( 1 / rof ) - (bp.MuzzleChargeDelay or 0))) * 1.25
+            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
 
         -- Ensure firing cycle is compatible internally
@@ -438,7 +438,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             local bp = self:GetBlueprint()
             if not bp.RackBones then
-                error('Error on rackbones ' .. self.unit:GetUnitId() )
+                error('Error on rackbones ' .. self.unit:GetUnitId())
             end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
@@ -554,7 +554,17 @@ DefaultProjectileWeapon = Class(Weapon) {
                 self.WeaponCanFire = true
             end
 
-            if bp.CountedProjectile == true  or bp.AnimationReload then
+            -- This code has the effect of forcing a unit to wait on its firing state to change from Hold Fire
+            -- before resuming the sequence from this point
+            -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
+            -- from OnGotTarget, without waiting for OnFire() to be called from engine.
+            if bp.CountedProjectile == true or bp.AnimationReload then
+                if self.unit:GetFireState() == 1 then
+                    while self.unit:GetFireState() == 1 do
+                        WaitTicks(1)
+                    end
+                end
+
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
@@ -584,7 +594,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             while clockTime > 0.0 and
                   not self:BeenDestroyed() and
                   not self.unit.Dead do
-                self.unit:SetWorkProgress( 1 - clockTime / totalTime )
+                self.unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 0.1
                 WaitSeconds(0.1)
             end
@@ -664,7 +674,8 @@ DefaultProjectileWeapon = Class(Weapon) {
 
                             -- Generate UI notification for automatic nuke ping
                             local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
-                            Sync.NukeLaunchData = launchData
+                            if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
+                            table.insert(Sync.NukeLaunchData, launchData)
                             self.unit:RemoveNukeSiloAmmo(1)
                         else
                             self.unit:RemoveTacticalSiloAmmo(1)
@@ -864,7 +875,7 @@ BareBonesWeapon = Class(Weapon) {
 
     OnFire = function(self)
         local myBlueprint = self:GetBlueprint()
-        local myProjectile = self.unit:CreateProjectile( myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         if self.Data then
             myProjectile:PassData(self.Data)
         end
@@ -881,8 +892,20 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         return self.unit:GetAIBrain():GetEconomyStored('ENERGY') >= self.EnergyRequired
     end,
 
+    -- Can we use the OC weapon?
     CanOvercharge = function(self)
-        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not self.unit:IsUnitState('Enhancing') and not self.unit:IsUnitState('Building')
+        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not
+            self:UnitOccupied() and not
+            self.unit:IsUnitState('Enhancing') and not
+            self.unit:IsUnitState('Upgrading')
+    end,
+
+    -- Returns true if the unit is doing something that shouldn't allow any weapon fire
+    UnitOccupied = function(self)
+        return (self.unit:IsUnitState('Upgrading') and not self.unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
+            self.unit:IsUnitState('Building') or
+            self.unit:IsUnitState('Repairing') or
+            self.unit:IsUnitState('Reclaiming')
     end,
 
     -- The Overcharge cool-down function
@@ -890,17 +913,17 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
             self:OnDisableWeapon()
-            WaitSeconds(1/self:GetBlueprint().RateOfFire)
+            WaitSeconds(1 / self:GetBlueprint().RateOfFire)
             self.unit:SetOverchargePaused(false)
             if self.AutoMode then
-                self:ForkThread(self.AutoEnable)
+                self.AutoThread = self:ForkThread(self.AutoEnable)
             end
         end
     end,
 
     AutoEnable = function(self)
         while not self:CanOvercharge() do
-             WaitSeconds(0.1)
+            WaitSeconds(0.1)
         end
 
         if self.AutoMode then
@@ -912,15 +935,13 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AutoMode = auto
 
         if self.AutoMode then
-            if not self.AutoThread then
-                self.AutoThread = self:ForkThread(self.AutoEnable)
-            end
+            self.AutoThread = self:ForkThread(self.AutoEnable)
         else
             if self.AutoThread then
                 KillThread(self.AutoThread)
                 self.AutoThread = nil
             end
-            if self:IsEnabled() then
+            if self.enabled then
                 self:OnDisableWeapon()
             end
         end
@@ -959,7 +980,9 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if self:BeenDestroyed() then return end
         DefaultProjectileWeapon.OnEnableWeapon(self)
         self:SetWeaponEnabled(true)
-        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, false)
+        if self:CanOvercharge() then
+            self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, false)
+        end
         self.unit:BuildManipulatorSetEnabled(false)
         self.AimControl:SetEnabled(true)
         self.AimControl:SetPrecedence(20)
@@ -971,16 +994,17 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     OnDisableWeapon = function(self)
         if self.unit:BeenDestroyed() then return end
         self:SetWeaponEnabled(false)
-        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, true)
+
+        -- Only allow it to turn on the primary weapon if the unit is ready
+        if not self:UnitOccupied() then
+            self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, true)
+        end
+
         self.unit:BuildManipulatorSetEnabled(false)
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
-
-        if self.AutoMode and not self.AutoEnable then
-            self:ForkThread(self.AutoEnable)
-        end
 
         self.enabled = false
     end,
@@ -996,7 +1020,15 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
             else
-                self:OnDisableWeapon()
+                self:ForkThread(function()
+                    while self.enabled and not self:CanOvercharge() do
+                        WaitSeconds(0.1)
+                    end
+                    
+                    if self.enabled then
+                        self:OnGotTarget()
+                    end
+                end)
             end
         end,
 
@@ -1232,8 +1264,8 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     EconomySupportsBeam = function(self)
         local aiBrain = self.unit:GetAIBrain()
-        local energyIncome = aiBrain:GetEconomyIncome( 'ENERGY' ) * 10
-        local energyStored = aiBrain:GetEconomyStored( 'ENERGY' )
+        local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10
+        local energyStored = aiBrain:GetEconomyStored('ENERGY')
         local nrgReq = self:GetWeaponEnergyRequired()
         local nrgDrain = self:GetWeaponEnergyDrain()
 
@@ -1253,13 +1285,13 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local bp = self:GetBlueprint()
         local proj = self.unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         proj:ForkThread(proj.EffectThread)
-        
+
         -- Play the explosion sound
         local projBp = proj:GetBlueprint()
         if projBp.Audio.NukeExplosion then
             self:PlaySound(projBp.Audio.NukeExplosion)
         end
-        
+
         proj.InnerRing = NukeDamage()
         proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
         proj.OuterRing = NukeDamage()
@@ -1272,7 +1304,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local damageType = bp.DamageType
         proj.InnerRing:DoNukeDamage(launcher, pos, brain, army, damageType)
         proj.OuterRing:DoNukeDamage(launcher, pos, brain, army, damageType)
-        
+
         -- Stop it calling DoDamage any time in the future.
         proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
     end,

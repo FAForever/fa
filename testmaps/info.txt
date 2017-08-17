@@ -1,0 +1,4 @@
+To use these maps, rename the folder to PerfTest and put into your username\Documents\My Games\Gas Powered Games\Supreme Commander Forged Alliance\Maps folder.
+Launch the game using a development shortcut with the command line flag /perf
+
+PerfTestOriginal - The original performance test map, shipped with Supreme Commander, with some fixes to make it work with FAF. Returns a 'score' of sorts

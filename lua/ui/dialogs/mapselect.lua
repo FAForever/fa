@@ -140,10 +140,14 @@ mapFilters = {
             {text = "<LOC MAPSEL_0015>6", key = 6},
             {text = "<LOC MAPSEL_0016>7", key = 7},
             {text = "<LOC MAPSEL_0017>8", key = 8},
-            {text = "<LOC lobui_0714>9",  key = 9},
-            {text = "<LOC lobui_0715>10", key = 10},
-            {text = "<LOC lobui_0716>11", key = 11},
-            {text = "<LOC lobui_0717>12", key = 12},
+            {text = "<LOC MAPSEL_0040>9",  key = 9},
+            {text = "<LOC MAPSEL_0041>10", key = 10},
+            {text = "<LOC MAPSEL_0042>11", key = 11},
+            {text = "<LOC MAPSEL_0043>12", key = 12},
+            {text = "<LOC MAPSEL_0044>13", key = 13},
+            {text = "<LOC MAPSEL_0045>14", key = 14},
+            {text = "<LOC MAPSEL_0046>15", key = 15},
+            {text = "<LOC MAPSEL_0047>16", key = 16},
         },
         -- Builds specialised filtering closures for the given filter configuration.
         FilterFactory = {
@@ -234,7 +238,22 @@ mapFilters = {
         FilterFactory = {
             SelectedKey = 1,
             Filters = {
-                function(scenInfo) return not scenInfo.Outdated end
+                function(scenInfo)
+                    if scenInfo.Outdated then
+                        return false
+                    end
+                    local version = scenInfo.map_version or 0
+                    for _,comparisionlist in scenarios do
+                        if scenInfo.name == comparisionlist.name then
+                            if comparisionlist.map_version then
+                                if version < comparisionlist.map_version then
+                                    return false
+                                end
+                            end
+                        end
+                    end
+                    return true
+                end
             },
             Build = function(self)
                 return self.Filters[self.SelectedKey]
@@ -259,6 +278,9 @@ function InitFilters()
         map_obsolete = {
             SelectedKey = 1 -- Enable obsolete map filtering by default.
         }
+    }
+    savedFilterState['map_obsolete'] = {
+        SelectedKey = 1 -- Enable obsolete map filtering by default.
     }
 
     -- savedFilterState is an array of tables of filter options
@@ -521,7 +543,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         -- direct import allows data caching in ModsManager
-        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, availableMods, OnModsChanged)
+        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, OnModsChanged)
     end
     dialogContent.modButton = modButton
 
@@ -649,6 +671,9 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     SetupOptionsPanel(OptionGroup, curOptions)
 
     selectButton.OnClick = function(self, modifiers)
+        if mapIsOutdated() then
+            GUI_OldMap(over)
+        end
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
@@ -661,6 +686,9 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     mapList.OnKeySelect = OnMapChanged
     mapList.OnClick = OnMapChanged
     mapList.OnDoubleClick = function(self, row)
+        if mapIsOutdated() then
+            GUI_OldMap(over)
+        end
         mapList:SetSelection(row)
         PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
@@ -674,6 +702,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     return popup
 end
+
 
 function RefreshOptions(skipRefresh)
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
@@ -717,7 +746,7 @@ function RefreshOptions(skipRefresh)
         for _,optionData in OptionSource[4].options do
             changedOptions[optionData.key] = nil
         end
-        
+
         OptionContainer:CalcVisible()
     end
 end
@@ -833,7 +862,7 @@ function SetupOptionsPanel(parent, curOptions)
                 -- otherwise, don't use saved data for advanced options
                 local advancedOptions = OptionSource[4].options
                 for _,option in advancedOptions do
-                    if option.key == data.key then 
+                    if option.key == data.key then
                         return false
                     end
                 end
@@ -995,7 +1024,7 @@ function PopulateMapList()
     local count = 1
     for i,sceninfo in scenarios do
         local passedFiltering = true
-        
+
         -- If this is the currently selected map, mark it for reselection
         if selectedScenario and string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
             selectedRow = count - 1
@@ -1042,4 +1071,37 @@ function PopulateMapList()
         mapList:OnClick(reselectRow -1, true)
         mapList:ShowItem(reselectRow -1)
     end
+end
+
+function GUI_OldMap(over)
+    local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(1000)
+    dialogContent.Height:Set(100)
+
+    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local OldMapPopup = Popup(GUI, dialogContent)
+    OldMapPopup.OnClosed = function()
+        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
+    end
+
+    -- Title --
+    local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0773>The currently selected map is outdated and/or unbalanced. Please download the latest version from the map vault."), 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+
+    -- OK button --
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtCenterIn(OkButton, dialogContent, 20)
+    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
+    OkButton.OnClick = function()
+        OldMapPopup:Close()
+    end
+end
+
+function mapIsOutdated()
+    local obsoleteFilterFactory = mapFilters[GetFilterIndex('map_obsolete')].FilterFactory
+    obsoleteFilterFactory.SelectedKey = 1
+    local obsoleteFilter = obsoleteFilterFactory:Build()
+    return not obsoleteFilter(selectedScenario)
 end

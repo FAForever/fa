@@ -215,12 +215,12 @@ UnitBlueprint {
                     Cue = 'XSB2302_Turret_Start',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
-            	BarrelLoop = Sound {
+                BarrelLoop = Sound {
                     Bank = 'XSB',
                     Cue = 'XSB2302_Turret_Loop',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
-            	MuzzleChargeStart = Sound {
+                MuzzleChargeStart = Sound {
                     Bank = 'XSB_Weapon',
                     Cue = 'XSB2302_Charge',
                     LodCutoff = 'Weapon_LodCutoff',

@@ -26,7 +26,7 @@ Wreckage = Class(Prop) {
         local health = self:GetHealth()
 
         if health <= 0 then
-            self:DoPropCallbacks( 'OnKilled' )
+            self:DoPropCallbacks('OnKilled')
             self:Destroy()
         else
             self:UpdateReclaimLeft()
@@ -73,7 +73,9 @@ Wreckage = Class(Prop) {
 
         if not rebuilders[1] then return end
         local pos = self:GetPosition()
-        IssueBuildMobile(rebuilders, pos, bpid, {})
+        for _, u in rebuilders do
+            IssueBuildMobile({u}, pos, bpid, {})
+        end
         if assisters[1] then
             IssueGuard(assisters, pos)
         end

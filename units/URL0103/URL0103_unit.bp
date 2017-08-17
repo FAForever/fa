@@ -222,7 +222,7 @@ UnitBlueprint {
                     Duration = 3,
                     Radius = 2,
                     TargetAllow = 'TECH1',
-		    TargetDisallow = 'TECH2,WALL',  # added for bug fix [162]
+            TargetDisallow = 'TECH2,WALL',  # added for bug fix [162]
                 },
                 {
                     Add = {

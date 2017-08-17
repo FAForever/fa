@@ -142,7 +142,7 @@ AttackManager = Class({
             self.Platoons = {}
         end
         self.NeedSort = true
-        table.insert( self.Platoons, pltnTable )
+        table.insert(self.Platoons, pltnTable)
     end,
 
     ClearPlatoonList = function(self)
@@ -221,7 +221,7 @@ AttackManager = Class({
                     if platoon:IsPartOfAttackForce() then
                         for i, name in platoon.PlatoonData.AMPlatoons do
                             if name == v.PlatoonName then
-                                table.insert( combineList, platoon )
+                                table.insert(combineList, platoon)
                             end
                         end
                     end

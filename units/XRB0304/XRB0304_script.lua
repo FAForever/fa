@@ -1,16 +1,13 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/XRB0304/XRB0304_script.lua
--- **  Author(s):  Dru Staltman, Gordon Duclos
--- **
--- **  Summary  :  Cybran Engineering tower
--- **
--- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/XRB0304/XRB0304_script.lua
+-- Author(s):  Dru Staltman, Gordon Duclos
+-- Summary  :  Cybran Engineering tower
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
+
 local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionStructureUnit
 
-XRB0304 = Class(CConstructionStructureUnit) 
-{
+XRB0304 = Class(CConstructionStructureUnit) {
     OnStartBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStartBeingBuilt(self, builder, layer)
 
@@ -39,13 +36,13 @@ XRB0304 = Class(CConstructionStructureUnit)
             self.Trash:Add(self.AnimationManipulator)
         end
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(1)
-        
+
         CConstructionStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
-    
+
     OnStopBuild = function(self, unitBeingBuilt)
         CConstructionStructureUnit.OnStopBuild(self, unitBeingBuilt)
-        
+
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
@@ -53,4 +50,5 @@ XRB0304 = Class(CConstructionStructureUnit)
         self.AnimationManipulator:SetRate(-1)
     end,
 }
+
 TypeClass = XRB0304

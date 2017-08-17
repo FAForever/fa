@@ -1,0 +1,17 @@
+{
+    "mod":  null,
+    "files": [
+        ['ForgedAlliance.{}.exe', 1, '/opt/stable/faftools/faf/tools/fa/ForgedAlliance.exe'],
+        ['effects_0.{}.nxt', 11, ['effects']],
+        ['env_0.{}.nxt', 12, ['env']],
+        ['loc_0.{}.nxt', 13, ['loc']],
+        ['lua_0.{}.nxt', 14, ['lua']],
+        ['meshes_0.{}.nxt', 15, ['meshes']],
+        ['modules_0.{}.nxt', 17, []],
+        ['projectiles_0.{}.nxt', 18, ['projectiles']],
+        ['schook_0.{}.nxt', 19, ['schook']],
+        ['textures_0.{}.nxt', 20, ['textures']],
+        ['units_0.{}.nxt', 21, ['units']],
+        ['etc_0.{}.nxt', 22, ['etc']],
+    ]
+}

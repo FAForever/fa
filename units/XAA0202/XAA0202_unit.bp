@@ -105,8 +105,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
     },
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = -0.2,
     Defense = {
         AirThreatLevel = 4,
         ArmorType = 'Light',
@@ -249,8 +247,8 @@ UnitBlueprint {
     SelectionThickness = 0.37,
     SizeSphere = 1.6,
     SizeX = 1,
-    SizeY = 0.3,
-    SizeZ = 1,
+    SizeY = 0.5,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_fighter2_antiair',
     StrategicIconSortPriority = 65,
     Transport = {

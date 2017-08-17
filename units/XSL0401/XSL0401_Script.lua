@@ -26,14 +26,13 @@ XSL0401 = Class(SWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(SDFExperimentalPhasonProj) {},
         LeftArm = Class(SDFAireauWeapon) {},
-        RightArm = Class(SDFSinnuntheWeapon)
-        {
+        RightArm = Class(SDFSinnuntheWeapon) {
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 -- CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
-                if not self.ClawTopRotator then 
+                if not self.ClawTopRotator then
                     self.ClawTopRotator = CreateRotator(self.unit, 'Top_Claw', 'x')
                     self.ClawBottomRotator = CreateRotator(self.unit, 'Bottom_Claw', 'x')
-                    
+
                     self.unit.Trash:Add(self.ClawTopRotator)
                     self.unit.Trash:Add(self.ClawBottomRotator)
                 end
@@ -60,10 +59,6 @@ XSL0401 = Class(SWalkingLandUnit) {
         self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
     end,
 
-    OnAnimCollision = function(self, bone, x, y, z)
-        SWalkingLandUnit.OnAnimCollision(self, bone, x, y, z)
-    end,
-
     DeathThread = function(self, overkillRatio , instigator)
         local bigExplosionBones = {'Torso', 'Head', 'pelvis'}
         local explosionBones = {'Right_Arm_B07', 'Right_Arm_B03',
@@ -73,7 +68,7 @@ XSL0401 = Class(SWalkingLandUnit) {
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
 
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})           
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)
@@ -91,7 +86,7 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
         WaitSeconds(3.5)
-        explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)        
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
@@ -125,7 +120,7 @@ XSL0401 = Class(SWalkingLandUnit) {
 
         -- Don't make the energy being if not built, or if this is a unit transfer
         if self:GetFractionComplete() ~= 1 or self.IsBeingTransferred then return end
-        
+
         -- Spawn the Energy Being
         local position = self:GetPosition()
         local spiritUnit = CreateUnitHPR('XSL0402', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)

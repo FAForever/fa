@@ -56,17 +56,17 @@ function ApplyBuff(unit, buffName, instigator)
     end
 
     local ubt = unit.Buffs.BuffTable
-    
+
     -- We're going to need some naughty, hard-coded stuff here for a regen aura edge case where
     -- we need the advanced version to take precedence over the lower version, but not vice versa.
     if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
-    
+
     if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
         for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
             RemoveBuff(unit, key, true)
         end
     end
-    
+
     if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
         for key, bufftbl in ubt[def.BuffType] do
             RemoveBuff(unit, key, true)
@@ -171,7 +171,6 @@ end
 --We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
 --However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
-
     local buffDef = Buffs[buffName]
 
     local buffAffects = buffDef.Affects
@@ -181,7 +180,6 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     end
 
     for atype, vals in buffAffects do
-
         if atype == 'Health' then
             --Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
 
@@ -202,25 +200,27 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 unit:AdjustHealth(instigator, healthadj)
             end
         elseif atype == 'MaxHealth' then
+            -- With this type of buff, the idea is to adjust the Max Health of a unit.
+            -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
+            --     rest of the unit's HP affected to match. If it's not flagged, the unit's HP
+            --     will be adjusted by the same amount and direction as the max
             local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
             local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
+
             local oldmax = unit:GetMaxHealth()
+            local difference = oldmax - unit:GetHealth()
 
             unit:SetMaxHealth(val)
 
-            if not vals.DoNoFill and not unit.IsBeingTransferred then
-                if val > oldmax then
-                    unit:AdjustHealth(unit, val - oldmax)
-                else
-                    unit:SetHealth(unit, math.min(unit:GetHealth(), unit:GetMaxHealth()))
-                end
+            if not vals.DoNotFill and not unit.IsBeingTransferred then
+                unit:SetHealth(unit, unit:GetMaxHealth() - difference)
             end
         elseif atype == 'Regen' then
             -- Adjusted to use a special case of adding mults and calculating the final value
             -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
             local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
             local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
-            
+
             unit:SetRegen(val)
         elseif atype == 'Damage' then
             for i = 1, unit:GetWeaponCount() do
@@ -230,7 +230,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
 
-                    if val >= ( math.abs(val) + 0.5 ) then
+                    if val >= (math.abs(val) + 0.5) then
                         val = math.ceil(val)
                     else
                         val = math.floor(val)
@@ -309,7 +309,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             end
         elseif atype == 'BuildRate' then
             local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
-            unit:SetBuildRate( val )
+            unit:SetBuildRate(val)
         -------- ADJACENCY BELOW --------
         elseif atype == 'EnergyActive' then
             local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)
@@ -361,7 +361,7 @@ end
 
 -- Calculates the buff from all the buffs of the same time the unit has.
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
-    
+
     local adds = 0
     local mults = 1.0
     local multsTotal = 0 -- Used only for regen buffs
@@ -377,11 +377,11 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         if v.Mult then
             if affectType == 'Regen' then
                 -- Regen mults use MaxHp as base, so should always be <1
-                
+
                 -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
                 -- they will remove this
                 if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit:GetUnitId() .. ' and buff ' .. buffName) return end
-            
+
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
@@ -402,7 +402,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             bool = true
         end
     end
-    
+
     -- Adds are calculated first, then the mults.  May want to expand that later.
     local returnVal = false
     returnVal = (initialVal + adds + multsTotal) * mults

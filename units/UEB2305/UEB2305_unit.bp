@@ -66,7 +66,6 @@ UnitBlueprint {
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
     },
-    CollisionOffsetY = -0.25,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -143,7 +142,7 @@ UnitBlueprint {
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
+            RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,

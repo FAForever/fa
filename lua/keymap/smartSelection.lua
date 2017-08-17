@@ -10,13 +10,13 @@ local utils = import('/lua/system/utils.lua')
 function smartSelect(strExpression)
 
   -- some of these calls crash game if bad category name, so wrap in pcall
-  local success, value = pcall(function() 
+  local success, value = pcall(function()
     local expression = compile(strExpression)
     --LOG(repr(expression))
     setSelection(expression)
     return expression
   end)
-  
+
   if success == false then
     LOG("smartSelect failed: " .. strExpression)
   end
@@ -29,11 +29,11 @@ function setSelection(expression)
 
   ConExecute("Ui_SelectByCategory " .. others)
   local units = GetSelectedUnits()
-  
+
   for k,v in expression.negatives do
-	if units ~= nil then
-		units = EntityCategoryFilterOut(categories[v], units)
-	end
+    if units ~= nil then
+        units = EntityCategoryFilterOut(categories[v], units)
+    end
   end
 
   SelectUnits(units)
@@ -48,12 +48,12 @@ function compile(strExpression)
 
   local tokens = utils.StringSplit(strExpression, " ") -- split by space
   for k,v in tokens do
-   
+
     if utils.StringStartsWith(v, "-") then
       -- tokens with minus symbol are "negative"
       local withoutSymbol = string.sub(v,2)
       table.insert(result.negatives, withoutSymbol)
-     
+
     else
       -- everything else is an "other". This includes categories (eg: AIR) and modifiers (eg: +idle)
        table.insert(result.others, v)

@@ -239,8 +239,8 @@ UnitBlueprint {
     SizeZ = 2.75,
     StrategicIconName = 'icon_ship2_shield',
     StrategicIconSortPriority = 125,
-	Weapon = {
-        {               # Adds a dummy weapon that does nothing except adds another range circle to show 
+    Weapon = {
+        {               # Adds a dummy weapon that does nothing except adds another range circle to show
             Damage = 0, # where the shield ends  on the water's surface. Purely visual fix by themak [160]
             MaxRadius = 34.9;
             RangeCategory = 'UWRC_DirectFire',

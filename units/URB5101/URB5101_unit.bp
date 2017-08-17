@@ -39,9 +39,9 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 0,
-        Health = 4000,
-        MaxHealth = 4000,
-        RegenRate = 0,
+        Health = 1500,
+        MaxHealth = 1500,
+        RegenRate = 6,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
         ThreatLevel = 0,
@@ -70,7 +70,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 10,
         BuildCostMass = 2,
-        BuildTime = 10,
+        BuildTime = 20,
         RebuildBonusIds = {
             'urb5101',
         },

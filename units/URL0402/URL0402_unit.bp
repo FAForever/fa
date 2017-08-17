@@ -12,7 +12,7 @@ UnitBlueprint {
             'Right_Projectile02',
             'Left_Projectile02',
             'Exhaust05',
-            'Exhaust02',    
+            'Exhaust02',
         },
     },
     Audio = {
@@ -55,10 +55,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 10,
-            Level2 = 20,
-            Level3 = 30,
-            Level4 = 40,
-            Level5 = 50,
+            Level2 = 40,
+            Level3 = 70,
+            Level4 = 95,
+            Level5 = 125,
         },
     },
     BuildIconSortPriority = 20,
@@ -85,7 +85,7 @@ UnitBlueprint {
         'OVERLAYCOUNTERINTEL',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
-		'OVERLAYINDIRECTFIRE',
+        'OVERLAYINDIRECTFIRE',
     },
     CollisionOffsetY = 0.9,
     Defense = {
@@ -226,7 +226,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 260000,
         BuildCostMass = 19000,
-        BuildTime = 15750, 
+        BuildTime = 15750,
         MaintenanceConsumptionPerSecondEnergy = 400,
     },
     General = {

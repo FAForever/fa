@@ -13,6 +13,9 @@ local Orders = import('/lua/ui/game/orders.lua')
 local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
 local Prefs = import('/lua/user/prefs.lua')
 
+local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
+local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
+local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
 
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
@@ -33,7 +36,7 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUCC_Guard               = (1 << 3),
     RULEUCC_Patrol              = (1 << 4),
     RULEUCC_RetaliateToggle     = (1 << 5),
-    
+
     // Unit specific rules
     RULEUCC_Repair              = (1 << 6),
     RULEUCC_Capture             = (1 << 7),
@@ -52,13 +55,13 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUCC_Reclaim             = (1 << 20),
     RULEUCC_SpecialAction       = (1 << 21),
     RULEUCC_Dock                = (1 << 22),
-   
+
     // Unit general
     RULEUCC_Script              = (1 << 23),
  }
- 
+
  toggleModes = {
-    
+
     // Unit toggle rules
     RULEUTC_ShieldToggle        = (1 << 0),
     RULEUTC_WeaponToggle        = (1 << 1),
@@ -70,7 +73,7 @@ local Prefs = import('/lua/user/prefs.lua')
     RULEUTC_SpecialToggle       = (1 << 7),
     RULEUTC_CloakToggle         = (1 << 8),
 }
- 
+
 --]]
 
 local commandMode = false
@@ -79,6 +82,11 @@ local issuedOneCommand = false
 
 local startBehaviors = {}
 local endBehaviors = {}
+
+local ignoreSelection = false
+function SetIgnoreSelection(ignore)
+    ignoreSelection = ignore
+end
 
 function OnCommandModeBeat()
     if issuedOneCommand and not IsKeyDown('Shift') then
@@ -116,6 +124,10 @@ function GetCommandMode()
 end
 
 function EndCommandMode(isCancel)
+    if ignoreSelection then
+        return
+    end
+
     modeData.isCancel = isCancel or false
     for i,v in endBehaviors do
         v(commandMode, modeData)
@@ -147,6 +159,24 @@ function AddCommandFeedbackByType(pos, type)
     return true;
 end
 
+function AddDefaultCommandFeedbackBlips(pos)
+    AddCommandFeedbackBlip({
+        Position = pos,
+        MeshName = '/meshes/game/flag02d_lod0.scm',
+        TextureName = '/meshes/game/flag02d_albedo.dds',
+        ShaderName = 'CommandFeedback',
+        UniformScale = 0.5,
+    }, 0.7)
+
+    AddCommandFeedbackBlip({
+        Position = pos,
+        MeshName = '/meshes/game/crosshair02d_lod0.scm',
+        TextureName = '/meshes/game/crosshair02d_albedo.dds',
+        ShaderName = 'CommandFeedback2',
+        UniformScale = 0.5,
+    }, 0.75)
+end
+
 local lastMex = nil
 function AssistMex(command)
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
@@ -173,7 +203,6 @@ function AssistMex(command)
         SimCallback({Func = 'CapMex', Args = {target = command.Target.EntityId}}, true)
     end
 end
-    
 
 function OnCommandIssued(command)
     if not command.Clear then
@@ -196,38 +225,51 @@ function OnCommandIssued(command)
             if options['assist_mex'] then AssistMex(command) end
         end
     elseif command.CommandType == 'BuildMobile' then
-		AddCommandFeedbackBlip({
-			Position = command.Target.Position, 
-			BlueprintID = command.Blueprint,			
-			TextureName = '/meshes/game/flag02d_albedo.dds',
-			ShaderName = 'CommandFeedback',
-			UniformScale = 1,
-		}, 0.7)
+    AddCommandFeedbackBlip({
+        Position = command.Target.Position,
+        BlueprintID = command.Blueprint,
+        TextureName = '/meshes/game/flag02d_albedo.dds',
+        ShaderName = 'CommandFeedback',
+        UniformScale = 1,
+    }, 0.7)
     elseif command.CommandType == 'Repair' then
         local target = command.Target
         if target.Type == 'Entity' then -- repair wreck to rebuild
             local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
         end
-	else	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/flag02d_lod0.scm',
-				TextureName = '/meshes/game/flag02d_albedo.dds',
-				ShaderName = 'CommandFeedback',
-				UniformScale = 0.5,
-			}, 0.7)		
-			
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/crosshair02d_lod0.scm',
-				TextureName = '/meshes/game/crosshair02d_albedo.dds',
-				ShaderName = 'CommandFeedback2',
-				UniformScale = 0.5,
-			}, 0.75)		
-		end		
-	end
+    elseif command.CommandType == 'Script' and command.LuaParams.TaskName == 'AttackMove' then
+        local view = import('/lua/ui/game/worldview.lua').viewLeft
+        local avgPoint = {0,0}
+        for _,unit in command.Units do
+            avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
+            avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
+        end
+        avgPoint[1] = avgPoint[1] / table.getn(command.Units)
+        avgPoint[2] = avgPoint[2] / table.getn(command.Units)
 
-	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+        avgPoint[1] = command.Target.Position[1] - avgPoint[1]
+        avgPoint[2] = command.Target.Position[3] - avgPoint[2]
+
+        local rotation = math.atan(avgPoint[1]/avgPoint[2])
+        rotation = rotation * 180 / math.pi
+        if avgPoint[2] < 0 then
+            rotation = rotation + 180
+        end
+        local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}
+        SimCallback(cb, true)
+        AddDefaultCommandFeedbackBlips(command.Target.Position)
+    elseif command.Clear == true and command.CommandType ~= 'Stop' and table.getn(command.Units) == 1 and checkBadClean(command.Units[1]) then
+        watchForQueueChange(command.Units[1])
+    elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
+        EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
+    elseif command.CommandType == 'Stop' then
+        EnhancementQueueFile.clearEnhancements(command.Units)
+    else
+        if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
+            AddDefaultCommandFeedbackBlips(command.Target.Position)
+        end
+    end
+
+    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end

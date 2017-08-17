@@ -10,13 +10,13 @@
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
-ZEB9503 = Class(TSeaFactoryUnit) {    
+ZEB9503 = Class(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -5, 0, 0, -1)
         self.Trash:Add(self.BuildPointSlider)
     end,
-    
+
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
@@ -53,7 +53,7 @@ ZEB9503 = Class(TSeaFactoryUnit) {
             WaitFor(self.ArmSlider2)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
         if not self.ArmSlider1 then return end

@@ -13,7 +13,7 @@ UnitBlueprint {
         CanFly = true,
         CombatTurnSpeed = 1.5,
         EngageDistance = 50,
-        KLift = 1, # 3
+        KLift = 1,
         KLiftDamping = 2.5,
         KMove = 1,
         KMoveDamping = 1,
@@ -21,10 +21,10 @@ UnitBlueprint {
         KRollDamping = 1,
         KTurn = 1,
         KTurnDamping = 1.5,
-        LiftFactor = 15, # 7
+        LiftFactor = 15,
         MaxAirspeed = 15,
         MinAirspeed = 10,
-        PredictAheadForBombDrop = 3,  
+        PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.02,
         TurnSpeed = 1.5,
@@ -265,7 +265,7 @@ UnitBlueprint {
     SelectionThickness = 0.53,
     SizeSphere = 1.6,
     SizeX = 0.8,
-    SizeY = 0.2,
+    SizeY = 0.3,
     SizeZ = 1,
     StrategicIconName = 'icon_fighter2_directfire',
     StrategicIconSortPriority = 75,
@@ -457,7 +457,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 60, # 45
             MuzzleSalvoDelay = 0,

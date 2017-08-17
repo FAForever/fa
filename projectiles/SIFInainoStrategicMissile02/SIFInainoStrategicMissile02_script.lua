@@ -14,19 +14,19 @@ SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
     ExplodeSound = 'Nuke_Impact',
     AmbientSound = 'Nuke_Flight',
 
-	InitialEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},    
+    InitialEffects = {
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },
     ThrustEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },
     LaunchEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},
-    
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },
+
     OnCreate = function(self)
         SIFInainoStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/InainoEffectController01/InainoEffectController01_proj.bp'

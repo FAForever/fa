@@ -1,4 +1,4 @@
-UnitBlueprint { 
+UnitBlueprint {
     AI = {
         TargetBones = {
             'Torso',
@@ -7,7 +7,7 @@ UnitBlueprint {
             'Left_Leg_B01',
             'Right_Leg_B01',
         },
-		AddTargetBones = {
+        AddTargetBones = {
             'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
             'AttachSpecial02',
         },
@@ -47,10 +47,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 10,
-            Level2 = 20,
-            Level3 = 30,
-            Level4 = 40,
-            Level5 = 50,
+            Level2 = 60,
+            Level3 = 115,
+            Level4 = 165,
+            Level5 = 215,
         },
     },
     BuildIconSortPriority = 100,
@@ -179,7 +179,7 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 343750, 
+        BuildCostEnergy = 343750,
         BuildCostMass = 27500,
         BuildTime = 20625,
     },
@@ -245,7 +245,7 @@ UnitBlueprint {
         SkirtSizeZ = 6,
         StandUpright = true,
         TurnRadius = 3,
-        TurnRate = 40,					
+        TurnRate = 40,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
@@ -343,7 +343,7 @@ UnitBlueprint {
                 'SUBCOMMANDER',
                 'TECH3 MOBILE',
                 'STRUCTURE DEFENSE',#
-		'TECH3 STRUCTURE',#
+        'TECH3 STRUCTURE',#
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'SPECIALLOWPRI',

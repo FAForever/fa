@@ -4,6 +4,7 @@
 -- Summary  :  Cybran Destroyer Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 local CybranWeapons = import('/lua/cybranweapons.lua')
@@ -26,13 +27,11 @@ URS0201 = Class(CSeaUnit) {
         AntiTorpedoB = Class(CIFSmartCharge) {},
     },
 
-    OnCreate = function(self)
-        CSeaUnit.OnCreate(self)
-    end,
-
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
+
         if self.Dead then return end
+
         if not self.IsWaiting then
             if self.Walking then
                 if old == 'Stopped' then
@@ -62,11 +61,11 @@ URS0201 = Class(CSeaUnit) {
 
         -- Can only be built in water so transformthread only needs to be run
         -- when actually changing layer or when spawned on land
-        if old != 'None' or new == 'Land' then
+        if old ~= 'None' or new == 'Land' then
             if self.AT1 then
                 self.AT1:Destroy()
             end
-            self.AT1 = self:ForkThread(self.TransformThread, (new == 'Land'))
+            self.AT1 = self:ForkThread(self.TransformThread, new == 'Land')
         end
     end,
 
@@ -74,16 +73,16 @@ URS0201 = Class(CSeaUnit) {
         if not self.AnimManip then
             self.AnimManip = CreateAnimator(self)
         end
+
         local bp = self:GetBlueprint()
         local scale = bp.Display.UniformScale or 1
-
         if land then
             self:SetImmobile(true)
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
             self.AnimManip:SetRate(2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0,(bp.CollisionOffsetY + (bp.SizeY*1.0)) or 0,bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 1.0)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self:SetImmobile(false)
             self.SwitchAnims = true
@@ -96,7 +95,7 @@ URS0201 = Class(CSeaUnit) {
             self.AnimManip:SetRate(-2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0,(bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0,bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self.AnimManip:Destroy()
             self.AnimManip = nil
@@ -108,16 +107,17 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
-        if self:GetCurrentLayer() != 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.WaterAnimationDeath
         end
+
         CSeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-    
+
      DeathThread = function(self, overkillRatio)
-        if self:GetCurrentLayer() != 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' then
             self:PlayUnitSound('Destroyed')
             local army = self:GetArmy()
             if self.PlayDestructionEffects then
@@ -136,15 +136,16 @@ URS0201 = Class(CSeaUnit) {
                     self.CreateUnitDestructionDebris(self, true, true, true)
                 end
             end
-
             WaitSeconds(2)
+
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
-            end 
+            end
             WaitSeconds(1)
+
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
-            end                                    
+            end
             self:CreateWreckage(0.1)
             self:Destroy()
         else

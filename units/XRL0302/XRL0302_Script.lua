@@ -9,14 +9,14 @@ local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamika
 
 XRL0302 = Class(CWalkingLandUnit) {
 
-    -- OK this unit was horribly overcomplicated in the past. What we want is for only one of 
-    -- three situations to ever blow up the bomb. The unit getting in range and firing, the 
+    -- OK this unit was horribly overcomplicated in the past. What we want is for only one of
+    -- three situations to ever blow up the bomb. The unit getting in range and firing, the
     -- player pressing the detonate button, or the player using CTRL-K to suicide the unit.
 
     -- Since the weapon itself kills the unit with self.unit:Destroy(), and CTRL-K detonates the
     -- weapon immediately thanks to selfdestruct.lua, we don't need any logic here for OnKilled()
 
-    Weapons = {        
+    Weapons = {
         Suicide = Class(CMobileKamikazeBombWeapon) {},
     },
 

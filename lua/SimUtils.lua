@@ -8,7 +8,7 @@
 
 local sharedUnits = {}
 
-function BreakAlliance( data )
+function BreakAlliance(data)
 
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
@@ -26,7 +26,7 @@ function BreakAlliance( data )
     import('/lua/SimPing.lua').OnAllianceChange()
 end
 
-function OnAllianceResult( resultData )
+function OnAllianceResult(resultData)
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
@@ -43,7 +43,7 @@ function OnAllianceResult( resultData )
     end
     import('/lua/SimPing.lua').OnAllianceChange()
 end
-import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAllianceResult )
+import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 function KillSharedUnits(owner)
     if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
@@ -61,6 +61,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
     end
+    local fromBrain = GetArmyBrain(units[1]:GetArmy())
 
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
 
@@ -105,12 +106,12 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local posblEnh = bp.Enhancements
         if posblEnh then
             for k,v in posblEnh do
-                if unit:HasEnhancement( k ) then
-                   table.insert( enh, k )
+                if unit:HasEnhancement(k) then
+                   table.insert(enh, k)
                 end
             end
         end
-        
+
         unit.IsBeingTransferred = true
 
         -- changing owner
@@ -140,7 +141,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do
-                unit:CreateEnhancement( v )
+                unit:CreateEnhancement(v)
             end
         end
         if unitHealth > unit:GetMaxHealth() then
@@ -151,13 +152,13 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             unit:SetFuelRatio(fuelRatio)
         end
         if numNukes and numNukes > 0 then
-            unit:GiveNukeSiloAmmo( (numNukes - unit:GetNukeSiloAmmoCount()) )
+            unit:GiveNukeSiloAmmo((numNukes - unit:GetNukeSiloAmmoCount()))
         end
         if numTacMsl and numTacMsl > 0 then
-            unit:GiveTacticalSiloAmmo( (numTacMsl - unit:GetTacticalSiloAmmoCount()) )
+            unit:GiveTacticalSiloAmmo((numTacMsl - unit:GetTacticalSiloAmmoCount()))
         end
         if unit.MyShield then
-            unit.MyShield:SetHealth( unit, ShieldHealth )
+            unit.MyShield:SetHealth(unit, ShieldHealth)
             if shieldIsOn then
                 unit:EnableShield()
             else
@@ -169,28 +170,38 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         unit.IsBeingTransferred = false
-        
+
         v:OnGiven(unit)
     end
+
+    if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
+        for _,aiBrain in {fromBrain, toBrain} do
+            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+            for _, victim in buildRestrictionVictims do
+                victim:updateBuildRestrictions()
+            end
+        end
+    end
+
     return newUnits
 end
 
-function GiveUnitsToPlayer( data, units )
+function GiveUnitsToPlayer(data, units)
     if units then
         local owner = units[1]:GetArmy()
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
-            TransferUnitsOwnership( units, data.To )
+            TransferUnitsOwnership(units, data.To)
         end
     end
 end
 
-function SetResourceSharing( data )
+function SetResourceSharing(data)
     if not OkayToMessWithArmy(data.Army) then return end
     local brain = GetArmyBrain(data.Army)
     brain:SetResourceSharing(data.Value)
 end
 
-function RequestAlliedVictory( data )
+function RequestAlliedVictory(data)
     -- You cannot change this in a team game
 
     if ScenarioInfo.TeamGame then
@@ -235,8 +246,8 @@ function UpdateUnitCap(deadArmy)
     end
 
     if aliveCount > 0 then
-        local initialCap = tonumber(ScenarioInfo.Options.UnitCap)
-        local totalCap = totalCount * initialCap
+        local currentCap = GetArmyUnitCap(alive[1].index) -- First time, this is the initial army cap, but it will update each time this function runs
+        local totalCap = (aliveCount + 1) * currentCap -- Total cap for the team/game. Uses aliveCount to take account of currentCap updating
         local newCap = math.floor(totalCap / aliveCount)
         for _, brain in alive do
             SetArmyUnitCap(brain.index, newCap)
@@ -245,28 +256,28 @@ function UpdateUnitCap(deadArmy)
 end
 
 function SendChatToReplay(data)
-	if data.Sender and data.Msg then
-		if not Sync.UnitData.Chat then
-			Sync.UnitData.Chat = {}
-		end
-		table.insert(Sync.UnitData.Chat, {sender=data.Sender, msg=data.Msg})
-	end
+    if data.Sender and data.Msg then
+        if not Sync.UnitData.Chat then
+            Sync.UnitData.Chat = {}
+        end
+        table.insert(Sync.UnitData.Chat, {sender=data.Sender, msg=data.Msg})
+    end
 end
 
 function GiveResourcesToPlayer(data)
-	SendChatToReplay(data)
-	if data.From != -1 then
-		if not OkayToMessWithArmy(data.From) then
-			return
-		end
-		local fromBrain = GetArmyBrain(data.From)
-		local toBrain = GetArmyBrain(data.To)
-		if fromBrain:IsDefeated() or toBrain:IsDefeated() then
-			return
-		end
-		local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
-		local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
-		toBrain:GiveResource('Mass',massTaken)
-		toBrain:GiveResource('Energy',energyTaken)
-	end
+    SendChatToReplay(data)
+    if data.From != -1 then
+        if not OkayToMessWithArmy(data.From) then
+            return
+        end
+        local fromBrain = GetArmyBrain(data.From)
+        local toBrain = GetArmyBrain(data.To)
+        if fromBrain:IsDefeated() or toBrain:IsDefeated() then
+            return
+        end
+        local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
+        local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
+        toBrain:GiveResource('Mass',massTaken)
+        toBrain:GiveResource('Energy',energyTaken)
+    end
 end

@@ -31,9 +31,9 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-	Buffs = {
-		Regen = {
-			Level1 = 3,
+    Buffs = {
+        Regen = {
+            Level1 = 3,
             Level2 = 6,
             Level3 = 9,
             Level4 = 12,
@@ -42,14 +42,14 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 25,
     Categories = {
-		'PRODUCTDL',
+        'PRODUCTDL',
         'SELECTABLE',
         'BUILTBYTIER3FACTORY',
         'UEF',
         'MOBILE',
         'LAND',
         'TECH3',
-		'ANTIAIR',
+        'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
@@ -114,13 +114,13 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = false,
-		TransportAnimation = {
+        TransportAnimation = {
             {
                 Animation = '/units/DELK002/DELK002_fold.sca',
                 Weight = 100,
             },
         },
-		TransportDropAnimation = {
+        TransportDropAnimation = {
             {
                 Animation = '/units/DELK002/DELK002_unfold.sca',
                 Weight = 100,
@@ -190,7 +190,7 @@ UnitBlueprint {
         MeshExtentsZ = 1.15,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Land',
-		RotateOnSpot = true,
+        RotateOnSpot = true,
         RotateOnSpotThreshold = 0.1,
         TurnRadius = 0,
         TurnRate = 100,
@@ -208,7 +208,7 @@ UnitBlueprint {
     Transport = {
         TransportClass = 3,
     },
-	Veteran = {
+    Veteran = {
         Level1 = 15,
         Level2 = 30,
         Level3 = 45,
@@ -252,7 +252,7 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
-			CannotAttackGround = true,
+            CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 100,
             DamageRadius = 1,
@@ -280,11 +280,11 @@ UnitBlueprint {
                 {
                     MuzzleBones = {
                         'Left_Muzzle',
-						'Right_Muzzle',
+                        'Right_Muzzle',
                     },
                     RackBone = 'Turret',
                 },
-			},
+            },
             RackFireTogether = true,
             RackRecoilDistance = 0,
             RackReloadTimeout = 0,
@@ -327,7 +327,7 @@ UnitBlueprint {
             WeaponRepackTimeout = 2,
             WeaponUnpacks = true,
         },
-	},
+    },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

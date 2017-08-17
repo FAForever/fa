@@ -10,7 +10,11 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
-local UpdateReclaim = import('/lua/ui/game/reclaim.lua').UpdateReclaim
+local reclaim = import('/lua/ui/game/reclaim.lua')
+local UpdateReclaim = reclaim.UpdateReclaim
+local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
+local SetPlayableArea = reclaim.SetPlayableArea
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
     if Sync.RequestingExit then
@@ -34,11 +38,11 @@ function OnSync()
         ConExecute('UI_RenderUnitBars true')
     end
 
-	if not table.empty(Sync.AIChat) then
-		for k, v in Sync.AIChat do
-			import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
-		end
-	end
+    if not table.empty(Sync.AIChat) then
+        for k, v in Sync.AIChat do
+            import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
+        end
+    end
 
     if Sync.UserConRequests then
         for num, execRequest in Sync.UserConRequests do
@@ -55,8 +59,8 @@ function OnSync()
     end
 
     if Sync.NukeLaunchData then
-		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
-	end
+        import('/lua/ui/game/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
+    end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
     if not table.empty(Sync.Reclaim) then
@@ -80,8 +84,22 @@ function OnSync()
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(data)
         end
     end
-	
+
     if Sync.EnforceRating then
         GpgNetSend('EnforceRating')
+    end
+
+    if not table.empty(Sync.EnhanceMessage) then
+        for _, messageTable in Sync.EnhanceMessage do
+            sendEnhancementMessage(messageTable)
+        end
+    end
+    
+    if Sync.NewPlayableArea then
+        SetPlayableArea(Sync.NewPlayableArea)
+    end
+
+    if Sync.StartPositions then
+        import('/lua/ui/game/worldview.lua').MarkStartPositions(Sync.StartPositions)
     end
 end

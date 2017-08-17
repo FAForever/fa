@@ -1,12 +1,12 @@
 UnitBlueprint {
     AI = {
-        TargetBones = {          
+        TargetBones = {
             'Right_Leg01_B01',
             'Right_Leg02_B01',
             'Left_Leg01_B01',
             'Left_Leg02_B01',
             'Turret',
-            'Projectile03',            
+            'Projectile03',
         },
     },
     Audio = {

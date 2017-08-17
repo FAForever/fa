@@ -50,33 +50,33 @@ armordefinition = {
     {
         # Armor Type name
         'Experimental',
-        
+
         # Armor Definition
-        'ExperimentalFootfall 0.0',        
+        'ExperimentalFootfall 0.0',
     },
     {
         # Armor Type name
         'FireBeetle',
-        
+
         # Armor Definition
-        'Normal 1.0',        
-        'FireBeetleExplosion 0.0',        
+        'Normal 1.0',
+        'FireBeetleExplosion 0.0',
     },
     {
         # Armor Type name
         'ASF',
-        
+
         # Armor Definition
-        'Normal 1.0',        
+        'Normal 1.0',
         'CzarBeam 0.25',
-        'OtheTacticalBomb 0.1',   
+        'OtheTacticalBomb 0.1',
     },
     {
         # Armor Type name
         'TMD',
-        
+
         # Armor Definition
-        'Normal 1.0',        
-        'TacticalMissile 0.55',   
+        'Normal 1.0',
+        'TacticalMissile 0.55',
     },
 }

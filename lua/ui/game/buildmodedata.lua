@@ -560,7 +560,7 @@ buildModeKeys = {
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
-    },	
+    },
     -- subcommander - shield combatant preset
     ['ual0301_ShieldCombat'] = {
         [1] = AeonT1Eng,
@@ -702,49 +702,49 @@ buildModeKeys = {
         [4] = UEFT4Eng,
     },
     -- subcommander
-	['uel0301'] = {
+    ['uel0301'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - resource allocation preset
-	['uel0301_RAS'] = {
+    -- subcommander - resource allocation preset
+    ['uel0301_RAS'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - combatant preset
-	['uel0301_Combat'] = {
+    -- subcommander - combatant preset
+    ['uel0301_Combat'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - engineer preset
-	['uel0301_Engineer'] = {
+    -- subcommander - engineer preset
+    ['uel0301_Engineer'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - rambo preset
-	['uel0301_Rambo'] = {
+    -- subcommander - rambo preset
+    ['uel0301_Rambo'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - shield preset
-	['uel0301_BubbleShield'] = {
+    -- subcommander - shield preset
+    ['uel0301_BubbleShield'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
-	-- subcommander - intel jammer preset
-	['uel0301_IntelJammer'] = {
+    -- subcommander - intel jammer preset
+    ['uel0301_IntelJammer'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
@@ -885,7 +885,7 @@ buildModeKeys = {
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
-    },	
+    },
     -- subcommander - combatant preset
     ['url0301_Combat'] = {
         [1] = CybranT1Eng,
@@ -899,7 +899,7 @@ buildModeKeys = {
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
-    },	
+    },
     -- subcommander - rambo preset
     ['url0301_Rambo'] = {
         [1] = CybranT1Eng,
@@ -920,7 +920,7 @@ buildModeKeys = {
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
-    },	
+    },
     -- subcommander - anti-air preset
     ['url0301_AntiAir'] = {
         [1] = CybranT1Eng,
@@ -1050,7 +1050,7 @@ buildModeKeys = {
         [2] = CybranCrabBot,
         [3] = CybranCrabBot,
     },
-    
+
 -- Seraphim
     -- commander
     ['xsl0001'] = {
@@ -1086,14 +1086,14 @@ buildModeKeys = {
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
-    },	
+    },
     -- subcommander - advanced combatant preset
     ['xsl0301_AdvancedCombat'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
-    },	
+    },
     -- subcommander - rambo preset
     ['xsl0301'] = {
         [1] = SeraphimT1Eng,

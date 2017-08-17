@@ -1,0 +1,2 @@
+This branch is for bugfixes, general improvements, and new features. If your change is designed to alter balance, please make 
+sure your changes are rebased onto [development/balance] (https://github.com/FAForever/fa/tree/development/balance), and target that branch with your PR.

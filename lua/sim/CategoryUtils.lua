@@ -155,15 +155,15 @@ function ParseEntityCategoryProperly(categoryExpression)
 
     return _parseSubexpression(1, numTokens)
 end
--- converts specified category expression to a string 
--- representing it in global categories or returns repr(categoryExpression)  
+-- converts specified category expression to a string
+-- representing it in global categories or returns repr(categoryExpression)
 function ToString(categoryExpression)
-    for key, value in categories or {} do 
+    for key, value in categories or {} do
         if categoryExpression == value then
             return 'categories.' .. key
         end
-    end    
-    -- TODO find a way to revers ParseEntityCategoryProperly and get a string 
+    end
+    -- TODO find a way to revers ParseEntityCategoryProperly and get a string
     -- representing categoryExpression, e.g. categories.TECH2 * categories.AIR
     return repr(categoryExpression)
 end

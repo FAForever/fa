@@ -79,10 +79,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 10,
-            Level2 = 20,
-            Level3 = 30,
-            Level4 = 40,
-            Level5 = 50,
+            Level2 = 45,
+            Level3 = 80,
+            Level4 = 115,
+            Level5 = 145,
         },
     },
     BuildIconSortPriority = 110,
@@ -286,10 +286,10 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,	#0.2				
+            BeamCollisionDelay = 0,	#0.2
             BeamLifetime = 0,
             CollideFriendly = false,
-            Damage = 333,			#1000						
+            Damage = 333,			#1000
             DamageRadius = 4,
             DamageType = 'CzarBeam',  # Normal
             DisplayName = 'Quantum Beam Generator',
@@ -663,7 +663,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
             WeaponCategory = 'Anti Navy',
         },
@@ -717,7 +717,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
             WeaponCategory = 'Anti Navy',
         },

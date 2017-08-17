@@ -4,6 +4,7 @@
 -- Summary  :  UEF Experimental Submersible Aircraft Carrier Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
@@ -12,7 +13,7 @@ local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
 UES0401 = Class(TSeaUnit) {
     BuildAttachBone = 'UES0401',
-    
+
     Weapons = {
         Torpedo01 = Class(TANTorpedoAngler) {},
         Torpedo02 = Class(TANTorpedoAngler) {},
@@ -23,10 +24,10 @@ UES0401 = Class(TSeaUnit) {
         MissileRack03 = Class(TSAMLauncher) {},
         MissileRack04 = Class(TSAMLauncher) {},
     },
-	
-	OnKilled = function(self, instigator, type, overkillRatio)
-		TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
-	end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
 
     OnCreate = function(self)
         TSeaUnit.OnCreate(self)
@@ -35,21 +36,23 @@ UES0401 = Class(TSeaUnit) {
         for i = 2, 6 do
             self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):SetRate(-1)
         end
+
         for k, v in self.OpenAnimManips do
             self.Trash:Add(v)
         end
+
         if self:GetCurrentLayer() == 'Water' then
             self:PlayAllOpenAnims(true)
         end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
-			self:HideBone(0, true)        
-            self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
+        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
+            self:HideBone(0, true)
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
-    end,  
+    end,
 
     PlayAllOpenAnims = function(self, open)
         for k, v in self.OpenAnimManips do
@@ -61,18 +64,57 @@ UES0401 = Class(TSeaUnit) {
         end
     end,
 
-    OnMotionVertEventChange = function( self, new, old )
+    OnMotionVertEventChange = function(self, new, old)
         TSeaUnit.OnMotionVertEventChange(self, new, old)
+
         if new == 'Down' then
             self:PlayAllOpenAnims(false)
         elseif new == 'Top' then
             self:PlayAllOpenAnims(true)
         end
+
+        if new == 'Up' and old == 'Bottom' then -- When starting to surface
+            self.WatchDepth = false
+        end
+
+        if new == 'Bottom' and old == 'Down' then -- When finished diving
+            self.WatchDepth = true
+            if not self.DiverThread then
+                self.DiverThread = self:ForkThread(self.DiveDepthThread)
+            end
+        end
+    end,
+
+    DiveDepthThread = function(self)
+        -- Takes the given location, adjusts the Y value to the surface height on that location, with an offset
+        local Yoffset = 1.2 -- The default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
+        -- 1.2 is for tempest to clear the torpedo tubes from most cases of ground clipping, keeping overall height minimal.
+        while self.WatchDepth == true do
+            local pos = self:GetPosition()
+            local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) -- Target depth, in this case the seabed
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) -- Doesnt sink too much, just maneuveres the bed better.
+            self.SinkSlider:SetSpeed(1)
+
+            self.SinkSlider:SetGoal(0, difference, 0)
+            WaitSeconds(1)
+        end
+
+        self.SinkSlider:SetGoal(0, 0, 0) -- Reset the slider while we are not watching depth
+        WaitFor(self.SinkSlider)-- We have to wait for it to finish before killing the thread or it stops
+
+        KillThread(self.DiverThread)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         TSeaUnit.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
+
+        if not self.SinkSlider then -- Setup the slider and get blueprint values
+            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) -- Create sink controller to overlay ontop of original collision detection
+            self.Trash:Add(self.SinkSlider)
+        end
+
+        self.WatchDepth = false
     end,
 
     OnFailedToBuild = function(self)
@@ -120,6 +162,7 @@ UES0401 = Class(TSeaUnit) {
                 IssueMoveOffFactory({unitBuilding}, worldPos)
                 unitBuilding:ShowBone(0,true)
             end
+
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,

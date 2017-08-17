@@ -1,4 +1,4 @@
-UnitBlueprint { 
+UnitBlueprint {
     AI = {
         GuardScanRadius = 50,
     },
@@ -161,7 +161,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 9600,
         BuildCostMass = 840,
-        BuildRate = 3,
+        BuildRate = 5,
         BuildTime = 4500,#3600
         MaintenanceConsumptionPerSecondEnergy = 25,
         TeleportEnergyMod = 0.15,

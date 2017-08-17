@@ -33,7 +33,7 @@ BuilderGroup {
     # =======================================
     #     Land Factory Builders - Initial
     # =======================================
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Land Factory Builder - Initial',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 1000,
@@ -41,7 +41,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -58,7 +58,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerFactoryConstructionLandHigherPriority',
     BuildersType = 'EngineerBuilder',
-    Builder {        
+    Builder {
         BuilderName = 'SorianT2 Land Factory Builder Higher Pri',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
         Priority = 750,
@@ -70,7 +70,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -83,7 +83,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {        
+    Builder {
         BuilderName = 'SorianT3 Land Factory Builder Higher Pri',
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 750,
@@ -94,7 +94,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -111,14 +111,14 @@ BuilderGroup {
         BuilderName = 'SorianCDR T1 Land Factory Higher Pri - Init',
         PlatoonTemplate = 'CommanderBuilderSorian',
         Priority = 905,
-        BuilderConditions = {                        
+        BuilderConditions = {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'LAND FACTORY'}},
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, 'FACTORY LAND' }},
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'LAND FACTORY'}},
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, 'FACTORY LAND' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -134,15 +134,15 @@ BuilderGroup {
         BuilderName = 'Sorian T1 Land Factory Higher Pri - Init',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 975, #950,
-        BuilderConditions = {                        
+        BuilderConditions = {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'LAND FACTORY'}},
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, 'FACTORY LAND' }},
-			{ SBC, 'GreaterThanGameTime', { 165 } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'LAND FACTORY'}},
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, 'FACTORY LAND' }},
+            { SBC, 'GreaterThanGameTime', { 165 } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -157,17 +157,17 @@ BuilderGroup {
         BuilderName = 'Sorian T1 Land Factory Higher Pri',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 975, #950,
-        BuilderConditions = {                        
+        BuilderConditions = {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'AIR FACTORY'}},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY AIR' }},
-			{ SBC, 'GreaterThanGameTime', { 165 } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'AIR FACTORY'}},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY AIR' }},
+            { SBC, 'GreaterThanGameTime', { 165 } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -187,10 +187,10 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
-			{ SBC, 'GreaterThanGameTime', { 165 } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
+            { SBC, 'GreaterThanGameTime', { 165 } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -205,16 +205,16 @@ BuilderGroup {
         BuilderName = 'SorianCDR T1 Land Factory Higher Pri',
         PlatoonTemplate = 'CommanderBuilderSorian',
         Priority = 905,
-        BuilderConditions = {                        
+        BuilderConditions = {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'AIR FACTORY'}},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY AIR' }},
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'AIR FACTORY'}},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY AIR' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -235,9 +235,9 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			#{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'LAND FACTORY'}},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'FACTORY LAND' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -257,7 +257,7 @@ BuilderGroup {
     # =============================
     #     Land Factory Builders
     # =============================
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Land Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 905,
@@ -267,7 +267,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
             #{ UCBC, 'FactoryRatioLessAtLocation', { 'LocationType', 'LAND', 'AIR' } },
         },
         BuilderType = 'Any',
@@ -290,7 +290,7 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
             #{ UCBC, 'FactoryRatioLessAtLocation', { 'LocationType', 'LAND', 'AIR' } },
         },
         BuilderType = 'Any',
@@ -303,11 +303,11 @@ BuilderGroup {
             }
         }
     },
-    
+
     # ============================
     #     Air Factory Builders
     # ============================
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Air Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 906,
@@ -318,7 +318,7 @@ BuilderGroup {
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
             { UCBC, 'FactoryRatioLessAtLocation', { 'LocationType', 'AIR', 'LAND' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -342,7 +342,7 @@ BuilderGroup {
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
             { UCBC, 'FactoryRatioLessAtLocation', { 'LocationType', 'AIR', 'LAND' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -359,7 +359,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerFactoryConstruction Air',
     BuildersType = 'EngineerBuilder',
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Air Factory Builder - Air',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 900,
@@ -369,7 +369,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -392,7 +392,7 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -412,7 +412,7 @@ BuilderGroup {
     # =============================
     #     Land Factory Builders
     # =============================
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Land Factory Builder',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 900,
@@ -422,7 +422,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -444,7 +444,7 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -456,7 +456,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Land Factory Builder - Dead ACU',
         PlatoonTemplate = 'AnyEngineerBuilderSorian',
         Priority = 900,
@@ -466,8 +466,8 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
-			{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'COMMAND', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'LAND FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'COMMAND', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -480,11 +480,11 @@ BuilderGroup {
             }
         },
     },
-    
+
     # ============================
     #     Air Factory Builders
     # ============================
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Air Factory Builder',
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 900,
@@ -494,7 +494,7 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -516,7 +516,7 @@ BuilderGroup {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -528,7 +528,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {        
+    Builder {
         BuilderName = 'Sorian T1 Air Factory Builder - Dead ACU',
         PlatoonTemplate = 'AnyEngineerBuilderSorian',
         Priority = 900,
@@ -538,8 +538,8 @@ BuilderGroup {
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 1.0, 1.1} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
-			{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'COMMAND', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'COMMAND', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -569,7 +569,7 @@ BuilderGroup {
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'AIR FACTORY', 'LocationType', }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -592,9 +592,9 @@ BuilderGroup {
         Priority = 950, #850,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH3' }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSPRODUCTION TECH3' }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSPRODUCTION TECH3' }},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'GATE TECH3 STRUCTURE' }},
-			{ SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Gate' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'UnitCapCheckLess', { .85 } },

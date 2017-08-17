@@ -288,11 +288,11 @@ BuildingTemplates =
 
         # UEF FA Specific
         {
-            'T2EngineerSupport', 
+            'T2EngineerSupport',
             'xeb0104',
         },
         {
-            'T3GroundDefense', 
+            'T3GroundDefense',
             'xeb2306',
         },
     },
@@ -572,7 +572,7 @@ BuildingTemplates =
             'T4EconExperimental',
             'xab1401',
         },
-        
+
         # FA Aeon specific
         {
             'T3Optics',
@@ -845,7 +845,7 @@ BuildingTemplates =
         {
             'T4LandExperimental3',
             'xrl0403',
-        },        
+        },
         {
             'T4AirExperimental1',
             'ura0401',
@@ -854,18 +854,18 @@ BuildingTemplates =
             'T4SeaExperimental1',
             'urb0101',
         },
-        
+
         # Cybran FA Specific
         {
             'T3Optics',
             'xrb3301',
         },
         {
-            'T2EngineerSupport', 
+            'T2EngineerSupport',
             'xrb0104',
         },
         {
-            'T3NavalDefense', 
+            'T3NavalDefense',
             'xrb2308',
         },
     },

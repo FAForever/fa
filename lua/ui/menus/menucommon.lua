@@ -42,7 +42,7 @@ local function CreateBackground(parent, fileSpec, lBorderOverload, rBorderOverlo
     local lborder = Bitmap(background, UIUtil.SkinnableFile(lBorderOverload or '/menus02/borde02b-l_bmp.dds'))
     LayoutHelpers.AtBottomIn(lborder, parent)
     LayoutHelpers.AtLeftIn(lborder, parent)
-    
+
     local rborder = Bitmap(background, UIUtil.SkinnableFile(rBorderOverload or '/menus/border02-r_bmp.dds'))
     LayoutHelpers.AtTopIn(rborder, parent)
     LayoutHelpers.AtRightIn(rborder, parent)
@@ -50,9 +50,9 @@ end
 
 function SetupBackground(parent, lBorderOverload, rBorderOverload)
     DestroyBackground()
-    
-    if not curBackground then 
-        curBackground = math.random(table.getn(backgroundFiles))    
+
+    if not curBackground then
+        curBackground = math.random(table.getn(backgroundFiles))
     end
 
     CreateBackground(parent, backgroundFiles[curBackground], lBorderOverload, rBorderOverload)
@@ -110,7 +110,7 @@ function CreateProfileButton(parent, exitBehavior, enterBehavior)
             end
          end
     end
-    
+
     profileButton.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             Tooltip.CreateMouseoverDisplay(self, "profile", 5, true)
@@ -125,16 +125,16 @@ function CreateProfileButton(parent, exitBehavior, enterBehavior)
     SetNameToCurrentProfile()
 
     profileButton.OnClick = function(self)
-       	if enterBehavior then
-    		enterBehavior()
-		end    
+        if enterBehavior then
+            enterBehavior()
+        end
         if not profileDlg then
             profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-               	SetNameToCurrentProfile()
-               	profileDlg = nil
-               	if exitBehavior then
-               	    exitBehavior()
-               	end
+                SetNameToCurrentProfile()
+                profileDlg = nil
+                if exitBehavior then
+                    exitBehavior()
+                end
             end)
         end
     end

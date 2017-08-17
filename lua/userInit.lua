@@ -13,8 +13,17 @@ for index, language in __installedlanguages do
     __installedlanguages[index] = {text = language, key = language}
 end
 
+
 -- Do global init
 doscript '/lua/globalInit.lua'
+
+-- Do we have an custom language set inside user-options ?
+local selectedlanguage = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').selectedlanguage
+if selectedlanguage ~= nil then
+    __language = selectedlanguage
+    SetPreference('options_overrides.language', __language)
+    doscript '/lua/system/Localization.lua'
+end
 
 local AvgFPS = 10
 WaitFrames = coroutine.yield

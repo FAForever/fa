@@ -40,13 +40,8 @@ local needsSquadLayoutPostNIS = false
 local preCreationQueue = {}
 local preCreationWaitThread = false
 
-controls = {
-    parent = false,
-    bg = false,
-    objItems = {},
-    tooltip = false,
-    movie = false,
-}
+controls = import('/lua/ui/controls.lua').Get()
+controls.objItems = controls.objItems or {}
 
 function CreateUI(inParent)
     controls.parent = inParent
@@ -201,6 +196,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
     for _, update in updateTable do
         if objectives[update.tag] and objectives[update.tag][update.updateField] then
             if update.updateField == 'complete' and not onLoad then
+                objectives[update.tag].EndTime = GetGameTimeSeconds()
                 needsLayoutUpdate = true
             end
             objectives[update.tag][update.updateField] = update.updateData
@@ -210,6 +206,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
                     if not controls.objItems[update.tag].ImageLocked and update.updateData.BlueprintId and DiskGetFileInfo('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds') then
                         if not onLoad then
                             controls.objItems[update.tag].icon:SetTexture('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds')
+                            objectives[update.tag].actionImage = '/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds'
                             controls.objItems[update.tag].ImageLocked = true
                         end
                     end
@@ -245,6 +242,9 @@ function UpdateObjectiveItems(skipAnnounce)
         elseif data.type == 'secondary' then
             group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/secondary-ring_bmp.dds'))
             group.secondary = true
+        elseif data.type == 'bonus' then
+            group.bgRing = Bitmap(group.bg, UIUtil.UIFile('/game/objective-icons/bonus-ring_bmp.dds'))
+            group.bonus = true
         end
         if group.bgRing then
             LayoutHelpers.AtCenterIn(group.bgRing, group.bg, -6)
@@ -288,7 +288,7 @@ function UpdateObjectiveItems(skipAnnounce)
         group.icon.Height:Set(40)
         group.icon.Width:Set(40)
         group.icon:DisableHitTest()
-        
+
         group.icon.flash = Bitmap(group.icon, UIUtil.UIFile('/game/units_bmp/glow.dds'))
         group.icon.flash:SetAlpha(0)
         LayoutHelpers.AtCenterIn(group.icon.flash, group.icon)
@@ -311,7 +311,7 @@ function UpdateObjectiveItems(skipAnnounce)
             end
             self:SetAlpha(newAlpha)
         end
-        
+
         group.Height:Set(group.bg.Height)
         group.Width:Set(group.bg.Width)
         group.data = data
@@ -321,13 +321,13 @@ function UpdateObjectiveItems(skipAnnounce)
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Diplomacy_Open'}))
             elseif event.Type == 'MouseExit' then
                 DestroyTooltip()
-            elseif event.Type == 'ButtonPress' then 
+            elseif event.Type == 'ButtonPress' then
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
                 local targets = self.data.targets
                 local positions = self.data.unitPositions
                 if targets and table.getsize(targets) > 0 then
                     local max = table.getn(targets)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getn(targets )) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getn(targets)) + 1
 
                     for idx,target in targets do
                         if idx == desiredTarget then
@@ -336,16 +336,16 @@ function UpdateObjectiveItems(skipAnnounce)
                                                   target.Value[3] - 20,
                                                   target.Value[1] + 20,
                                                   target.Value[3] + 20)
-                                GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             elseif target.Type == 'Area' then
-                                GetCamera("WorldCamera"):MoveToRegion( target.Value, 1.0 )
+                                GetCamera("WorldCamera"):MoveToRegion(target.Value, 1.0)
                             end
                             self.TargetFocus = idx
                         end
                     end
                 elseif positions and table.getsize(positions) > 0 then
                     local max = table.getsize(positions)
-                    local desiredTarget = math.mod( self.TargetFocus or 0, table.getsize(positions)) + 1
+                    local desiredTarget = math.mod(self.TargetFocus or 0, table.getsize(positions)) + 1
 
                     for idx,target in positions do
                         if idx >= desiredTarget then
@@ -353,7 +353,7 @@ function UpdateObjectiveItems(skipAnnounce)
                                               target[3] - 20,
                                               target[1] + 20,
                                               target[3] + 20)
-                            GetCamera("WorldCamera"):MoveToRegion( rect, 1.0 )
+                            GetCamera("WorldCamera"):MoveToRegion(rect, 1.0)
                             self.TargetFocus = idx
                         end
                     end
@@ -385,42 +385,50 @@ function UpdateObjectiveItems(skipAnnounce)
         return group
     end
     for tag, objData in objectives do
-        if objData.complete == 'complete' or objData.complete == 'failed' then
-            if controls.objItems[tag] and not skipAnnounce and not objData.announced then
-                local objTag = tag
-                objData.announced = true
-                local announceStr = '<LOC objectives_0000>Objective Completed'
-                if objData.complete == 'failed' then
-                    announceStr = '<LOC objectives_0001>Objective Failed'
+        if objData.hidden then
+            if objData.complete == 'complete' then
+                if not skipAnnounce and not objData.announced then
+                    objData.announced = true
+                    Announcement(LOC('<LOC objectives_0000>Objective Completed'), controls.bg, LOC(objData.title))
                 end
-                Announcement(LOC(announceStr), controls.objItems[objTag], LOC(controls.objItems[objTag].data.title),
-                    function()
-                        if controls.objItems[objTag] then
-                            --LOG('destroying objective chicklet thing')
-                            controls.objItems[objTag]:Destroy()
-                            controls.objItems[objTag] = false
-                            if controls.tooltip and controls.tooltip.ID == objTag then
-                                DestroyTooltip()
-                            end
-                            LayoutObjectiveItems()
-                        end
-                    end)
-            else
-                if controls.objItems[tag] then
-                    controls.objItems[tag]:Destroy()
-                    controls.objItems[tag] = false
-                end
-            end
-            continue
-        end
-        if not controls.objItems[tag] then
-            controls.objItems[tag] = CreateObjectiveItem(objData)
-            if not skipAnnounce then
-                Announcement(LOC('<LOC objectives_0002>Objective Added'), controls.objItems[tag])
-                controls.objItems[tag]:Flash(true)
             end
         else
-            controls.objItems[tag]:Update(objData)
+            if objData.complete == 'complete' or objData.complete == 'failed' then
+                if controls.objItems[tag] and not skipAnnounce and not objData.announced then
+                    local objTag = tag
+                    objData.announced = true
+                    local announceStr = '<LOC objectives_0000>Objective Completed'
+                    if objData.complete == 'failed' then
+                        announceStr = '<LOC objectives_0001>Objective Failed'
+                    end
+                    Announcement(LOC(announceStr), controls.objItems[objTag], LOC(controls.objItems[objTag].data.title),
+                        function()
+                            if controls.objItems[objTag] then
+                                controls.objItems[objTag]:Destroy()
+                                controls.objItems[objTag] = false
+                                if controls.tooltip and controls.tooltip.ID == objTag then
+                                    DestroyTooltip()
+                                end
+                                LayoutObjectiveItems()
+                            end
+                        end)
+                else
+                    if controls.objItems[tag] then
+                        controls.objItems[tag]:Destroy()
+                        controls.objItems[tag] = false
+                    end
+                end
+                continue
+            end
+            if not controls.objItems[tag] then
+                controls.objItems[tag] = CreateObjectiveItem(objData)
+                if not skipAnnounce then
+                    Announcement(LOC('<LOC objectives_0002>Objective Added'), controls.objItems[tag])
+                    controls.objItems[tag]:Flash(true)
+                end
+            else
+                controls.objItems[tag]:Update(objData)
+            end
         end
     end
     LayoutObjectiveItems()
@@ -432,6 +440,11 @@ function LayoutObjectiveItems()
         return
     end
     local sortedControls = {}
+    for _, item in controls.objItems do
+        if item.bonus then
+            table.insert(sortedControls, item)
+        end
+    end
     for _, item in controls.objItems do
         if item.secondary then
             table.insert(sortedControls, item)
@@ -469,7 +482,7 @@ function CreateTooltip(parentControl, objData, container)
         end
         controls.tooltip:Show()
     else
-        controls.tooltip = Bitmap(GetFrame(0), UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
+        controls.tooltip = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
         controls.tooltip.Depth:Set(GetFrame(0):GetTopmostDepth()+1)
 
         controls.tooltip.text = {}
@@ -483,50 +496,50 @@ function CreateTooltip(parentControl, objData, container)
         controls.tooltip.text.desc = {}
         controls.tooltip.text.desc[1] = UIUtil.CreateText(controls.tooltip, '', 12, UIUtil.bodyFont)
 
-        controls.tooltip.bgTL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
+        controls.tooltip.bgTL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
         controls.tooltip.bgTL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgTL.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgTL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgTR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
+        controls.tooltip.bgTR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
         controls.tooltip.bgTR.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgTR.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgTR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.bgLL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
+        controls.tooltip.bgLL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
         controls.tooltip.bgLL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgLL.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgLL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgLR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
+        controls.tooltip.bgLR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
         controls.tooltip.bgLR.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgLR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.bgT = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
+        controls.tooltip.bgT = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
         controls.tooltip.bgT.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgT.Bottom:Set(controls.tooltip.Top)
         controls.tooltip.bgT.Right:Set(controls.tooltip.Right)
         controls.tooltip.bgT.Left:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgB = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
+        controls.tooltip.bgB = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
         controls.tooltip.bgB.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgB.Top:Set(controls.tooltip.Bottom)
         controls.tooltip.bgB.Right:Set(controls.tooltip.Right)
         controls.tooltip.bgB.Left:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgL = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
+        controls.tooltip.bgL = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
         controls.tooltip.bgL.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgL.Top:Set(controls.tooltip.Top)
         controls.tooltip.bgL.Bottom:Set(controls.tooltip.Bottom)
         controls.tooltip.bgL.Right:Set(controls.tooltip.Left)
 
-        controls.tooltip.bgR = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
+        controls.tooltip.bgR = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
         controls.tooltip.bgR.Depth:Set(controls.tooltip.Depth)
         controls.tooltip.bgR.Top:Set(controls.tooltip.Top)
         controls.tooltip.bgR.Bottom:Set(controls.tooltip.Bottom)
         controls.tooltip.bgR.Left:Set(controls.tooltip.Right)
 
-        controls.tooltip.connector = Bitmap(controls.tooltip, UIUtil.UIFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
+        controls.tooltip.connector = Bitmap(controls.tooltip, UIUtil.SkinnableFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
         controls.tooltip.connector.Depth:Set(controls.tooltip.Depth)
     end
 
@@ -537,6 +550,8 @@ function CreateTooltip(parentControl, objData, container)
             controls.tooltip.text.title:SetColor('ffff0000')
         elseif parentControl.secondary then
             controls.tooltip.text.title:SetColor('fffff700')
+        elseif parentControl.bonus then
+            controls.tooltip.text.title:SetColor('ffba00ff')
         else
             controls.tooltip.text.title:SetColor('ff00f7ff')
         end
@@ -803,7 +818,7 @@ function Contract()
     if not controls.bg then
         return
     end
-    if controls.tooltip then    
+    if controls.tooltip then
         DestroyTooltip()
     end
     preContractState = controls.bg:IsHidden()

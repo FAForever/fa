@@ -14,54 +14,54 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-		'EngineerFactoryConstructionAirHigherPriority',
-        
+        'EngineerFactoryConstructionAirHigherPriority',
+
         # Engineer Support buildings
         'EngineeringSupportBuilder',
-        
+
         # Build energy at this base
         'EngineerEnergyBuilders',
-        
+
         # Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
-        
+
         # Extractors
         'Time Exempt Extractor Upgrades',
-        
+
         # ACU Builders
         'Default Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
-		'ACUUpgrades - Tech 2 Engineering',
-		'ACUUpgrades - Shields',
-        
+        'ACUUpgrades - Tech 2 Engineering',
+        'ACUUpgrades - Shields',
+
         # ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
-        
+
         # ==== EXPANSION ==== #
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-		'EngineerFirebaseBuilders',
-        
+        'EngineerFirebaseBuilders',
+
         # ==== DEFENSES ==== #
         'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
-		
+
         'T2MissileDefenses',
-		'T2ArtilleryFormBuilders',
-        
+        'T2ArtilleryFormBuilders',
+
         'T1DefensivePoints',
         'T2DefensivePoints',
         'T3DefensivePoints',
@@ -69,31 +69,31 @@ BaseBuilderTemplate {
         'T1PerimeterDefenses',
         'T2PerimeterDefenses',
         'T3PerimeterDefenses',
-        
+
         'T1DefensivePoints High Pri',
         'T2DefensivePoints High Pri',
         'T3DefensivePoints High Pri',
-        
+
         'T2Shields',
         'ShieldUpgrades',
         'T3Shields',
-        
+
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
-        
+
         'MiscDefensesEngineerBuilders',
-        
+
         # ==== NAVAL EXPANSION ==== #
         'NavalExpansionBuilders',
-        
+
         # ==== LAND UNIT BUILDERS ==== #
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
         'BigLandAttackFormBuilders',
         'MassHunterLandFormBuilders',
-        'MiscLandFormBuilders', 
-        
+        'MiscLandFormBuilders',
+
         'T1LandAA',
         'T2LandAA',
 
@@ -107,53 +107,53 @@ BaseBuilderTemplate {
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-        
+
         'TransportFactoryBuilders',
-        
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
-        
+
         # ==== UNIT CAP BUILDERS ==== #
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-		
-		# ==== ARTILLERY BUILDERS ==== #
+
+        # ==== ARTILLERY BUILDERS ==== #
         'T3ArtilleryGroup',
-		'T3ArtilleryFormBuilders',
-        
+        'T3ArtilleryFormBuilders',
+
         'ExperimentalArtillery',
-		
-		'NukeBuildersEngineerBuilders',
+
+        'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
         # ==== EXPERIMENTALS ==== #
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
-        
+
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
-		
-		'SatelliteExperimentalEngineers',
-		'SatelliteExperimentalForm',
-		
-		'EconomicExperimentalEngineers',
+
+        'SatelliteExperimentalEngineers',
+        'SatelliteExperimentalForm',
+
+        'EconomicExperimentalEngineers',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
         'AirScoutFormBuilders',
-        
+
         'LandScoutFactoryBuilders',
         'LandScoutFormBuilders',
-        
+
         'RadarEngineerBuilders',
         'RadarUpgradeBuildersMain',
-        
+
         'CounterIntelBuilders',
-        
+
         'AeonOpticsEngineerBuilders',
         'CybranOpticsEngineerBuilders',
     },
@@ -165,7 +165,7 @@ BaseBuilderTemplate {
             SCU = 3,
         },
         FactoryCount = {
-			#DUNCAN - was 3,1,0,1
+            #DUNCAN - was 3,1,0,1
             Land = 7,
             Air = 4,
             Sea = 0,

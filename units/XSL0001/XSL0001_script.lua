@@ -43,7 +43,7 @@ XSL0001 = Class(ACUUnit) {
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction( categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -53,8 +53,8 @@ XSL0001 = Class(ACUUnit) {
         self.ShieldEffectsBag = {}
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     GetUnitsToBuff = function(self, bp)
@@ -118,7 +118,7 @@ XSL0001 = Class(ACUUnit) {
                     buff_bp.Affects.MaxHealth = {
                         Add = 0,
                         Mult = bp.MaxHealthFactor,
-                        DoNoFill = true,
+                        DoNotFill = true,
                     }
                 end
 
@@ -207,8 +207,8 @@ XSL0001 = Class(ACUUnit) {
                     },
                 }
             end
-            if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
+            if Buff.HasBuff(self, 'SeraphimACUDamageStabilization') then
+                Buff.RemoveBuff(self, 'SeraphimACUDamageStabilization')
             end
             Buff.ApplyBuff(self, 'SeraphimACUDamageStabilization')
           elseif enh == 'DamageStabilizationAdvanced' then
@@ -231,21 +231,21 @@ XSL0001 = Class(ACUUnit) {
                     },
                 }
             end
-            if Buff.HasBuff( self, 'SeraphimACUDamageStabilizationAdv' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUDamageStabilizationAdv' )
+            if Buff.HasBuff(self, 'SeraphimACUDamageStabilizationAdv') then
+                Buff.RemoveBuff(self, 'SeraphimACUDamageStabilizationAdv')
             end
             Buff.ApplyBuff(self, 'SeraphimACUDamageStabilizationAdv')
         elseif enh == 'DamageStabilizationAdvancedRemove' then
             -- since there's no way to just remove an upgrade anymore, if we're remove adv, were removing both
-            if Buff.HasBuff( self, 'SeraphimACUDamageStabilizationAdv' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUDamageStabilizationAdv' )
+            if Buff.HasBuff(self, 'SeraphimACUDamageStabilizationAdv') then
+                Buff.RemoveBuff(self, 'SeraphimACUDamageStabilizationAdv')
             end
-            if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
+            if Buff.HasBuff(self, 'SeraphimACUDamageStabilization') then
+                Buff.RemoveBuff(self, 'SeraphimACUDamageStabilization')
             end
         elseif enh == 'DamageStabilizationRemove' then
-            if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
+            if Buff.HasBuff(self, 'SeraphimACUDamageStabilization') then
+                Buff.RemoveBuff(self, 'SeraphimACUDamageStabilization')
             end
         --Teleporter
         elseif enh == 'Teleporter' then
@@ -298,9 +298,9 @@ XSL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction( categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-            if Buff.HasBuff( self, 'SeraphimACUT2BuildRate' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUT2BuildRate' )
+            self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            if Buff.HasBuff(self, 'SeraphimACUT2BuildRate') then
+                Buff.RemoveBuff(self, 'SeraphimACUT2BuildRate')
          end
         -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
         self:updateBuildRestrictions()
@@ -341,10 +341,10 @@ XSL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            if Buff.HasBuff( self, 'SeraphimACUT3BuildRate' ) then
-                Buff.RemoveBuff( self, 'SeraphimACUT3BuildRate' )
+            if Buff.HasBuff(self, 'SeraphimACUT3BuildRate') then
+                Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
             end
-            self:AddBuildRestriction( categories.SERAPHIM * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+            self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
         self:updateBuildRestrictions()
         --Blast Attack

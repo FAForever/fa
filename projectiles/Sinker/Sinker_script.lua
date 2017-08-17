@@ -34,7 +34,15 @@ Sinker = Class(Projectile) {
     end,
 
     StartSinking = function(self, targetEntity, targetBone)
-        Warp(self, targetEntity:CalculateWorldPositionFromRelative({0, 0, 0}) , targetEntity:GetOrientation() )
+        local pos = targetEntity:GetPosition(targetBone)
+        local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        if pos[2] <= seafloor then
+            self:Destroy()
+            ForkThread(self.callback)
+            return
+        end
+
+        Warp(self, pos, targetEntity:GetOrientation())
         targetEntity:AttachBoneTo(targetBone, self, 'anchor')
 
         if not targetEntity:BeenDestroyed() then

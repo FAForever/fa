@@ -47,7 +47,7 @@ function CreateProfile(name)
     if primaryAdapter == 'overridden' then
         primaryAdapter = '1024,768,60'
     end
-    
+
     if secondaryAdapter == 'overridden' then
         secondaryAdapter = 'disabled'
     end
@@ -58,7 +58,7 @@ function CreateProfile(name)
     else
         return false
     end
-        
+
     SetPreference("profile.profiles", profiles)
 
     -- set default video options in to new profile, but don't actually cause any functions to get set
@@ -104,7 +104,7 @@ end
 -- read from the current options set, find and return default if not available
 function GetOption(optionKey)
     local ret = GetOptions(optionKey)
-    
+
     if ret == nil then
         for section, secInfo in optionsLogic.GetOptionsData() do
             for index, item in secInfo.items do
@@ -115,19 +115,19 @@ function GetOption(optionKey)
             end
         end
     end
-    
+
     return ret
 end
 
 function SetOption(optionKey, newValue)
-    local tempOptionTable = optionsLogic.GetCurrent() 
-    
+    local tempOptionTable = optionsLogic.GetCurrent()
+
     for i, v in tempOptionTable do
         if i == optionKey then
             tempOptionTable[i] = newValue
             break
         end
     end
-    
+
     optionsLogic.SetCurrent(tempOptionTable)
 end

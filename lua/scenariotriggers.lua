@@ -1,17 +1,13 @@
---****************************************************************************
---**
---**  File     :  /data/lua/scenariotriggers.lua
---**
---**  Author(s):  John Comes
---**
---**  Summary  :  Generalized trigger functions for scenarios.
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------
+--  File     :  /data/lua/scenariotriggers.lua
+--  Author(s):  John Comes
+--  Summary  :  Generalized trigger functions for scenarios.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
+
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 function CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
-    --LOG('*SCENARIO DEBUG: FORKING AREA TRIGGER THREAD')
     return ForkThread(AreaTriggerThread, callbackFunction, {rectangle}, category, onceOnly, invert, aiBrain, number, requireBuilt)
 end
 
@@ -21,18 +17,19 @@ end
 
 function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly, invert, aiBrain, number, requireBuilt, name)
     local recTable = {}
-    for k,v in rectangleTable do
+    for _, v in rectangleTable do
         if type(v) == 'string' then
-            table.insert(recTable,ScenarioUtils.AreaToRect(v))
+            table.insert(recTable, ScenarioUtils.AreaToRect(v))
         else
             table.insert(recTable, v)
         end
     end
+
     while true do
         local amount = 0
         local totalEntities = {}
-        for k, v in recTable do
-            local entities = GetUnitsInRect( v )
+        for _, v in recTable do
+            local entities = GetUnitsInRect(v)
             if entities then
                 for ke, ve in entities do
                     totalEntities[table.getn(totalEntities) + 1] = ve
@@ -43,17 +40,17 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
         local triggeringEntity
         local numEntities = table.getn(totalEntities)
         if numEntities > 0 then
-            for k, v in totalEntities do
+            for _, v in totalEntities do
                 local contains = EntityCategoryContains(category, v)
                 if contains and (aiBrain and v:GetAIBrain() == aiBrain) and (not requireBuilt or (requireBuilt and not v:IsBeingBuilt())) then
                     amount = amount + 1
-                    --If we want to trigger as soon as one of a type is in there, kick out immediately.
+                    -- If we want to trigger as soon as one of a type is in there, kick out immediately.
                     if not number then
                         triggeringEntity = v
                         triggered = true
                         break
-                    --If we want to trigger on an amount, then add the entity into the triggeringEntity table
-                    --so we can pass that table back to the callback function.
+                    -- If we want to trigger on an amount, then add the entity into the triggeringEntity table
+                    -- so we can pass that table back to the callback function.
                     else
                         if not triggeringEntity then
                             triggeringEntity = {}
@@ -63,15 +60,15 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
                 end
             end
         end
-        --Check to see if we have a triggering amount inside in the area.
+        -- Check to see if we have a triggering amount inside in the area.
         if number and ((amount >= number and not invert) or (amount < number and invert)) then
             triggered = true
         end
-        --TRIGGER IF:
-        --You don't want a specific amount and the correct unit category entered
-        --You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
-        --You want a specific amount and we have enough.
-        if ( triggered and not invert and not number) or (not triggered and invert and not number) or (triggered and number) then
+        -- TRIGGER IF:
+        -- You don't want a specific amount and the correct unit category entered
+        -- You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
+        -- You want a specific amount and we have enough.
+        if (triggered and not invert and not number) or (not triggered and invert and not number) or (triggered and number) then
             if name then
                 callbackFunction(TriggerManager, name, triggeringEntity)
             else
@@ -85,14 +82,12 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
     end
 end
 
-
-
 function CreateThreatTriggerAroundUnit(callbackFunction, aiBrain, unit, rings, onceOnly, value, greater)
     return ForkThread(ThreatTriggerAroundUnitThread, callbackFunction, aiBrain, unit, rings, onceOnly, value, greater)
 end
 
 function ThreatTriggerAroundUnitThread(callbackFunction, aiBrain, unit, rings, onceOnly, value, greater, name)
-    while not unit:IsDead() do
+    while not unit.Dead do
         local threat = aiBrain:GetThreatAtPosition(unit:GetPosition(), rings, true)
         if greater and threat >= value then
             if name then
@@ -116,7 +111,6 @@ function ThreatTriggerAroundUnitThread(callbackFunction, aiBrain, unit, rings, o
         WaitSeconds(0.5)
     end
 end
-
 
 function CreateThreatTriggerAroundPosition(callbackFunction, aiBrain, posVector, rings, onceOnly, value, greater)
     return ForkThread(ThreatTriggerAroundPositionThread, callbackFunction, aiBrain, posVector, rings, onceOnly, value, greater)
@@ -151,21 +145,18 @@ function ThreatTriggerAroundPositionThread(callbackFunction, aiBrain, posVector,
     end
 end
 
-
-
 function CreateTimerTrigger(callbackFunction, seconds, name, displayBool, onTickFunc)
     return ForkThread(TimerTriggerThread, callbackFunction, seconds, name, displayBool, onTickFunc)
 end
 
 function TimerTriggerThread(callbackFunction, seconds, name, displayBool, onTickFunc)
     if displayBool then
-    
         local ticking = true
         local targetTime = math.floor(GetGameTimeSeconds()) + seconds
-        
+
         while ticking do
             onTickFunc(targetTime - math.floor(GetGameTimeSeconds()))
-                
+
             if targetTime - math.floor(GetGameTimeSeconds()) < 0 then
                 ticking = false
             end
@@ -175,14 +166,13 @@ function TimerTriggerThread(callbackFunction, seconds, name, displayBool, onTick
     else
         WaitSeconds(seconds)
     end
+
     if name then
         callbackFunction(TriggerManager, name)
     else
         callbackFunction()
     end
 end
-
-
 
 function CreateGroupDeathTrigger(callbackFunction, group)
     return ForkThread(GroupDeathTriggerThread, callbackFunction, group)
@@ -192,8 +182,8 @@ function GroupDeathTriggerThread(callbackFunction, group, name)
     local allDead = false
     while not allDead do
         allDead = true
-        for k, v in group do
-            if not v:IsDead() then
+        for _, v in group do
+            if not v.Dead then
                 allDead = false
                 break
             end
@@ -215,13 +205,13 @@ end
 
 function SubGroupDeathTriggerThread(callbackFunction, group, num, name)
     local numDead = 0
-    while(numDead < num) do
+    while numDead < num do
         numDead = 0
-        for k, v in group do
-            if(v:IsDead()) then
+        for _, v in group do
+            if v.Dead then
                 numDead = numDead + 1
             end
-            if(numDead == num) then
+            if numDead == num then
                 if name then
                     callbackFunction(TriggerManager, name)
                 else
@@ -282,32 +272,32 @@ function CreateArmyUnitCategoryVeterancyTrigger(callbackFunction, aiBrain, categ
     aiBrain:SetupBrainVeterancyTrigger(spec)
 end
 
-function CreateUnitDistanceTrigger( callbackFunction, unitOne, unitTwo, distance )
-    ForkThread( UnitDistanceTriggerThread, callbackFunction, unitOne, unitTwo, distance )
+function CreateUnitDistanceTrigger(callbackFunction, unitOne, unitTwo, distance)
+    ForkThread(UnitDistanceTriggerThread, callbackFunction, unitOne, unitTwo, distance)
 end
 
-function UnitDistanceTriggerThread( callbackFunction, unitOne, unitTwo, distance )
-    while not ( VDist3( unitOne:GetPosition(), unitTwo:GetPosition() ) < distance  ) do
+function UnitDistanceTriggerThread(callbackFunction, unitOne, unitTwo, distance)
+    while not (VDist3(unitOne:GetPosition(), unitTwo:GetPosition()) < distance) do
         WaitSeconds(0.5)
     end
     callbackFunction()
 end
 
-function CreateUnitToPositionDistanceTrigger( callbackFunction, unit, marker, distance )
+function CreateUnitToPositionDistanceTrigger(callbackFunction, unit, marker, distance)
     ForkThread(UnitToPositionDistanceTriggerThread, callbackFunction, unit, marker, distance)
 end
 
-function UnitToPositionDistanceTriggerThread( cb, unit, marker, distance, name )
+function UnitToPositionDistanceTriggerThread(cb, unit, marker, distance, name)
     if type(marker) == 'string' then
         marker = ScenarioUtils.MarkerToPosition(marker)
     end
     local fired = false
     while not fired do
-        if unit:IsDead() then
+        if unit.Dead then
             return
         else
             local position = unit:GetPosition()
-            local value = VDist2( position[1], position[3], marker[1], marker[3])
+            local value = VDist2(position[1], position[3], marker[1], marker[3])
             if value <= distance then
                 fired = true
                 if name then
@@ -323,19 +313,19 @@ function UnitToPositionDistanceTriggerThread( cb, unit, marker, distance, name )
     end
 end
 
-function CreateUnitNearTypeTrigger( callbackFunction, unit, brain, category, distance )
-    return ForkThread( CreateUnitNearTypeTriggerThread, callbackFunction, unit, brain, category, distance )
+function CreateUnitNearTypeTrigger(callbackFunction, unit, brain, category, distance)
+    return ForkThread(CreateUnitNearTypeTriggerThread, callbackFunction, unit, brain, category, distance)
 end
 
-function CreateUnitNearTypeTriggerThread( callbackFunction, unit, brain, category, distance, name )
+function CreateUnitNearTypeTriggerThread(callbackFunction, unit, brain, category, distance, name)
     local fired = false
     while not fired do
-        if unit:IsDead() then
+        if unit.Dead then
             return
         else
             local position = unit:GetPosition()
-            for k,catUnit in brain:GetListOfUnits(category, false) do
-                if (VDist3( position, catUnit:GetPosition() ) < distance) and not catUnit:IsBeingBuilt() then
+            for k, catUnit in brain:GetListOfUnits(category, false) do
+                if VDist3(position, catUnit:GetPosition()) < distance and not catUnit:IsBeingBuilt() then
                     fired = true
                     if name then
                         callbackFunction(TriggerManager, name, unit, catUnit)
@@ -351,9 +341,7 @@ function CreateUnitNearTypeTriggerThread( callbackFunction, unit, brain, categor
     end
 end
 
--- =============
 -- Unit Triggers
--- =============
 function CreateStartBuildTrigger(callbackFunction, unit, category)
     unit:AddOnStartBuildCallback(callbackFunction, category)
 end
@@ -366,7 +354,7 @@ function CreateUnitBuiltTrigger(callbackFunction, unit, category)
     unit:AddOnUnitBuiltCallback(callbackFunction, category)
 end
 
-function CreateUnitDamagedTrigger( callbackFunction, unit, amount, repeatNum )
+function CreateUnitDamagedTrigger(callbackFunction, unit, amount, repeatNum)
     unit:AddOnDamagedCallback(callbackFunction, amount, repeatNum)
 end
 
@@ -377,7 +365,7 @@ end
 function CreateUnitDestroyedTrigger(callbackFunction, unit)
     unit:AddUnitCallback(callbackFunction, 'OnReclaimed')
     unit:AddUnitCallback(callbackFunction, 'OnCaptured')
-    unit:AddUnitCallback(callbackFunction,'OnKilled')
+    unit:AddUnitCallback(callbackFunction, 'OnKilled')
 end
 
 function CreateUnitPercentageBuiltTrigger(callbackFunction, aiBrain, category, percent)
@@ -392,57 +380,57 @@ function RemoveUnitTrigger(unit, callbackFunction)
     unit:RemoveCallback(callbackFunction)
 end
 
-function CreateUnitReclaimedTrigger( cb, unit )
-   unit:AddUnitCallback( cb, 'OnReclaimed' )
+function CreateUnitReclaimedTrigger(cb, unit)
+   unit:AddUnitCallback(cb, 'OnReclaimed')
 end
 
-function CreateUnitStartReclaimTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStartReclaim' ) 
+function CreateUnitStartReclaimTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStartReclaim')
 end
 
-function CreateUnitStopReclaimTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStopReclaim' ) 
+function CreateUnitStopReclaimTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStopReclaim')
 end
 
-function CreateUnitCapturedTrigger( cbOldUnit, cbNewUnit, unit )
+function CreateUnitCapturedTrigger(cbOldUnit, cbNewUnit, unit)
     if cbOldUnit then
-        unit:AddUnitCallback( cbOldUnit, 'OnCaptured' )
+        unit:AddUnitCallback(cbOldUnit, 'OnCaptured')
     end
     if cbNewUnit then
-        unit:AddUnitCallback( cbNewUnit, 'OnCapturedNewUnit' )
+        unit:AddUnitCallback(cbNewUnit, 'OnCapturedNewUnit')
     end
 end
 
-function CreateUnitStartCaptureTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStartCapture' ) 
+function CreateUnitStartCaptureTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStartCapture')
 end
 
-function CreateUnitStopCaptureTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStopCapture' )
+function CreateUnitStopCaptureTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStopCapture')
 end
 
-function CreateUnitStartBeingCapturedTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStartBeingCaptured' )
+function CreateUnitStartBeingCapturedTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStartBeingCaptured')
 end
 
-function CreateUnitStopBeingCapturedTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStopBeingCaptured' )
+function CreateUnitStopBeingCapturedTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStopBeingCaptured')
 end
 
-function CreateUnitFailedBeingCapturedTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnFailedBeingCaptured' )
+function CreateUnitFailedBeingCapturedTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnFailedBeingCaptured')
 end
 
-function CreateUnitFailedCaptureTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnFailedCapture' )
+function CreateUnitFailedCaptureTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnFailedCapture')
 end
 
-function CreateUnitStopBeingBuiltTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnStopBeingBuilt' )
+function CreateUnitStopBeingBuiltTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnStopBeingBuilt')
 end
 
-function CreateUnitGivenTrigger( cb, unit )
-    unit:AddUnitCallback( cb, 'OnGiven' ) 
+function CreateUnitGivenTrigger(cb, unit)
+    unit:AddUnitCallback(cb, 'OnGiven')
 end
 
 function VariableBoolCheckThread(cb, varName, value, name)
@@ -468,13 +456,11 @@ function MissionNumberTriggerThread(cb, value, name)
     end
 end
 
--- =============
 -- Prop Triggers
--- =============
-function CreatePropKilledTrigger( cb, prop )
-   prop:AddPropCallback( cb, 'OnKilled' )
+function CreatePropKilledTrigger(cb, prop)
+   prop:AddPropCallback(cb, 'OnKilled')
 end
 
-function CreatePropReclaimedTrigger( cb, prop )
-   prop:AddPropCallback( cb, 'OnReclaimed' )
+function CreatePropReclaimedTrigger(cb, prop)
+   prop:AddPropCallback(cb, 'OnReclaimed')
 end

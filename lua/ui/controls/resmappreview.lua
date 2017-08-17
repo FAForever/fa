@@ -229,7 +229,7 @@ ResourceMapPreview = Class(Group) {
     UpdatePlayer = function(self, slot, playerInfo, hideColours)
         -- The ACUButton instance representing this slot, if any.
         local marker = self.startPositions[slot]
-        
+
         if not marker then return end -- Marker is nil when the map slot count shrunk
 
         if hideColours then

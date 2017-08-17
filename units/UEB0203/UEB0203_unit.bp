@@ -65,8 +65,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 12,
-        Health = 18000,
-        MaxHealth = 18000,
+        Health = 16000,
+        MaxHealth = 16000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -93,7 +93,7 @@ UnitBlueprint {
         },
         BuildAttachBone = 'Attachpoint01',
         IdleEffects = {
-            Water = {    
+            Water = {
                 Effects = {
                     {
                         Bones = {
@@ -129,7 +129,7 @@ UnitBlueprint {
         BuildCostMass = 2000,
         BuildRate = 90,
         BuildTime = 3600,
-        DifferentialUpgradeCostCalculation = true, 
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'ueb0203',
         },

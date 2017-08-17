@@ -35,21 +35,21 @@ XEL0209 = Class(TConstructionUnit) {
         self:SetWeaponEnabledByLabel('Riotgun01', false)
         TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
-    
+
     OnStopBuild = function(self)
         --Re-enable the gun after done building
         self:SetWeaponEnabledByLabel('Riotgun01', true)
         TConstructionUnit.OnStopBuild(self)
     end,
-    
+
     OnStartReclaim = function(self, target)
         TConstructionUnit.OnStartReclaim(self, target)
         self:SetAllWeaponsEnabled(false)
     end,
-    
+
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
-        self:SetAllWeaponsEnabled( true)
+        self:SetAllWeaponsEnabled(true)
     end,--]]
 }
 

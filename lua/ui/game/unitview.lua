@@ -18,12 +18,12 @@ local Factions = import('/lua/factions.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
-local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
+local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 
 local selectedUnit = nil
 local updateThread = nil
 
-controls = {}
+controls = import('/lua/ui/controls.lua').Get()
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
@@ -108,26 +108,26 @@ local statFuncs = {
         end
     end,
     function(info)
-		if UnitData[info.entityId].xp ~= nil then
-			local nextLevel = 0
-			local veterancyLevels = __blueprints[info.blueprintId].Veteran or veterancyDefaults
-			for index = 1, 5 do
-				local i = index
-				local vet = veterancyLevels[string.format('Level%d', i)]
+        if UnitData[info.entityId].xp ~= nil then
+            local nextLevel = 0
+            local veterancyLevels = __blueprints[info.blueprintId].Veteran or veterancyDefaults
+            for index = 1, 5 do
+                local i = index
+                local vet = veterancyLevels[string.format('Level%d', i)]
 
-				if UnitData[info.entityId].xp < vet then
-					return string.format('%d / %d', UnitData[info.entityId].xp, vet)
-				end
-			end
+                if UnitData[info.entityId].xp < vet then
+                    return string.format('%d / %d', UnitData[info.entityId].xp, vet)
+                end
+            end
 
-			return false
-		else
-			return false
-		end
+            return false
+        else
+            return false
+        end
 
 
     end,
-	function(info)
+    function(info)
         if info.kills > 0 then
             return string.format('%d', info.kills)
         else
@@ -176,6 +176,15 @@ local statFuncs = {
             return false
         end
     end,
+    function(info, bp)
+        if options.gui_detailed_unitview == 0 then
+            return false
+        end
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
+            return string.format("%d",math.floor(info.userUnit:GetBuildRate()))
+        end
+        return false
+    end,
 }
 
 function UpdateWindow(info)
@@ -183,7 +192,7 @@ function UpdateWindow(info)
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
         controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         controls.stratIcon:SetTexture('/textures/ui/common/game/strategicicons/icon_structure_generic_selected.dds')
-        for index = 1, 7 do
+        for index = 1, table.getn(controls.statGroups) do
             local i = index
             controls.statGroups[i].icon:Hide()
             if controls.statGroups[i].color then
@@ -213,9 +222,9 @@ function UpdateWindow(info)
         end
         local techLevel = false
         local levels = {TECH1 = 1,TECH2 = 2,TECH3 = 3}
-        for i, v in bp.Categories do
-            if levels[v] then
-                techLevel = levels[v]
+        for cat, level in levels do
+            if bp.CategoriesHash[cat] then
+                techLevel = level
                 break
             end
         end
@@ -236,7 +245,7 @@ function UpdateWindow(info)
             LayoutHelpers.AtTopIn(controls.name, controls.bg, 14)
             controls.name:SetFont(UIUtil.bodyFont, 10)
         end
-        for index = 1, 7 do
+        for index = 1, table.getn(statFuncs) do
             local i = index
             if statFuncs[i](info, bp) then
                 if i == 1 then
@@ -245,10 +254,10 @@ function UpdateWindow(info)
                     controls.statGroups[i].icon:SetTexture(iconType)
                     controls.statGroups[i].value:SetText(value)
                 elseif i == 3 then
-					local value, iconType, color = statFuncs[i](info, bp)
-					controls.statGroups[i].value:SetText(value)
-					controls.statGroups[i].icon:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
-				elseif i == 5 then
+                    local value, iconType, color = statFuncs[i](info, bp)
+                    controls.statGroups[i].value:SetText(value)
+                    controls.statGroups[i].icon:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
+                elseif i == 5 then
                     local text, iconType = statFuncs[i](info, bp)
                     controls.statGroups[i].value:SetText(text)
                     if iconType == 'strategic' then
@@ -285,10 +294,10 @@ function UpdateWindow(info)
 
         if info.health then
             controls.healthBar:Show()
-            
+
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
-            
+
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
                 controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
@@ -390,13 +399,6 @@ function UpdateWindow(info)
             controls.abilities:Hide()
         end
     end
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType:Hide()
-        if info.userUnit.SCUType then
-            controls.SCUType:SetTexture('/textures/ui/common/SCUManager/'..info.userUnit.SCUType..'_icon.dds')
-            controls.SCUType:Show()
-        end
-    end
     if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
         if info.blueprintId ~= 'unknown' then
@@ -409,7 +411,6 @@ function UpdateWindow(info)
     end
     if options.gui_detailed_unitview ~= 0 then
         if info.blueprintId ~= 'unknown' then
-            controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
@@ -442,14 +443,37 @@ function UpdateWindow(info)
                     end
                 end
             end
-
-            if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-                controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
-                controls.Buildrate:Show()
-            else
-                controls.Buildrate:Hide()
-            end
         end
+    end
+
+    UpdateEnhancementIcons(info)
+end
+
+local GetEnhancementPrefix = import('/lua/ui/game/construction.lua').GetEnhancementPrefix
+function UpdateEnhancementIcons(info)
+    local unit = info.userUnit
+    local existingEnhancements
+    if unit then
+        existingEnhancements = EnhancementCommon.GetEnhancements(unit:GetEntityId())
+    end
+
+    for slot, enhancement in controls.enhancements do
+        if unit == nil or
+                (not unit:IsInCategory('COMMAND') and not unit:IsInCategory('SUBCOMMANDER')) or
+                existingEnhancements == nil or existingEnhancements[slot] == nil then
+            enhancement:Hide()
+            continue
+        end
+
+        local bp = unit:GetBlueprint()
+        local bpId = bp.BlueprintId
+        local enhancementBp = bp.Enhancements[existingEnhancements[slot]]
+        local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'
+
+        enhancement:Show()
+        enhancement:SetTexture(UIUtil.UIFile(texture))
+        enhancement.Width:Set(30)
+        enhancement.Height:Set(30)
     end
 end
 
@@ -482,7 +506,7 @@ function CreateUI()
     controls.fuelBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.health = UIUtil.CreateText(controls.healthBar, '', 14, UIUtil.bodyFont)
     controls.statGroups = {}
-    for i = 1, 7 do
+    for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
         controls.statGroups[i].icon = Bitmap(controls.bg)
         controls.statGroups[i].value = UIUtil.CreateText(controls.statGroups[i].icon, '', 12, UIUtil.bodyFont)
@@ -504,9 +528,8 @@ function CreateUI()
 
     if options.gui_detailed_unitview ~= 0 then
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
-        controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
-    
+
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
         if not info and selectedUnit then
@@ -524,19 +547,22 @@ function CreateUI()
         end
     end
 
-    if options.gui_scu_manager ~= 0 then
-        controls.SCUType = Bitmap(controls.bg)
-        LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
-        LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
-    end
+    -- This section is for the small icons showing what active enhancements an ACU has
+	controls.enhancements = {}
+	controls.enhancements['RCH'] = Bitmap(controls.bg)
+	controls.enhancements['Back'] = Bitmap(controls.bg)
+	controls.enhancements['LCH'] = Bitmap(controls.bg)
 
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
+	LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
 end
 
 function OnSelection(units)
     if options.gui_enhanced_unitview == 0 then
         return
     end
-    
+
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else

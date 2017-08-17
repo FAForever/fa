@@ -12,7 +12,7 @@ local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
 
 ZEB9502 = Class(TAirFactoryUnit) {
-    
+
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
@@ -42,15 +42,15 @@ ZEB9502 = Class(TAirFactoryUnit) {
             WaitFor(self.ArmSlider2)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
-		if not self.ArmSlider1 then return end
-		if not self.ArmSlider2 then return end
+        if not self.ArmSlider1 then return end
+        if not self.ArmSlider2 then return end
         self.ArmSlider1:SetGoal(0, 0, 0)
-		self.ArmSlider1:SetSpeed(40)
-		self.ArmSlider2:SetGoal(0, 0, 0)
-		self.ArmSlider2:SetSpeed(40)
+        self.ArmSlider1:SetSpeed(40)
+        self.ArmSlider2:SetGoal(0, 0, 0)
+        self.ArmSlider2:SetSpeed(40)
     end,
 }
 

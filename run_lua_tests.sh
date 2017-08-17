@@ -31,7 +31,7 @@ check_file() {
   fi
 }
 
-for file in `find . -name '*.lua' -o -name '*.bp'`; do
+for file in `find . \( -path ./engine -o -path ./testmaps \) -prune -o -name '*.lua' -o -name '*.bp'`; do
   check_file "$file"
 done
 

@@ -140,6 +140,10 @@ UnitBlueprint {
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
     },
+    Footprint = {
+        SizeX = 1,
+        SizeZ = 1,
+    },
     General = {
         Category = 'Direct Fire',
         Classification = 'RULEUC_MilitaryVehicle',
@@ -199,7 +203,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.62,
     SizeX = 1.2,
-    SizeY = 0.6,     
+    SizeY = 0.6,
     SizeZ = 1.1,
     StrategicIconName = 'icon_bot3_antiair',
     StrategicIconSortPriority = 155,
@@ -287,7 +291,7 @@ UnitBlueprint {
                     },
                     RackBone = 'Turret_Barrel01',
                 },
-                
+
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
@@ -464,7 +468,7 @@ UnitBlueprint {
                     },
                     RackBone = 'Turret_Barrel01',
                 },
-                
+
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,

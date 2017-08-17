@@ -71,10 +71,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 10,
-            Level2 = 20,
-            Level3 = 30,
-            Level4 = 40,
-            Level5 = 50,
+            Level2 = 35,
+            Level3 = 65,
+            Level4 = 90,
+            Level5 = 115,
         },
     },
     BuildIconSortPriority = 20,
@@ -136,7 +136,7 @@ UnitBlueprint {
             '<LOC ability_torpedo>Torpedoes',
         },
         AnimationDeath = {
-	    {
+        {
                 Animation = '/units/ues0401/ues0401_ADeath01.sca',
                 AnimationRateMax = 0.2,
                 AnimationRateMin = 0.1,
@@ -155,7 +155,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        
+
         IdleEffects = {
             Sub = {
                 Effects = {

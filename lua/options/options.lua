@@ -260,7 +260,7 @@ options = {
                 title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
                 key = 'assist_mex',
                 type = 'toggle',
-                default = false,
+                default = true,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = false},
@@ -280,9 +280,6 @@ options = {
                 type = 'toggle',
                 restart = true,
                 default = __language,
-                set = function(key, value, startup)
-                    import('/lua/system/Localization.lua').language(value)
-                end,
                 custom = {
                     states = __installedlanguages,
                 },
@@ -317,6 +314,18 @@ options = {
             {
                 title = "<LOC OPTIONS_0005>Display Tooltips",
                 key = 'tooltips',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0009>Display Loading Tips",
+                key = 'loading_tips',
                 type = 'toggle',
                 default = true,
                 custom = {
@@ -424,6 +433,21 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
+                key = 'faction_font_color',
+                type = 'toggle',
+                default = true,
+                set = function(key,value,startup)
+                    import('/lua/ui/uiutil.lua').UpdateCurrentSkin({faction_font_color = value})
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0226>Enable Cycle Preview for Hotbuild",
                 key = 'hotbuild_cycle_preview',
                 type = 'toggle',
@@ -463,19 +487,6 @@ options = {
             {
                 title = "<LOC OPTIONS_0229>Template Rotation",
                 key = 'gui_template_rotator',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0230>SCU Manager",
-                key = 'gui_scu_manager',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -691,11 +702,38 @@ options = {
                 set = function(key, value, startup)
                     import('/lua/ui/game/reclaim.lua').updateMaxLabels(value)
                 end,
-                default = 10,
+                default = 1000,
                 custom = {
                     min = 500,
                     max = 5000,
                     inc = 500,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
+                tip = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
+                key = 'minimum_reclaim_amount',
+                type = 'slider',
+                set = function(key, value, startup)
+                    import('/lua/ui/game/reclaim.lua').updateMinAmount(value)
+                end,
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 300,
+                    inc = 10,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0281>Hotkey Labels",
+                key = 'show_hotkeylabels',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
                 },
             },
         },
@@ -712,10 +750,10 @@ options = {
                 verify = true,
                 populate = function(value)
                     -- this is a bit odd, but the value of the primary determines how to populate the value of the secondary
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 update = function(control,value)
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 ignore = function(value)
                     if value == 'overridden' then
@@ -726,7 +764,7 @@ options = {
                     if not startup then
                         ConExecute("SC_PrimaryAdapter " .. tostring(value))
                     end
-                    ConExecute("SC_SecondaryAdapter " .. tostring( 'windowed' == value ))
+                    ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 custom = {
                     states = {

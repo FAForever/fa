@@ -12,7 +12,7 @@ ResetSyncTable = function()
 
     -- contains the current score for each army
     Sync.Score = {}
-	  Sync.ScoreAccum = {}
+      Sync.ScoreAccum = {}
 
     -- Table of army indices set to "victory" or "defeat".
     -- It's the user layer's job to determine if any UI needs to be shown
@@ -114,10 +114,11 @@ function NoteFocusArmyChanged(new, old)
     --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import('/lua/SimPing.lua').OnArmyChange()
     for entityID, data in UnitData do
-        if data.OwnerArmy == old then
-            Sync.ReleaseIds[entityID] = true
-        elseif data.OwnerArmy == new then
+        if new == -1 or data.OwnerArmy == new then
             Sync.UnitData[entityID] = data.Data
+        elseif old == -1 or data.OwnerArmy == old then
+            Sync.ReleaseIds[entityID] = true
+        else
         end
     end
     SyncUnitEnhancements()

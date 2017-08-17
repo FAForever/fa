@@ -44,7 +44,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
         self:SetStayUpright(false)
         #self:ForkThread(self.EnterWaterMovementThread)
     end,
-    
+
     EnterWaterMovementThread = function(self)
         WaitTicks(1)
         self:SetVelocity(0.5)

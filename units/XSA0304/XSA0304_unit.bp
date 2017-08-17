@@ -24,7 +24,7 @@ UnitBlueprint {
         LiftFactor = 7,
         MaxAirspeed = 17,
         MinAirspeed = 15,
-        PredictAheadForBombDrop = 3,        
+        PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
         TurnSpeed = 0.8,
@@ -107,7 +107,6 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
     },
-    CollisionOffsetZ = 0.2,
     Defense = {
         AirThreatLevel = 1.5,
         ArmorType = 'Light',
@@ -265,9 +264,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.29,
     SizeSphere = 2,
-    SizeX = 2,
-    SizeY = 0.5,
-    SizeZ = 1.6,
+    SizeX = 2.6,
+    SizeY = 0.4,
+    SizeZ = 1,
     StrategicIconName = 'icon_bomber3_directfire',
     StrategicIconSortPriority = 55,
     Transport = {
@@ -308,7 +307,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,

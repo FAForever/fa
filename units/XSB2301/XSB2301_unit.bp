@@ -218,7 +218,7 @@ UnitBlueprint {
             BeamLifetime = 1,					#0.9
             CollideFriendly = false,
             Damage = 55,					#220
-            DamageRadius = 0,					
+            DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
             FireTargetLayerCapsTable = {
@@ -273,7 +273,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 60,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire',
             WeaponUnpacks = false,
         },

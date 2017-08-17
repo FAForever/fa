@@ -23,13 +23,13 @@ XAB1401 = Class(AStructureUnit) {
         local num = self:GetRandomDir()
         self.BallManip = CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
         self.Trash:Add(self.BallManip)
-        
-        ChangeState( self, self.ResourceOn )
+
+        ChangeState(self, self.ResourceOn)
         self:ForkThread(self.ResourceMonitor)
-        
-		for k, v in FxAmbient do
-			CreateAttachedEmitter( self, 'Orb', self:GetArmy(), v )
-		end
+
+        for k, v in FxAmbient do
+            CreateAttachedEmitter(self, 'Orb', self:GetArmy(), v)
+        end
     end,
 
     ResourceOn = State {
@@ -39,19 +39,19 @@ XAB1401 = Class(AStructureUnit) {
             local energyAdd = 0
             local maxMass = self:GetBlueprint().Economy.MaxMass
             local maxEnergy = self:GetBlueprint().Economy.MaxEnergy
-            
+
             while true do
                 local massNeed = aiBrain:GetEconomyRequested('MASS') * 10
                 local energyNeed = aiBrain:GetEconomyRequested('ENERGY') * 10
 
-                local massIncome = (aiBrain:GetEconomyIncome( 'MASS' ) * 10) - massAdd
-                local energyIncome = (aiBrain:GetEconomyIncome( 'ENERGY' ) * 10) - energyAdd
-                
+                local massIncome = (aiBrain:GetEconomyIncome('MASS') * 10) - massAdd
+                local energyIncome = (aiBrain:GetEconomyIncome('ENERGY') * 10) - energyAdd
+
                 massAdd = 20
                 if massNeed - massIncome > 0 then
                     massAdd = massAdd + massNeed - massIncome
                 end
-                
+
                 if maxMass and massAdd > maxMass then
                    massAdd = maxMass
                 end

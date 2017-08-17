@@ -28,38 +28,38 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
 function SeaAttackCondition(aiBrain, locationType, targetNumber)
-	local UC = import('/lua/editor/UnitCountBuildConditions.lua')
+    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-	if not engineerManager then
+    if not engineerManager then
         return true
     end
-	#if aiBrain:GetCurrentEnemy() then
-	#	local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-	#	targetNumber = aiBrain:GetThreatAtPosition( {estartX, 0, estartZ}, 1, true, 'AntiSurface' )
-	#	targetNumber = targetNumber + aiBrain:GetThreatAtPosition( {estartX, 0, estartZ}, 1, true, 'AntiSub' )
-	#end
+    #if aiBrain:GetCurrentEnemy() then
+    #	local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+    #	targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
+    #	targetNumber = targetNumber + aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSub')
+    #end
 
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager:GetLocationRadius()
-    
-    --local surfaceThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.NAVAL, position, radius )
-    --local subThreat = pool:GetPlatoonThreat( 'AntiSub', categories.MOBILE * categories.NAVAL, position, radius )
-    local surfaceThreat = pool:GetPlatoonThreat( 'AntiSurface', categories.MOBILE * categories.NAVAL)
-    local subThreat = pool:GetPlatoonThreat( 'AntiSub', categories.MOBILE * categories.NAVAL)
-    if ( surfaceThreat + subThreat ) >= targetNumber then
+
+    --local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.NAVAL, position, radius)
+    --local subThreat = pool:GetPlatoonThreat('AntiSub', categories.MOBILE * categories.NAVAL, position, radius)
+    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.NAVAL)
+    local subThreat = pool:GetPlatoonThreat('AntiSub', categories.MOBILE * categories.NAVAL)
+    if (surfaceThreat + subThreat) >= targetNumber then
         return true
-	elseif UC.UnitCapCheckGreater(aiBrain, .95) then
-		return true
-	elseif SUtils.ThreatBugcheck(aiBrain) then -- added to combat buggy inflated threat
-		return true
-	elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH3) and ( surfaceThreat + subThreat ) > 1125 then #5 Units x 225
-		return true
-	elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH2)
-	and UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL * categories.TECH3) and ( surfaceThreat + subThreat ) > 280 then #7 Units x 40
-		return true
-	elseif UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL - categories.TECH1) and ( surfaceThreat + subThreat ) > 42 then #7 Units x 6
-		return true
+    elseif UC.UnitCapCheckGreater(aiBrain, .95) then
+        return true
+    elseif SUtils.ThreatBugcheck(aiBrain) then -- added to combat buggy inflated threat
+        return true
+    elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 1125 then #5 Units x 225
+        return true
+    elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH2)
+    and UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 280 then #7 Units x 40
+        return true
+    elseif UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL - categories.TECH1) and (surfaceThreat + subThreat) > 42 then #7 Units x 6
+        return true
     end
     return false
 end
@@ -73,9 +73,9 @@ BuilderGroup {
         Priority = 500,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
-			#{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
+            #{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -87,9 +87,9 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -100,9 +100,9 @@ BuilderGroup {
         BuilderConditions = {
             { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
-			{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -119,8 +119,8 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -131,8 +131,8 @@ BuilderGroup {
         Priority = 600,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -144,8 +144,8 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -157,8 +157,8 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'SHIELD NAVAL MOBILE' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -170,8 +170,8 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'COUNTERINTELLIGENCE NAVAL MOBILE' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -187,9 +187,9 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -200,9 +200,9 @@ BuilderGroup {
         Priority = 705,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH2 } },
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -219,8 +219,8 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
     },
@@ -231,8 +231,8 @@ BuilderGroup {
         Priority = 700,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -244,10 +244,10 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
+            { UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
         },
     },
     Builder {
@@ -256,8 +256,8 @@ BuilderGroup {
         Priority = 0, #700,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -269,10 +269,10 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
+            { UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
         },
     },
     Builder {
@@ -282,10 +282,10 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-			{ SBC, 'NoRushTimeCheck', { 600 }},
-			{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
+            { SBC, 'NoRushTimeCheck', { 600 }},
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
+            { UCBC, 'HaveUnitRatio', { 0.1, categories.NAVAL * categories.MOBILE * categories.TECH3, '<=', categories.NAVAL * categories.MOBILE * categories.TECH2}},
         },
     },
 }
@@ -297,95 +297,95 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Sea Hunters T1',
         PlatoonTemplate = 'SeaHuntSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 20 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Sea Hunters T2',
         PlatoonTemplate = 'SeaHuntSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 60 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Sea Hunters T3',
         PlatoonTemplate = 'SeaHuntSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
         },
         BuilderConditions = {
             { SeaAttackCondition, { 'LocationType', 180 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
-    },	
+    },
     Builder {
         BuilderName = 'Sorian Sea StrikeForce T2',
         PlatoonTemplate = 'SeaStrikeSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 100,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
         },
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, 'MOBILE TECH2 NAVAL' } },
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
             { SeaAttackCondition, { 'LocationType', 60 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {
-			SearchRadius = 6000,
-            PrioritizedCategories = {                
-				'STRUCTURE DEFENSE ANTINAVY TECH2',
-				'STRUCTURE DEFENSE ANTINAVY TECH1',
-				'MOBILE NAVAL',
-				'STRUCTURE NAVAL',
+            SearchRadius = 6000,
+            PrioritizedCategories = {
+                'STRUCTURE DEFENSE ANTINAVY TECH2',
+                'STRUCTURE DEFENSE ANTINAVY TECH1',
+                'MOBILE NAVAL',
+                'STRUCTURE NAVAL',
             },
         },
     },
-}	
-	
+}
+
 BuilderGroup {
     BuilderGroupName = 'SorianFrequentSeaAttackFormBuilders',
     BuildersType = 'PlatoonFormBuilder',
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T1',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -394,26 +394,26 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 20 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T2',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -422,26 +422,26 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 60 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T3',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -450,13 +450,13 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { SeaAttackCondition, { 'LocationType', 180 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
 }
@@ -467,13 +467,13 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Big Sea Attack T1',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -482,26 +482,26 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 40 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Big Sea Attack T2',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -510,26 +510,26 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
             { SeaAttackCondition, { 'LocationType', 120 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
     Builder {
         BuilderName = 'Sorian Big Sea Attack T3',
         PlatoonTemplate = 'SeaAttackSorian',
-		#PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-		PlatoonAddPlans = {'AirLandToggleSorian'},
+        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-		UseFormation = 'AttackFormation',
+        UseFormation = 'AttackFormation',
             ThreatWeights = {
                 #IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
@@ -538,13 +538,13 @@ BuilderGroup {
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
-                MidThreatWeight = 1,                
-                FarThreatWeight = 1,            
+                MidThreatWeight = 1,
+                FarThreatWeight = 1,
             },
         },
         BuilderConditions = {
             { SeaAttackCondition, { 'LocationType', 360 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
 }

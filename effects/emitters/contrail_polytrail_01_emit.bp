@@ -1,6 +1,6 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'contrail_polytrail_01',
-	Lifetime = -1.00,
+    BlueprintId = 'contrail_polytrail_01',
+    Lifetime = -1.00,
     TrailLength = 15,
     Size = 0.1,
     SortOrder = 0,
@@ -10,7 +10,7 @@ TrailEmitterBlueprint {
     LowFidelity = false,
     MedFidelity = true,
     HighFidelity = true,
-	RepeatTexture = [[/textures/particles/air_contrail_02.dds]],
-	RampTexture = [[/textures/particles/ramp_white_03.dds]],
+    RepeatTexture = [[/textures/particles/air_contrail_02.dds]],
+    RampTexture = [[/textures/particles/ramp_white_03.dds]],
 }
 

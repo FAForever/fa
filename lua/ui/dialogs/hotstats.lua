@@ -246,7 +246,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
         graphic[play.index].bg=Bitmap(grp)
         graphic[play.index].bg.Left:Set(parent.Left() +x1+x_center +(p-1)*(space_bg_width+bg_width))
         graphic[play.index].bg.Top:Set(parent.Top() +y1 +(bg_height+space_bg_height)*row)
-        graphic[play.index].bg.Right:Set( graphic[play.index].bg.Left() +bg_width)
+        graphic[play.index].bg.Right:Set(graphic[play.index].bg.Left() +bg_width)
         graphic[play.index].bg.Bottom:Set(graphic[play.index].bg.Top()+bg_height)
         graphic[play.index].bg:SetSolidColor(play.color)
         graphic[play.index].bg:SetAlpha(.65)
@@ -341,7 +341,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                 graphic[play.index][columns_num][part_num]={}
                 graphic[play.index][columns_num][part_num].bmp=Bitmap(graphic[play.index][columns_num].grp)
                 graphic[play.index][columns_num][part_num].bmp.Left:Set(value[columns_num].left)
-                graphic[play.index][columns_num][part_num].bmp.Right:Set( value[columns_num].left +columns_width )
+                graphic[play.index][columns_num][part_num].bmp.Right:Set(value[columns_num].left +columns_width)
                 graphic[play.index][columns_num][part_num].bmp.Bottom:Set(y)
                 y=y-return_value(0,play.index,part.path)/value[columns_num].factor
                 graphic[play.index][columns_num][part_num].bmp.Top:Set(y)
@@ -425,10 +425,10 @@ function line(parent,x1,y1,x2,y2,color, size)
     grp.Bottom:Set(0)
     function add_pixel(grp,parent,x1,y1,color,size)
         local bmp=Bitmap(grp)
-        bmp.Left:Set(parent.Left() +x1 )
-        bmp.Top:Set(parent.Top() +y1 )
-        bmp.Right:Set( bmp.Left() +size )
-        bmp.Bottom:Set( bmp.Top() +size )
+        bmp.Left:Set(parent.Left() +x1)
+        bmp.Top:Set(parent.Top() +y1)
+        bmp.Right:Set(bmp.Left() +size)
+        bmp.Bottom:Set(bmp.Top() +size)
         bmp:SetSolidColor(color)
     end
     local dist=math.sqrt(math.pow((x2-x1),2)+math.pow(y2-y1,2))/size
@@ -539,7 +539,7 @@ function page_graph(parent)
     for name,data in main_graph do
         local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', LOC(data.name), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         local index = data.index
-        --btn.Left:Set((math.min((x2-2*x1)/table.getsize(histo),200) )*i+x1)
+        --btn.Left:Set((math.min((x2-2*x1)/table.getsize(histo),200))*i+x1)
         btn.Left:Set((((graph_pos.Right()-100)-btn.Width()*.5*(table.getsize(main_graph)))/(table.getsize(main_graph)+1)+btn.Width()*.5)*i+100)
         btn.Top:Set(graph_pos.Bottom()+25)
         EffectHelpers.ScaleTo(btn, .5, 0)
@@ -748,7 +748,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         t1=CurrentTime()
         --LOG("------- calculating the timing of the frame")
         --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
-        delta_refresh=(x2-x1)*(t1-t)/10*( (player_nbr+1)/4)
+        delta_refresh=(x2-x1)*(t1-t)/10*((player_nbr+1)/4)
         --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
         while periode<data_nbr do
             nbr=nbr+1
@@ -769,16 +769,16 @@ function create_graph(parent,path,x1,y1,x2,y2)
             while (x<(parent.Left()+ x1 + nbr*dist) and x<(x2+parent.Left()))  do
                 for name,data in line do
                     graph[data.index][x-x1]=Bitmap(grp)
-                    graph[data.index][x-x1].Left:Set(parent.Left() +x )
+                    graph[data.index][x-x1].Left:Set(parent.Left() +x)
                     if data.y_factor != 0 then
-                    local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1) )
+                    local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                         if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
                         if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
                         graph[data.index][x-x1].Top:Set(yn)
                     else
                         graph[data.index][x-x1].Top:Set(parent.Top() +data.y-size)
                     end
-                    graph[data.index][x-x1].Right:Set( graph[data.index][x-x1].Left() +size )
+                    graph[data.index][x-x1].Right:Set(graph[data.index][x-x1].Left() +size)
                     graph[data.index][x-x1].Bottom:Set(parent.Top() +data.y)
                     graph[data.index][x-x1]:SetSolidColor(data.color)
                     graph[data.index][x-x1]:Depth(bg.Depth()+5)
@@ -805,7 +805,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 yb=parent.Top() +y2  - val*factor
                 if yb<y1 then yb=y1+2 end
                 if yb>y2 then yb=y2-2 end
-                --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1) )
+                --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                 --if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
                 --if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
                 --  graph[data.index][x2].Top:Set(yn)
@@ -813,7 +813,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                     graph[data.index][x2].Top:Set(parent.Top() +yb)
                 --end
                 --LOG("x: ",x2,"  ya:",ya,"  yb:",yb)
-                graph[data.index][x2].Right:Set( graph[data.index][x2].Left() +size )
+                graph[data.index][x2].Right:Set(graph[data.index][x2].Left() +size)
                 graph[data.index][x2].Bottom:Set(parent.Top() +ya)
                 graph[data.index][x2]:SetSolidColor(data.color)
             end
@@ -899,7 +899,7 @@ end
         t1=CurrentTime()
         --LOG("------- calculating the timing of the frame")
         --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
-        delta_refresh=(x2-x1)*(t1-t)/10*( (player_nbr+1)/4)
+        delta_refresh=(x2-x1)*(t1-t)/10*((player_nbr+1)/4)
         --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
         while periode<data_nbr do
             nbr=nbr+1
@@ -939,10 +939,10 @@ end
                     --data.ya*(1-data.yb*(x/sav_x)/data.ya)*factor
                     --data.ya*factor*(x/sva_x)
                     graph2[data.index][x-x1]=Bitmap(grp)
-                    graph2[data.index][x-x1].Left:Set(parent.Left() +x )
-                    --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1) )
+                    graph2[data.index][x-x1].Left:Set(parent.Left() +x)
+                    --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                     graph2[data.index][x-x1].Top:Set(parent.Top()+ya_draw)
-                    graph2[data.index][x-x1].Right:Set( graph2[data.index][x-x1].Left() +size )
+                    graph2[data.index][x-x1].Right:Set(graph2[data.index][x-x1].Left() +size)
                     graph2[data.index][x-x1].Bottom:Set(parent.Top() +yb_draw) --+data.y)
                     graph2[data.index][x-x1]:SetSolidColor(data.color)
                     graph2[data.index][x-x1]:Depth(bg.Depth()+1)
@@ -1006,10 +1006,11 @@ end
 -- the starting function launch by the hook
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
     --LOG("called Set_graph...")
-    scoreData = scoreAccum.scoreData
-    if not showCampaign then
-        standardScore:Hide()
+    if showCampaign then
+        return
     end
+    scoreData = scoreAccum.scoreData
+    standardScore:Hide()
     page_active=Group(dialog)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -1090,11 +1091,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             graph_btn:SetCheck(false)
         end
     end
-    if showCampaign then
-        standardBtn:SetCheck(true)
-    else
-        graph_btn:SetCheck(true)
-    end
+    graph_btn:SetCheck(true)
     page_graph(dialog)
     -- create first graph
     -- graph=create_graph(dialog,info.dialog[5].path,120,140,GetFrame(0).Right()-120,GetFrame(0).Bottom()-140)

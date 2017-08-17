@@ -77,7 +77,7 @@ BuilderGroup {
             }
         }
     },
-	Builder {
+    Builder {
         BuilderName = 'T3 Land Exp3 Engineer 1',
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 875,
@@ -155,9 +155,9 @@ BuilderGroup {
         Priority = 10001,
         FormRadius = 10000,
         InstanceCount = 50,
-		BuilderConditions = {
+        BuilderConditions = {
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 1, categories.NUKE * categories.STRUCTURE, 'Enemy'}},
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 2, categories.TACTICALMISSILEPLATFORM, 'Enemy'}},
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 2, categories.TACTICALMISSILEPLATFORM, 'Enemy'}},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -168,7 +168,7 @@ BuilderGroup {
             PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'FACTORY LAND', 'MASSPRODUCTION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE' }, # list in order
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'T4 Exp Land Group',
         PlatoonAddPlans = {'NameUnits'},
         PlatoonTemplate = 'T4ExperimentalLandGroup',
@@ -184,21 +184,21 @@ BuilderGroup {
             PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'FACTORY LAND', 'MASSPRODUCTION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE' }, # list in order
         },
     },
-	#DUNCAN - added
-	Builder {
+    #DUNCAN - added
+    Builder {
         BuilderName = 'LandExperimentalGuard',
         PlatoonTemplate = 'T3ExperimentalGuard',
         PlatoonAIPlan = 'GuardUnit',
-        Priority = 750, 
-        InstanceCount = 3, 
+        Priority = 750,
+        InstanceCount = 3,
         BuilderData = {
-			GuardCategory = categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE,
-			LocationType = 'LocationType',
+            GuardCategory = categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE,
+            LocationType = 'LocationType',
         },
         BuilderConditions = {
-			{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.MOBILE * categories.LAND * (categories.TECH1 + categories.TECH2 + categories.TECH3) } },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE} }, 
-			{ UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE} }, 
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.MOBILE * categories.LAND * (categories.TECH1 + categories.TECH2 + categories.TECH3) } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE} },
+            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.EXPERIMENTAL * categories.LAND - categories.ORBITALSYSTEM - categories.SATELLITE} },
         },
         BuilderType = 'Any',
     },
@@ -285,9 +285,9 @@ BuilderGroup {
         Priority = 801,
         InstanceCount = 50,
         FormRadius = 10000,
-		BuilderConditions = {
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 3, categories.DEFENSE * categories.TECH3 * categories.ANTIAIR, 'Enemy'}},
-			{ UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 8, categories.MOBILE * categories.TECH3 * categories.AIR * categories.ANTIAIR, 'Enemy'}},
+        BuilderConditions = {
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 3, categories.DEFENSE * categories.TECH3 * categories.ANTIAIR, 'Enemy'}},
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 8, categories.MOBILE * categories.TECH3 * categories.AIR * categories.ANTIAIR, 'Enemy'}},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -298,7 +298,7 @@ BuilderGroup {
             PrioritizedCategories = { 'COMMAND', 'ANTIAIR', 'EXPERIMENTAL', 'ENERGYPRODUCTION', 'FACTORY', 'STRUCTURE' }, # list in order
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'T4 Exp Air Group',
         PlatoonTemplate = 'T4ExperimentalAirGroup',
         PlatoonAddPlans = {'NameUnits'},
@@ -314,21 +314,21 @@ BuilderGroup {
             PrioritizedCategories = { 'COMMAND', 'ANTIAIR', 'EXPERIMENTAL', 'ENERGYPRODUCTION', 'FACTORY', 'STRUCTURE' }, # list in order
         },
     },
-	Builder {
+    Builder {
         BuilderName = 'AirExperimentalGuard',
         PlatoonTemplate = 'AirEscort',
-        Priority = 750,  
-        InstanceCount = 3, 
+        Priority = 750,
+        InstanceCount = 3,
         BuilderType = 'Any',
         BuilderData = {
-			GuardCategory = categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM - categories.SATELLITE,
-			LocationType = 'LocationType',
+            GuardCategory = categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM - categories.SATELLITE,
+            LocationType = 'LocationType',
         },
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * (categories.TECH1 + categories.TECH2 + categories.TECH3) * categories.ANTIAIR } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM } }, 
-			{ UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM - categories.SATELLITE} }, 
-		},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM } },
+            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.EXPERIMENTAL - categories.ORBITALSYSTEM - categories.SATELLITE} },
+        },
     },
 }
 
@@ -338,12 +338,12 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3 Satellite Exp Engineer',
         PlatoonTemplate = 'UEFT3EngineerBuilder',
-        Priority = 875, 
+        Priority = 875,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3}},
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}}, #DUNCAN - added
-			{ UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.EXPERIMENTAL * categories.ORBITALSYSTEM}}, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}}, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.EXPERIMENTAL * categories.ORBITALSYSTEM}}, #DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2}},
@@ -417,7 +417,7 @@ BuilderGroup {
         InstanceCount = 50,
         BuilderType = 'Any',
         BuilderData = {
-			SearchRadius = 60,
+            SearchRadius = 60,
             PrioritizedCategories = { 'MASSEXTRACTION', 'TECH3 STRUCTURE', 'TECH2 STRUCTURE', 'STRUCTURE' }, # list in order
         },
     },
@@ -435,7 +435,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3}},
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'BATTLESHIP'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'BATTLESHIP'}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
             { MABC, 'MarkerLessThanDistance',  { 'Naval Area', 400}},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -526,7 +526,7 @@ BuilderGroup {
         PlatoonTemplate = 'AeonT3EngineerBuilder',
         Priority = 875,
         BuilderConditions = {
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, categories.ENERGYPRODUCTION * categories.TECH3}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},

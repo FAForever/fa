@@ -39,7 +39,7 @@ UEA0107 = Class(AirTransport) {
             -- set up the thursting arcs for the engines
             for keys,values in self.EngineManipulators do
                 --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
-                values:SetThrustingParam( -0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25 )
+                values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
             end
 
             self.LandingAnimManip = CreateAnimator(self)
@@ -59,15 +59,15 @@ UEA0107 = Class(AirTransport) {
         end,
 
         -- Override air destruction effects so we can do something custom here
-        CreateUnitAirDestructionEffects = function( self, scale )
-            self:ForkThread(self.AirDestructionEffectsThread, self )
+        CreateUnitAirDestructionEffects = function(self, scale)
+            self:ForkThread(self.AirDestructionEffectsThread, self)
         end,
 
-        AirDestructionEffectsThread = function( self )
-            local numExplosions = math.floor( table.getn( self.AirDestructionEffectBones ) * 0.5 )
+        AirDestructionEffectsThread = function(self)
+            local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
             for i = 0, numExplosions do
-                explosion.CreateDefaultHitExplosionAtBone( self, self.AirDestructionEffectBones[util.GetRandomInt( 1, numExplosions )], 0.5 )
-                WaitSeconds( util.GetRandomFloat( 0.2, 0.9 ))
+                explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
+                WaitSeconds(util.GetRandomFloat(0.2, 0.9))
             end
         end,
 

@@ -94,7 +94,7 @@ UnitBlueprint {
         BuildCostMass = 4800,
         BuildTime = 1195,
         MaintenanceConsumptionPerSecondEnergy = 3000,
-		RebuildBonusIds = {
+        RebuildBonusIds = {
             'xrb3301',       # fix for this unit doesn't have rebuild bonus [150]
         },
     },

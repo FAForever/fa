@@ -21,6 +21,8 @@ local UIMain = import('/lua/ui/uimain.lua')
 <LOC chat_win_0002>Chat (%d - %d of %d lines)
 --]]
 
+local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+
 local CHAT_INACTIVITY_TIMEOUT = 15  -- in seconds
 local savedParent = false
 local chatHistory = {}
@@ -33,6 +35,7 @@ local defOptions = { all_color = 1,
         allies_color = 2,
         priv_color = 3,
         link_color = 4,
+        notify_color = 8,
         font_size = 14,
         fade_time = 15,
         win_alpha = 1,
@@ -46,28 +49,25 @@ for option, value in defOptions do
     end
 end
 
-GUI = {
-    bg = false,
-    chatLines = {},
-    chatContainer = false,
-    config = false,
-}
+GUI = import('/lua/ui/controls.lua').Get()
+GUI.chatLines = GUI.chatLines or {}
 
 local FactionsIcon = {}
 local Factions = import('/lua/factions.lua').Factions
 for k, FactionData in Factions do
-    table.insert( FactionsIcon, FactionData.Icon )
+    table.insert(FactionsIcon, FactionData.Icon)
 end
-table.insert( FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds' )
+table.insert(FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 
-local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb'}
+local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42'}
 
 local ToStrings = {
     to = {text = '<LOC chat_0000>to', caps = '<LOC chat_0001>To', colorkey = 'all_color'},
     allies = {text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'allies_color'},
     all = {text = '<LOC chat_0004>to all:', caps = '<LOC chat_0005>To All:', colorkey = 'all_color'},
     private = {text = '<LOC chat_0006>to you:', caps = '<LOC chat_0007>To You:', colorkey = 'priv_color'},
+    notify = {text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'notify_color'},
 }
 
 function SetLayout()
@@ -307,7 +307,7 @@ function SetupChatScroll()
 
     local function IsValidEntry(entryData)
         if entryData.camera then
-            return ChatOptions.links
+            return ChatOptions.links and ChatOptions[entryData.armyID]
         end
 
         return ChatOptions[entryData.armyID]
@@ -374,11 +374,11 @@ function SetupChatScroll()
         local curEntry = 1
         local curTop = 1
         local tempsize = 0
-        
+
         if GUI.bg:IsHidden() then
             tempTop = math.max(DataSize() - numLines()+1, 1)
         end
-        
+
         for i, v in chatHistory do
             if IsValidEntry(v) then
                 if tempsize + table.getsize(v.wrappedtext) < tempTop then
@@ -456,19 +456,19 @@ function SetupChatScroll()
                 end
 
                 line.EntryID = curEntry
-                
+
                 if GUI.bg:IsHidden() then
-                
+
                     line.curHistory = chatHistory[curEntry]
                     if line.curHistory.new or line.curHistory.time == nil then
                         line.curHistory.time = 0
                     end
-                    
+
                     if line.curHistory.time < ChatOptions.fade_time then
                         line:Show()
 
                         UIUtil.setVisible(line.lineStickybg, ChatOptions.feed_background)
-                        
+
                         if line.name:GetText() == '' then
                             line.teamColor:Hide()
                         end
@@ -495,7 +495,7 @@ function SetupChatScroll()
                         end
                         line:SetNeedsFrameUpdate(true)
                     end
-                    
+
                 end
             else
                 line.name:Disable()
@@ -565,6 +565,7 @@ function FindClients(id)
     return result
 end
 
+local RunChatCommand = import('/lua/ui/notify/commands.lua').RunChatCommand
 function CreateChatEdit()
     local parent = GUI.bg:GetClientGroup()
     local group = Group(parent)
@@ -652,6 +653,9 @@ function CreateChatEdit()
     LayoutHelpers.AtVerticalCenterIn(group.chatBubble, group.edit)
 
     group.edit.OnNonTextKeyPressed = function(self, charcode, event)
+        if AddUnicodeCharToEditText(self, charcode) then
+            return
+        end
         GUI.bg.curTime = 0
         local function RecallCommand(entryNumber)
             self:SetText(commandHistory[self.recallEntry].text)
@@ -718,6 +722,20 @@ function CreateChatEdit()
     end
 
     group.edit.OnEnterPressed = function(self, text)
+        -- Analyse for any commands entered for Notify toggling
+        if string.len(text) > 1 and string.sub(text, 1, 1) == "/" then
+            local args = {}
+
+            for word in string.gfind(string.sub(text, 2), "%S+") do
+                table.insert(args, string.lower(word))
+            end
+
+            -- We've done the command, exit without sending the message to other players
+            if RunChatCommand(args) then
+                return
+            end
+        end
+
         GUI.bg.curTime = 0
         if group.camData:IsDisabled() then
             group.camData:Enable()
@@ -774,6 +792,24 @@ function CreateChatEdit()
     return group
 end
 
+function ChatPageUp(mod)
+    if GUI.bg:IsHidden() then
+        ForkThread(function() ToggleChat() end)
+    else
+        local newTop = GUI.chatContainer.top - mod
+        GUI.chatContainer:ScrollSetTop(nil, newTop)
+    end
+end
+
+function ChatPageDown(mod)
+    local oldTop = GUI.chatContainer.top
+    local newTop = GUI.chatContainer.top + mod
+    GUI.chatContainer:ScrollSetTop(nil, newTop)
+    if GUI.bg:IsHidden() or oldTop == GUI.chatContainer.top then
+        ForkThread(function() ToggleChat() end)
+    end
+end
+
 function ReceiveChat(sender, msg)
     if not msg.ConsoleOutput then
         SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
@@ -792,6 +828,10 @@ function ReceiveChatFromSim(sender, msg)
     end
 
     if not msg.Chat then
+        return
+    end
+    
+    if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
         return
     end
 
@@ -876,7 +916,7 @@ function ToggleChat()
         GUI.bg:Hide()
         GUI.chatEdit.edit:AbandonFocus()
         GUI.bg:SetNeedsFrameUpdate(false)
-        
+
         if ChatOptions.feed_persist then
             GUI.chatContainer:CalcVisible()
         else
@@ -912,7 +952,7 @@ function CreateChatList(parent)
     container.entries = {}
     local function CreatePlayerEntry(data)
         if not data.human and not data.civilian then
-            data.nickname = UiUtilsS.trim(string.gsub(data.nickname,'%b()', '' ))
+            data.nickname = UiUtilsS.trim(string.gsub(data.nickname,'%b()', ''))
         end
         local text = UIUtil.CreateText(container, data.nickname, 12, "Arial")
         text:SetColor('ffffffff')
@@ -1268,6 +1308,7 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Allies>', key = 'allies_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC _Private>', key = 'priv_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
+                {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
                 {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},

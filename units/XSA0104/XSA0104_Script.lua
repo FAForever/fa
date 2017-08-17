@@ -29,15 +29,15 @@ XSA0104 = Class(AirTransport) {
     },
 
     -- Override air destruction effects so we can do something custom here
-    CreateUnitAirDestructionEffects = function( self, scale )
-        self:ForkThread(self.AirDestructionEffectsThread, self )
+    CreateUnitAirDestructionEffects = function(self, scale)
+        self:ForkThread(self.AirDestructionEffectsThread, self)
     end,
 
-    AirDestructionEffectsThread = function( self )
-        local numExplosions = math.floor( table.getn( self.AirDestructionEffectBones ) * 0.5 )
+    AirDestructionEffectsThread = function(self)
+        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone( self, self.AirDestructionEffectBones[util.GetRandomInt( 1, numExplosions )], 0.5 )
-            WaitSeconds( util.GetRandomFloat( 0.2, 0.9 ))
+            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
+            WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,
 }

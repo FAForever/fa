@@ -24,18 +24,18 @@ end
 
 function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
-        AddBuilderTable( aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
+        AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
     end
 end
 
 function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     aiBrain.BuilderManagers[locationType].BuilderHandles = aiBrain.BuilderManagers[locationType].BuilderHandles or {}
     aiBrain.BuilderManagers[locationType].BuilderHandles[tableName] = {}
-    
+
     local builders = aiBrain.BuilderManagers[locationType].BuilderHandles[tableName]
 
     local managers = aiBrain.BuilderManagers[locationType]
-    
+
     local tableType, builderFunction
 
     if builderTable.BuildersType == 'PlatoonFormBuilder' then
@@ -49,7 +49,7 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     else
         error('*AI ERROR: Invalid BuildersType for table of builder to add to brain')
     end
-    
+
     for k,v in builderTable do
         if k != 'BuildersType' and k != 'BuilderGroupName' then
             if type(v) != 'string' then
@@ -58,7 +58,7 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
             if not Builders[v] then
                 WARN('*AI ERROR: Invalid Builder named - ' .. v)
             end
-            table.insert( builders, managers[tableType]:AddBuilder(Builders[v], locationType) )
+            table.insert(builders, managers[tableType]:AddBuilder(Builders[v], locationType))
         end
     end
 end

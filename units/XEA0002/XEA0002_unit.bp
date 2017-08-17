@@ -69,7 +69,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'UNTARGETABLE',
-		'OVERLAYRADAR',
+        'OVERLAYRADAR',
     },
     CollisionOffsetY = -0.65,
     Defense = {
@@ -102,10 +102,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 8000,
-        BuildCostMass = 800,
-        BuildTime = 400,
-	MaintenanceConsumptionPerSecondEnergy = 1000,
+        BuildCostEnergy = 80000,
+        BuildCostMass = 5000,
+        BuildTime = 15000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -200,10 +199,10 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,				#0.1
+            BeamCollisionDelay = 0,
             BeamLifetime = 8,
             CollideFriendly = false,
-            Damage = 50,					#100
+            Damage = 50,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',
@@ -213,7 +212,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#1.5
+            FiringTolerance = 0,
             Label = 'OrbitalDeathLaserWeapon',
             MaxRadius = 32,
             MaximumBeamLength = 200,
@@ -240,7 +239,7 @@ UnitBlueprint {
             RateOfFire = 0.05,
             RenderFireClock = true,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,				#1
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
@@ -251,7 +250,7 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.3,				#1.1 - Satellite wobbles in orbit. This gives it a bit more lockon range for when it's circling
+            TrackingRadius = 1.3, -- 1.1 - Satellite wobbles in orbit. This gives it a bit more lock on range for when it's circling
             TurretBoneMuzzle = 'Turret_Barrel_Muzzle',
             TurretBonePitch = 'Turret_Barrel01',
             TurretBoneYaw = 'Turret_Barrel01',
@@ -263,14 +262,14 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 360,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+            UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 10,
             WeaponUnpacks = false,
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 3000,
+            Damage = 1000,
             DamageFriendly = true,
             DamageRadius = 2,
             DamageType = 'Normal',

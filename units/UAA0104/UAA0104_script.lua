@@ -34,9 +34,9 @@ UAA0104 = Class(AirTransport) {
     end,
 
     AirDestructionEffectsThread = function(self)
-        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones ) * 0.5)
+        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5 )
+            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,

@@ -42,7 +42,7 @@ OpAI = Class {
             self.ChildMonitorHandle = false
             self.PreCreateFinished = true
         end,
-        
+
         FindMaster = function(self, force)
             if self.MasterData and not force then
                 return true
@@ -55,7 +55,7 @@ OpAI = Class {
             end
             return false
         end,
-        
+
         FindChildren = function(self, force)
             if self.ChildrenHandles and table.getn(self.ChildrenHandles) > 0 and not force then
                 return true
@@ -65,14 +65,14 @@ OpAI = Class {
             for tNum,currType in types do
                 for name,builder in ScenarioInfo.BuilderTable[self.AIBrain.CurrentPlan][currType] do
                     if self:ChildNameCheck(name) then
-                        table.insert( self.ChildrenHandles, { ChildName=name, ChildBuilder=builder } )
+                        table.insert(self.ChildrenHandles, { ChildName=name, ChildBuilder=builder })
                     end
                 end
             end
             return true
         end,
 
-        AddChildType = function( self,typeTable )
+        AddChildType = function(self,typeTable)
             if typeTable then
                 for tNum, tName in typeTable do
                     if self.EnabledTypes[tName] == nil then
@@ -82,10 +82,10 @@ OpAI = Class {
             end
         end,
 
-        ChildNameCheck = function(self,name)           
+        ChildNameCheck = function(self,name)
             for k,v in self.ChildrenNames do
                 local found = string.find(v.BuilderName, name .. '_', 1, true)
-                if v.BuilderName == name or found then                   
+                if v.BuilderName == name or found then
                     return true
                 end
             end
@@ -126,15 +126,15 @@ OpAI = Class {
         SetFunctionStatus = function(self,funcName,bool)
             ScenarioInfo.OSPlatoonCounter[self.MasterName..'_' .. funcName] = bool
         end,
-        
+
         -- TODO: make a system out of this.  Derive functionality per override per OpAI type
-        MasterPlatoonFunctionalityChange = function( self, functionData )
+        MasterPlatoonFunctionalityChange = function(self, functionData)
             if functionData[2] == 'LandAssaultWithTransports' then
-                self:SetFunctionStatus( 'Transports', true )
+                self:SetFunctionStatus('Transports', true)
             end
         end,
 
-        TargetCommanderLast = function( self, cat)
+        TargetCommanderLast = function(self, cat)
             return self:SetTargettingPriorities(
             {
                 categories.EXPERIMENTAL,
@@ -145,12 +145,12 @@ OpAI = Class {
                 categories.SPECIALLOWPRI,
                 categories.ALLUNITS - categories.COMMAND,
                 categories.COMMAND,
-                
+
             }
             , cat)
         end,
-        
-        TargetCommanderNever = function( self, cat)
+
+        TargetCommanderNever = function(self, cat)
             return self:SetTargettingPriorities(
             {
                 categories.EXPERIMENTAL,
@@ -159,50 +159,50 @@ OpAI = Class {
                 categories.STRUCTURE * categories.ECONOMIC,
                 categories.MOBILE - categories.COMMAND,
                 categories.SPECIALLOWPRI,
-                categories.ALLUNITS - categories.COMMAND,   
+                categories.ALLUNITS - categories.COMMAND,
             }
-            , cat)        
+            , cat)
         end,
 
         --categories is an optional parameter specifying a subset of the platoon we wish to set target priorities for.
-        SetTargettingPriorities = function( self, priTable, categories )
+        SetTargettingPriorities = function(self, priTable, categories)
             if not self:FindMaster() then
                 return false
             end
-            
+
             local priList = { unpack(priTable) }
             local defList = {'SPECIALHIGHPRI', 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'SPECIALLOWPRI', 'ALLUNITS',}
-              
-            if categories then               
+
+            if categories then
                 --save the priorities for this category.
                 if not self.MasterData.PlatoonData.CategoryPriorities then self.MasterData.PlatoonData.CategoryPriorities = {} end
-                
+
                 --NOTE: This should probably be a table.deepcopy if we're going to alter the original table in the future.
-                
+
                 self.MasterData.PlatoonData.CategoryPriorities[categories] = priList
-                
+
             else
                 for i,v in defList do
                     table.insert(priList, v)
                 end
-                
+
                 self.MasterData.PlatoonData.TargetPriorities = {}
-                
+
                 for i,v in priList do
                     table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 end
-                
+
                 --for k,v in priTable do
                 --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 --end
                 --for k,v in defaultPri do
                 --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 --end
-                
+
             end
-            
-            table.insert( self.MasterData.PlatoonAddFunctions, { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'PlatoonSetTargetPriorities' })
-            
+
+            table.insert(self.MasterData.PlatoonAddFunctions, { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'PlatoonSetTargetPriorities' })
+
             return true
         end,
 
@@ -216,7 +216,7 @@ OpAI = Class {
         -- }
         AddChildrenMonitor = function(self, childrenData)
             for k,v in childrenData do
-                self:AddChildMonitor( v )
+                self:AddChildMonitor(v)
             end
         end,
 
@@ -225,7 +225,7 @@ OpAI = Class {
             -- ChildMonitorData
             for tNum,tName in childData[1] do
                 if self.EnabledTypes[tName] == nil then
-                    error( '*AI DEBUG: Invalid child type - ' .. tName .. ' - in OpAI type - ' .. self.BuilderType, 2 )
+                    error('*AI DEBUG: Invalid child type - ' .. tName .. ' - in OpAI type - ' .. self.BuilderType, 2)
                 end
                 if not self.ChildMonitorData[tName] then
                     self.ChildMonitorData[tName] = {}
@@ -235,24 +235,24 @@ OpAI = Class {
                 if type(fData) == 'table' then
                     -- Check function data
                     for tNum,tName in childData[1] do
-                        table.insert( self.ChildMonitorData[tName], { FunctionInfo = fData } )
+                        table.insert(self.ChildMonitorData[tName], { FunctionInfo = fData })
                     end
                 elseif type(fData) == 'function' then
                     for tNum,tName in childData[1] do
-                        table.insert( self.ChildMonitorData[tName], { DirectFunction = fData } )
+                        table.insert(self.ChildMonitorData[tName], { DirectFunction = fData })
                     end
                 end
             end
 
             -- run the check once and enable/disable as needed
             for tNum,tName in childData[1] do
-                self:ChildMonitorCheck( tName, self.ChildMonitorData[tName] )
+                self:ChildMonitorCheck(tName, self.ChildMonitorData[tName])
             end
 
             -- start thread if not already started
             if not self.ChildMonitorHandle then
                 self.ChildMonitorHandle = ForkThread(self.ChildMonitorThread, self)
-                self.Trash:Add( self.ChildMonitorHandle )
+                self.Trash:Add(self.ChildMonitorHandle)
             end
         end,
 
@@ -260,7 +260,7 @@ OpAI = Class {
             while true do
                 -- Iterate through list enabling/disabling children types as needed.
                 for name,data in self.ChildMonitorData do
-                    self:ChildMonitorCheck( name, data )
+                    self:ChildMonitorCheck(name, data)
                 end
                 WaitSeconds(7)
             end
@@ -275,7 +275,7 @@ OpAI = Class {
                     if v.FunctionInfo[3][1] == "default_brain" then
                         table.remove(v.FunctionInfo[3], 1)
                     end
-                    if not import(v.FunctionInfo[1])[v.FunctionInfo[2]]( self.AIBrain, unpack(v.FunctionInfo[3]) ) then
+                    if not import(v.FunctionInfo[1])[v.FunctionInfo[2]](self.AIBrain, unpack(v.FunctionInfo[3])) then
                         self:SetChildActive(childName, false)
                         return false
                     end
@@ -284,7 +284,7 @@ OpAI = Class {
             self:SetChildActive(childName, true)
             return true
         end,
-        
+
         SetChildQuantity = function(self, childrenType, quantity)
             if not self:FindChildren() or not self:FindMaster() then
                 return false
@@ -299,7 +299,7 @@ OpAI = Class {
             self:KeepChildren(childrenType)
             self:OverrideTemplateSize(quantity)
         end,
-        
+
         RemoveChildren = function(self, childrenType)
             if not self:FindChildren() then
                 return false
@@ -308,9 +308,9 @@ OpAI = Class {
             if type(childrenType) == 'table' then
                 removeTable = childrenType
             else
-                table.insert( removeTable, childrenType )
+                table.insert(removeTable, childrenType)
             end
-            
+
             for k,v in self.ChildrenNames do
                 if v.ChildrenType then
                     local found = false
@@ -338,7 +338,7 @@ OpAI = Class {
                end
             end
         end,
-        
+
         KeepChildren = function(self, childrenType)
             if not self:FindChildren() then
                 return false
@@ -347,9 +347,9 @@ OpAI = Class {
             if type(childrenType) == 'table' then
                 keepTable = childrenType
             else
-                table.insert( keepTable, childrenType )
+                table.insert(keepTable, childrenType)
             end
-            
+
             for k,v in self.ChildrenNames do
                 if v.ChildrenType then
                     -- Child must have all children type to be kept
@@ -362,17 +362,17 @@ OpAI = Class {
                                 break
                             end
                         end
-                        
+
                         -- This child was not found; break out so we can remove
                         if not found then
                             break
                         end
                     end
-                    
+
                     -- All keeptable children must be found to be kept as well.
                     if found then
-                        found = false
                         for num,name in keepTable do
+                            found = false
                             for cNun,cName in v.ChildrenType do
                                 -- child name found; move to the next
                                 if cName == name then
@@ -380,7 +380,7 @@ OpAI = Class {
                                     break
                                 end
                             end
-                            
+
                             -- Child not found; break to remove
                             if not found then
                                 break
@@ -404,11 +404,20 @@ OpAI = Class {
 
         OverrideTemplateSize = function(self, quantity)
             for k,v in self.ChildrenHandles do
-                local overrideNum = math.floor( quantity / ( table.getn(v.ChildBuilder.PlatoonTemplate) - 2 ) )
-                for sNum,sData in v.ChildBuilder.PlatoonTemplate do
-                    if sNum >= 3 then
-                        sData[2] = 1
-                        sData[3] = overrideNum
+                if type(quantity) == 'table' then
+                    for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+                        if sNum >= 3 then
+                            sData[2] = 1
+                            sData[3] = quantity[sNum - 2] or 1
+                        end
+                    end
+                else
+                    local overrideNum = math.floor(quantity / (table.getn(v.ChildBuilder.PlatoonTemplate) - 2))
+                    for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+                        if sNum >= 3 then
+                            sData[2] = 1
+                            sData[3] = overrideNum
+                        end
                     end
                 end
             end
@@ -420,18 +429,18 @@ OpAI = Class {
                 return false
             end
             for k,v in self.ChildrenHandles do
-                local found 
-                
+                local found
+
                 if bName and v.ChildBuilder.BuilderName then
                     found = string.find(bName, v.ChildBuilder.BuilderName .. '_', 1, true)
                 end
-                
+
                 if not bName or bName == v.ChildBuilder.BuilderName or found then
-                    table.insert( v.ChildBuilder.BuildConditions, { fileName, funcName, parameters } )
+                    table.insert(v.ChildBuilder.BuildConditions, { fileName, funcName, parameters })
                 end
             end
             if not bName or bName == self.MasterName then
-                table.insert(self.MasterData.AttackConditions, { fileName, funcName, parameters } )
+                table.insert(self.MasterData.AttackConditions, { fileName, funcName, parameters })
             end
             return true
         end,
@@ -466,14 +475,14 @@ OpAI = Class {
             end
             for k,v in self.ChildrenHandles do
                 if not bName or bName == v.ChildBuilder.BuilderName then
-                    table.insert( v.ChildBuilder.PlatoonAddFunctions, { fileName, funcName } )
+                    table.insert(v.ChildBuilder.PlatoonAddFunctions, { fileName, funcName })
                 end
             end
             if not bName or bName == self.MasterName then
                 if type(fileName) == 'function' then
                     table.insert(self.MasterData.FormCallbacks, fileName)
                 else
-                    table.insert(self.MasterData.FormCallbacks, { fileName, funcName } )
+                    table.insert(self.MasterData.FormCallbacks, { fileName, funcName })
                 end
             end
             return true
@@ -517,11 +526,11 @@ OpAI = Class {
             end
             for k,v in self.ChildrenHandles do
                 if not bName or bName == v.ChildBuilder.BuilderName then
-                    table.insert( v.ChildBuilder.PlatoonBuildCallbacks, { fileName, funcName } )
+                    table.insert(v.ChildBuilder.PlatoonBuildCallbacks, { fileName, funcName })
                 end
             end
             if not bName or bName == self.MasterName then
-                table.insert(self.MasterData.DestroyCallbacks, { fileName, funcName } )
+                table.insert(self.MasterData.DestroyCallbacks, { fileName, funcName })
             end
             return true
         end,
@@ -566,12 +575,12 @@ OpAI = Class {
         end,
 
         SetLockingStyle = function(self,lockType, lockData)
-            if not( lockType == 'None' or lockType == 'DeathTimer' or lockType == 'BuildTimer' or lockType == 'DeathRatio' or lockType == 'RatioTimer' ) then
+            if not(lockType == 'None' or lockType == 'DeathTimer' or lockType == 'BuildTimer' or lockType == 'DeathRatio' or lockType == 'RatioTimer') then
                 error('*AI ERROR: Error adding lock style: valid types are "DeathTimer", "BuildTimer", "DeathRatio", or "None"', 2)
             end
             self:RemoveBuildCondition('AMCheckPlatoonLock')
             if lockType ~= 'None' then
-                self:AddBuildCondition('/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock', {self.MasterName} )
+                self:AddBuildCondition('/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock', {self.MasterName})
                 self:RemoveDestroyCallback('AMUnlockPlatoon', self.MasterName)
                 self:RemoveFormCallback('AMUnlockBuildTimer', self.MasterName)
                 self:RemoveFormCallback('AMUnlockRatio', self.MasterName)
@@ -603,14 +612,14 @@ OpAI = Class {
                 end
             end
         end,
-        
+
         SetChildrenActive = function(self, childrenTypes)
             if not self:FindChildren() then
                 return false
             end
-            
+
             for k,v in childrenTypes do
-                self:SetChildActive( v, true )
+                self:SetChildActive(v, true)
             end
         end,
 
@@ -633,7 +642,7 @@ OpAI = Class {
             for k,v in self.ChildrenNames do
                 -- Make sure this child has children types
                 if v.ChildrenType then
-                
+
                     -- We don't want to change by default
                     local change = false
                     -- if the type is 'All' or we find that this builder has this child type, we may want to change
@@ -688,7 +697,7 @@ OpAI = Class {
             else
                 self.GlobalVarName = name .. '_' .. self.BuilderType.Name
             end
-            
+
             -- Load all the platoon data info in the formation desired
             local platoonData = {}
             if not builderData then
@@ -709,29 +718,29 @@ OpAI = Class {
                 end
             end
             platoonData.LocationType = location
-            
+
             local builders = false
             local saveFile
-            
+
             if type(self.BuilderType) == "string" then --BuilderType is old-school
                 ScenarioUtils.LoadOSB('OSB_' .. self.BuilderType .. '_' .. name, brain.Name, platoonData)
 
                 local fileName = '/lua/ai/OpAI/' .. self.BuilderType .. '_save.lua'
                 saveFile = import(fileName)
-                
+
                 builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
                 self.MasterName = 'OSB_Master_' .. self.BuilderType .. '_' .. brain.Name .. '_' .. name
             else --If BuilderType is a table (was pregenerated)
-            
+
                 ScenarioUtils.LoadOSB(builderType, brain.Name, platoonData)
                 saveFile = {Scenario = builderType}
-                
+
                 --self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name .. '_' .. brain.Name .. '_' .. name
                 self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name .. '_' .. brain.Name
             end
-            
+
             builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
-            
+
             if not builders then
                 error('*OpAI ERROR: No OpAI Global named: '..self.BuilderType, 2)
             end
@@ -748,18 +757,18 @@ OpAI = Class {
                     end
                     local cType = string.sub(k,startCheck)
 
-                    table.insert(self.ChildrenNames, { BuilderName = k..'_'..brain.Name..'_'..name, ChildrenType = v.ChildrenType } )
-                    self:AddChildType( v.ChildrenType )
+                    table.insert(self.ChildrenNames, { BuilderName = k..'_'..brain.Name..'_'..name, ChildrenType = v.ChildrenType })
+                    self:AddChildType(v.ChildrenType)
                 end
             end
             if builderData.MasterPlatoonFunction then
                 if self:FindMaster() then
                     self.MasterData.AIThread = builderData.MasterPlatoonFunction
-                    self:MasterPlatoonFunctionalityChange( builderData.MasterPlatoonFunction )
+                    self:MasterPlatoonFunctionalityChange(builderData.MasterPlatoonFunction)
                 end
             end
 
-            self:AddBuildCondition(BMBC, 'BaseActive', { location } )
+            self:AddBuildCondition(BMBC, 'BaseActive', { location })
         end,
     }
 

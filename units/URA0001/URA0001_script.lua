@@ -6,6 +6,8 @@
 -----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
+local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
@@ -19,14 +21,33 @@ URA0001 = Class(CAirUnit) {
         self:SetConsumptionActive(false)
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams( self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag )
+        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
+    end,
+
+    OnStartCapture = function(self, target)
+        IssueStop({self}) -- You can't capture!
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop({self})  -- You can't reclaim!
+        IssueStop({self}) -- You can't reclaim!
+    end,
+
+    -- We never want to waste effort sinking these
+    ShallSink = function(self)
+        return false
+    end,
+
+    -- Removed all collider related stuff
+    OnImpact = function(self, with)
+        if with == 'Water' then
+            self:PlayUnitSound('AirUnitWaterImpact')
+            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+        end
+
+        self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
@@ -38,11 +59,11 @@ URA0001 = Class(CAirUnit) {
     OnKilled = function(self)
         self:StopBuildingEffects()
     end,
-    
+
     -- Don't cycle intel!
     EnableUnitIntel = function(self, disabler, intel)
     end,
-    
+
     -- Don't make wreckage
     CreateWreckage = function (self, overkillRatio)
         overkillRatio = 1.1
