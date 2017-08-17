@@ -86,8 +86,8 @@ end
 
 local statFuncs = {
     function(info)
-        if info.massProduced > 0 or info.massRequested > 0 then
-            return string.format('%+d', math.ceil(info.massProduced - info.massRequested)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+        if info.massProduced > 0 or info.massConsumed > 0 then
+            return string.format('%+d', math.ceil(info.massProduced - info.massConsumed)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
@@ -101,8 +101,8 @@ local statFuncs = {
         end
     end,
     function(info)
-        if info.energyProduced > 0 or info.energyRequested > 0 then
-            return string.format('%+d', math.ceil(info.energyProduced - info.energyRequested))
+        if info.energyProduced > 0 or info.energyConsumed > 0 then
+            return string.format('%+d', math.ceil(info.energyProduced - info.energyConsumed))
         else
             return false
         end
