@@ -2204,7 +2204,6 @@ CommandUnit = Class(WalkingLandUnit) {
         self:HideBone(0, true)
         self:SetUnSelectable(true)
         self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
         self:ForkThread(self.WarpInEffectThread, bones)
     end,
 
