@@ -156,8 +156,8 @@ function CreateDialog()
     end
 
     edit.OnEnterPressed = function(self, text)
-        if text == "ren_showdirtyterrain" then
-            WARN("This command is harmful and will crash the game. It is not executed.")
+        if string.lower(text) == "ren_showdirtyterrain" then
+            WARN("The command \'" .. text .. "\' is harmful and will crash the game. It is not executed.")
             return
         end
         ConExecuteSave(text)
