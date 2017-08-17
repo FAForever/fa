@@ -355,6 +355,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
 end
 
 function CommanderWarpDelay(cdrUnit, delay)
+    cdrUnit:SetBlockCommandQueue(true)
     WaitSeconds(delay)
     cdrUnit:PlayCommanderWarpInEffect()
 end
