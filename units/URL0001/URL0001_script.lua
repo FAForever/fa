@@ -58,6 +58,17 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         end
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        
+        local wepBp = self:GetBlueprint().Weapon
+        self.normalRange = 22
+        self.torpRange = 60
+        for k, v in wepBp do
+            if v.Label == 'RightRipper' then
+                self.normalRange = v.MaxRadius
+            elseif v.Label == 'Torpedo' then
+                self.torpRange = v.MaxRadius
+            end
+        end
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -241,6 +252,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            self.normalRange = bp.NewMaxRadius or 44
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
             local microwave = self:GetWeaponByLabel('MLG')
             microwave:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -250,16 +262,18 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
-            wep:ChangeRateOfFire(bpDisrupt or 1)
-            bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
-            wep:ChangeMaxRadius(bpDisrupt or 22)
-            local microwave = self:GetWeaponByLabel('MLG')
-            microwave:ChangeMaxRadius(bpDisrupt or 22)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bpDisrupt or 22)
+            local wepBp = self:GetBlueprint().Weapon
+            for k, v in wepBp do
+                if v.Label == 'RightRipper' then
+                    wep:ChangeRateOfFire(v.RateOfFire or 1)
+                    wep:ChangeMaxRadius(v.MaxRadius or 22)
+                    self.normalRange = v.MaxRadius or 22
+                    self:GetWeaponByLabel('MLG'):ChangeMaxRadius(v.MaxRadius or 22)
+                    self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
+                    self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
+                    break
+                end
+            end
         elseif enh == 'MicrowaveLaserGenerator' then
             self:SetWeaponEnabledByLabel('MLG', true)
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
@@ -366,6 +380,16 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         end
         -- Otherwise, we should finish killing the unit
         ACUUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
+    OnLayerChange = function(self, new, old)
+        ACUUnit.OnLayerChange(self, new, old)
+        if self:GetWeaponByLabel('DummyWeapon') == nil then return end
+        if new == "Seabed" then
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange or 60)
+        else
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange or 22)
+        end
     end,
 }
 
