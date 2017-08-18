@@ -1,11 +1,11 @@
---****************************************************************************
---**
---**  File     :  /data/units/XSL0305/XSL0305_script.lua
---**
---**  Summary  :  Seraphim Sniper Bot Script
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+--**************************************************************************
+--
+--  File     :  /data/units/XSL0305/XSL0305_script.lua
+--
+--  Summary  :  Seraphim Sniper Bot Script
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**************************************************************************
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')  #added for effects
@@ -30,17 +30,13 @@ XSL0305 = Class(SLandUnit) {
         SLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('SniperGun', false)
         
-        -- find dummy weapon. Since it is not declared above, we can't use getweaponbylabel
         local wepBp = self:GetBlueprint().Weapon
-        self.dummyweapon = nil
         self.sniperRange = 75
         self.normalRange = 65
         for k, v in wepBp do
-            if v.Label == 'DummyWeapon' then
-                self.dummyweapon = k
-            elseif v.Label == 'SniperGun' then
+            if v.Label == 'SniperGun' then
                 self.sniperRange = v.MaxRadius
-            else
+            elseif v.Label == 'MainGun' then
                 self.normalRange = v.MaxRadius
             end
         end
@@ -55,7 +51,7 @@ XSL0305 = Class(SLandUnit) {
             self:SetWeaponEnabledByLabel('SniperGun', true)
             self:SetWeaponEnabledByLabel('MainGun', false)
             self:GetWeaponManipulatorByLabel('SniperGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('MainGun'):GetHeadingPitch())
-            self.dummyweapon:ChangeMaxRadius(self.sniperRange)
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.sniperRange)
         end
 
 
@@ -66,9 +62,6 @@ XSL0305 = Class(SLandUnit) {
         self.ShieldEffectsBag = {}
 
         table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp'))
-        --CreateAttachedEmitter(self, 'XSL0305', self:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_01_emit.bp')
-        --end added visual que
-
     end,
 
     OnScriptBitClear = function(self, bit)
@@ -81,10 +74,8 @@ XSL0305 = Class(SLandUnit) {
             self:SetWeaponEnabledByLabel('SniperGun', false)
             self:SetWeaponEnabledByLabel('MainGun', true)
             self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch())
-            self.dummyweapon:ChangeMaxRadius(self.normalRange)
-            --this is to remove the effect generated in sniper mode
-            --table.remove(self.ShieldEffectsBag)
-            --EffectUtil.CleanupEffectBag(self,'ShieldEffectsBag')
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+            
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
                     v:Destroy()
