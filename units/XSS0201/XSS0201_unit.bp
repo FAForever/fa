@@ -477,7 +477,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 1,
-            TargetCheckInterval = 2,
+            TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
