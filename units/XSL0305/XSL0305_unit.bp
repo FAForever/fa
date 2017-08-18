@@ -259,6 +259,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
+            Label = 'DummyWeapon',
             MaxRadius = 65,
             RackBones = {
                 {
