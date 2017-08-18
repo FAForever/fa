@@ -7,17 +7,17 @@ ProjectileBlueprint {
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_impact',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_impact',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         NukeExplosion = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_impact',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
     },
