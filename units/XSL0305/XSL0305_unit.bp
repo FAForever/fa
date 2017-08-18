@@ -51,6 +51,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'BOT',
         'OVERLAYDIRECTFIRE',
+        'DUMMYGSRWEAPON',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -251,6 +252,32 @@ UnitBlueprint {
         Level5 = 60,
     },
     Weapon = {
+        { -- special dummy weapon to make the unit stop a certain distance away
+            Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = { --what the unit will stop for, flak stops for air as well
+                Land = 'Land|Water|Seabed',
+                Water = 'Land|Water|Seabed',
+            },
+            MaxRadius = 65,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Muzzle',
+                    },
+                    RackBone = 'Barrel',
+                },
+            },
+            RateOfFire = 0.5,
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TrackingRadius = 1.2,
+            Turreted = true,
+            SlavedToBody = false,
+        },
         {
             AboveWaterTargetsOnly = true,
             Audio = {
