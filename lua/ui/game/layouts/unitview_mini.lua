@@ -84,7 +84,7 @@ function SetLayout()
     LayoutHelpers.Below(controls.nextVet, controls.vetBar)
     controls.nextVet:SetDropShadow(true)
     LayoutHelpers.Above(controls.vetTitle, controls.vetBar)
-    controls.nextVet:SetDropShadow(true)
+    controls.vetTitle:SetDropShadow(true)
 
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
