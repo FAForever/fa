@@ -1307,33 +1307,22 @@ Unit = Class(moho.unit_methods) {
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
-    OnKilledUnit = function(self, unitKilled)
-        -- No XP for friendly fire...
-        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
-            return
+    OnKilledUnit = function(self, unitKilled, massKilled)
+        if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
+        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then return end -- No XP for friendly fire...
+
+        -- Give more weight to contributing to the death of a unit of higher veterancy than ourselves
+        massKilled = massKilled * math.max(((unitKilled.Sync.VeteranLevel or 1) - self.Sync.VeteranLevel), 1)
+
+        self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+    end,
+
         end
 
-        -- Or for killing incomplete units.
-        if unitKilled:GetFractionComplete() ~= 1 then
-            return
         end
 
-        -- Assign XP according to the category of unit killed.
-        -- TODO: We can very possibly do this more cheaply and clearly by using RTTI on unitKilled?
-        if EntityCategoryContains(categories.WALL, unitKilled) then
-            self:AddXP(WALL_XP)
-        elseif EntityCategoryContains(categories.STRUCTURE, unitKilled) then
-            self:AddXP(STRUCTURE_XP)
-        elseif EntityCategoryContains(categories.TECH1, unitKilled) then
-            self:AddXP(TECH1_XP)
-        elseif EntityCategoryContains(categories.TECH2, unitKilled) then
-            self:AddXP(TECH2_XP)
-        elseif EntityCategoryContains(categories.TECH3, unitKilled) then
-            self:AddXP(TECH3_XP)
-        elseif EntityCategoryContains(categories.EXPERIMENTAL, unitKilled) then
-            self:AddXP(EXPERIMENTAL_XP)
-        elseif EntityCategoryContains(categories.COMMAND, unitKilled) then
-            self:AddXP(COMMAND_XP)
         else
             self:AddXP(DEFAULT_XP)
         end
