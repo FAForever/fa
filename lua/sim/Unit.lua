@@ -1657,7 +1657,11 @@ Unit = Class(moho.unit_methods) {
 
             if isNaval and self:GetBlueprint().Display.AnimationDeath then
                 -- Waits for wreck to hit bottom or end of animation
-                self:SeabedWatcher()
+                if self:GetFractionComplete() > 0.5 then
+                    self:SeabedWatcher()
+                else
+                    self:DestroyUnit(overkillRatio)
+                end
             else
                 -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's make one up.
                 local this = self
