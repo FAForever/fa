@@ -21,6 +21,7 @@ GameColors = {
     "FF2F4F4F",      -- olive (dark green)
     "ff40bf40",      -- mid green
     "ff66ffcc",      -- aqua
+    "ff76a101",      -- Order Green
     },
 
     PlayerColors = {
@@ -42,6 +43,7 @@ GameColors = {
     "FF2F4F4F",      -- olive (dark green)
     "ff40bf40",      -- mid green
     "ff66ffcc",      -- aqua
+    "ff76a101",      -- Order Green
     },
 
     TeamColorMode = {
