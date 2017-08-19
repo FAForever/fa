@@ -1123,6 +1123,13 @@ Unit = Class(moho.unit_methods) {
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         local preAdjHealth = self:GetHealth()
 
+        -- Keep track of instigators, but only if it is a unit
+        if instigator and IsUnit(instigator) then
+            amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
+            self.Instigators[instigator] = (self.Instigators[instigator] or 0) + amountForVet
+            self.totalDamageTaken = self.totalDamageTaken + amountForVet
+        end
+
         self:AdjustHealth(instigator, -amount)
 
         local health = self:GetHealth()
@@ -1252,10 +1259,14 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
-        -- Notify instigator of kill
-        if instigator and IsUnit(instigator) then
-            instigator:OnKilledUnit(self)
+        -- Notify instigator of kill and spread veterancy
+        -- We prevent any vet spreading if the instigator isn't part of the vet system (EG - Self destruct)
+        -- This is so that you can bring a damaged Experimental back to base, kill, and rebuild, without granting
+        -- instant vet to the enemy army, as well as other obscure reasons
+        if instigator and IsUnit(instigator) and self.totalDamageTaken > 0 and instigator.gainsVeterancy then
+            self:VeterancyDispersal()
         end
+
         ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
 
         if self.DeathWeaponEnabled ~= false then
@@ -1276,6 +1287,24 @@ Unit = Class(moho.unit_methods) {
 
     -- This section contains functions used by the new mass-based veterancy system
     ------------------------------------------------------------------------------
+
+    -- Tell any living instigators that they need to gain some veterancy
+    VeterancyDispersal = function(self)
+        local bp = self:GetBlueprint()
+        local mass = bp.Economy.BuildCostMass
+
+        -- Allow units to count for more or less than their real mass if needed.
+        mass = mass * (bp.Veteran.ImportanceMult or 1)
+
+        for unit, damageDealt in self.Instigators do
+            -- Make sure the unit is something which can vet, and is not maxed
+            if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
+                -- Find the proportion of yourself that each instigator killed
+                local massKilled = math.floor(mass * (damageDealt / self.totalDamageTaken))
+                unit:OnKilledUnit(self, massKilled)
+            end
+        end
+    end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
