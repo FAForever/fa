@@ -1154,6 +1154,8 @@ RebuildStructuresTemplate = {
         -- radar
         -- {'ueb3104', 'ueb3101',},
         -- {'ueb3201', 'ueb3101',},
+        -- engie stations
+        {'xeb0204', 'xeb0104',},
     },
     -- Aeon
     {
@@ -1189,6 +1191,9 @@ RebuildStructuresTemplate = {
         {'urb4205', 'urb4202',},
         {'urb4206', 'urb4202',},
         {'urb4207', 'urb4202',},
+        -- engie stations
+        {'xrb0204', 'xrb0104',},
+        {'xrb0304', 'xrb0104',},
     },
 
     -- Seraphim
