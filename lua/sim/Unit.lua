@@ -27,23 +27,8 @@ local Set = import('/lua/system/setutils.lua')
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
-
 -- Deprecated function warning flags
 local GetUnitBeingBuiltWarning = false
-
-
--- TODO: We should really introduce a veterancy module at some point.
--- XP gained for killing various unit types.
-local WALL_XP = 0.1
-local STRUCTURE_XP = 1
-local TECH1_XP = 1
-local TECH2_XP = 3
-local TECH3_XP = 6
-local COMMAND_XP = 6
-local EXPERIMENTAL_XP = 50
-
--- For killing any unit that doesn't match any of the other categories.
-local DEFAULT_XP = 1
 
 SyncMeta = {
     __index = function(t, key)
