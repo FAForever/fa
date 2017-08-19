@@ -163,7 +163,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Create an economy event for those weapons which require Energy to fire
     StartEconomyDrain = function(self)
         if self.FirstShot then return end
-        if self.unit:GetFractionComplete() ~= 1 then retern end
+        if self.unit:GetFractionComplete() ~= 1 then return end
 
         local bp = self:GetBlueprint()
         if not self.EconDrain and bp.EnergyRequired and bp.EnergyDrainPerSecond then
