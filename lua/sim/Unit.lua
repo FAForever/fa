@@ -1304,15 +1304,111 @@ Unit = Class(moho.unit_methods) {
         ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
     end,
 
+    CalculateVeterancyLevel = function(self, massKilled)
+        local bp = self:GetBlueprint()
+
+        -- Total up the mass the unit has killed overall, and store it
+        self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
+
+        -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 1.25 by default) grants a level
+        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+
+        -- Bail if our veterancy hasn't increased
+        if newVetLevel == self.Sync.VeteranLevel then return end
+
+        -- Update our recorded veterancy level
+        self.Sync.VeteranLevel = newVetLevel
+
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
+    end,
+
+    -- Use this to set a veterancy level directly, usually used by a scenario
+    SetVeterancy = function(self, veteranLevel)
+        if veteranLevel <= 0 or veteranLevel > 5 then return end
+        if not self.gainsVeterancy then return end
+
+        self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+    end,
+
+    -- Set the veteran level to the level specified
+    SetVeteranLevel = function(self, level)
+        local buffTypes = {'Regen', 'MaxHealth'}
+        local bp = self:GetBlueprint().Buffs or {}
+        local name = 'Level' .. level
+        for _, bType in buffTypes do
+            if bp[bType] and bp[bType][name] then -- Check the unit has an entry for this buffType and veterancy level
+                local buffName = self:CreateVeterancyBuff(level, bp[bType][name], bType)
+                if buffName then
+                    Buff.ApplyBuff(self, buffName)
+                end
+            else
+                Buff.ApplyBuff(self, 'Veterancy' .. bType .. level)
+            end
         end
 
+        self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
+        self:DoVeterancyHealing(level)
+
+        self:DoUnitCallbacks('OnVeteran')
+    end,
+
+    -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
+    DoVeterancyHealing = function(self, level)
+        local bp = self:GetBlueprint()
+        local maxHealth = bp.Defense.MaxHealth
+        local mult = bp.VeteranHealingMult[level] or 0.1
+
+        self:AdjustHealth(self, maxHealth * mult) -- Adjusts health by the given value (Can be +tv or -tv), not to the given value
+    end,
+
+    -- Table housing data on what to use to generate buffs for a unit
+    BuffTypes = {
+        Regen = {BuffType = 'VeterancyRegen', BuffValFunction = 'Add', BuffDuration = -1, BuffStacks = 'REPLACE'},
+        Health = {BuffType = 'VeterancyMaxHealth', BuffValFunction = 'Mult', BuffDuration = -1, BuffStacks = 'REPLACE'},
+    },
+
+    CreateVeterancyBuff = function(self, level, levelValue, buffType)
+        -- Make sure there is an appropriate buff type for this unit
+        if not self.BuffTypes[buffType] then
+            WARN('*WARNING: Tried to generate a buff of unknown type to units: ' .. buffType .. ' - UnitId: ' .. self:GetUnitId())
+            return nil
         end
 
+        local buffName = self:GetUnitId() .. buffType .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
+
+        if Buffs[buffName] then
+            return buffName -- We already have this generated
+        end
+
+        local addVal = 0
+        local multVal = 1
+        local buffTable = self.BuffTypes[buffType]
+
+        -- Figure out what we want the Add and Mult values to be based on the BuffTypes table
+        if buffTable.BuffValFunction == 'Add' then
+            addVal = levelValue
         else
-            self:AddXP(DEFAULT_XP)
+            multVal = levelValue
         end
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+        -- Create the buff if needed
+        BuffBlueprint {
+            Name = buffName,
+            DisplayName = buffName,
+            BuffType = buffTable.BuffType,
+            Stacks = buffTable.BuffStacks,
+            Duration = buffTable.BuffDuration,
+            Affects = {
+                Regen = {
+                    Add = addVal,
+                    Mult = multVal,
+                },
+            },
+        }
+
+        -- Return the buffname so the buff can be applied to the unit
+        return buffName
+    end,
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
     ShouldUseVetSystem = function(self)
@@ -3735,145 +3831,6 @@ Unit = Class(moho.unit_methods) {
     SetRegen = function(self, value)
         self:SetRegenRate(value)
         self.Sync.regen = value
-    end,
-
-    AddXP = function(self, amount)
-        self.xp = self.xp + (amount)
-        self.Sync.xp = self.xp
-        self:CheckVeteranLevel()
-    end,
-
-    -- Use this to go through the AddXP function rather than directly setting Veterancy
-    SetVeterancy = function(self, veteranLevel)
-        veteranLevel = veteranLevel or 5
-        if veteranLevel == 0 or veteranLevel > 5 then return end
-
-        local bp = self:GetBlueprint()
-        local lvl = 'Level' .. veteranLevel
-        local xp = bp.Veteran[lvl] or import('/lua/game.lua').VeteranDefault[lvl]
-        if xp then
-            self:AddXP(xp)
-        else
-             error('Invalid veteran level - ' .. veteranLevel)
-        end
-    end,
-
-    -- Return the unit's current vet level
-    GetVeteranLevel = function(self)
-        return self.VeteranLevel
-    end,
-
-    -- Check to see if we should veteran up.
-    CheckVeteranLevel = function(self)
-        local levels = self:GetBlueprint().Veteran or Game.VeteranDefault
-        local maxLevel = table.getsize(levels)
-
-        -- We are already at the highest veteran level, return
-        if self.VeteranLevel >= maxLevel then
-            return
-        end
-
-        local next = self.VeteranLevel + 1
-        while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
-             self:SetVeteranLevel(next)
-             next = self.VeteranLevel + 1
-        end
-    end,
-
-    -- Set the veteran level to the level specified
-    SetVeteranLevel = function(self, level)
-        local old = self.VeteranLevel
-        self.VeteranLevel = level
-
-        -- Apply default veterancy buffs
-        local buffTypes = {'Regen', 'MaxHealth'}
-
-        for k, bType in buffTypes do
-            Buff.ApplyBuff(self, 'Veterancy' .. bType .. level)
-        end
-
-        -- Get any overriding buffs if they exist
-        local bp = self:GetBlueprint().Buffs
-        if bp then
-            for bType, bData in bp do
-                for lName, lValue in bData do
-                    if lName == 'Level'..level then
-                        -- Generate a buff based on the data paseed in
-                        local buffName = self:CreateVeterancyBuff(lName, lValue, bType)
-                        if buffName then
-                            Buff.ApplyBuff(self, buffName)
-                        end
-                    end
-                end
-            end
-        end
-        self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
-        self:DoVeterancyHealing(level)
-
-        self:DoUnitCallbacks('OnVeteran')
-    end,
-
-    -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
-    DoVeterancyHealing = function(self, level)
-        local bp = self:GetBlueprint()
-        local maxHealth = bp.Defense.MaxHealth
-        local mult = bp.VeteranHealingMult[level] or 0.1
-
-        self:AdjustHealth(self, maxHealth * mult)
-    end,
-
-    -- Table housing data on what to use to generate buffs for a unit
-    BuffTypes = {
-        Regen = {BuffType = 'VETERANCYREGEN', BuffValFunction = 'Add', BuffDuration = -1, BuffStacks = 'REPLACE'},
-        Health = {BuffType = 'VETERANCYHEALTH', BuffValFunction = 'Mult', BuffDuration = -1, BuffStacks = 'REPLACE'},
-    },
-
-    CreateVeterancyBuff = function(self, levelName, levelValue, buffType)
-        if buffType == 'MaxHealthAffectHealth' then
-            return false
-        end
-
-        if buffType == 'Damage' then
-            return false
-        end
-
-        -- Make sure there is an appropriate buff type for this unit
-        if not self.BuffTypes[buffType] then
-            WARN('*WARNING: Tried to generate a buff of unknown type to units: ' .. buffType .. ' - UnitId: ' .. self:GetUnitId())
-            return nil
-        end
-
-        -- Generate a buff based on the unitId
-        local buffName = self:GetUnitId() .. levelName .. buffType
-
-        -- Figure out what we want the Add and Mult values to be based on the BuffTypes table
-        local addVal = 0
-        local multVal = 1
-        if self.BuffTypes[buffType].BuffValFunction == 'Add' then
-            addVal = levelValue
-        else
-            multVal = levelValue
-        end
-
-        -- Create the buff if needed
-        if not Buffs[buffName] then
-            BuffBlueprint {
-                Name = buffName,
-                DisplayName = buffName,
-                BuffType = self.BuffTypes[buffType].BuffType,
-                Stacks = self.BuffTypes[buffType].BuffStacks,
-                Duration = self.BuffTypes[buffType].BuffDuration,
-                Affects = {
-                    Regen = {
-                        Add = addVal,
-                        Mult = multVal,
-                    },
-                },
-            }
-        end
-
-        -- Return the buffname so the buff can be applied to the unit
-        return buffName
     end,
 
     -------------------------------------------------------------------------------------------
