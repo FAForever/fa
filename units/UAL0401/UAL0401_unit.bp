@@ -8,7 +8,7 @@ UnitBlueprint {
             'Right_Leg_B01',
         },
         AddTargetBones = {
-            'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
+            'AttachSpecial01',
             'AttachSpecial02',
         },
     },
@@ -342,8 +342,8 @@ UnitBlueprint {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',#
-        'TECH3 STRUCTURE',#
+                'STRUCTURE DEFENSE',
+                'TECH3 STRUCTURE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'SPECIALLOWPRI',
@@ -424,8 +424,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-
-            # TrackingRadius = 45,
             TurretBoneMuzzle = 'Right_Arm_Muzzle01',
             TurretBonePitch = 'Right_Arm_B02',
             TurretBoneYaw = 'Right_Arm_B01',
@@ -515,8 +513,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-
-            # TrackingRadius = 45,
             TurretBoneMuzzle = 'Left_Arm_Muzzle01',
             TurretBonePitch = 'Left_Arm_B02',
             TurretBoneYaw = 'Left_Arm_B01',
@@ -554,8 +550,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = true, #from false
-            Water = true, #from false
+            Sub = true,
+            Water = true,
         },
     },
 }

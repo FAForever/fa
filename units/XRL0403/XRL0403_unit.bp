@@ -354,7 +354,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-            ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -444,7 +444,7 @@ UnitBlueprint {
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-            ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -512,7 +512,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Torpedo01',
-            MaxRadius = 64, -- Fix for Megalith not attacking a naval target because it stays in range of primary weapon
+            MaxRadius = 64,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
