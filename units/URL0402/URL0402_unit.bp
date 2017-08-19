@@ -262,7 +262,6 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        AlwaysActiveIntel = true,
         ActiveIntel = {'Sonar'},
         RadarStealth = true,
         RadarStealthField = true,
