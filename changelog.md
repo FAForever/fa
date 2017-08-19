@@ -1,7 +1,30 @@
-Patch 3688
+Patch 3688 (Upcoming)
 ============================
-### Other
+### Gameplay
+- Disabled ACU build ability before warp in to stop fast clicks sometimes netting a several-second advantage
+- Fixed the Seraphim Sniperbot not working with attack-move in its non-default mode
+- Added target bones to T1 Subs to allow them to be attacked by surface units when surfaced
+- Added above water target bone to Cybran T1 Torpedo Launcher to allow it to be attacked by surface units, particularly the Seraphim Destroyer
+- Fixed the Cybran ACU needing to get into Gun range to attack a specific target with its torpedo upgrade
+
+### Bugs
+- Fixed units with no faction assignment (From mods usually) breaking the game
+- Fixed Percival low detail model not turning its gun properly
+- Fixed Seraphim Destroyer not firing its torpedo salvos properly when given orders
+- Fixed the Seraphim nuke impact sound calling the wrong sound cue
+- Fixed incomplete ships sometimes not being destroyed with their factory
+
+### UI
 - Changed Salvation to be categorized as an experimental instead of a t3 building
+- Fixed ACU power consumption not correct after Overcharge
+
+### Lobby
+- Changed background faction images to widescreen versions
+- Added a new army colour: Order Green. It is the same colour as the Order in the FA Campaign
+
+### Other
+- Fixed typo in Novax center bones
+- Prevented the execution of certain game-breaking console commands
 
 ### Contributors
 - CookieNoob
