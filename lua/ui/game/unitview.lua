@@ -205,6 +205,7 @@ function UpdateWindow(info)
         controls.healthBar:Hide()
         controls.shieldBar:Hide()
         controls.fuelBar:Hide()
+        controls.vetBar:Hide()
         controls.actionIcon:Hide()
         controls.actionText:Hide()
         controls.abilities:Hide()
@@ -281,6 +282,7 @@ function UpdateWindow(info)
 
         controls.shieldBar:Hide()
         controls.fuelBar:Hide()
+        controls.vetBar:Hide()
 
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
@@ -310,16 +312,37 @@ function UpdateWindow(info)
         else
             controls.healthBar:Hide()
         end
-        local veterancyLevels = bp.Veteran or veterancyDefaults
-        for index = 1, 5 do
-            local i = index
-            if UnitData[info.entityId].xp >= veterancyLevels[string.format('Level%d', i)] then
-                controls.vetIcons[i]:Show()
-                controls.vetIcons[i]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
+
+        -- Control the veterancy stars
+        local currentLevel = UnitData[info.entityId].Sync.VeteranLevel
+        local massKilled = UnitData[info.entityId].Sync.totalMassKilled
+        local myValue = UnitData[info.entityId].Sync.myValue
+
+        for level = 1, 5 do
+            local l = level
+            if currentLevel >= l then
+                controls.vetIcons[l]:Show()
+                controls.vetIcons[l]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
             else
-                controls.vetIcons[i]:Hide()
+                controls.vetIcons[1]:Hide()
             end
         end
+
+        -- Control the veterancy progress bar
+        if massKilled and myValue then
+            local progress = math.min(massKilled / myValue, 5) - currentLevel
+            if progress then
+                if currentLevel < 5 then
+                    controls.vetBar:Show()
+                    controls.vetBar:SetValue(progress)
+                    local text = massKilled .. '/' .. (myValue * (currentLevel + 1))
+                    controls.nextVet:SetText(text)
+                else
+                    controls.vetBar:Hide()
+                end
+            end
+        end
+
         local unitQueue = false
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
@@ -505,6 +528,10 @@ function CreateUI()
     controls.shieldBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.fuelBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.health = UIUtil.CreateText(controls.healthBar, '', 14, UIUtil.bodyFont)
+    controls.vetBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
+    controls.nextVet = UIUtil.CreateText(controls.vetBar, '', 10, UIUtil.bodyFont)
+    controls.vetTitle = UIUtil.CreateText(controls.vetBar, 'Veterancy', 10, UIUtil.bodyFont)
+
     controls.statGroups = {}
     for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
