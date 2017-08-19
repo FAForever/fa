@@ -2328,6 +2328,18 @@ ACUUnit = Class(CommandUnit) {
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
 
+    OnKilledUnit = function(self, unitKilled, massKilled)
+        -- Adjust mass based on unit killed for ACU
+        local techIndex = function()
+            for k, tech in pairs({'TECH1', 'TECH2', 'TECH3', 'EXPERIMENTAL', 'COMMAND'}) do
+                if tech == unitKilled.techCategory then return k end
+            end
+        end
+        massKilled = massKilled / techIndex()
+
+        CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
+    end,
+
     BuildDisable = function(self)
         while self:IsUnitState('Building') or self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') or
                 self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
