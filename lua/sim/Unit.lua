@@ -2042,6 +2042,8 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
+        local bp = self:GetBlueprint()
+
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
         -- Do all this here so we only have to do for things which get completed
         -- Don't need to track damage for things which cannot attack!
@@ -2057,7 +2059,6 @@ Unit = Class(moho.unit_methods) {
             self.Sync.myValue = math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult))
         end
 
-        local bp = self:GetBlueprint()
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
