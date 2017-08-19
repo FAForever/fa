@@ -403,9 +403,8 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         end
     end
 
-    -- Adds are calculated first, then the mults.  May want to expand that later.
-    local returnVal = false
-    returnVal = (initialVal + adds + multsTotal) * mults
+    -- Adds are calculated first, then the mults.
+    local returnVal = (initialVal + adds + multsTotal) * mults
 
     return returnVal, bool
 end
