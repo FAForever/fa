@@ -172,8 +172,6 @@ UnitBlueprint {
             '<LOC ability_omni>Omni Sensor',
             '<LOC ability_deathaoe>Volatile',
         },
-
-        -- AnimationIdle = '/units/uel0001/uel0001_a002.sca',
         AnimationWalk = '/units/uel0001/uel0001_a001.sca',
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
