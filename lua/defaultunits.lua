@@ -1762,8 +1762,8 @@ AirUnit = Class(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if instigator and IsUnit(instigator) then
-                instigator:OnKilledUnit(self)
+            if instigator and IsUnit(instigator) and self.totalDamageTaken > 0 and instigator.gainsVeterancy then
+                self:VeterancyDispersal()
             end
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
