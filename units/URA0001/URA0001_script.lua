@@ -103,7 +103,7 @@ URA0001 = Class(CAirUnit) {
         Main = function(self)
             local focus = self.spawnedBy:GetFocusUnit()
 
-            if not focus or focus.Dead then
+            if not focus or focus:BeenDestroyed() then
                 ChangeState(self, self.IdleState)
             end
 
