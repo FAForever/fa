@@ -216,7 +216,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Set up veterancy
         self.xp = 0
-        self.VeteranLevel = 0
+        self.Instigators = {}
+        self.totalDamageTaken = 0
 
         self.debris_Vector = Vector(0, 0, 0)
 
@@ -1273,6 +1274,9 @@ Unit = Class(moho.unit_methods) {
         self.CanBeKilled = val
     end,
 
+    -- This section contains functions used by the new mass-based veterancy system
+    ------------------------------------------------------------------------------
+
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
         -- No XP for friendly fire...
@@ -1306,7 +1310,29 @@ Unit = Class(moho.unit_methods) {
         end
 
         ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+
+    -- Returns true if a unit can gain veterancy (Has a weapon)
+    ShouldUseVetSystem = function(self)
+        local weps = self:GetBlueprint().Weapon
+
+        -- Bail if we don't have any weapons
+        if not weps[1] then
+            return false
+        end
+
+        -- Find a weapon which is not a DeathWeapon
+        for index, wep in weps do
+            if wep.Label ~= 'DeathWeapon' then
+                return true
+            end
+        end
+
+        -- We only have a DeathWeapon. Bail.
+        return false
     end,
+
+    -- End of Veterancy Section
+    ------------------------------------------------------------------------------
 
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
@@ -1915,6 +1941,21 @@ Unit = Class(moho.unit_methods) {
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
             return false
+        end
+
+        -- Set up Veterancy tracking here. Avoids needing to check completion later.
+        -- Do all this here so we only have to do for things which get completed
+        -- Don't need to track damage for things which cannot attack!
+        self.gainsVeterancy = self:ShouldUseVetSystem()
+
+        if self.gainsVeterancy then
+            self.Sync.totalMassKilled = 0
+            self.Sync.VeteranLevel = 0
+
+            -- Allow units to require more or less mass to level up. Decimal multipliers mean
+            -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
+            local defaultMult = 1.25
+            self.Sync.myValue = math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult))
         end
 
         local bp = self:GetBlueprint()
@@ -3693,9 +3734,6 @@ Unit = Class(moho.unit_methods) {
         self.Sync.regen = value
     end,
 
-    -------------------------------------------------------------------------------------------
-    -- VETERANCY
-    -------------------------------------------------------------------------------------------
     AddXP = function(self, amount)
         self.xp = self.xp + (amount)
         self.Sync.xp = self.xp
