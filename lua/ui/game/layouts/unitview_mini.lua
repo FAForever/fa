@@ -89,27 +89,7 @@ function SetLayout()
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
 
-    local iconPositions = {
-        [1] = {Left = 70, Top = 60},
-        [2] = {Left = 70, Top = 80},
-        [3] = {Left = 190, Top = 60},
-        [4] = {Left = 130, Top = 60},
-        [5] = {Left = 130, Top = 80},
-        [6] = {Left = 130, Top = 80},
-        [7] = {Left = 190, Top = 90},
-    }
-
-    local iconTextures = {
-        UIUtil.UIFile('/game/unit_view_icons/mass.dds'),
-        UIUtil.UIFile('/game/unit_view_icons/energy.dds'),
-        UIUtil.UIFile('/game/unit_view_icons/kills.dds'),
-		UIUtil.UIFile('/game/unit_view_icons/kills.dds'),
-        UIUtil.UIFile('/game/unit_view_icons/missiles.dds'),
-        UIUtil.UIFile('/game/unit_view_icons/shield.dds'),
-        UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
-    }
-
-    for index = 1, 7 do
+    for index = 1, table.getn(iconPositions) do
         local i = index
         if iconPositions[i] then
             LayoutHelpers.AtLeftTopIn(controls.statGroups[i].icon, controls.bg, iconPositions[i].Left, iconPositions[i].Top)
