@@ -314,9 +314,9 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy stars
-        local currentLevel = UnitData[info.entityId].Sync.VeteranLevel
-        local massKilled = UnitData[info.entityId].Sync.totalMassKilled
-        local myValue = UnitData[info.entityId].Sync.myValue
+        local currentLevel = UnitData[info.entityId].VeteranLevel
+        local massKilled = UnitData[info.entityId].totalMassKilled
+        local myValue = UnitData[info.entityId].myValue
 
         for level = 1, 5 do
             local l = level
