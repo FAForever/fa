@@ -44,7 +44,7 @@ function CalculateBrainScore(brain)
 
     -- score components calculated
     local resourceProduction = ((massSpent) + (energySpent / energyValueCoefficient)) / 2
-    local battleResults = (((massValueDestroyed - massValueLost- (commanderKills * 18000)) + ((energyValueDestroyed - energyValueLost - (commanderKills * 5000000)) / energyValueCoefficient)) / 2)
+    local battleResults = (((massValueDestroyed - massValueLost- (commanderKills * 1000)) + ((energyValueDestroyed - energyValueLost - (commanderKills * 5000000)) / energyValueCoefficient)) / 2)
     if battleResults < 0 then
         battleResults = 0
     end
