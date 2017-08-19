@@ -3021,7 +3021,7 @@ Unit = Class(moho.unit_methods) {
         end
         
         if new == 'Seabed' then
-            if self:GetBlueprint().Intel.OmniRadius == 0 then
+            if not self:GetBlueprint().Intel.OmniRadius > 0 then
                 self:DisableIntel('Vision')
             end
         else
