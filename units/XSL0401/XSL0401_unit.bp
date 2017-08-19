@@ -279,6 +279,7 @@ UnitBlueprint {
         Level4 = 280,
         Level5 = 350,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
