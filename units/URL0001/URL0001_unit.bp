@@ -697,7 +697,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        ActiveIntel = {'Omni', 'Sonar'},
+        ActiveIntel = {'Omni' = true, 'Sonar' = true},
         Cloak = true,
         FreeIntel = false,
         OmniRadius = 26,
