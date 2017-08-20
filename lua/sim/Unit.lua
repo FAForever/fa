@@ -2396,11 +2396,9 @@ Unit = Class(moho.unit_methods) {
         local function DisableOneIntel(disabler, intel)
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
-                local intel_bp = self:GetBlueprint().Intel
-                for _, inteltype in intel_bp.ActiveIntel do
-                    if intel == inteltype then
-                        return
-                    end
+                local active = self:GetBlueprint().Intel.ActiveIntel
+                if active and active[intel] then
+                    return
                 end
                 self:DisableIntel(intel)
 
