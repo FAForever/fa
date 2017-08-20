@@ -2580,7 +2580,7 @@ Unit = Class(moho.unit_methods) {
 
                 -- Handle the cloak FX timing
                 if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'NotInitialized' and intel_bp[intel] then
+                    if disabler ~= 'NotInitialized' and self:GetBlueprint().Intel[intel] then
                         self:UpdateCloakEffect(false, intel)
                     end
                 end
