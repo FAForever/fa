@@ -617,7 +617,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        ActiveIntel = {'Omni'},
+        ActiveIntel = {'Omni' = true},
         Cloak = true,
         FreeIntel = false,
         OmniRadius = 16,
