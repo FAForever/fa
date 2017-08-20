@@ -5,13 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
+local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
-UES0401 = Class(TSeaUnit) {
+UES0401 = Class(AircraftCarrier) {
     BuildAttachBone = 'UES0401',
 
     Weapons = {
@@ -26,11 +26,11 @@ UES0401 = Class(TSeaUnit) {
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+        AircraftCarrier.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnCreate = function(self)
-        TSeaUnit.OnCreate(self)
+        AircraftCarrier.OnCreate(self)
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
         for i = 2, 6 do
@@ -65,7 +65,7 @@ UES0401 = Class(TSeaUnit) {
     end,
 
     OnMotionVertEventChange = function(self, new, old)
-        TSeaUnit.OnMotionVertEventChange(self, new, old)
+        AircraftCarrier.OnMotionVertEventChange(self, new, old)
 
         if new == 'Down' then
             self:PlayAllOpenAnims(false)
@@ -106,7 +106,7 @@ UES0401 = Class(TSeaUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        TSeaUnit.OnStopBeingBuilt(self,builder,layer)
+        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
 
         if not self.SinkSlider then -- Setup the slider and get blueprint values
@@ -118,7 +118,7 @@ UES0401 = Class(TSeaUnit) {
     end,
 
     OnFailedToBuild = function(self)
-        TSeaUnit.OnFailedToBuild(self)
+        AircraftCarrier.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
@@ -129,7 +129,7 @@ UES0401 = Class(TSeaUnit) {
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
-            TSeaUnit.OnStartBuild(self, unitBuilding, order)
+            AircraftCarrier.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
@@ -145,7 +145,7 @@ UES0401 = Class(TSeaUnit) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            TSeaUnit.OnStopBuild(self, unitBeingBuilt)
+            AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
     },
