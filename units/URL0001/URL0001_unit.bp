@@ -698,8 +698,8 @@ UnitBlueprint {
     },
     Intel = {
         ActiveIntel = {
-            Omni = True,
-            Sonar = True,
+            Omni = true,
+            Sonar = true,
         },
         Cloak = true,
         FreeIntel = false,
