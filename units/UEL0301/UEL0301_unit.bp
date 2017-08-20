@@ -694,7 +694,7 @@ UnitBlueprint {
         UnitWeight = 0,
     },
     Intel = {
-        ActiveIntel = {'Omni' = true},
+        ActiveIntel = {'Omni' = True},
         FreeIntel = false,
         JamRadius = {
             Max = 26,
