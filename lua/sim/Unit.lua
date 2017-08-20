@@ -1276,7 +1276,7 @@ Unit = Class(moho.unit_methods) {
     -- Tell any living instigators that they need to gain some veterancy
     VeterancyDispersal = function(self)
         local bp = self:GetBlueprint()
-        local mass = bp.Economy.BuildCostMass
+        local mass = bp.Economy.BuildCostMass * self:GetFractionComplete()
 
         -- Allow units to count for more or less than their real mass if needed.
         mass = mass * (bp.Veteran.ImportanceMult or 1)
@@ -2056,7 +2056,7 @@ Unit = Class(moho.unit_methods) {
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
             -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
             local defaultMult = 1.25
-            self.Sync.myValue = math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult))
+            self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
         end
 
         self:EnableUnitIntel('NotInitialized', nil)

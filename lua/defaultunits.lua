@@ -2330,12 +2330,17 @@ ACUUnit = Class(CommandUnit) {
 
     OnKilledUnit = function(self, unitKilled, massKilled)
         -- Adjust mass based on unit killed for ACU
-        local techIndex = function()
-            for k, tech in pairs({'TECH1', 'TECH2', 'TECH3', 'EXPERIMENTAL', 'COMMAND'}) do
-                if tech == unitKilled.techCategory then return k end
-            end
+        if unitKilled.techCategory then
+            local techMultipliers = {
+                TECH1 = 1,
+                TECH2 = 0.5,
+                TECH3 = 0.333334,
+                SUBCOMMANDER = 0.3,
+                EXPERIMENTAL = 0.25,
+                COMMAND = 0.2,
+            }
+            massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
         end
-        massKilled = massKilled / techIndex()
 
         CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
     end,
