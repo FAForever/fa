@@ -1279,7 +1279,7 @@ Unit = Class(moho.unit_methods) {
         local mass = bp.Economy.BuildCostMass * self:GetFractionComplete()
 
         -- Allow units to count for more or less than their real mass if needed.
-        mass = mass * (bp.Veteran.ImportanceMult or 1)
+        mass = mass * (bp.Veteran.ImportanceMult or 1) + (self.cargoMass or 0)
 
         for unit, damageDealt in self.Instigators do
             -- Make sure the unit is something which can vet, and is not maxed

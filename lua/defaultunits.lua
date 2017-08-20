@@ -1829,6 +1829,15 @@ BaseTransport = Class() {
             unit:DetachFrom()
         end
     end,
+
+    SaveCargoMass = function(self)
+        local mass = 0
+        for _, unit in self:GetCargo() do
+            local bp = unit:GetBlueprint()
+            mass = mass + bp.Economy.BuildCostMass * unit:GetFractionComplete() * (bp.Veteran.ImportanceMult or 1)
+        end
+        self.cargoMass = mass
+    end
 }
 
 --- Base class for air transports.
@@ -1869,6 +1878,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
     FlagCargo = function(self)
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
+        self:SaveCargoMass()
         self.cargo = {}
         local cargo = self:GetCargo()
         for _, unit in cargo or {} do
@@ -1891,7 +1901,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         for _, unit in self.cargo or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(self, 'Normal', 0)
+                unit:OnKilled(nil, 'Normal', 0)
             end
         end
     end,
@@ -2041,6 +2051,7 @@ SeaUnit = Class(MobileUnit){
 --- Base class for aircraft carriers.
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
     OnKilled = function(self, instigator, type, overkillRatio)
+        self:SaveCargoMass()
         SeaUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
     end,
