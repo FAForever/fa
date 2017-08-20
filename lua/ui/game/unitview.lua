@@ -319,12 +319,11 @@ function UpdateWindow(info)
         local myValue = UnitData[info.entityId].myValue
 
         for level = 1, 5 do
-            local l = level
-            if currentLevel >= l then
-                controls.vetIcons[l]:Show()
-                controls.vetIcons[l]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
+            if currentLevel >= level then
+                controls.vetIcons[level]:Show()
+                controls.vetIcons[level]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
             else
-                controls.vetIcons[1]:Hide()
+                controls.vetIcons[level]:Hide()
             end
         end
 
