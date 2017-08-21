@@ -219,7 +219,7 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
     LOG('BeginSession...')
-    ForkThread(GametimeLogger)
+    ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
@@ -286,17 +286,11 @@ function BeginSession()
     end
 end
 
-function GametimeLogger()
-    local gametime = 0
-    local sec = 0
+function GameTimeLogger()
+    local time
     while true do
-        gametime = GetGameTimeSeconds()
-        sec = math.floor(math.mod(gametime,60))
-        if sec < 10 then
-            LOG('current gametime:  ' .. math.floor(gametime/60) .. ':0' ..  sec)
-        else
-            LOG('current gametime:  ' .. math.floor(gametime/60) .. ':' ..  sec)
-        end
+        time = GetGameTimeSeconds()
+        LOG(string.format('Current gametime: %02d:%02d:%02d', math.floor(time/3600), math.floor(time/60), math.mod(time, 60)))
         WaitSeconds(30)
     end
 end
