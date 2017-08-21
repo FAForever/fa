@@ -251,15 +251,15 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
-            self.normalRange = bp.NewMaxRadius or 44
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+            self.normalRange = bp.NewMaxRadius or 30
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
             local microwave = self:GetWeaponByLabel('MLG')
-            microwave:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            microwave:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
             local wepBp = self:GetBlueprint().Weapon
