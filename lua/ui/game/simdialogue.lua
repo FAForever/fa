@@ -112,6 +112,7 @@ function CreateSimDialogue(newDialogues)
         LayoutHelpers.AtTopIn(dlg.text, dlg)
         LayoutHelpers.AtHorizontalCenterIn(dlg.text, dlg)
         dlg.text:SetText(LOC(info.text) or '')
+        dlg.text:SetColor(UIUtil.fontColor)
         dlg.btns = {}
         for index, text in info.buttonText do
             local i = index
