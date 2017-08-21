@@ -35,6 +35,7 @@ local vertRows = 3
 local horzRows = 4
 local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
+local lastOCTime = {}
 
 local function CreateOrderGlow(parent)
     controls.orderGlow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
@@ -824,7 +825,13 @@ local function OverchargeFrame(self, deltaTime)
             local armyTable = GetArmiesTable()
             local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
             local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
-            PlayVoice(sound)
+            if not lastOCTime[unit:GetArmy()] then
+                lastOCTime[unit:GetArmy()] = GetGameTimeSeconds() - 2
+            end
+            if GetGameTimeSeconds() - lastOCTime[unit:GetArmy()] > 1 then
+                PlayVoice(sound)
+                lastOCTime[unit:GetArmy()] = GetGameTimeSeconds()
+            end
         end
     else
         if not self:IsDisabled() then
