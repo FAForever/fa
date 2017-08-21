@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 31.5,
+        GuardScanRadius = 61.5,
         TargetBones = {
             'Head',
             'Torso',
