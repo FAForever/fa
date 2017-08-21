@@ -8,10 +8,10 @@ local iconPositions = {
     [1] = {Left = 70, Top = 55},
     [2] = {Left = 70, Top = 70},
     [3] = {Left = 190, Top = 60},
-    [4] = {Left = 130, Top = 60},
-    [5] = {Left = 130, Top = 80},
-    [6] = {Left = 130, Top = 80},
-    [7] = {Left = 190, Top = 80},
+    [4] = {Left = 130, Top = 55},
+    [5] = {Left = 130, Top = 85},
+    [6] = {Left = 130, Top = 70},
+    [7] = {Left = 190, Top = 85},
     [8] = {Left = 70, Top = 85},
 }
 local iconTextures = {
