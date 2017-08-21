@@ -385,7 +385,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     OnLayerChange = function(self, new, old)
         ACUUnit.OnLayerChange(self, new, old)
         if self:GetWeaponByLabel('DummyWeapon') == nil then return end
-        if new == "Seabed" then
+        if new == "Seabed" and self:HasEnhancement('NaniteTorpedoTube') then
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange or 60)
         else
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange or 22)
