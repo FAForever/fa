@@ -111,7 +111,7 @@ function CreateSimDialogue(newDialogues)
         dlg.text.Width:Set(300)
         LayoutHelpers.AtTopIn(dlg.text, dlg)
         LayoutHelpers.AtHorizontalCenterIn(dlg.text, dlg)
-        dlg.text:SetText(info.text or '')
+        dlg.text:SetText(LOC(info.text) or '')
         dlg.btns = {}
         for index, text in info.buttonText do
             local i = index
