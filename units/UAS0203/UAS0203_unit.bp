@@ -3,6 +3,7 @@ UnitBlueprint {
         GuardReturnRadius = 130,        
         TargetBones = {
             'UAS0203',
+            'upper_target',
         },
     },
     Audio = {
