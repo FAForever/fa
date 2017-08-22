@@ -176,6 +176,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
+                self.unit:ForkThread(function()
+                    WaitFor(self.EconDrain)
+                    RemoveEconomyEvent(self.unit, self.EconDrain)
+                    self.EconDrain = nil
+                end)
             end
         end
     end,
@@ -550,8 +555,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             if self.EconDrain then
                 self.WeaponCanFire = false
                 WaitFor(self.EconDrain)
-                RemoveEconomyEvent(self.unit, self.EconDrain)
-                self.EconDrain = nil
                 self.WeaponCanFire = true
             end
 
