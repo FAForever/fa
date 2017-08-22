@@ -1,6 +1,10 @@
 UnitBlueprint {
     AI = {
         InitialAutoMode = false,
+        TargetBones = {
+            'Muzzle_04',
+            'Muzzle_05',
+        },
     },
     Audio = {
         AmbientMove = Sound {
