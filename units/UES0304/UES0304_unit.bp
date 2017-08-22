@@ -1,6 +1,9 @@
 UnitBlueprint {
     AI = {
         InitialAutoMode = false,
+        TargetBones = {
+            'Tower_Target',
+        },
     },
     Audio = {
         AmbientMove = Sound {
