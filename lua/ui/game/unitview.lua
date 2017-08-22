@@ -86,10 +86,7 @@ end
 
 local statFuncs = {
     function(info)
-        local massUsed = info.massConsumed
-        if info.massRequested > 0 then
-            massUsed = info.massRequested
-        end
+        local massUsed = math.max(info.massRequested, info.massConsumed)
         if info.massProduced > 0 or massUsed > 0 then
             return string.format('%+d', math.ceil(info.massProduced - massUsed)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
@@ -105,10 +102,7 @@ local statFuncs = {
         end
     end,
     function(info)
-        local energyUsed = info.energyConsumed
-        if info.energyRequested > 0 then
-            energyUsed = info.energyRequested
-        end
+        local energyUsed = math.max(info.energyRequested, info.energyConsumed)
         if info.energyProduced > 0 or energyUsed > 0 then
             return string.format('%+d', math.ceil(info.energyProduced - energyUsed))
         else
