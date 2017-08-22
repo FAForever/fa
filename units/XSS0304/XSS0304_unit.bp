@@ -1,6 +1,9 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 130,
+        TargetBones = {
+            'Front_Turret_Barrel01',
+        },
     },
     Audio = {
         AmbientMove = Sound {
