@@ -593,13 +593,13 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Render the fire recharge bar
         RenderClockThread = function(self, rof)
-            local clockTime = rof
+            local clockTime = 10*rof
             local totalTime = clockTime
-            while clockTime > 0.0 and
+            while clockTime >= 0.0 and
                   not self:BeenDestroyed() and
                   not self.unit.Dead do
                 self.unit:SetWorkProgress(1 - clockTime / totalTime)
-                clockTime = clockTime - 0.1
+                clockTime = math.floor(clockTime - 1)
                 WaitSeconds(0.1)
             end
         end,
