@@ -1108,11 +1108,16 @@ Unit = Class(moho.unit_methods) {
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         local preAdjHealth = self:GetHealth()
 
-        -- Keep track of instigators, but only if it is a unit
-        if instigator and IsUnit(instigator) and instigator.gainsVeterancy then
+        -- Keep track of incoming damage, but only if it is from a unit
+        if instigator and IsUnit(instigator) and not instigator == self then
             amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
-            self.Instigators[instigator] = (self.Instigators[instigator] or 0) + amountForVet
             self.totalDamageTaken = self.totalDamageTaken + amountForVet
+
+            -- We want to keep track of damage from things that cannot gain vet (deathweps etc)
+            -- But not enter them into the table to have credit dispersed later
+            if instigator.gainsVeterancy then
+                self.Instigators[instigator] = (self.Instigators[instigator] or 0) + amountForVet
+            end
         end
 
         self:AdjustHealth(instigator, -amount)
@@ -1248,7 +1253,7 @@ Unit = Class(moho.unit_methods) {
         -- We prevent any vet spreading if the instigator isn't part of the vet system (EG - Self destruct)
         -- This is so that you can bring a damaged Experimental back to base, kill, and rebuild, without granting
         -- instant vet to the enemy army, as well as other obscure reasons
-        if instigator and IsUnit(instigator) and self.totalDamageTaken > 0 and instigator.gainsVeterancy then
+        if instigator and IsUnit(instigator) and self.totalDamageTaken > 0 then
             self:VeterancyDispersal()
         end
 
