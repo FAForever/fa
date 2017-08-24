@@ -7,6 +7,7 @@ OnSync = function()
     if Sync.FocusArmyChanged then
         import('/lua/ui/game/avatars.lua').FocusArmyChanged()
         import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
+        import('/lua/ui/notify/notify.lua').focusArmyChanged()
     end
 
     if Sync.CampaignMode then
