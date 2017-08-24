@@ -215,7 +215,7 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     CreateImpactEffect = function(self, vector)
-        if not self or self.Owner:IsDead() or self.Owner.Dead then return end
+        if not self or self.Owner.Dead then return end
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
