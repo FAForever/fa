@@ -260,6 +260,9 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+            if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+            end
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
             local wepBp = self:GetBlueprint().Weapon
@@ -271,6 +274,10 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     self:GetWeaponByLabel('MLG'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
+                    self.normalRange = v.MaxRadius or 22
+                    if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                        self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+                    end
                     break
                 end
             end
@@ -281,9 +288,15 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'NaniteTorpedoTube' then
             self:SetWeaponEnabledByLabel('Torpedo', true)
             self:EnableUnitIntel('Enhancement', 'Sonar')
+            if self:GetCurrentLayer() == 'Seabed' then
+                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
+            end
         elseif enh == 'NaniteTorpedoTubeRemove' then
             self:SetWeaponEnabledByLabel('Torpedo', false)
             self:DisableUnitIntel('Enhancement', 'Sonar')
+            if self:GetCurrentLayer() == 'Seabed' then
+                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+            end
         end
     end,
 
