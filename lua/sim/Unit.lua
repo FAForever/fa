@@ -4262,7 +4262,9 @@ Unit = Class(moho.unit_methods) {
 
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
-        if self:GetArmy() == GetFocusArmy() then
+        local focusArmy = GetFocusArmy()
+        local army = self:GetArmy()
+        if focusArmy == -1 or focusArmy == army then
             local id
             local unitType
             local category
@@ -4299,7 +4301,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-                local message = {source = source or unitType, trigger = trigger, category = category, id = id}
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = army}
                 table.insert(Sync.EnhanceMessage, message)
             end
         end
