@@ -295,7 +295,7 @@ UnitBlueprint {
     SelectionSizeZ = 2.2,
     SelectionThickness = 0.32,
     SizeX = 0.7,
-    SizeY = 0.7,
+    SizeY = 0.9,
     SizeZ = 3.5,
     StrategicIconName = 'icon_sub3_missile',
     StrategicIconSortPriority = 145,
