@@ -240,7 +240,7 @@ UnitBlueprint {
             MinRadius = 5,
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 1.8,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 3,
             ProjectileId = '/projectiles/TIFMissileCruise03/TIFMissileCruise03_proj.bp',
             ProjectileLifetime = 20,
