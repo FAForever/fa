@@ -210,7 +210,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             self:UpdateShieldRatio(-1)
 
-            WaitSeconds(1)
+            WaitTicks(2)
         end
     end,
 
