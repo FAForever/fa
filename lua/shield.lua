@@ -328,17 +328,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
-        local owner = self.Owner
-        local position = owner:GetPosition()
-        local shieldbp = self.Owner:GetBlueprint().Defense.Shield
-        local shieldRadius = shieldbp.ShieldSize
-        local aiBrain = owner:GetAIBrain()
-        local otherShields = aiBrain:GetUnitsAroundPoint((categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally')
-        local rechargeTime = time + ((table.getn(otherShields) - 1) * .2 * time)
-        if rechargeTime > time * 3 then
-            rechargeTime = time
-        end
-        while curProgress < rechargeTime do
+        while curProgress < time do
             local fraction = self.Owner:GetResourceConsumed()
             curProgress = curProgress + (fraction / 10)
             curProgress = math.min(curProgress, rechargeTime)
