@@ -112,6 +112,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
+            '<LOC ability_jamming>Jamming',            
         },
         ForcedBuildSpin = 0,
         IdleEffects = {
@@ -248,6 +249,11 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        JamRadius = {
+            Max = 40,
+            Min = 10,
+        },
+        JammerBlips = 4,
         VisionRadius = 32,
     },
     Interface = {
