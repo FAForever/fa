@@ -11,7 +11,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 10,
         LiftFactor = 10,
-        MaxAirspeed = 6,
+        MaxAirspeed = 9,
         StartTurnDistance = 50,
     },
     Audio = {
@@ -70,6 +70,8 @@ UnitBlueprint {
         'RECLAIMABLE',
         'UNTARGETABLE',
         'OVERLAYRADAR',
+        'OMNI',
+        'OVERLAYOMNI',
     },
     CollisionOffsetY = -0.65,
     Defense = {
@@ -84,6 +86,10 @@ UnitBlueprint {
     },
     Description = '<LOC xea0002_desc>Defense Satellite',
     Display = {
+      Abilities = {
+          '<LOC ability_omni>Omni Sensor',
+          '<LOC ability_radar>Radar',
+      },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -135,7 +141,8 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarRadius = 70,
+        RadarRadius = 150,
+        OmniRadius = 50,
         VisionRadius = 40,
     },
     Interface = {
