@@ -3,7 +3,7 @@ Patch 3691 (Upcoming)
 ### Gameplay
 - Disabled ACU build ability before warp in to stop fast clicks sometimes netting a several-second advantage
 - Fixed the Seraphim Sniperbot not working with attack-move in its non-default mode
-- Added target bones to T1 Subs to allow them to be attacked by surface units when surfaced
+- Added target bones to Subs to allow them to be attacked by surface units when surfaced
 - Added above water target bone to Cybran T1 Torpedo Launcher to allow it to be attacked by surface units, particularly the Seraphim Destroyer
 - Fixed the Cybran ACU needing to get into Gun range to attack a specific target with its torpedo upgrade
 
@@ -13,22 +13,41 @@ Patch 3691 (Upcoming)
 - Fixed Seraphim Destroyer not firing its torpedo salvos properly when given orders
 - Fixed the Seraphim nuke impact sound calling the wrong sound cue
 - Fixed incomplete ships sometimes not being destroyed with their factory
+- Fixed Counter-intel turning off intel when power stalling
+- Fixed game-breaking bug related to template name cutoff
+- Fixed energy consuming weapons draining power before completion
 
 ### UI
 - Changed Salvation to be categorized as an experimental instead of a t3 building
 - Fixed ACU power consumption not correct after Overcharge
+- Fixed and improved the sim dialog window
+- Fixed rendering of reload bars
+- Fixed bug with the notify overlay in replays
 
 ### Lobby
 - Changed background faction images to widescreen versions
 - Added a new army colour: Order Green. It is the same colour as the Order in the FA Campaign
+- Fixed missing dependency bug for non hosts in lobbies
+
+### Balance
+- remove over water vision from submerged amphibious units
 
 ### Other
 - Fixed typo in Novax center bones
 - Prevented the execution of certain game-breaking console commands
+- Allow AI to rebuild upgraded engineering stations in coop missions
+- Added game time to the log every 30 seconds
+- Added timeout for the overcharge ready notification message to avoid voice spam
+- Added rotation animation to the t2 aeon power generator
+- Fixed blacklist for coop maps
+
 
 ### Contributors
+- IceDreamer
+- MrNukealizer
 - CookieNoob
-
+- Uveso
+- basdawimp
 
 Patch 3690 (15th November 2017)
 ============================
