@@ -39,7 +39,7 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         MassActive=         {-0.025, -0.0125, -0.008333, -0.0125, -0.0075},
     },
     T3MassFabricator={
-        MassActive=         {-0.2, -0.2, -0.2, -0.2, -0.0225}, -- is the SIZE16 value really correct?
+        MassActive=         {-0.2, -0.2, -0.2, -0.2, -0.0375},
     },
     T1EnergyStorage={
         EnergyProduction=   {0.125, 0.0625, 0.041667, 0.03125, 0.025},
