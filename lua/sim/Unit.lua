@@ -1109,7 +1109,7 @@ Unit = Class(moho.unit_methods) {
         local preAdjHealth = self:GetHealth()
 
         -- Keep track of incoming damage, but only if it is from a unit
-        if instigator and IsUnit(instigator) and not instigator == self then
+        if instigator and IsUnit(instigator) and instigator ~= self then
             amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
             self.totalDamageTaken = self.totalDamageTaken + amountForVet
 
