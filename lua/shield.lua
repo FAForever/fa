@@ -331,9 +331,9 @@ Shield = Class(moho.shield_methods, Entity) {
         while curProgress < time do
             local fraction = self.Owner:GetResourceConsumed()
             curProgress = curProgress + (fraction / 10)
-            curProgress = math.min(curProgress, rechargeTime)
+            curProgress = math.min(curProgress, time)
 
-            local workProgress = curProgress / rechargeTime
+            local workProgress = curProgress / time
 
             self:UpdateShieldRatio(workProgress)
             WaitTicks(1)
