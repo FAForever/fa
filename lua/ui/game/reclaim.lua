@@ -182,6 +182,11 @@ function UpdateLabels()
         end
         if not LabelPool[labelIndex] then
             LabelPool[labelIndex] = CreateReclaimLabel(view.ReclaimGroup, r)
+        else
+            if IsDestroyed(r) then
+                LabelPool[labelIndex] = nil
+                continue
+            end
         end
 
         local label = LabelPool[labelIndex]
@@ -191,6 +196,10 @@ function UpdateLabels()
 
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
+        if IsDestroyed(LabelPool[index]) then
+            LabelPool[index] = nil
+            continue
+        end
         local label = LabelPool[index]
         if label and not label:IsHidden() then
             label:Hide()
