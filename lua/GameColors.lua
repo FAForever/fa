@@ -12,16 +12,17 @@ GameColors = {
     "ff9161ff",      -- purple
     "ffff88ff",      -- pink
     "ff2e8b57",      -- new green
-    "FF131cd3",      -- UEF blue
+    "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
     "ffffbf80",      -- lt orange
+    "ffa79602",      -- Sera golden
     "ffb76518",      -- new brown
     "ff901427",      -- dark red
     "FF2F4F4F",      -- olive (dark green)
     "ff40bf40",      -- mid green
     "ff66ffcc",      -- aqua
-    "ff76a101",      -- Order Green
+    "ff9fd802",      -- Order Green
     },
 
     PlayerColors = {
@@ -34,16 +35,17 @@ GameColors = {
     "ff9161ff",      -- purple
     "ffff88ff",      -- pink
     "ff2e8b57",      -- new green
-    "FF131cd3",      -- UEF blue
+    "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
     "ffffbf80",      -- lt orange
+    "ffa79602",      -- Sera golden
     "ffb76518",      -- new brown
     "ff901427",      -- dark red
     "FF2F4F4F",      -- olive (dark green)
     "ff40bf40",      -- mid green
     "ff66ffcc",      -- aqua
-    "ff76a101",      -- Order Green
+    "ff9fd802",      -- Order Green
     },
 
     TeamColorMode = {
