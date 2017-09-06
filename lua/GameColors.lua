@@ -12,7 +12,7 @@ GameColors = {
     "ff9161ff",      -- purple
     "ffff88ff",      -- pink
     "ff2e8b57",      -- new green
-    "FF131cd3",      -- UEF blue
+    "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
     "ffffbf80",      -- lt orange
@@ -34,7 +34,7 @@ GameColors = {
     "ff9161ff",      -- purple
     "ffff88ff",      -- pink
     "ff2e8b57",      -- new green
-    "FF131cd3",      -- UEF blue
+    "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
     "ffffbf80",      -- lt orange
