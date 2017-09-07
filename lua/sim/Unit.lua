@@ -1118,7 +1118,12 @@ Unit = Class(moho.unit_methods) {
             -- We want to keep track of damage from things that cannot gain vet (deathweps etc)
             -- But not enter them into the table to have credit dispersed later
             if instigator.gainsVeterancy then
-                self.Instigators[instigator] = (self.Instigators[instigator] or 0) + amountForVet
+                local previousDamage = self.Instigators[instigator.EntityId].damage
+                if previousDamage then
+                    self.Instigators[instigator.EntityId].damage = previousDamage + amountForVet
+                else
+                    self.Instigators[instigator.EntityId] = {unit = instigator, damage = amountForVet}
+                end
             end
         end
 
@@ -1288,11 +1293,12 @@ Unit = Class(moho.unit_methods) {
         -- Allow units to count for more or less than their real mass if needed.
         mass = mass * (bp.Veteran.ImportanceMult or 1) + (self.cargoMass or 0)
 
-        for unit, damageDealt in self.Instigators do
+        for _, data in self.Instigators do
+            local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
             if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
                 -- Find the proportion of yourself that each instigator killed
-                local massKilled = math.floor(mass * (damageDealt / self.totalDamageTaken))
+                local massKilled = math.floor(mass * (data.damage / self.totalDamageTaken))
                 unit:OnKilledUnit(self, massKilled)
             end
         end
