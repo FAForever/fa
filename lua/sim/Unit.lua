@@ -83,10 +83,10 @@ Unit = Class(moho.unit_methods) {
     EconomyProductionInitiallyActive = true,
 
     GetSync = function(self)
-        if not Sync.UnitData[self:GetEntityId()] then
-            Sync.UnitData[self:GetEntityId()] = {}
+        if not Sync.UnitData[self.EntityId] then
+            Sync.UnitData[self.EntityId] = {}
         end
-        return Sync.UnitData[self:GetEntityId()]
+        return Sync.UnitData[self.EntityId]
     end,
 
     -- The original builder of this unit, set by OnStartBeingBuilt. Used for calculating differential
@@ -97,9 +97,11 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+        self.EntityId = self:GetEntityId()
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
-        self.Sync.id = self:GetEntityId()
+        self.Sync.id = self.EntityId
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync, SyncMeta)
 
@@ -705,7 +707,7 @@ Unit = Class(moho.unit_methods) {
             self.Captors = {}
         end
 
-        self.Captors[captor:GetEntityId()] = captor
+        self.Captors[captor.EntityId] = captor
 
         if not self.CaptureThread then
             self.CaptureThread = self:ForkThread(function()
@@ -732,7 +734,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     RemoveCaptor = function(self, captor)
-        self.Captors[captor:GetEntityId()] = nil
+        self.Captors[captor.EntityId] = nil
 
         if table.getsize(self.Captors) == 0 then
             self:ResetCaptors()
@@ -764,7 +766,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartRepair = function(self, unit)
-        unit.Repairers[self:GetEntityId()] = self
+        unit.Repairers[self.EntityId] = self
 
         if unit.WorkItem ~= self.WorkItem then
             self:InheritWork(unit)
@@ -1862,14 +1864,14 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Clear out our sync data
-        UnitData[self:GetEntityId()] = false
-        Sync.UnitData[self:GetEntityId()] = false
+        UnitData[self.EntityId] = false
+        Sync.UnitData[self.EntityId] = false
 
         -- Don't allow anyone to stuff anything else in the table
         self.Sync = false
 
         -- Let the user layer know this id is gone
-        Sync.ReleaseIds[self:GetEntityId()] = true
+        Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
@@ -2479,10 +2481,9 @@ Unit = Class(moho.unit_methods) {
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
 
-        local id = self:GetEntityId()
-        if built.Repairers[id] then
+        if built.Repairers[self.EntityId] then
             self:OnStopRepair(self, built)
-            built.Repairers[id] = nil
+            built.Repairers[self.EntityId] = nil
         end
     end,
 
@@ -2817,7 +2818,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        local unitEnhancements = enhCommon.GetEnhancements(self:GetEntityId())
+        local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
@@ -2929,8 +2930,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     HasEnhancement = function(self, enh)
-        local entId = self:GetEntityId()
-        local unitEnh = SimUnitEnhancements[entId]
+        local unitEnh = SimUnitEnhancements[self.EntityId]
         if unitEnh then
             for k, v in unitEnh do
                 if v == enh then
@@ -4244,7 +4244,7 @@ Unit = Class(moho.unit_methods) {
                     return
                 end
             else -- We are being called from the Enhancements chain (ACUs)
-                id = self:GetEntityId()
+                id = self.EntityId
                 category = string.lower(self.factionCategory)
             end
 
