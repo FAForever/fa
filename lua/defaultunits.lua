@@ -1833,8 +1833,7 @@ BaseTransport = Class() {
     SaveCargoMass = function(self)
         local mass = 0
         for _, unit in self:GetCargo() do
-            local bp = unit:GetBlueprint()
-            mass = mass + bp.Economy.BuildCostMass * unit:GetFractionComplete() * (bp.Veteran.ImportanceMult or 1)
+            mass = mass + unit:GetVeterancyValue()
         end
         self.cargoMass = mass
     end
@@ -2348,7 +2347,7 @@ ACUUnit = Class(CommandUnit) {
                 TECH3 = 0.333334,
                 SUBCOMMANDER = 0.3,
                 EXPERIMENTAL = 0.25,
-                COMMAND = 0.2,
+                COMMAND = 1,
             }
             massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
         end

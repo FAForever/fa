@@ -1288,10 +1288,7 @@ Unit = Class(moho.unit_methods) {
     -- Tell any living instigators that they need to gain some veterancy
     VeterancyDispersal = function(self)
         local bp = self:GetBlueprint()
-        local mass = bp.Economy.BuildCostMass * self:GetFractionComplete()
-
-        -- Allow units to count for more or less than their real mass if needed.
-        mass = mass * (bp.Veteran.ImportanceMult or 1) + (self.cargoMass or 0)
+        local mass = self:GetVeterancyValue()
 
         for _, data in self.Instigators do
             local unit = data.unit
@@ -1304,13 +1301,36 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    GetVeterancyValue = function(self)
+        local bp = self:GetBlueprint()
+        local mass = bp.Economy.BuildCostMass
+        local fractionComplete = self:GetFractionComplete()
+
+        if fractionComplete == 1 then
+            -- Add the value of any enhancements
+            local enhancements = SimUnitEnhancements[self.EntityId]
+            if enhancements then
+                for _, name in enhancements do
+                    mass = mass + bp.Enhancements[name].BuildCostMass or 0
+                end
+            end
+
+            -- Subtract the value of any enhancements from a preset because their value is included in bp.Economy.BuildCostMass
+            if bp.EnhancementPresetAssigned.Enhancements then
+                for _, name in bp.EnhancementPresetAssigned.Enhancements do
+                    mass = mass - bp.Enhancements[name].BuildCostMass or 0
+                end
+            end
+        end
+
+        -- Allow units to count for more or less than their real mass if needed.
+        return mass * fractionComplete * (bp.VeteranImportanceMult or 1) + (self.cargoMass or 0)
+    end,
+
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
         if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then return end -- No XP for friendly fire...
-
-        -- Give more weight to contributing to the death of a unit of higher veterancy than ourselves
-        massKilled = massKilled * math.max(((unitKilled.Sync.VeteranLevel or 1) - self.Sync.VeteranLevel), 1)
 
         self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
 
@@ -1323,16 +1343,19 @@ Unit = Class(moho.unit_methods) {
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
 
-        -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 1.25 by default) grants a level
+        -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
         local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
         -- Bail if our veterancy hasn't increased
         if newVetLevel == self.Sync.VeteranLevel then return end
 
-        -- Update our recorded veterancy level
-        self.Sync.VeteranLevel = newVetLevel
+        -- If the unit gained more than one level make sure not to skip any
+        for level = self.Sync.VeteranLevel + 1, newVetLevel, 1 do
+            -- Update our recorded veterancy level
+            self.Sync.VeteranLevel = level
 
-        self:SetVeteranLevel(self.Sync.VeteranLevel)
+            self:SetVeteranLevel(self.Sync.VeteranLevel)
+        end
     end,
 
     -- Use this to set a veterancy level directly, usually used by a scenario
@@ -1345,17 +1368,10 @@ Unit = Class(moho.unit_methods) {
 
     -- Set the veteran level to the level specified
     SetVeteranLevel = function(self, level)
-        local buffTypes = {'Regen', 'MaxHealth'}
-        local bp = self:GetBlueprint().Buffs or {}
-        local name = 'Level' .. level
-        for _, bType in buffTypes do
-            if bp[bType] and bp[bType][name] then -- Check the unit has an entry for this buffType and veterancy level
-                local buffName = self:CreateVeterancyBuff(level, bp[bType][name], bType)
-                if buffName then
-                    Buff.ApplyBuff(self, buffName)
-                end
-            else
-                Buff.ApplyBuff(self, 'Veterancy' .. bType .. level)
+        local buffs = self:CreateVeterancyBuffs(level)
+        if buffs then
+            for _, buffName in buffs do
+                Buff.ApplyBuff(self, buffName)
             end
         end
 
@@ -1374,53 +1390,52 @@ Unit = Class(moho.unit_methods) {
         self:AdjustHealth(self, maxHealth * mult) -- Adjusts health by the given value (Can be +tv or -tv), not to the given value
     end,
 
-    -- Table housing data on what to use to generate buffs for a unit
-    BuffTypes = {
-        Regen = {BuffType = 'VeterancyRegen', BuffValFunction = 'Add', BuffDuration = -1, BuffStacks = 'REPLACE'},
-        Health = {BuffType = 'VeterancyMaxHealth', BuffValFunction = 'Mult', BuffDuration = -1, BuffStacks = 'REPLACE'},
-    },
+    CreateVeterancyBuffs = function(self, level)
+        local healthBuffName = 'VeterancyMaxHealth' .. level -- Currently there is no difference between units, therefore no need for unique buffs
+        local regenBuffName = self:GetUnitId() .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
 
-    CreateVeterancyBuff = function(self, level, levelValue, buffType)
-        -- Make sure there is an appropriate buff type for this unit
-        if not self.BuffTypes[buffType] then
-            WARN('*WARNING: Tried to generate a buff of unknown type to units: ' .. buffType .. ' - UnitId: ' .. self:GetUnitId())
-            return nil
-        end
-
-        local buffName = self:GetUnitId() .. buffType .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
-
-        if Buffs[buffName] then
-            return buffName -- We already have this generated
-        end
-
-        local addVal = 0
-        local multVal = 1
-        local buffTable = self.BuffTypes[buffType]
-
-        -- Figure out what we want the Add and Mult values to be based on the BuffTypes table
-        if buffTable.BuffValFunction == 'Add' then
-            addVal = levelValue
-        else
-            multVal = levelValue
-        end
-
-        -- Create the buff if needed
-        BuffBlueprint {
-            Name = buffName,
-            DisplayName = buffName,
-            BuffType = buffTable.BuffType,
-            Stacks = buffTable.BuffStacks,
-            Duration = buffTable.BuffDuration,
-            Affects = {
-                Regen = {
-                    Add = addVal,
-                    Mult = multVal,
+        if not Buffs[regenBuffName] then
+            -- Maps self.techCategory to a number so we can do math on it for naval units
+            local techLevels = {
+                TECH1 = 1,
+                TECH2 = 2,
+                TECH3 = 3,
+                COMMAND = 3,
+                EXPERIMENTAL = 4,
+                SUBCOMMANDER = 5,
+            }
+            
+            local techLevel = techLevels[self.techCategory] or 1
+            
+            -- Treat naval units as one level higher
+            if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
+                techLevel = techLevel + 1
+            end
+            
+            -- Regen values by tech level and veterancy level
+            local regenBuffs = {
+                {1,  2,  3,  4,  5}, -- T1
+                {3,  6,  9,  12, 15}, -- T2
+                {6,  12, 18, 24, 30}, -- T3 / ACU
+                {25, 50, 75, 100,125}, -- Experimental
+                {9,  18, 27, 36, 45}, -- SACU
+            }
+        
+            BuffBlueprint {
+                Name = regenBuffName,
+                DisplayName = regenBuffName,
+                BuffType = 'VeterancyRegen',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    Regen = {
+                        Add = regenBuffs[techLevel][level],
+                    },
                 },
-            },
-        }
-
-        -- Return the buffname so the buff can be applied to the unit
-        return buffName
+            }
+        end
+        
+        return {regenBuffName, healthBuffName}
     end,
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
@@ -2068,7 +2083,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
             -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-            local defaultMult = 1.25
+            local defaultMult = 2
             self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
         end
 
