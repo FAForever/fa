@@ -854,14 +854,14 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 12000,
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyRequired = 5000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -874,13 +874,6 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
-            Overcharge = {
-                BaseDamage = 1000,
-                BaseEnergy = 500,
-                DamagePerCharge = 1000,
-                EnergyPerCharge = 500,
-                MaxCharges = 11,
-            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -944,14 +937,14 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 12000,
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyRequired = 5000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -963,13 +956,6 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
-            Overcharge = {
-                BaseDamage = 1000,
-                BaseEnergy = 500,
-                DamagePerCharge = 1000,
-                EnergyPerCharge = 500,
-                MaxCharges = 11,
-            },
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             ProjectilesPerOnFire = 1,

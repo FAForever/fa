@@ -175,11 +175,6 @@ DefaultProjectileWeapon = Class(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
-                self.unit:ForkThread(function()
-                    WaitFor(self.EconDrain)
-                    RemoveEconomyEvent(self.unit, self.EconDrain)
-                    self.EconDrain = nil
-                end)
             end
         end
     end,
@@ -554,6 +549,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             if self.EconDrain then
                 self.WeaponCanFire = false
                 WaitFor(self.EconDrain)
+                RemoveEconomyEvent(self.unit, self.EconDrain)
                 self.EconDrain = nil
                 self.WeaponCanFire = true
             end
@@ -974,48 +970,6 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         else
             self:OnDisableWeapon()
         end
-    end,
-
-    StartEconomyDrain = function(self) -- OverchargeWeapon drains energy in CreateProjectileForWeapon instead
-    end,
-
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = DefaultProjectileWeapon.CreateProjectileForWeapon(self, bone)
-        if proj then
-            local target = self:GetCurrentTarget()
-            if target and IsBlip(target) then
-                target = target:GetSource()
-            end
-
-            local energyDrain = self:GetWeaponEnergyDrain()
-            local bp = self:GetBlueprint()
-            local overcharge = bp.Overcharge
-            proj.Overcharge = overcharge
-            proj.Overcharge.EnergyDrain = energyDrain
-
-            local damageMultiplier = 1
-            if self.DamageMod ~= 0 then -- This allows mods or future changes to adjust overcharge damage like normal weapons
-                damageMultiplier = (bp.Damage + self.DamageMod) / bp.Damage
-                proj.Overcharge.DamageMultiplier = damageMultiplier
-            end
-
-            local energyStored = self.unit:GetAIBrain():GetEconomyStored('ENERGY')
-            local numCharges = math.min(proj:CalcChargesNeeded(target), math.floor(energyStored / overcharge.EnergyPerCharge))
-            proj:SetChargeCount(numCharges)
-
-            local energyNeeded = overcharge.BaseEnergy + overcharge.EnergyPerCharge * numCharges
-            if energyNeeded > 0 then
-                self.EconDrain = CreateEconomyEvent(self.unit, energyNeeded, 0, energyNeeded / energyDrain)
-                proj.Overcharge.FiringDrain = self.EconDrain -- Pass along this event so extra drain on impact can wait for it instead of overlapping
-                self.unit:ForkThread(function()
-                    WaitFor(self.EconDrain)
-                    RemoveEconomyEvent(self.unit, self.EconDrain)
-                    self.EconDrain = nil
-                    proj.Overcharge.FiringDrain = nil
-                end)
-            end
-        end
-        return proj
     end,
 
     IsEnabled = function(self)

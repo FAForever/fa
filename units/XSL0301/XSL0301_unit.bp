@@ -834,14 +834,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10000, -- Display only, use the Overcharge section to make changes
+            Damage = 10000,
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Light Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyRequired = 5000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -854,13 +854,6 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 22,
-            Overcharge = {
-                BaseDamage = 1000,
-                BaseEnergy = 500,
-                DamagePerCharge = 1000,
-                EnergyPerCharge = 500,
-                MaxCharges = 9,
-            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -923,14 +916,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10000, -- Display only, use the Overcharge section to make changes
+            Damage = 10000,
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Light Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyRequired = 5000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -942,13 +935,6 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 22,
-            Overcharge = {
-                BaseDamage = 1000,
-                BaseEnergy = 500,
-                DamagePerCharge = 1000,
-                EnergyPerCharge = 500,
-                MaxCharges = 9,
-            },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {

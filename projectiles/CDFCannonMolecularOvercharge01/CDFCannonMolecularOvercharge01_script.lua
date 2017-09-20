@@ -1,11 +1,10 @@
 #
 # Cybran Molecular Cannon
 #
-local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
 local CMolecularCannonProjectile = import('/lua/cybranprojectiles.lua').CMolecularCannonProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-CDFCannonMolecular01 = Class(CMolecularCannonProjectile, OverchargeProjectile) {
+CDFCannonMolecular01 = Class(CMolecularCannonProjectile) {
 
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     FxTrails = EffectTemplate.CCommanderOverchargeFxTrail01,
@@ -14,11 +13,6 @@ CDFCannonMolecular01 = Class(CMolecularCannonProjectile, OverchargeProjectile) {
     FxImpactUnit = EffectTemplate.CCommanderOverchargeHit01,
     FxImpactProp = EffectTemplate.CCommanderOverchargeHit01,
     FxImpactLand = EffectTemplate.CCommanderOverchargeHit01,
-
-    OnImpact = function(self, targetType, targetEntity)
-        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
-        CMolecularCannonProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 TypeClass = CDFCannonMolecular01
 
