@@ -334,7 +334,18 @@ function UpdateWindow(info)
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
-                    local text = massKilled .. '/' .. (myValue * (currentLevel + 1))
+
+                    local nextLevel = myValue * (currentLevel + 1)
+                    local text
+                    if nextLevel >= 1000000 then
+                        text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
+                    elseif nextLevel >= 100000 then
+                        text = string.format('%.0fK/%.0fK', massKilled / 1000, nextLevel / 1000)
+                    elseif nextLevel >= 10000 then
+                        text = string.format('%.1fK/%.1fK', massKilled / 1000, nextLevel / 1000)
+                    else
+                        text = massKilled .. '/' .. nextLevel
+                    end
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()

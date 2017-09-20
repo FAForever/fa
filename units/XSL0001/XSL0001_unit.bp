@@ -323,7 +323,7 @@ UnitBlueprint {
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
-        BuildCostMass = 1000,
+        BuildCostMass = 2000,
         BuildRate = 10,
         BuildTime = 6000000,
         BuildableCategory = {
@@ -884,7 +884,7 @@ UnitBlueprint {
         0.4,
         0.5,
     },
-    VeteranMassMult = 1,
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
