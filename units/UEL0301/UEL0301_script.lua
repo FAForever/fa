@@ -62,6 +62,7 @@ UEL0301 = Class(CommandUnit) {
             self:RequestRefreshUI()
             WaitFor(self.RebuildingPod)
             self:SetWorkProgress(0.0)
+            RemoveEconomyEvent(self, self.RebuildingPod)
             self.RebuildingPod = nil
             local location = self:GetPosition('AttachSpecial01')
             local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)

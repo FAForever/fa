@@ -182,6 +182,11 @@ function UpdateLabels()
         end
         if not LabelPool[labelIndex] then
             LabelPool[labelIndex] = CreateReclaimLabel(view.ReclaimGroup, r)
+        else
+            if IsDestroyed(r) then
+                LabelPool[labelIndex] = nil
+                continue
+            end
         end
 
         local label = LabelPool[labelIndex]
@@ -191,6 +196,10 @@ function UpdateLabels()
 
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
+        if IsDestroyed(LabelPool[index]) then
+            LabelPool[index] = nil
+            continue
+        end
         local label = LabelPool[index]
         if label and not label:IsHidden() then
             label:Hide()
@@ -232,22 +241,23 @@ function ShowReclaimThread(watch_key)
     InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-        local zoom = camera:GetZoom()
-        local position = camera:GetFocusPosition()
-        if ReclaimChanged
-            or view.NewViewing
-            or OldZoom ~= zoom
-            or OldPosition[1] ~= position[1]
-            or OldPosition[2] ~= position[2]
-            or OldPosition[3] ~= position[3] then
-                UpdateLabels()
-                OldZoom = zoom
-                OldPosition = position
-                ReclaimChanged = false
+        if not IsDestroyed(camera) then
+            local zoom = camera:GetZoom()
+            local position = camera:GetFocusPosition()
+            if ReclaimChanged
+                or view.NewViewing
+                or OldZoom ~= zoom
+                or OldPosition[1] ~= position[1]
+                or OldPosition[2] ~= position[2]
+                or OldPosition[3] ~= position[3] then
+                    UpdateLabels()
+                    OldZoom = zoom
+                    OldPosition = position
+                    ReclaimChanged = false
+            end
+
+            view.NewViewing = false
         end
-
-        view.NewViewing = false
-
         WaitSeconds(.1)
     end
 

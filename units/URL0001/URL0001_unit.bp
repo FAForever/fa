@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 31.5,
+        GuardScanRadius = 61.5,
         TargetBones = {
             'Head',
             'Torso',
@@ -697,6 +697,10 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        ActiveIntel = {
+            Omni = true,
+            Sonar = true,
+        },
         Cloak = true,
         FreeIntel = false,
         OmniRadius = 26,
@@ -767,6 +771,48 @@ UnitBlueprint {
     },
     VeteranMassMult = 0.5,
     Weapon = {
+        { -- special dummy weapon to make the unit able to target at max torpedo range in the water
+            BallisticArc = 'RULEUBA_LowArc',
+            Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = {
+                Land = 'Land|Water|Seabed',
+                Seabed = 'Land|Water|Seabed',
+                Water = 'Land|Water|Seabed',
+            },
+            Label = 'DummyWeapon',
+            MaxRadius = 22,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret_Muzzle_02',
+                    },
+                    RackBone = 'Right_Turret',
+                },
+            },
+            RateOfFire = 0.5,
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'SPECIALHIGHPRI',
+                'MOBILE',
+                'STRUCTURE DEFENSE',
+                'SPECIALLOWPRI',
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TurretBoneMuzzle = 'Turret_Muzzle_02',
+            TurretBonePitch = 'Right_Turret',
+            TurretBoneYaw = 'Torso',
+            TurretDualManipulators = false,
+            TurretPitch = 0,
+            TurretPitchRange = 90,
+            TurretPitchSpeed = 90,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 90,
+            Turreted = true,
+            UseFiringSolutionInsteadOfAimBone = true,
+        },
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,

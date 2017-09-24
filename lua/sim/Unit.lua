@@ -1810,7 +1810,11 @@ Unit = Class(moho.unit_methods) {
 
             if isNaval and self:GetBlueprint().Display.AnimationDeath then
                 -- Waits for wreck to hit bottom or end of animation
-                self:SeabedWatcher()
+                if self:GetFractionComplete() > 0.5 then
+                    self:SeabedWatcher()
+                else
+                    self:DestroyUnit(overkillRatio)
+                end
             else
                 -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's make one up.
                 local this = self
@@ -2564,6 +2568,10 @@ Unit = Class(moho.unit_methods) {
         local function DisableOneIntel(disabler, intel)
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
+                local active = self:GetBlueprint().Intel.ActiveIntel
+                if active and active[intel] then
+                    return
+                end
                 self:DisableIntel(intel)
 
                 -- Handle the cloak FX timing
@@ -3006,6 +3014,14 @@ Unit = Class(moho.unit_methods) {
         -- Trigger the re-worded stuff that used to be inherited, no longer because of the engine bug above.
         if self.LayerChangeTrigger then
             self:LayerChangeTrigger(new, old)
+        end
+        
+        if new == 'Seabed' then
+            if not self:GetBlueprint().Intel.OmniRadius or self:GetBlueprint().Intel.OmniRadius == 0 then
+                self:DisableIntel('Vision')
+            end
+        else
+            self:EnableIntel('Vision')
         end
     end,
 
@@ -4242,7 +4258,9 @@ Unit = Class(moho.unit_methods) {
 
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
-        if self:GetArmy() == GetFocusArmy() then
+        local focusArmy = GetFocusArmy()
+        local army = self:GetArmy()
+        if focusArmy == -1 or focusArmy == army then
             local id
             local unitType
             local category
@@ -4279,7 +4297,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-                local message = {source = source or unitType, trigger = trigger, category = category, id = id}
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = army}
                 table.insert(Sync.EnhanceMessage, message)
             end
         end

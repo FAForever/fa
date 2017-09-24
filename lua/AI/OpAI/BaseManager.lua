@@ -907,7 +907,8 @@ BaseManager = Class {
                 for k, v in self.UpgradeTable do
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit:IsDead() then
-                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and unit:IsIdleState() and not unit:IsBeingBuilt() then
+                        -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state 
+                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end

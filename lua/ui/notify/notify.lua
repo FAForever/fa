@@ -16,7 +16,22 @@ local messageCounts = {}
 local messageLimits = {tech = 1, other = 1, experimentals = 1}
 local customMessagesDisabled
 
+local focusArmy
+local observer
+local localClient
+
 function init(isReplay, parent)
+    focusArmy = GetFocusArmy()
+    observer = isReplay or focusArmy == -1
+
+    local clients = GetSessionClients()
+    for index, client in clients do
+        if client['local'] then
+            localClient = index
+            break
+        end
+    end
+
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
 
@@ -211,6 +226,27 @@ function round(num, idp)
     end
 end
 
+function focusArmyChanged()
+    focusArmy = GetFocusArmy()
+    observer = observer or focusArmy == -1
+
+    if focusArmy ~= -1 then
+        for _, data in ACUs do
+            if data.army ~= focusArmy then
+                killWatcher(data)
+            end
+        end
+    end
+end
+
+function sendMessage(msg)
+    if observer then
+        SessionSendChatMessage(localClient, msg)
+    else
+        SessionSendChatMessage(FindClients(), msg)
+    end
+end
+
 -- This function processes messages sent from the sim from unit.lua and defaultunits.lua
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
@@ -218,10 +254,11 @@ function sendEnhancementMessage(messageTable)
     if not messages[category][source] then return end
 
     local id = messageTable.id
+    local army = messageTable.army
     local trigger = messageTable.trigger
 
     if trigger == 'started' then
-        onStartEnhancement(id, category, source)
+        onStartEnhancement(id, army, category, source)
     elseif trigger == 'cancelled' then
         onCancelledEnhancement(id, category, source)
     elseif trigger == 'completed' then
@@ -229,13 +266,13 @@ function sendEnhancementMessage(messageTable)
     end
 end
 
-function onStartEnhancement(id, category, source)
+function onStartEnhancement(id, army, category, source)
     local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
-    if id then
+    if id and (focusArmy == -1 or army == focusArmy) then
         if not ACUs[id] then
-            ACUs[id] = {id = id, watcher = false, startTime = 0}
+            ACUs[id] = {id = id, army = army, watcher = false, startTime = 0}
         end
 
         local data = ACUs[id]
@@ -247,7 +284,7 @@ function onStartEnhancement(id, category, source)
         end
     end
 
-    SessionSendChatMessage(FindClients(), msg)
+    sendMessage(msg)
 end
 
 function onCancelledEnhancement(id, category, source)
@@ -260,7 +297,7 @@ function onCancelledEnhancement(id, category, source)
         end
     end
 
-    SessionSendChatMessage(FindClients(), msg)
+    sendMessage(msg)
 end
 
 -- Called from the enhancement watcher
@@ -277,7 +314,7 @@ function onCompletedEnhancement(id, category, source)
         end
     end
 
-    SessionSendChatMessage(FindClients(), msg)
+    sendMessage(msg)
 end
 
 function killWatcher(data)

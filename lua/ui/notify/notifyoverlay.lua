@@ -1,6 +1,5 @@
 -- This file contains the functions which deal with creating and updating ETA overlay for ACU upgrades
 
-local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -213,7 +212,7 @@ function generateEnhancementMessage(data)
             data.pos = pos
             data.last_message = seconds
             msg.data = table.merged(msg.data, {progress = percent, eta = eta, pos = pos})
-            SessionSendChatMessage(FindClients(), msg)
+            import('/lua/ui/notify/notify.lua').sendMessage(msg)
         end
     end
 
@@ -224,5 +223,5 @@ end
 
 function sendDestroyOverlayMessage(id)
     local msg = {to = 'allies', NotifyOverlay = true, data = {id = id, destroy = true}}
-    SessionSendChatMessage(FindClients(), msg)
+    import('/lua/ui/notify/notify.lua').sendMessage(msg)
 end
