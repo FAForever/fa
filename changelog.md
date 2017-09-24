@@ -1,4 +1,4 @@
-Patch 3688 (13th August 2017)
+Patch 3688 (24th September 2017)
 ============================
 ### Balance
 - Veterancy
