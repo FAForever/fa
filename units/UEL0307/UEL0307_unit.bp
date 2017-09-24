@@ -82,7 +82,7 @@ UnitBlueprint {
             ShieldRegenRate = 55,
             ShieldRegenStartTime = 3,
             ShieldSize = 17,
-            ShieldSpillOverDamageMod = 0.4,
+            ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -3,
         },
         SubThreatLevel = 0,
