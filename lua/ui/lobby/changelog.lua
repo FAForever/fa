@@ -1,4 +1,4 @@
-last_version = 3686
+last_version = 3688
 changelog = {
     {
         version = 3,
@@ -1218,6 +1218,10 @@ changelog = {
         description = {
             '**Balance**',
             '- Veterancy',
+            '- Until now the veterancy system worked in such a way that the tech level of the units killed determined how many veterancy points a unit was given, and only the unit that got the killing blow would get the veterancy point(s).'
+            '- With this patch we are moving from that tech based system to a mass based system. That means your units will get veterancy based on the mass of the unit that is killed.'
+            '- Your unit also does not need to get the killing blow to get veterancy.'
+            '- Once a unit dies all the units which damaged it will get veterancy points based on how much damage they did to that unit. There are also multipliers to adjust how much veterancy certain classes of units will require to vet up. We will watch closely for cases where veterancy may move to fast or too slow in certain fights and make any adjustments neccessary in upcoming patches.'
             '- The mass value of the ACU has been reduced to 2 000 to avoid getting insane veterancy by killing an ACU',
             '- The amount of veterancy points that the ACU gains from higher tech units is reduced to avoid vetting too fast by overcharging mass heavy land units.',
             '- Experimental units only need to kill 50% of their own worth in mass to gain one veterancy rank.',
