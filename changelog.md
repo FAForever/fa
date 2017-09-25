@@ -174,62 +174,62 @@ Patch 3684 (27th May 2017)
 
 ### Balance
 - Janus
-    - Corrected miscalculation in total damage. Fire pulse count decreased 15 -> 10
+    - Corrected miscalculation in total damage. Fire pulse count decreased 15 → 10
 - Reclaim
     - Time taken to reclaim unit wrecks doubled. Props and living units unaffected
     - Increased value of split trees by 25% to compensate for it taking longer to reclaim them
 - T1 Land/Air Factory + T2 Land/Air Support
-    - Aeon Health increased 3100 -> 3200
+    - Aeon Health increased 3100 → 3200
     - Cybran
-        - Health increased 2500 -> 2750
-        - Regen increased 6 -> 9
+        - Health increased 2500 → 2750
+        - Regen increased 6 → 9
 - T1 Naval Factory
-    - Aeon Health increased 3100 -> 3700
-    - UEF Health increased 4000 -> 4500
+    - Aeon Health increased 3100 → 3700
+    - UEF Health increased 4000 → 4500
     - Cybran
-        - Health increased 2500 -> 3200
-        - Regen increased 6 -> 10
-    - Seraphim Health increased 3500 -> 4000
+        - Health increased 2500 → 3200
+        - Regen increased 6 → 10
+    - Seraphim Health increased 3500 → 4000
 - T2 Land/Air HQ + T3 Land/Air Support
-    - Aeon Health increased 6200 -> 6400
+    - Aeon Health increased 6200 → 6400
     - Cybran
-        - Health increased 5000 -> 5500
+        - Health increased 5000 → 5500
 - T2 Naval Support
-    - Aeon Health increased 5000 -> 6400
-    - UEF Health increased 6500 -> 8000
+    - Aeon Health increased 5000 → 6400
+    - UEF Health increased 6500 → 8000
     - Cybran
-        - Health increased 4000 -> 5500
-        - Regen increased 12 -> 20
-    - Seraphim Health increased 5500 -> 7000
+        - Health increased 4000 → 5500
+        - Regen increased 12 → 20
+    - Seraphim Health increased 5500 → 7000
 - T2 Naval HQ
-    - Aeon Health increased 10000 -> 12800
-    - UEF Health increased 13000 -> 16000
+    - Aeon Health increased 10000 → 12800
+    - UEF Health increased 13000 → 16000
     - Cybran
-        - Health increased 8000 -> 11000
-        - Regen increased 30 -> 40
-    - Seraphim Health increased 11000 -> 14000
+        - Health increased 8000 → 11000
+        - Regen increased 30 → 40
+    - Seraphim Health increased 11000 → 14000
 - T3 Land/Air HQ
-    - Aeon Health increased 12400 -> 12800
+    - Aeon Health increased 12400 → 12800
     - Cybran
-        - Health increased 10000 -> 11000
+        - Health increased 10000 → 11000
 - T3 Naval Support
-    - Aeon Health decreased 13000 -> 12800
-    - UEF Health decreased 17000 -> 16000
-    - Cybran Regen increased 30 -> 40
-    - Seraphim Health decreased 15000 -> 14000
+    - Aeon Health decreased 13000 → 12800
+    - UEF Health decreased 17000 → 16000
+    - Cybran Regen increased 30 → 40
+    - Seraphim Health decreased 15000 → 14000
 - T3 Naval HQ
-    - Aeon Health increased 20000 -> 21000
-    - Cybran Health increased 16000 -> 17000
-    - Seraphim Health increased 22000 -> 23000
+    - Aeon Health increased 20000 → 21000
+    - Cybran Health increased 16000 → 17000
+    - Seraphim Health increased 22000 → 23000
 - Hydrocarbon
-    - Cybran Regen decreased 6 -> 5
+    - Cybran Regen decreased 6 → 5
 - Mass Storage
-    - Cybran Regen drecreased 4 -> 3
+    - Cybran Regen drecreased 4 → 3
 - Seraphim ACU Second Gun Upgrade
-    - Mass cost increased 3500 -> 4800
-    - Energy cost decreased 300000 -> 270000
-    - Damage bonus increased 400 -> 750
-    - Damage radius increased 2 -> 2.7
+    - Mass cost increased 3500 → 4800
+    - Energy cost decreased 300000 → 270000
+    - Damage bonus increased 400 → 750
+    - Damage radius increased 2 → 2.7
 - Veterancy
     - Increased veterancy regen values for Experimentals across the board
     - Fixed longstanding bug causing Veterancy to heal far too much health
@@ -238,42 +238,42 @@ Patch 3684 (27th May 2017)
     - New system: Unchanged for ACUs. Other units heal max HP * 0.1 each time
 - MMLs
     - Aeon
-        - Missile HP increased 1 -> 2
+        - Missile HP increased 1 → 2
         - Missile motion parameters changed to be slower
     - UEF
         - Now fires 3 missiles in a salvo, 1.8 seconds apart, every 10 seconds
-        - Effective DPS increased 60 -> 90
+        - Effective DPS increased 60 → 90
     - Seraphim
         - Missile motion parameters changed to be faster
-        - MuzzleVelocity increased 3 -> 4
-        - RateOfFire increased 0.15 -> 0.1666. Firing cycle from 1 shot every 6.7s to one shot every 6 seconds
-        - Effective DPS increased 60.4 -> 67.5
+        - MuzzleVelocity increased 3 → 4
+        - RateOfFire increased 0.15 → 0.1666. Firing cycle from 1 shot every 6.7s to one shot every 6 seconds
+        - Effective DPS increased 60.4 → 67.5
 - Sparky
     - Reintroduced Energy drain of 15 for running Jammer
 - Novax Satellite
-    - Crash damage decreased 3000 -> 1000
+    - Crash damage decreased 3000 → 1000
 - UEF T1 Bomber
-    - Bomb DoT Duration increased 1.5 -> 4.2. Damage remains the same, just more spread out in time
+    - Bomb DoT Duration increased 1.5 → 4.2. Damage remains the same, just more spread out in time
 T2 Static Flak
-    - Aeon MuzzleVelocity increased 30 -> 35
-    - UEF MuzzleVelocity increased 25 -> 35
-    - Cybran MuzzleVelocity increased 20 -> 30
+    - Aeon MuzzleVelocity increased 30 → 35
+    - UEF MuzzleVelocity increased 25 → 35
+    - Cybran MuzzleVelocity increased 20 → 30
     - Seraphim
-        - MuzzleVelocity increased 25 -> 35
-        - AOE increased 3 -> 4
-        - FiringRandomness decreased 2.5 -> 2
+        - MuzzleVelocity increased 25 → 35
+        - AOE increased 3 → 4
+        - FiringRandomness decreased 2.5 → 2
 - Crab Eggs
     - Corrected T3 Engineer Egg to match new values for the main unit from previous patches
     - BuildTime of all eggs reduced by 50%
 - Megalith
-    - BuildRate decreased 180 -> 45
+    - BuildRate decreased 180 → 45
     - Combined with egg changes, effectively doubles egg build time, and reduces Megalith reclaim rate to 25% of before
 - Aurora
-    - FiringRandomnessWhileMoving increased 0.1 -> 0.3
+    - FiringRandomnessWhileMoving increased 0.1 → 0.3
 - Harbinger
-    - BuildRate increased 3 -> 5
+    - BuildRate increased 3 → 5
 - Aeon ACU
-    - First Shield upgrade recharge time increased 65 -> 90
+    - First Shield upgrade recharge time increased 65 → 90
 
 ### Contributors
 - Crotalus
@@ -454,67 +454,67 @@ Patch 3676 (27th February, 2017)
 
 ### Balance
 - Janus
-    - Initial damage per bomblet increased 15 -> 20 (Overall impact 300 -> 400)
+    - Initial damage per bomblet increased 15 → 20 (Overall impact 300 → 400)
 - T3 Naval Support
-    - Aeon Health increased 10000 -> 13000
-    - UEF Health increased 13000 -> 17000
+    - Aeon Health increased 10000 → 13000
+    - UEF Health increased 13000 → 17000
     - Cybran
-        - Health increased 8000 -> 11000
-        - Regen increased 15 -> 30
-    - Seraphim Health increased 10000 -> 15000
+        - Health increased 8000 → 11000
+        - Regen increased 15 → 30
+    - Seraphim Health increased 10000 → 15000
 - T2 UEF Naval Support
-    - Health increased 6000 -> 6500
+    - Health increased 6000 → 6500
 - Mass Storage
-    - Aeon Health increased 600 -> 1000
-    - UEF Health increased 760 -> 1200
+    - Aeon Health increased 600 → 1000
+    - UEF Health increased 760 → 1200
     - Cybran
-        - Health increased 500 -> 800
-        - Regen increased 1 -> 4
-    - Seraphim Health increased 600 -> 1100
+        - Health increased 500 → 800
+        - Regen increased 1 → 4
+    - Seraphim Health increased 600 → 1100
 - Seraphim Buildings
     - T1
-        - Factory Health increased 3100 -> 3500
-        - Power Generator Health increased 600 -> 650
-        - Hydrocarbon Health increased 1600 -> 1700
-        - Mass Extractor Health increased 600 -> 650
-        - Wall Health increased 2000 -> 2500
+        - Factory Health increased 3100 → 3500
+        - Power Generator Health increased 600 → 650
+        - Hydrocarbon Health increased 1600 → 1700
+        - Mass Extractor Health increased 600 → 650
+        - Wall Health increased 2000 → 2500
     - T2
-        - Air/Land HQ Health increased 6200 -> 7000
-        - Naval HQ Health increased 10000 -> 11000
-        - Air/Land Support Health increased 3100 -> 3500
-        - Naval Support Health increased 5000 -> 5500
-        - Power Generator Health increased 1900 -> 2000
-        - Mass Extractor Health increased 1900 -> 2000
+        - Air/Land HQ Health increased 6200 → 7000
+        - Naval HQ Health increased 10000 → 11000
+        - Air/Land Support Health increased 3100 → 3500
+        - Naval Support Health increased 5000 → 5500
+        - Power Generator Health increased 1900 → 2000
+        - Mass Extractor Health increased 1900 → 2000
     - T3
-        - Air/Land HQ Health increased 12400 -> 14000
-        - Naval HQ Health increased 20000 -> 22000
-        - Air/Land Support Health increased 6200 -> 7000
-        - Naval Support Health increased 10000 -> 15000
-        - Power Generator Health increased 6200 -> 7000
-        - Mass Extractor Health increased 6200 -> 7000
+        - Air/Land HQ Health increased 12400 → 14000
+        - Naval HQ Health increased 20000 → 22000
+        - Air/Land Support Health increased 6200 → 7000
+        - Naval Support Health increased 10000 → 15000
+        - Power Generator Health increased 6200 → 7000
+        - Mass Extractor Health increased 6200 → 7000
 - Cybran Buildings
     - T1
-        - Factory Regen increased 3 -> 6
-        - Power Generator Regen increased 1 -> 2
-        - Mass Extractor Regen increased 1 -> 2
-        - Hydrocarbon Regen increased 1 -> 6
-        - Wall Regen increased 3 -> 6
+        - Factory Regen increased 3 → 6
+        - Power Generator Regen increased 1 → 2
+        - Mass Extractor Regen increased 1 → 2
+        - Hydrocarbon Regen increased 1 → 6
+        - Wall Regen increased 3 → 6
     - T2
-        - Air/Land HQ Regen increased 10 -> 20
-        - Naval HQ Regen increased 15 -> 30
-        - Air/Land Support Regen increased 3 -> 6
-        - Naval Support Regen increased 6 -> 12
-        - Power Generator Regen increased 3 -> 6
-        - Mass Extractor Regen increased 3 -> 6
+        - Air/Land HQ Regen increased 10 → 20
+        - Naval HQ Regen increased 15 → 30
+        - Air/Land Support Regen increased 3 → 6
+        - Naval Support Regen increased 6 → 12
+        - Power Generator Regen increased 3 → 6
+        - Mass Extractor Regen increased 3 → 6
     - T3
-        - Air/Land HQ Regen increased 20 -> 40
-        - Naval HQ Regen increased 30 -> 60
-        - Air/Land Support Regen increased 10 -> 20
-        - Naval Support Regen increased 15 -> 30
-        - Power Generator Regen increased 10 -> 20
-        - Mass Extractor Regen increased 10 -> 20
+        - Air/Land HQ Regen increased 20 → 40
+        - Naval HQ Regen increased 30 → 60
+        - Air/Land Support Regen increased 10 → 20
+        - Naval Support Regen increased 15 → 30
+        - Power Generator Regen increased 10 → 20
+        - Mass Extractor Regen increased 10 → 20
 - T2 Radar
-    - Intel maintenance cost decreased 250 -> 200
+    - Intel maintenance cost decreased 250 → 200
 
 ### Contributors
 - IceDreamer
@@ -548,16 +548,16 @@ http://content.faforever.com/patchnotes/3674.html
 - Stun mechanics now apply in a sphere rather than a cylinder
 - Ythotha
     - Changed various aspects of the unit to make it easier to micro
-    - UniformScale decreased 0.05 -> 0.042
-    - TurnRate increased 40 -> 60
-    - SizeX decreased 3.5 -> 3.2
-    - SizeY decreased 8.5 -> 7.5
-    - Eye weapon MaxRadius increased 45 -> 47
-    - Gatling arm weapon MaxRadius increased 45 -> 47
-    - Medium cannon weapon MaxRadius increased 45 -> 47
+    - UniformScale decreased 0.05 → 0.042
+    - TurnRate increased 40 → 60
+    - SizeX decreased 3.5 → 3.2
+    - SizeY decreased 8.5 → 7.5
+    - Eye weapon MaxRadius increased 45 → 47
+    - Gatling arm weapon MaxRadius increased 45 → 47
+    - Medium cannon weapon MaxRadius increased 45 → 47
     - AA
-        - MaxRadius increased 45 -> 47
-        - AOE increased 1.5 -> 4
+        - MaxRadius increased 45 → 47
+        - AOE increased 1.5 → 4
         - Can shoot at a slightly greater angle to eliminate blindspots',
         - Added UseFiringSolutionInsteadOfAimBone = true for better AA performance',
     - Added ACU as higher priority target on the DeathBall
@@ -565,231 +565,231 @@ http://content.faforever.com/patchnotes/3674.html
 - T1 Factories
     - Land
         - Aeon
-            - Health decreased 3700 -> 3100
+            - Health decreased 3700 → 3100
         - UEF
-            - Health decreased 4100 -> 4000
+            - Health decreased 4100 → 4000
         - Cybran
-            - Health decreased 3500 -> 2500
-            - Regen increased 0 -> 3
+            - Health decreased 3500 → 2500
+            - Regen increased 0 → 3
         - Seraphim
-            - Health decreased 3700 -> 3100
+            - Health decreased 3700 → 3100
     - Air
         - Aeon
-            - Health decreased 3700 -> 3100
+            - Health decreased 3700 → 3100
         - UEF
-            - Health decreased 4100 -> 4000
+            - Health decreased 4100 → 4000
         - Cybran
-            - Health decreased 3500 -> 2500
-            - Regen increased 0 -> 3
+            - Health decreased 3500 → 2500
+            - Regen increased 0 → 3
         - Seraphim
-            - Health decreased 3700 -> 3100
+            - Health decreased 3700 → 3100
     - Naval
         - Aeon
-            - Health decreased 4400 -> 3100
+            - Health decreased 4400 → 3100
         - UEF
-            - Health decreased 4800 -> 4000
+            - Health decreased 4800 → 4000
         - Cybran
-            - Health decreased 4200 -> 2500
-            - Regen increased 0 -> 3
+            - Health decreased 4200 → 2500
+            - Regen increased 0 → 3
         - Seraphim
-            - Health decreased 4600 -> 3100
+            - Health decreased 4600 → 3100
 - T2 HQs
     - Land
         - Aeon
-            - Health decreased 8200 -> 6200
+            - Health decreased 8200 → 6200
         - UEF
-            - Health decreased 9000 -> 8000
+            - Health decreased 9000 → 8000
         - Cybran
-            - Health decreased 7800 -> 5000
-            - Regen increased 0 -> 10
+            - Health decreased 7800 → 5000
+            - Regen increased 0 → 10
         - Seraphim
-            - Health decreased 8200 -> 6200
+            - Health decreased 8200 → 6200
     - Air
         - Aeon
-            - Health decreased 8200 -> 6200
+            - Health decreased 8200 → 6200
         - UEF
-            - Health decreased 9000 -> 8000
+            - Health decreased 9000 → 8000
         - Cybran
-            - Health decreased 7800 -> 5000
-            - Regen increased 0 -> 10
+            - Health decreased 7800 → 5000
+            - Regen increased 0 → 10
         - Seraphim
-            - Health decreased 8600 -> 6200
+            - Health decreased 8600 → 6200
     - Naval
         - Aeon
-            - Health decreased 16000 -> 10000
+            - Health decreased 16000 → 10000
         - UEF
-            - Health decreased 18000 -> 13000
+            - Health decreased 18000 → 13000
         - Cybran
-            - Health decreased 15000 -> 8000
-            - Regen increased 0 -> 15
+            - Health decreased 15000 → 8000
+            - Regen increased 0 → 15
         - Seraphim
-            - Health decreased 17000 -> 10000
+            - Health decreased 17000 → 10000
 - T3 HQs
     - Land
         - Aeon
-            - Health decreased 20000 -> 12400
+            - Health decreased 20000 → 12400
         - UEF
-            - Health decreased 22000 -> 16000
+            - Health decreased 22000 → 16000
         - Cybran
-            - Health decreased 19000 -> 10000
-            - Regen increased 0 -> 20
+            - Health decreased 19000 → 10000
+            - Regen increased 0 → 20
         - Seraphim
-            - Health decreased 21000 -> 12400
+            - Health decreased 21000 → 12400
     - Air
         - Aeon
-            - Health decreased 20000 -> 12400
+            - Health decreased 20000 → 12400
         - UEF
-            - Health decreased 22000 -> 16000
+            - Health decreased 22000 → 16000
         - Cybran
-            - Health decreased 19000 -> 10000
-            - Regen increased 0 -> 20
+            - Health decreased 19000 → 10000
+            - Regen increased 0 → 20
         - Seraphim
-            - Health decreased 21000 -> 12400
+            - Health decreased 21000 → 12400
     - Naval
         - Aeon
-            - Health decreased 37500 -> 20000
+            - Health decreased 37500 → 20000
         - UEF
-            - Health decreased 40000 -> 26000
+            - Health decreased 40000 → 26000
         - Cybran
-            - Health decreased 34000 -> 16000
-            - Regen increased 0 -> 30
+            - Health decreased 34000 → 16000
+            - Regen increased 0 → 30
         - Seraphim
-            - Health decreased 38000 -> 20000
+            - Health decreased 38000 → 20000
 - T2 Support
     - Land
         - Aeon
-            - Health decreased 4100 -> 3100
+            - Health decreased 4100 → 3100
         - UEF
-            - Health decreased 4500 -> 4000
+            - Health decreased 4500 → 4000
         - Cybran
-            - Health decreased 3900 -> 2500
-            - Regen increased 0 -> 3
+            - Health decreased 3900 → 2500
+            - Regen increased 0 → 3
         - Seraphim
-            - Health decreased 4100 -> 3100
+            - Health decreased 4100 → 3100
     - Air
         - Aeon
-            - Health decreased 4100 -> 3100
+            - Health decreased 4100 → 3100
         - UEF
-            - Health decreased 4500 -> 4000
+            - Health decreased 4500 → 4000
         - Cybran
-            - Health decreased 3900 -> 2500
-            - Regen increased 0 -> 3
+            - Health decreased 3900 → 2500
+            - Regen increased 0 → 3
         - Seraphim
-            - Health decreased 4300 -> 3100
+            - Health decreased 4300 → 3100
     - Naval
         - Aeon
-            - Health decreased 8000 -> 5000
+            - Health decreased 8000 → 5000
         - UEF
-            - Health decreased 9000 -> 6000
+            - Health decreased 9000 → 6000
         - Cybran
-            - Health decreased 7500 -> 4000
-            - Regen increased 0 -> 6
+            - Health decreased 7500 → 4000
+            - Regen increased 0 → 6
         - Seraphim
-            - Health decreased 8500 -> 5000
+            - Health decreased 8500 → 5000
 - T3 Support
     - Land
         - Aeon
-            - Health decreased 10000 -> 6200
+            - Health decreased 10000 → 6200
         - UEF
-            - Health decreased 11000 -> 8000
+            - Health decreased 11000 → 8000
         - Cybran
-            - Health decreased 9500 -> 5000
-            - Regen increased 0 -> 10
+            - Health decreased 9500 → 5000
+            - Regen increased 0 → 10
         - Seraphim
-            - Health decreased 10500 -> 6200
+            - Health decreased 10500 → 6200
     - Air
         - Aeon
-            - Health decreased 10000 -> 6200
+            - Health decreased 10000 → 6200
         - UEF
-            - Health decreased 11000 -> 8000
+            - Health decreased 11000 → 8000
         - Cybran
-            - Health decreased 9500 -> 5000
-            - Regen increased 0 -> 10
+            - Health decreased 9500 → 5000
+            - Regen increased 0 → 10
         - Seraphim
-            - Health decreased 10500 -> 6200
+            - Health decreased 10500 → 6200
     - Naval
         - Aeon
-            - Health decreased 18750 -> 10000
+            - Health decreased 18750 → 10000
         - UEF
-            - Health decreased 20000 -> 13000
+            - Health decreased 20000 → 13000
         - Cybran
-            - Health decreased 17000 -> 8000
-            - Regen increased 0 -> 15
+            - Health decreased 17000 → 8000
+            - Regen increased 0 → 15
         - Seraphim
-            - Health decreased 19000 -> 10000
+            - Health decreased 19000 → 10000
 - T3 Power Generator
-    - Death damage decreased 8000 -> 5500
+    - Death damage decreased 8000 → 5500
     - Aeon
-        - Health decreased 9720 -> 6200
+        - Health decreased 9720 → 6200
     - UEF
-        - Health decreased 9720 -> 9000
+        - Health decreased 9720 → 9000
     - Cybran
-        - Health decreased 9720 -> 6000
-        - Regen increased 0 -> 10
+        - Health decreased 9720 → 6000
+        - Regen increased 0 → 10
     - Seraphim
-        - Health decreased 9720 -> 6200
+        - Health decreased 9720 → 6200
 - T2 Power Generator
     - Aeon
-        - Health decreased 2160 -> 1900
+        - Health decreased 2160 → 1900
     - UEF
-        - Health increased 2160 -> 2500
+        - Health increased 2160 → 2500
     - Cybran
-        - Health decreased 2160 -> 1800
-        - Regen increased 0 -> 3
+        - Health decreased 2160 → 1800
+        - Regen increased 0 → 3
     - Seraphim
-        - Health decreased 2160 -> 1900
+        - Health decreased 2160 → 1900
 - T1 Power Generator
-    - UEF Health increased 600 -> 760
+    - UEF Health increased 600 → 760
     - Cybran
-        - Health decreased 600 -> 500
-        - Regen increased 0 -> 1
+        - Health decreased 600 → 500
+        - Regen increased 0 → 1
 - Hydrocarbon
-    - UEF Health increased 1600 -> 1800
+    - UEF Health increased 1600 → 1800
     - Cybran
-        - Health decreased 1600 -> 1400
-        - Regen increased 0 -> 1
+        - Health decreased 1600 → 1400
+        - Regen increased 0 → 1
 - T3 Mex
     - Aeon
-        - Health decreased 8400 -> 6200
+        - Health decreased 8400 → 6200
     - UEF
-        - Health increased 8400 -> 9000
+        - Health increased 8400 → 9000
     - Cybran
-        - Health decreased 8400 -> 6000
-        - Regen increased 0 -> 10
+        - Health decreased 8400 → 6000
+        - Regen increased 0 → 10
     - Seraphim
-        - Health decreased 8400 -> 6200
+        - Health decreased 8400 → 6200
 - T2 Mex
     - Aeon
-        - Health decreased 3000 -> 1900
+        - Health decreased 3000 → 1900
     - UEF
-        - Health decreased 3000 -> 2500
+        - Health decreased 3000 → 2500
     - Cybran
-        - Health decreased 3000 -> 1800
-        - Regen increased 0 -> 3
+        - Health decreased 3000 → 1800
+        - Regen increased 0 → 3
     - Seraphim
-        - Health decreased 3000 -> 1900
+        - Health decreased 3000 → 1900
 - T1 Mex
-    - UEF Health increased 600 -> 760
+    - UEF Health increased 600 → 760
     - Cybran
-        - Health decreased 600 -> 500
-        - Regen increased 0 -> 1
+        - Health decreased 600 → 500
+        - Regen increased 0 → 1
 - Mass Storage
-    - Aeon Health decreased 1600 -> 600
-    - UEF Health decreased 1600 -> 760
+    - Aeon Health decreased 1600 → 600
+    - UEF Health decreased 1600 → 760
     - Cybran
-        - Health decreased 1600 -> 500
-        - Regen increased 0 -> 1
-    - Seraphim Health decreased 1600 -> 600
+        - Health decreased 1600 → 500
+        - Regen increased 0 → 1
+    - Seraphim Health decreased 1600 → 600
 - Walls
-    - Aeon/Seraphim Health decreased 4000 -> 2000
-    - UEF Health decreased 4000 -> 3000
+    - Aeon/Seraphim Health decreased 4000 → 2000
+    - UEF Health decreased 4000 → 3000
     - Cybran
-        - Health decreased 4000 -> 1500
-        - Regen increased 0 -> 3
-    - BuildTime increased 10 -> 20
+        - Health decreased 4000 → 1500
+        - Regen increased 0 → 3
+    - BuildTime increased 10 → 20
 - Janus
-    - Fire lifetime increased 4.2 -> 6
-    - Initial damage per bomblet decreased 30 -> 15 (Overall impact 600 -> 300)
+    - Fire lifetime increased 4.2 → 6
+    - Initial damage per bomblet decreased 30 → 15 (Overall impact 600 → 300)
 
 ### Contributors
 - CookieNoob
@@ -929,91 +929,91 @@ Patch 3662 (November 9th, 2016)
 
 ### Balance
 - T2 HQs
-    - Energy cost decreased 13300 -> 11200
-    - Mass cost decreased 1520 -> 1410
+    - Energy cost decreased 13300 → 11200
+    - Mass cost decreased 1520 → 1410
 - ACUs
     - T2 upgrade
-        - Energy cost increased 18000 -> 21000
-        - Mass cost increased 720 -> 800
-        - Buildtime increased 900 -> 1000
-        - HP increased 1500 -> 2000
-        - Regen increased 0 -> 10
-    - T3 upgrade regen increased 0 -> 20
+        - Energy cost increased 18000 → 21000
+        - Mass cost increased 720 → 800
+        - Buildtime increased 900 → 1000
+        - HP increased 1500 → 2000
+        - Regen increased 0 → 10
+    - T3 upgrade regen increased 0 → 20
     - Aeon
         - RAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 2700 -> 1700
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 2700 → 1700
         - ARAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 5400 -> 3400
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 5400 → 3400
         - Shield upgrade
-            - Energy cost decreased 93750 -> 35000
-            - Mass cost decreased 1500 -> 1000
-            - Buildtime decreased 1750 -> 1000
-            - Energy maintenance cost decreased 250/s -> 150/s
-            - Shield HP decreased 29000 -> 8000
-            - Shield recharge time decreased 160 -> 65
-            - Shield regen rate (Only while not under fire) decreased 37 -> 30
+            - Energy cost decreased 93750 → 35000
+            - Mass cost decreased 1500 → 1000
+            - Buildtime decreased 1750 → 1000
+            - Energy maintenance cost decreased 250/s → 150/s
+            - Shield HP decreased 29000 → 8000
+            - Shield recharge time decreased 160 → 65
+            - Shield regen rate (Only while not under fire) decreased 37 → 30
         - Advanced Shield upgrade
-            - Energy cost decreased 1000000 -> 93750
-            - Mass cost decreased 4500 -> 1500
-            - Buildtime decreased 3500 -> 1750
-            - Energy maintenance cost decreased 500/s -> 250/s
-            - Shield HP decreased 44000 -> 29000
-            - Shield recharge time decreased 200 -> 160
-            - Shield regen rate (Only while not under fire) decreased 44 -> 37
+            - Energy cost decreased 1000000 → 93750
+            - Mass cost decreased 4500 → 1500
+            - Buildtime decreased 3500 → 1750
+            - Energy maintenance cost decreased 500/s → 250/s
+            - Shield HP decreased 44000 → 29000
+            - Shield recharge time decreased 200 → 160
+            - Shield regen rate (Only while not under fire) decreased 44 → 37
     - UEF
         - RAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 3300 -> 2500
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 3300 → 2500
         - Nano upgrade
             - Add HP bonus of 2000
-            - Regen decreased 60 -> 40
-            - Energy cost decreased 44800 -> 24000
-            - Mass cost decreased 1200 -> 800
-            - Buildtime decreased 1400 -> 800
+            - Regen decreased 60 → 40
+            - Energy cost decreased 44800 → 24000
+            - Mass cost decreased 1200 → 800
+            - Buildtime decreased 1400 → 800
     - Cybran
         - RAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 3500 -> 2700
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 3500 → 2700
     - Seraphim
         - RAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 3000 -> 2000
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 3000 → 2000
         - ARAS upgrade
-            - Energy cost increased 150000 -> 175000
-            - Buildtime increased 1400 -> 2800
-            - Energy production decreased 6000 -> 4000
+            - Energy cost increased 150000 → 175000
+            - Buildtime increased 1400 → 2800
+            - Energy production decreased 6000 → 4000
         - Nano upgrade
-            - Energy cost decreased 90000 -> 42000
-            - Mass cost decreased 2000 -> 1200
-            - Buildtime decreased 2800 -> 1200
-            - HP decreased 6000 -> 3000
-            - Regen decreased 75 -> 60
+            - Energy cost decreased 90000 → 42000
+            - Mass cost decreased 2000 → 1200
+            - Buildtime decreased 2800 → 1200
+            - HP decreased 6000 → 3000
+            - Regen decreased 75 → 60
 - sACUs
-    - RAS upgrade energy cost increased 68000 -> 90000
+    - RAS upgrade energy cost increased 68000 → 90000
 - Aeon T1 MAA
-    - HP decreased 360 -> 250
-    - Radius increased 32 -> 35
+    - HP decreased 360 → 250
+    - Radius increased 32 → 35
 - Janus
-    - Damage increased 5 -> 6
-    - Initial damage decreased 75 -> 30
-    - Bomb count increased 8 -> 20
-    - Damage time increased 2.5 -> 4.2
+    - Damage increased 5 → 6
+    - Initial damage decreased 75 → 30
+    - Bomb count increased 8 → 20
+    - Damage time increased 2.5 → 4.2
     - Significantly re-worked weapon fire sequence to increase ground cover and decrease focus damage
 - UEF T2 MML
     - Turned on friendly fire to match all the others
 - Air Staging
     - Decreased the staging 'Size' of most aircraft to make docking a much easier, much quicker process, with each building able to service more planes at once
 - T1 Bombers
-    - Energy cost increased 2400 -> 2450
-    - Mass cost decreased 120 -> 105
-    - Buildtime decreased 800 -> 700
+    - Energy cost increased 2400 → 2450
+    - Mass cost decreased 120 → 105
+    - Buildtime decreased 800 → 700
 - Mercy
     - Allow Mercy to land the same as other aircraft. Air maneuverability increased to allow it.
 
@@ -1121,7 +1121,7 @@ Patch 3660 (October 24th, 2016)
 
 Hotfix Patch 3659 (September 12th, 2016)
 ============================
-- Fixed UEF T2 Naval Support Factory HP typo 900 -> 9000
+- Fixed UEF T2 Naval Support Factory HP typo 900 → 9000
 
 
 Patch 3658 (August 29th, 2016)
@@ -1169,193 +1169,193 @@ Patch 3658 (August 29th, 2016)
 
 ### Balance
 - Light Assault Bots
-    - Build time reduced 140 -> 120
+    - Build time reduced 140 → 120
 - Cybran T2 Mobile Stealth
-    - Energy drain increased 25 -> 75
+    - Energy drain increased 25 → 75
 - Fire Beetle
     - Now takes two transport slots the same as all other T2 units
 - UEF T1 Mobile Artillery
-    - Health increased 200 -> 205
+    - Health increased 200 → 205
 - Scathis
-    - Mass cost increased 85,000 -> 110,000
-    - Energy cost increased 1,500,000 -> 2,000,000
-    - Build time cost increased 31,500 -> 50,000
-    - Weapon range decreased 330 -> 300
+    - Mass cost increased 85,000 → 110,000
+    - Energy cost increased 1,500,000 → 2,000,000
+    - Build time cost increased 31,500 → 50,000
+    - Weapon range decreased 330 → 300
 - Selen
     - Reworked hiding ability into a button toggle:
         - When pressed, puts the unit in hide mode. The weapon is disabled, all commands are removed from the unit, and it comes to a halt. Counter-intel Stealth and Cloak come online once it's stopped.
         - Selens in hide mode have lowered selection priority: They cannot be selected alongside other units.
     - Introduced power drain in hide mode - 5 energy/second
 - Mobile T1 AA
-    - Mass cost increased 28 -> 55
-    - Energy cost increased 140 -> 275
-    - Build time increased 140 -> 220
+    - Mass cost increased 28 → 55
+    - Energy cost increased 140 → 275
+    - Build time increased 140 → 220
     - UEF
-        - Health increased 200 -> 360
-        - Speed increased 2.8 -> 3.3
-        - Damage increased 8 -> 16
+        - Health increased 200 → 360
+        - Speed increased 2.8 → 3.3
+        - Damage increased 8 → 16
     - Cybran
-        - Health increased 130 -> 260
-        - Damage increased 8 -> 16
+        - Health increased 130 → 260
+        - Damage increased 8 → 16
         - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA.
     - Aeon
-        - Health increased 200 -> 360
-        - Speed decreased 3 -> 2.8
-        - Damage increased 5 -> 10
+        - Health increased 200 → 360
+        - Speed decreased 3 → 2.8
+        - Damage increased 5 → 10
     - Seraphim
-        - Health increased 200 -> 360
-        - Speed increased 2.5 -> 3.4
-        - Damage increased 4 -> 8
+        - Health increased 200 → 360
+        - Speed increased 2.5 → 3.4
+        - Damage increased 4 → 8
 - T2 Hover Tanks
    - UEF
-        - Increased speed on water 3 -> 3.3
+        - Increased speed on water 3 → 3.3
    - Aeon
-        - Increased speed on water 3 -> 3.5
+        - Increased speed on water 3 → 3.5
    - Seraphim
-        - Increased speed on water 3 -> 3.5
+        - Increased speed on water 3 → 3.5
 - T2 Flak
    - UEF
-        - Increased speed 2.8 -> 3
+        - Increased speed 2.8 → 3
    - Cybran
-        - Decreased speed 2.9 -> 2.7
+        - Decreased speed 2.9 → 2.7
    - Aeon
-        - Increased speed on water 3 -> 3.5
-        - Decreased speed on land 3 -> 2.6
+        - Increased speed on water 3 → 3.5
+        - Decreased speed on land 3 → 2.6
    - Seraphim
-        - Increased speed on water 3 -> 3.5
-        - Decreased speed on land 3 -> 2.5
+        - Increased speed on water 3 → 3.5
+        - Decreased speed on land 3 → 2.5
 - Engineers
    - T2 Engineers
-        - Decreased energy cost 700 -> 650
-        - Decreased mass cost 140 -> 130
-        - Decreased build time 700 -> 650
+        - Decreased energy cost 700 → 650
+        - Decreased mass cost 140 → 130
+        - Decreased build time 700 → 650
        - UEF
-            - Increased health 300 -> 400
+            - Increased health 300 → 400
        - Cybran
-            - Increased health 290 -> 390
+            - Increased health 290 → 390
        - Aeon
-            - Increased health 240 -> 340
+            - Increased health 240 → 340
        - Seraphim
-            - Increased health 250 -> 350
+            - Increased health 250 → 350
    - T3 Engineers
-        - Decreased energy cost 2200 -> 1560
-        - Decreased mass cost 440 -> 312
-        - Decreased build time 2200 -> 1560
+        - Decreased energy cost 2200 → 1560
+        - Decreased mass cost 440 → 312
+        - Decreased build time 2200 → 1560
        - UEF
-            - Increased health 600 -> 800
+            - Increased health 600 → 800
        - Cybran
-            - Increased health 540 -> 740
+            - Increased health 540 → 740
        - Aeon
-            - Increased health 480 -> 680
-            - Decreased build rate 40 -> 30
+            - Increased health 480 → 680
+            - Decreased build rate 40 → 30
        - Seraphim
-            - Increased health 500 -> 700
-            - Decreased build rate 40 -> 30
+            - Increased health 500 → 700
+            - Decreased build rate 40 → 30
 - T1 Bombers
     - Increased energy cost 2250- 2400
-    - Increased mass cost 80 -> 120
-    - Increased build time 500 -> 800
+    - Increased mass cost 80 → 120
+    - Increased build time 500 → 800
     - Removed Radar ability
-    - Increased RateOfFire 0.25 -> 0.2
+    - Increased RateOfFire 0.25 → 0.2
     - Cybran and UEF
-        - Decreased FiringRandomness 3 -> 0
+        - Decreased FiringRandomness 3 → 0
     - Flight Parameters
-        - Decreased BreakOffDistance 30 -> 24
-        - Increased CombatTurnSpeed 0.75 -> 1.5
-        - Increased KTurn 0.7 -> 0.8
-        - Decreased StartTurnDistance 5 -> 1.4
-        - Increased TurnSpeed 0.75 -> 1.5
-        - Decreased RandomBreakOffDistanceMult 1.5 -> 1
+        - Decreased BreakOffDistance 30 → 24
+        - Increased CombatTurnSpeed 0.75 → 1.5
+        - Increased KTurn 0.7 → 0.8
+        - Decreased StartTurnDistance 5 → 1.4
+        - Increased TurnSpeed 0.75 → 1.5
+        - Decreased RandomBreakOffDistanceMult 1.5 → 1
 - Ahwasssa
-    - Decreased StartTurnDistance 15 -> 1
-    - Increased TurnSpeed 0.65 -> 0.9
+    - Decreased StartTurnDistance 15 → 1
+    - Increased TurnSpeed 0.65 → 0.9
 - Cybran T1 Frigate
-    - Decreased AA MuzzleVelocity 60 -> 45
+    - Decreased AA MuzzleVelocity 60 → 45
     - Removed AA projectile tracking
     - Removed AA projectile TurnRate
 - Cybran T2 Destroyer
-    - Decreased AA damage 10 -> 5
+    - Decreased AA damage 10 → 5
 - Cybran T1 Static AA
     - Fixed bug preventing it from shooting scouts on certain approaches
 - Tactical Missile Launchers
    - UEF
-        - Decreased clip size 12 -> 6
+        - Decreased clip size 12 → 6
    - Cybran
-        - Decreased clip size 10 -> 4
+        - Decreased clip size 10 → 4
    - Aeon
-        - Decreased clip size 16 -> 6
+        - Decreased clip size 16 → 6
    - Seraphim
-        - Decreased clip size 20 -> 8
+        - Decreased clip size 20 → 8
 - T2 Static Artillery
-    - Decreased build time 1608 -> 1200
+    - Decreased build time 1608 → 1200
 - Aeon TMD
     - Adapted weapon collision to prevent flare failing to intercept missiles flying near
         the top of the range sphere
 - Factory Cost Changes
     - T2 Land HQs
-        - Increased mass cost 800 -> 1520
-        - Increased energy cost 7200 -> 13300
-        - Increased build time 1600 -> 2600
+        - Increased mass cost 800 → 1520
+        - Increased energy cost 7200 → 13300
+        - Increased build time 1600 → 2600
     - T3 Land HQs (Price increase due to the T2 cost increase)
-        - Increased mass cost 4540 -> 4920
-        - Increased energy cost 41100 -> 43900
+        - Increased mass cost 4540 → 4920
+        - Increased energy cost 41100 → 43900
     - T2 Land Support Factories
-        - Increased mass cost 300 -> 340
-        - Increased build time 1300 -> 1600
+        - Increased mass cost 300 → 340
+        - Increased build time 1300 → 1600
     - T3 Land Support Factories
-        - Increased mass cost 750 -> 860
-        - Increased build time 3000 -> 4000
+        - Increased mass cost 750 → 860
+        - Increased build time 3000 → 4000
     - T2 Navy HQs
-        - Increased mass cost 1370 -> 1700
-        - Increased energy cost 6600 -> 8500
-        - Increased build time 2400 -> 3600
-        - Increased build power 60 -> 90
+        - Increased mass cost 1370 → 1700
+        - Increased energy cost 6600 → 8500
+        - Increased build time 2400 → 3600
+        - Increased build power 60 → 90
     - T3 Navy HQs
-        - Increased mass cost 5450 -> 7500
-        - Increased energy cost 24472 -> 35000
-        - Increased build time 8200 -> 11250
-        - Increased build power 120 -> 150
+        - Increased mass cost 5450 → 7500
+        - Increased energy cost 24472 → 35000
+        - Increased build time 8200 → 11250
+        - Increased build power 120 → 150
     - T2 Navy Support Factories
-        - Increased mass cost 500 -> 800
-        - Increased energy cost 2500 -> 4000
-        - Increased build time 2000 -> 3000
-        - Increased build power 60 -> 90
+        - Increased mass cost 500 → 800
+        - Increased energy cost 2500 → 4000
+        - Increased build time 2000 → 3000
+        - Increased build power 60 → 90
     - T3 Navy Support Factories
-        - Increased mass cost 800 -> 1100
-        - Increased energy cost 3429 -> 5500
-        - Decreased build time 4000 -> 3500
-        - Increased build power 120 -> 150
+        - Increased mass cost 800 → 1100
+        - Increased energy cost 3429 → 5500
+        - Decreased build time 4000 → 3500
+        - Increased build power 120 → 150
 - Cybran T3 MAA
     - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA
 - Cybran T2 Cruiser
     - Removed AA/AG toggle. The weapon will now auto-toggle between modes
             depending on what is in range, prioritising AA
-    - Decreased AG toggle weapon damage 60 -> 40
-    - Increased AG toggle weapon rate of fire 0.5 -> 1
-    - Decreased AG toggle weapon rockets per salvo 6 -> 3
-    - Increased AG toggle weapon FiringRandomness 0.3 -> 0.9
+    - Decreased AG toggle weapon damage 60 → 40
+    - Increased AG toggle weapon rate of fire 0.5 → 1
+    - Decreased AG toggle weapon rockets per salvo 6 → 3
+    - Increased AG toggle weapon FiringRandomness 0.3 → 0.9
 - All ACUs
     - T2 Upgrade
         - Removed health regen bonus
-        - Decreased health increase 3000 -> 1500 (UEF, Aeon, Seraphim) 3500 -> 2000 (Cybran)
+        - Decreased health increase 3000 → 1500 (UEF, Aeon, Seraphim) 3500 → 2000 (Cybran)
     - T3 Upgrade
         - Removed health regen bonus
         - Decreased health increase to respect the T2 adjustment
-        - Decreased buildpower 126 -> 100
+        - Decreased buildpower 126 → 100
     - Aeon ACU
        - Enhanced Sensor System Upgrade
-            - Decreased mass cost 400 -> 350
-            - Decreased energy cost 10000 -> 5000
-            - Decreased omni radius 100 -> 80
-            - Increased visual radius 50 -> 80
+            - Decreased mass cost 400 → 350
+            - Decreased energy cost 10000 → 5000
+            - Decreased omni radius 100 → 80
+            - Increased visual radius 50 → 80
     - Cybran ACU
-        - Decreased health regen 17 -> 15
-        - Changed regen per veterancy level 21/24/27/30/33 -> 19/23/27/31/35
+        - Decreased health regen 17 → 15
+        - Changed regen per veterancy level 21/24/27/30/33 → 19/23/27/31/35
         - Personal Stealth System Upgrade
-            - Decreased energy cost 5250 -> 5000
-            - Increased build time 350 -> 500
+            - Decreased energy cost 5250 → 5000
+            - Increased build time 350 → 500
 
 ### Contributors
 - Brutus5000
