@@ -464,7 +464,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     dialogContent = Group(over)
     dialogContent.Width:Set(956)
     dialogContent.Height:Set(692)
-
+    
+    local dialogColumnWidth = (dialogContent.Width()) / 9
     popup = Popup(over, dialogContent)
 
     local title = UIUtil.CreateText(dialogContent, "<LOC map_sel_0000>", 24)
@@ -473,18 +474,19 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     dialogContent.title = title
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
-    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, 30)
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 10)
     dialogContent.cancelButton = cancelButton
 
     selectButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>")
-    LayoutHelpers.LeftOf(selectButton, cancelButton, 72)
+    LayoutHelpers.AtRightIn(selectButton, dialogContent, dialogColumnWidth * 2 - 40)
+    LayoutHelpers.AtBottomIn(selectButton, dialogContent, 10)
     dialogContent.selectButton = selectButton
 
     local doNotRepeatMap
     local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0501>Random Map")
-    LayoutHelpers.AtHorizontalCenterIn(randomMapButton, dialogContent)
-    LayoutHelpers.AtVerticalCenterIn(randomMapButton, selectButton)
+    LayoutHelpers.AtLeftIn(randomMapButton, dialogContent, dialogColumnWidth * 5 - 40)
+    LayoutHelpers.AtBottomIn(randomMapButton, dialogContent, 10)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
     dialogContent.randomMapButton = randomMapButton
 
@@ -517,7 +519,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
-    LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
+    LayoutHelpers.AtLeftIn(restrictedUnitsButton, dialogContent, dialogColumnWidth * 2 - 40)
+    LayoutHelpers.AtBottomIn(restrictedUnitsButton, dialogContent, 10)
     Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
     dialogContent.restrictedUnitsButton = restrictedUnitsButton
 
@@ -538,8 +541,17 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             true)
     end
 
+    local unitSkinsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', 'Unit Skins')
+    LayoutHelpers.AtLeftIn(unitSkinsButton, dialogContent, dialogColumnWidth * 3 + 40)
+    LayoutHelpers.AtBottomIn(unitSkinsButton, dialogContent, 10)
+    WARN("UnitSkinsManager")
+    unitSkinsButton.OnClick = function(self, modifiers)
+        import('/lua/ui/lobby/SkinsDialog.lua').CreateDialog(dialogContent)
+    end
+
     local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
-    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
+    LayoutHelpers.AtLeftIn(modButton, dialogContent, 40)
+    LayoutHelpers.AtBottomIn(modButton, dialogContent, 10)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         -- direct import allows data caching in ModsManager
