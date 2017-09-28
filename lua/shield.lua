@@ -202,11 +202,11 @@ Shield = Class(moho.shield_methods, Entity) {
         WaitSeconds(self.RegenStartTime)
         while self:GetHealth() < self:GetMaxHealth() do
 
-            self:AdjustHealth(self.Owner, self.RegenRate)
+            self:AdjustHealth(self.Owner, self.RegenRate / 10)
 
             self:UpdateShieldRatio(-1)
 
-            WaitTicks(2)
+            WaitTicks(1)
         end
     end,
 
