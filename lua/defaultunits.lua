@@ -1762,8 +1762,8 @@ AirUnit = Class(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if instigator and IsUnit(instigator) and self.totalDamageTaken > 0 and instigator.gainsVeterancy then
-                self:VeterancyDispersal()
+            if self.totalDamageTaken > 0 and not self.veterancyDispersed then
+                self:VeterancyDispersal(not instigator or not IsUnit(instigator))
             end
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -1834,6 +1834,7 @@ BaseTransport = Class() {
         local mass = 0
         for _, unit in self:GetCargo() do
             mass = mass + unit:GetVeterancyValue()
+            unit.veterancyDispersed = true
         end
         self.cargoMass = mass
     end
@@ -1854,7 +1855,9 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
-        self:FlagCargo()
+         -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
+        local instigator = arg[1]
+        self:FlagCargo(not instigator or not IsUnit(instigator))
         AirUnit.Kill(self, unpack(arg))
     end,
 
@@ -1874,10 +1877,12 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     -- Flags cargo that it's been killed while in a transport
-    FlagCargo = function(self)
+    FlagCargo = function(self, suicide)
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
-        self:SaveCargoMass()
+        if not suicide then -- If the transport is self destructed, let its contents be self destructed separately
+            self:SaveCargoMass()
+        end
         self.cargo = {}
         local cargo = self:GetCargo()
         for _, unit in cargo or {} do
@@ -1900,7 +1905,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         for _, unit in self.cargo or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(nil, 'Normal', 0)
+                unit:OnKilled(nil, '', 0)
             end
         end
     end,
