@@ -2347,7 +2347,7 @@ ACUUnit = Class(CommandUnit) {
                 TECH3 = 0.333334,
                 SUBCOMMANDER = 0.3,
                 EXPERIMENTAL = 0.25,
-                COMMAND = 1,
+                COMMAND = 0.1,
             }
             massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
         end
