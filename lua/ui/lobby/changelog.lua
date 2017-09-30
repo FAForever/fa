@@ -1,4 +1,4 @@
-last_version = 3688
+last_version = 3689
 changelog = {
     {
         version = 3,
@@ -1229,6 +1229,15 @@ changelog = {
             '- Experimental units only need to kill 50% of their own worth in mass to gain one veterancy rank.',
             '- Regular units need to destroy 200% of their own worth in mass to gain one veterancy rank.',
             '- Destroying a transport gives veterancy points for the cargo as well as the transport itself.',
+            '- Unified regeneration values.',
+            '- T1      +1  ->  1,  2,  3,   4,   5 regeneration',
+            '- T2      +3  ->  3,  6,  9,  12,  15 regeneration',
+            '- T3/ACUs +6  ->  6, 12, 18,  24,  30 regeneration',
+            '- SACUs   +9  ->  9, 18, 27,  36,  45 regeneration',
+            '- T4      +25 -> 25, 50, 75, 100, 125 regeneration',
+            '',
+            '- Shields',
+            '- Reduced the time a shield needs before it starts to recharge.',
             '',
             '- Gunships',
             '- Seraphim T2 Gunship',
@@ -1268,6 +1277,21 @@ changelog = {
             '- Exotic-Retard',
             '- IceDreamer',
             '- JaggedAppliance',
+            '- MrNukealizer',
+            '- PhilipJFry',
+        },
+    },
+    {
+        version = 3688,
+        name = 'Game Version 3688',
+        description = {
+            '**Bugs**',
+            '- Fixed a bug that caused units to give 100% veterancy points instead of a fraction depending on their remaining HP on death when getting destroyed by self destruction.',
+            '- Fixed ACUs giving too much veterancy to other ACUs when being killed.',
+            '- Fixed shields recharging many times faster than intended.',
+            '',
+            '**Contributors**',
+            '- Exotic-Retard',
             '- MrNukealizer',
             '- PhilipJFry',
         },
