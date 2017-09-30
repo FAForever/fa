@@ -1401,8 +1401,8 @@ Unit = Class(moho.unit_methods) {
                 TECH2 = 2,
                 TECH3 = 3,
                 COMMAND = 3,
-                EXPERIMENTAL = 4,
-                SUBCOMMANDER = 5,
+                SUBCOMMANDER = 4,
+                EXPERIMENTAL = 5,
             }
             
             local techLevel = techLevels[self.techCategory] or 1
@@ -1417,8 +1417,8 @@ Unit = Class(moho.unit_methods) {
                 {1,  2,  3,  4,  5}, -- T1
                 {3,  6,  9,  12, 15}, -- T2
                 {6,  12, 18, 24, 30}, -- T3 / ACU
-                {25, 50, 75, 100,125}, -- Experimental
                 {9,  18, 27, 36, 45}, -- SACU
+                {25, 50, 75, 100,125}, -- Experimental
             }
         
             BuffBlueprint {
