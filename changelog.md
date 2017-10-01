@@ -1,4 +1,4 @@
-Patch 3689 (30th September 2017)
+Patch 3689 (1st October 2017)
 ============================
 ### Bugs
 - Veterancy

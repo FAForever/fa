@@ -1282,8 +1282,8 @@ changelog = {
         },
     },
     {
-        version = 3688,
-        name = 'Game Version 3688',
+        version = 3689,
+        name = 'Game Version 3689',
         description = {
             '**Bugs**',
             '- Fixed a bug that caused units to give 100% veterancy points instead of a fraction depending on their remaining HP on death when getting destroyed by self destruction.',
