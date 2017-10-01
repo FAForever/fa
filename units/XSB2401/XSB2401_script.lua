@@ -122,7 +122,7 @@ XSB2401 = Class(SStructureUnit) {
                 self:StopBuildEffects()
                 return
             end
-            WaitTicks(2)
+            WaitTicks(1)
         end
     end,
 
