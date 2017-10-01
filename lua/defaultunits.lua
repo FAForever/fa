@@ -2022,7 +2022,7 @@ ConstructionUnit = Class(MobileUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 
@@ -2135,7 +2135,7 @@ CommandUnit = Class(WalkingLandUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 
@@ -2337,7 +2337,7 @@ ACUUnit = Class(CommandUnit) {
     end,
 
     GiveInitialResources = function(self)
-        WaitTicks(2)
+        WaitTicks(1)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
