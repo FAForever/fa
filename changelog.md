@@ -16,6 +16,7 @@ Patch 3690 (Upcoming)
 - Fixed Counter-intel turning off intel when power stalling
 - Fixed game-breaking bug related to template name cutoff
 - Fixed energy consuming weapons draining power before completion
+- Added COUNTERINTELLIGENCE to HARMS category list, as it has personal stealth
 
 ### UI
 - Changed Salvation to be categorized as an experimental instead of a t3 building
@@ -23,6 +24,8 @@ Patch 3690 (Upcoming)
 - Fixed and improved the sim dialog window
 - Fixed rendering of reload bars
 - Fixed bug with the notify overlay in replays
+- Fixed a bug where using split-screen mode would break reclaim labels
+- Added perrsonal stealth to HARMS ability list
 
 ### Lobby
 - Changed background faction images to widescreen versions
@@ -30,7 +33,7 @@ Patch 3690 (Upcoming)
 - Fixed missing dependency bug for non hosts in lobbies
 
 ### Balance
-- remove over water vision from submerged amphibious units
+- Remove over water vision from submerged amphibious units
 
 ### Other
 - Fixed typo in Novax center bones
@@ -41,13 +44,13 @@ Patch 3690 (Upcoming)
 - Added rotation animation to the t2 aeon power generator
 - Fixed blacklist for coop maps
 
-
 ### Contributors
 - IceDreamer
 - MrNukealizer
 - CookieNoob
 - Uveso
 - basdawimp
+
 
 Patch 3689 (1st October 2017)
 ============================
