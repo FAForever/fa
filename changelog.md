@@ -30,7 +30,7 @@ Patch 3688 (24th September 2017)
         - SACUs   +9  ->  9, 18, 27,  36,  45 regeneration
         - T4      +25 -> 25, 50, 75, 100, 125 regeneration
 - Shields
-    - Reduced the time a shield needs before it starts to recharge.
+    - Smoothed out shield recharge from once per second lumps to once per tick.
 - Gunships
     - Seraphim T2 Gunship
         - Health: 864 → 1080
