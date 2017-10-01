@@ -6,6 +6,12 @@ Patch 3689 (30th September 2017)
     - Fixed ACUs giving too much veterancy to other ACUs when being killed.
 - Fixed shields recharging many times faster than intended.
 
+###Contributors
+- Exotic-Retard
+- MrNukealizer
+- PhilipJFry
+
+
 Patch 3688 (24th September 2017)
 ============================
 ### Balance
