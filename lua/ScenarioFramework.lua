@@ -1612,7 +1612,7 @@ function KillBaseInAreaThread(unitTable)
             unit:Kill()
         end
         if waitNum > 0 and num >= waitNum and math.mod(waitNum, num) == 0 then
-            WaitTicks(5)
+            WaitTicks(6)
         end
     end
 end
@@ -2062,7 +2062,7 @@ function GenerateOffMapAreas()
 end
 
 function AntiOffMapMainThread()
-    WaitTicks(10)
+    WaitTicks(11)
     GenerateOffMapAreas()
     local OffMapAreas = {}
     local UnitsThatAreOffMap = {}

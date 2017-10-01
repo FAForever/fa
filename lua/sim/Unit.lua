@@ -1760,7 +1760,7 @@ Unit = Class(moho.unit_methods) {
 
         self.StopSink = false
         while not self.StopSink do
-            WaitTicks(2)
+            WaitTicks(1)
             if self:GetPosition(watchBone)[2]-0.2 <= seafloor then
                 self.StopSink = true
             end
@@ -2713,13 +2713,13 @@ Unit = Class(moho.unit_methods) {
                     end
                 end
 
-                WaitTicks(5)
+                WaitTicks(6)
             end
         end
     end,
 
     CloakFXWatcher = function(self)
-        WaitTicks(5)
+        WaitTicks(6)
 
         if self and not self.Dead then
             self:UpdateCloakEffect(false, 'Cloak')
