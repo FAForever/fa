@@ -17,6 +17,8 @@ Patch 3690 (Upcoming)
 - Fixed game-breaking bug related to template name cutoff
 - Fixed energy consuming weapons draining power before completion
 - Added COUNTERINTELLIGENCE to HARMS category list, as it has personal stealth
+- Fixed Salem death not animating on land
+- Fixed Bulwark's dummy shield range ring being the wrong size
 
 ### UI
 - Changed Salvation to be categorized as an experimental instead of a t3 building
@@ -25,11 +27,12 @@ Patch 3690 (Upcoming)
 - Fixed rendering of reload bars
 - Fixed bug with the notify overlay in replays
 - Fixed a bug where using split-screen mode would break reclaim labels
-- Added perrsonal stealth to HARMS ability list
+- Added personal stealth to HARMS ability list
+- Adjusted some army colours. A new Order Green, a slightly lighter dark blue, and a golden Seraphim colour from the campaign.
+- Fixed Attack-Move icon being greyed out permanently
 
 ### Lobby
 - Changed background faction images to widescreen versions
-- Added a new army colour: Order Green. It is the same colour as the Order in the FA Campaign
 - Fixed missing dependency bug for non hosts in lobbies
 
 ### Balance
