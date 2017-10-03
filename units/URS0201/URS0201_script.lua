@@ -48,6 +48,11 @@ URS0201 = Class(CSeaUnit) {
         end
     end,
 
+    -- Override ShallSink to have Salem animate properly when it dies on land
+    ShallSink = function(self)
+        return true
+    end,
+
     LayerChangeTrigger = function(self, new, old)
         local bp = self:GetBlueprint()
         -- Enable sonar on water only, apply speed multiplier on land
