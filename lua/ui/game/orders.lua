@@ -1062,7 +1062,7 @@ local function CreateCommonOrders(availableOrders, init)
 
     local units = {}
     if currentSelection and table.getn(currentSelection) > 0 then
-        for unit in currentSelection do
+        for _, unit in currentSelection do
             if not IsDestroyed(unit) then
                 table.insert(units, unit)
             end
