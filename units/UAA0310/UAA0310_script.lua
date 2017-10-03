@@ -30,8 +30,12 @@ UAA0310 = Class(AirTransport) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
-        for k, v in wep.Beams do
+        for _, v in wep.Beams do
             v.Beam:Disable()
+            if wep.HoldFireThread then
+                KillThread(wep.HoldFireThread)
+            end
+            v.Beam:Destroy()
         end
 
         self.detector = CreateCollisionDetector(self)
