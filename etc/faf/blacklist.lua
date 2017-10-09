@@ -151,4 +151,11 @@ Blacklist = {
     ['55394440-5DC8-11E3-91ED-66546288709B'] = INCOMPATIBLE,
     ['2bc59538-fc2c-4a18-964b-85322e9562a2'] = INCOMPATIBLE,
     ['022E3DB4-9C00-4ED7-9876-4866D316E009'] = INCOMPATIBLE,
+
+     -- old versions of Supreme Score Board mod
+    ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1100'] = UPGRADE,
+    ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1200'] = UPGRADE,
+    ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1230'] = UPGRADE,
+    ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1300'] = UPGRADE,
+
 }
