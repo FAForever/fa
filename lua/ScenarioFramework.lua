@@ -39,6 +39,7 @@ function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
 
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced
+        UnlockInput()
         Sync.OperationComplete = {
             success = _success,
             difficulty = ScenarioInfo.Options.Difficulty,
