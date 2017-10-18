@@ -9,7 +9,7 @@ local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
 
-UEA0203 = Class(AirTransport, TAirUnit) {
+UEA0203 = Class(AirTransport) {
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
 
     Weapons = {
