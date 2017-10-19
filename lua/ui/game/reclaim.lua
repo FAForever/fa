@@ -180,29 +180,28 @@ function UpdateLabels()
         if labelIndex > MaxLabels then
             break
         end
-        if not LabelPool[labelIndex] then
-            LabelPool[labelIndex] = CreateReclaimLabel(view.ReclaimGroup, r)
-        else
-            if IsDestroyed(r) then
-                LabelPool[labelIndex] = nil
-                continue
-            end
+        local label = LabelPool[labelIndex]
+        if label and IsDestroyed(label) then
+            label = nil
+        end
+        if not label then
+            label = CreateReclaimLabel(view.ReclaimGroup, r)
+            LabelPool[labelIndex] = label
         end
 
-        local label = LabelPool[labelIndex]
         label:DisplayReclaim(r)
         labelIndex = labelIndex + 1
     end
 
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
-        if IsDestroyed(LabelPool[index]) then
-            LabelPool[index] = nil
-            continue
-        end
         local label = LabelPool[index]
-        if label and not label:IsHidden() then
-            label:Hide()
+        if label then
+            if IsDestroyed(label) then
+                LabelPool[index] = nil
+            elseif not label:IsHidden() then
+                label:Hide()
+            end
         end
     end
 end
