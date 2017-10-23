@@ -240,7 +240,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 16,
+            Damage = 9,
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             FireTargetLayerCapsTable = {
