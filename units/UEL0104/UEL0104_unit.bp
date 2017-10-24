@@ -240,7 +240,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 9,
+            Damage = 14,
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             FireTargetLayerCapsTable = {
@@ -257,7 +257,7 @@ UnitBlueprint {
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/TAARailgun01/TAARailgun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 2,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
