@@ -9,10 +9,10 @@ local iconPositions = {
     [1] = {Left = 70, Top = 55},
     [2] = {Left = 70, Top = 70},
     [3] = {Left = 190, Top = 60},
-    [4] = {Left = 130, Top = 60},
-    [5] = {Left = 130, Top = 80},
-    [6] = {Left = 130, Top = 80},
-    [7] = {Left = 190, Top = 80},
+    [4] = {Left = 130, Top = 55},
+    [5] = {Left = 130, Top = 85},
+    [6] = {Left = 130, Top = 70},
+    [7] = {Left = 190, Top = 85},
     [8] = {Left = 70, Top = 85},
 }
 local iconTextures = {
@@ -81,6 +81,18 @@ function SetLayout()
     controls.fuelBar.Height:Set(2)
     controls.fuelBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.fuelBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
+
+    LayoutHelpers.AtLeftTopIn(controls.vetBar, controls.bg, 192, 68)
+    controls.vetBar.Width:Set(56)
+    controls.vetBar.Height:Set(3)
+    controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
+    controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
+
+    LayoutHelpers.Below(controls.nextVet, controls.vetBar)
+    controls.nextVet:SetDropShadow(true)
+    LayoutHelpers.Above(controls.vetTitle, controls.vetBar)
+    controls.vetTitle:SetDropShadow(true)
+
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
 
