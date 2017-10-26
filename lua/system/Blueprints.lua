@@ -493,7 +493,7 @@ function PreModBlueprints(all_bps)
             end
         end
 
-        bp.FactionCategory = string.upper(bp.General.FactionName)
+        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account

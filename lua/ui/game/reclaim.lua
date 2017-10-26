@@ -180,11 +180,15 @@ function UpdateLabels()
         if labelIndex > MaxLabels then
             break
         end
-        if not LabelPool[labelIndex] then
-            LabelPool[labelIndex] = CreateReclaimLabel(view.ReclaimGroup, r)
+        local label = LabelPool[labelIndex]
+        if label and IsDestroyed(label) then
+            label = nil
+        end
+        if not label then
+            label = CreateReclaimLabel(view.ReclaimGroup, r)
+            LabelPool[labelIndex] = label
         end
 
-        local label = LabelPool[labelIndex]
         label:DisplayReclaim(r)
         labelIndex = labelIndex + 1
     end
@@ -192,8 +196,12 @@ function UpdateLabels()
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
         local label = LabelPool[index]
-        if label and not label:IsHidden() then
-            label:Hide()
+        if label then
+            if IsDestroyed(label) then
+                LabelPool[index] = nil
+            elseif not label:IsHidden() then
+                label:Hide()
+            end
         end
     end
 end
@@ -232,22 +240,23 @@ function ShowReclaimThread(watch_key)
     InitReclaimGroup(view)
 
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-        local zoom = camera:GetZoom()
-        local position = camera:GetFocusPosition()
-        if ReclaimChanged
-            or view.NewViewing
-            or OldZoom ~= zoom
-            or OldPosition[1] ~= position[1]
-            or OldPosition[2] ~= position[2]
-            or OldPosition[3] ~= position[3] then
-                UpdateLabels()
-                OldZoom = zoom
-                OldPosition = position
-                ReclaimChanged = false
+        if not IsDestroyed(camera) then
+            local zoom = camera:GetZoom()
+            local position = camera:GetFocusPosition()
+            if ReclaimChanged
+                or view.NewViewing
+                or OldZoom ~= zoom
+                or OldPosition[1] ~= position[1]
+                or OldPosition[2] ~= position[2]
+                or OldPosition[3] ~= position[3] then
+                    UpdateLabels()
+                    OldZoom = zoom
+                    OldPosition = position
+                    ReclaimChanged = false
+            end
+
+            view.NewViewing = false
         end
-
-        view.NewViewing = false
-
         WaitSeconds(.1)
     end
 

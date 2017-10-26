@@ -163,6 +163,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Create an economy event for those weapons which require Energy to fire
     StartEconomyDrain = function(self)
         if self.FirstShot then return end
+        if self.unit:GetFractionComplete() ~= 1 then return end
 
         local bp = self:GetBlueprint()
         if not self.EconDrain and bp.EnergyRequired and bp.EnergyDrainPerSecond then
@@ -175,6 +176,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
+                self.unit:ForkThread(function()
+                    WaitFor(self.EconDrain)
+                    RemoveEconomyEvent(self.unit, self.EconDrain)
+                    self.EconDrain = nil
+                end)
             end
         end
     end,
@@ -549,8 +555,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             if self.EconDrain then
                 self.WeaponCanFire = false
                 WaitFor(self.EconDrain)
-                RemoveEconomyEvent(self.unit, self.EconDrain)
-                self.EconDrain = nil
                 self.WeaponCanFire = true
             end
 
@@ -589,13 +593,13 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Render the fire recharge bar
         RenderClockThread = function(self, rof)
-            local clockTime = rof
+            local clockTime = math.round(10*rof)
             local totalTime = clockTime
-            while clockTime > 0.0 and
+            while clockTime >= 0 and
                   not self:BeenDestroyed() and
                   not self.unit.Dead do
                 self.unit:SetWorkProgress(1 - clockTime / totalTime)
-                clockTime = clockTime - 0.1
+                clockTime = clockTime - 1
                 WaitSeconds(0.1)
             end
         end,

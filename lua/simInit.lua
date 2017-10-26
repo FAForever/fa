@@ -25,6 +25,9 @@ WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
     local ticks = math.max(1, n * 10)
+    if ticks > 1 then
+        ticks = ticks + 1
+    end
     WaitTicks(ticks)
 end
 
@@ -219,6 +222,7 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
     LOG('BeginSession...')
+    ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
@@ -282,6 +286,15 @@ function BeginSession()
 
     if syncStartPositions then
         Sync.StartPositions = syncStartPositions
+    end
+end
+
+function GameTimeLogger()
+    local time
+    while true do
+        time = GetGameTimeSeconds()
+        SPEW(string.format('Current gametime: %02d:%02d:%02d', math.floor(time/3600), math.floor(time/60), math.mod(time, 60)))
+        WaitSeconds(30)
     end
 end
 

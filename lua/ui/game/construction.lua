@@ -1017,7 +1017,9 @@ function CommonLogic()
             -- The text
             if type == 'templates' and 'templates' then
                 control.Tmplnm.Width:Set(48)
-                control.Tmplnm:SetText(STR_Utf8SubString(control.Data.template.name, cutA, cutB))
+                if STR_Utf8Len(control.Data.template.name) >= cutA then
+                    control.Tmplnm:SetText(STR_Utf8SubString(control.Data.template.name, cutA, cutB))
+                end
             end
         end
     end

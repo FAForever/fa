@@ -75,7 +75,7 @@ XSL0401 = Class(SWalkingLandUnit) {
         for i = 1, Random(4, 6) do
             local bone = RandBoneIter()
             explosion.CreateDefaultHitExplosionAtBone(self, bone, 1.0)
-            WaitTicks(Random(1, 3))
+            WaitTicks(Random(1, 4))
         end
 
         local bp = self:GetBlueprint()
