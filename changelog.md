@@ -30,10 +30,12 @@ Patch 3690 (Upcoming)
 - Added personal stealth to HARMS ability list
 - Adjusted some army colours. A new Order Green, a slightly lighter dark blue, and a golden Seraphim colour from the campaign.
 - Fixed Attack-Move icon being greyed out permanently
+- Fixed veterancy UI not showing for non-default screen layouts
 
 ### Lobby
 - Changed background faction images to widescreen versions
 - Fixed missing dependency bug for non hosts in lobbies
+- Overhauled and refined the mod manager
 
 ### Balance
 - Remove over water vision from submerged amphibious units
@@ -46,6 +48,8 @@ Patch 3690 (Upcoming)
 - Added timeout for the overcharge ready notification message to avoid voice spam
 - Added rotation animation to the t2 aeon power generator
 - Fixed blacklist for coop maps
+- Added more naval templates to OpAI
+- Updated mod blacklist
 
 ### Contributors
 - IceDreamer
