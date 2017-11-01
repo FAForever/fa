@@ -6,6 +6,7 @@ Patch 3691 (Upcoming)
 - Added target bones to Subs to allow them to be attacked by surface units when surfaced
 - Added above water target bone to Cybran T1 Torpedo Launcher to allow it to be attacked by surface units, particularly the Seraphim Destroyer
 - Fixed the Cybran ACU needing to get into Gun range to attack a specific target with its torpedo upgrade
+- Fixed the Cybran ACU not stopping at max range in attack move when firing torpedo
 
 ### Bugs
 - Fixed units with no faction assignment (From mods usually) breaking the game
@@ -31,6 +32,7 @@ Patch 3691 (Upcoming)
 - Adjusted some army colours. A new Order Green, a slightly lighter dark blue, and a golden Seraphim colour from the campaign.
 - Fixed Attack-Move icon being greyed out permanently
 - Fixed veterancy UI not showing for non-default screen layouts
+- Fixed bulwark dummy weapon range ring
 
 ### Lobby
 - Changed background faction images to widescreen versions
