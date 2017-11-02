@@ -257,7 +257,7 @@ UnitBlueprint {
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/TAARailgun01/TAARailgun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
