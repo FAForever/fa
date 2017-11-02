@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 36.75,
+        GuardScanRadius = 36.75, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
             'Head',
             'Right_Arm_B01',
