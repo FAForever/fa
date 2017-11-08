@@ -276,7 +276,7 @@ UnitBlueprint {
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun01/SAAShleoAAGatlingGun01_proj.bp',
             ProjectileLifetime = 10,
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
