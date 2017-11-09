@@ -903,6 +903,9 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             self.unit:IsUnitState('Enhancing') and not
             self.unit:IsUnitState('Upgrading')
     end,
+    
+    StartEconomyDrain = function(self) -- OverchargeWeapon drains energy on impact
+    end,
 
     -- Returns true if the unit is doing something that shouldn't allow any weapon fire
     UnitOccupied = function(self)
