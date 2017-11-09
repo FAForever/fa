@@ -68,6 +68,9 @@ Blacklist = {
     -- Hotkey Labels
     ['e338e34e-58da-11e6-8b77-86f30ca893d3'] = INTEGRATED,
 
+    -- Icon Support
+    ['9e8ea941-c306-4751-b367-f00000000002'] = INTEGRATED,
+
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0
     ['63472293-f7d7-4b77-ba7b-d04ad09f63de'] = INTEGRATED,
