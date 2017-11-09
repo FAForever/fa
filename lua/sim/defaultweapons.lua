@@ -904,6 +904,53 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             self.unit:IsUnitState('Upgrading')
     end,
 
+    CreateProjectileForWeapon = function(self, bone)
+    -- TODO: Take shields into account
+    --       Calculate max E based on storage available, not E in storage right now
+    --       Have OC disabled below X energy
+    
+    
+        -- Find target
+        local target = self:GetCurrentTarget()
+        
+        if not target then return end
+        
+        if IsBlip(target) then
+            target = target:GetSource()
+        end
+        
+        -- Calculate drain
+        -- Get drain allowed
+        local bp = self:GetBlueprint()
+        local maxDamage = bp.Damage
+        local maxEnergyMult = 0.75
+        local converter = 2 -- 2 Energy == 1 Damage
+        
+        local currentEnergy = self.unit:GetAIBrain():GetEconomyStored('ENERGY')
+        local availableDamage = math.min(maxDamage * converter, currentEnergy * maxEnergyMult)
+        
+        local desiredDamage = target:GetHealth()
+        local damage = math.min(desiredDamage, availableDamage)
+        local baseDrain = bp.EnergyRequired
+        local drain = baseDrain + (damage * converter)
+        local drainSpeed = bp.EnergyDrainPerSecond or 5000
+        
+        self:ChangeDamage(damage)  
+        local proj = DefaultProjectileWeapon.CreateProjectileForWeapon(self, bone)
+        
+        if proj then
+            if drain > 0 then
+                self.EconDrain = CreateEconomyEvent(self.unit, drain, 0, drain / energyDrain)
+                self.unit:ForkThread(function()
+                    WaitFor(self.EconDrain)
+                    RemoveEconomyEvent(self.unit, self.EconDrain)
+                    self.EconDrain = nil
+                    proj.Overcharge.FiringDrain = nil
+                end)
+            end
+        end
+    end,
+
     -- Returns true if the unit is doing something that shouldn't allow any weapon fire
     UnitOccupied = function(self)
         return (self.unit:IsUnitState('Upgrading') and not self.unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
