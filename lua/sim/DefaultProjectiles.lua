@@ -341,7 +341,6 @@ OverchargeProjectile = Class() {
             structureDamage = _,
             maxDamage = _,
             minDamage = _,
-            EnergyRequired = _,
         },
         ]]--
         local data = wep:GetBlueprint().Overcharge

@@ -951,14 +951,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -971,6 +971,14 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                baseDrain = 5000,
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 40000,
+                minDamage = 1500,
+            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/ADFOverCharge01/ADFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1033,14 +1041,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1052,6 +1060,14 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                baseDrain = 5000,
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 40000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/ADFOverCharge01/ADFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
