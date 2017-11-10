@@ -314,13 +314,6 @@ BaseGenericDebris = Class(EmitterProjectile){
 -----------------------------------------------------------
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
-    
-    -- TODO: Take shields into account
-    --       Calculate max E based on storage available, not E in storage right now
-    --       Have OC disabled below X energy
-    -- y = 6000e^0.00013x - 2300
-    -- Remember to remove armour vs OC
-    
         if not targetEntity then return end
         
         WARN('Inside OCPROJ OnImpact')
@@ -333,17 +326,29 @@ OverchargeProjectile = Class() {
             targetUnit = targetEntity.MyShield
         end
         
-        -- Get our data
         local unit = self:GetLauncher()
         if not unit then return end
         
         local wep = unit:GetWeaponByLabel('OverCharge')
         if not wep then return end
         
+        
+        --[[ Table layout for Overcharge data section
+        Overcharge = {
+            baseDrain = _,
+            energyMult = _,
+            commandDamage = _,
+            structureDamage = _,
+            maxDamage = _,
+            minDamage = _,
+            EnergyRequired = _,
+        },
+        ]]--
         local data = wep:GetBlueprint().Overcharge
-        local damage = data.baseDamage
+        if not data then return end
+
+        local damage
         local drain = data.baseDrain
-        local energyMult = data.energyMult
         
         -- Static damage for against ACU or Structures, and use the base energy drain
         local targetBP = targetUnit:GetBlueprint()
@@ -353,19 +358,19 @@ OverchargeProjectile = Class() {
             damage = data.structureDamage
         else
             -- Calculate drain
-            -- Get max energy according to how much we have
-            local energyLimit = self.unit:GetAIBrain():GetEconomyStored('ENERGY') * energyMult
+            -- Get max energy available to drain according to how much we have
+            local energyLimit = self.unit:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
             local energyLimitDamage = self:EnergyAsDamage(energyLimit)
             
             -- Find max available damage
-            local availableDamage = math.min(data.max, energyLimitDamage)
+            damage = math.min(data.maxDamage, energyLimitDamage)
             
-            -- How much damage do we actually need?
+            -- How much damage do we actually need to kill the unit?
             local idealDamage = targetUnit:GetHealth()
             local shield = targetUnit.MyShield
             
-            local shieldHealth
-            if shield then
+            local shieldHealth = 0
+            if shield then -- No need to check if shield is up. If it is, we hit it. If not, no need to damage it, so add 0.
                 shieldHealth = shield:GetHealth()
             end
             
@@ -375,8 +380,8 @@ OverchargeProjectile = Class() {
                 idealDamage = shieldHealth
             end
             
-            damage = math.min(availableDamage, idealDamage)
-            damage = math.max(data.min, damage)
+            damage = math.min(damage, idealDamage)
+            damage = math.max(data.minDamage, damage)
             
             -- Turn the final damage into energy
             drain = self:DamageAsEnergy(damage)
