@@ -308,3 +308,97 @@ BaseGenericDebris = Class(EmitterProjectile){
     FxTrails = false,
     FxTrailScale = 1,
 }
+
+-----------------------------------------------------------
+-- PROJECTILE THAT ADJUSTS DAMAGE AND ENERGY COST ON IMPACT
+-----------------------------------------------------------
+OverchargeProjectile = Class() {
+    OnImpact = function(self, targetType, targetEntity)
+    
+    -- TODO: Take shields into account
+    --       Calculate max E based on storage available, not E in storage right now
+    --       Have OC disabled below X energy
+    -- y = 6000e^0.00013x - 2300
+    -- Remember to remove armour vs OC
+    
+        if not targetEntity then return end
+        
+        WARN('Inside OCPROJ OnImpact')
+        LOG(TargetType)
+        
+        if targetType ~= 'UNIT' or targetType ~= 'SHIELD' then return end
+
+        local targetUnit = targetEntity
+        if targetType == 'SHIELD' then
+            targetUnit = targetEntity.MyShield
+        end
+        
+        -- Get our data
+        local unit = self:GetLauncher()
+        if not unit then return end
+        
+        local wep = unit:GetWeaponByLabel('OverCharge')
+        if not wep then return end
+        
+        local data = wep:GetBlueprint().Overcharge
+        local damage = data.baseDamage
+        local drain = data.baseDrain
+        local energyMult = data.energyMult
+        
+        -- Static damage for against ACU or Structures, and use the base energy drain
+        local targetBP = targetUnit:GetBlueprint()
+        if targetBP.CategoriesHash.COMMAND then
+            damage = data.commandDamage
+        elseif targetBP.CategoriesHash.STRUCTURE then
+            damage = data.structureDamage
+        else
+            -- Calculate drain
+            -- Get max energy according to how much we have
+            local energyLimit = self.unit:GetAIBrain():GetEconomyStored('ENERGY') * energyMult
+            local energyLimitDamage = self:EnergyAsDamage(energyLimit)
+            
+            -- Find max available damage
+            local availableDamage = math.min(data.max, energyLimitDamage)
+            
+            -- How much damage do we actually need?
+            local idealDamage = targetUnit:GetHealth()
+            local shield = targetUnit.MyShield
+            
+            local shieldHealth
+            if shield then
+                shieldHealth = shield:GetHealth()
+            end
+            
+            if shield.ShieldType ~= 'Bubble' then -- Personal shields. Damage to overwhelm.
+                idealDamage = idealDamage + shieldHealth
+            else -- Mobile shield generators. Hit the shield, not the HP.
+                idealDamage = shieldHealth
+            end
+            
+            damage = math.min(availableDamage, idealDamage)
+            damage = math.max(data.min, damage)
+            
+            -- Turn the final damage into energy
+            drain = self:DamageAsEnergy(damage)
+        end
+        
+        self.DamageData.DamageAmount = damage
+
+        if drain > 0 then
+            unit.EconDrain = CreateEconomyEvent(unit, drain, 0, 1)
+            unit:ForkThread(function()
+                WaitFor(unit.EconDrain)
+                RemoveEconomyEvent(unit, unit.EconDrain)
+                unit.EconDrain = nil
+            end)
+        end
+    end,
+    
+    DamageAsEnergy = function(self, damage)
+        return (6000 * math.exp(0.00013 * damage)) - 2300
+    end,
+    
+    EnergyAsDamage = function(self, energy)
+        return math.log((energy + 2300) / 6000) / 0.00013
+    end,
+}
