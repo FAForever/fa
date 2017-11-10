@@ -506,7 +506,7 @@ function UpdateEnhancementIcons(info)
         local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'
 
         enhancement:Show()
-        enhancement:SetTexture(UIUtil.UIFile(texture))
+        enhancement:SetTexture(UIUtil.UIFile(texture, true))
         enhancement.Width:Set(30)
         enhancement.Height:Set(30)
     end
