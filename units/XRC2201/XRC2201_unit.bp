@@ -17,7 +17,7 @@ UnitBlueprint {
         },
     },
     Categories = {
-        'UEF',
+        'CYBRAN',
         'STRUCTURE',
         'CIVILIAN',
         'SELECTABLE',
@@ -74,7 +74,7 @@ UnitBlueprint {
                 },
             },
         },
-        PlaceholderMeshName = 'UEC1101',
+        PlaceholderMeshName = 'XRC2201',
         SpawnRandomRotation = true,
         Tarmacs = {
             {
@@ -118,7 +118,7 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'UEF',
+        FactionName = 'Cybran',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
