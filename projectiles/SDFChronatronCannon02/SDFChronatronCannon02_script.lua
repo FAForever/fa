@@ -5,7 +5,14 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
-SDFChronatronCannon02 = Class(import('/lua/seraphimprojectiles.lua').SChronatronCannonOverCharge) {
+local SChronatronCannonOverCharge = import('/lua/seraphimprojectiles.lua').SChronatronCannonOverCharge
+local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
+
+SDFChronatronCannon02 = Class(SChronatronCannonOverCharge, OverchargeProjectile) {
+    OnImpact = function(self, targetType, targetEntity)
+        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
+        SChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 TypeClass = SDFChronatronCannon02
