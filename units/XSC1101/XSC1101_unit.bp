@@ -53,7 +53,7 @@ UnitBlueprint {
                 },
             },
         },
-        PlaceholderMeshName = 'UAC1101',
+        PlaceholderMeshName = 'XSC1101',
         SpawnRandomRotation = true,
         Tarmacs = {
             {

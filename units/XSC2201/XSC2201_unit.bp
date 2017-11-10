@@ -17,7 +17,7 @@ UnitBlueprint {
         },
     },
     Categories = {
-        'UEF',
+        'SERAPHIM',
         'STRUCTURE',
         'CIVILIAN',
         'SELECTABLE',
@@ -67,7 +67,7 @@ UnitBlueprint {
                 },
             },
         },
-        PlaceholderMeshName = 'UEC1101',
+        PlaceholderMeshName = 'XSC2201',
         SpawnRandomRotation = true,
         Tarmacs = {
             {
@@ -113,7 +113,7 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'UEF',
+        FactionName = 'Seraphim',
         Icon = 'land',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
