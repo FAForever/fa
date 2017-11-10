@@ -398,8 +398,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Angler Torpedo',
             FireTargetLayerCapsTable = {
-                Sub = 'Seabed|Sub|Water|Land',
-                Water = 'Seabed|Sub|Water|Land',
+                Sub = 'Seabed|Sub|Water',
+                Water = 'Seabed|Sub|Water',
             },
             FiringTolerance = 60,
             Label = 'Torpedo01',
