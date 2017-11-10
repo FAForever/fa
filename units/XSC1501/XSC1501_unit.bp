@@ -70,7 +70,7 @@ UnitBlueprint {
                 {
                     AlbedoName = 'xsc1501_lod1_albedo.dds',
                     LODCutoff = 300,
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'Unit',
                     SpecularName = 'xsc1501_lod1_specteam.dds',
                 },
             },
