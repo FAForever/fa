@@ -1,14 +1,13 @@
-#
-# Aeon Mortar
-#
+-- UEF Blaster
+
 local TLaserBotProjectile = import('/lua/terranprojectiles.lua').TLaserBotProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 TDFOverCharge01 = Class(TLaserBotProjectile) {
     FxTrails = EffectTemplate.TCommanderOverchargeFXTrail01,
-    FxTrailScale = 1.0,    
+    FxTrailScale = 1.0,
 
-	# Hit Effects
+	-- Hit Effects
     FxImpactUnit =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactProp =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactLand =  EffectTemplate.TCommanderOverchargeHit01,
@@ -17,4 +16,3 @@ TDFOverCharge01 = Class(TLaserBotProjectile) {
 }
 
 TypeClass = TDFOverCharge01
-
