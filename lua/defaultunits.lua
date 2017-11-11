@@ -2285,6 +2285,12 @@ ACUUnit = Class(CommandUnit) {
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('Overcharge')
+            amount = wep.Overcharge.commandDamage
+        end
+
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
         local aiBrain = self:GetAIBrain()
         if aiBrain then
