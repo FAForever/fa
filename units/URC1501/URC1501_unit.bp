@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 1350,
+        MaxHealth = 1350,
         RegenRate = 5,
     },
     Description = '<LOC urc1501_desc>Cybran Manufacturing Center',

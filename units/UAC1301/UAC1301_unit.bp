@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 1200,
+        MaxHealth = 1200,
         RegenRate = 0,
     },
     Description = '<LOC uac1301_desc>Aeon Administrative Structure',

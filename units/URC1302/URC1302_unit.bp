@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 1100,
+        MaxHealth = 1100,
         RegenRate = 5,
     },
     Description = '<LOC urc1302_desc>Cybran Communication Station',

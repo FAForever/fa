@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 1550,
+        MaxHealth = 1550,
         RegenRate = 0,
     },
     Description = '<LOC xsc1501_desc>Seraphim Manufacturing Building',
