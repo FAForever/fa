@@ -321,93 +321,85 @@ OverchargeProjectile = Class() {
             LOG(targetEntity:GetBlueprint().Description)
         end
 
-        -- Stop us doing the 12000 in blueprint in the other OnImpact call if we ditch this one
+        -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
-        
-        local unit = self:GetLauncher()
-        if not unit then return end
-        
-        local wep = unit:GetWeaponByLabel('OverCharge')
+
+        local launcher = self:GetLauncher()
+        if not launcher then return end
+
+        local wep = launcher:GetWeaponByLabel('OverCharge')
         if not wep then return end
-        
-        --[[ Table layout for Overcharge data section
-        Overcharge = {
-            baseDrain = _,
-            energyMult = _,
-            commandDamage = _,
-            structureDamage = _,
-            maxDamage = _,
-            minDamage = _,
-        },
-        ]]--
+
+        --  Table layout for Overcharge data section
+        --  Overcharge = {
+        --      energyMult = _, -- What proportion of current storage are we allowed to spend?
+        --      commandDamage = _, -- Takes effect in ACUUnit DoTakeDamage()
+        --      maxDamage = _,
+        --      minDamage = _,
+        --  },
+
         local data = wep:GetBlueprint().Overcharge
         if not data then return end
 
-        local damage
-        local drain = data.baseDrain
-        
-        if not targetEntity then -- We hit the floor. Do default damage.
-            damage = data.minDamage
-        else
-            local targetUnit = targetEntity
+        -- Set the damage dealt by the projectile for hitting the floor or an ACUUnit
+        -- Energy drained is calculated by the relationship equations
+        local damage = data.minDamage
+
+        if targetEntity then
+            -- Handle hitting shields. We want the unit underneath, not the shield itself
             if not IsUnit(targetEntity) then
                 if not targetEntity.Owner then -- We hit something odd, not a shield
+                    WARN('Overcharge hit something that was not the ground, a shield, or a unit')
+                    LOG(targetType)
                     return
-                else
-                    targetUnit = targetEntity.Owner
                 end
+
+                targetEntity = targetEntity.Owner
             end
-        
-            -- Static damage for against ACU or Structures, and use the base energy drain
-            local targetBP = targetUnit:GetBlueprint()
-            if targetBP.CategoriesHash.COMMAND then
-                damage = data.commandDamage
-            elseif targetBP.CategoriesHash.STRUCTURE then
-                damage = data.structureDamage
-            else
-                -- Calculate drain
+
+            if not EntityCategoryContains(categories.COMMAND, targetEntity) then -- Static damage for against ACUs
                 -- Get max energy available to drain according to how much we have
-                local energyLimit = unit:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
+                local energyLimit = launcher:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
                 local energyLimitDamage = self:EnergyAsDamage(energyLimit)
-                
+
                 -- Find max available damage
                 damage = math.min(data.maxDamage, energyLimitDamage)
-                
+
                 -- How much damage do we actually need to kill the unit?
-                local idealDamage = targetUnit:GetHealth()
-                local shield = targetUnit.MyShield
-                
+                local idealDamage = targetEntity:GetHealth()
+                local shield = targetEntity.MyShield
+
                 local shieldHealth = 0
                 if shield then -- No need to check if shield is up. If it is, we hit it. If not, no need to damage it, so add 0.
                     shieldHealth = shield:GetHealth()
                 end
-                
+
                 if shield.ShieldType ~= 'Bubble' then -- Personal shields. Damage to overwhelm.
                     idealDamage = idealDamage + shieldHealth
                 else -- Mobile shield generators. Hit the shield, not the HP.
                     idealDamage = shieldHealth
                 end
-                
+
                 damage = math.min(damage, idealDamage)
                 damage = math.max(data.minDamage, damage)
-                
-                -- Turn the final damage into energy
-                drain = self:DamageAsEnergy(damage)
             end
         end
-        
+
+        -- Turn the final damage into energy
+        local drain = self:DamageAsEnergy(damage)
+
         LOG('Drain is ' .. drain)
         LOG('Damage is ' .. damage)
         self.DamageData.DamageAmount = damage
 
         if drain > 0 then
-            unit.EconDrain = CreateEconomyEvent(unit, drain, 0, 1)
-            unit:ForkThread(function()
-                WaitFor(unit.EconDrain)
-                RemoveEconomyEvent(unit, unit.EconDrain)
-                unit.EconDrain = nil
+            launcher.EconDrain = CreateEconomyEvent(launcher, drain, 0, 1)
+            launcher:ForkThread(function()
+                WaitFor(launcher.EconDrain)
+                RemoveEconomyEvent(launcher, launcher.EconDrain)
+                launcher.EconDrain = nil
             end)
-        end--]]
+        end
     end,
 
     -- y = 3000e^(0.000095(x+14500))-8000
