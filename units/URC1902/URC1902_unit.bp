@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 2400,
+        MaxHealth = 2400,
         RegenRate = 10,
     },
     Description = '<LOC urc1902_desc>Cybran Network Node',

@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 2500,
+        MaxHealth = 2500,
         RegenRate = 0,
     },
     Description = '<LOC uec1907_desc>UEF Black Sun Building',

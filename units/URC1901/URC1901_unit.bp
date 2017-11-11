@@ -30,8 +30,8 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 4000,
+        MaxHealth = 4000,
         RegenRate = 15,
     },
     Description = '<LOC urc1901_desc>Cybran QAI Mainframe',
