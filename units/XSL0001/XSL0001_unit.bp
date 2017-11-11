@@ -992,10 +992,8 @@ UnitBlueprint {
             MuzzleVelocity = 25,
             OverChargeWeapon = true,
             Overcharge = {
-                baseDrain = 5000,
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
                 maxDamage = 40000,
                 minDamage = 1500,
             },
@@ -1081,10 +1079,8 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             Overcharge = {
-                baseDrain = 5000,
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
                 maxDamage = 40000,
                 minDamage = 1500,
             },
