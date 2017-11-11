@@ -32,7 +32,7 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
+        RegenRate = 5,
     },
     Description = '<LOC urc1301_desc>Cybran Administrative Structure',
     Display = {
