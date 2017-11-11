@@ -317,9 +317,12 @@ OverchargeProjectile = Class() {
         WARN('Inside OCPROJ OnImpact')
         LOG(targetType)
         LOG(targetEntity)
-        if targetEntity then
+        if targetEntity and IsUnit(targetEntity) then
             LOG(targetEntity:GetBlueprint().Description)
         end
+
+        -- Stop us doing the 12000 in blueprint in the other OnImpact call if we ditch this one
+        self.DamageData.DamageAmount = 0
         
         local unit = self:GetLauncher()
         if not unit then return end
@@ -346,8 +349,17 @@ OverchargeProjectile = Class() {
         if not targetEntity then -- We hit the floor. Do default damage.
             damage = data.minDamage
         else
+            local targetUnit = targetEntity
+            if not IsUnit(targetEntity) then
+                if not targetEntity.Owner then -- We hit something odd, not a shield
+                    return
+                else
+                    targetUnit = targetEntity.Owner
+                end
+            end
+        
             -- Static damage for against ACU or Structures, and use the base energy drain
-            local targetBP = targetEntity:GetBlueprint()
+            local targetBP = targetUnit:GetBlueprint()
             if targetBP.CategoriesHash.COMMAND then
                 damage = data.commandDamage
             elseif targetBP.CategoriesHash.STRUCTURE then
@@ -362,8 +374,8 @@ OverchargeProjectile = Class() {
                 damage = math.min(data.maxDamage, energyLimitDamage)
                 
                 -- How much damage do we actually need to kill the unit?
-                local idealDamage = targetEntity:GetHealth()
-                local shield = targetEntity.MyShield
+                local idealDamage = targetUnit:GetHealth()
+                local shield = targetUnit.MyShield
                 
                 local shieldHealth = 0
                 if shield then -- No need to check if shield is up. If it is, we hit it. If not, no need to damage it, so add 0.
@@ -395,7 +407,7 @@ OverchargeProjectile = Class() {
                 RemoveEconomyEvent(unit, unit.EconDrain)
                 unit.EconDrain = nil
             end)
-        end
+        end--]]
     end,
     
     DamageAsEnergy = function(self, damage)
