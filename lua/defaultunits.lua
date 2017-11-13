@@ -2287,8 +2287,8 @@ ACUUnit = Class(CommandUnit) {
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
-            local wep = instigator:GetWeaponByLabel('Overcharge')
-            amount = wep.Overcharge.commandDamage
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.commandDamage
         end
 
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)

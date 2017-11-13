@@ -318,7 +318,7 @@ OverchargeProjectile = Class() {
         LOG(targetType)
         LOG(targetEntity)
         if targetEntity and IsUnit(targetEntity) then
-            LOG(targetEntity:GetBlueprint().Description)
+            LOG(targetEntity:GetUnitId())
         end
 
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
