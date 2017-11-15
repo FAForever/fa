@@ -1,3 +1,12 @@
+Patch 3690 (15th November 2017)
+============================
+### Bugs
+- Fixed a word wrap bug that caused missing characters in tooltips and chat, and allowed certain chat messages to crash the game.
+
+###Contributors
+- MrNukealizer
+
+
 Patch 3689 (1st October 2017)
 ============================
 ### Bugs

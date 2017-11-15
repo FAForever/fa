@@ -1,4 +1,4 @@
-last_version = 3689
+last_version = 3690
 changelog = {
     {
         version = 3,
@@ -1294,6 +1294,17 @@ changelog = {
             '- Exotic-Retard',
             '- MrNukealizer',
             '- PhilipJFry',
+        },
+    },
+    {
+        version = 3690,
+        name = 'Game Version 3689',
+        description = {
+            '**Bugs**',
+            '- Fixed a word wrap bug that caused missing characters in tooltips and chat, and allowed certain chat messages to crash the game.',
+            '',
+            '**Contributors**',
+            '- MrNukealizer',
         },
     },
 }
