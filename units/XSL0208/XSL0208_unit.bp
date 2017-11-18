@@ -223,7 +223,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = false,  ----changed to make faster building like otehr engineers
+        NeedToFaceTargetToBuild = false,  -- changed to make faster building like otehr engineers
         StorageEnergy = 0,
         StorageMass = 20,
         TeleportEnergyMod = 0.15,

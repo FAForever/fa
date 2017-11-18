@@ -107,7 +107,6 @@ UnitBlueprint {
             '<LOC ability_reclaim>Reclaims',
             '<LOC ability_repairs>Repairs',
         },
-        #AnimationBuild = '/units/ual0105/ual0105_aopen01.sca',
         IdleEffects = {
             Land = {
                 Effects = {
@@ -225,7 +224,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER1ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = false,  ###changed to make it build faster
+        NeedToFaceTargetToBuild = false, -- changed to make it build faster
         StorageEnergy = 0,
         StorageMass = 10,
         TeleportEnergyMod = 0.15,
@@ -325,9 +324,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
