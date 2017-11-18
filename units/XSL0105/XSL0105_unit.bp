@@ -104,8 +104,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_hover>Hover',
             '<LOC ability_engineeringsuite>Engineering Suite',
-            '<LOC ability_reclaim>Reclaims',
-            '<LOC ability_repairs>Repairs',
         },
         IdleEffects = {
             Land = {
