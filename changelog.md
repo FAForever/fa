@@ -1,4 +1,4 @@
-Patch 3691 (Upcoming)
+Patch 3692 (Upcoming)
 ============================
 ### Gameplay
 - Disabled ACU build ability before warp in to stop fast clicks sometimes netting a several-second advantage
@@ -19,7 +19,7 @@ Patch 3691 (Upcoming)
 - Fixed energy consuming weapons draining power before completion
 - Added COUNTERINTELLIGENCE to HARMS category list, as it has personal stealth
 - Fixed Salem death not animating on land
-- Fixed Bulwark's dummy shield range ring being the wrong size
+- Fixed Czar beam not vanishing on death
 
 ### UI
 - Changed Salvation to be categorized as an experimental instead of a t3 building
@@ -32,15 +32,14 @@ Patch 3691 (Upcoming)
 - Adjusted some army colours. A new Order Green, a slightly lighter dark blue, and a golden Seraphim colour from the campaign.
 - Fixed Attack-Move icon being greyed out permanently
 - Fixed veterancy UI not showing for non-default screen layouts
-- Fixed bulwark dummy weapon range ring
+- Fixed Bulwark dummy shield range ring being the wrong size
+- Allowed mod icon support for ACU upgrades
+- Refined some UI tips. Engineers now display "Engineering Suite" only, with "Reclaims" and "Repairs" being saved for special case units like the Harbinger
 
 ### Lobby
 - Changed background faction images to widescreen versions
 - Fixed missing dependency bug for non hosts in lobbies
 - Overhauled and refined the mod manager
-
-### Balance
-- Remove over water vision from submerged amphibious units
 
 ### Other
 - Fixed typo in Novax center bones
@@ -54,11 +53,15 @@ Patch 3691 (Upcoming)
 - Updated mod blacklist
 
 ### Contributors
+- basdawimp
+- CookieNoob
+- Hussar
 - IceDreamer
 - MrNukealizer
-- CookieNoob
+- PhilipJFry
+- Speed2
+- supcomBlackMaster
 - Uveso
-- basdawimp
 
 
 Patch 3690 (15th November 2017)
