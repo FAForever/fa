@@ -1,9 +1,9 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/platoontemplates.lua
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+------------------------------------------------------------------------------
+----
+----  File     :  /lua/platoontemplates.lua
+----
+----  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
 EngineerFormTemplates = {
     CommanderAssist={
@@ -69,7 +69,7 @@ EngineerFormTemplates = {
 }
 
 EngineerBuildTemplates = {
-    # UEF
+    -- UEF
     {
         EngineerOnlyBuild={
             "EngineerOnlyBuild",
@@ -97,7 +97,7 @@ EngineerBuildTemplates = {
             { "uel0309", -1, 1, "support", "None" }
         },
     },
-    # Aeon
+    -- Aeon
     {
         EngineerOnlyBuild={
             "EngineerOnlyBuild",
@@ -125,7 +125,7 @@ EngineerBuildTemplates = {
             { "ual0309", -1, 1, "support", "None" }
         },
     },
-    # Cybran
+    -- Cybran
     {
         EngineerOnlyBuild={
             "EngineerOnlyBuild",
@@ -153,7 +153,7 @@ EngineerBuildTemplates = {
             { "url0309", -1, 1, "support", "None" }
         },
     },
-    # Seraphim
+    -- Seraphim
     {
         EngineerOnlyBuild={
             "EngineerOnlyBuild",
@@ -183,10 +183,8 @@ EngineerBuildTemplates = {
     },
 }
 
-
 PlatoonTemplates = {
-
-    # UEF templates
+    -- UEF templates
     {
         AirAttack = {
             "AirAttack",
@@ -706,10 +704,10 @@ PlatoonTemplates = {
             "PauseAI",
             { "ueb1303", 1, 1, "support", "None" }
         },
-        T3Nuke={ 
-            "T3Nuke", 
-            "NukeAI", 
-            { "ueb2305", 1, 1, "attack", "None" } 
+        T3Nuke={
+            "T3Nuke",
+            "NukeAI",
+            { "ueb2305", 1, 1, "attack", "None" }
         },
         T3SeaBattleship1={
             "T3SeaBattleship1",
@@ -752,8 +750,7 @@ PlatoonTemplates = {
             { "ues0401", 1, 1, "attack", "None" }
         }
     },
-    
-    # Aeon templates
+    -- Aeon templates
     {
         AirAttack = {
             "AirAttack",
@@ -1266,10 +1263,10 @@ PlatoonTemplates = {
             "PauseAI",
             { "uab1303", 1, 1, "support", "None" }
         },
-        T3Nuke={ 
-            "T3Nuke", 
-            "NukeAI", 
-            { "uab2305", 1, 1, "attack", "None" } 
+        T3Nuke={
+            "T3Nuke",
+            "NukeAI",
+            { "uab2305", 1, 1, "attack", "None" }
         },
         T3SeaBattleship1={
             "T3SeaBattleship1",
@@ -1312,8 +1309,7 @@ PlatoonTemplates = {
             { "uas0401", 1, 1, "attack", "None" }
         }
     },
-    
-    # Cybran Templates
+    -- Cybran Templates
     {
         AirAttack = {
             "AirAttack",
@@ -1827,9 +1823,9 @@ PlatoonTemplates = {
             { "urb1303", 1, 1, "support", "None" }
         },
         T3Nuke={
-            "T3Nuke", 
-            "NukeAI", 
-            { "urb2305", 1, 1, "attack", "None" } 
+            "T3Nuke",
+            "NukeAI",
+            { "urb2305", 1, 1, "attack", "None" }
         },
         T3SeaBattleship1={
             "T3SeaBattleship1",
@@ -1872,8 +1868,7 @@ PlatoonTemplates = {
             { "urs0302", -1, 1, "attack", "None" }
         }
     },
-    
-    # Seraphim templates
+    -- Seraphim templates
     {
         AirAttack = {
             "AirAttack",
