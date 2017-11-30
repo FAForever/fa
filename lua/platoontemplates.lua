@@ -669,6 +669,16 @@ PlatoonTemplates = {
             "DisbandAI",
             { "uel0309", -1, 6, "support", "None" }
         },
+        T3LandAA1={
+            "T3LandAA1",
+            "PatrolBaseVectorsAI",
+            { "delk002", 1, 3, "attack", "GrowthFormation" }
+        },
+        T3LandAA2={
+            "T3LandAA2",
+            "PatrolBaseVectorsAI",
+            { "delk002", -1, 3, "attack", "GrowthFormation" }
+        },
         T3LandArtillery1={
             "T3LandArtillery1",
             "PatrolBaseVectorsAI",
@@ -1229,6 +1239,16 @@ PlatoonTemplates = {
             "DisbandAI",
             { "ual0309", -1, 6, "support", "None" }
         },
+        T3LandAA1={
+            "T3LandAA1",
+            "PatrolBaseVectorsAI",
+            { "dalk003", 1, 3, "attack", "GrowthFormation" }
+        },
+        T3LandAA2={
+            "T3LandAA2",
+            "PatrolBaseVectorsAI",
+            { "dalk003", -1, 3, "attack", "GrowthFormation" }
+        },
         T3LandArtillery1={
             "T3LandArtillery1",
             "PatrolBaseVectorsAI",
@@ -1788,6 +1808,16 @@ PlatoonTemplates = {
             "DisbandAI",
             { "url0309", -1, 6, "support", "None" }
         },
+        T3LandAA1={
+            "T3LandAA1",
+            "PatrolBaseVectorsAI",
+            { "drlk001", 1, 3, "attack", "GrowthFormation" }
+        },
+        T3LandAA2={
+            "T3LandAA2",
+            "PatrolBaseVectorsAI",
+            { "drlk001", -1, 3, "attack", "GrowthFormation" }
+        },
         T3LandArtillery1={
             "T3LandArtillery1",
             "PatrolBaseVectorsAI",
@@ -2345,6 +2375,16 @@ PlatoonTemplates = {
             "T3EngineerOnlyBuild2",
             "DisbandAI",
             { "xsl0309", -1, 6, "support", "None" }
+        },
+        T3LandAA1={
+            "T3LandAA1",
+            "PatrolBaseVectorsAI",
+            { "dslk004", 1, 3, "attack", "GrowthFormation" }
+        },
+        T3LandAA2={
+            "T3LandAA2",
+            "PatrolBaseVectorsAI",
+            { "dslk004", -1, 3, "attack", "GrowthFormation" }
         },
         T3LandArtillery1={
             "T3LandArtillery1",
