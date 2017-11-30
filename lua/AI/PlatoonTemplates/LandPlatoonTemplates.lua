@@ -395,16 +395,16 @@ PlatoonTemplate {
     Name = 'T3LandAA',
     FactionSquads = {
         UEF = {
-            { 'uel0205', 1, 1, 'attack', 'none' }
+            { 'delk002', 1, 1, 'attack', 'none' }
         },
         Aeon = {
-            { 'ual0205', 1, 1, 'attack', 'none' }
+            { 'dalk003', 1, 1, 'attack', 'none' }
         },
         Cybran = {
-            { 'url0205', 1, 1, 'attack', 'none' }
+            { 'drlk001', 1, 1, 'attack', 'none' }
         },
         Seraphim = {
-            { 'xsl0205', 1, 1, 'attack', 'none' }
+            { 'dslk004', 1, 1, 'attack', 'none' }
         },
     }
 }
