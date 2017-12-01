@@ -1,5 +1,11 @@
-Patch 3692 (Upcoming)
+Patch 3692 (1st December 2017)
 ============================
+### Shared Armies
+- This patch ships with a new, modified exe file that enables the Shared Armies alpha mod. The mod can be found on the vault.
+    - To play a game with it, set up your teams such that the topmost slot in the lobby of each team is the army your team will be.
+    - On starting the game, control of all team member will be transferred to that army. Coordination between team members is ESSENTIAL
+    - This mode will be developed into a fully integrated game mode down the line. It should open up extensive interesting new options for gameplay.
+
 ### Gameplay
 - Disabled ACU build ability before warp in to stop fast clicks sometimes netting a several-second advantage
 - Fixed the Seraphim Sniperbot not working with attack-move in its non-default mode
