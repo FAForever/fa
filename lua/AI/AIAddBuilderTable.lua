@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIAddBuilderTable.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--------------------------------------------------------------------------*
+--
+--  File     :  /lua/ai/AIAddBuilderTable.lua
+--
+--  Summary  : Default economic builders for skirmish
+--
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------
 
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
@@ -31,13 +31,9 @@ end
 function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     aiBrain.BuilderManagers[locationType].BuilderHandles = aiBrain.BuilderManagers[locationType].BuilderHandles or {}
     aiBrain.BuilderManagers[locationType].BuilderHandles[tableName] = {}
-
     local builders = aiBrain.BuilderManagers[locationType].BuilderHandles[tableName]
-
     local managers = aiBrain.BuilderManagers[locationType]
-
     local tableType, builderFunction
-
     if builderTable.BuildersType == 'PlatoonFormBuilder' then
         tableType = 'PlatoonFormManager'
     elseif builderTable.BuildersType == 'EngineerBuilder' then
@@ -49,10 +45,9 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     else
         error('*AI ERROR: Invalid BuildersType for table of builder to add to brain')
     end
-
     for k,v in builderTable do
-        if k != 'BuildersType' and k != 'BuilderGroupName' then
-            if type(v) != 'string' then
+        if k ~= 'BuildersType' and k ~= 'BuilderGroupName' then
+            if type(v) ~= 'string' then
                 error('*AI ERROR: Invalid builder type in BuilderGroup - ' .. tableName)
             end
             if not Builders[v] then
