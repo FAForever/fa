@@ -14,7 +14,7 @@ function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     for k,v in BaseBuilderTemplates[baseBuilderName].Builders do
         AddGlobalBuilderGroup(aiBrain, locationType, v)
     end
-    if not aiBrain.CheatEnabled and BaseBuilderTemplates[baseBuilderName].NonCheatBuilders then
+    if (not aiBrain.CheatEnabled or (aiBrain.CheatEnabled and ScenarioInfo.Options.OmniCheat == 'off')) and BaseBuilderTemplates[baseBuilderName].NonCheatBuilders then
         for k,v in BaseBuilderTemplates[baseBuilderName].NonCheatBuilders do
             AddGlobalBuilderGroup(aiBrain, locationType, v)
         end
