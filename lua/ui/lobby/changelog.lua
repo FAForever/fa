@@ -1,4 +1,4 @@
-last_version = 3690
+last_version = 3693
 changelog = {
     {
         version = 3,
@@ -1379,6 +1379,17 @@ changelog = {
             '- Speed2',
             '- supcomBlackMaster',
             '- Uveso',
+        },
+    },
+    {
+        version = 3693,
+        name = 'Game Version 3693',
+        description = {
+            '**Lobby**',
+            '- Fixed the lobby changelog appearing every time',
+            '',
+            '**Contributors**',
+            '- IceDreamer',
         },
     },
 }

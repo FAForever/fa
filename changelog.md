@@ -1,4 +1,13 @@
-Patch 3692 (1st December 2017)
+Patch 3693 (3rd December, 2017)
+============================
+### Lobby
+- Fixed the lobby changelog appearing every time
+
+### Contributors
+- IceDreamer
+
+
+Patch 3692 (1st December, 2017)
 ============================
 ### Shared Armies
 - This patch ships with a new, modified exe file that enables the Shared Armies alpha mod. The mod can be found on the vault.
