@@ -84,7 +84,6 @@ MapBlacklist = {
     ['8 - badlandsv1.v0001'] = true,
     ['8 - badlands_v2.v0001'] = true,
     ['8 - badlands_v3.v0001'] = true,
-    ['8 - badlands_v4.v0001'] = true,
     ['8 castles v3'] = true,
     ['8plfosv1.v0001'] = true,
     ['action_tug_of_war.v0001'] = true,
