@@ -239,7 +239,7 @@ mapFilters = {
             SelectedKey = 1,
             Filters = {
                 function(scenInfo)
-                    if CheckMapIsOfficial(scenInfo.name) then
+                    if CheckMapIsOfficial(scenInfo) then
                         return true
                     end
                     if scenInfo.Outdated then
