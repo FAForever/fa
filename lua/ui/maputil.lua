@@ -240,8 +240,10 @@ function CheckMapHasMarkers(scenario)
     if saveData and saveData.Scenario and saveData.Scenario.MasterChain and
             saveData.Scenario.MasterChain['_MASTERCHAIN_'] and saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers then
         for marker, data in saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers do
-            if string.find(string.lower(marker), 'landpn') then
-                return true
+            if data.adjacentTo then
+                if string.find(data.adjacentTo, ' ') then
+                    return true
+                end
             end
         end
     else
