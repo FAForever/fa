@@ -1,11 +1,4 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'Blade03',
-            'Extension01',
-            'Extension04',
-        },
-    },
     Adjacency = 'HydrocarbonAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
