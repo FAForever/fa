@@ -1424,8 +1424,6 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         OnResult = function(self, success, data)
             self.Complete = success
 
-            for _, v in self.ResultCallbacks do v(success, data) end
-
             -- Destroy decals
             for _, v in self.Decals do v:Destroy() end
 
@@ -1454,6 +1452,8 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                     end
                 end
             end
+
+            for _, v in self.ResultCallbacks do v(success, data) end
         end,
 
         OnProgress = function(self, current, total)
