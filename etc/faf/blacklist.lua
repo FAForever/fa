@@ -162,6 +162,6 @@ Blacklist = {
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1300'] = UPGRADE,
     
     -- Santa is coming mod (temporarily)
-    ['Santa-is-comi-ng03-90f1-0264a2479872'] = Integrated,
+    ['Santa-is-comi-ng03-90f1-0264a2479872'] = INTEGRATED,
 
 }
