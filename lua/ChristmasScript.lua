@@ -74,7 +74,7 @@ function Create_Christmas_Presents()
             new_size = 0.084
         end
         if proptype == 10 then
-            new_size = 9 * new_size
+            new_size = 8 * new_size
         end
         NewGift:SetScale(new_size*0.9)
         
