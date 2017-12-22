@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = [[/mods/Santa_Is_Coming_Reloaded/props/snowman/snowman_albedo.dds]],
+                    AlbedoName = [[/props/snowman/snowman_albedo.dds]],
                     LODCutoff = 500,
                     ShaderName = 'NormalMappedTerrain',
                 },

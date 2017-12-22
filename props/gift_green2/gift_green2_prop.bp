@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-				 AlbedoName = [[/mods/Santa_Is_Coming_Reloaded/props/gift_green2/gift_green2.dds]],
+                    AlbedoName = [[/props/gift_green2/gift_green2.dds]],
                     LODCutoff = 500,
                     ShaderName = 'NormalMappedTerrain',
                 },
