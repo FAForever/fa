@@ -163,5 +163,7 @@ Blacklist = {
     
     -- Santa is coming mod (temporarily)
     ['Santa-is-comi-ng03-90f1-0264a2479872'] = INTEGRATED,
+    ['Santa-is-comi-ng04-90f1-0264a2479872'] = INTEGRATED,
+    ['Santa-is-comi-ng05-90f1-0264a2479872'] = INTEGRATED,
 
 }
