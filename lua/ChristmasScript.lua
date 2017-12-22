@@ -45,15 +45,15 @@ function Create_Christmas_Presents()
         end
     end
 
-    local color_gifts = {'blue', 'green', 'green2', 'pink', 'red', 'yellow'}
+    local color_gifts = {'blue', 'green', 'green2', 'pink', 'red', 'yellow','snowflake', 'owl', 'star'}
     local new_props = {}
+    new_props[table.getn(new_props)+ 1] = '/props/snowman/snowman_prop.bp'
     for _, color in color_gifts do
         new_props[table.getn(new_props)+1] = '/props/gift_' .. color .. '/gift_' .. color .. '_prop.bp'
     end
     for k = 1, 3 do
         new_props[table.getn(new_props)+ 1] = '/props/cookie/cookie_prop.bp'
     end
-    new_props[table.getn(new_props)+ 1] = '/props/snowman/snowman_prop.bp'
     
     for _, present in ListOfProps or {} do
     local proptype = math.ceil(math.random(table.getn(new_props)))
@@ -73,7 +73,7 @@ function Create_Christmas_Presents()
         elseif (new_size > 0.084) then
             new_size = 0.084
         end
-        if proptype == 10 then
+        if proptype == 1 then
             new_size = 8 * new_size
         end
         NewGift:SetScale(new_size*0.9)
