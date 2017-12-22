@@ -1,0 +1,39 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = [[/mods/Santa_Is_Coming_Reloaded/props/snowman/snowman_albedo.dds]],
+                    LODCutoff = 500,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.051,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Large Rock',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 2,
+    SizeY = 1,
+    SizeZ = 5,
+}
