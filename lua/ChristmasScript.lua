@@ -74,9 +74,9 @@ function Create_Christmas_Presents()
             new_size = 0.084
         end
         if proptype == 10 then
-            new_size = 6 * new_size
+            new_size = 9 * new_size
         end
-        NewGift:SetScale(new_size)
+        NewGift:SetScale(new_size*0.9)
         
         local orient = math.random(628)/100-3.14
         local vec = VECTOR3(math.cos(orient),0,math.sin(orient))
