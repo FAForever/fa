@@ -74,12 +74,26 @@ function Create_Christmas_Presents()
             new_size = 0.084
         end
         if proptype == 1 then
-            new_size = 8 * new_size
+            new_size = 100 * new_size
         end
-        NewGift:SetScale(new_size*0.9)
+        NewGift:SetScale(new_size*0.7)
         
         local orient = math.random(628)/100-3.14
         local vec = VECTOR3(math.cos(orient),0,math.sin(orient))
         NewGift:SetOrientation(OrientFromDir( vec ), true)
     end
+
+	-- create christmas tree
+	if GetSurfaceHeight(posx/2,posy/2) == GetTerrainHeight(posx/2,posy/2) then
+		local christmasTree = CreateProp( VECTOR3(posx/2,
+                            GetTerrainHeight(posx/2,posy/2),
+                            posy/2 ),
+                            '/props/christmastree/christmastree_prop.bp')
+        christmasTree:SetMaxReclaimValues( 10, 1, 1)
+        christmasTree:SetScale(0.24)
+
+        local orient = math.random(628)/100-3.14
+        local vec = VECTOR3(math.cos(orient),0,math.sin(orient))
+        christmasTree:SetOrientation(OrientFromDir( vec ), true)
+	end
 end

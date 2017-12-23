@@ -1,0 +1,40 @@
+PropBlueprint {
+    Categories = {
+		'UNTARGETABLE',
+        'VISIBLETORECON',
+    },
+    Defense = {
+        Health = 500000,
+        MaxHealth = 500000,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = [[/props/santahat/santahat.dds]],
+                    LODCutoff = 500,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.051,
+    },
+    Economy = {
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 5000000000,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Large Rock',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.01,
+    SizeY = 0.01,
+    SizeZ = 0.01,
+}
