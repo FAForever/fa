@@ -47,7 +47,7 @@ XSL0001 = Class(ACUUnit) {
         self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
 		ForkThread(function()
 			WaitSeconds(5)	
-			local temphat = self:CreatePropAtBone('Torso','/mods/santa_is_coming_reloaded/props/gift_pink/gift_pink_prop.bp') 	
+			local temphat = self:CreatePropAtBone('Torso','/props/gift_pink/gift_pink_prop.bp') 	
 			local pos = temphat:GetPosition()
 			local orientation = temphat:GetOrientation()
 			christmashat = CreateUnit('CHS0001', self:GetArmy(), pos[1], pos[2], pos[3], orientation[1], orientation[2], orientation[3], orientation[4]) 	

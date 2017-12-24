@@ -43,7 +43,7 @@ UAL0001 = Class(ACUUnit) {
 
 		ForkThread(function()
 			WaitSeconds(5)
-			local temphat = self:CreatePropAtBone('Head','/mods/santa_is_coming_reloaded/props/gift_pink/gift_pink_prop.bp') 	
+			local temphat = self:CreatePropAtBone('Head','/props/gift_pink/gift_pink_prop.bp') 	
 			local pos = temphat:GetPosition()
 			local orientation = temphat:GetOrientation()
 			temphat:Destroy()			
