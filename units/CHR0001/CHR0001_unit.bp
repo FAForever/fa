@@ -1,0 +1,67 @@
+UnitBlueprint {
+    Categories = {
+		'UNTARGETABLE',
+		'CYBRAN',
+		'INVULNERABLE',
+        'MOBILE',
+        'LAND',
+    },
+    Defense = {
+        Health = 500000,
+        MaxHealth = 500000,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = [[/units/santahat_common/santahat.dds]],
+					NormalsName = [[/units/santahat_common/santahat_NormalsTS.dds]],
+					SpecularName = [[/units/santahat_common/santahat_SpecTeam.dds]],
+                    LODCutoff = 500,
+                    ShaderName = 'Insect',
+                },
+            },
+        },
+        UniformScale = 0.015,
+    },
+    Economy = {
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 5000000000,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Intel = {
+        RadarStealth = true,
+		SonarStealth = true,
+    },	
+    Interface = {
+        HelpText = 'Large Rock',
+    },
+	Physics = {
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = true,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        MaxAcceleration = 3.7,
+        MaxBrake = 3.7,
+        MaxSpeed = 3.7,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 10,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Amphibious',
+        TurnRadius = 0,
+        TurnRate = 90,
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

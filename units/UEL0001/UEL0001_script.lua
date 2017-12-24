@@ -14,6 +14,7 @@ local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
+local christmashat
 
 UEL0001 = Class(ACUUnit) {
     Weapons = {
@@ -40,7 +41,24 @@ UEL0001 = Class(ACUUnit) {
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+		
+		ForkThread(function()
+			WaitSeconds(5)	
+			local temphat = self:CreatePropAtBone('Head','/props/gift_pink/gift_pink_prop.bp') 	
+			local pos = temphat:GetPosition()
+			local orientation = temphat:GetOrientation()
+			christmashat = CreateUnit('CHE0001', self:GetArmy(), pos[1], pos[2], pos[3], orientation[1], orientation[2], orientation[3], orientation[4]) 	
+			temphat:Destroy()
+			christmashat:AttachTo(self, 'Head') 
+			christmashat:SetCanTakeDamage(false)
+			christmashat:SetCanBeKilled(false)
+		end)
     end,
+	
+	OnDestroy = function(self)
+		ACUUnit.OnDestroy(self)
+		christmashat:Destroy()
+	end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)

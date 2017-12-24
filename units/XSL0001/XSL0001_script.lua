@@ -16,6 +16,7 @@ local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local AIUtils = import('/lua/ai/aiutilities.lua')
+local christmashat
 
 XSL0001 = Class(ACUUnit) {
     Weapons = {
@@ -44,7 +45,23 @@ XSL0001 = Class(ACUUnit) {
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+		ForkThread(function()
+			WaitSeconds(5)	
+			local temphat = self:CreatePropAtBone('Torso','/props/gift_pink/gift_pink_prop.bp') 	
+			local pos = temphat:GetPosition()
+			local orientation = temphat:GetOrientation()
+			christmashat = CreateUnit('CHS0001', self:GetArmy(), pos[1], pos[2], pos[3], orientation[1], orientation[2], orientation[3], orientation[4]) 	
+			temphat:Destroy()
+			christmashat:AttachTo(self, 'Torso') 
+			christmashat:SetCanTakeDamage(false)
+			christmashat:SetCanBeKilled(false)
+		end)
     end,
+	
+	OnDestroy = function(self)
+		ACUUnit.OnDestroy(self)
+		christmashat:Destroy()
+	end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         ACUUnit.OnStopBeingBuilt(self,builder,layer)
