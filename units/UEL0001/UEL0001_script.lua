@@ -14,6 +14,7 @@ local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
+local christmashat
 
 UEL0001 = Class(ACUUnit) {
     Weapons = {
@@ -40,7 +41,19 @@ UEL0001 = Class(ACUUnit) {
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+		ForkThread(function()
+			WaitSeconds(5)
+			christmashat = self:CreatePropAtBone('Head','/props/santahat_UEF/santahat_UEF_prop.bp') 	
+			christmashat:AttachTo(self, 'Head') 
+			christmashat:SetCanTakeDamage(false)
+			christmashat:SetCanBeKilled(false)
+		end)
     end,
+	
+	OnDestroy = function(self)
+		ACUUnit.OnDestroy(self)
+		christmashat:Destroy()
+	end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
