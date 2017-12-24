@@ -1401,7 +1401,8 @@ changelog = {
             '',
             '**Contributors**',
             '- CookieNoob',
-			'- Ozonex',
+            '- Ozonex',
+            '- Black_Death',
         },
     },
 }
