@@ -167,5 +167,8 @@ Blacklist = {
     ['Santa-is-comi-ng05-90f1-0264a2479872'] = INTEGRATED,
     ['Santa-is-comi-ng06-90f1-0264a2479872'] = INTEGRATED,
     ['Santa-is-comi-ng07-90f1-0264a2479872'] = INTEGRATED,
+    ['Santa-is-comi-ng08-90f1-0264a2479872'] = INTEGRATED,
+    ['Santa-is-comi-ng09-90f1-0264a2479872'] = INTEGRATED,
+    ['Santa-is-comi-ng10-90f1-0264a2479872'] = INTEGRATED,
 
 }
