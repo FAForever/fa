@@ -12,13 +12,14 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = [[/props/santahat/santahat.dds]],
+                    AlbedoName = [[/props/santahat_common/santahat.dds]],
+					NormalsName = [[/props/santahat_common/santahat_NormalsTS.dds]],
                     LODCutoff = 500,
-                    ShaderName = 'NormalMappedTerrain',
+                    ShaderName = 'VertexNormal',
                 },
             },
         },
-        UniformScale = 0.051,
+        UniformScale = 0.015,
     },
     Economy = {
         ReclaimEnergyMax = 1,

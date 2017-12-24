@@ -16,6 +16,7 @@ local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGenera
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
+local christmashat
 
 URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {
@@ -69,7 +70,19 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 self.torpRange = v.MaxRadius
             end
         end
+		ForkThread(function()
+			WaitSeconds(5)
+			christmashat = self:CreatePropAtBone('Head','/props/santahat_Cybran/santahat_Cybran_prop.bp') 	
+			christmashat:AttachTo(self, 'Head') 
+			christmashat:SetCanTakeDamage(false)
+			christmashat:SetCanBeKilled(false)
+		end)
     end,
+	
+	OnDestroy = function(self)
+		ACUUnit.OnDestroy(self)
+		christmashat:Destroy()
+	end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
