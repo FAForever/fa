@@ -1,7 +1,10 @@
-PropBlueprint {
+UnitBlueprint {
     Categories = {
 		'UNTARGETABLE',
-        'VISIBLETORECON',
+		'UEF',
+		'INVULNERABLE',
+        'MOBILE',
+        'LAND',
     },
     Defense = {
         Health = 500000,
@@ -12,10 +15,11 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = [[/props/santahat_common/santahat.dds]],
-					NormalsName = [[/props/santahat_common/santahat_NormalsTS.dds]],
+                    AlbedoName = [[/mods/Santa_Is_Coming_Reloaded/units/santahat_common/santahat.dds]],
+					NormalsName = [[/mods/Santa_Is_Coming_Reloaded/units/santahat_common/santahat_NormalsTS.dds]],
+					SpecularName = [[/mods/Santa_Is_Coming_Reloaded/units/santahat_common/santahat_SpecTeam.dds]],
                     LODCutoff = 500,
-                    ShaderName = 'VertexNormal',
+                    ShaderName = 'Unit',
                 },
             },
         },
@@ -29,6 +33,10 @@ PropBlueprint {
     Footprint = {
         OccupancyCaps = 3,
     },
+    Intel = {
+        RadarStealth = true,
+		SonarStealth = true,
+    },	
     Interface = {
         HelpText = 'Large Rock',
     },
