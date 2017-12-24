@@ -1,198 +1,238 @@
 --- Class Unit
 -- @classmod Sim.Unit
 
----
---  unit:AddCommandCap(capName) -- Add a command cap to a unit.
+--- Add a command cap to a unit.
+-- Also adds a button to the UI, or enables it, for the unit to use the new command.
+-- @param capName String Available:
+-- RULEUCC_Move
+-- RULEUCC_Stop
+-- RULEUCC_Attack
+-- RULEUCC_Guard
+-- RULEUCC_Patrol
+-- RULEUCC_RetaliateToggle
+-- RULEUCC_Repair
+-- RULEUCC_Capture
+-- RULEUCC_Transport
+-- RULEUCC_CallTransport
+-- RULEUCC_Nuke
+-- RULEUCC_Tactical
+-- RULEUCC_Teleport
+-- RULEUCC_Ferry
+-- RULEUCC_SiloBuildTactical
+-- RULEUCC_SiloBuildNuke
+-- RULEUCC_Sacrifice
+-- RULEUCC_Pause
+-- RULEUCC_Overcharge
+-- RULEUCC_Dive
+-- RULEUCC_Reclaim
+-- RULEUCC_SpecialAction
+-- RULEUCC_Dock
+-- RULEUCC_Script
+-- RULEUCC_Invalid
 function Unit:AddCommandCap(capName)
 end
 
----
---  unit:AddToggleCap(capName) -- Add a toggle cap to a unit.
+--- Add a toggle cap to a unit.
+-- Also adds a button to the UI, or enables it, for the unit to use the new command.
+-- @param capName String Available:
+-- RULEUTC_ShieldToggle
+-- RULEUTC_WeaponToggle
+-- RULEUTC_JammingToggle
+-- RULEUTC_IntelToggle
+-- RULEUTC_ProductionToggle
+-- RULEUTC_StealthToggle
+-- RULEUTC_GenericToggle
+-- RULEUTC_SpecialToggle
+-- RULEUTC_CloakToggle
 function Unit:AddToggleCap(capName)
 end
 
----
---  Unit:AddUnitToStorage(storedUnit)
-function Unit:AddUnitToStorage(storedUnit)
+--- Adds unit to the storage of the carrier.
+-- @param unit Target unit to load.
+function Unit:AddUnitToStorage(unit)
 end
 
----
---  Unit:AlterArmor(damageTypeName, multiplier)
-function Unit:AlterArmor(damageTypeName,  multiplier)
+--- Changes the unit's armor type.
+-- @param damageTypeName String, see lua/armordefinition.lua available types.
+-- @param multiplier TODO.
+function Unit:AlterArmor(damageTypeName, multiplier)
 end
 
----
---  Calculate the desired world position from the supplied relative vector from the center of the unit
-function Unit:CalculateWorldPositionFromRelative()
+--- Calculate the desired world position from the supplied relative vector from the center of the unit.
+-- Used for naval factories to set rally point under them.
+-- @param vector Table {x, y, z}.
+function Unit:CalculateWorldPositionFromRelative(vector)
 end
 
----
---  CanBuild(self, blueprint
-function Unit:CanBuild()
+--- See if the unit can build the target unit.
+-- @param bpID Blueprint ID of the target unit, example 'ueb0101'.
+-- @return true/false.
+function Unit:CanBuild(bpID)
 end
 
----
---  See if the unit can path to the goal
-function Unit:CanPathTo()
+--- See if the unit can path to the goal.
+-- @param position Table with position {x, y, z}.
+-- @return result, bestGoal true/false, if falses, returns the closest position, else the original position.
+function Unit:CanPathTo(position)
 end
 
----
---  See if the unit can path to the goal rectangle
-function Unit:CanPathToRect()
+--- See if the unit can path to the goal rectangle.
+-- TODO: find out if it returns position as well
+-- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+-- @return true/false
+function Unit:CanPathToRect(rectangle)
 end
 
----
---  ClearFocusEntity(self)
-function Unit:ClearFocusEntity(self)
+--- TODO.
+function Unit:ClearFocusEntity()
 end
 
----
---  Unit:EnableManipulators([string boneName | int boneIndex], bool Enable)
+--- TODO.
 function Unit:EnableManipulators([string boneName | int boneIndex],  bool Enable)
 end
 
----
---  mult = Unit:GetArmorMult(damageTypeName)
+--- TODO.
 function Unit:GetArmorMult(damageTypeName)
 end
 
----
---  GetAttacker() - get the tactical attack manager object of this unit
+--- Get the tactical attack manager object of this unit.
 function Unit:GetAttacker()
 end
 
----
---  blip = GetBlip(armyIndex) - returns a blip (if any) that the given army has for the unit
+--- Returns a blip (if any) that the given army has for the unit
+-- @return blip
 function Unit:GetBlip(armyIndex)
 end
 
----
---  unit:GetBuildRate() -- returns the build rate of a unit: what fraction of target unit it builds per second.
+--- Returns the build rate of a unit.
+-- What fraction of target unit it builds per second.
+-- @return rate
 function Unit:GetBuildRate()
 end
 
----
---  GetCargo(self)
-function Unit:GetCargo(self)
+--- Returns list of unit that the unit is transporting.
+-- @return Table List of units or empty table.
+function Unit:GetCargo()
 end
 
----
---  Unit:GetCommandQueue()
+--- Return table of commands queued up for this unit.
+-- @return table
 function Unit:GetCommandQueue()
 end
 
----
---  Get the consumption of energy of the unit
+--- Get the consumption of energy of the unit.
+-- @return number
 function Unit:GetConsumptionPerSecondEnergy()
 end
 
----
---  Get the consumption of mass of the unit
+--- Get the consumption of mass of the unit.
+-- @return number
 function Unit:GetConsumptionPerSecondMass()
 end
 
----
---  GetUnitId(self)
+--- Return the name of the layer the unit is currently in.
+-- @return layer String, name of the layer, types: 'Air','Land', 'Orbital', 'Seabed', 'Sub', 'Water'.
 function Unit:GetCurrentLayer()
 end
 
----
---  Unit:GetCurrentMoveLocation()
+--- Returns the current move location of the unit.
+-- TODO: untested.
+-- @return position Table with position {x, y ,z}.
 function Unit:GetCurrentMoveLocation()
 end
 
----
---  Get the fire state for the unit
+--- Get the fire state for the unit.
+-- TODO find out return format.
 function Unit:GetFireState()
 end
 
----
---  GetFocusUnit(self)
+--- TODO.
 function Unit:GetFocusUnit(self)
 end
 
----
---  Get the fuel ratio
+--- Find out ratio of fuel ramaining.
+-- @return ratio How much fuel left, range 0 - 1.
 function Unit:GetFuelRatio()
 end
 
----
---  Get the fuel use time
+--- Get the fuel use time.
+-- @return number Fuel left in seconds.
 function Unit:GetFuelUseTime()
 end
 
----
---  Unit:GetGuardedUnit()
+--- Returns the unit that is being guarded.
+-- @return unit Guarded unit or nil.
 function Unit:GetGuardedUnit()
 end
 
----
---  Unit:GetGuards()
+--- Find out units that are guarding this unit.
+-- @return table Table of units that are guarding this uni.
 function Unit:GetGuards()
 end
 
----
---  GetHealth(self)
-function Unit:GetHealth(self)
+--- Find out current health
+-- @return number HP remaining.
+function Unit:GetHealth()
 end
 
----
---  GetNavigator() - get the navigator object of this unit
+--- Get the navigator object of this unit.
 function Unit:GetNavigator()
 end
 
----
---  Unit:GetNukeSiloAmmoCount()
+--- Find out number of nuclear missile this unit has available.
+-- @return number
 function Unit:GetNukeSiloAmmoCount()
 end
 
----
---  Get number of factory/engineer build orders that fit in the specified category
-function Unit:GetNumBuildOrders()
+--- Get number of factory/engineer build orders that fit in the specified category.
+-- @param category Unit's category, example: categories.ALLUNITS.
+function Unit:GetNumBuildOrders(category)
 end
 
----
---  Get the production of energy of the unit
+--- Get the production of energy of the unit.
+-- @return number Production of energy per second.
 function Unit:GetProductionPerSecondEnergy()
 end
 
----
---  Get the production of mass of the unit
+--- Get the production of mass of the unit.
+-- @return number Production of mass per second.
 function Unit:GetProductionPerSecondMass()
 end
 
----
---  Get the rally point for the factory
+--- Get the rally point for the factory.
+-- @return position Table with position {x, y ,z}.
 function Unit:GetRallyPoint()
 end
 
----
---  Return the fraction of requested resources this unit consumed last tick. Normally 1, but can be fractional if economy is struggling.
+--- Return the fraction of requested resources this unit consumed last tick.
+-- Normally 1, but can be fractional if economy is struggling.
 function Unit:GetResourceConsumed()
 end
 
----
---  Get the current toggle state of the script bit that matches the string
+--- Get the current toggle state of the script bit that matches the string.
+-- TODO.
 function Unit:GetScriptBit()
 end
 
----
---  Get the shield ratio
+--- Get the shield ratio.
+-- @return float Range 0 - 1.
 function Unit:GetShieldRatio()
 end
 
----
---  GetStat(Name[,defaultVal])
-function Unit:GetStat(Name[, defaultVal])
+--- Find out unit's specific statistics.
+-- Example: 'KILLS'.
+-- @param statName String, name of the stat to find out.
+-- @param [defaultVal] TODO.
+function Unit:GetStat(statName, [defaultVal])
 end
 
----
---  Unit:GetTacticalSiloAmmoCount()
+--- Find out number of tactical missile this unit has available.
+-- @return number
 function Unit:GetTacticalSiloAmmoCount()
 end
 
----
---  Return our target unit if we have one
+--- Return our target unit if we have one.
+-- @return entity or nil.
 function Unit:GetTargetEntity()
 end
 
@@ -201,289 +241,284 @@ end
 function Unit:GetTransportFerryBeacon()
 end
 
----
---  GetUnitId(self)
+--- Returns the unit's blueprint ID.
+-- @return bpID
 function Unit:GetUnitId(self)
 end
 
----
+--- TODO.
 --  GetVelocity() -> x,y,z
 function Unit:GetVelocity()
 end
 
----
---  GetWeapon(self,index) -- return the index'th weapon of this unit. Index must be between 1 and self:GetWeaponCount(), inclusive.
-function Unit:GetWeapon(self, index)
+--- return the index'th weapon of this unit.
+-- Index must be between 1 and self:GetWeaponCount(), inclusive.
+-- @return weapon
+function Unit:GetWeapon(index)
 end
 
----
---  GetWeaponCount(self) -- return the number of weapons on this unit. Note that dummy weapons are not included in the count, so this may differ from the number of weapons defined in the unit's blueprint.
-function Unit:GetWeaponCount(self)
+--- Return the number of weapons on this unit.
+-- Note that dummy weapons are not included in the count, so this may differ from the number of weapons defined in the unit's blueprint.
+-- @return number
+function Unit:GetWeaponCount()
 end
 
----
---  GetWorkProgress()
+--- TODO.
 function Unit:GetWorkProgress()
 end
 
----
---  Unit:GiveNukeSiloAmmo(num)
+--- Give nuclear missile to the unit.
+-- @param num Amout of missiles to give.
 function Unit:GiveNukeSiloAmmo(num)
 end
 
----
---  Unit:GiveTacticalSiloAmmo(num)
+--- Give tactical missile to the unit.
+-- @param num Amout of missiles to give.
 function Unit:GiveTacticalSiloAmmo(num)
 end
 
----
---  Unit:HasMeleeSpaceAroundTarget(target)
+--- TODO.
 function Unit:HasMeleeSpaceAroundTarget(target)
 end
 
----
---  Unit:HasValidTeleportDest()
+--- TODO.
 function Unit:HasValidTeleportDest()
 end
 
----
---  HideBone(self,bone,affectChildren)
-function Unit:HideBone(self, bone, affectChildren)
+--- Makes unit's bone invisible.
+-- @param bone Bone name or index.
+-- @param affectChildren true/false.
+function Unit:HideBone(bone, affectChildren)
 end
 
----
---  Unit:IsBeingBuilt()
+--- See if unit is under construction.
+-- @return bool true/false.
 function Unit:IsBeingBuilt()
 end
 
----
---  Returns if this unit can be captured or not
+--- Returns if this unit can be captured or not.
+-- @return bool true/false.
 function Unit:IsCapturable()
 end
 
----
---  IsIdleState(unit)
-function Unit:IsIdleState(unit)
+--- See if the eunit is in Idle state or not.
+-- @return bool true/false.
+function Unit:IsIdleState()
 end
 
----
---  bool IsMobile() - Is this a mobile unit?
+--- See if it's a mobile unit.
+-- @return bool true/false.
 function Unit:IsMobile()
 end
 
----
---  bool IsMoving() - Is this unit moving?
+--- See if the unit is moving or not.
+-- @return bool true/false.
 function Unit:IsMoving()
 end
 
----
---  Returns if this unit has its overcharge paused
+--- See if the unit has paused overcharge.
+-- @return bool true/false.
 function Unit:IsOverchargePaused()
 end
 
----
---  Unit:IsPaused()
+--- See if the unit is paused.
+-- @return bool true/false.
 function Unit:IsPaused()
 end
 
----
---  IsStunned(unit)
-function Unit:IsStunned(unit)
+--- See if the unit is stunned.
+-- @return bool true/false.
+function Unit:IsStunned()
 end
 
----
---  IsUnitState(unit, stateName)
-function Unit:IsUnitState(unit,  stateName)
+--- See if the unit is in given state.
+-- @param stateName String, see SetUnitState function for available states.
+-- @return bool true/false.
+function Unit:IsUnitState(stateName)
 end
 
----
---  bool = IsValidTarget(self)
+--- TODO.
+-- @return bool true/false.
 function Unit:IsValidTarget(self)
 end
 
----
---  Kill a specific manipulator held by a script object
+--- Kill a specific manipulator held by a script object.
+-- TODO: param
 function Unit:KillManipulator()
 end
 
----
---  Unit:KillManipulators([boneName|boneIndex])
+--- TODO.
 function Unit:KillManipulators([boneName|boneIndex])
 end
 
----
---  Unit:MeleeWarpAdjacentToTarget(target)
+--- TODO.
 function Unit:MeleeWarpAdjacentToTarget(target)
 end
 
----
---  Unit:PrintCommandQueue()
+--- TODO.
 function Unit:PrintCommandQueue()
 end
 
----
---  RecoilImpulse(self, x, y, z)
-function Unit:RecoilImpulse(self,  x,  y,  z)
+--- TODO.
+function Unit:RecoilImpulse(x, y, z)
 end
 
----
---  Allow building of categories for this unit
-function Unit:RemoveBuildRestriction()
+--- Allow building of categories for this unit.
+-- @param category Unit's category, example categories.TECH1.
+function Unit:RemoveBuildRestriction(category)
 end
 
----
---  unit:RemoveCommandCap(capName) -- Remove a command cap to a unit.
+--- Remove a command cap to a unit.
+-- Also removes the command button, or disables it, from the UI, see AddCommandCap for available options. 
+-- @param capName String.
 function Unit:RemoveCommandCap(capName)
 end
 
----
---  Unit:RemoveNukeSiloAmmo(num)
+--- Remove amout of nuke missiles from the unit. 
+-- @param num Amount of nukes to remove.
 function Unit:RemoveNukeSiloAmmo(num)
 end
 
----
---  Unit:RemoveTacticalSiloAmmo(num)
+--- Remove amout of tactical missiles from the unit. 
+-- @param num Amount of tactical missiles to remove.
 function Unit:RemoveTacticalSiloAmmo(num)
 end
 
----
---  unit:RemoveToggleCap(capName) -- Remove a toggle cap to a unit.
+--- Remove a toggle cap to a unit.
+-- Also removes the command button, or disables it, from the UI, see AddToggleCap for available options. 
+-- @param capName String.
 function Unit:RemoveToggleCap(capName)
 end
 
----
---  Restore buildable categories to that as defined in the blueprint
+--- Restore buildable categories to that as defined in the blueprint
 function Unit:RestoreBuildRestrictions()
 end
 
----
---  Restore the command caps of the unit back to blueprint spec.
+--- Restore the command caps of the unit back to blueprint spec.
 function Unit:RestoreCommandCaps()
 end
 
----
---  Restore the toggle caps of the unit back to blueprint spec.
+--- Restore the toggle caps of the unit back to blueprint spec.
 function Unit:RestoreToggleCaps()
 end
 
----
---  Revert the collision shape to the blueprint spec
+--- Revert the collision shape to the blueprint spec.
 function Unit:RevertCollisionShape()
 end
 
----
---  Revert the elevation of the unit back to the blueperint spec
+--- Revert the elevation of the unit back to the blueperint spec.
 function Unit:RevertElevation()
 end
 
----
---  Restore regen rate of the unit back to blueprint spec.
+--- Restore regen rate of the unit back to blueprint spec.
 function Unit:RevertRegenRate()
 end
 
----
+--- TODO.
 --  ScaleGetBuiltEmitter(self, emitter)
-function Unit:ScaleGetBuiltEmitter(self,  emitter)
+function Unit:ScaleGetBuiltEmitter(self, emitter)
 end
 
----
---  Set the acceleration multiplier of the unit
-function Unit:SetAccMult()
+--- Set the acceleration multiplier of the unit.
+-- @param float Multiplier to apply.
+function Unit:SetAccMult(float)
 end
 
----
---  Set auto silo build mode to on/off
-function Unit:SetAutoMode()
+--- Set auto silo build mode to on/off.
+-- @param bool true/false
+function Unit:SetAutoMode(bool)
 end
 
----
---  SetBlockCommandQueue(unit, flag)
-function Unit:SetBlockCommandQueue(unit,  flag)
+--- TODO.
+-- @param flag true/false.
+function Unit:SetBlockCommandQueue(flag)
 end
 
----
---  Set the break off distance multiplier of the unit
-function Unit:SetBreakOffDistanceMult()
+--- Set the break off distance multiplier of the unit.
+-- @param float Multiplier to apply.
+function Unit:SetBreakOffDistanceMult(float)
 end
 
----
---  Set the break off trigger multiplier of the unit
-function Unit:SetBreakOffTriggerMult()
+--- Set the break off trigger multiplier of the unit.
+-- TODO: find out what this does.
+function Unit:SetBreakOffTriggerMult(float)
 end
 
----
---  unit:SetBuildRate(frac) -- Set the build rate of a unit: what fraction of target unit it builds per second.
+--- Set the build rate of a unit: what fraction of target unit it builds per second.
+-- @param frac Number.
 function Unit:SetBuildRate(frac)
 end
 
----
---  SetBusy(unit, flag)
-function Unit:SetBusy(unit,  flag)
+--- TODO.
+-- @param flag true/false.
+function Unit:SetBusy(flag)
 end
 
----
---  Set if this unit can be captured or not.
-function Unit:SetCapturable()
+--- Set if this unit can be captured or not.
+-- @param flag true/false.
+function Unit:SetCapturable(flag)
 end
 
----
---  Unit:SetConsumptionActive(flag)
+--- TODO.
+-- @param flag true/false.
 function Unit:SetConsumptionActive(flag)
 end
 
----
---  unit:SetConsumptionPerSecondEnergy(value) -- Set the consumption of energy of a unit
+--- Set the consumption of energy of a unit.
+-- @param value Amount of energy consumed per second.
 function Unit:SetConsumptionPerSecondEnergy(value)
 end
 
----
---  Set the consumption of mass of the unit
-function Unit:SetConsumptionPerSecondMass()
+--- Set the consumption of mass of the unit.
+-- @param value Amount of mass consumed per second.
+function Unit:SetConsumptionPerSecondMass(value)
 end
 
----
---  Set the creator for this unit
-function Unit:SetCreator()
+--- Set the creator for this unit.
+-- Used for example for UEF ACU pods or Kennel pods.
+-- @param unit Parent unit.
+function Unit:SetCreator(unit)
 end
 
----
---  Unit:SetCustomName(name)
+--- Sets a custom name for the unit, displayed by green text.
+-- @param name String with the name.
 function Unit:SetCustomName(name)
 end
 
----
---  SetDoNotTarget(unit, flag)
-function Unit:SetDoNotTarget(unit,  flag)
+--- If set true, enemy units won't target this unit.
+-- Accidental hits can still damage it but it enemy units won't lock on it.
+-- @param flag true/false.
+function Unit:SetDoNotTarget(flag)
 end
 
----
---  Set the elevation of the unit
+--- Set the elevation of the unit
+-- @param TODO.
 function Unit:SetElevation()
 end
 
----
---  Set a specific fire state for the retaliation state of the unit
-function Unit:SetFireState()
+--- Set a specific fire state for the retaliation state of the unit.
+-- @param fireState Return fie - 0, Hold fire - 1 and Ground fire - 2.
+function Unit:SetFireState(fireState)
 end
 
----
---  SetFocusUnit(self, focus)
-function Unit:SetFocusEntity()
+--- TODO.
+function Unit:SetFocusEntity(focus)
 end
 
----
---  Set the fuel ratio
-function Unit:SetFuelRatio()
+--- Set the fuel ratio.
+-- How much fuel has the unit left
+-- @param ratio Float, range 0 - 1.
+function Unit:SetFuelRatio(ratio)
 end
 
----
---  Set the fuel use time
-function Unit:SetFuelUseTime()
+--- Set the fuel use time.
+-- @seconds Number, how many seconds of can the unit fly.
+function Unit:SetFuelUseTime(seconds)
 end
 
----
---  SetImmobile(unit, flag)
-function Unit:SetImmobile(unit,  flag)
+--- Sets if the unit is able to move.
+-- @param flag true/false.
+function Unit:SetImmobile(flag)
 end
 
 ---
@@ -491,134 +526,185 @@ end
 function Unit:SetIsValidTarget(self, bool)
 end
 
----
---  Set if this unit has an overcharge pasued.
-function Unit:SetOverchargePaused()
+--- Set if this unit has an overcharge pasued.
+-- @param flag true/false.
+function Unit:SetOverchargePaused(flag)
 end
 
----
---  Unit:SetPaused()
-function Unit:SetPaused()
+--- Pauses building, upgrading and other tasks of the unit.
+-- @param flag true/false.
+function Unit:SetPaused(flag)
 end
 
----
---  Unit:SetProductionActive(flag)
+--- Enable, disable production of resources on the unit.
+-- Used for mass fabricators or extractors for example.
+-- @param flag true/false.
 function Unit:SetProductionActive(flag)
 end
 
----
---  Set the production of energy of the unit
-function Unit:SetProductionPerSecondEnergy()
+--- Set the production of energy of the unit.
+-- @param number Amout of energy to produce per second.
+function Unit:SetProductionPerSecondEnergy(number)
 end
 
----
---  Set the production of mass of the unit
-function Unit:SetProductionPerSecondMass()
+--- Set the production of mass of the unit.
+-- @param number Amout of mass to produce per second.
+function Unit:SetProductionPerSecondMass(number)
 end
 
----
---  Set if this unit can be reclaimed or not.
-function Unit:SetReclaimable()
+--- Set if this unit can be reclaimed or not.
+-- @param flag true/false.
+function Unit:SetReclaimable(flag)
 end
 
----
---  unit:SetRegenRate(rate) -- Set the regen rate of a unit.
+--- Set the regen rate of a unit.
+-- @param rate Number of HPs regenerated per second.
 function Unit:SetRegenRate(rate)
 end
 
----
---  Set the script bit that matches the string to the desired state
-function Unit:SetScriptBit()
+--- Set the script bit that matches the string to the desired state.
+-- @param string TODO.
+-- @param state true/false.
+function Unit:SetScriptBit(string, state)
 end
 
----
---  Set the shield ratio
-function Unit:SetShieldRatio()
+--- Set the shield ratio.
+-- @param ratio Float, range 0 - 1.
+function Unit:SetShieldRatio(ratio)
 end
 
----
---  Set the speed multiplier of the unit
-function Unit:SetSpeedMult()
+--- Set the speed multiplier of the unit.
+-- @param float Multiplier to apply.
+function Unit:SetSpeedMult(float)
 end
 
----
---  SetStat(Name, Value)
-function Unit:SetStat(Name,  Value)
+--- Set the unit statistic.
+-- @param name String, name of the stat to set.
+-- @param value Number.
+function Unit:SetStat(name, value)
 end
 
----
---  SetStrategicUnderlay(icon)
+--- Sets the icon underlay to set texture.
+-- Used in campaign to highlight objetcive targets. Example 'icon_objective_primary', the dds textures must be in textures\ui\common\game\strategicicons.
+-- @param icon String, name of the texture to apply, '' - empty string to reset.
 function Unit:SetStrategicUnderlay(icon)
 end
 
----
---  SetStunned(unit, time)
-function Unit:SetStunned(unit,  time)
+--- Stuns the unit for the set time.
+-- @param time Number, seconds.
+function Unit:SetStunned(time)
 end
 
----
---  Set the turn multiplier of the unit
-function Unit:SetTurnMult()
+--- Set the turn multiplier of the unit.
+-- @param float Multiplier to apply.
+function Unit:SetTurnMult(float)
 end
 
----
---  SetUnSelectable(unit, flag)
-function Unit:SetUnSelectable(unit,  flag)
+--- Set if the unit can be selected.
+-- @param flag true/false.
+function Unit:SetUnSelectable(flag)
 end
 
----
---  SetUnitState(name, bool)
-function Unit:SetUnitState(name,  bool)
+--- Set unit's state.
+-- @param stateName String, name of the state to set.
+-- 'Immobile'
+-- 'Moving'
+-- 'Attacking'
+-- 'Guarding'
+-- 'Building'
+-- 'Upgrading'
+-- 'WaitingForTransport'
+-- 'TransportLoading'
+-- 'TransportUnloading'
+-- 'MovingDown'
+-- 'MovingUp'
+-- 'Patrolling'
+-- 'Busy'
+-- 'Attached'
+-- 'BeingReclaimed'
+-- 'Repairing'
+-- 'Diving'
+-- 'Surfacing'
+-- 'Teleporting'
+-- 'Ferrying'
+-- 'WaitForFerry'
+-- 'AssistMoving'
+-- 'PathFinding'
+-- 'ProblemGettingToGoal'
+-- 'NeedToTerminateTask'
+-- 'Capturing'
+-- 'BeingCaptured'
+-- 'Reclaiming'
+-- 'AssistingCommander'
+-- 'Refueling'
+-- 'GuardBusy'
+-- 'ForceSpeedThrough'
+-- 'UnSelectable'
+-- 'DoNotTarget'
+-- 'LandingOnPlatform'
+-- 'CannotFindPlaceToLand'
+-- 'BeingUpgraded'
+-- 'Enhancing'
+-- 'BeingBuilt'
+-- 'NoReclaim'
+-- 'NoCost'
+-- 'BlockCommandQueue'
+-- 'MakingAttackRun'
+-- 'HoldingPattern'
+-- 'SiloBuildingAmmo'
+-- @param bool true/false.
+function Unit:SetUnitState(stateName, bool)
 end
 
----
---  SetWorkProgress(float)
+--- Set the work progress on the unit.
+-- Used for ACU upgrades, missile construction? TODO.
+-- @param float Range 0 - 1, where 1 is completed.
 function Unit:SetWorkProgress(float)
 end
 
----
---  ShowBone(self,bone,affectChildren)
-function Unit:ShowBone(self, bone, affectChildren)
+--- Makes unit's bone visible.
+-- @param bone Bone name or index.
+-- @param affectChildren true/false.
+function Unit:ShowBone(bone, affectChildren)
 end
 
----
---  StopSiloBuild(unit)
-function Unit:StopSiloBuild(unit)
+--- Stops production of a missile.
+function Unit:StopSiloBuild()
 end
 
----
---  Test if a unit has this specified set to true in the blueprint spec.
-function Unit:TestCommandCaps()
+--- Test if a unit has this specified set to true in the blueprint spec.
+-- @param capName String.
+function Unit:TestCommandCaps(capName)
 end
 
----
---  Test if a unit has this specified set to true in the blueprint spec.
-function Unit:TestToggleCaps()
+--- Test if a unit has this specified set to true in the blueprint spec.
+-- @param capName String.
+function Unit:TestToggleCaps(capName)
 end
 
----
---  Toggle the fire state for the retaliation state of the unit
+--- Toggle the fire state for the retaliation state of the unit.
 function Unit:ToggleFireState()
 end
 
----
---  Toggle the script bit that matches the string
+--- Toggle the script bit that matches the string.
+-- TODO.
 function Unit:ToggleScriptBit()
 end
 
----
---  DetachAllUnits(self,destroySomeUnits)
-function Unit:TransportDetachAllUnits()
+--- Detach all units from a transport.
+-- @param destroySomeUnits TODO.
+function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
 
----
---  TransportHasAvailableStorage(self)
-function Unit:TransportHasAvailableStorage(self)
+--- Find out if carrier is full or not.
+-- @return true/false.
+function Unit:TransportHasAvailableStorage()
 end
 
----
---  TransportHasSpaceFor(self,target)
-function Unit:TransportHasSpaceFor(self, target)
+--- Find out if the target unit can fit into the carrier.
+-- @param target Unit to test.
+-- @return true/false.
+function Unit:TransportHasSpaceFor(target)
 end
 
 ---
