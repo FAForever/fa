@@ -1,4 +1,4 @@
-last_version = 3694
+last_version = 3693
 changelog = {
     {
         version = 3,
@@ -1390,19 +1390,6 @@ changelog = {
             '',
             '**Contributors**',
             '- IceDreamer',
-        },
-    },
-    {
-        version = 3694,
-        name = 'Game Version 3694',
-        description = {
-            '** Game**',
-            '- Add Christmas theme to the game',
-            '',
-            '**Contributors**',
-            '- CookieNoob',
-            '- Ozonex',
-            '- Black_Death',
         },
     },
 }

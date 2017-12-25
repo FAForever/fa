@@ -1,13 +1,3 @@
-Patch 3694 (21st December 2017)
-============================
-### Game
-- Add Christmas theme to the game
-
-### Contributors
-- CookieNoob
-- Ozonex
-- Black_Death
-
 Patch 3693 (3rd December, 2017)
 ============================
 ### Lobby

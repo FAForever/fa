@@ -16,7 +16,6 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
-local christmashat
 
 UAL0001 = Class(ACUUnit) {
     Weapons = {
@@ -40,24 +39,7 @@ UAL0001 = Class(ACUUnit) {
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-
-		ForkThread(function()
-			WaitSeconds(5)
-			local temphat = self:CreatePropAtBone('Head','/props/gift_pink/gift_pink_prop.bp') 	
-			local pos = temphat:GetPosition()
-			local orientation = temphat:GetOrientation()
-			temphat:Destroy()			
-			christmashat = CreateUnit('cha0001', self:GetArmy(), pos[1], pos[2], pos[3], orientation[1], orientation[2], orientation[3], orientation[4]) 	
-			christmashat:AttachTo(self, 'Head') 
-			christmashat:SetCanTakeDamage(false)
-			christmashat:SetCanBeKilled(false)
-		end)
     end,
-	
-	OnDestroy = function(self)
-		ACUUnit.OnDestroy(self)
-		christmashat:Destroy()
-	end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)

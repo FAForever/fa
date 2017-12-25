@@ -287,8 +287,6 @@ function BeginSession()
     if syncStartPositions then
         Sync.StartPositions = syncStartPositions
     end
-    
-    import('/lua/ChristmasScript.lua').Init()
 end
 
 function GameTimeLogger()
