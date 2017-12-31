@@ -356,7 +356,21 @@ function UpdateWindow(info)
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-
+		
+	if info.shieldRatio > 0 and info.fuelRatio > 0 then
+	    controls.store = 1
+	else
+	    controls.store = 0
+	end
+        
+	if options.gui_detailed_unitview != 0 and controls.store == 1 then
+	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
+	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
+	else
+	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,0)
+	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
+	end
+		
         if info.health then
             controls.healthBar:Show()
 
