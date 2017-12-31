@@ -305,7 +305,7 @@ function UpdateWindow(info)
 	if options.gui_detailed_unitview != 0 and controls.store == 1 then
 	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
 	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
-	else
+	elseif options.gui_detailed_unitview != 0 then
 	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,0)
 	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
 	end
