@@ -362,14 +362,6 @@ function UpdateWindow(info)
 	else
 	    controls.store = 0
 	end
-        
-	if options.gui_detailed_unitview != 0 and controls.store == 1 then
-	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
-	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
-	elseif options.gui_detailed_unitview != 0 then
-	    LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,0)
-	    LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
-	end
 		
         if info.health then
             controls.healthBar:Show()
@@ -661,6 +653,7 @@ function CreateUI()
                 self:SetAlpha(1, true)
             end
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
+	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end
