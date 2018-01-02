@@ -30,7 +30,6 @@ UnitBlueprint {
         'DEFENSE',
         'DRAGBUILD',
         'TECH1',
-        'WALL',
         'BENIGN',
         'VISIBLETORECON',
         'RECLAIMABLE',

@@ -28,7 +28,6 @@ UnitBlueprint {
         'STRUCTURE',
         'DEFENSE',
         'TECH1',
-        'WALL',
         'DRAGBUILD',
         'BENIGN',
         'VISIBLETORECON',
