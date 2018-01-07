@@ -4,17 +4,17 @@
 --- Orders platoon to attack target unit.
 -- If squad is specified, attacks only with the squad.
 -- @param target Unit to attack.
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:AttackTarget(target, squad)
+function CPlatoon:AttackTarget(target, [squad])
 end
 
 --- Orders platoon to attack mote to target position..
 -- If squad is specified, attack moves only with the squad.
 -- @param position Table with position {x, y, z}.
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:AggressiveMoveToLocation(position, squad)
+function CPlatoon:AggressiveMoveToLocation(position, [squad])
 end
 
 --- TODO.
@@ -167,9 +167,9 @@ end
 
 --- Orders platoon to assist the target unit.
 -- If squad is specified, assists the unit only with the squad.
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:GuardTarget(target, squad)
+function CPlatoon:GuardTarget(target, [squad])
 end
 
 --- Returns true if platoon's squad is on attack command.
@@ -216,26 +216,26 @@ end
 -- If squad is specified, moves only the squad.
 -- @param position Table with position {x, y, z}.
 -- @param useTransports true/false
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:MoveToLocation(position, useTransports, squad)
+function CPlatoon:MoveToLocation(position, useTransports, [squad])
 end
 
 --- Orders platoon to move to target unit.
--- If squad is specified, attacks only with the squad.
+-- If squad is specified, move only with the squad.
 -- @param target Unit to move to.
 -- @param useTransports true/false
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:MoveToTarget(target, useTransports, squad)
+function CPlatoon:MoveToTarget(target, useTransports, [squad])
 end
 
 --- Orders platoon to patrol at target position.
 -- If squad is specified, patrols only with the squad.
 -- @param position Table with position {x, y, z}.
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
-function CPlatoon:Patrol(position, squad)
+function CPlatoon:Patrol(position, [squad])
 end
 
 --- Count how many units fit the specified category.
@@ -265,8 +265,8 @@ end
 --- Orders platoon to stop, cancels all commands.
 -- If squad is specified, stops only the squad.
 -- Cancels all commands.
--- @param squad Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
-function CPlatoon:Stop(squad)
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+function CPlatoon:Stop([squad])
 end
 
 --- TODO.
@@ -285,8 +285,9 @@ end
 function CPlatoon:UnloadAllAtLocation(position)
 end
 
---- Unloads specific units from transports.
--- TODO: using categories as a frist parametr doesn't break but it drops everything.
+--- Unloads specific units from transports (carriers).
+-- This seems to work only with carriers and not with air transports.
+-- @param category Unit category (categories.BOMBER).
 -- @param position Table with position {x, y, z}.
 -- @return command
 function CPlatoon:UnloadUnitsAtLocation(category, position)
@@ -299,8 +300,9 @@ function CPlatoon:UseFerryBeacon(category, beacon)
 end
 
 --- TODO.
--- Needs 1-2 parametrs, ideas: position, squad
-function CPlatoon:UseTeleporter()
+-- @param gameObject TODO.
+-- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+function CPlatoon:UseTeleporter(gameObject, [squad])
 end
 
 ---
