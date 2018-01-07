@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XEB2402/XEB2402_script.lua
 -- Author(s):  Dru Staltman
 -- Summary  :  UEF Sub Orbital Laser
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
@@ -88,6 +88,7 @@ XEB2402 = Class(TAirFactoryUnit) {
 
                 -- Release unit
                 self.Satellite:DetachFrom()
+                IssueMove({self.Satellite}, self:GetRallyPoint())
                 self.Satellite:Open()
 
                 self.waitingForLaunch = false
