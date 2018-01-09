@@ -125,7 +125,7 @@ RedirectingState = State{
     end
         if self.Enemy then
          -- Set collision to friends active so that when the missile reaches its source it can deal damage. 
-            self.EnemyProj.DamageData.CollideFriendly = true         
+            self.EnemyProj.CollideFriendly = true         
             self.EnemyProj.DamageData.DamageFriendly = true 
             self.EnemyProj.DamageData.DamageSelf = true 
         end
