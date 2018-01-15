@@ -23,18 +23,26 @@ DRA0202 = Class(CAirUnit) {
     end,
                 
     OnGotTarget = function(self)
-        self.unit:SetBreakOffTriggerMult(2.0)
-        self.unit:SetBreakOffDistanceMult(8.0)
-        self.unit:SetSpeedMult(0.67)
-        CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+        if self.unit:IsUnitState('Moving') then
+           self.unit:SetSpeedMult(1.0)
+        else
+           self.unit:SetBreakOffTriggerMult(2.0)
+           self.unit:SetBreakOffDistanceMult(8.0)
+           self.unit:SetSpeedMult(0.67)
+           CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+        end
     end,            
     },
         
     OnGotTarget = function(self)
-        self.unit:SetBreakOffTriggerMult(2.0)
-        self.unit:SetBreakOffDistanceMult(8.0)
-        self.unit:SetSpeedMult(0.67)
-        CIFMissileCorsairWeapon.OnGotTarget(self)
+        if self.unit:IsUnitState('Moving') then
+           self.unit:SetSpeedMult(1.0)
+        else
+           self.unit:SetBreakOffTriggerMult(2.0)
+           self.unit:SetBreakOffDistanceMult(8.0)
+           self.unit:SetSpeedMult(0.67)
+           CIFMissileCorsairWeapon.OnGotTarget(self)
+        end
     end,
         
     OnLostTarget = function(self)
