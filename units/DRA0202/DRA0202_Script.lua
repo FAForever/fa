@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/DRA0202/DRA0202_script.lua
-#**  Author(s):  Dru Staltman, Eric Williamson
-#**
-#**  Summary  :  Cybran Bomber Fighter Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/DRA0202/DRA0202_script.lua
+--**  Author(s):  Dru Staltman, Eric Williamson
+--**
+--**  Summary  :  Cybran Bomber Fighter Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
@@ -17,32 +17,32 @@ DRA0202 = Class(CAirUnit) {
         AntiAirMissiles = Class(CAAMissileNaniteWeapon) {},
         GroundMissile = Class(CIFMissileCorsairWeapon) {
         
-            IdleState = State (CIFMissileCorsairWeapon.IdleState) {
-                Main = function(self)
-                    CIFMissileCorsairWeapon.IdleState.Main(self)
-                end,
+    IdleState = State (CIFMissileCorsairWeapon.IdleState) {
+    Main = function(self)
+        CIFMissileCorsairWeapon.IdleState.Main(self)
+    end,
                 
-                OnGotTarget = function(self)
-                    self.unit:SetBreakOffTriggerMult(2.0)
-                    self.unit:SetBreakOffDistanceMult(8.0)
-                    self.unit:SetSpeedMult(0.67)
-                    CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
-                end,            
-            },
+    OnGotTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(2.0)
+        self.unit:SetBreakOffDistanceMult(8.0)
+        self.unit:SetSpeedMult(0.67)
+        CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+    end,            
+    },
         
-            OnGotTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(2.0)
-                self.unit:SetBreakOffDistanceMult(8.0)
-                self.unit:SetSpeedMult(0.67)
-                CIFMissileCorsairWeapon.OnGotTarget(self)
-            end,
+    OnGotTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(2.0)
+        self.unit:SetBreakOffDistanceMult(8.0)
+        self.unit:SetSpeedMult(0.67)
+        CIFMissileCorsairWeapon.OnGotTarget(self)
+    end,
         
-            OnLostTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(1.0)
-                self.unit:SetBreakOffDistanceMult(1.0)
-                self.unit:SetSpeedMult(1.0)
-                CIFMissileCorsairWeapon.OnLostTarget(self)
-            end,
+    OnLostTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(1.0)
+        self.unit:SetBreakOffDistanceMult(1.0)
+        self.unit:SetSpeedMult(1.0)
+        CIFMissileCorsairWeapon.OnLostTarget(self)
+    end,
         },
     },
     OnStopBeingBuilt = function(self,builder,layer)
