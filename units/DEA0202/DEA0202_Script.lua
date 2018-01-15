@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/DEA0202/DEA0202_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
-#**
-#**  Summary  :  UEF Supersonic Fighter Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/DEA0202/DEA0202_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+--**
+--**  Summary  :  UEF Supersonic Fighter Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TAirToAirLinkedRailgun = import('/lua/terranweapons.lua').TAirToAirLinkedRailgun
@@ -18,41 +18,41 @@ DEA0202 = Class(TAirUnit) {
         LeftBeam = Class(TAirToAirLinkedRailgun) {},
         Bomb = Class(TIFCarpetBombWeapon) {
 
-            IdleState = State (TIFCarpetBombWeapon.IdleState) {
-                Main = function(self)
-                    TIFCarpetBombWeapon.IdleState.Main(self)
-                end,
+    IdleState = State (TIFCarpetBombWeapon.IdleState) {
+        Main = function(self)
+        TIFCarpetBombWeapon.IdleState.Main(self)
+    end,
                 
-                OnGotTarget = function(self)
-                    self.unit:SetBreakOffTriggerMult(2.0)
-                    self.unit:SetBreakOffDistanceMult(8.0)
-                    self.unit:SetSpeedMult(0.67)
-                    TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
-                end,
-                OnFire = function(self)
-                    self.unit:RotateWings(self:GetCurrentTarget())
-                    TIFCarpetBombWeapon.IdleState.OnFire(self)
-                end,                
-            },
+    OnGotTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(2.0)
+        self.unit:SetBreakOffDistanceMult(8.0)
+        self.unit:SetSpeedMult(0.67)
+        TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
+    end,
+    OnFire = function(self)
+        self.unit:RotateWings(self:GetCurrentTarget())
+        TIFCarpetBombWeapon.IdleState.OnFire(self)
+    end,                
+    },
             
-            OnFire = function(self)
-                self.unit:RotateWings(self:GetCurrentTarget())
-                TIFCarpetBombWeapon.OnFire(self)
-            end,
+    OnFire = function(self)
+        self.unit:RotateWings(self:GetCurrentTarget())
+        TIFCarpetBombWeapon.OnFire(self)
+    end,
                     
-            OnGotTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(2.0)
-                self.unit:SetBreakOffDistanceMult(8.0)
-                self.unit:SetSpeedMult(0.67)
-                TIFCarpetBombWeapon.OnGotTarget(self)
-            end,
+    OnGotTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(2.0)
+        self.unit:SetBreakOffDistanceMult(8.0)
+        self.unit:SetSpeedMult(0.67)
+        TIFCarpetBombWeapon.OnGotTarget(self)
+    end,
         
-            OnLostTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(1.0)
-                self.unit:SetBreakOffDistanceMult(1.0)
-                self.unit:SetSpeedMult(1.0)
-                TIFCarpetBombWeapon.OnLostTarget(self)
-            end,        
+    OnLostTarget = function(self)
+        self.unit:SetBreakOffTriggerMult(1.0)
+        self.unit:SetBreakOffDistanceMult(1.0)
+        self.unit:SetSpeedMult(1.0)
+        TIFCarpetBombWeapon.OnLostTarget(self)
+    end,        
         },
     },
     
