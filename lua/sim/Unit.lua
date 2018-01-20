@@ -1294,6 +1294,11 @@ Unit = Class(moho.unit_methods) {
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
 
+        -- Non-combat structures only give 50% veterancy
+        if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
+            mass = mass * 0.5
+        end
+
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
@@ -1344,6 +1349,9 @@ Unit = Class(moho.unit_methods) {
     CalculateVeterancyLevel = function(self, massKilled)
         local bp = self:GetBlueprint()
 
+        -- Limit the veterancy gain from one kill to one level worth
+        massKilled = math.min(massKilled, self.Sync.myValue)
+
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
 
@@ -1353,13 +1361,10 @@ Unit = Class(moho.unit_methods) {
         -- Bail if our veterancy hasn't increased
         if newVetLevel == self.Sync.VeteranLevel then return end
 
-        -- If the unit gained more than one level make sure not to skip any
-        for level = self.Sync.VeteranLevel + 1, newVetLevel, 1 do
-            -- Update our recorded veterancy level
-            self.Sync.VeteranLevel = level
+        -- Update our recorded veterancy level
+        self.Sync.VeteranLevel = newVetLevel
 
-            self:SetVeteranLevel(self.Sync.VeteranLevel)
-        end
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
     -- Use this to set a veterancy level directly, usually used by a scenario
