@@ -136,7 +136,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 275,
-        BuildCostMass = 55,
+        BuildCostMass = 50,
         BuildTime = 220,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -258,7 +258,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 14,
+            Damage = 13,
             DamageType = 'Normal',
             DisplayName = 'Shleo AA AutoGun',
             FireTargetLayerCapsTable = {
