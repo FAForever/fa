@@ -132,7 +132,7 @@ UnitBlueprint {
         BuildCostEnergy = 400000,
         BuildCostMass = 28000,
         BuildRate = 300,
-        BuildTime = 25000,
+        BuildTime = 30000,
         BuildableCategory = {
             'SATELLITE',
         },
