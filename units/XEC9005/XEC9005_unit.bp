@@ -24,6 +24,8 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 100,
     Categories = {
+        'UEF',
+        'CIVILIAN',
         'SELECTABLE',
         'STRUCTURE',
         'DEFENSE',
