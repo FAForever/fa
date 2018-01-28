@@ -8,6 +8,7 @@ UnitBlueprint {
         'INDIRECTFIRE',
         'ARTILLERY',
         'INTELLIGENCE',
+        'DEBUG',
     },
     Defense = {
         AirThreatLevel = 0,
