@@ -139,7 +139,7 @@ end
 DecalFunctions = {
     RULEUCC_Attack = AttackDecalFunc,
     RULEUCC_Nuke = NukeDecalFunc,
-    RULEUCC_Tactical = TacticalDecalFunc
+    RULEUCC_Tactical = TacticalDecalFunc,
     RULEUCC_Overcharge = OverchargeDecalFunc
 }
 
