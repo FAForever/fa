@@ -128,10 +128,19 @@ local function AttackDecalFunc(mode)
 )
 end
 
+local function OverchargeDecalFunc()
+  return RadiusDecalFunction(
+        function(w)
+            return w.DamageType == 'Overcharge'
+        end
+)
+end
+
 DecalFunctions = {
     RULEUCC_Attack = AttackDecalFunc,
     RULEUCC_Nuke = NukeDecalFunc,
     RULEUCC_Tactical = TacticalDecalFunc
+    RULEUCC_Overcharge = OverchargeDecalFunc
 }
 
 WorldView = Class(moho.UIWorldView, Control) {
