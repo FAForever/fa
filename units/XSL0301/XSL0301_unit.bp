@@ -150,6 +150,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'VERIFYMISSILEUI',
         'USEBUILDPRESETS',
+        'SHOWATTACKRETICLE',
     },
     CollisionOffsetX = -0.04,
     Defense = {
