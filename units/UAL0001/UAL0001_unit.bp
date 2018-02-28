@@ -144,6 +144,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
+        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,
