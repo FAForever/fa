@@ -26,7 +26,7 @@ local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
 function OverchargeCanKill()
-  local damage = (math.log(((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
+  local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
 
   if unitHP[1] and unitHP[1] > damage then
    unitHP[1] = nil
