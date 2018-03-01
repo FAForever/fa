@@ -16,6 +16,7 @@ local Ping = import('/lua/ui/game/ping.lua')
 local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -224,6 +225,12 @@ WorldView = Class(moho.UIWorldView, Control) {
         elseif command_mode == "order" then
             if self:ShowConvertToPatrolCursor() then
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
+            elseif command_data.name == "RULEUCC_Overcharge" then
+                if OverchargeCanKill() == false then
+				  self.Cursor = {UIUtil.GetCursor("OVERCHARGE2")}
+				else
+				  self.Cursor = {UIUtil.GetCursor(command_data.name)}
+				end
             else
                 if command_data.cursor then
                     self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
