@@ -22,8 +22,17 @@ local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRollov
 
 local selectedUnit = nil
 local updateThread = nil
-
+local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
+
+function OverchargeCanKill()
+  local damage = (math.log(((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
+
+  if unitHP[1] and unitHP[1] > damage then
+   unitHP[1] = nil
+  return false
+  end
+end
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
@@ -301,6 +310,10 @@ function UpdateWindow(info)
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
+	    
+	    if not info.userUnit then
+	       unitHP[1] = info.health
+	    end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
