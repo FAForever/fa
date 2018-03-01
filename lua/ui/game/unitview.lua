@@ -26,11 +26,17 @@ local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
 function OverchargeCanKill()
-  local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
-
-  if unitHP[1] and unitHP[1] > damage then
-   unitHP[1] = nil
+local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
+	
+if unitHP[1] and string.find(unitHP.blueprintId, "0001") and unitHP[1] > 400 then
+  unitHP[1] = nil
   return false
+elseif unitHP[1] and string.byte(unitHP.blueprintId, 3) == 98 and unitHP[1] > 375 then
+  unitHP[1] = nil
+  return false
+elseif unitHP[1] and unitHP[1] > damage then
+  unitHP[1] = nil
+  return false   
   end
 end
 
@@ -313,6 +319,7 @@ function UpdateWindow(info)
 	    
 	    if not info.userUnit then
 	       unitHP[1] = info.health
+	       unitHP.blueprintId = info.blueprintId
 	    end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
