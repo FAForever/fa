@@ -378,6 +378,10 @@ OverchargeProjectile = Class() {
                 table.sort(units1)
                 idealDamage = units1[table.getn(units1)]
                 
+                if EntityCategoryContains(categories.STRUCTURE, targetEntity) and idealDamage < targetEntity:GetHealth() * 4 then 
+				  idealDamage = targetEntity:GetHealth() * 4
+				end
+                
                 local shield = targetEntity.MyShield
 
                 local shieldHealth = 0
