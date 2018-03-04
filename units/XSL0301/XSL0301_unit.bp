@@ -860,7 +860,7 @@ UnitBlueprint {
                 energyMult = 0.9,
                 commandDamage = 400,
                 structureDamage = 800,
-                maxDamage = 40000,
+                maxDamage = 15000,
                 minDamage = 1500,
             },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
