@@ -402,7 +402,7 @@ OverchargeProjectile = Class() {
 		   end
 		elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity:GetHealth() == units1[table.getn(units1)] then
 		idealDamage = units1[table.getn(units1) - 1]				
-		nd
+		end
 
                 damage = math.min(damage, idealDamage)
                 damage = math.max(data.minDamage, damage)
