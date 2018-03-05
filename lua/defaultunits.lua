@@ -587,11 +587,11 @@ StructureUnit = Class(Unit) {
     
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
 	    -- Handle incoming OC damage
-	    if damageType == 'Overcharge' then
-			local wep = instigator:GetWeaponByLabel('OverCharge')
-			amount = wep:GetBlueprint().Overcharge.structureDamage
-			end
-		Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.structureDamage
+        end
+        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 }
 

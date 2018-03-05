@@ -169,19 +169,17 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-	
-		if dmgType == 'Overcharge' and instigator.EntityId then 
-			local wep = instigator:GetWeaponByLabel('OverCharge')
-		  
-			if EntityCategoryContains(categories.COMMAND, self.Owner) then --fixed damage for all ACU shields
-				amount = wep:GetBlueprint().Overcharge.commandDamage
-		  
-			elseif EntityCategoryContains(categories.STRUCTURE, self.Owner) then -- fixed damage for static shields
-				amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
-				-- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2. 
-			end
-		  
-			end
+    
+        if dmgType == 'Overcharge' and instigator.EntityId then 
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            
+		    if EntityCategoryContains(categories.COMMAND, self.Owner) then --fixed damage for all ACU shields
+                amount = wep:GetBlueprint().Overcharge.commandDamage
+            elseif EntityCategoryContains(categories.STRUCTURE, self.Owner) then -- fixed damage for static shields
+                amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
+                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2. 
+            end	  
+        end
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
