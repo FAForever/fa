@@ -134,7 +134,7 @@ local function OverchargeDecalFunc()
         function(w)
             return w.DamageType == 'Overcharge'
         end
-)
+    )
 end
 
 DecalFunctions = {

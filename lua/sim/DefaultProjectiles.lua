@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
+local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities                                                                                                
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -334,6 +335,7 @@ OverchargeProjectile = Class() {
         --  Overcharge = {
         --      energyMult = _, -- What proportion of current storage are we allowed to spend?
         --      commandDamage = _, -- Takes effect in ACUUnit DoTakeDamage()
+        --      structureDamage = _, -- Takes effect in StructureUnit DoTakeDamage()                                                                      
         --      maxDamage = _,
         --      minDamage = _,
         --  },
@@ -367,22 +369,42 @@ OverchargeProjectile = Class() {
 
                 -- How much damage do we actually need to kill the unit?
                 local idealDamage = targetEntity:GetHealth()
-                local units1 = {}
+                local unitsHP = {}
 
                  -- looking for units around target which are in splash range
                  
-                for _, unit in UnitsInSphere(launcher, targetEntity:GetPosition(), 2.7, categories.MOBILE) do
+                for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE) do
                     if unit.MyShield then
-                        table.insert(units1, unit:GetHealth() + unit.MyShield:GetHealth())
+                        table.insert(unitsHP, unit:GetHealth() + unit.MyShield:GetHealth())
                     else
-                        table.insert(units1, unit:GetHealth())
+                        table.insert(unitsHP, unit:GetHealth())
                     end
                 end
                 
-                table.sort(units1)
+                
+                for _, unit in UnitsInSphere(launcher, self:GetPosition(), 14, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) do
+                    -- Special for fatty's shield
+                    if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp then
+                        table.insert(unitsHP, unit.MyShield:GetMaxHealth())
+                    elseif EntityCategoryContains(categories.EXPERIMENTAL, targetEntity) then
+                        table.insert(unitsHP, targetEntity:GetHealth())
+                        --[[ we need this additional elseif because if OC shell hitted top part of GC model its health won't be in our table
+                        Bug appeared since we use shell.pos in getUnitsInSphere instead of target.pos.
+                        Shell is too far from actual target.pos(target pos is somewhere near land and shell is near GC's head)
+                        and getUnits returns nothing. Same to GetDistance. Distance between shell and GC pos > than math.min (x,z) size]]
+                    else
+                        local distance = math.min(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)
                         
-                if units1[table.getn(units1)]  then -- if units1[] == nil then no mobile units in splash range. => min.Damage
-                    idealDamage = units1[table.getn(units1)]
+                        if GetDistanceBetweenTwoEntities(unit, self) < distance + self.DamageData.DamageRadius then
+                            table.insert(unitsHP, unit:GetHealth())
+                        end
+                    end
+                end
+                
+                table.sort(unitsHP)
+                        
+                if unitsHP[table.getn(unitsHP)]  then -- if unitsHP[] == nil then no mobile units in splash range. => min.Damage
+                    idealDamage = unitsHP[table.getn(unitsHP)]
                 else
                     idealDamage = data.minDamage
                 end	
@@ -394,14 +416,14 @@ OverchargeProjectile = Class() {
                 end
 	        
                         -------- ACU ------------
-                if EntityCategoryContains(categories.COMMAND, targetEntity) and table.getn(units1) == 1 then --table.getn == 1 means no units in AoE range so min.damage
+                if EntityCategoryContains(categories.COMMAND, targetEntity) and table.getn(unitsHP) == 1 then --table.getn == 1 means no units in AoE range so min.damage
                     idealDamage = data.minDamage
                 elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity.MyShield then
-                    if targetEntity.MyShield:GetHealth() + targetEntity:GetHealth() == units1[table.getn(units1)] then
-                    idealDamage = units1[table.getn(units1) - 1]	
+                    if targetEntity.MyShield:GetHealth() + targetEntity:GetHealth() == unitsHP[table.getn(unitsHP)] then
+                        idealDamage = unitsHP[table.getn(unitsHP) - 1]	
                     end
-                elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity:GetHealth() == units1[table.getn(units1)] then
-                    idealDamage = units1[table.getn(units1) - 1]				
+                elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity:GetHealth() == unitsHP[table.getn(unitsHP)] then
+                    idealDamage = unitsHP[table.getn(unitsHP) - 1]				
                 end
 
                 damage = math.min(damage, idealDamage)
