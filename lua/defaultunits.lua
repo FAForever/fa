@@ -588,9 +588,9 @@ StructureUnit = Class(Unit) {
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
 	    -- Handle incoming OC damage
 	    if damageType == 'Overcharge' then
-            local wep = instigator:GetWeaponByLabel('OverCharge')
-            amount = wep:GetBlueprint().Overcharge.structureDamage
-          end
+			local wep = instigator:GetWeaponByLabel('OverCharge')
+			amount = wep:GetBlueprint().Overcharge.structureDamage
+			end
 		Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 }
@@ -2291,14 +2291,6 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
-    end,
-    
-    OnDamage = function(self, instigator, amount, vector, damageType)
-	    if damageType == 'Overcharge' then --DoTakeDamage doesn't affect ACU personal shield
-		local wep = instigator:GetWeaponByLabel('OverCharge')
-        amount = wep:GetBlueprint().Overcharge.commandDamage
-		end
-        CommandUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
     
     DoTakeDamage = function(self, instigator, amount, vector, damageType)

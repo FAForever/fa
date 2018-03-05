@@ -373,36 +373,36 @@ OverchargeProjectile = Class() {
                  
                 for _, unit in UnitsInSphere(launcher, targetEntity:GetPosition(), 2.7, categories.MOBILE) do
                     if unit.MyShield then
-                    table.insert(units1, unit:GetHealth() + unit.MyShield:GetHealth())
-		    else
-		    table.insert(units1, unit:GetHealth())
-		    end
-                 end
+						table.insert(units1, unit:GetHealth() + unit.MyShield:GetHealth())
+		            else
+						table.insert(units1, unit:GetHealth())
+		            end
+                end
                 
                 table.sort(units1)
                         
                 if units1[table.getn(units1)]  then -- if units1[] == nil then no mobile units in splash range. => min.Damage
-                idealDamage = units1[table.getn(units1)]
-		else
-	        idealDamage = data.minDamage
+					idealDamage = units1[table.getn(units1)]
+		        else
+					idealDamage = data.minDamage
                 end	
                 
-		if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
-                idealDamage = targetEntity.MyShield:GetMaxHealth() 
-	        --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
-		--good against group of mobile shields
+		        if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
+					idealDamage = targetEntity.MyShield:GetMaxHealth() 
+	            --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
+		        --good against group of mobile shields
                 end
 	        
                         -------- ACU ------------
-		if EntityCategoryContains(categories.COMMAND, targetEntity) and table.getn(units1) == 1 then --table.getn == 1 means no units in AoE range so min.damage
-		idealDamage = data.minDamage
-		elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity.MyShield then
-		   if targetEntity.MyShield:GetHealth() + targetEntity:GetHealth() == units1[table.getn(units1)] then
-		   idealDamage = units1[table.getn(units1) - 1]	
-		   end
-		elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity:GetHealth() == units1[table.getn(units1)] then
-		idealDamage = units1[table.getn(units1) - 1]				
-		end
+		        if EntityCategoryContains(categories.COMMAND, targetEntity) and table.getn(units1) == 1 then --table.getn == 1 means no units in AoE range so min.damage
+					idealDamage = data.minDamage
+		        elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity.MyShield then
+					if targetEntity.MyShield:GetHealth() + targetEntity:GetHealth() == units1[table.getn(units1)] then
+						idealDamage = units1[table.getn(units1) - 1]	
+					end
+		        elseif EntityCategoryContains(categories.COMMAND, targetEntity) and targetEntity:GetHealth() == units1[table.getn(units1)] then
+					idealDamage = units1[table.getn(units1) - 1]				
+		        end
 
                 damage = math.min(damage, idealDamage)
                 damage = math.max(data.minDamage, damage)

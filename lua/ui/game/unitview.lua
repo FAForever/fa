@@ -26,18 +26,18 @@ local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
 function OverchargeCanKill()
-local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
+	local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
 	
-if unitHP[1] and string.find(unitHP.blueprintId, "0001") and unitHP[1] > 400 then
-  unitHP[1] = nil
-  return false
-elseif unitHP[1] and string.byte(unitHP.blueprintId, 3) == 98 and unitHP[1] > 800 then
-  unitHP[1] = nil
-  return false
-elseif unitHP[1] and unitHP[1] > damage then
-  unitHP[1] = nil
-  return false   
-  end
+	if unitHP[1] and string.find(unitHP.blueprintId, "0001") and unitHP[1] > 400 then
+		unitHP[1] = nil
+		return false
+	elseif unitHP[1] and string.byte(unitHP.blueprintId, 3) == 98 and unitHP[1] > 800 then
+		unitHP[1] = nil
+		return false
+	elseif unitHP[1] and unitHP[1] > damage then
+		unitHP[1] = nil
+		return false   
+	end
 end
 
 function Contract()
@@ -317,10 +317,10 @@ function UpdateWindow(info)
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
 	    
-	    if not info.userUnit then
-	       unitHP[1] = info.health
-	       unitHP.blueprintId = info.blueprintId
-	    end	
+			if not info.userUnit then
+				unitHP[1] = info.health
+				unitHP.blueprintId = info.blueprintId
+			end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then

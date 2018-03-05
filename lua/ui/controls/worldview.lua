@@ -130,9 +130,9 @@ local function AttackDecalFunc(mode)
 end
 
 local function OverchargeDecalFunc()
-  return RadiusDecalFunction(
-        function(w)
-            return w.DamageType == 'Overcharge'
+	return RadiusDecalFunction(
+		function(w)
+			return w.DamageType == 'Overcharge'
         end
 )
 end
@@ -227,13 +227,13 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
             elseif command_data.name == "RULEUCC_Overcharge" then
                 if OverchargeCanKill() == false then
-				  self.Cursor = {UIUtil.GetCursor("OVERCHARGE2")}
+					self.Cursor = {UIUtil.GetCursor("OVERCHARGE2")}
 				else
-				  self.Cursor = {UIUtil.GetCursor(command_data.name)}
+					self.Cursor = {UIUtil.GetCursor(command_data.name)}
 				end
             else
                 if command_data.cursor then
-                    self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
+					self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
                 else
                     self.Cursor = {UIUtil.GetCursor(command_data.name)}
                 end
