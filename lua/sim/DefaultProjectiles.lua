@@ -373,9 +373,9 @@ OverchargeProjectile = Class() {
                  
                 for _, unit in UnitsInSphere(launcher, targetEntity:GetPosition(), 2.7, categories.MOBILE) do
                     if unit.MyShield then
-                    table.insert(units1, unit:GetHealth() + unit.MyShield:GetHealth())
+                        table.insert(units1, unit:GetHealth() + unit.MyShield:GetHealth())
                     else
-                    table.insert(units1, unit:GetHealth())
+                        table.insert(units1, unit:GetHealth())
                     end
                 end
                 
@@ -390,7 +390,7 @@ OverchargeProjectile = Class() {
                 if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
                     idealDamage = targetEntity.MyShield:GetMaxHealth() 
 	            --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
-		        --good against group of mobile shields
+                --good against group of mobile shields
                 end
 	        
                         -------- ACU ------------
