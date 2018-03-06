@@ -26,12 +26,15 @@ local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
 function OverchargeCanKill()
-    local damage = (math.log((GetEconomyTotals().stored.ENERGY * 0.9 + 9700) / 3000) / 0.000095) - 15500
+    local bp = __blueprints["ual0001"].Weapon[2].Overcharge --taking Overcharge values from Aeon ACU bp.
+    
+    -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
+    local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
 	
-    if unitHP[1] and string.find(unitHP.blueprintId, "0001") and unitHP[1] > 400 then
+    if unitHP[1] and string.find(unitHP.blueprintId, "0001") and unitHP[1] > bp.commandDamage then
         unitHP[1] = nil
         return false
-    elseif unitHP[1] and string.byte(unitHP.blueprintId, 3) == 98 and unitHP[1] > 800 then
+    elseif unitHP[1] and string.byte(unitHP.blueprintId, 3) == 98 and unitHP[1] > bp.structureDamage then
         unitHP[1] = nil
         return false
     elseif unitHP[1] and unitHP[1] > damage then
