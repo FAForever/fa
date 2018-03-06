@@ -369,7 +369,7 @@ OverchargeProjectile = Class() {
 
                 -- How much damage do we actually need to kill the unit?
                 local idealDamage = targetEntity:GetHealth()
-                local maxHP = self:UnitsDetection(self, targetType, targetEntity)
+                local maxHP = self:UnitsDetection(targetType, targetEntity)
 
                 idealDamage = maxHP or data.minDamage
                 
