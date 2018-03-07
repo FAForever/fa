@@ -74,7 +74,7 @@ NukeProjectile = Class(NullShell) {
         WaitSeconds(2.5)
         self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)
-        self:SetTurnRate(47.36)
+        self:SetTurnRate(45)
         WaitSeconds(2) -- Now set turn rate to zero so nuke flies straight
         self:SetTurnRate(0)
         self:SetAcceleration(0.001)
