@@ -226,10 +226,13 @@ WorldView = Class(moho.UIWorldView, Control) {
             if self:ShowConvertToPatrolCursor() then
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
             elseif command_data.name == "RULEUCC_Overcharge" then
-                if OverchargeCanKill() == false then
-                    self.Cursor = {UIUtil.GetCursor("OVERCHARGE2")}
-                else
+                local canKill = OverchargeCanKill()
+                if canKill == true then
                     self.Cursor = {UIUtil.GetCursor(command_data.name)}
+                elseif canKill == false then
+                    self.Cursor = {UIUtil.GetCursor("OVERCHARGE_ORANGE")}
+                else
+                    self.Cursor = {UIUtil.GetCursor("OVERCHARGE_GREY")}
                 end
             else
                 if command_data.cursor then

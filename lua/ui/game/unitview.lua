@@ -40,21 +40,24 @@ function OverchargeCanKill()
     if ACU:GetBlueprint().Weapon[2].Overcharge then
         bp = ACU:GetBlueprint().Weapon[2].Overcharge
 
-        if unitHP.blueprintId then
+        if unitHP[1] and unitHP.blueprintId then
             local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
             -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
             local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
             
-            if unitHP[1] and targetCategories.COMMAND and unitHP[1] > bp.commandDamage then
+            if targetCategories.COMMAND and unitHP[1] < bp.commandDamage then
                 unitHP[1] = nil
-                return false
-            elseif unitHP[1] and targetCategories.STRUCTURE and unitHP[1] > bp.structureDamage then
+                return true
+            elseif targetCategories.STRUCTURE and unitHP[1] < bp.structureDamage then
                 unitHP[1] = nil
-                return false
-            elseif unitHP[1] and unitHP[1] > damage then
+                return true
+            elseif unitHP[1] < damage then
                 unitHP[1] = nil
-                return false   
-            end
+                return true
+            else
+                unitHP[1] = nil 
+                return false                
+            end 
         end
     end
 end
