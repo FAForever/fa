@@ -424,40 +424,38 @@ OverchargeProjectile = Class() {
     UnitsDetection = function(self, targetType, targetEntity)
      -- looking for units around target which are in splash range
         local launcher = self:GetLauncher() 
-        local unitsHP = {}
+        local maxHP = 0
         
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE) do
-            if not EntityCategoryContains(categories.COMMAND, unit) then
-                if unit.MyShield then
-                    table.insert(unitsHP, unit:GetHealth() + unit.MyShield:GetHealth())
-                else
-                    table.insert(unitsHP, unit:GetHealth())
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) do
+                if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
+                    maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
+                elseif unit:GetHealth() > maxHP then
+                    maxHP = unit:GetHealth()
                 end
-            end
         end
                
         for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) do
             -- Special for fatty's shield
-            if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp then
-                table.insert(unitsHP, unit.MyShield:GetMaxHealth())
-            else
+            if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
+                maxHP = unit.MyShield:GetMaxHealth()
+            elseif unit:GetHealth() > maxHP then
                 local distance = math.min(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)
                 if GetDistanceBetweenTwoEntities(unit, self) < distance + self.DamageData.DamageRadius then
-                    table.insert(unitsHP, unit:GetHealth())
+                    maxHP = unit:GetHealth()
                 end
             end
         end
         
-        if EntityCategoryContains(categories.EXPERIMENTAL, targetEntity) then
-            table.insert(unitsHP, targetEntity:GetHealth())
+        if EntityCategoryContains(categories.EXPERIMENTAL, targetEntity) and targetEntity:GetHealth() > maxHP then
+            maxHP = targetEntity:GetHealth()
             --[[ we need this because if OC shell hitted top part of GC model its health won't be in our table
             Bug appeared since we use shell.pos in getUnitsInSphere instead of target.pos.
             Shell is too far from actual target.pos(target pos is somewhere near land and shell is near GC's head)
             and getUnits returns nothing. Same to GetDistance. Distance between shell and GC pos > than math.min (x,z) size]]
         end
-        if unitsHP[1] then
-            table.sort(unitsHP) 
-            return unitsHP[table.getn(unitsHP)]
+        
+        if maxHP ~= 0 then
+            return maxHP     
         end
     end,
 }
