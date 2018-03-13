@@ -105,7 +105,7 @@ function CreateUI()
         {
             name = '<LOC _Campaign>',
             tooltip = 'mainmenu_campaign',
-            action = function() ButtonCampaign() end,
+            action = function() ButtonSkirmish() end,
         },
         {
             name = '<LOC _Skirmish>',
