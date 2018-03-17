@@ -70,6 +70,7 @@ Blacklist = {
 
     -- Icon Support
     ['9e8ea941-c306-4751-b367-f00000000002'] = INTEGRATED,
+    ['9e8ea941-c306-4751-b367-f00000000005'] = INTEGRATED, -- different version; probably from 3rd party site
 
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0
