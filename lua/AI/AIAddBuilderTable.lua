@@ -9,12 +9,15 @@
 
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
-        ERROR('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
+        error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
     end
     for k,v in BaseBuilderTemplates[baseBuilderName].Builders do
         AddGlobalBuilderGroup(aiBrain, locationType, v)
     end
-    if not aiBrain.CheatEnabled and BaseBuilderTemplates[baseBuilderName].NonCheatBuilders then
+    -- We build NonCheaterBuilders for all AI's.
+    -- Cheating AI's don't have always OmniView.
+    -- (OmniView is an ACU enhancement. If you lose your ACU, you will also lose OmniView.)
+    if BaseBuilderTemplates[baseBuilderName].NonCheatBuilders then
         for k,v in BaseBuilderTemplates[baseBuilderName].NonCheatBuilders do
             AddGlobalBuilderGroup(aiBrain, locationType, v)
         end

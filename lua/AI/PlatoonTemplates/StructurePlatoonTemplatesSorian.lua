@@ -51,7 +51,7 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'T3NukeSorian',
-    Plan = 'NukeAISorian',
+    Plan = 'NukeAI',
     GlobalSquads = {
         { categories.NUKE * categories.STRUCTURE * categories.TECH3, 1, 1, 'attack', 'none' },
     }

@@ -86,7 +86,7 @@ end
 
 function AIGetStartLocations(aiBrain)
     local markerList = {}
-    for i = 1, 12 do
+    for i = 1, 16 do
         if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
             table.insert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
         end
@@ -325,19 +325,66 @@ function AIGetMarkerLocations(aiBrain, markerType)
 end
 
 function AIGetMarkerLocationsEx(aiBrain, markerType)
-    local markers = ScenarioUtils.GetMarkers()
     local markerList = {}
-
-    -- Make a list of all the markers in the scenario that are of the markerType
+    local markers = ScenarioUtils.GetMarkers()
     if markers then
-        for k, v in markers do
-            if v.type == markerType then
-                v.name = k
-                table.insert(markerList, v)
+        markerList = GenerateMarkerList(markerList,markers,markerType)
+        LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType)
+        -- If we have no Amphibious Path Nodes, generate them from Land and Water Nodes
+        if markerType == 'Amphibious Path Node' and table.getn(markerList) <= 0 then
+            markerList = GenerateAmphibiousMarkerList(markerList,markers,'Land Path Node')
+            markerList = GenerateAmphibiousMarkerList(markerList,markers,'Water Path Node')
+            LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType..' (generated from Land/Water markers).')
+            -- Inject the new amphibious marker to the MasterChain
+            for k, v in markerList do
+                if v.type == 'Amphibious Path Node' then
+                    Scenario.MasterChain._MASTERCHAIN_.Markers[v.name] = v
+                end
             end
         end
     end
+    -- Make a list of all the markers in the scenario that are of the markerType
+    return markerList
+end
 
+function GenerateMarkerList(markerList,markers,markerType)
+    for k, v in markers do
+        if v.type == markerType then
+            -- copy the marker to a local variable. We don't want to change values inside the original markers array
+            local marker = table.copy(v)
+            marker.name = k
+            -- insert the (default)graph if missing.
+            if not marker.graph then
+                marker.graph = 'Default'..markerType
+            end
+            table.insert(markerList, marker)
+        end
+    end
+    return markerList
+end
+
+function GenerateAmphibiousMarkerList(markerList,markers,markerType)
+    for k, v in markers do
+        local marker = table.copy(v)
+        if marker.type == markerType then
+            -- transform adjacentTo to Amphibious marker names
+            local adjacentTo = ''
+            for i, node in STR_GetTokens(marker.adjacentTo, ' ') do
+                if adjacentTo == '' then
+                    adjacentTo = 'Amph'..node
+                else
+                    adjacentTo = adjacentTo..' '..'Amph'..node
+                end
+            end
+            marker.adjacentTo = adjacentTo
+            -- Add 'Amph' to marker name
+            marker.name = 'Amph'..k
+            marker.graph = 'DefaultAmphibious'
+            marker.type = 'Amphibious Path Node'
+            marker.color = 'ff00FFFF'
+            table.insert(markerList, marker)
+        end
+    end
     return markerList
 end
 
@@ -819,7 +866,7 @@ function GetAssistees(aiBrain, locationType, assisteeType, buildingCategory, ass
         local manager = aiBrain.BuilderManagers[locationType].PlatoonFormManager
         return manager:GetUnitsBeingBuilt(buildingCategory, assisteeCategory)
     else
-        ERROR('*AI ERROR: Invalid assisteeType - ' .. assisteeType)
+        error('*AI ERROR: Invalid assisteeType - ' .. assisteeType)
     end
 
     return false
@@ -1125,7 +1172,10 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
     local enemyIndex = enemyBrain:GetArmyIndex()
     local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, maxRange, 'Enemy')
     for _, v in atkPri do
-        local category = ParseEntityCategory(v)
+        local category = v
+        if type(category) == 'string' then
+            category = ParseEntityCategory(category)
+        end
         local retUnit = false
         local distance = false
         for num, unit in targetUnits do
@@ -1142,6 +1192,137 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
         end
     end
 
+    return false
+end
+
+function AIFindNearestCategoryTargetInRange(aiBrain, platoon, squad, position, maxRange, PrioritizedTargetList, TargetSearchCategory, enemyBrain)
+    local TargetSearchCategory = TargetSearchCategory
+    if type(TargetSearchCategory) == 'string' then
+        TargetSearchCategory = ParseEntityCategory(TargetSearchCategory)
+    end
+    local enemyIndex = false
+    if enemyBrain then
+        enemyIndex = enemyBrain:GetArmyIndex()
+    end
+
+    local RangeList = { [1] = maxRange }
+    if maxRange > 512 then
+        RangeList = {
+            [1] = 64,
+            [2] = 256,
+            [3] = 512,
+            [4] = maxRange,
+        }
+    elseif maxRange > 256 then
+        RangeList = {
+            [1] = 64,
+            [2] = 256,
+            [3] = maxRange,
+        }
+    elseif maxRange > 64 then
+        RangeList = {
+            [1] = 64,
+            [2] = maxRange,
+        }
+    end
+
+    for _, range in RangeList do
+        TargetsInBaseRange = aiBrain:GetUnitsAroundPoint(TargetSearchCategory, position, range, 'Enemy')
+        --DrawCircle(position, range, '0000FF')
+        for _, v in PrioritizedTargetList do
+            local category = v
+            if type(category) == 'string' then
+                category = ParseEntityCategory(category)
+            end
+            local retUnit = false
+            local distance = maxRange
+            --LOG('* AIFindNearestCategoryTargetInRange: numTargets '..table.getn(TargetsInBaseRange[TargetSearchCategory])..'  ')
+            for num, unit in TargetsInBaseRange do
+                if enemyBrain and enemyIndex and enemyBrain ~= enemyIndex then continue end
+                if not unit.Dead and EntityCategoryContains(category, unit) and platoon:CanAttackTarget(squad, unit) then
+                    local targetRange = Utils.XZDistanceTwoVectors(position, unit:GetPosition())
+                    if targetRange < distance then
+                        retUnit = unit
+                        distance = targetRange
+                        --LOG('* AIFindNearestCategoryTargetInRange: Possible target. distance '..distance..'  ')
+                    end
+                end
+            end
+            if retUnit then
+                return retUnit
+            end
+        end
+    end
+    return false
+end
+
+function AIFindNearestNavalCategoryTargetInRange(aiBrain, platoon, squad, position, maxRange, PrioritizedTargetList, TargetSearchCategory, enemyBrain)
+    local TargetSearchCategory = TargetSearchCategory
+    if type(TargetSearchCategory) == 'string' then
+        TargetSearchCategory = ParseEntityCategory(TargetSearchCategory)
+    end
+    local enemyIndex = false
+    if enemyBrain then
+        enemyIndex = enemyBrain:GetArmyIndex()
+    end
+
+    local RangeList = { [1] = maxRange }
+    if maxRange > 512 then
+        RangeList = {
+            [1] = 64,
+            [2] = 256,
+            [3] = 512,
+            [4] = maxRange,
+        }
+    elseif maxRange > 256 then
+        RangeList = {
+            [1] = 64,
+            [2] = 256,
+            [3] = maxRange,
+        }
+    elseif maxRange > 64 then
+        RangeList = {
+            [1] = 64,
+            [2] = maxRange,
+        }
+    end
+
+    for _, range in RangeList do
+        TargetsInBaseRange = aiBrain:GetUnitsAroundPoint(TargetSearchCategory, position, range, 'Enemy')
+        --DrawCircle(position, range, '0000FF')
+        for _, v in PrioritizedTargetList do
+            local category = v
+            if type(category) == 'string' then
+                category = ParseEntityCategory(category)
+            end
+            local retUnit = false
+            local distance = maxRange
+            --LOG('* AIFindNearestNavalCategoryTargetInRange: numTargets '..table.getn(TargetsInBaseRange)..'  ')
+            for num, unit in TargetsInBaseRange do
+                if enemyBrain and enemyIndex and enemyBrain ~= enemyIndex then continue end
+                if not unit.Dead and EntityCategoryContains(category, unit) and platoon:CanAttackTarget(squad, unit) then
+                    local targetRange = Utils.XZDistanceTwoVectors(position, unit:GetPosition())
+                    if targetRange < distance then
+                        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), unit:GetPosition(), platoon.PlatoonData.NodeWeight or 10 )
+                        if path then
+                            retUnit = unit
+                            distance = targetRange
+                            --LOG('* AIFindNearestNavalCategoryTargetInRange: Possible target. distance '..distance..'  ')
+                        else
+                            if reason != 'NoPath' then
+                                --LOG('* AIFindNearestNavalCategoryTargetInRange: Bad Target. reason '..reason..'  ')
+                            end
+                        end
+                    end
+                end
+            end
+            if retUnit then
+                return retUnit
+            end
+            -- Wait a tick before we scann the next target Category
+            WaitTicks(1)
+        end
+    end
     return false
 end
 
@@ -1720,7 +1901,6 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
-
     local pos = unit:GetPosition()
     local result, bestPos = unit:CanPathTo(destination)
     local bUsedTransports = false
@@ -1729,7 +1909,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     and unit.PlatoonHandle and not EntityCategoryContains(categories.COMMAND, unit) then
         -- If we can't path to our destination, we need, rather than want, transports
         local needTransports = not result
-        if VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
+        if VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300 * 300 then
             needTransports = true
         end
 
@@ -1746,7 +1926,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination)
+        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)
@@ -1759,8 +1939,60 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         -- If there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
         -- so don't bother... the build/capture/reclaim command will take care of that after we return
         return true
+    -- if we are here, then we don't have a valid Path from the c-engine. maybe we find an alternative destination.
+    elseif aiBrain.Uveso then
+        --LOG('* EngineerMoveWithSafePath: Fist unit:CanPathTo('..repr(destination)..') = '..repr(result)..' - bestPos'..repr(bestPos))
+        local DistEngDestination = VDist2(pos[1], pos[3], destination[1], destination[3])
+        local DistDestinationBestPosition = VDist2(bestPos[1], bestPos[3], destination[1], destination[3])
+        --LOG('* EngineerMoveWithSafePath: DistEngDestination '..DistEngDestination..' - DistDestinationBestPosition '..DistDestinationBestPosition..'')
+        -- Are we near our destination ?
+        if DistEngDestination < 30 then
+            --LOG('* EngineerMoveWithSafePath: near destination! DistEngDestination '..DistEngDestination..' - Moving directly.')
+            IssueMove({unit}, destination)
+            return true
+        end
+        -- Do we have a alternative destination that is near the original destination ?
+        if DistDestinationBestPosition < 15 then
+            --LOG('* EngineerMoveWithSafePath: alternative destination! DistDestinationBestPosition '..DistDestinationBestPosition..' - Moving directly.')
+            path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, bestPos)
+            if path then
+                for widx, waypointPath in path do
+                    IssueMove({unit}, waypointPath)
+                end
+                return true
+            end
+        end
+        WaitTicks(3)
+        -- Search again for a redundant path with slight different destination.
+        destination[1] = destination[1] + 5
+        destination[3] = destination[3] + 5
+        result, bestPos = unit:CanPathTo(destination)
+        --LOG('* EngineerMoveWithSafePath: redundant unit:CanPathTo('..repr(destination)..') = '..repr(result)..' - bestPos'..repr(bestPos))
+        if result then
+            path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+            if path then
+                local pathSize = table.getn(path)
+                -- Move to way points (but not to destination... leave that for the final command)
+                for widx, waypointPath in path do
+                    if pathSize ~= widx then
+                        IssueMove({unit}, destination)
+                    end
+                end
+                return true
+            else
+                --LOG('* EngineerMoveWithSafePath: redundant no Path!.')
+            end
+        else
+            DistDestinationBestPosition = VDist2(bestPos[1], bestPos[3], destination[1], destination[3])
+            if DistDestinationBestPosition < 15 then
+                --LOG('* EngineerMoveWithSafePath: redundant destination! DistDestinationBestPosition '..DistDestinationBestPosition..' - Moving directly.')
+                IssueMove({unit}, bestPos)
+                return true
+            else
+                --LOG('* EngineerMoveWithSafePath: No way to the Destination.')
+            end
+        end
     end
-
     return false
 end
 

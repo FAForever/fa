@@ -1,3 +1,4 @@
+local DebugNames = true
 -- ***************************************************************************
 -- *
 -- **  File     :  /lua/sim/BuilderManager.lua
@@ -373,6 +374,9 @@ FactoryBuilderManager = Class(BuilderManager) {
             local personality = self.Brain:GetPersonality()
             local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), factory)
             -- LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))
+            if DebugNames then
+                factory:SetCustomName(builder.BuilderName)
+            end
             self.Brain:BuildPlatoon(template, {factory}, 1)
         else
             -- No builder found setup way to check again

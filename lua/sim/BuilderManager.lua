@@ -1,3 +1,5 @@
+local DebugNames = false -- Display next building Platoonn inside LOG
+
 #***************************************************************************
 #*
 #**  File     :  /lua/sim/BuilderManager.lua
@@ -10,6 +12,11 @@
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+
+-- AI DEBUG
+local AntiSpamList = {}
+local AntiSpamCounter = 0
+local LastBuilder = ''
 
 BuilderManager = Class {
     Create = function(self, brain)
@@ -105,9 +112,19 @@ BuilderManager = Class {
     AddInstancedBuilder = function(self,newBuilder, builderType)
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
-            error('*BUILDERMANAGER ERROR: Invalid builder type: ' .. builderType .. ' - in builder: ' .. newBuilder.BuilderName)
+            -- Warn the programmer that something is wrong. We can continue, hopefully the builder is not too important for the AI ;)
+            -- But god for testing, and the case that a mod has bad builders.
+            -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
+            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
+            return
         end
         if newBuilder then
+            if not self.BuilderData[builderType] then
+                -- Warn the programmer that something is wrong here. Same here, we can continue.
+                -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
+                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
+                return
+            end
             table.insert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
@@ -217,6 +234,21 @@ BuilderManager = Class {
         end
         return false
     end,
+    
+    IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
+        if DelayEqualBuildPlattons then
+            local CheckDelayTime = GetGameTimeSeconds()
+            local PlatoonName = DelayEqualBuildPlattons[1]
+            if not self.Brain.DelayEqualBuildPlattons[PlatoonName] or self.Brain.DelayEqualBuildPlattons[PlatoonName] < CheckDelayTime then
+                --LOG('Setting '..DelayEqualBuildPlattons[2]..' sec. delaytime for builder ['..PlatoonName..']')
+                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + DelayEqualBuildPlattons[2]
+                return false
+            else
+                --LOG('Builder ['..PlatoonName..'] still delayed for '..(CheckDelayTime - self.Brain.DelayEqualBuildPlattons[PlatoonName])..' seconds.')
+                return true
+            end
+        end
+    end,
 
     GetHighestBuilder = function(self,bType,params)
         if not self.BuilderData[bType] then
@@ -230,14 +262,38 @@ BuilderManager = Class {
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
             if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and (not found or v:GetPriority() == found) and v:GetBuilderStatus() then
-                found = v:GetPriority()
-                table.insert(possibleBuilders, k)
+                if not self:IsPlattonBuildDelayed(v:GetBuildDelay()) then
+                    found = v:GetPriority()
+                    table.insert(possibleBuilders, k)
+                    if DebugNames and (string.find(v.BuilderName,'U1') or string.find(v.BuilderName,'U2') or string.find(v.BuilderName,'U3')) then
+                        LOG('* AI DEBUG: GetHighestBuilder: Priority = '..found..' - possibleBuilders = '..repr(v.BuilderName))
+                    end
+                end
             elseif found and v:GetPriority() < found then
                 break
             end
         end
         if found and found > 0 then
             local whichBuilder = Random(1,table.getn(possibleBuilders))
+            -- DEBUG - Start
+            -- If we have a builder that is repeating (Happens when buildconditions are true, but the builder can't find something to build/assist etc.)
+            local BuilderName = self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ].BuilderName
+            if BuilderName ~= LastBuilder then
+                LastBuilder = BuilderName
+                AntiSpamCounter = 0
+            elseif not AntiSpamList[BuilderName] then
+                AntiSpamCounter = AntiSpamCounter + 1
+                if AntiSpamCounter > 6 then
+                    -- Warn the programmer that something is going wrong.
+                    WARN('* AI DEBUG: GetHighestBuilder: Builder is spaming. Maybe wrong Buildconditions for Builder = '..repr(self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ].BuilderName)..' ???')
+                    AntiSpamCounter = 0
+                    AntiSpamList[BuilderName] = true
+                end                
+            end
+            -- DEBUG - End
+            if DebugNames and (string.find(BuilderName,'U1') or string.find(BuilderName,'U2') or string.find(BuilderName,'U3')) then
+                LOG('* AI DEBUG: GetHighestBuilder: SelectedBuilder = '..repr(self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ].BuilderName))
+            end
             return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]
         end
         return false

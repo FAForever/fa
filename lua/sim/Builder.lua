@@ -33,6 +33,8 @@ Builder = Class {
         self.Brain = brain
 
         self.BuilderName = data.BuilderName
+        
+        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
 
         self.ReportFailure = data.ReportFailure
 
@@ -45,6 +47,10 @@ Builder = Class {
 
     GetPriority = function(self)
         return self.Priority
+    end,
+
+    GetBuildDelay = function(self)
+        return self.DelayEqualBuildPlattons
     end,
 
     GetActivePriority = function(self)

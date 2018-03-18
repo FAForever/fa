@@ -1,4 +1,4 @@
-scoreInterval = 10
+HistoryScoreInterval = 60
 
 local scoreData = {current={}, historical={}}
 local scoreOption = ScenarioInfo.Options.Score or "no"
@@ -57,7 +57,7 @@ end
 
 function ScoreHistoryThread()
     while true do
-        WaitSeconds(scoreInterval)
+        WaitSeconds(HistoryScoreInterval)
         table.insert(scoreData.historical, table.deepcopy(scoreData.current))
     end
 end

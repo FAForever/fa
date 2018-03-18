@@ -9,7 +9,7 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local scoreAccum = import('/lua/ui/game/scoreaccum.lua')
 local scoreData = scoreAccum.scoreData
-local scoreInterval = import('/lua/ui/game/scoreaccum.lua').scoreInterval
+local HistoryScoreInterval = 60
 local gamemain = import('/lua/ui/game/gamemain.lua')
 
 local page_active=false
@@ -610,7 +610,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     local player={} -- would be the name/color of the player in the left-top corner
-    -- scoreInterval is the time between to data saved
+    -- HistoryScoreInterval is the time between to data saved
     -- parent group
     local grp=Group(parent)
     grp.Left:Set(0) grp.Top:Set(0) grp.Right:Set(0) grp.Bottom:Set(0)
@@ -678,7 +678,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     maxvalue=arrange(maxvalue*1.02)
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
-    --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
+    --LOG("Value the highest:",maxvalue,"   final time saved:",HistoryScoreInterval*data_nbr,"   scale factor on y:",factor)
     -- drawing the axies/quadrillage
     local j=1
     local quadrillage_horiz={}
@@ -712,7 +712,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         quadrillage_vertical[j]:SetSolidColor("white")
         quadrillage_vertical[j].Depth:Set(grp.Depth)
 
-        quadrillage_vertical[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(nbr_quadrillage_vertical-2)*data_nbr*scoreInterval), 14, UIUtil.titleFont)
+        quadrillage_vertical[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(nbr_quadrillage_vertical-2)*data_nbr*HistoryScoreInterval), 14, UIUtil.titleFont)
         quadrillage_vertical[j].title_label.Left:Set(parent.Left()+x1 + ((x2-x1))*((tmp-1)/(nbr_quadrillage_vertical-2))+1)
         quadrillage_vertical[j].title_label.Top:Set(parent.Top()+y2 +10)
         quadrillage_vertical[j].title_label:SetColor("white")
@@ -849,7 +849,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 infoText = false
             end
             if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. math.floor(((y2-posY())/factor))
+                local  value = tps_format((posX()-x1)/(x2-x1)*HistoryScoreInterval*data_nbr) .. " / " .. math.floor(((y2-posY())/factor))
                 infoText = UIUtil.CreateText(grp,value, 14, UIUtil.titleFont)
                 infoText.Left:Set(function() return posX()-(infoText.Width()/2) end)
                 infoText.Bottom:Set(function() return posY()-7 end)
