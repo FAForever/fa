@@ -1,3 +1,5 @@
+local DebugNames = true
+
 #***************************************************************************
 #*
 #**  File     :  /lua/sim/BuilderManager.lua
@@ -161,6 +163,9 @@ PlatoonFormManager = Class(BuilderManager) {
                 hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
 
                 for k,v in hndl:GetPlatoonUnits() do
+                    if DebugNames then
+                        v:SetCustomName('S '..hndl.BuilderName)
+                    end
                     if not v.PlatoonPlanName then
                         v.PlatoonHandle = hndl
                     end

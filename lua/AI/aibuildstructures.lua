@@ -78,8 +78,13 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
         builder.EngineerBuildQueue = {}
     end
     # put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build
-     AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation))
-     aiBrain:BuildStructure(builder, whatToBuild, buildLocation, false)
+    if aiBrain.Sorian then
+        AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation))
+    else
+        AIUtils.EngineerTryReclaimCaptureArea(aiBrain, builder, BuildToNormalLocation(buildLocation)) 
+    end
+    
+    aiBrain:BuildStructure(builder, whatToBuild, buildLocation, false)
 
     local newEntry = {whatToBuild, buildLocation, relative}
 

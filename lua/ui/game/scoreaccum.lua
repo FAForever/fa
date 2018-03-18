@@ -117,8 +117,6 @@ scoreData.historical = {}
 
 fullSyncOccured = false
 
--- score interval determines how often the historical data gets updated, this is in seconds
-scoreInterval = 10 -- FIXME: this should be synced from sim side
 
 function UpdateScoreData(newData)
     if fullSyncOccured == false then
