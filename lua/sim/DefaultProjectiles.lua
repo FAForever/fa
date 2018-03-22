@@ -315,12 +315,12 @@ BaseGenericDebris = Class(EmitterProjectile){
 -----------------------------------------------------------
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
-        WARN('Inside OCPROJ OnImpact')
+        --[[WARN('Inside OCPROJ OnImpact')
         LOG(targetType)
         LOG(targetEntity)
         if targetEntity and IsUnit(targetEntity) then
             LOG(targetEntity:GetUnitId())
-        end
+        end]]
 
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
@@ -397,8 +397,8 @@ OverchargeProjectile = Class() {
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
 
-        LOG('Drain is ' .. drain)
-        LOG('Damage is ' .. damage)
+        --LOG('Drain is ' .. drain)
+        --LOG('Damage is ' .. damage)
         self.DamageData.DamageAmount = damage
 
         if drain > 0 then

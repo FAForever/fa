@@ -58,12 +58,22 @@ function OverchargeCanKill()
                     damage = bp.maxDamage
                 end
             
-                if targetCategories.COMMAND and unitHP[1] < bp.commandDamage then
-                    unitHP[1] = nil
-                    return true
-                elseif targetCategories.STRUCTURE and unitHP[1] < bp.structureDamage then
-                    unitHP[1] = nil
-                    return true
+                if targetCategories.COMMAND then 
+                    if unitHP[1] < bp.commandDamage then
+                       unitHP[1] = nil
+                       return true
+                    else
+                       unitHP[1] = nil 
+                       return false
+                    end
+                elseif targetCategories.STRUCTURE then
+                    if unitHP[1] < bp.structureDamage then
+                        unitHP[1] = nil
+                        return true
+                    else
+                        unitHP[1] = nil 
+                        return false
+                        end
                 elseif unitHP[1] < damage then
                     unitHP[1] = nil
                     return true
