@@ -6,7 +6,8 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-aitypes = (function()
+
+function aitypes()
     --Table of AI Names to return
     local aitypes = {
         {
@@ -39,7 +40,7 @@ aitypes = (function()
         }
     }
 
-    --Defualt GPG AIs
+    --Default GPG AIs
 
     local AIFiles = DiskFindFiles('/lua/AI/CustomAIs_v2', '*.lua')
     local AIFilesold = DiskFindFiles('/lua/AI/CustomAIs', '*.lua')
@@ -62,6 +63,25 @@ aitypes = (function()
         end
     end
 
+    --Load Custom AIs from Moddirectory
+    local CustomAIfile
+    local Mods = import('/lua/mods.lua')
+    local simMods = Mods.GetGameMods()
+    local ModAIFiles
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        if ModAIFiles[1] then
+            for i, v in ModAIFiles do
+                CustomAIfile = import(v).AI
+                if CustomAIfile.AIList then
+                    for s, t in CustomAIfile.AIList do
+                        table.insert(aitypes, { key = t.key, name = t.name })
+                    end
+                end
+            end
+        end
+    end
+    
     --Default GPG Cheating AIs
     table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive" })
     table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush" })
@@ -87,5 +107,22 @@ aitypes = (function()
         end
     end
 
+    --Load Custom Cheating AIs from Moddirectory
+    local Mods = import('/lua/mods.lua')
+    local simMods = Mods.GetGameMods()
+    local ModAIFiles
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        if ModAIFiles[1] then
+            for i, v in ModAIFiles do
+                if CustomAIfile.CheatAIList then
+                    for s, t in CustomAIfile.CheatAIList do
+                        table.insert(aitypes, { key = t.key, name = t.name })
+                    end
+                end
+            end
+        end
+    end
+
     return aitypes
-end)()
+end

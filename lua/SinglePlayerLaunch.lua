@@ -12,7 +12,7 @@ function GetRandomName(faction, aiKey)
     local name = aiNames[factions[faction].Key][math.random(table.getn(aiNames[factions[faction].Key]))]
 
     if aiKey then
-        local aiTypes = import('/lua/ui/lobby/aitypes.lua').aitypes
+        local aiTypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
         local aiName = "AI"
         for index, value in aiTypes do
             if aiKey == value.key then
@@ -196,7 +196,7 @@ function SetupBotSession(mapName)
     if aiopt then
         ai = aiopt[1]
     else
-        aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
+        aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
         ai = aitypes[1].key
     end
 
