@@ -26,37 +26,51 @@ local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
 function OverchargeCanKill()
-    local selected = GetSelectedUnits()
-    local ACU
-    local bp
+    if unitHP[1] and unitHP.blueprintId then
+        local selected = GetSelectedUnits()
+        local ACU
+        local ACUBp
+        local bp
     
-    for _, unit in selected do
-        if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
-            ACU = unit
-            break
-        end
-    end  
-
-    if ACU:GetBlueprint().Weapon[2].Overcharge then
-        bp = ACU:GetBlueprint().Weapon[2].Overcharge
-
-        if unitHP[1] and unitHP.blueprintId then
-            local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
-            -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
-            local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+        for _, unit in selected do
+            if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
+                ACU = unit
+                break
+            end
+        end  
+        
+        if ACU then
+            ACUBp = ACU:GetBlueprint()
             
-            if targetCategories.COMMAND and unitHP[1] < bp.commandDamage then
-                unitHP[1] = nil
-                return true
-            elseif targetCategories.STRUCTURE and unitHP[1] < bp.structureDamage then
-                unitHP[1] = nil
-                return true
-            elseif unitHP[1] < damage then
-                unitHP[1] = nil
-                return true
-            else
-                unitHP[1] = nil 
-                return false                
+            if ACUBp.Weapon[2].Overcharge then
+                bp = ACUBp.Weapon[2].Overcharge
+            elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
+                bp = ACUBp.Weapon[3].Overcharge
+            -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
+            end
+            
+            if bp then
+                local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
+                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
+                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+                
+                if damage > bp.maxDamage then
+                    damage = bp.maxDamage
+                end
+            
+                if targetCategories.COMMAND and unitHP[1] < bp.commandDamage then
+                    unitHP[1] = nil
+                    return true
+                elseif targetCategories.STRUCTURE and unitHP[1] < bp.structureDamage then
+                    unitHP[1] = nil
+                    return true
+                elseif unitHP[1] < damage then
+                    unitHP[1] = nil
+                    return true
+                else
+                    unitHP[1] = nil 
+                    return false
+                end                    
             end 
         end
     end
