@@ -222,7 +222,7 @@ UnitBlueprint {
         BuildCostEnergy = 437500,
         BuildCostMass = 37500,
         BuildRate = 45,
-        BuildTime = 60625,
+        BuildTime = 65625,
         BuildableCategory = {
             'xrl0002',
             'xrl0003',
