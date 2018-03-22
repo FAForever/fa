@@ -1039,8 +1039,7 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
-                maxDamage = 15000,
+                maxDamage = 40000,
                 minDamage = 1500,
             },
             OverChargeWeapon = true,
@@ -1127,8 +1126,7 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
-                maxDamage = 15000,
+                maxDamage = 40000,
                 minDamage = 1500,
             },
             ProjectileId = '/projectiles/TDFOverCharge01/TDFOverCharge01_proj.bp',

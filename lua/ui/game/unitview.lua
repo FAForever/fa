@@ -22,69 +22,8 @@ local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRollov
 
 local selectedUnit = nil
 local updateThread = nil
-local unitHP = {}
-controls = import('/lua/ui/controls.lua').Get()
 
-function OverchargeCanKill()
-    if unitHP[1] and unitHP.blueprintId then
-        local selected = GetSelectedUnits()
-        local ACU
-        local ACUBp
-        local bp
-    
-        for _, unit in selected do
-            if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
-                ACU = unit
-                break
-            end
-        end  
-        
-        if ACU then
-            ACUBp = ACU:GetBlueprint()
-            
-            if ACUBp.Weapon[2].Overcharge then
-                bp = ACUBp.Weapon[2].Overcharge
-            elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
-                bp = ACUBp.Weapon[3].Overcharge
-            -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
-            end
-            
-            if bp then
-                local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
-                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
-                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
-                
-                if damage > bp.maxDamage then
-                    damage = bp.maxDamage
-                end
-            
-                if targetCategories.COMMAND then 
-                    if unitHP[1] < bp.commandDamage then
-                       unitHP[1] = nil
-                       return true
-                    else
-                       unitHP[1] = nil 
-                       return false
-                    end
-                elseif targetCategories.STRUCTURE then
-                    if unitHP[1] < bp.structureDamage then
-                        unitHP[1] = nil
-                        return true
-                    else
-                        unitHP[1] = nil 
-                        return false
-                        end
-                elseif unitHP[1] < damage then
-                    unitHP[1] = nil
-                    return true
-                else
-                    unitHP[1] = nil 
-                    return false
-                end                    
-            end 
-        end
-    end
-end
+controls = import('/lua/ui/controls.lua').Get()
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
@@ -362,11 +301,6 @@ function UpdateWindow(info)
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
-	    
-        if not info.userUnit then
-            unitHP[1] = info.health
-            unitHP.blueprintId = info.blueprintId
-        end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then

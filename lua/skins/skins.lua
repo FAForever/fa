@@ -171,8 +171,6 @@ skins = {
             W_E = {'/textures/ui/common/game/cursors/w_e.dds', 15, 15},
             MOVE_WINDOW = {'/textures/ui/common/game/cursors/move_window.dds', 15, 15},
             ATTACK_MOVE = {'/textures/ui/common/game/cursors/attack_move-.dds', 15, 15, 12, 12},
-            OVERCHARGE_ORANGE = {'/textures/ui/common/game/cursors/overcharge_orange-.dds', 15, 15, 8, 12},
-            OVERCHARGE_GREY = {'/textures/ui/common/game/cursors/overcharge_grey-.dds', 15, 15, 8, 12},
         },
     },
 }

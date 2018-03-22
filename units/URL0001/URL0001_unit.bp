@@ -145,7 +145,6 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
-        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -924,8 +923,7 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
-                maxDamage = 15000,
+                maxDamage = 40000,
                 minDamage = 1500,
             },
             OverChargeWeapon = true,
@@ -1013,8 +1011,7 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                structureDamage = 800,
-                maxDamage = 15000,
+                maxDamage = 40000,
                 minDamage = 1500,
             },
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
