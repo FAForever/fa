@@ -39,11 +39,31 @@ local function loadLanguage(la)
     doscript(dbFilename(la), newdb)
     __language = la
     loc_table = newdb
+    LocalisationAILobby()
 
     if HasLocalizedVO(la) then
         AudioSetLanguage(la)
     else
         AudioSetLanguage('us')
+    end
+end
+
+-- Add localisation strings from any AI mod to location table
+function LocalisationAILobby()
+    local simMods = import('/lua/mods.lua').AllMods()
+    local ModAIFiles
+    local TooltipData
+    local AILanguageFile
+    local AILanguageText = {}
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        AILanguageFile = DiskFindFiles(ModData.location..'/hook/loc/'..__language, 'strings_db.lua')
+        if ModAIFiles[1] and AILanguageFile[1] then
+            doscript(AILanguageFile[1], AILanguageText)
+            for s, t in AILanguageText do
+                loc_table[s]=t
+            end
+        end
     end
 end
 
