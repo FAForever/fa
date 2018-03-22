@@ -331,3 +331,22 @@ function SetTooltipText(control, id)
         mouseoverDisplay:SetText(id)
     end
 end
+
+function AddModAILobbyTooltips()
+    local simMods = import('/lua/mods.lua').AllMods()
+    local ModAIFiles
+    local TooltipData
+    local ToolTipsFile
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        ToolTipsFile = DiskFindFiles(ModData.location..'/hook/lua/ui/help', 'tooltips.lua')
+        if ModAIFiles[1] and ToolTipsFile[1] then
+            TooltipData = import(ToolTipsFile[1]).Tooltips or {}
+            for s, t in TooltipData do
+                TooltipInfo.Tooltips[s]=t
+            end
+        end
+    end
+end
+-- Add tooltips for AI mods
+AddModAILobbyTooltips()
