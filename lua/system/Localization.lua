@@ -56,7 +56,7 @@ function LocalisationAILobby()
     local AILanguageFile
     local AILanguageText = {}
     for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
         AILanguageFile = DiskFindFiles(ModData.location..'/hook/loc/'..__language, 'strings_db.lua')
         if ModAIFiles[1] and AILanguageFile[1] then
             doscript(AILanguageFile[1], AILanguageText)

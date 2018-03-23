@@ -69,7 +69,7 @@ function aitypes()
     local simMods = Mods.GetGameMods()
     local ModAIFiles
     for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
         if ModAIFiles[1] then
             for i, v in ModAIFiles do
                 CustomAIfile = import(v).AI
@@ -112,9 +112,10 @@ function aitypes()
     local simMods = Mods.GetGameMods()
     local ModAIFiles
     for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/hook/lua/AI/CustomAIs_v2', '*.lua')
+        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
         if ModAIFiles[1] then
             for i, v in ModAIFiles do
+                CustomAIfile = import(v).AI
                 if CustomAIfile.CheatAIList then
                     for s, t in CustomAIfile.CheatAIList do
                         table.insert(aitypes, { key = t.key, name = t.name })
