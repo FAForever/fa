@@ -43,6 +43,7 @@ local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
+local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
 
 local IsSyncReplayServer = false
 
@@ -336,7 +337,6 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
                     end
                 end
             end
-            local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)

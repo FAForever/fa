@@ -52,7 +52,6 @@ end
 function LocalisationAILobby()
     local simMods = import('/lua/mods.lua').AllMods()
     local ModAIFiles
-    local TooltipData
     local AILanguageFile
     local AILanguageText = {}
     for Index, ModData in simMods do
