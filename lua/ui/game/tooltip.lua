@@ -335,11 +335,9 @@ end
 function AddModAILobbyTooltips()
     local simMods = import('/lua/mods.lua').AllMods()
     local TooltipData
-    local ToolTipsFile
     for Index, ModData in simMods do
-        ToolTipsFile = DiskFindFiles(ModData.location..'/lua/AI/LobbyTooltips', 'tooltips.lua')
-        if ToolTipsFile[1] then
-            TooltipData = import(ToolTipsFile[1]).Tooltips or {}
+        if exists(ModData.location..'/lua/AI/LobbyTooltips/tooltips.lua') then
+            TooltipData = import(ModData.location..'/lua/AI/LobbyTooltips/tooltips.lua').Tooltips or {}
             for s, t in TooltipData do
                 TooltipInfo.Tooltips[s]=t
             end
