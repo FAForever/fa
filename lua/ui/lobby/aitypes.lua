@@ -65,17 +65,18 @@ function aitypes()
 
     --Load Custom AIs from Moddirectory
     local CustomAIfile
-    local Mods = import('/lua/mods.lua')
-    local simMods = Mods.GetGameMods()
+    local simMods = import('/lua/mods.lua').GetGameMods()
     local ModAIFiles
     for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
-        if ModAIFiles[1] then
-            for i, v in ModAIFiles do
-                CustomAIfile = import(v).AI
-                if CustomAIfile.AIList then
-                    for s, t in CustomAIfile.AIList do
-                        table.insert(aitypes, { key = t.key, name = t.name })
+        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            if ModAIFiles[1] then
+                for i, v in ModAIFiles do
+                    CustomAIfile = import(v).AI
+                    if CustomAIfile.AIList then
+                        for s, t in CustomAIfile.AIList do
+                            table.insert(aitypes, { key = t.key, name = t.name })
+                        end
                     end
                 end
             end
@@ -108,17 +109,17 @@ function aitypes()
     end
 
     --Load Custom Cheating AIs from Moddirectory
-    local Mods = import('/lua/mods.lua')
-    local simMods = Mods.GetGameMods()
-    local ModAIFiles
+    ModAIFiles = false
     for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
-        if ModAIFiles[1] then
-            for i, v in ModAIFiles do
-                CustomAIfile = import(v).AI
-                if CustomAIfile.CheatAIList then
-                    for s, t in CustomAIfile.CheatAIList do
-                        table.insert(aitypes, { key = t.key, name = t.name })
+        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            if ModAIFiles[1] then
+                for i, v in ModAIFiles do
+                    CustomAIfile = import(v).AI
+                    if CustomAIfile.CheatAIList then
+                        for s, t in CustomAIfile.CheatAIList do
+                            table.insert(aitypes, { key = t.key, name = t.name })
+                        end
                     end
                 end
             end
