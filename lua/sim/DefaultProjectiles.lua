@@ -2,10 +2,10 @@
 -- File     : /lua/defaultprojectiles.lua
 -- Author(s): John Comes, Gordon Duclos
 -- Summary  : Script for default projectiles
--- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
-local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
+
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -367,17 +367,6 @@ OverchargeProjectile = Class() {
 
                 -- How much damage do we actually need to kill the unit?
                 local idealDamage = targetEntity:GetHealth()
-                local units1 = {}
-
-                 -- looking for units around target which are in splash range
-                 
-                for _, unit in UnitsInSphere(launcher, targetEntity:GetPosition(), 2.7, categories.ALLUNITS) do
-                    table.insert(units1, unit:GetHealth())
-                 end
-                 
-                table.sort(units1)
-                idealDamage = units1[table.getn(units1)]
-                
                 local shield = targetEntity.MyShield
 
                 local shieldHealth = 0
