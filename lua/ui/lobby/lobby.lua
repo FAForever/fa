@@ -2214,6 +2214,8 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     end
 
     if not ignoreRefresh then
+        -- reload AI types in case we have enable or disable an AI mod.
+        aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
         UpdateGame()
     end
 end
