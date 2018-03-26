@@ -150,6 +150,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'VERIFYMISSILEUI',
         'USEBUILDPRESETS',
+        'SHOWATTACKRETICLE',
     },
     CollisionOffsetX = -0.04,
     Defense = {
@@ -858,7 +859,8 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                maxDamage = 40000,
+                structureDamage = 800,
+                maxDamage = 15000,
                 minDamage = 1500,
             },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
@@ -944,7 +946,8 @@ UnitBlueprint {
             Overcharge = {
                 energyMult = 0.9,
                 commandDamage = 400,
-                maxDamage = 40000,
+                structureDamage = 800,
+                maxDamage = 15000,
                 minDamage = 1500,
             },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',

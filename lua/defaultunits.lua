@@ -584,6 +584,15 @@ StructureUnit = Class(Unit) {
             end
         end
     end,
+    
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+	    -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.structureDamage
+        end
+        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
+    end,
 }
 
 -- FACTORY UNITS
@@ -2283,7 +2292,7 @@ ACUUnit = Class(CommandUnit) {
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
-
+    
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
