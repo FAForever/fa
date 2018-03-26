@@ -20,6 +20,7 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
+local teleportTime = {}
 
 local CreateScaledBoom = function(unit, overkill, bone)
     explosion.CreateDefaultHitExplosionAtBone(
@@ -2248,6 +2249,87 @@ CommandUnit = Class(WalkingLandUnit) {
             WaitSeconds(6)
             self:SetMesh(bp.Display.MeshBlueprint, true)
         end
+    end,
+    
+    -------------------------------------------------------------------------------------------
+    -- TELEPORTING WITH DELAY
+    -------------------------------------------------------------------------------------------
+    
+    OnTeleportUnit = function(self, teleporter, location, orientation)
+        if self.TeleportDrain then
+            RemoveEconomyEvent(self, self.TeleportDrain)
+            self.TeleportDrain = nil
+        end
+
+        if self.TeleportThread then
+            KillThread(self.TeleportThread)
+            self.TeleportThread = nil
+        end
+        
+        local teleDelay = 150 --Ticks
+        local tick
+        local seconds
+        
+        if teleportTime[self.EntityId] then
+            tick = GetGameTick() - teleportTime[self.EntityId]
+            seconds = teleportTime[self.EntityId] + teleDelay - GetGameTick()
+        end    
+        
+        if not teleportTime[self.EntityId] or tick > teleDelay then
+            self:CleanupTeleportChargeEffects()
+            self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation)
+        elseif seconds > 100 then
+            print("The core is overloaded... restarting in", string.sub(seconds, 1, 2), "seconds")
+        elseif seconds > 10 then
+            print("The core is overloaded... restarting in", string.sub(seconds, 1, 1), "seconds")
+        else
+            print("The core is overloaded... restarting in", string.sub(seconds/10, 1, 3), " seconds")        
+        end
+    end,
+    
+    InitiateTeleportThread = function(self, teleporter, location, orientation)
+        self.UnitBeingTeleported = self
+        self:SetImmobile(true)
+        self:PlayUnitSound('TeleportStart')
+        self:PlayUnitAmbientSound('TeleportLoop')
+
+        local bp = self:GetBlueprint().Economy
+        local energyCost, time
+        if bp then
+            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
+            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bp.TeleportTimeMod or 0.01)
+        end
+
+        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+
+        -- Create teleport charge effect
+        self:PlayTeleportChargeEffects(location, orientation)
+        WaitFor(self.TeleportDrain)
+
+        if self.TeleportDrain then
+            RemoveEconomyEvent(self, self.TeleportDrain)
+            self.TeleportDrain = nil
+        end
+
+        self:PlayTeleportOutEffects()
+        self:CleanupTeleportChargeEffects()
+        WaitSeconds(0.1)
+        self:SetWorkProgress(0.0)
+        Warp(self, location, orientation)
+        self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
+        teleportTime[self.EntityId] = GetGameTick()
+
+        WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
+
+        -- Landing Sound
+        self:StopUnitAmbientSound('TeleportLoop')
+        self:PlayUnitSound('TeleportEnd')
+        self:SetImmobile(false)
+        self.UnitBeingTeleported = nil
+        self.TeleportThread = nil
     end,
 }
 
