@@ -30,10 +30,12 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
+        'BUILTBYTIER3ENGINEER',
+        'BUILTBYTIER3COMMANDER',
         'CYBRAN',
         'STRUCTURE',
         'DEFENSE',
-        'TECH2',
+        'TECH3',
         'SHIELD',
         'DRAGBUILD',
         'SIZE12',
