@@ -185,6 +185,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        ActiveIntel = {
+            Radar = true,
+        },
         Cloak = true,
         RadarRadius = 40,
         RadarStealth = true,
