@@ -24,6 +24,13 @@ XRL0302 = Class(CWalkingLandUnit) {
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
+        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
+        if instigator then
+            self:GetWeaponByLabel('Suicide'):FireWeapon()
+        end
+    end,
 }
 
 TypeClass = XRL0302
