@@ -396,6 +396,7 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 10,
             TargetCheckInterval = 0.3,
+            MaximumBeamLength = 26,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
@@ -422,6 +423,7 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire Experimental',
             WeaponRepackTimeout = 0,
             WeaponUnpacks = false,
+            TrackingRadius = 1.15,
         },
         {
             AboveWaterFireOnly = true,
