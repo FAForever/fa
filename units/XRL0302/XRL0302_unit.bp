@@ -257,7 +257,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             IgnoreIfDisabled = true,
             Label = 'DeathWeapon',
-            MaxRadius = 4.5,
+            MaxRadius = 6,
             MuzzleVelocity = 0,
             ProjectileId = '/projectiles/CIFEMP01/CIFEMP01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
