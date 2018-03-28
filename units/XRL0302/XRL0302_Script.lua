@@ -6,18 +6,26 @@
 -----------------------------------------------------------------
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
+local Weapon = import('/lua/sim/Weapon.lua').Weapon
+
+local EMPDeathWeapon = Class(Weapon) {
+    OnCreate = function(self)
+        Weapon.OnCreate(self)
+        self:SetWeaponEnabled(false)
+    end,
+
+    Fire = function(self)
+        local blueprint = self:GetBlueprint()
+        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
+                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+    end,
+}
 
 XRL0302 = Class(CWalkingLandUnit) {
 
-    -- OK this unit was horribly overcomplicated in the past. What we want is for only one of
-    -- three situations to ever blow up the bomb. The unit getting in range and firing, the
-    -- player pressing the detonate button, or the player using CTRL-K to suicide the unit.
-
-    -- Since the weapon itself kills the unit with self.unit:Destroy(), and CTRL-K detonates the
-    -- weapon immediately thanks to selfdestruct.lua, we don't need any logic here for OnKilled()
-
     Weapons = {
         Suicide = Class(CMobileKamikazeBombWeapon) {},
+        DeathWeapon = Class(EMPDeathWeapon) {},
     },
 
     -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
@@ -30,6 +38,28 @@ XRL0302 = Class(CWalkingLandUnit) {
         if instigator then
             self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
+    end,
+    
+    DoDeathWeapon = function(self)
+        if self:IsBeingBuilt() then return end
+
+        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
+
+        -- Now handle our special buff and FX
+        local bp
+        for k, v in self:GetBlueprint().Buffs do
+            if v.Add.OnDeath then
+                bp = v
+            end
+        end
+
+        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
+        if bp ~= nil then
+            self:AddBuff(bp)
+        end
+
+        -- Play EMP Effect
+        CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
 }
 
