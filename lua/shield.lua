@@ -55,7 +55,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
         self:SetType('Bubble')
-        self.SpillOverDmgMod = math.max(spec.SpillOverDamageMod or 0.15, 0)
+        self.SpillOverDmgMod = math.max(spec.ShieldSpillOverDamageMod or 0.15, 0)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
