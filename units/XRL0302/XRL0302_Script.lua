@@ -45,7 +45,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
-        -- Now handle our special buff and FX
+        -- Now handle our special buff
         local bp
         for k, v in self:GetBlueprint().Buffs do
             if v.Add.OnDeath then
@@ -57,9 +57,11 @@ XRL0302 = Class(CWalkingLandUnit) {
         if bp ~= nil then
             self:AddBuff(bp)
         end
-
-        -- Play EMP Effect
-        CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
+    end,
+    
+    OnDestroy = function(self)
+        CWalkingLandUnit.OnDestroy(self)
+        self:DoDeathWeapon()
     end,
 }
 
