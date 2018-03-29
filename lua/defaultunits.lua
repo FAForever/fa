@@ -2278,12 +2278,14 @@ CommandUnit = Class(WalkingLandUnit) {
         if not teleportTime[self.EntityId] or tick > teleDelay then
             self:CleanupTeleportChargeEffects()
             self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation)
-        elseif seconds > 100 then
-            print("The core is overloaded... restarting in", string.sub(seconds, 1, 2), "seconds")
-        elseif seconds > 10 then
-            print("The core is overloaded... restarting in", string.sub(seconds, 1, 1), "seconds")
-        else
-            print("The core is overloaded... restarting in", string.sub(seconds/10, 1, 3), " seconds")        
+        elseif self:GetArmy() == GetFocusArmy() then
+            if seconds > 100 then
+                print("The core is overloaded... restarting in", string.sub(seconds, 1, 2), "seconds")
+            elseif seconds > 10 then
+                print("The core is overloaded... restarting in", string.sub(seconds, 1, 1), "seconds")
+            else
+                print("The core is overloaded... restarting in", string.sub(seconds/10, 1, 3), " seconds")
+            end                
         end
     end,
     
