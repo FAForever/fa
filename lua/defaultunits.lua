@@ -2274,26 +2274,46 @@ CommandUnit = Class(WalkingLandUnit) {
             tick = GetGameTick() - teleportTime[self.EntityId]
             seconds = teleportTime[self.EntityId] + teleDelay - GetGameTick()
         end    
+
+        self:CleanupTeleportChargeEffects()
+        self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation, tick, seconds, teleDelay)
         
-        if not teleportTime[self.EntityId] or tick > teleDelay then
-            self:CleanupTeleportChargeEffects()
-            self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation)
-        elseif self:GetArmy() == GetFocusArmy() then
-            if seconds > 100 then
-                print("The core is overloaded... restarting in", string.sub(seconds, 1, 2), "seconds")
-            elseif seconds > 10 then
-                print("The core is overloaded... restarting in", string.sub(seconds, 1, 1), "seconds")
-            else
-                print("The core is overloaded... restarting in", string.sub(seconds/10, 1, 3), " seconds")
-            end                
-        end
     end,
     
-    InitiateTeleportThread = function(self, teleporter, location, orientation)
+    InitiateTeleportThread = function(self, teleporter, location, orientation, tick, seconds, teleDelay)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
+        
+        if tick < teleDelay then
+        
+            local sec = seconds
+            local msgTimer = 10
+            local showMessage
+            
+            if self:GetArmy() == GetFocusArmy() then
+                showMessage = true
+            end
+            
+            while sec > 0 do
+                if msgTimer == 10 and showMessage then
+                    if sec > 100 then
+                        print("The core is overloaded... restarting in", string.sub(sec, 1, 2), "seconds")
+                    elseif sec > 10 then
+                        print("The core is overloaded... restarting in", string.sub(sec, 1, 1), "seconds")
+                    else
+                        print("The core is overloaded... restarting in", string.sub(sec/10, 1, 1), " seconds")        
+                    end
+                    
+                    msgTimer = 0
+                end
+                
+                sec = sec - 1
+                msgTimer = msgTimer + 1
+                WaitTicks(1)   
+            end      
+        end
 
         local bp = self:GetBlueprint().Economy
         local energyCost, time
