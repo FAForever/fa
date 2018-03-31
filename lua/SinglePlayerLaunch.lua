@@ -1,6 +1,7 @@
 -- Logic and defaults for launching non-skirmish sessions
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtils = import('/lua/ui/maputil.lua')
+-- Uveso - aitypes inside aitypes.lua is now a function, not a table.
 local aiTypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
 
 function GetRandomName(faction, aiKey)

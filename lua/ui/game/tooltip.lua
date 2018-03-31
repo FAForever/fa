@@ -332,12 +332,18 @@ function SetTooltipText(control, id)
     end
 end
 
+-- Add tooltipsfrom every AI mod to TooltipInfo table
 function AddModAILobbyTooltips()
+    -- get all sim mods installed in /mods/
     local simMods = import('/lua/mods.lua').AllMods()
     local TooltipData
+    -- loop over all installed mods
     for Index, ModData in simMods do
+        -- check if tooltips.lua exist inside the mod
         if exists(ModData.location..'/lua/AI/LobbyTooltips/tooltips.lua') then
+            -- load tooltip data into TooltipData
             TooltipData = import(ModData.location..'/lua/AI/LobbyTooltips/tooltips.lua').Tooltips or {}
+            -- insert AI mod tooltips into TooltipInfo
             for s, t in TooltipData do
                 TooltipInfo.Tooltips[s]=t
             end
