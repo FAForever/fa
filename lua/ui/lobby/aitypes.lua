@@ -6,8 +6,7 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-
-function aitypes()
+function GetAItypes()
     --Table of AI Names to return
     local aitypes = {
         {
@@ -145,3 +144,9 @@ function aitypes()
 
     return aitypes
 end
+
+-- Uveso - aitypes are now available as function. This old table version is for hook compatibility.
+aitypes = (function()
+    local aitypes = GetAItypes()
+    return aitypes
+end)()
