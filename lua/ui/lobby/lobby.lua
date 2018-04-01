@@ -43,8 +43,8 @@ local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
--- Uveso - aitypes inside aitypes.lua is now a function, not a table.
-local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
+-- Uveso - aitypes inside aitypes.lua are now also available as a function.
+local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
 
 local IsSyncReplayServer = false
 
@@ -2216,7 +2216,7 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 
     if not ignoreRefresh then
         -- reload AI types in case we have enable or disable an AI mod.
-        aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes()
+        aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
         UpdateGame()
     end
 end
