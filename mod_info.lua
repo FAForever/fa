@@ -25,7 +25,8 @@ mountpoints = {
     modules = '/modules',
     projectiles = '/projectiles',
     textures = '/textures',
-    units = '/units'
+    units = '/units',
+    props = '/props'
 }
 hooks = {
     '/schook'
