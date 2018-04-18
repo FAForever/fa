@@ -800,8 +800,11 @@ function CreateUI()
     end
 
     function CampaignPrompt(callback)
-      UIUtil.QuickDialog(GetFrame(0), "The Campaign missions from the base game are broken! \n Please use the coop maps from the FAForever client or start the game offline with the coop init file to play the FAF patched campaign. For more information visit wiki.faforever.com",
-      "<LOC _Ok>", callback()
+        UIUtil.QuickDialog(GetFrame(0), "The Campaign missions from the base game are broken! \n Please use the coop maps from the FAForever client or start the game offline with the coop init file to play the FAF patched campaign. For more information visit wiki.faforever.com",
+        "<LOC _Ok>", callback(),
+        "Open Wiki", function()
+            OpenURL('https://wiki.faforever.com/index.php?title=How_do_i_play_FAF_offline%3F')
+        end
     )
     end
 
