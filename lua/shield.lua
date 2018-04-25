@@ -334,6 +334,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
+        self.Charging = true
         while curProgress < time do
             local fraction = self.Owner:GetResourceConsumed()
             curProgress = curProgress + (fraction / 10)
@@ -344,6 +345,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self:UpdateShieldRatio(workProgress)
             WaitTicks(1)
         end
+        self.Charging = nil
     end,
 
     OnState = State {
