@@ -2266,9 +2266,11 @@ CommandUnit = Class(WalkingLandUnit) {
             self.TeleportThread = nil
         end
         
-        local teleDelay = 150 --Ticks
+        local teleDelay = self:GetBlueprint().General.TeleportDelay or 0
         local tick
         local seconds
+        
+        teleDelay = teleDelay * 10 -- We have seconds in bp (easier to use), so need to convert value in ticks.
         
         if teleportTime[self.EntityId] then
             tick = GetGameTick() - teleportTime[self.EntityId]

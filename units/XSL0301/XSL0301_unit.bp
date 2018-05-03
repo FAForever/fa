@@ -691,6 +691,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 0,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,

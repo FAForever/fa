@@ -821,6 +821,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
