@@ -78,7 +78,7 @@ Expressions = {
     -- added exclusion of engineers and structures because they are restricted by other presets
     LAND        = "(LAND - ENGINEER - STRUCTURE)",
     -- added restriction of AA structures because they are not needed when all air units are restricted
-    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD) + (LAND * ANTIAIR - EXPERIMENTAL) + (NAVAL * ANTIAIR - DIRECTFIRE - INDIRECTFIRE - ANTINAVY))",
+    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD) + (NAVAL * CARRIER - EXPERIMENTAL))",
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
     NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
