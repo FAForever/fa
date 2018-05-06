@@ -75,19 +75,13 @@ MissileRedirect = Class(Entity) {
         },
 
         -- Return true to process this collision, false to ignore it.
-        WaitingState = State{
+        WaitingState = State {
             OnCollisionCheck = function(self, other)
-                if EntityCategoryContains(categories.MISSILE, other) and not EntityCategoryContains(categories.STRATEGIC, other)
-                    and other ~= self.EnemyProj and IsEnemy(self:GetArmy(), other:GetArmy()) then
+                if EntityCategoryContains(categories.MISSILE, other) and not EntityCategoryContains(categories.STRATEGIC, other) and
+                   other ~= self.EnemyProj and IsEnemy(self:GetArmy(), other:GetArmy()) then
                     self.Enemy = other:GetLauncher()
                     self.EnemyProj = other
-                    -- NOTE: Fix me We need to test enemy validity if there is no enemy
-                    --      set target to 180 of the unit
-                    if self.Enemy then
-                        other:SetNewTarget(self.Enemy)
-                        other:TrackTarget(true)
-                        other:SetTurnRate(720)
-                    end
+
                     ChangeState(self, self.RedirectingState)
                 end
                 return false
@@ -95,11 +89,14 @@ MissileRedirect = Class(Entity) {
         },
 
         RedirectingState = State{
-
             Main = function(self)
-                if not self or self:BeenDestroyed()
-                    or not self.EnemyProj or self.EnemyProj:BeenDestroyed()
-                    or not self.Owner or self.Owner:IsDead() then
+                if not self or self:BeenDestroyed() or
+                   not self.EnemyProj or self.EnemyProj:BeenDestroyed() or
+                   not self.Owner or self.Owner:IsDead() then
+                    if self then
+                        ChangeState(self, self.WaitingState)
+                    end
+
                     return
                 end
 
@@ -107,28 +104,51 @@ MissileRedirect = Class(Entity) {
                 for k, v in self.RedirectBeams do
                     table.insert(beams, AttachBeamEntityToEntity(self.EnemyProj, -1, self.Owner, self.AttachBone, self:GetArmy(), v))
                 end
+
                 if self.Enemy then
                     -- Set collision to friends active so that when the missile reaches its source it can deal damage.
                     self.EnemyProj.CollideFriendly = true
                     self.EnemyProj.DamageData.DamageFriendly = true
                     self.EnemyProj.DamageData.DamageSelf = true
                 end
-                if self.Enemy and not self.Enemy:BeenDestroyed() then
-                    WaitSeconds(1 / self.RedirectRateOfFire)
-                    if not self.EnemyProj:BeenDestroyed() then
-                        self.EnemyProj:TrackTarget(false)
+
+                if not self.EnemyProj:BeenDestroyed() then
+                    local proj = self.EnemyProj
+                    local enemy = self.Enemy
+                    local enemyPos = enemy and enemy:GetPosition()
+
+                    if proj.MoveThread then
+                        KillThread(proj.MoveThread)
+                        proj.MoveThread = nil
                     end
-                else
-                    WaitSeconds(1 / self.RedirectRateOfFire)
-                    local vectordam = {}
-                    vectordam.x = 0
-                    vectordam.y = 1
-                    vectordam.z = 0
-                    self.EnemyProj:DoTakeDamage(self.Owner, 30, vectordam, 'Fire')
+
+                    proj:ForkThread(function()
+                        local projPos = proj:GetPosition()
+                        local above = {projPos[1], projPos[2] + 5, projPos[3]}
+
+                        proj:SetTurnRate(160)
+                        proj:SetNewTargetGround(above)
+                        proj:TrackTarget(true)
+                        WaitSeconds(1)
+
+                        if proj:BeenDestroyed() then return end
+                        if not enemy then
+                            proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), 'Fire')
+                        elseif enemy:BeenDestroyed() then
+                            proj:SetNewTargetGround(enemyPos)
+                        else
+                            proj:SetNewTarget(enemy)
+                            WaitSeconds(2)
+                            proj:SetNewTargetGround(enemy:GetPosition())
+                        end
+                    end)
                 end
+
+                WaitSeconds(1 / self.RedirectRateOfFire)
                 for k, v in beams do
                     v:Destroy()
                 end
+
                 ChangeState(self, self.WaitingState)
             end,
 
