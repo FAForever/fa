@@ -4312,10 +4312,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.ClosedSlots[data.Slot] = data.Closed
                 gameInfo.SpawnMex[data.Slot] = false
                 ClearSlotInfo(data.Slot)
+                PossiblyAnnounceGameFull()
             elseif data.Type == 'SlotClosedSpawnMex' then
                 gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
                 gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
                 ClearSlotInfo(data.Slot)
+                PossiblyAnnounceGameFull()
             end
         end
     end
