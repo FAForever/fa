@@ -8,6 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Entity = import('/lua/sim/Entity.lua').Entity
+local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 Flare = Class(Entity){
         OnCreate = function(self, spec)
@@ -124,8 +125,10 @@ MissileRedirect = Class(Entity) {
 
                     proj:ForkThread(function()
                         local projPos = proj:GetPosition()
-                        local above = {projPos[1], projPos[2] + 5, projPos[3]}
+                        local above = {projPos[1] + GetRandomFloat(-2, 2), projPos[2] + GetRandomFloat(4, 6), projPos[3] + GetRandomFloat(-2, 2)}
 
+                        proj:SetLifetime(30)
+                        proj:SetCollideSurface(true)
                         proj:SetTurnRate(160)
                         proj:SetNewTargetGround(above)
                         proj:TrackTarget(true)
@@ -134,13 +137,15 @@ MissileRedirect = Class(Entity) {
                         if proj:BeenDestroyed() then return end
                         if not enemy then
                             proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), 'Fire')
-                        elseif enemy:BeenDestroyed() then
-                            proj:SetNewTargetGround(enemyPos)
-                        else
+                        elseif not enemy:BeenDestroyed() then
                             proj:SetNewTarget(enemy)
                             WaitSeconds(2)
-                            proj:SetNewTargetGround(enemy:GetPosition())
+                            enemyPos = enemy:GetPosition()
                         end
+
+                        enemyPos[2] = math.max(17.45, enemyPos[2]-0.05) -- aim at surface if submerged
+
+                        proj:SetNewTargetGround(enemyPos)
                     end)
                 end
 
