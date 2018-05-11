@@ -219,7 +219,7 @@ UnitBlueprint {
             MinRadius = 150,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 63,
+            MuzzleVelocity = 65,
             MuzzleVelocityReduceDistance = 800,
             ProjectileId = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_proj.bp',
             ProjectileLifetime = 120,
