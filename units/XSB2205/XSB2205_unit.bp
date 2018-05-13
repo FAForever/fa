@@ -77,14 +77,6 @@ UnitBlueprint {
             '<LOC ability_torpedo>Torpedoes',
             '<LOC ability_torpedodef>Torpedo Defense',
         },
-        AnimationDeath = {
-            {
-                Animation = '/units/xsb2205/xsb2205_Adeath.sca',
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
-                Weight = 1,
-            },
-        },
         DamageEffects = {
             {
                 Bone = 0,
