@@ -302,7 +302,29 @@ Patch 3696 (26 May, 2018)
 - speed2
 - Strogo
 - Uveso
-    
+
+
+Patch 3695 (25th December, 2017)
+============================
+### Other
+- Reverted 3694's changes
+- This patch is identical to patch 3693
+
+### Contributors
+- Ozonex
+- CookieNoob
+
+Patch 3694 (21st December, 2017)
+============================
+### Other
+- Added christmas-related content, like reclaimable gifts.
+- Renamed the Galactic Colossus accordingly
+
+### Contributors
+- Ozonex
+- CookieNoob
+
+
 Patch 3693 (3rd December, 2017)
 ============================
 ### Lobby
