@@ -1,4 +1,4 @@
-Patch 3695 (25st December, 2017)
+Patch 3695 (25th December, 2017)
 ============================
 ### Other
 - Reverted 3694's changes
@@ -11,7 +11,7 @@ Patch 3695 (25st December, 2017)
 Patch 3694 (21st December, 2017)
 ============================
 ### Other
-- Added christmas-theme related content, like reclaimable gifts.
+- Added christmas-related content, like reclaimable gifts.
 - Renamed the Galactic Colossus accordingly
 
 ### Contributors
