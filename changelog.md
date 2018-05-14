@@ -5,7 +5,7 @@ Patch 3695 (25th December, 2017)
 - This patch is identical to patch 3693
 
 ### Contributors
-- IceDreamer
+- Ozonex
 - CookieNoob
 
 Patch 3694 (21st December, 2017)
@@ -15,7 +15,8 @@ Patch 3694 (21st December, 2017)
 - Renamed the Galactic Colossus accordingly
 
 ### Contributors
-- IceDreamer
+- Ozonex
+- CookieNoob
 
 Patch 3693 (3rd December, 2017)
 ============================
