@@ -2272,7 +2272,9 @@ CommandUnit = Class(WalkingLandUnit) {
         local teleDelay = self:GetBlueprint().General.TeleportDelay
 
         if teleDelay then
+            energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
+            energyCost = energyCost * energyCostMod
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
             WaitTicks(teleDelay * 10)
         else 
