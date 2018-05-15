@@ -535,7 +535,7 @@ UnitBlueprint {
             ShieldRegenRate = 150,
             ShieldRegenStartTime = 1,
             ShieldSize = 20,
-            ShieldSpillOverDamageMod = 0.5,
+            ShieldSpillOverDamageMod = 0.20,
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
