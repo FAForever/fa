@@ -2254,69 +2254,12 @@ CommandUnit = Class(WalkingLandUnit) {
     -------------------------------------------------------------------------------------------
     -- TELEPORTING WITH DELAY
     -------------------------------------------------------------------------------------------
-    
-    OnTeleportUnit = function(self, teleporter, location, orientation)
-        if self.TeleportDrain then
-            RemoveEconomyEvent(self, self.TeleportDrain)
-            self.TeleportDrain = nil
-        end
-
-        if self.TeleportThread then
-            KillThread(self.TeleportThread)
-            self.TeleportThread = nil
-        end
-        
-        local teleDelay = self:GetBlueprint().General.TeleportDelay or 0
-        local tick
-        local seconds
-        
-        teleDelay = teleDelay * 10 -- We have seconds in bp (easier to use), so need to convert value in ticks.
-        
-        if teleportTime[self.EntityId] then
-            tick = GetGameTick() - teleportTime[self.EntityId]
-            seconds = teleportTime[self.EntityId] + teleDelay - GetGameTick()
-        end    
-
-        self:CleanupTeleportChargeEffects()
-        self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation, tick, seconds, teleDelay)
-        
-    end,
-    
-    InitiateTeleportThread = function(self, teleporter, location, orientation, tick, seconds, teleDelay)
+    InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
         
-        if tick < teleDelay then
-        
-            local sec = seconds
-            local msgTimer = 10
-            local showMessage
-            
-            if self:GetArmy() == GetFocusArmy() then
-                showMessage = true
-            end
-            
-            while sec > 0 do
-                if msgTimer == 10 and showMessage then
-                    if sec > 100 then
-                        print("The core is overloaded... restarting in", string.sub(sec, 1, 2), "seconds")
-                    elseif sec > 10 then
-                        print("The core is overloaded... restarting in", string.sub(sec, 1, 1), "seconds")
-                    else
-                        print("The core is overloaded... restarting in", string.sub(sec/10, 1, 1), " seconds")        
-                    end
-                    
-                    msgTimer = 0
-                end
-                
-                sec = sec - 1
-                msgTimer = msgTimer + 1
-                WaitTicks(1)   
-            end      
-        end
-
         local bp = self:GetBlueprint().Economy
         local energyCost, time
         if bp then
@@ -2326,7 +2269,15 @@ CommandUnit = Class(WalkingLandUnit) {
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
 
-        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+        local teleDelay = self:GetBlueprint().General.TeleportDelay
+
+        if teleDelay then
+            time = time + teleDelay
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+            WaitTicks(teleDelay * 10)
+        else 
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+        end
 
         -- Create teleport charge effect
         self:PlayTeleportChargeEffects(location, orientation)
