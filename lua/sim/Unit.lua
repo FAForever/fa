@@ -4128,8 +4128,8 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
 
-    PlayTeleportChargeEffects = function(self, location, orientation)
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
+    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
