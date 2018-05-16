@@ -2275,6 +2275,10 @@ CommandUnit = Class(WalkingLandUnit) {
             energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
             energyCost = energyCost * energyCostMod
+            
+            self.TeleportDestChargeBag = nil 
+            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
+            
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
             
             -- Create teleport charge effect + exit animation delay
