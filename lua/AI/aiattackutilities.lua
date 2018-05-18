@@ -1022,7 +1022,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 else
                     platoon:MoveToLocation(waypointPath, false)
                 end
-            end  
+            end
         end
     end
 
@@ -1039,15 +1039,18 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
     # only get transports for land (or partial land) movement
     if platoon.MovementLayer == 'Land' or platoon.MovementLayer == 'Amphibious' then
 
-        #DUNCAN - commented out, why check it?
-        #if platoon.MovementLayer == 'Land' then
-        #    # if it's water, this is not valid at all
-        #    local terrain = GetTerrainHeight(destination[1], destination[2])
-        #    local surface = GetSurfaceHeight(destination[1], destination[2])
-        #    if terrain <= surface then
-        #        return false
-        #    end
-        #end
+        -- DUNCAN - commented out, why check it?
+        -- UVESO - If we reach this point, then we have either a platoon with Land or Amphibious MovementLayer.
+        --         Both are valid if we have a Land destination point. But if we have a Amphibious destination
+        --         point then we don't want to transport landunits.
+        --         (This only happens on maps without AI path markers. Path graphing would prevent this.)
+        if platoon.MovementLayer == 'Land' then
+            local terrain = GetTerrainHeight(destination[1], destination[2])
+            local surface = GetSurfaceHeight(destination[1], destination[2])
+            if terrain < surface then
+                return false
+            end
+        end
 
         # if we don't *need* transports, then just call GetTransports...
         if not bRequired then
@@ -1203,7 +1206,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                 else
                     platoon:MoveToLocation(waypointPath, false)
                 end
-            end  
+            end
         end
     else
         return false
@@ -1226,6 +1229,10 @@ end
 #-----------------------------------------------------
 
 function GetMostRestrictiveLayer(platoon)
+    -- in case the platoon is already destroyed return false.
+    if not platoon then
+        return false
+    end
     local unit = false
     platoon.MovementLayer = 'Air'
     for k,v in platoon:GetPlatoonUnits() do
@@ -1269,62 +1276,58 @@ end
 #-----------------------------------------------------
 
 function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, optThreatWeight, optMaxMarkerDist, testPathDist)
-
+    -- if we don't have markers for the platoonLayer, then we can't build a path.
+    if not GetPathGraphs()[platoonLayer] then
+        return false, 'NoGraph'
+    end
     local location = start
     optMaxMarkerDist = optMaxMarkerDist or 250
     optThreatWeight = optThreatWeight or 1
     local finalPath = {}
-    local testPath = false
 
-    #If it is a Sorian AI or Duncane AI and not a water unit.
-    if (aiBrain.Sorian or aiBrain.Duncan) and platoonLayer != "Water" then
-        testPath = true
-    end
-
-    #If we are within 100 units of the destination, don't bother pathing.
-    if (VDist2Sq(start[1], start[3], destination[1], destination[3]) <= 10000 or
-        (testPathDist and VDist2Sq(start[1], start[3], destination[1], destination[3]) <= testPathDist)) and
-        testPath then
-            table.insert(finalPath, destination)
-            return finalPath
+    --If we are within 100 units of the destination, don't bother pathing. (Sorian and Duncan AI)
+    if (aiBrain.Sorian or aiBrain.Duncan) and (VDist2(start[1], start[3], destination[1], destination[3]) <= 100
+    or (testPathDist and VDist2Sq(start[1], start[3], destination[1], destination[3]) <= testPathDist)) then
+        table.insert(finalPath, destination)
+        return finalPath
     end
 
     --Get the closest path node at the platoon's position
     local startNode
-    #if testPath then
-    #	startNode = GetClosestPathNodeInRadiusByLayerSorian(location, destination, optMaxMarkerDist, platoonLayer)
-    #else
+    if (aiBrain.Sorian or aiBrain.Duncan) then
+        startNode = GetClosestPathNodeInRadiusByLayerSorian(location, destination, optMaxMarkerDist, platoonLayer)
+    else
         startNode = GetClosestPathNodeInRadiusByLayer(location, optMaxMarkerDist, platoonLayer)
-    #end
-    if not startNode and platoonLayer == 'Amphibious' then
-        return PlatoonGenerateSafePathTo(aiBrain, 'Land', start, destination, optThreatWeight, optMaxMarkerDist)
     end
     if not startNode then return false, 'NoStartNode' end
 
     --Get the matching path node at the destiantion
-    local endNode = GetClosestPathNodeInRadiusByGraph(destination, optMaxMarkerDist, startNode.graphName)
-    if not endNode and platoonLayer == 'Amphibious' then
-        return PlatoonGenerateSafePathTo(aiBrain, 'Land', start, destination, optThreatWeight, optMaxMarkerDist)
+    local endNode
+    if (aiBrain.Sorian or aiBrain.Duncan) then
+        endNode = GetClosestPathNodeInRadiusByLayerSorian(destination, destination, optMaxMarkerDist, platoonLayer)
+    else
+        endNode = GetClosestPathNodeInRadiusByGraph(destination, optMaxMarkerDist, startNode.graphName)
     end
     if not endNode then return false, 'NoEndNode' end
 
-     --Generate the safest path between the start and destination
-    local path = GeneratePath(aiBrain, startNode, endNode, ThreatTable[platoonLayer], optThreatWeight, destination, location, testPath)
-    if not path and platoonLayer == 'Amphibious' then
-        return PlatoonGenerateSafePathTo(aiBrain, 'Land', start, destination, optThreatWeight, optMaxMarkerDist)
+    --Generate the safest path between the start and destination
+    local path
+    if aiBrain.Sorian or aiBrain.Duncan then
+        -- Sorian and Duncans AI are using a strong modified pathfinding with path shortcuts, range checks and path caching for better performance.
+        path = GeneratePathSorian(aiBrain, startNode, endNode, ThreatTable[platoonLayer], optThreatWeight, destination, location)
+    else
+        -- The original AI is using the vanilla version of GeneratePath. No cache, ugly (AStarLoopBody) code, but reacts faster on new situations.
+        path = GeneratePath(aiBrain, startNode, endNode, ThreatTable[platoonLayer], optThreatWeight, destination, location)
     end
     if not path then return false, 'NoPath' end
 
-    --Insert the path nodes (minus the start node and end nodes, which are close enough to our start and destination) into our command queue.
-    #local finalPath = {}
+    -- Insert the path nodes (minus the start node and end nodes, which are close enough to our start and destination) into our command queue.
     for i,node in path.path do
         if i > 1 and i < table.getn(path.path) then
-              #platoon:MoveToLocation(node.position, false)
-              table.insert(finalPath, node.position)
-          end
+            table.insert(finalPath, node.position)
+        end
     end
 
-    #platoon:MoveToLocation(destination, false)
     table.insert(finalPath, destination)
 
     return finalPath
@@ -1340,8 +1343,11 @@ end
 #-----------------------------------------------------
 
 function GetPathGraphs()
-    if ScenarioInfo.PathGraphs then return ScenarioInfo.PathGraphs
-    else ScenarioInfo.PathGraphs = {} end
+    if ScenarioInfo.PathGraphs then
+        return ScenarioInfo.PathGraphs
+    else
+        ScenarioInfo.PathGraphs = {}
+    end
 
     local markerGroups = {
         Land = AIUtils.AIGetMarkerLocationsEx(nil, 'Land Path Node') or {},
@@ -1355,7 +1361,11 @@ function GetPathGraphs()
             --Create stuff if it doesn't exist
             ScenarioInfo.PathGraphs[gk] = ScenarioInfo.PathGraphs[gk] or {}
             ScenarioInfo.PathGraphs[gk][marker.graph] = ScenarioInfo.PathGraphs[gk][marker.graph] or {}
-
+            -- If the marker has no adjacentTo then don't use it. We can't build a path with this node.
+            if not (marker.adjacentTo) then
+                LOG('*AI DEBUG: GetPathGraphs(): Path Node '..marker.name..' has no adjacentTo entry!')
+                continue
+            end
             --Add the marker to the graph.
             ScenarioInfo.PathGraphs[gk][marker.graph][marker.name] = {name = marker.name, layer = gk, graphName = marker.graph, position = marker.position, adjacent = STR_GetTokens(marker.adjacentTo, ' '), color = marker.color}
         end
@@ -1413,7 +1423,6 @@ end
 #-----------------------------------------------------
 
 function GetClosestPathNodeInRadiusByGraph(location, radius, graphName)
-
     local bestDist = radius*radius
     local bestMarker = false
 
@@ -1482,25 +1491,32 @@ end
 #       A list of positions of path nodes from beginning to end of the selected path
 #-----------------------------------------------------
 
-function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, destination, location, testPath)
+function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeight, destination, location)
     if not aiBrain.PathCache then
         #Create path cache table. Paths are stored in this table and saved for 1 minute so
         #any other platoons needing to travel the same route can get the path without the extra work.
         aiBrain.PathCache = {}
     end
-    if not aiBrain.PathCache[startNode.name] then
-        aiBrain.PathCache[startNode.name] = {}
-        aiBrain.PathCache[startNode.name][endNode.name] = {}
-    end
-    if not aiBrain.PathCache[startNode.name][endNode.name] then
-        aiBrain.PathCache[startNode.name][endNode.name] = {}
-    end
+    -- create a new path
+    aiBrain.PathCache[startNode.name] = aiBrain.PathCache[startNode.name] or {}
+    aiBrain.PathCache[startNode.name][endNode.name] = aiBrain.PathCache[startNode.name][endNode.name] or {}
+    aiBrain.PathCache[startNode.name][endNode.name].settime = aiBrain.PathCache[startNode.name][endNode.name].settime or GetGameTimeSeconds()
 
     if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path != 'bad'
     and aiBrain.PathCache[startNode.name][endNode.name].settime + 60 > GetGameTimeSeconds() then
         return aiBrain.PathCache[startNode.name][endNode.name].path
-    --elseif aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path == 'bad' then
-    --	return false
+    end
+
+    -- Uveso - Clean path cache. Loop over all paths's and remove old ones
+    if aiBrain.PathCache then
+        local GameTime = GetGameTimeSeconds()
+        for StartNode, EndNodeCache in aiBrain.PathCache do
+            for EndNode, Path in EndNodeCache do
+                if Path.settime + 60 < GameTime then
+                    aiBrain.PathCache[StartNode][EndNode] = nil
+                end
+            end
+        end
     end
 
     threatWeight = threatWeight or 1
@@ -1513,7 +1529,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, des
             path = {startNode, },
     }
 
-    if testPath and VDist2Sq(location[1], location[3], startNode.position[1], startNode.position[3]) > 10000 and
+    if (aiBrain.Sorian or aiBrain.Duncan) and VDist2Sq(location[1], location[3], startNode.position[1], startNode.position[3]) > 10000 and
     SUtils.DestinationBetweenPoints(destination, location, startNode.position) then
         local newPath = {
                 path = {newNode = {position = destination}, },
@@ -1545,7 +1561,8 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, des
                 continue
             end
 
-            if testPath and SUtils.DestinationBetweenPoints(destination, lastNode.position, newNode.position) then
+            if (aiBrain.Sorian or aiBrain.Duncan) and SUtils.DestinationBetweenPoints(destination, lastNode.position, newNode.position) then
+                aiBrain.PathCache[startNode.name][endNode.name] = { settime = GetGameTimeSeconds(), path = queue }
                 return queue
             end
 
@@ -1581,26 +1598,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, des
 end
 
 
-function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, destination, location, testPath)
-    if not aiBrain.PathCache then
-        #Create path cache table. Paths are stored in this table and saved for 1 minute so
-        #any other platoons needing to travel the same route can get the path without the extra work.
-        aiBrain.PathCache = {}
-    end
-    if not aiBrain.PathCache[startNode.name] then
-        aiBrain.PathCache[startNode.name] = {}
-        aiBrain.PathCache[startNode.name][endNode.name] = {}
-    end
-    if not aiBrain.PathCache[startNode.name][endNode.name] then
-        aiBrain.PathCache[startNode.name][endNode.name] = {}
-    end
-
-    if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path != 'bad'
-    and aiBrain.PathCache[startNode.name][endNode.name].settime + 60 > GetGameTimeSeconds() then
-        return aiBrain.PathCache[startNode.name][endNode.name].path
-    --elseif aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path == 'bad' then
-    --	return false
-    end
+function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, destination, location)
     threatWeight = threatWeight or 1
 
     local graph = GetPathGraphs()[startNode.layer][startNode.graphName]
@@ -1616,17 +1614,6 @@ function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, 
             threat = 0
         }
     }
-    if testPath and VDist2Sq(location[1], location[3], startNode.position[1], startNode.position[3]) > 10000 and
-    SUtils.DestinationBetweenPoints(destination, location, startNode.position) then
-            local newPath = {
-                {
-                    cost = 0,
-                    path = {newNode = {position = destination}, },
-                    threat = 0
-                }
-            }
-            return newPath
-    end
 
     --I didn't know we had a continue statement when I wrote this, and this was a workaround to avoid using continue. :(
     local AStarLoopBody = function()
@@ -1653,14 +1640,10 @@ function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, 
             local newNode = graph[adjacentNode]
 
             if newNode then
-                if testPath and SUtils.DestinationBetweenPoints(destination, lastNode.position, newNode.position) then
-                        return curPath
-                end
                 --get distance from new node to end node
                 local dist = VDist2Sq(newNode.position[1], newNode.position[3], endNode.position[1], endNode.position[3])
-
                 # this brings the dist value from 0 to 100% of the maximum length with can travel on a map
-                dist = 100 * dist / (mapSizeX + mapSizeZ) #(mapSizeX * mapSizeX  + mapSizeZ * mapSizeZ)
+                dist = 100 * dist / ( mapSizeX + mapSizeZ ) #(mapSizeX * mapSizeX  + mapSizeZ * mapSizeZ)
 
                 --get threat from current node to adjacent node
                 local threat = aiBrain:GetThreatBetweenPositions(newNode.position, lastNode.position, nil, threatType)
@@ -1686,7 +1669,6 @@ function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, 
         loopRet = AStarLoopBody()
 
         if loopRet then
-            aiBrain.PathCache[startNode.name][endNode.name] = { settime = GetGameTimeSeconds(), path = loopRet }
             return loopRet
         end
     end
@@ -1720,25 +1702,6 @@ function CanGraphTo(unit, destPos, layer)
 end
 
 #-----------------------------------------------------
-#   Function: GraphExists
-#   Args:
-#       layer - layer name to check if a pathing graph exists for
-#   Description:
-#       Checks if a pathing graph exists for the specified layer
-#   Returns:
-#       true if layer exists, else nil.
-#-----------------------------------------------------
-function GraphExists(layer)
-    local graphs = GetPathGraphs()
-
-    if layer == 'Amphibious' then
-        return graphs[layer] or graphs.Land
-    end
-
-    return graphs[layer]
-end
-
-#-----------------------------------------------------
 #   Function: CheckPlatoonPathingEx
 #   Args:
 #       platoon - platoon to check pathing for
@@ -1751,35 +1714,25 @@ end
 function CheckPlatoonPathingEx(platoon, destPos)
     local unit = GetMostRestrictiveLayer(platoon)
 
-    if platoon.MovementLayer == 'Air' then
-        return true, destPos
+    --reject invalid spaces
+    if destPos[1] < 0 or destPos[3] < 0 or destPos[1] > ScenarioInfo.size[1] or destPos[3] > ScenarioInfo.size[2] then
+        return false, destPos
     end
 
-    local platPos = platoon:GetPlatoonPosition()
-    local bestPos = platPos
-
-    #reject invalid spaces
-    if platPos[1] < 0 or platPos[3] < 0 or destPos[1] < 0 or destPos[3] < 0 or
-       platPos[1] > ScenarioInfo.size[1] or platPos[3] > ScenarioInfo.size[2] or
-       destPos[1] > ScenarioInfo.size[1] or destPos[3] > ScenarioInfo.size[2] then
-        return false, bestPos
-    end
-
-    local result = false
-
-    #only try to path to places on the same layer
-    if GraphExists(platoon.MovementLayer) then
-        result, bestPos = CanGraphTo(unit, destPos, platoon.MovementLayer)
-        bestPos = destPos #Same layer, so if the graph says we're good, then use the destination pos.
-
-        if not result then
-            bestPos = platPos
+    --only try to path to places on the same layer
+    if not unit or unit.Dead then
+        return false, destPos
+    elseif GetPathGraphs()[platoon.MovementLayer] then
+        if CanGraphTo(unit, destPos, platoon.MovementLayer) then
+            return true, destPos
         end
     else
-        result, bestPos = unit:CanPathTo(destPos)
+        if unit:CanPathTo(destPos) then
+            return true, destPos
+        end
     end
 
-    return result, bestPos
+    return false, destPos
 end
 
 
@@ -2328,7 +2281,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 else
                     platoon:MoveToLocation(waypointPath, false)
                 end
-            end  
+            end
         end
     else
         return false
@@ -2345,3 +2298,7 @@ function InWaterCheck(platoon)
     return inWater
 end
 
+-- Deprecated functions / unused
+function GraphExists(layer)
+    WARN('[aiattackutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function GraphExists(layer) called. Use GetPathGraphs()[layer] instead.')
+end
