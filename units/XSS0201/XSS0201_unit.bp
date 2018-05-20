@@ -287,7 +287,7 @@ UnitBlueprint {
             BeamLifetime = 1,
             CollideFriendly = false,
             Damage = 50,
-            DamageRadius = 1,
+            DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
             DoNotCollideList = {
