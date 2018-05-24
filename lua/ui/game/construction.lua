@@ -2519,7 +2519,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
             sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
-            sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
+            sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL - categories.REMOVEFROMETAB, buildableUnits)
         else
             sortedOptions.t1 = buildableUnits
         end

@@ -60,7 +60,8 @@ UnitBlueprint {
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
         'EXPERIMENTAL',
-        'NEEDMOBILEBUILD',                                
+        'NEEDMOBILEBUILD',
+        'REMOVEFROMETAB',   
     },
     Defense = {
         AirThreatLevel = 0,
