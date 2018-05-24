@@ -16,7 +16,10 @@ XRB2308 = Class(CStructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
-        self:StartSinkingFromBuild()
+        --self:StartSinkingFromBuild() --previous sinking code
+        
+        IssueDive({self})
+        self:FinalAnimation()
 
         local army = self:GetArmy() -- Add inital sinking effects
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
