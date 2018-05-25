@@ -414,7 +414,6 @@ function GiveOrders(Data)
          ["Patrol"]             = IssuePatrol,
          ["Repair"]             = IssueRepair,
          ["Reclaim"]            = IssueReclaim,
-         ["Repair"]             = IssueRepair,
          ["Tactical"]           = IssueTactical,
         }
     end
