@@ -439,8 +439,9 @@ function GiveOrders(Data)
             if order.EntityId then
                 target = GetEntityById(order.EntityId)
             end
-            
-            Function({ unit }, target)
+            if target then
+                Function({ unit }, target)
+            end
         end
     end
 end -- function GiveOrders(Data)
