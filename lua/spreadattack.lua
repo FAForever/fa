@@ -86,7 +86,7 @@ end -- function MakeShadowCopyorders(command)
 -- based on its current command queue.
 -- It can only get ability names and positions of current orders,
 -- so it can't retarget orders with a changed entity target.
-local function FixOrders(unit)
+function FixOrders(unit)
 
     -- The factory exclusion is because GetCommandQueue doesn't work right for them.
     -- This means we can't fix orders for Fatboy, Megalith, Tempest, or carriers.
