@@ -4242,7 +4242,7 @@ Unit = Class(moho.unit_methods) {
 
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
-        if self:ShieldIsOn() then
+        if self:ShieldIsOn() or self.MyShield.Charging then
             self:DisableShield()
             self:DisableDefaultToggleCaps()
         end
