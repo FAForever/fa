@@ -1,3 +1,38 @@
+Patch 3698 (Upcoming)
+============================
+### Lobby
+- Introduced ability to have mods that affect AI options
+- Fixed official maps being hidden at the wrong time by the filter
+
+### UI
+- Fixed shielded air units having their shield and fuel UI bars collide
+
+### Gameplay
+- Allow Novax Command Center to have rally points
+
+### Bugs
+- Fixed Aeon Hydrocarbon not being targetable during construction
+- Fixed some underwater props being rendered as though they were above the water
+- Fixed objective units not being properly highlighted in COOP
+
+### Other
+- Improved engine documentation
+- Updated mod blacklist
+- Updated map blacklist
+- Added blueprints for unit database
+- Cleaned up some blueprint entries and unit IDs for unit database
+- Further translation into French
+
+### Contributors
+- speed2
+- CookieNoob
+- PhilipJFry
+- IceDreamer
+- shalkya
+- Uveso
+- FAETHER
+
+
 Patch 3696 (26 May, 2018)
 ============================
 ### Gameplay
