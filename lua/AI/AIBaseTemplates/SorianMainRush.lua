@@ -225,6 +225,9 @@ BaseBuilderTemplate {
         return 0
     end,
     FirstBaseFunction = function(aiBrain)
+        if not aiBrain.Sorian then
+            return 0
+        end
         local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not per then
             return 1, 'sorianrush'

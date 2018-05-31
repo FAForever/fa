@@ -280,6 +280,14 @@ end
 function CommanderBehavior(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.CommanderThread then
+            v.CommanderThread = v:ForkThread(CommanderThread, platoon)
+        end
+    end
+end
+
+function CommanderBehaviorImproved(platoon)
+    for _, v in platoon:GetPlatoonUnits() do
+        if not v.Dead and not v.CommanderThread then
             v.CommanderThread = v:ForkThread(CommanderThreadImproved, platoon)
         end
     end
@@ -2636,7 +2644,7 @@ function FatBoyBehaviorSorian(self)
                 cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', targetUnit:GetPosition(), 'AttackMove')
             end
         else
-            LOG('*DEBUG: FatBoy no target.')
+            --LOG('*DEBUG: FatBoy no target.')
         end
 
         -- Walk to and kill target loop
