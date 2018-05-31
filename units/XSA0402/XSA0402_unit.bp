@@ -208,7 +208,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 780000,
         BuildCostMass = 48000,
-        BuildTime = 36000,
+        BuildTime = 67500,
     },
     Footprint = {
         MaxSlope = 0.5,
@@ -298,7 +298,7 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BombDropThreshold = 4,
+            BombDropThreshold = 20,
             CollideFriendly = false,
             Damage = 11000,
             DamageFriendly = true,

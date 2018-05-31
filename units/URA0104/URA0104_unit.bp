@@ -28,7 +28,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 4,
         LiftFactor = 8,
-        MaxAirspeed = 15,
+        MaxAirspeed = 14.3,
         StartTurnDistance = 10,
         TransportHoverHeight = 6,
     },
@@ -201,9 +201,9 @@ UnitBlueprint {
         UniformScale = 0.06,
     },
     Economy = {
-        BuildCostEnergy = 12000,
-        BuildCostMass = 300,
-        BuildTime = 2400,
+        BuildCostEnergy = 13200,
+        BuildCostMass = 330,
+        BuildTime = 2640,
     },
     Footprint = {
         MaxSlope = 0.25,

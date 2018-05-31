@@ -254,7 +254,7 @@ UnitBlueprint {
         BuildCostEnergy = 350000,
         BuildCostMass = 24000,
         BuildRate = 240,
-        BuildTime = 14400,
+        BuildTime = 28800,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
@@ -391,7 +391,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 1.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 28,
+            MuzzleVelocity = 35,
             MuzzleVelocityReduceDistance = 130,
             NotExclusive = true,
             ProjectileId = '/projectiles/ADFOblivionCannon04/ADFOblivionCannon04_proj.bp',

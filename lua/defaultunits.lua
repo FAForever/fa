@@ -20,6 +20,7 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
+local teleportTime = {}
 
 local CreateScaledBoom = function(unit, overkill, bone)
     explosion.CreateDefaultHitExplosionAtBone(
@@ -583,6 +584,15 @@ StructureUnit = Class(Unit) {
                 self.AdjacencyBeamsBag[k] = nil
             end
         end
+    end,
+    
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+	    -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.structureDamage
+        end
+        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 }
 
@@ -2240,6 +2250,71 @@ CommandUnit = Class(WalkingLandUnit) {
             self:SetMesh(bp.Display.MeshBlueprint, true)
         end
     end,
+    
+    -------------------------------------------------------------------------------------------
+    -- TELEPORTING WITH DELAY
+    -------------------------------------------------------------------------------------------
+    InitiateTeleportThread = function(self, teleporter, location, orientation)
+        self.UnitBeingTeleported = self
+        self:SetImmobile(true)
+        self:PlayUnitSound('TeleportStart')
+        self:PlayUnitAmbientSound('TeleportLoop')
+        
+        local bp = self:GetBlueprint().Economy
+        local energyCost, time
+        if bp then
+            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
+            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bp.TeleportTimeMod or 0.01)
+        end
+
+        local teleDelay = self:GetBlueprint().General.TeleportDelay
+
+        if teleDelay then
+            energyCostMod = (time + teleDelay) / time
+            time = time + teleDelay
+            energyCost = energyCost * energyCostMod
+            
+            self.TeleportDestChargeBag = nil 
+            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
+            
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+            
+            -- Create teleport charge effect + exit animation delay
+            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
+            WaitFor(self.TeleportDrain)
+        else 
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+            
+            -- Create teleport charge effect
+            self:PlayTeleportChargeEffects(location, orientation)
+            WaitFor(self.TeleportDrain)
+        end
+
+        if self.TeleportDrain then
+            RemoveEconomyEvent(self, self.TeleportDrain)
+            self.TeleportDrain = nil
+        end
+
+        self:PlayTeleportOutEffects()
+        self:CleanupTeleportChargeEffects()
+        WaitSeconds(0.1)
+        self:SetWorkProgress(0.0)
+        Warp(self, location, orientation)
+        self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
+        teleportTime[self.EntityId] = GetGameTick()
+
+        WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
+
+        -- Landing Sound
+        self:StopUnitAmbientSound('TeleportLoop')
+        self:PlayUnitSound('TeleportEnd')
+        self:SetImmobile(false)
+        self.UnitBeingTeleported = nil
+        self.TeleportThread = nil
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
@@ -2283,8 +2358,14 @@ ACUUnit = Class(CommandUnit) {
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
-
+    
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.commandDamage
+        end
+
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
         local aiBrain = self:GetAIBrain()
         if aiBrain then
