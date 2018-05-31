@@ -1174,7 +1174,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T1 Engineer Reclaim',
         PlatoonTemplate = 'EngineerBuilderSorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 900,
         InstanceCount = 3,
         BuilderConditions = {
@@ -1257,7 +1257,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T1 Engineer Reclaim Excess',
         PlatoonTemplate = 'EngineerBuilderSorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 1,
         InstanceCount = 50,
         BuilderConditions = {
@@ -1569,7 +1569,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T2 Engineer Reclaim',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 750,
         InstanceCount = 3,
         BuilderConditions = {
@@ -1653,7 +1653,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T2 Engineer Reclaim Excess',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 1,
         InstanceCount = 50,
         BuilderConditions = {
@@ -1810,7 +1810,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T3 Engineer Reclaim',
         PlatoonTemplate = 'T3EngineerBuilderOnlySorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 750,
         InstanceCount = 3,
         BuilderConditions = {
@@ -1878,7 +1878,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T3 Engineer Reclaim Excess',
         PlatoonTemplate = 'T3EngineerBuilderOnlySorian',
-        PlatoonAIPlan = 'ReclaimAISorian',
+        PlatoonAIPlan = 'ReclaimAI',
         Priority = 1,
         InstanceCount = 50,
         BuilderConditions = {
@@ -3351,7 +3351,7 @@ BuilderGroup {
         PlatoonTemplate = 'MassFabsSorian',
         Priority = 300,
         InstanceCount = 3,
-        BuildConditions = {
+        BuilderConditions = {
                 { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSFABRICATION}},
                 { EBC, 'LessThanEconStorageRatio',  { 1.1, 0.6}},
             },
