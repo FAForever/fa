@@ -17,6 +17,11 @@ CDFCannonMolecular01 = Class(CMolecularCannonProjectile, OverchargeProjectile) {
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         CMolecularCannonProjectile.OnImpact(self, targetType, targetEntity)
     end,
+    
+    OnCreate = function(self)
+        OverchargeProjectile.OnCreate(self)
+        CMolecularCannonProjectile.OnCreate(self)
+    end,
 }
 
 TypeClass = CDFCannonMolecular01
