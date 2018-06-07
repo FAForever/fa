@@ -324,7 +324,7 @@ Patch 3696 (26 May, 2018)
 ### Fixes
     - Nuke trajectory is now corrected so it travels parallel to the ground.
     - Selens will no longer lose their radar when there is a power stall.
-    - Units with personal shields that are unloading from transports will now take damage on their shield when hit.
+    - Units with personal shields that are unloading from transports will now take damage on their health when hit.
     - The seraphim T2 torp defence wreck is no longer invisible.
     
 ### Contributors
