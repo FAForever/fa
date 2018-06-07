@@ -13,6 +13,11 @@ SDFChronatronCannon02 = Class(SChronatronCannonOverCharge, OverchargeProjectile)
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         SChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
     end,
+    
+    OnCreate = function(self)
+        OverchargeProjectile.OnCreate(self)
+        SChronatronCannonOverCharge.OnCreate(self)
+    end,
 }
 
 TypeClass = SDFChronatronCannon02
