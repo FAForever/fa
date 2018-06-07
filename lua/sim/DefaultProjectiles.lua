@@ -6,7 +6,8 @@
 -----------------------------------------------------------------
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
-local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities                                                                                                
+local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
+local OCProjectiles = 0                                                                                            
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -362,6 +363,11 @@ OverchargeProjectile = Class() {
             
                 -- Get max energy available to drain according to how much we have
                 local energyLimit = launcher:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
+                
+                if OCProjectiles > 1 then
+                    energyLimit = energyLimit / OCProjectiles
+                end
+                
                 local energyLimitDamage = self:EnergyAsDamage(energyLimit)
 
                 -- Find max available damage
@@ -402,10 +408,11 @@ OverchargeProjectile = Class() {
         self.DamageData.DamageAmount = damage
 
         if drain > 0 then
-            launcher.EconDrain = CreateEconomyEvent(launcher, drain, 0, 1)
+            launcher.EconDrain = CreateEconomyEvent(launcher, drain, 0, 0)
             launcher:ForkThread(function()
                 WaitFor(launcher.EconDrain)
                 RemoveEconomyEvent(launcher, launcher.EconDrain)
+                OCProjectiles = OCProjectiles - 1
                 launcher.EconDrain = nil
             end)
         end
@@ -457,5 +464,9 @@ OverchargeProjectile = Class() {
         if maxHP ~= 0 then
             return maxHP     
         end
+    end,
+    
+    OnCreate = function(self)
+        OCProjectiles = OCProjectiles + 1
     end,
 }
