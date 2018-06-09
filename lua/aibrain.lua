@@ -3410,31 +3410,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOff' then
-                self:OnDefeat()
-            else
-                ForkThread(function()
-                    local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
-
-                    WaitSeconds(1)
-
-                    -- Reassign all Army attributes to better suit the AI.
-                    self.BrainType = 'AI'
-                    self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
-                    self.NumBases = 1
-                    self.BuilderManagers = {}
-                    self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
-                    SUtils.AddCustomUnitSupport(self)
-
-                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
-                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
-
-                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
-
-                    self:InitializeSkirmishSystems()
-                    self:OnCreateAI(planName)
-                end)
-            end
+            self:OnDefeat()
         end
     end,
 
