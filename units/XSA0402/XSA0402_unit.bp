@@ -208,7 +208,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 780000,
         BuildCostMass = 48000,
-        BuildTime = 36000,
+        BuildTime = 67500,
     },
     Footprint = {
         MaxSlope = 0.5,
@@ -285,6 +285,7 @@ UnitBlueprint {
         Level4 = 400,
         Level5 = 500,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -297,7 +298,7 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BombDropThreshold = 4,
+            BombDropThreshold = 20,
             CollideFriendly = false,
             Damage = 11000,
             DamageFriendly = true,
@@ -310,7 +311,7 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true,
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,

@@ -100,8 +100,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_engineeringsuite>Engineering Suite',
             '<LOC ability_upgradable>Upgradeable',
-            '<LOC ability_reclaim>Reclaims',
-            '<LOC ability_repairs>Repairs',
         },
         AnimationOpen = '/units/XRB0104/XRB0104_Aopen.sca',
         Mesh = {
@@ -164,9 +162,6 @@ UnitBlueprint {
                 'Attachpoint01',
             },
         },
-
-        # PitchBone = 'Attachpoint01',
-        # YawBone = 'Turret',
         Category = 'Construction',
         Classification = 'RULEUC_Engineer',
         CommandCaps = {

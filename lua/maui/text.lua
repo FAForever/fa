@@ -171,14 +171,14 @@ function WrapText(text, lineWidth, advanceFunction)
     for packedWord in string.gfind(text, "[^ \t]+") do
         local words = {}
         local lfStartIndex = string.find(packedWord, "\n")  -- the first line feed in the text (if any), prime the while pump
-        local bytes = STR_Utf8Len(packedWord) -- the number of bytes in the packed word
+        local bytes = string.len(packedWord) -- the number of bytes in the packed word
         local curIndex = 1
         if lfStartIndex then
             -- split out new lines from packedWords and make them their own entry in the table
             while lfStartIndex do
                 if lfStartIndex - curIndex > 0 then
                     -- found a word before this line feed, so get it and push in to the word list
-                    table.insert(words, STR_Utf8SubString(packedWord, curIndex, lfStartIndex - 1 - curIndex))
+                    table.insert(words, string.sub(packedWord, curIndex, lfStartIndex - 1))
                 end
                 -- add the line feed to the word list
                 table.insert(words, "\n")
@@ -188,7 +188,7 @@ function WrapText(text, lineWidth, advanceFunction)
                 lfStartIndex = string.find(packedWord, "\n", curIndex)
                 -- pick up any trailing word
                 if not lfStartIndex and curIndex < bytes then
-                    table.insert(words, STR_Utf8SubString(packedWord, curIndex, bytes - curIndex))
+                    table.insert(words, string.sub(packedWord, curIndex, bytes))
                 end
             end
         else

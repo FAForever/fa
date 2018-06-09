@@ -2299,7 +2299,6 @@ Platoon = Class(moho.platoon_methods) {
             local guards = eng:GetGuards()
             for k,v in guards do
                 if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
-                    --WaitTicks(1)
                     v.PlatoonHandle:PlatoonDisband()
                 end
             end
@@ -6585,7 +6584,6 @@ Platoon = Class(sorianoldPlatoon) {
             local guards = eng:GetGuards()
             for k,v in guards do
                 if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) and EntityCategoryContains(categories.CONSTRUCTION, v) then
-                    --WaitTicks(1)
                     v.PlatoonHandle:PlatoonDisband()
                 end
             end

@@ -39,6 +39,7 @@ function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
 
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced
+        UnlockInput()
         Sync.OperationComplete = {
             success = _success,
             difficulty = ScenarioInfo.Options.Difficulty,
@@ -1612,7 +1613,7 @@ function KillBaseInAreaThread(unitTable)
             unit:Kill()
         end
         if waitNum > 0 and num >= waitNum and math.mod(waitNum, num) == 0 then
-            WaitTicks(5)
+            WaitTicks(6)
         end
     end
 end
@@ -2062,7 +2063,7 @@ function GenerateOffMapAreas()
 end
 
 function AntiOffMapMainThread()
-    WaitTicks(10)
+    WaitTicks(11)
     GenerateOffMapAreas()
     local OffMapAreas = {}
     local UnitsThatAreOffMap = {}

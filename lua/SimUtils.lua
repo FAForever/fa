@@ -86,7 +86,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount()  -- looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local xp = unit.xp
+        local massKilled = unit.Sync.totalMassKilled
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
         local ShieldHealth = 0
@@ -136,8 +136,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         -- A F T E R
-        if xp and xp > 0 then
-            unit:AddXP(xp)
+        if massKilled and massKilled > 0 then
+            unit:CalculateVeterancyLevel(massKilled)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do

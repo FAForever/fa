@@ -88,6 +88,7 @@ UEL0001 = Class(ACUUnit) {
                 self:RequestRefreshUI()
                 WaitFor(self.RebuildingPod)
                 self:SetWorkProgress(0.0)
+                RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
                 local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
@@ -106,6 +107,7 @@ UEL0001 = Class(ACUUnit) {
                 self:RequestRefreshUI()
                 WaitFor(self.RebuildingPod2)
                 self:SetWorkProgress(0.0)
+                RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
                 local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)

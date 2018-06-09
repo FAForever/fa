@@ -194,9 +194,9 @@ UnitBlueprint {
         UniformScale = 0.042,
     },
     Economy = {
-        BuildCostEnergy = 312500,
-        BuildCostMass = 25000,
-        BuildTime = 18750,
+        BuildCostEnergy = 330000,
+        BuildCostMass = 26500,
+        BuildTime = 46875,
     },
     General = {
         Category = 'Direct Fire',
@@ -279,6 +279,7 @@ UnitBlueprint {
         Level4 = 280,
         Level5 = 350,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
@@ -299,7 +300,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 8000,
+            Damage = 6000,
             DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Experimental Phason Beam Generator',
@@ -379,7 +380,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 550,
+            Damage = 610,
             DamageType = 'Normal',
             DisplayName = 'Gatling Plasma Cannon',
             FireTargetLayerCapsTable = {
@@ -465,7 +466,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 1200,
+            Damage = 1850,
             DamageRadius = 6,
             DamageType = 'Normal',
             DisplayName = 'Heavy Sinn Unthe Cannon',

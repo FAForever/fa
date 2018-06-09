@@ -36,6 +36,20 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
+    Buffs = {
+        Stun = {   
+            Add = {
+                OnImpact = true,
+                OnDeath = true,
+            },
+            AppliedToTarget = false,
+            BuffType = 'STUN',
+            Duration = 2,
+            Radius = 6,
+            TargetAllow = 'ALLUNITS',
+            TargetDisallow = 'EXPERIMENTAL,WALL',
+        },
+    },
     BuildIconSortPriority = 80,
     Categories = {
         'PRODUCTFA',
@@ -57,8 +71,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'FireBeetle',
         EconomyThreatLevel = 0,
-        Health = 300,
-        MaxHealth = 300,
+        Health = 500,
+        MaxHealth = 500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
@@ -67,6 +81,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_suicideweapon>Suicide Weapon',
+            '<LOC ability_stun>EMP Weapon',
         },
         AnimationWalk = '/units/XRL0302/XRL0302_Awalk.sca',
         AnimationWalkRate = 11.5,
@@ -191,16 +206,16 @@ UnitBlueprint {
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
-        TransportClass = 2,
+        TransportClass = 1,
         CanFireFromTransport = false,
     },
     Weapon = {
-        {
+        {            
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 3500,
-            DamageFriendly = true,
-            DamageRadius = 4.5,
+            Damage = 1499,
+            DamageFriendly = false,
+            DamageRadius = 6,
             DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
             FireOnSelfDestruct = true,
@@ -210,7 +225,7 @@ UnitBlueprint {
             },
             FiringTolerance = 180,
             Label = 'Suicide',
-            MaxRadius = 4,
+            MaxRadius = 5.8,
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -222,6 +237,45 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Kamikaze',
+        },
+        {
+            AboveWaterTargetsOnly = true,
+            Accurate = true,
+            BallisticArc = 'RULEUBA_None',
+            CollideFriendly = false,
+            Damage = 1,
+            DamageFriendly = false,
+            DamageRadius = 6,
+            DamageType = 'EMP',
+            DisplayName = 'EMP',
+            FireTargetLayerCapsTable = {
+                Air = 'Air|Land|Seabed|Water',
+                Land = 'Air|Land|Seabed|Water',
+                Water = 'Air|Land|Water',
+            },
+            FireOnDeath = true,
+            FiringTolerance = 2,
+            IgnoreIfDisabled = true,
+            Label = 'DeathWeapon',
+            MaxRadius = 6,
+            MuzzleVelocity = 0,
+            ProjectileId = '/projectiles/CIFEMP01/CIFEMP01_proj.bp',
+            ProjectileLifetimeUsesMultiplier = 1.15,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        0,
+                    },
+                    RackBone = 0,
+                },
+            },
+            RangeCategory = 'UWRC_InDirectFire',
+            RateOfFire = 0.5,
+            SalvoSize = 1,
+            SlavedToBody = true,
+            TargetCheckInterval = 1,
+            TargetRestrictDisallow = 'UNTARGETABLE, AIR',
+            WeaponCategory = 'Direct Fire',
         },
     },
     Wreckage = {

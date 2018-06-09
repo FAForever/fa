@@ -51,7 +51,6 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DEFENSIVEBOAT',
-        'OVERLAYDEFENSE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -69,11 +68,11 @@ UnitBlueprint {
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 8000,
-            ShieldRechargeTime = 32,
+            ShieldRechargeTime = 40,
             ShieldRegenRate = 80,
             ShieldRegenStartTime = 3,
             ShieldSize = 120,
-            ShieldSpillOverDamageMod = 0.5,
+            ShieldSpillOverDamageMod = 0.25,
             ShieldVerticalOffset = -50,
         },
         SubThreatLevel = 9,
@@ -240,9 +239,10 @@ UnitBlueprint {
     StrategicIconName = 'icon_ship2_shield',
     StrategicIconSortPriority = 125,
     Weapon = {
-        {               # Adds a dummy weapon that does nothing except adds another range circle to show
-            Damage = 0, # where the shield ends  on the water's surface. Purely visual fix by themak [160]
-            MaxRadius = 34.9;
+        {   -- Adds a dummy weapon that does nothing except adds another range circle to show
+            -- where the shield ends on the water's surface. Purely visual fix.
+            Damage = 0,
+            MaxRadius = 34,
             RangeCategory = 'UWRC_DirectFire',
             WeaponCategory = 'Direct Fire Naval',
         },

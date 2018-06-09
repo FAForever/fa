@@ -112,6 +112,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
+            '<LOC ability_jamming>Jamming',
         },
         ForcedBuildSpin = 0,
         IdleEffects = {
@@ -217,6 +218,7 @@ UnitBlueprint {
         BuildCostEnergy = 42000,
         BuildCostMass = 1260,
         BuildTime = 6300,
+        MaintenanceConsumptionPerSecondEnergy = 25,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -243,11 +245,25 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'air',
+        OrderOverrides = {
+            RULEUTC_JammingToggle = {
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
+        },
         TechLevel = 'RULEUTL_Secret',
+        ToggleCaps = {
+            RULEUTC_JammingToggle = true,
+        },
         UnitName = '<LOC uea0305_name>Broadsword',
         UnitWeight = 1,
     },
     Intel = {
+        JamRadius = {
+            Max = 40,
+            Min = 10,
+        },
+        JammerBlips = 4,
         VisionRadius = 32,
     },
     Interface = {

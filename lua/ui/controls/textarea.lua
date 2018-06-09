@@ -59,7 +59,11 @@ TextArea = Class(ItemList) {
     --- Add more text to the textfield starting on a new line (high-performance append operation
     -- that avoids incurring a complete reflow).
     AppendLine = function(self, text)
-        self.text = self.text .. "\n" .. text
+        if self.text == "" then
+            self.text = text
+        else
+            self.text = self.text .. "\n" .. text
+        end
         local wrapped = Text.WrapText(text, self.Width(), self.advanceFunction)
 
         for i, line in wrapped do

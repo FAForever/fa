@@ -150,6 +150,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'VERIFYMISSILEUI',
         'USEBUILDPRESETS',
+        'SHOWATTACKRETICLE',
     },
     CollisionOffsetX = -0.04,
     Defense = {
@@ -690,6 +691,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 0,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
@@ -834,14 +836,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10000,
+            Damage = 10000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Light Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -855,6 +857,13 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 22,
             OverChargeWeapon = true,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
@@ -916,14 +925,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10000,
+            Damage = 10000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Light Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -935,6 +944,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 22,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {

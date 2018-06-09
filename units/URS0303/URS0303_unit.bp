@@ -294,7 +294,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
-            ProjectileId = '/projectiles/CAAAutocannon01/CAAAutocannon01_proj.bp',
+            ProjectileId = '/projectiles/CAAAutocannon03/CAAAutocannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 4,
             RackBones = {
@@ -367,7 +367,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
-            ProjectileId = '/projectiles/CAAAutocannon01/CAAAutocannon01_proj.bp',
+            ProjectileId = '/projectiles/CAAAutocannon03/CAAAutocannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 4,
             RackBones = {
@@ -446,7 +446,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
-            ProjectileId = '/projectiles/CAAAutocannon01/CAAAutocannon01_proj.bp',
+            ProjectileId = '/projectiles/CAAAutocannon03/CAAAutocannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 4,
             RackBones = {
@@ -525,7 +525,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
-            ProjectileId = '/projectiles/CAAAutocannon01/CAAAutocannon01_proj.bp',
+            ProjectileId = '/projectiles/CAAAutocannon03/CAAAutocannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 4,
             RackBones = {

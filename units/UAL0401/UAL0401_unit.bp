@@ -8,7 +8,7 @@ UnitBlueprint {
             'Right_Leg_B01',
         },
         AddTargetBones = {
-            'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
+            'AttachSpecial01',
             'AttachSpecial02',
         },
     },
@@ -181,7 +181,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 343750,
         BuildCostMass = 27500,
-        BuildTime = 20625,
+        BuildTime = 51500,
     },
     General = {
         Category = 'Direct Fire',
@@ -267,6 +267,7 @@ UnitBlueprint {
         Level4 = 360,
         Level5 = 450,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
@@ -342,8 +343,8 @@ UnitBlueprint {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',#
-        'TECH3 STRUCTURE',#
+                'STRUCTURE DEFENSE',
+                'TECH3 STRUCTURE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'SPECIALLOWPRI',
@@ -387,9 +388,9 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 5,
+            FiringTolerance = 1,
             HeadingArcCenter = -35,
-            HeadingArcRange = 35,
+            HeadingArcRange = 40,
             Label = 'RightArmTractor',
             MaxRadius = 40,
             MinRadius = 2,
@@ -397,6 +398,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleSpecial = 'Right_Arm_Muzzle02',
+            PrefersPrimaryWeaponTarget = false,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -407,13 +409,14 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 2,
             RackSalvoChargeTime = 0,
+            RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 1,
-            TargetCheckInterval = 2.5,
+            RateOfFire = 0.15,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
@@ -424,17 +427,16 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-
-            # TrackingRadius = 45,
+            TrackingRadius = 1,
             TurretBoneMuzzle = 'Right_Arm_Muzzle01',
             TurretBonePitch = 'Right_Arm_B02',
             TurretBoneYaw = 'Right_Arm_B01',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 70,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
-            TurretYaw = -25,
-            TurretYawRange = 65,
+            TurretYaw = -35,
+            TurretYawRange = 41,
             TurretYawSpeed = 20,
             Turreted = true,
             WeaponCategory = 'Experimental',
@@ -478,9 +480,9 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 5,
+            FiringTolerance = 1,
             HeadingArcCenter = 35,
-            HeadingArcRange = 35,
+            HeadingArcRange = 40,
             Label = 'LeftArmTractor',
             MaxRadius = 40,
             MinRadius = 2,
@@ -488,6 +490,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleSpecial = 'Left_Arm_Muzzle02',
+            PrefersPrimaryWeaponTarget = false,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -498,13 +501,14 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 2,
             RackSalvoChargeTime = 0,
+            RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 1,
-            TargetCheckInterval = 2.5,
+            RateOfFire = 0.15,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
@@ -515,17 +519,16 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-
-            # TrackingRadius = 45,
+            TrackingRadius = 1,
             TurretBoneMuzzle = 'Left_Arm_Muzzle01',
             TurretBonePitch = 'Left_Arm_B02',
             TurretBoneYaw = 'Left_Arm_B01',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 70,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
-            TurretYaw = 25,
-            TurretYawRange = 65,
+            TurretYaw = 35,
+            TurretYawRange = 41,
             TurretYawSpeed = 20,
             Turreted = true,
             WeaponCategory = 'Experimental',
@@ -554,8 +557,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = true, #from false
-            Water = true, #from false
+            Sub = true,
+            Water = true,
         },
     },
 }

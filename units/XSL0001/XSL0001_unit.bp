@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 31.5,
+        GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
             'Head',
             'Right_Arm_B01',
@@ -323,7 +323,7 @@ UnitBlueprint {
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
-        BuildCostMass = 18000,
+        BuildCostMass = 2000,
         BuildRate = 10,
         BuildTime = 6000000,
         BuildableCategory = {
@@ -417,10 +417,10 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         BlastAttack = {
-            AdditionalDamage = 750,
+            AdditionalDamage = 620,
             BuildCostEnergy = 270000,
-            BuildCostMass = 4800,
-            BuildTime = 4200,
+            BuildCostMass = 5400,
+            BuildTime = 4600,
             Icon = 'cba',
             Name = '<LOC enhancements_0129>Refracting Chronotron Amplifier',
             NewDamageRadius = 2.7,
@@ -453,12 +453,12 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         DamageStabilization = {
-            BuildCostEnergy = 42000,
-            BuildCostMass = 1200,
-            BuildTime = 1200,
+            BuildCostEnergy = 56000,
+            BuildCostMass = 1800,
+            BuildTime = 1800,
             Icon = 'dss',
             Name = '<LOC enhancements_0131>Nano-Repair System',
-            NewHealth = 3000,
+            NewHealth = 2000,
             NewRegenRate = 60,
             ShowBones = {
                 'Back_Upgrade',
@@ -475,8 +475,8 @@ UnitBlueprint {
         },
         DamageStabilizationAdvanced = {
             BuildCostEnergy = 450000,
-            BuildCostMass = 4500,
-            BuildTime = 4200,
+            BuildCostMass = 5800,
+            BuildTime = 4600,
             Icon = 'adss',
             Name = '<LOC enhancements_0133>Enhanced Nano-Repair System',
             NewHealth = 20000,
@@ -821,6 +821,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
@@ -884,6 +885,7 @@ UnitBlueprint {
         0.4,
         0.5,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
@@ -936,6 +938,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
+                'COMMAND',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',
@@ -967,14 +970,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -989,6 +992,13 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             OverChargeWeapon = true,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/SDFChronatronCannon02/SDFChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
@@ -1050,14 +1060,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1070,6 +1080,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/SDFChronatronCannon02/SDFChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {

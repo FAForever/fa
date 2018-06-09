@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 31.5,
+        GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
             'Head',
             'Right_Arm_B01',
@@ -172,8 +172,6 @@ UnitBlueprint {
             '<LOC ability_omni>Omni Sensor',
             '<LOC ability_deathaoe>Volatile',
         },
-
-        -- AnimationIdle = '/units/uel0001/uel0001_a002.sca',
         AnimationWalk = '/units/uel0001/uel0001_a001.sca',
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
@@ -335,7 +333,7 @@ UnitBlueprint {
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
-        BuildCostMass = 18000,
+        BuildCostMass = 2000,
         BuildRate = 10,
         BuildTime = 6000000,
         BuildableCategory = {
@@ -401,7 +399,7 @@ UnitBlueprint {
             BuildTime = 800,
             Icon = 'dsu',
             Name = '<LOC enhancements_0039>Nano-Repair System',
-            NewHealth = 2000,
+            NewHealth = 1500,
             NewRegenRate = 40,
             ShowBones = {
                 'Left_Upgrade',
@@ -576,7 +574,7 @@ UnitBlueprint {
         },
         Shield = {
             BuildCostEnergy = 112500,
-            BuildCostMass = 1500,
+            BuildCostMass = 2300,
             BuildTime = 2100,
             Icon = 'psg',
             ImpactEffects = 'UEFShieldHit01',
@@ -586,9 +584,9 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 24000,
+            ShieldMaxHealth = 19000,
             ShieldRechargeTime = 140,
-            ShieldRegenRate = 35,
+            ShieldRegenRate = 30,
             ShieldRegenStartTime = 1,
             ShieldSize = 3,
             ShieldVerticalOffset = 0,
@@ -605,8 +603,8 @@ UnitBlueprint {
         },
         ShieldGeneratorField = {
             BuildCostEnergy = 450000,
-            BuildCostMass = 3000,
-            BuildTime = 2800,
+            BuildCostMass = 3600,
+            BuildTime = 3400,
             Icon = 'sgf',
             ImpactEffects = 'UEFShieldHit01',
             ImpactMesh = '/effects/entities/ShieldSection01/ShieldSection01_mesh',
@@ -869,6 +867,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
@@ -934,6 +933,7 @@ UnitBlueprint {
         0.4,
         0.5,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterFireOnly = true,
@@ -985,6 +985,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
+                'COMMAND',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',
@@ -1016,14 +1017,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1036,6 +1037,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/TDFOverCharge01/TDFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1098,14 +1106,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1117,6 +1125,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/TDFOverCharge01/TDFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {

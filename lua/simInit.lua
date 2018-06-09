@@ -25,6 +25,9 @@ WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
     local ticks = math.max(1, n * 10)
+    if ticks > 1 then
+        ticks = ticks + 1
+    end
     WaitTicks(ticks)
 end
 
@@ -183,6 +186,9 @@ function SetupSession()
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
+    -- Preloads AI telplates from AI mods
+    AIModTemplatesPreloader()
+    
     ResetSyncTable()
 end
 
@@ -219,6 +225,7 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
     LOG('BeginSession...')
+    ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
@@ -285,6 +292,18 @@ function BeginSession()
     end
 end
 
+function GameTimeLogger()
+    local time
+    while true do
+        GTS = GetGameTimeSeconds()
+        hours   = math.floor(GTS / 3600);
+        minutes = math.floor((GTS - (hours * 3600)) / 60);
+        seconds = GTS - (hours * 3600) - (minutes * 60);
+        SPEW(string.format('Current gametime: %02d:%02d:%02d', hours, minutes, seconds))
+        WaitSeconds(30)
+    end
+end
+
 -- forks a thread that performs off-map prevention
 function OnStartOffMapPreventionThread()
     OffMappingPreventThread = ForkThread(import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
@@ -319,3 +338,20 @@ end
 
 Prefetcher:Update(DefaultPrefetchSet())
 
+function AIModTemplatesPreloader()
+    local simMods = import('/lua/mods.lua').AllMods()
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+        if ModAIFiles[1] then
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
+                import(file)
+            end
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
+                import(file)
+            end
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
+                import(file)
+            end
+        end
+    end
+end

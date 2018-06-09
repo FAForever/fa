@@ -183,6 +183,7 @@ unitkeygroups = {
         "uaa0310", -- Czar
         "uas0401", -- Tempest
         "xab1401", -- Paragon
+        "xab2307", -- Salvation
         -- Cyb
         "url0402", -- Monkeylord
         "xrl0403", -- Megalith
@@ -429,6 +430,7 @@ unitkeygroups = {
     },
     ["Heavy_Shield_Generator"] = {
         "xsb4301",
+        "urb4206",
         "ueb4301",
         "uab4301",
     },
@@ -457,9 +459,6 @@ unitkeygroups = {
         "urs0305",
         "ues0305",
         "uas0305",
-    },
-    ["Rapid_Fire_Artillery_Installation"] = {
-        "xab2307",
     },
     ["Quantum_Optics_Facility"] = {
         "xab3301",

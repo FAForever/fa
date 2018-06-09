@@ -103,8 +103,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_hover>Hover',
             '<LOC ability_engineeringsuite>Engineering Suite',
-            '<LOC ability_reclaim>Reclaims',
-            '<LOC ability_repairs>Repairs',
         },
         IdleEffects = {
             Land = {
@@ -223,7 +221,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = false,  ----changed to make faster building like otehr engineers
+        NeedToFaceTargetToBuild = false,  -- changed to make faster building like otehr engineers
         StorageEnergy = 0,
         StorageMass = 20,
         TeleportEnergyMod = 0.15,

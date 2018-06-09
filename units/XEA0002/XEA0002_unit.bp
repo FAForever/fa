@@ -11,7 +11,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 10,
         LiftFactor = 10,
-        MaxAirspeed = 6,
+        MaxAirspeed = 9,
         StartTurnDistance = 50,
     },
     Audio = {
@@ -70,6 +70,8 @@ UnitBlueprint {
         'RECLAIMABLE',
         'UNTARGETABLE',
         'OVERLAYRADAR',
+        'OMNI',
+        'OVERLAYOMNI',
     },
     CollisionOffsetY = -0.65,
     Defense = {
@@ -84,6 +86,10 @@ UnitBlueprint {
     },
     Description = '<LOC xea0002_desc>Defense Satellite',
     Display = {
+      Abilities = {
+          '<LOC ability_omni>Omni Sensor',
+          '<LOC ability_radar>Radar',
+      },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -102,9 +108,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 80000,
-        BuildCostMass = 5000,
-        BuildTime = 15000,
+        BuildCostEnergy = 160000,
+        BuildCostMass = 10000,
+        BuildTime = 30000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -135,7 +141,8 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarRadius = 70,
+        RadarRadius = 150,
+        OmniRadius = 50,
         VisionRadius = 40,
     },
     Interface = {
@@ -160,15 +167,15 @@ UnitBlueprint {
         MaxAcceleration = 1,
         MaxSpeed = 10,
         MaxSteerForce = 100,
-        MeshExtentsX = 27,
-        MeshExtentsY = 8,
-        MeshExtentsZ = 27,
+        MeshExtentsX = 1.7,
+        MeshExtentsY = 1.1,
+        MeshExtentsZ = 1.7,
         MinSpeedPercent = 0.85,
         MotionType = 'RULEUMT_Air',
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
-        SkirtSizeX = 24,
-        SkirtSizeZ = 24,
+        SkirtSizeX = 2,
+        SkirtSizeZ = 2,
         TurnRadius = 100,
         TurnRate = 20,
     },

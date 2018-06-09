@@ -27,23 +27,8 @@ local Set = import('/lua/system/setutils.lua')
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
-
 -- Deprecated function warning flags
 local GetUnitBeingBuiltWarning = false
-
-
--- TODO: We should really introduce a veterancy module at some point.
--- XP gained for killing various unit types.
-local WALL_XP = 0.1
-local STRUCTURE_XP = 1
-local TECH1_XP = 1
-local TECH2_XP = 3
-local TECH3_XP = 6
-local COMMAND_XP = 6
-local EXPERIMENTAL_XP = 50
-
--- For killing any unit that doesn't match any of the other categories.
-local DEFAULT_XP = 1
 
 SyncMeta = {
     __index = function(t, key)
@@ -98,10 +83,10 @@ Unit = Class(moho.unit_methods) {
     EconomyProductionInitiallyActive = true,
 
     GetSync = function(self)
-        if not Sync.UnitData[self:GetEntityId()] then
-            Sync.UnitData[self:GetEntityId()] = {}
+        if not Sync.UnitData[self.EntityId] then
+            Sync.UnitData[self.EntityId] = {}
         end
-        return Sync.UnitData[self:GetEntityId()]
+        return Sync.UnitData[self.EntityId]
     end,
 
     -- The original builder of this unit, set by OnStartBeingBuilt. Used for calculating differential
@@ -112,9 +97,11 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+        self.EntityId = self:GetEntityId()
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
-        self.Sync.id = self:GetEntityId()
+        self.Sync.id = self.EntityId
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync, SyncMeta)
 
@@ -216,7 +203,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Set up veterancy
         self.xp = 0
-        self.VeteranLevel = 0
+        self.Instigators = {}
+        self.totalDamageTaken = 0
 
         self.debris_Vector = Vector(0, 0, 0)
 
@@ -719,7 +707,7 @@ Unit = Class(moho.unit_methods) {
             self.Captors = {}
         end
 
-        self.Captors[captor:GetEntityId()] = captor
+        self.Captors[captor.EntityId] = captor
 
         if not self.CaptureThread then
             self.CaptureThread = self:ForkThread(function()
@@ -746,7 +734,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     RemoveCaptor = function(self, captor)
-        self.Captors[captor:GetEntityId()] = nil
+        self.Captors[captor.EntityId] = nil
 
         if table.getsize(self.Captors) == 0 then
             self:ResetCaptors()
@@ -778,7 +766,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartRepair = function(self, unit)
-        unit.Repairers[self:GetEntityId()] = self
+        unit.Repairers[self.EntityId] = self
 
         if unit.WorkItem ~= self.WorkItem then
             self:InheritWork(unit)
@@ -1111,7 +1099,7 @@ Unit = Class(moho.unit_methods) {
             self:DoOnDamagedCallbacks(instigator)
 
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
-            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
             else
                 self:DoTakeDamage(instigator, amount, vector, damageType)
@@ -1121,6 +1109,23 @@ Unit = Class(moho.unit_methods) {
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         local preAdjHealth = self:GetHealth()
+
+        -- Keep track of incoming damage, but only if it is from a unit
+        if instigator and IsUnit(instigator) and instigator ~= self then
+            amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
+            self.totalDamageTaken = self.totalDamageTaken + amountForVet
+
+            -- We want to keep track of damage from things that cannot gain vet (deathweps etc)
+            -- But not enter them into the table to have credit dispersed later
+            if instigator.gainsVeterancy then
+                local previousDamage = self.Instigators[instigator.EntityId].damage
+                if previousDamage then
+                    self.Instigators[instigator.EntityId].damage = previousDamage + amountForVet
+                else
+                    self.Instigators[instigator.EntityId] = {unit = instigator, damage = amountForVet}
+                end
+            end
+        end
 
         self:AdjustHealth(instigator, -amount)
 
@@ -1251,10 +1256,14 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
-        -- Notify instigator of kill
-        if instigator and IsUnit(instigator) then
-            instigator:OnKilledUnit(self)
+        -- Notify instigator of kill and spread veterancy
+        -- We prevent any vet spreading if the instigator isn't part of the vet system (EG - Self destruct)
+        -- This is so that you can bring a damaged Experimental back to base, kill, and rebuild, without granting
+        -- instant vet to the enemy army, as well as other obscure reasons
+        if self.totalDamageTaken > 0 and not self.veterancyDispersed then
+            self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
+
         ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
 
         if self.DeathWeaponEnabled ~= false then
@@ -1273,40 +1282,193 @@ Unit = Class(moho.unit_methods) {
         self.CanBeKilled = val
     end,
 
+    -- This section contains functions used by the new mass-based veterancy system
+    ------------------------------------------------------------------------------
+
+    -- Tell any living instigators that they need to gain some veterancy
+    VeterancyDispersal = function(self, suicide)
+        local bp = self:GetBlueprint()
+        local mass = self:GetVeterancyValue()
+        -- Adjust mass based on current health when a unit is self destructed
+        if suicide then
+            mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
+        end
+
+        -- Non-combat structures only give 50% veterancy
+        if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
+            mass = mass * 0.5
+        end
+
+        for _, data in self.Instigators do
+            local unit = data.unit
+            -- Make sure the unit is something which can vet, and is not maxed
+            if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
+                -- Find the proportion of yourself that each instigator killed
+                local massKilled = math.floor(mass * (data.damage / self.totalDamageTaken))
+                unit:OnKilledUnit(self, massKilled)
+            end
+        end
+    end,
+
+    GetVeterancyValue = function(self)
+        local bp = self:GetBlueprint()
+        local mass = bp.Economy.BuildCostMass
+        local fractionComplete = self:GetFractionComplete()
+
+        if fractionComplete == 1 then
+            -- Add the value of any enhancements
+            local enhancements = SimUnitEnhancements[self.EntityId]
+            if enhancements then
+                for _, name in enhancements do
+                    mass = mass + bp.Enhancements[name].BuildCostMass or 0
+                end
+            end
+
+            -- Subtract the value of any enhancements from a preset because their value is included in bp.Economy.BuildCostMass
+            if bp.EnhancementPresetAssigned.Enhancements then
+                for _, name in bp.EnhancementPresetAssigned.Enhancements do
+                    mass = mass - bp.Enhancements[name].BuildCostMass or 0
+                end
+            end
+        end
+
+        -- Allow units to count for more or less than their real mass if needed.
+        return mass * fractionComplete * (bp.VeteranImportanceMult or 1) + (self.cargoMass or 0)
+    end,
+
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
-    OnKilledUnit = function(self, unitKilled)
-        -- No XP for friendly fire...
-        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
-            return
-        end
+    OnKilledUnit = function(self, unitKilled, massKilled)
+        if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
+        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then return end -- No XP for friendly fire...
 
-        -- Or for killing incomplete units.
-        if unitKilled:GetFractionComplete() ~= 1 then
-            return
-        end
-
-        -- Assign XP according to the category of unit killed.
-        -- TODO: We can very possibly do this more cheaply and clearly by using RTTI on unitKilled?
-        if EntityCategoryContains(categories.WALL, unitKilled) then
-            self:AddXP(WALL_XP)
-        elseif EntityCategoryContains(categories.STRUCTURE, unitKilled) then
-            self:AddXP(STRUCTURE_XP)
-        elseif EntityCategoryContains(categories.TECH1, unitKilled) then
-            self:AddXP(TECH1_XP)
-        elseif EntityCategoryContains(categories.TECH2, unitKilled) then
-            self:AddXP(TECH2_XP)
-        elseif EntityCategoryContains(categories.TECH3, unitKilled) then
-            self:AddXP(TECH3_XP)
-        elseif EntityCategoryContains(categories.EXPERIMENTAL, unitKilled) then
-            self:AddXP(EXPERIMENTAL_XP)
-        elseif EntityCategoryContains(categories.COMMAND, unitKilled) then
-            self:AddXP(COMMAND_XP)
-        else
-            self:AddXP(DEFAULT_XP)
-        end
+        self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
 
         ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
     end,
+
+    CalculateVeterancyLevel = function(self, massKilled)
+        local bp = self:GetBlueprint()
+
+        -- Limit the veterancy gain from one kill to one level worth
+        massKilled = math.min(massKilled, self.Sync.myValue)
+
+        -- Total up the mass the unit has killed overall, and store it
+        self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
+
+        -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
+        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+
+        -- Bail if our veterancy hasn't increased
+        if newVetLevel == self.Sync.VeteranLevel then return end
+
+        -- Update our recorded veterancy level
+        self.Sync.VeteranLevel = newVetLevel
+
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
+    end,
+
+    -- Use this to set a veterancy level directly, usually used by a scenario
+    SetVeterancy = function(self, veteranLevel)
+        if veteranLevel <= 0 or veteranLevel > 5 then return end
+        if not self.gainsVeterancy then return end
+
+        self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+    end,
+
+    -- Set the veteran level to the level specified
+    SetVeteranLevel = function(self, level)
+        local buffs = self:CreateVeterancyBuffs(level)
+        if buffs then
+            for _, buffName in buffs do
+                Buff.ApplyBuff(self, buffName)
+            end
+        end
+
+        self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
+        self:DoVeterancyHealing(level)
+
+        self:DoUnitCallbacks('OnVeteran')
+    end,
+
+    -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
+    DoVeterancyHealing = function(self, level)
+        local bp = self:GetBlueprint()
+        local maxHealth = bp.Defense.MaxHealth
+        local mult = bp.VeteranHealingMult[level] or 0.1
+
+        self:AdjustHealth(self, maxHealth * mult) -- Adjusts health by the given value (Can be +tv or -tv), not to the given value
+    end,
+
+    CreateVeterancyBuffs = function(self, level)
+        local healthBuffName = 'VeterancyMaxHealth' .. level -- Currently there is no difference between units, therefore no need for unique buffs
+        local regenBuffName = self:GetUnitId() .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
+
+        if not Buffs[regenBuffName] then
+            -- Maps self.techCategory to a number so we can do math on it for naval units
+            local techLevels = {
+                TECH1 = 1,
+                TECH2 = 2,
+                TECH3 = 3,
+                COMMAND = 3,
+                SUBCOMMANDER = 4,
+                EXPERIMENTAL = 5,
+            }
+            
+            local techLevel = techLevels[self.techCategory] or 1
+            
+            -- Treat naval units as one level higher
+            if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
+                techLevel = techLevel + 1
+            end
+            
+            -- Regen values by tech level and veterancy level
+            local regenBuffs = {
+                {1,  2,  3,  4,  5}, -- T1
+                {3,  6,  9,  12, 15}, -- T2
+                {6,  12, 18, 24, 30}, -- T3 / ACU
+                {9,  18, 27, 36, 45}, -- SACU
+                {25, 50, 75, 100,125}, -- Experimental
+            }
+        
+            BuffBlueprint {
+                Name = regenBuffName,
+                DisplayName = regenBuffName,
+                BuffType = 'VeterancyRegen',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    Regen = {
+                        Add = regenBuffs[techLevel][level],
+                    },
+                },
+            }
+        end
+        
+        return {regenBuffName, healthBuffName}
+    end,
+
+    -- Returns true if a unit can gain veterancy (Has a weapon)
+    ShouldUseVetSystem = function(self)
+        local weps = self:GetBlueprint().Weapon
+
+        -- Bail if we don't have any weapons
+        if not weps[1] then
+            return false
+        end
+
+        -- Find a weapon which is not a DeathWeapon
+        for index, wep in weps do
+            if wep.Label ~= 'DeathWeapon' then
+                return true
+            end
+        end
+
+        -- We only have a DeathWeapon. Bail.
+        return false
+    end,
+
+    -- End of Veterancy Section
+    ------------------------------------------------------------------------------
 
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
@@ -1603,7 +1765,7 @@ Unit = Class(moho.unit_methods) {
 
         self.StopSink = false
         while not self.StopSink do
-            WaitTicks(2)
+            WaitTicks(1)
             if self:GetPosition(watchBone)[2]-0.2 <= seafloor then
                 self.StopSink = true
             end
@@ -1657,7 +1819,11 @@ Unit = Class(moho.unit_methods) {
 
             if isNaval and self:GetBlueprint().Display.AnimationDeath then
                 -- Waits for wreck to hit bottom or end of animation
-                self:SeabedWatcher()
+                if self:GetFractionComplete() > 0.5 then
+                    self:SeabedWatcher()
+                else
+                    self:DestroyUnit(overkillRatio)
+                end
             else
                 -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's make one up.
                 local this = self
@@ -1732,14 +1898,14 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Clear out our sync data
-        UnitData[self:GetEntityId()] = false
-        Sync.UnitData[self:GetEntityId()] = false
+        UnitData[self.EntityId] = false
+        Sync.UnitData[self.EntityId] = false
 
         -- Don't allow anyone to stuff anything else in the table
         self.Sync = false
 
         -- Let the user layer know this id is gone
-        Sync.ReleaseIds[self:GetEntityId()] = true
+        Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
@@ -1918,6 +2084,22 @@ Unit = Class(moho.unit_methods) {
         end
 
         local bp = self:GetBlueprint()
+
+        -- Set up Veterancy tracking here. Avoids needing to check completion later.
+        -- Do all this here so we only have to do for things which get completed
+        -- Don't need to track damage for things which cannot attack!
+        self.gainsVeterancy = self:ShouldUseVetSystem()
+
+        if self.gainsVeterancy then
+            self.Sync.totalMassKilled = 0
+            self.Sync.VeteranLevel = 0
+
+            -- Allow units to require more or less mass to level up. Decimal multipliers mean
+            -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
+            local defaultMult = 2
+            self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
+        end
+
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
@@ -2333,10 +2515,9 @@ Unit = Class(moho.unit_methods) {
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
 
-        local id = self:GetEntityId()
-        if built.Repairers[id] then
+        if built.Repairers[self.EntityId] then
             self:OnStopRepair(self, built)
-            built.Repairers[id] = nil
+            built.Repairers[self.EntityId] = nil
         end
     end,
 
@@ -2396,6 +2577,10 @@ Unit = Class(moho.unit_methods) {
         local function DisableOneIntel(disabler, intel)
             local intDisabled = false
             if Set.Empty(self.IntelDisables[intel]) then
+                local active = self:GetBlueprint().Intel.ActiveIntel
+                if active and active[intel] then
+                    return
+                end
                 self:DisableIntel(intel)
 
                 -- Handle the cloak FX timing
@@ -2533,13 +2718,13 @@ Unit = Class(moho.unit_methods) {
                     end
                 end
 
-                WaitTicks(5)
+                WaitTicks(6)
             end
         end
     end,
 
     CloakFXWatcher = function(self)
-        WaitTicks(5)
+        WaitTicks(6)
 
         if self and not self.Dead then
             self:UpdateCloakEffect(false, 'Cloak')
@@ -2671,7 +2856,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        local unitEnhancements = enhCommon.GetEnhancements(self:GetEntityId())
+        local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
@@ -2783,8 +2968,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     HasEnhancement = function(self, enh)
-        local entId = self:GetEntityId()
-        local unitEnh = SimUnitEnhancements[entId]
+        local unitEnh = SimUnitEnhancements[self.EntityId]
         if unitEnh then
             for k, v in unitEnh do
                 if v == enh then
@@ -3694,148 +3878,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -------------------------------------------------------------------------------------------
-    -- VETERANCY
-    -------------------------------------------------------------------------------------------
-    AddXP = function(self, amount)
-        self.xp = self.xp + (amount)
-        self.Sync.xp = self.xp
-        self:CheckVeteranLevel()
-    end,
-
-    -- Use this to go through the AddXP function rather than directly setting Veterancy
-    SetVeterancy = function(self, veteranLevel)
-        veteranLevel = veteranLevel or 5
-        if veteranLevel == 0 or veteranLevel > 5 then return end
-
-        local bp = self:GetBlueprint()
-        local lvl = 'Level' .. veteranLevel
-        local xp = bp.Veteran[lvl] or import('/lua/game.lua').VeteranDefault[lvl]
-        if xp then
-            self:AddXP(xp)
-        else
-             error('Invalid veteran level - ' .. veteranLevel)
-        end
-    end,
-
-    -- Return the unit's current vet level
-    GetVeteranLevel = function(self)
-        return self.VeteranLevel
-    end,
-
-    -- Check to see if we should veteran up.
-    CheckVeteranLevel = function(self)
-        local levels = self:GetBlueprint().Veteran or Game.VeteranDefault
-        local maxLevel = table.getsize(levels)
-
-        -- We are already at the highest veteran level, return
-        if self.VeteranLevel >= maxLevel then
-            return
-        end
-
-        local next = self.VeteranLevel + 1
-        while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
-             self:SetVeteranLevel(next)
-             next = self.VeteranLevel + 1
-        end
-    end,
-
-    -- Set the veteran level to the level specified
-    SetVeteranLevel = function(self, level)
-        local old = self.VeteranLevel
-        self.VeteranLevel = level
-
-        -- Apply default veterancy buffs
-        local buffTypes = {'Regen', 'MaxHealth'}
-
-        for k, bType in buffTypes do
-            Buff.ApplyBuff(self, 'Veterancy' .. bType .. level)
-        end
-
-        -- Get any overriding buffs if they exist
-        local bp = self:GetBlueprint().Buffs
-        if bp then
-            for bType, bData in bp do
-                for lName, lValue in bData do
-                    if lName == 'Level'..level then
-                        -- Generate a buff based on the data paseed in
-                        local buffName = self:CreateVeterancyBuff(lName, lValue, bType)
-                        if buffName then
-                            Buff.ApplyBuff(self, buffName)
-                        end
-                    end
-                end
-            end
-        end
-        self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
-        self:DoVeterancyHealing(level)
-
-        self:DoUnitCallbacks('OnVeteran')
-    end,
-
-    -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
-    DoVeterancyHealing = function(self, level)
-        local bp = self:GetBlueprint()
-        local maxHealth = bp.Defense.MaxHealth
-        local mult = bp.VeteranHealingMult[level] or 0.1
-
-        self:AdjustHealth(self, maxHealth * mult)
-    end,
-
-    -- Table housing data on what to use to generate buffs for a unit
-    BuffTypes = {
-        Regen = {BuffType = 'VETERANCYREGEN', BuffValFunction = 'Add', BuffDuration = -1, BuffStacks = 'REPLACE'},
-        Health = {BuffType = 'VETERANCYHEALTH', BuffValFunction = 'Mult', BuffDuration = -1, BuffStacks = 'REPLACE'},
-    },
-
-    CreateVeterancyBuff = function(self, levelName, levelValue, buffType)
-        if buffType == 'MaxHealthAffectHealth' then
-            return false
-        end
-
-        if buffType == 'Damage' then
-            return false
-        end
-
-        -- Make sure there is an appropriate buff type for this unit
-        if not self.BuffTypes[buffType] then
-            WARN('*WARNING: Tried to generate a buff of unknown type to units: ' .. buffType .. ' - UnitId: ' .. self:GetUnitId())
-            return nil
-        end
-
-        -- Generate a buff based on the unitId
-        local buffName = self:GetUnitId() .. levelName .. buffType
-
-        -- Figure out what we want the Add and Mult values to be based on the BuffTypes table
-        local addVal = 0
-        local multVal = 1
-        if self.BuffTypes[buffType].BuffValFunction == 'Add' then
-            addVal = levelValue
-        else
-            multVal = levelValue
-        end
-
-        -- Create the buff if needed
-        if not Buffs[buffName] then
-            BuffBlueprint {
-                Name = buffName,
-                DisplayName = buffName,
-                BuffType = self.BuffTypes[buffType].BuffType,
-                Stacks = self.BuffTypes[buffType].BuffStacks,
-                Duration = self.BuffTypes[buffType].BuffDuration,
-                Affects = {
-                    Regen = {
-                        Add = addVal,
-                        Mult = multVal,
-                    },
-                },
-            }
-        end
-
-        -- Return the buffname so the buff can be applied to the unit
-        return buffName
-    end,
-
-    -------------------------------------------------------------------------------------------
     -- SHIELDS
     -------------------------------------------------------------------------------------------
     CreateShield = function(self, bpShield)
@@ -4086,8 +4128,8 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
 
-    PlayTeleportChargeEffects = function(self, location, orientation)
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
+    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
@@ -4217,7 +4259,9 @@ Unit = Class(moho.unit_methods) {
 
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
-        if self:GetArmy() == GetFocusArmy() then
+        local focusArmy = GetFocusArmy()
+        local army = self:GetArmy()
+        if focusArmy == -1 or focusArmy == army then
             local id
             local unitType
             local category
@@ -4240,7 +4284,7 @@ Unit = Class(moho.unit_methods) {
                     return
                 end
             else -- We are being called from the Enhancements chain (ACUs)
-                id = self:GetEntityId()
+                id = self.EntityId
                 category = string.lower(self.factionCategory)
             end
 
@@ -4254,7 +4298,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-                local message = {source = source or unitType, trigger = trigger, category = category, id = id}
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = army}
                 table.insert(Sync.EnhanceMessage, message)
             end
         end

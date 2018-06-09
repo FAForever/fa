@@ -291,7 +291,7 @@ function CommanderThread(cdr, platoon)
     local aiBrain = cdr:GetAIBrain()
     aiBrain:BuildScoutLocations()
     while not cdr.Dead do
-        WaitTicks(2)
+        WaitTicks(1)
         -- Overcharge
         if not cdr.Dead then CDROverCharge(aiBrain, cdr) end
         WaitTicks(1)
@@ -323,7 +323,7 @@ function CommanderThreadImproved(cdr, platoon)
     aiBrain:BuildScoutLocations()
 
     while not cdr.Dead do
-        WaitTicks(2)
+        WaitTicks(1)
         -- Overcharge
         if not cdr.Dead then CDROverCharge(aiBrain, cdr) end
         WaitTicks(1)
@@ -1971,7 +1971,7 @@ function CommanderThreadSorian(cdr, platoon)
         if Mult > 1 and (SBC.GreaterThanGameTime(aiBrain, 1200) or not SBC.EnemyToAllyRatioLessOrEqual(aiBrain, 1.0) or not SBC.ClosestEnemyLessThan(aiBrain, 750) or not SUtils.CheckForMapMarkers(aiBrain)) then
             Mult = 1
         end
-        WaitTicks(2)
+        WaitTicks(1)
 
         -- Overcharge
         if Mult == 1 and not cdr.Dead and not cdr.Upgrading and SBC.GreaterThanGameTime(aiBrain, Delay) and

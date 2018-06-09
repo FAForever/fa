@@ -161,7 +161,7 @@ UnitBlueprint {
                 helpText = 'toggle_shield_dome',
             },
         },
-        FactionName = 'AEON',
+        FactionName = 'Aeon',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {

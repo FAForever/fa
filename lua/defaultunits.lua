@@ -20,6 +20,7 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
+local teleportTime = {}
 
 local CreateScaledBoom = function(unit, overkill, bone)
     explosion.CreateDefaultHitExplosionAtBone(
@@ -583,6 +584,15 @@ StructureUnit = Class(Unit) {
                 self.AdjacencyBeamsBag[k] = nil
             end
         end
+    end,
+    
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+	    -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.structureDamage
+        end
+        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 }
 
@@ -1762,8 +1772,8 @@ AirUnit = Class(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if instigator and IsUnit(instigator) then
-                instigator:OnKilledUnit(self)
+            if self.totalDamageTaken > 0 and not self.veterancyDispersed then
+                self:VeterancyDispersal(not instigator or not IsUnit(instigator))
             end
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -1829,6 +1839,15 @@ BaseTransport = Class() {
             unit:DetachFrom()
         end
     end,
+
+    SaveCargoMass = function(self)
+        local mass = 0
+        for _, unit in self:GetCargo() do
+            mass = mass + unit:GetVeterancyValue()
+            unit.veterancyDispersed = true
+        end
+        self.cargoMass = mass
+    end
 }
 
 --- Base class for air transports.
@@ -1846,7 +1865,9 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
-        self:FlagCargo()
+         -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
+        local instigator = arg[1]
+        self:FlagCargo(not instigator or not IsUnit(instigator))
         AirUnit.Kill(self, unpack(arg))
     end,
 
@@ -1866,9 +1887,12 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     -- Flags cargo that it's been killed while in a transport
-    FlagCargo = function(self)
+    FlagCargo = function(self, suicide)
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
+        if not suicide then -- If the transport is self destructed, let its contents be self destructed separately
+            self:SaveCargoMass()
+        end
         self.cargo = {}
         local cargo = self:GetCargo()
         for _, unit in cargo or {} do
@@ -1891,7 +1915,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         for _, unit in self.cargo or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(self, 'Normal', 0)
+                unit:OnKilled(nil, '', 0)
             end
         end
     end,
@@ -2008,7 +2032,7 @@ ConstructionUnit = Class(MobileUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 
@@ -2041,6 +2065,7 @@ SeaUnit = Class(MobileUnit){
 --- Base class for aircraft carriers.
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
     OnKilled = function(self, instigator, type, overkillRatio)
+        self:SaveCargoMass()
         SeaUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
     end,
@@ -2120,7 +2145,7 @@ CommandUnit = Class(WalkingLandUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(2) self:SetImmobile(false) end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 
@@ -2189,7 +2214,6 @@ CommandUnit = Class(WalkingLandUnit) {
         self:HideBone(0, true)
         self:SetUnSelectable(true)
         self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
         self:ForkThread(self.WarpInEffectThread, bones)
     end,
 
@@ -2225,6 +2249,71 @@ CommandUnit = Class(WalkingLandUnit) {
             WaitSeconds(6)
             self:SetMesh(bp.Display.MeshBlueprint, true)
         end
+    end,
+    
+    -------------------------------------------------------------------------------------------
+    -- TELEPORTING WITH DELAY
+    -------------------------------------------------------------------------------------------
+    InitiateTeleportThread = function(self, teleporter, location, orientation)
+        self.UnitBeingTeleported = self
+        self:SetImmobile(true)
+        self:PlayUnitSound('TeleportStart')
+        self:PlayUnitAmbientSound('TeleportLoop')
+        
+        local bp = self:GetBlueprint().Economy
+        local energyCost, time
+        if bp then
+            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
+            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bp.TeleportTimeMod or 0.01)
+        end
+
+        local teleDelay = self:GetBlueprint().General.TeleportDelay
+
+        if teleDelay then
+            energyCostMod = (time + teleDelay) / time
+            time = time + teleDelay
+            energyCost = energyCost * energyCostMod
+            
+            self.TeleportDestChargeBag = nil 
+            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
+            
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+            
+            -- Create teleport charge effect + exit animation delay
+            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
+            WaitFor(self.TeleportDrain)
+        else 
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+            
+            -- Create teleport charge effect
+            self:PlayTeleportChargeEffects(location, orientation)
+            WaitFor(self.TeleportDrain)
+        end
+
+        if self.TeleportDrain then
+            RemoveEconomyEvent(self, self.TeleportDrain)
+            self.TeleportDrain = nil
+        end
+
+        self:PlayTeleportOutEffects()
+        self:CleanupTeleportChargeEffects()
+        WaitSeconds(0.1)
+        self:SetWorkProgress(0.0)
+        Warp(self, location, orientation)
+        self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
+        teleportTime[self.EntityId] = GetGameTick()
+
+        WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
+
+        -- Landing Sound
+        self:StopUnitAmbientSound('TeleportLoop')
+        self:PlayUnitSound('TeleportEnd')
+        self:SetImmobile(false)
+        self.UnitBeingTeleported = nil
+        self.TeleportThread = nil
     end,
 }
 
@@ -2269,8 +2358,14 @@ ACUUnit = Class(CommandUnit) {
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
-
+    
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        -- Handle incoming OC damage
+        if damageType == 'Overcharge' then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            amount = wep:GetBlueprint().Overcharge.commandDamage
+        end
+
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
         local aiBrain = self:GetAIBrain()
         if aiBrain then
@@ -2323,9 +2418,26 @@ ACUUnit = Class(CommandUnit) {
     end,
 
     GiveInitialResources = function(self)
-        WaitTicks(2)
+        WaitTicks(1)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+    end,
+
+    OnKilledUnit = function(self, unitKilled, massKilled)
+        -- Adjust mass based on unit killed for ACU
+        if unitKilled.techCategory then
+            local techMultipliers = {
+                TECH1 = 1,
+                TECH2 = 0.5,
+                TECH3 = 0.333334,
+                SUBCOMMANDER = 0.3,
+                EXPERIMENTAL = 0.25,
+                COMMAND = 0.05,
+            }
+            massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
+        end
+
+        CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
     end,
 
     BuildDisable = function(self)

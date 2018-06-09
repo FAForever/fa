@@ -22,8 +22,69 @@ local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRollov
 
 local selectedUnit = nil
 local updateThread = nil
-
+local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
+
+function OverchargeCanKill()
+    if unitHP[1] and unitHP.blueprintId then
+        local selected = GetSelectedUnits()
+        local ACU
+        local ACUBp
+        local bp
+    
+        for _, unit in selected do
+            if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
+                ACU = unit
+                break
+            end
+        end  
+        
+        if ACU then
+            ACUBp = ACU:GetBlueprint()
+            
+            if ACUBp.Weapon[2].Overcharge then
+                bp = ACUBp.Weapon[2].Overcharge
+            elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
+                bp = ACUBp.Weapon[3].Overcharge
+            -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
+            end
+            
+            if bp then
+                local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
+                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
+                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+                
+                if damage > bp.maxDamage then
+                    damage = bp.maxDamage
+                end
+            
+                if targetCategories.COMMAND then 
+                    if unitHP[1] < bp.commandDamage then
+                       unitHP[1] = nil
+                       return true
+                    else
+                       unitHP[1] = nil 
+                       return false
+                    end
+                elseif targetCategories.STRUCTURE then
+                    if unitHP[1] < bp.structureDamage then
+                        unitHP[1] = nil
+                        return true
+                    else
+                        unitHP[1] = nil 
+                        return false
+                        end
+                elseif unitHP[1] < damage then
+                    unitHP[1] = nil
+                    return true
+                else
+                    unitHP[1] = nil 
+                    return false
+                end                    
+            end 
+        end
+    end
+end
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
@@ -86,8 +147,9 @@ end
 
 local statFuncs = {
     function(info)
-        if info.massProduced > 0 or info.massRequested > 0 then
-            return string.format('%+d', math.ceil(info.massProduced - info.massRequested)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+        local massUsed = math.max(info.massRequested, info.massConsumed)
+        if info.massProduced > 0 or massUsed > 0 then
+            return string.format('%+d', math.ceil(info.massProduced - massUsed)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
@@ -101,8 +163,9 @@ local statFuncs = {
         end
     end,
     function(info)
-        if info.energyProduced > 0 or info.energyRequested > 0 then
-            return string.format('%+d', math.ceil(info.energyProduced - info.energyRequested))
+        local energyUsed = math.max(info.energyRequested, info.energyConsumed)
+        if info.energyProduced > 0 or energyUsed > 0 then
+            return string.format('%+d', math.ceil(info.energyProduced - energyUsed))
         else
             return false
         end
@@ -205,6 +268,7 @@ function UpdateWindow(info)
         controls.healthBar:Hide()
         controls.shieldBar:Hide()
         controls.fuelBar:Hide()
+        controls.vetBar:Hide()
         controls.actionIcon:Hide()
         controls.actionText:Hide()
         controls.abilities:Hide()
@@ -281,6 +345,7 @@ function UpdateWindow(info)
 
         controls.shieldBar:Hide()
         controls.fuelBar:Hide()
+        controls.vetBar:Hide()
 
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
@@ -291,12 +356,23 @@ function UpdateWindow(info)
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-
+		
+	if info.shieldRatio > 0 and info.fuelRatio > 0 then
+	    controls.store = 1
+	else
+	    controls.store = 0
+	end
+		
         if info.health then
             controls.healthBar:Show()
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
+	    
+        if not info.userUnit then
+            unitHP[1] = info.health
+            unitHP.blueprintId = info.blueprintId
+        end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
@@ -310,16 +386,47 @@ function UpdateWindow(info)
         else
             controls.healthBar:Hide()
         end
-        local veterancyLevels = bp.Veteran or veterancyDefaults
-        for index = 1, 5 do
-            local i = index
-            if UnitData[info.entityId].xp >= veterancyLevels[string.format('Level%d', i)] then
-                controls.vetIcons[i]:Show()
-                controls.vetIcons[i]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
+
+        -- Control the veterancy stars
+        local currentLevel = UnitData[info.entityId].VeteranLevel
+        local massKilled = UnitData[info.entityId].totalMassKilled
+        local myValue = UnitData[info.entityId].myValue
+
+        for level = 1, 5 do
+            if currentLevel >= level then
+                controls.vetIcons[level]:Show()
+                controls.vetIcons[level]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)]].VeteranIcon))
             else
-                controls.vetIcons[i]:Hide()
+                controls.vetIcons[level]:Hide()
             end
         end
+
+        -- Control the veterancy progress bar
+        if massKilled and myValue then
+            local progress = math.min(massKilled / myValue, 5) - currentLevel
+            if progress then
+                if currentLevel < 5 then
+                    controls.vetBar:Show()
+                    controls.vetBar:SetValue(progress)
+
+                    local nextLevel = myValue * (currentLevel + 1)
+                    local text
+                    if nextLevel >= 1000000 then
+                        text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
+                    elseif nextLevel >= 100000 then
+                        text = string.format('%.0fK/%.0fK', massKilled / 1000, nextLevel / 1000)
+                    elseif nextLevel >= 10000 then
+                        text = string.format('%.1fK/%.1fK', massKilled / 1000, nextLevel / 1000)
+                    else
+                        text = massKilled .. '/' .. nextLevel
+                    end
+                    controls.nextVet:SetText(text)
+                else
+                    controls.vetBar:Hide()
+                end
+            end
+        end
+
         local unitQueue = false
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
@@ -471,7 +578,7 @@ function UpdateEnhancementIcons(info)
         local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'
 
         enhancement:Show()
-        enhancement:SetTexture(UIUtil.UIFile(texture))
+        enhancement:SetTexture(UIUtil.UIFile(texture, true))
         enhancement.Width:Set(30)
         enhancement.Height:Set(30)
     end
@@ -505,6 +612,10 @@ function CreateUI()
     controls.shieldBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.fuelBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.health = UIUtil.CreateText(controls.healthBar, '', 14, UIUtil.bodyFont)
+    controls.vetBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
+    controls.nextVet = UIUtil.CreateText(controls.vetBar, '', 10, UIUtil.bodyFont)
+    controls.vetTitle = UIUtil.CreateText(controls.vetBar, 'Veterancy', 10, UIUtil.bodyFont)
+
     controls.statGroups = {}
     for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
@@ -542,6 +653,7 @@ function CreateUI()
                 self:SetAlpha(1, true)
             end
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
+	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end

@@ -7,7 +7,6 @@ UnitBlueprint {
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
         TargetBones = {
-#            'UAA0310',
             'Attachpoint01',
             'Attachpoint02',
             'Attachpoint03',
@@ -161,7 +160,7 @@ UnitBlueprint {
         BuildCostEnergy = 731250,
         BuildCostMass = 45000,
         BuildRate = 180,
-        BuildTime = 33750,
+        BuildTime = 50625,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE AIR',
         },
@@ -225,8 +224,8 @@ UnitBlueprint {
         },
         Elevation = 25,
 
-        # FuelRechargeRate = 150,
-        # FuelUseTime = 30000,
+        -- FuelRechargeRate = 150,
+        -- FuelUseTime = 30000,
         MaxAcceleration = 1,
         MaxSpeed = 1,
         MaxSteerForce = 100,
@@ -264,6 +263,7 @@ UnitBlueprint {
         Level4 = 160,
         Level5 = 200,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -286,17 +286,17 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,	#0.2
+            BeamCollisionDelay = 0,
             BeamLifetime = 0,
             CollideFriendly = false,
-            Damage = 333,			#1000
+            Damage = 333,
             DamageRadius = 4,
-            DamageType = 'CzarBeam',  # Normal
+            DamageType = 'CzarBeam',
             DisplayName = 'Quantum Beam Generator',
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
             },
-            FiringTolerance = 30,					#0
+            FiringTolerance = 30,
             Label = 'QuantumBeamGeneratorWeapon',
             MaxRadius = 30,
             MaximumBeamLength = 50,
@@ -318,8 +318,8 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,						#0.2
-            TargetCheckInterval = 0.1,					#2.5
+            RateOfFire = 10,
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'STRUCTURE',
@@ -332,7 +332,7 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Direct Fire Experimental',
-            WeaponRepackTimeout = 0,					#10
+            WeaponRepackTimeout = 0,
             WeaponUnpacks = false,
         },
         {

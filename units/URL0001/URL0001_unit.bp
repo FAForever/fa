@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardRadius = 10,
-        GuardScanRadius = 31.5,
+        GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
             'Head',
             'Torso',
@@ -145,6 +145,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
+        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -305,7 +306,7 @@ UnitBlueprint {
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
-        BuildCostMass = 18000,
+        BuildCostMass = 2000,
         BuildRate = 10,
         BuildTime = 6000000,
         BuildableCategory = {
@@ -695,8 +696,13 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
+        TeleportDelay = 10,
     },
     Intel = {
+        ActiveIntel = {
+            Omni = true,
+            Sonar = true,
+        },
         Cloak = true,
         FreeIntel = false,
         OmniRadius = 26,
@@ -765,7 +771,50 @@ UnitBlueprint {
         0.4,
         0.5,
     },
+    VeteranMassMult = 0.5,
     Weapon = {
+        { -- special dummy weapon to make the unit able to target at max torpedo range in the water
+            BallisticArc = 'RULEUBA_LowArc',
+            Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = {
+                Land = 'Land|Water|Seabed',
+                Seabed = 'Land|Water|Seabed',
+                Water = 'Land|Water|Seabed',
+            },
+            Label = 'DummyWeapon',
+            MaxRadius = 22,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret_Muzzle_02',
+                    },
+                    RackBone = 'Right_Turret',
+                },
+            },
+            RateOfFire = 0.5,
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'SPECIALHIGHPRI',
+                'MOBILE',
+                'STRUCTURE DEFENSE',
+                'SPECIALLOWPRI',
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TurretBoneMuzzle = 'Turret_Muzzle_02',
+            TurretBonePitch = 'Right_Turret',
+            TurretBoneYaw = 'Torso',
+            TurretDualManipulators = false,
+            TurretPitch = 0,
+            TurretPitchRange = 90,
+            TurretPitchSpeed = 90,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 90,
+            Turreted = true,
+            UseFiringSolutionInsteadOfAimBone = true,
+        },
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
@@ -819,6 +868,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
+                'COMMAND',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',
@@ -852,14 +902,14 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -872,6 +922,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -935,14 +992,14 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -954,6 +1011,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/CDFCannonMolecularOvercharge01/CDFCannonMolecularOvercharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             ProjectilesPerOnFire = 1,

@@ -55,7 +55,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
         self:SetType('Bubble')
-        self:SetSpillOverDmgMod(spec.SpillOverDamageMod or 0.15)
+        self.SpillOverDmgMod = math.max(spec.ShieldSpillOverDamageMod or 0.15, 0)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -103,10 +103,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
     SetType = function(self, type)
         self.ShieldType = type
-    end,
-
-    SetSpillOverDmgMod = function(self, dmgMod)
-        self.SpillOverDmgMod = math.max(dmgMod, 0)
     end,
 
     UpdateShieldRatio = function(self, value)
@@ -173,6 +169,15 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+        if dmgType == 'Overcharge' and instigator.EntityId then 
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            if self.Owner:GetBlueprint().CategoriesHash.COMMAND then --fixed damage for all ACU shields
+                amount = wep:GetBlueprint().Overcharge.commandDamage
+            elseif self.Owner:GetBlueprint().CategoriesHash.STRUCTURE then -- fixed damage for static shields
+                amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
+                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2. 
+            end	  
+        end
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
@@ -206,15 +211,16 @@ Shield = Class(moho.shield_methods, Entity) {
         WaitSeconds(self.RegenStartTime)
         while self:GetHealth() < self:GetMaxHealth() do
 
-            self:AdjustHealth(self.Owner, self.RegenRate)
+            self:AdjustHealth(self.Owner, self.RegenRate / 10)
 
             self:UpdateShieldRatio(-1)
 
-            WaitSeconds(1)
+            WaitTicks(1)
         end
     end,
 
     CreateImpactEffect = function(self, vector)
+        if not self or self.Owner.Dead then return end
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
@@ -328,26 +334,18 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
-        local owner = self.Owner
-        local position = owner:GetPosition()
-        local shieldbp = self.Owner:GetBlueprint().Defense.Shield
-        local shieldRadius = shieldbp.ShieldSize
-        local aiBrain = owner:GetAIBrain()
-        local otherShields = aiBrain:GetUnitsAroundPoint((categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally')
-        local rechargeTime = time + ((table.getn(otherShields) - 1) * .2 * time)
-        if rechargeTime > time * 3 then
-            rechargeTime = time
-        end
-        while curProgress < rechargeTime do
+        self.Charging = true
+        while curProgress < time do
             local fraction = self.Owner:GetResourceConsumed()
             curProgress = curProgress + (fraction / 10)
-            curProgress = math.min(curProgress, rechargeTime)
+            curProgress = math.min(curProgress, time)
 
-            local workProgress = curProgress / rechargeTime
+            local workProgress = curProgress / time
 
             self:UpdateShieldRatio(workProgress)
             WaitTicks(1)
         end
+        self.Charging = nil
     end,
 
     OnState = State {

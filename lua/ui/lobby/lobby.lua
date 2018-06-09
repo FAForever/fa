@@ -43,6 +43,8 @@ local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
+-- Uveso - aitypes inside aitypes.lua are now also available as a function.
+local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
 
 local IsSyncReplayServer = false
 
@@ -57,6 +59,21 @@ local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
+
+-- Add lobby options from AI mods
+function ImportModAIOptions()
+    local simMods = import('/lua/mods.lua').AllMods()
+    local OptionData
+    for Index, ModData in simMods do
+        if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
+            OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
+            for s, t in OptionData do
+                table.insert(AIOpts, t)
+            end
+        end
+    end
+end
+ImportModAIOptions()
 
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
@@ -336,7 +353,6 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
                     end
                 end
             end
-            local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)
@@ -2199,6 +2215,8 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     end
 
     if not ignoreRefresh then
+        -- reload AI types in case we have enable or disable an AI mod.
+        aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
         UpdateGame()
     end
 end

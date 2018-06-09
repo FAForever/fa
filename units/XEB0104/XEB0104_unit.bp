@@ -168,8 +168,8 @@ UnitBlueprint {
         SizeZ = 1,
     },
     General = {
-        Category = 'Intelligence',
-        Classification = 'RULEUC_Sensor',
+        Category = 'Construction',
+        Classification = 'RULEUC_Engineer',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
