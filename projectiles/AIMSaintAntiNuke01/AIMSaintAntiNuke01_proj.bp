@@ -1,0 +1,56 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Explosions',
+            Cue = 'Expl_Anti_Nuke',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'PROJECTILE',
+        'ANTIMISSILE',
+        'NOSPLASHDAMAGE',
+        'AEON',
+    },
+    Description = 'AEON Anti Nuclear Missile',
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 150,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.05,
+    },
+    Economy = {
+        BuildCostEnergy = 360000,
+        BuildCostMass = 3600,
+        BuildTime = 259200,
+    },
+    DoNotCollideList = {
+        'AIR',
+    },
+    General = {
+        Category = 'Defense',
+        Faction = 'Aeon',
+        Weapon = 'EMP Anti Nuke',
+    },
+    Interface = {
+        HelpText = 'AEON Anti Nuclear Missile',
+    },
+    Physics = {
+        Acceleration = 30,
+        DestroyOnWater = false,
+        HitAssignedTarget = true,
+        LeadTarget = true,
+        MaxSpeed = 90,
+        TrackTarget = true,
+        TurnRate = 180,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds',
+}
