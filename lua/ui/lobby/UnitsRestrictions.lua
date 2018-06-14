@@ -78,7 +78,7 @@ Expressions = {
     -- added exclusion of engineers and structures because they are restricted by other presets
     LAND        = "(LAND - ENGINEER - STRUCTURE)",
     -- added restriction of AA structures because they are not needed when all air units are restricted
-    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD) + (LAND * ANTIAIR - EXPERIMENTAL) + (NAVAL * ANTIAIR - DIRECTFIRE - INDIRECTFIRE - ANTINAVY))",
+    AIR         = "((STRUCTURE * (ANTIAIR + AIRSTAGINGPLATFORM)) + (AIR - POD) + (NAVAL * CARRIER - EXPERIMENTAL))",
     -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
     NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
@@ -429,11 +429,11 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/tech-4.dds")
     -- TYPES restrictions
     CreatePreset("LAND",
-        "<LOC restricted_units_info_LAND>Prevents all land units and anti-land structures, except engineers and factories",
+        "<LOC restricted_units_info_LAND>Prevents all land units with weapons, except engineers, commanders, and structures",
         "<LOC restricted_units_data_LAND>No Land Units",
         "/textures/ui/common/icons/presets/type-land.dds")
     CreatePreset("AIR",
-        "<LOC restricted_units_info_AIR>Prevents all air units, air factories, and anti-air structures",
+        "<LOC restricted_units_info_AIR>Prevents all air units (except drones), air factories, and anti-air structures",
         "<LOC restricted_units_data_AIR>No Air Units",
         "/textures/ui/common/icons/presets/type-air.dds")
     CreatePreset("NAVAL",
