@@ -436,8 +436,7 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
                 HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
             else
-                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
-                                   RequestedSlot = slot})
+                lobbyComm:SendData(hostID, {Type = 'MovePlayer', RequestedSlot = slot})
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
@@ -3891,7 +3890,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         if lobbyComm:IsHost() then
                             HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
                         else
-                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
+                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', RequestedSlot = slot})
                         end
                         -- if first click is a not empty slot and second click is a empty slot: reset vars
                         if mapPreviewSlotSwap == true then
@@ -4184,13 +4183,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
+                local CurrentSlot = FindSlotForID(data.SenderID)
+
                 -- Handle ready-races.
-                if gameInfo.PlayerOptions[data.CurrentSlot].Ready then
+                if gameInfo.PlayerOptions[CurrentSlot].Ready then
                     return
                 end
 
                 -- Player requests to be moved to a different empty slot.
-                HostUtils.MovePlayerToEmptySlot(data.CurrentSlot, data.RequestedSlot)
+                HostUtils.MovePlayerToEmptySlot(CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
                 HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
