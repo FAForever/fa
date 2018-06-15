@@ -1954,7 +1954,7 @@ local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
         HostUtils.PlayerMissingMapAlert(localPlayerID)
     else
-        lobbyComm:SendData(hostID, {Type = 'MissingMap', Id = localPlayerID})
+        lobbyComm:SendData(hostID, {Type = 'MissingMap'})
     end
 end
 
@@ -4220,7 +4220,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 availableMods[data.SenderID] = data.Mods
                 HostUtils.UpdateMods(data.SenderID, data.Name)
             elseif data.Type == 'MissingMap' then
-                HostUtils.PlayerMissingMapAlert(data.Id)
+                HostUtils.PlayerMissingMapAlert(data.SenderID)
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
