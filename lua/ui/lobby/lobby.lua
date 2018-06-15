@@ -3334,7 +3334,7 @@ function CreateUI(maxPlayers)
             if isHost then
                 HostUtils.ConvertPlayerToObserver(FindSlotForID(localPlayerID))
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedSlot = FindSlotForID(localPlayerID)})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver'})
             end
         elseif IsObserver(localPlayerID) then
             if isHost then
@@ -4193,7 +4193,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 -- Player requests to be moved to a different empty slot.
                 HostUtils.MovePlayerToEmptySlot(CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
-                HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
+                HostUtils.ConvertPlayerToObserver(FindSlotForID(data.SenderID))
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
