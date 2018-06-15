@@ -3340,7 +3340,7 @@ function CreateUI(maxPlayers)
             if isHost then
                 HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID))
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', ObserverSlot = FindObserverSlotForID(localPlayerID)})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer'})
             end
         end
     end
@@ -4195,7 +4195,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToObserver' then
                 HostUtils.ConvertPlayerToObserver(FindSlotForID(data.SenderID))
             elseif data.Type == 'RequestConvertToPlayer' then
-                HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
+                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(data.SenderID), data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
