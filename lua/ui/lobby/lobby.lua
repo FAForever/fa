@@ -2435,7 +2435,7 @@ function CreateSlotsUI(makeLabel)
         colorSelector.Width:Set(COLUMN_WIDTHS[6])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow })
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index })
                 SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                 UpdateGame()
             else
@@ -4197,15 +4197,18 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(data.SenderID), data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
+                local TargetSlot = FindSlotForID(data.SenderID)
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
-                    SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
-                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = data.Slot })
-                    SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+                    SetPlayerColor(gameInfo.PlayerOptions[TargetSlot], data.Color)
+                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = TargetSlot })
+                    SetSlotInfo(TargetSlot, gameInfo.PlayerOptions[TargetSlot])
                 else
                     -- Sorry, it's not free. Force the player back to the color we have for him.
-                    lobbyComm:SendData(data.SenderID, { Type = 'SetColor', Color =
-                    gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot })
+                    lobbyComm:SendData(data.SenderID, {
+                        Type = 'SetColor',
+                        Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
+                    })
                 end
             elseif data.Type == 'ClearSlot' then
                 if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
