@@ -3988,6 +3988,427 @@ function UpdateClientModStatus(newHostSimMods)
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
 end
 
+local IsFromHost = function(data) return data.SenderID == hostID end
+local AmHost = function(data) return lobbyComm:IsHost() end
+
+local FromSubjectOrHost = function(data)
+    if IsFromHost(data) then
+        return true
+    end
+
+    -- Do ridiculous things to infer the identity of the subject of the message.
+    -- TODO: A UNIFORM PROTOCOL MAYBE?
+    local subjectID = data.SenderID
+    if data.PlayerName then
+        return data.SenderID == FindIDForName(data.PlayerName)
+    end
+
+    if data.Slot and gameInfo.PlayerOptions[data.Slot] then
+        return data.SenderID == FindIDForName(gameInfo.PlayerOptions[data.Slot].PlayerName)
+    end
+
+    return false
+end
+
+--
+local MessageHandlers = {
+    -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
+    PlayerOptions = {
+        Accept = function(data)
+            for key, val in data.Options do
+                -- The host *is* allowed to set options on slots he doesn't own, of course.
+                if data.SenderID ~= hostID then
+                    if key == 'Team' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
+                        WARN("Attempt to set Team while Auto Teams are on.")
+                        return false
+                    elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
+                        WARN("Attempt to set option on unowned slot.")
+                        return false
+                    end
+                end
+            end
+
+            -- TODO: Players may not change *all* of their own options...
+
+            return true
+        end,
+        Handle = function(data)
+            local options = data.Options
+
+            for key, val in options do
+                gameInfo.PlayerOptions[data.Slot][key] = val
+                if lobbyComm:IsHost() then
+                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
+                    if playerInfo.Human then
+                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
+                    else
+                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
+                    end
+
+                    -- TODO: This should be a global listener on PlayerData objects, but I'm in too
+                    -- much pain to implement that listener system right now. EVIL HACK TIME
+                    if key == "Ready" then
+                        HostUtils.RefreshButtonEnabledness()
+                    end
+                    -- DONE.
+                end
+            end
+
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+        end
+    },
+
+    -- SenderName here is inserted by lobbyComm, so validating it is just a gratuitious effort to
+    -- detect obnoxiousness.
+    PublicChat = {
+        Accept = function(data)
+            return data.SenderName == FindNameForID(data.SenderID)
+        end,
+        Handle = function(data)
+            AddChatText("["..data.SenderName.."] "..data.Text)
+        end
+    },
+
+    PrivateChat = {
+        Accept = function(data)
+            return data.SenderName == FindNameForID(data.SenderID)
+        end,
+        Handle = function(data)
+            AddChatText("<<"..LOCF("<LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
+        end
+    },
+
+    CPUBenchmark = {
+        Accept = FromSubjectOrHost,
+        Handle = function(data)
+            local newInfo = false
+            if data.PlayerName and CPU_Benchmarks[data.PlayerName] ~= data.Result then
+                newInfo = true
+            end
+
+            local benchmarks = {}
+            if data.PlayerName then
+                benchmarks[data.PlayerName] = data.Result
+            else
+                benchmarks = data.Benchmarks
+            end
+
+            for name, result in benchmarks do
+                CPU_Benchmarks[name] = result
+                local id = FindIDForName(name)
+                local slot = FindSlotForID(id)
+                if slot then
+                    SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
+                else
+                    refreshObserverList()
+                end
+            end
+
+            -- Host broadcasts new CPU benchmark information to give the info to clients that are not directly connected to data.PlayerName yet.
+            if lobbyComm:IsHost() and newInfo then
+                lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
+            end
+        end
+    },
+
+    SetPlayerNotReady = {
+        Accept = FromSubjectOrHost,
+        Handle = function(data)
+            EnableSlot(data.Slot)
+            GUI.becomeObserver:Enable()
+
+            SetPlayerOption(data.Slot, 'Ready', false)
+        end
+    },
+
+    AutoTeams = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.AutoTeams[data.Slot] = data.Team
+            gameInfo.PlayerOptions[data.Slot]['Team'] = data.Team
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+            UpdateGame()
+        end
+    },
+
+    AddPlayer = {
+        Accept = AmHost,
+        Handle = function(data)
+            -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
+            -- slot or move it to observer
+            SendCompleteGameStateToPeer(data.SenderID)
+
+            if argv.isRehost then
+                local rehostSlot = FindRehostSlotForID(data.SenderID) or 0
+                if rehostSlot ~= 0 and gameInfo.PlayerOptions[rehostSlot] then
+                    -- If the slot is occupied, the occupying player will be moved away or to observer. If it's an
+                    -- AI, it will be removed
+                    local occupyingPlayer = gameInfo.PlayerOptions[rehostSlot]
+                    if not occupyingPlayer.Human then
+                        HostUtils.RemoveAI(rehostSlot)
+                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                    else
+                        HostUtils.ConvertPlayerToObserver(rehostSlot, true)
+                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                        HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(occupyingPlayer.OwnerID))
+                    end
+                else
+                    HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                end
+            else
+                HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
+            end
+            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+        end
+    },
+
+    -- Player requests move.
+    MovePlayer = {
+        Accept = AmHost, -- Forgery would require tricking lobbyComm...
+        Handle = function(data)
+            local CurrentSlot = FindSlotForID(data.SenderID)
+
+            -- Handle ready-races.
+            if gameInfo.PlayerOptions[CurrentSlot].Ready then
+                return
+            end
+
+            -- Player requests to be moved to a different empty slot.
+            HostUtils.MovePlayerToEmptySlot(CurrentSlot, data.RequestedSlot)
+        end
+    },
+
+    RequestConvertToObserver = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.ConvertPlayerToObserver(FindSlotForID(data.SenderID))
+        end
+
+    },
+
+    RequestConvertToPlayer = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(data.SenderID), data.PlayerSlot)
+        end
+    },
+
+    RequestColor = {
+        Accept = AmHost,
+        Handle = function(data)
+            local TargetSlot = FindSlotForID(data.SenderID)
+            if IsColorFree(data.Color) then
+                -- Color is available, let everyone else know
+                SetPlayerColor(gameInfo.PlayerOptions[TargetSlot], data.Color)
+                lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = TargetSlot })
+                SetSlotInfo(TargetSlot, gameInfo.PlayerOptions[TargetSlot])
+            else
+                -- Sorry, it's not free. Force the player back to the color we have for him.
+                lobbyComm:SendData(data.SenderID, {
+                    Type = 'SetColor',
+                    Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
+                })
+            end
+        end
+    },
+
+    -- Sent to the host to advise them of which mods the players have.
+    SetAvailableMods = {
+        Accept = AmHost,
+        Handle = function(data)
+            availableMods[data.SenderID] = data.Mods
+            HostUtils.UpdateMods(data.SenderID, data.Name)
+        end
+    },
+
+    -- Sent by a non-host peer when a map is selected that they don't have installed.
+    MissingMap = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.PlayerMissingMapAlert(data.SenderID)
+        end
+    },
+
+    -- This is insane.
+    SystemMessage = {
+        Handle = function(data)
+            PrintSystemMessage(data.Id, data.Args)
+        end
+    },
+
+    -- This is very insane and somewhat insecure...
+    Peer_Really_Disconnected = {
+        Handle = function(data)
+            if data.Observ == false then
+                gameInfo.PlayerOptions[data.Slot] = nil
+            elseif data.Observ == true then
+                gameInfo.Observers[data.Slot] = nil
+            end
+            AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
+            ClearSlotInfo(data.Slot)
+            UpdateGame()
+        end
+    },
+
+    SetAllPlayerNotReady = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            if not IsPlayer(localPlayerID) then
+                return
+            end
+            local localSlot = FindSlotForID(localPlayerID)
+            EnableSlot(localSlot)
+            GUI.becomeObserver:Enable()
+            SetPlayerOption(localSlot, 'Ready', false)
+        end
+    },
+
+    -- Host telling us about things changing in the game configuration...
+
+    GameOptions = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            for key, value in data.Options do
+                gameInfo.GameOptions[key] = value
+            end
+
+            UpdateGame()
+        end
+    },
+    ClearSlot = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.Slot] = nil
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    ModsChanged = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.GameMods = data.GameMods
+
+            UpdateClientModStatus(data.GameMods)
+            UpdateGame()
+            import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
+        end
+    },
+    SlotClosed = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.ClosedSlots[data.Slot] = data.Closed
+            gameInfo.SpawnMex[data.Slot] = false
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    SlotClosedSpawnMex = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
+            gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    GameInfo = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            -- Completely update the game state. To be used exactly once: when first connecting.
+            local hostFlatInfo = data.GameInfo
+            gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
+
+            UpdateClientModStatus(gameInfo.GameMods, true)
+            UpdateGame()
+        end
+    },
+    SetColor = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+        end
+    },
+    ConvertObserverToPlayer = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.OldSlot] = nil
+            gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            refreshObserverList()
+            SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
+        end
+    },
+
+    ConvertPlayerToObserver = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
+            gameInfo.PlayerOptions[data.OldSlot] = nil
+            ClearSlotInfo(data.OldSlot)
+            refreshObserverList()
+            UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
+        end
+    },
+
+    SlotAssigned = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
+            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
+            PossiblyAnnounceGameFull()
+        end
+    },
+
+    SlotMove = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.OldSlot] = nil
+            gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            ClearSlotInfo(data.OldSlot)
+            SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
+        end
+    },
+
+    SwapPlayers = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            DoSlotSwap(data.Slot1, data.Slot2)
+        end
+    },
+
+    ObserverAdded = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.Slot] = PlayerData(data.Options)
+            refreshObserverList()
+        end
+    },
+
+    -- Start the game!
+    Launch = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            local info = data.GameInfo
+            info.GameMods = Mods.GetGameMods(info.GameMods)
+            SetWindowedLobby(false)
+
+            -- Evil hack to correct the skin for randomfaction players before launch.
+            for index, player in info.PlayerOptions do
+                -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
+                -- random-faction people from ending up with something retarded)
+                if player.OwnerID == localPlayerID then
+                    UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
+                end
+             end
+
+            SavePresetToName(LAST_GAME_PRESET_NAME)
+            lobbyComm:LaunchGame(info)
+        end
+    },
+}
+
+
 -- LobbyComm Callbacks
 function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -4068,249 +4489,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
-    lobbyComm.DataReceived = function(self,data)
-        -- Messages anyone can receive
-        if data.Type == 'PlayerOptions' then
-            local options = data.Options
-            local isHost = lobbyComm:IsHost()
-
-            for key, val in options do
-                -- The host *is* allowed to set options on slots he doesn't own, of course.
-                if data.SenderID ~= hostID then
-                    if key == 'Team' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
-                        WARN("Attempt to set Team while Auto Teams are on.")
-                        return
-                    elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
-                        WARN("Attempt to set option on unowned slot.")
-                        return
-                    end
-                end
-
-                gameInfo.PlayerOptions[data.Slot][key] = val
-                if isHost then
-                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
-                    if playerInfo.Human then
-                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
-                    else
-                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
-                    end
-
-
-                    -- TODO: This should be a global listener on PlayerData objects, but I'm in too
-                    -- much pain to implement that listener system right now. EVIL HACK TIME
-                    if key == "Ready" then
-                        HostUtils.RefreshButtonEnabledness()
-                    end
-                    -- DONE.
-                end
-            end
-            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-        elseif data.Type == 'PublicChat' then
-            AddChatText("["..data.SenderName.."] "..data.Text)
-        elseif data.Type == 'PrivateChat' then
-            AddChatText("<<"..LOCF("<LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
-        elseif data.Type == 'CPUBenchmark' then
-            -- CPU benchmark code
-            local newInfo = false
-            if data.PlayerName and CPU_Benchmarks[data.PlayerName] ~= data.Result then
-                newInfo = true
-            end
-
-            local benchmarks = {}
-            if data.PlayerName then
-                benchmarks[data.PlayerName] = data.Result
-            else
-                benchmarks = data.Benchmarks
-            end
-
-            for name, result in benchmarks do
-                CPU_Benchmarks[name] = result
-                local id = FindIDForName(name)
-                local slot = FindSlotForID(id)
-                if slot then
-                    SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
-                else
-                    refreshObserverList()
-                end
-            end
-
-            -- Host broadcasts new CPU benchmark information to give the info to clients that are not directly connected to data.PlayerName yet.
-            if lobbyComm:IsHost() and newInfo then
-                lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
-            end
-        elseif data.Type == 'SetPlayerNotReady' then
-            EnableSlot(data.Slot)
-            GUI.becomeObserver:Enable()
-
-            SetPlayerOption(data.Slot, 'Ready', false)
-        elseif data.Type == 'AutoTeams' then
-            gameInfo.AutoTeams[data.Slot] = data.Team
-            gameInfo.PlayerOptions[data.Slot]['Team'] = data.Team
-            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-            UpdateGame()
+    lobbyComm.DataReceived = function(self, data)
+        -- Decide if we should just drop the packet. Violations here are usually people using a
+        -- modified lobby.lua to try to do stupid shit.
+        if not MessageHandlers[data.Type] then
+            WARN("Unknown message type: " .. data.Type)
+            return
         end
 
-        if lobbyComm:IsHost() then
-            -- Host only messages
-            if data.Type == 'AddPlayer' then
-                -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
-                -- slot or move it to observer
-                SendCompleteGameStateToPeer(data.SenderID)
-
-                if argv.isRehost then
-                    local rehostSlot = FindRehostSlotForID(data.SenderID) or 0
-                    if rehostSlot ~= 0 and gameInfo.PlayerOptions[rehostSlot] then
-                        -- If the slot is occupied, the occupying player will be moved away or to observer. If it's an
-                        -- AI, it will be removed
-                        local occupyingPlayer = gameInfo.PlayerOptions[rehostSlot]
-                        if not occupyingPlayer.Human then
-                            HostUtils.RemoveAI(rehostSlot)
-                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                        else
-                            HostUtils.ConvertPlayerToObserver(rehostSlot, true)
-                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(occupyingPlayer.OwnerID))
-                        end
-                    else
-                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                    end
-                else
-                    HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
-                end
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
-            elseif data.Type == 'MovePlayer' then
-                local CurrentSlot = FindSlotForID(data.SenderID)
-
-                -- Handle ready-races.
-                if gameInfo.PlayerOptions[CurrentSlot].Ready then
-                    return
-                end
-
-                -- Player requests to be moved to a different empty slot.
-                HostUtils.MovePlayerToEmptySlot(CurrentSlot, data.RequestedSlot)
-            elseif data.Type == 'RequestConvertToObserver' then
-                HostUtils.ConvertPlayerToObserver(FindSlotForID(data.SenderID))
-            elseif data.Type == 'RequestConvertToPlayer' then
-                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(data.SenderID), data.PlayerSlot)
-            elseif data.Type == 'RequestColor' then
-                local TargetSlot = FindSlotForID(data.SenderID)
-                if IsColorFree(data.Color) then
-                    -- Color is available, let everyone else know
-                    SetPlayerColor(gameInfo.PlayerOptions[TargetSlot], data.Color)
-                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = TargetSlot })
-                    SetSlotInfo(TargetSlot, gameInfo.PlayerOptions[TargetSlot])
-                else
-                    -- Sorry, it's not free. Force the player back to the color we have for him.
-                    lobbyComm:SendData(data.SenderID, {
-                        Type = 'SetColor',
-                        Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
-                    })
-                end
-            elseif data.Type == 'SetAvailableMods' then
-                availableMods[data.SenderID] = data.Mods
-                HostUtils.UpdateMods(data.SenderID, data.Name)
-            elseif data.Type == 'MissingMap' then
-                HostUtils.PlayerMissingMapAlert(data.SenderID)
-            end
-        else -- Non-host only messages
-            if data.Type == 'SystemMessage' then
-                PrintSystemMessage(data.Id, data.Args)
-            elseif data.Type == 'SetAllPlayerNotReady' then
-                if not IsPlayer(localPlayerID) then
-                    return
-                end
-                local localSlot = FindSlotForID(localPlayerID)
-                EnableSlot(localSlot)
-                GUI.becomeObserver:Enable()
-                SetPlayerOption(localSlot, 'Ready', false)
-            elseif data.Type == 'Peer_Really_Disconnected' then
-                if data.Observ == false then
-                    gameInfo.PlayerOptions[data.Slot] = nil
-                elseif data.Observ == true then
-                    gameInfo.Observers[data.Slot] = nil
-                end
-                AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
-                ClearSlotInfo(data.Slot)
-                UpdateGame()
-            elseif data.Type == 'SlotAssigned' then
-                gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
-                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
-                PossiblyAnnounceGameFull()
-            elseif data.Type == 'SlotMove' then
-                gameInfo.PlayerOptions[data.OldSlot] = nil
-                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                ClearSlotInfo(data.OldSlot)
-                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
-            elseif data.Type == 'SwapPlayers' then
-                DoSlotSwap(data.Slot1, data.Slot2)
-            elseif data.Type == 'ObserverAdded' then
-                gameInfo.Observers[data.Slot] = PlayerData(data.Options)
-                refreshObserverList()
-            elseif data.Type == 'ConvertObserverToPlayer' then
-                gameInfo.Observers[data.OldSlot] = nil
-                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                refreshObserverList()
-                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
-            elseif data.Type == 'ConvertPlayerToObserver' then
-                gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
-                gameInfo.PlayerOptions[data.OldSlot] = nil
-                ClearSlotInfo(data.OldSlot)
-                refreshObserverList()
-                UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
-            elseif data.Type == 'SetColor' then
-                SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
-                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-            elseif data.Type == 'GameInfo' then
-                -- Completely update the game state. To be used exactly once: when first connecting.
-                local hostFlatInfo = data.GameInfo
-                gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
-
-                UpdateClientModStatus(gameInfo.GameMods, true)
-                UpdateGame()
-            elseif data.Type == 'GameOptions' then
-                for key, value in data.Options do
-                    gameInfo.GameOptions[key] = value
-                end
-
-                UpdateGame()
-            elseif data.Type == 'Launch' then
-                local info = data.GameInfo
-                info.GameMods = Mods.GetGameMods(info.GameMods)
-                SetWindowedLobby(false)
-
-                -- Evil hack to correct the skin for randomfaction players before launch.
-                for index, player in info.PlayerOptions do
-                    -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
-                    -- random-faction people from ending up with something retarded)
-                    if player.OwnerID == localPlayerID then
-                        UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
-                    end
-                 end
-
-                SavePresetToName(LAST_GAME_PRESET_NAME)
-                lobbyComm:LaunchGame(info)
-            elseif data.Type == 'ClearSlot' then
-                gameInfo.PlayerOptions[data.Slot] = nil
-                ClearSlotInfo(data.Slot)
-            elseif data.Type == 'ModsChanged' then
-                gameInfo.GameMods = data.GameMods
-
-                UpdateClientModStatus(data.GameMods)
-                UpdateGame()
-                import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
-            elseif data.Type == 'SlotClosed' then
-                gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[data.Slot] = false
-                ClearSlotInfo(data.Slot)
-            elseif data.Type == 'SlotClosedSpawnMex' then
-                gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
-                gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
-                ClearSlotInfo(data.Slot)
-            end
+        -- No defined validator is taken to be always-accept.
+        if not MessageHandlers[data.Type].Accept or MessageHandlers[data.Type].Accept(data) then
+            MessageHandlers[data.Type].Handle(data)
+        else
+            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
         end
     end
 
