@@ -20,6 +20,12 @@ local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
+local SetWeaponPriorities = import('/lua/keymap/misckeyactions.lua').SetWeaponPriorities
+local updateHotkeys = import('/lua/keymap/misckeyactions.lua').updatePriData
+local Dragger = import('/lua/maui/dragger.lua').Dragger
+local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local Combo = import('/lua/ui/controls/combo.lua').Combo
+local Edit = import('/lua/maui/edit.lua').Edit
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -551,12 +557,216 @@ local function CreateBorder(parent)
     return border
 end
 
+-------------------------------------------------------------------------
+---------------------Weapon priorities-----------------------------------
+-------------------------------------------------------------------------
+
+local prioStateTextures = {
+    Default = '/game/Weapon-priorities/default.dds',
+    ACU = '/game/Weapon-priorities/ACU.dds',
+    Power = '/game/Weapon-priorities/power.dds',
+    PD = '/game/Weapon-priorities/PD.dds',
+    Engies = '/game/Weapon-priorities/engies.dds',
+    Shield = '/game/Weapon-priorities/shields.dds',
+    EXP = '/game/Weapon-priorities/EXP.dds'
+}
+local categoryID ={[1] = 'AIR', [2] = 'ANTIAIR', [3] = 'ANTIMISSILE', [4] = 'ANTINAVY', [5] = 'ANTISUB',
+    [6] = 'ARTILLERY', [7] = 'BATTLESHIP', [8] = 'BOMBER', [9] = 'CARRIER', [10] = 'COMMAND',[11] = 'CONSTRUCTION',
+    [12] = 'COUNTERINTELLIGENCE',[13] = 'CRUISER',[14] = 'DEFENSE',[15] = 'DESTROYER',[16] = 'DIRECTFIRE',
+    [17] = 'ECONOMIC',[18] = 'ENERGYPRODUCTION',[19] = 'ENERGYSTORAGE',[20] = 'ENGINEER',[21] = 'EXPERIMENTAL',
+    [22] = 'FACTORY',[23] = 'FRIGATE',[24] = 'GROUNDATTACK',[25] = 'HOVER',[26] = 'INDIRECTFIRE', 
+    [27] = 'INTELLIGENCE', [28] = 'LAND', [29] = 'MASSEXTRACTION',[30] = 'MASSPRODUCTION',[31] = 'MASSSTORAGE',
+    [32] = 'MOBILE',[33] = 'MOBILESONAR',[34] = 'NAVAL',[35] = 'NUKE',[36] = 'NUKESUB',
+    [37] = 'OMNI',[38] = 'RADAR',[39] = 'RECLAIMABLE',[40] = 'SCOUT',[41] = 'SHIELD',[42] = 'SNIPER',
+    [43] = 'SONAR',[44] = 'STRATEGIC',[45] = 'STRUCTURE',[46] = 'SUBCOMMANDER',[47] = 'SUBMERSIBLE',
+    [48] = 'TECH1',[49] = 'TECH2',[50] = 'TECH3',[51] = 'TRANSPORTATION'}
+
+local updater
+local main
+local infoPanel
+
+local mainData
+local mainDataDefault = {
+    category = {}, 
+    sets = {ACU = {10}, Power = {18,45}, PD = {14,16,45}, Engies = {20, 39}, Shields = {41}, EXP = {21}}, 
+    defaults = {ACU = true, Power = true, PD = true, Engies = true, Shields = true, EXP = true}, 
+    buttonLayout = {[1] = "Default", [2] = "ACU", [3] = "Engies", [4] = "PD", [5] = "Power", [6] = "Shields", [7] = "EXP"},
+    buttonLayoutExpand = {},
+    hotkeys = {[1] = "ACU", [2] = "Engies", [3] = "PD", [4] = "Power", [5] = "Shields", [6] = "EXP"},
+    defCheck = true, 
+    }
+    
+mainData = Prefs.GetFromCurrentProfile("mainPriData") or mainDataDefault 
+
+local showUnitCat = true
+local showTable
+
+local function SavePrefs()
+    Prefs.SetToCurrentProfile("mainPriData", mainData)
+    Prefs.SavePreferences()
+    updateHotkeys()
+end
+
+local function ResetPri()
+    mainData = table.deepcopy(mainDataDefault)
+    Prefs.SetToCurrentProfile("mainPriData", mainData)
+    Prefs.SavePreferences()
+    updateHotkeys()
+end
+
+local function CreatePrioBorder(parent)
+    local prioBorder = {}
+    
+    prioBorder.topleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ul.dds'))
+    prioBorder.bottomleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ll.dds'))
+    prioBorder.topright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ur.dds'))
+    prioBorder.bottomright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lr.dds'))
+    
+    prioBorder.topmid = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_horz_um.dds'))
+    prioBorder.bottommid = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lm.dds'))
+    
+    prioBorder.midleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_vert_l.dds'))
+    prioBorder.midright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_vert_r.dds'))
+    
+    prioBorder.back = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+    
+    
+    local x = 56 --topleft relative coordinates
+    local y = -18
+    
+    local width = 70
+    local height = 155
+
+    if mainData.expand then
+        width = 140
+    end
+    
+    
+    
+    --corners
+    LayoutHelpers.AtLeftTopIn(prioBorder.topleft, parent, x, y)
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottomleft, prioBorder.topleft, 0, height)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.topright, prioBorder.topleft, width, 0)
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottomright, prioBorder.topleft, width, height)
+    
+    
+    --mid
+    LayoutHelpers.AtLeftTopIn(prioBorder.topmid, prioBorder.topleft, 18, 0)
+    prioBorder.topmid.Width:Set(width - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottommid, prioBorder.topleft, 18, height)
+    prioBorder.bottommid.Width:Set(width - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.midleft, prioBorder.topleft, 0, 18)
+    prioBorder.midleft.Height:Set(height - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.midright, prioBorder.topleft, width, 18)
+    prioBorder.midright.Height:Set(height - 18)
+ 
+    --background
+    LayoutHelpers.AtLeftTopIn(prioBorder.back, prioBorder.topleft, 18 , 18)
+    prioBorder.back.Width:Set(width - 18)
+    prioBorder.back.Height:Set(height - 18)
+    
+    return prioBorder
+end
+
+local function CreatePrioButtons(parent)
+    local buttons = {}
+    local i = 1
+    
+    local function CreateButton(name, key, defaults)
+        local btn = Checkbox(parent)
+      
+        btn.Width:Set(70)
+        btn.Height:Set(20)
+    
+        btn:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Button2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Button2.dds')
+        )
+        if name then 
+            btn.OnCheck = function(control, checked)
+                SetWeaponPriorities(key, name, defaults)
+            end
+        
+            LayoutHelpers.AtLeftTopIn(UIUtil.CreateText(parent, name, 14, UIUtil.bodyFont), btn, 10, 0)
+            
+        else -- empty button
+            btn:DisableHitTest()
+        end   
+        
+        return btn
+    end
+    
+  
+    while i < 8 do
+        
+        local name = mainData.buttonLayout[i]
+        if i == 1 then 
+            buttons[i] = CreateButton(name, 0)
+            LayoutHelpers.AtLeftTopIn(buttons[i], parent, 65, 120)
+        else
+            buttons[i] = CreateButton(name, mainData.sets[name], mainData.defaults[name])
+            LayoutHelpers.Above(buttons[i], buttons[i-1])
+        end
+        
+        i = i + 1
+    end
+    
+    local first
+    
+    if mainData.expand then
+        while i < 15 do
+        
+            local name = mainData.buttonLayoutExpand[i]
+            
+            if not first then 
+                buttons[i] = CreateButton(name, mainData.sets[name], mainData.defaults[name])
+                LayoutHelpers.AtLeftTopIn(buttons[i], parent, 137, 120)
+                first = true
+            else
+                buttons[i] = CreateButton(name, mainData.sets[name], mainData.defaults[name])
+                LayoutHelpers.Above(buttons[i], buttons[i-1])
+            end
+            
+            i = i + 1
+        end
+    end
+    
+    
+    --info button
+    buttons.info = Checkbox(parent)
+    
+    buttons.info.Width:Set(14)
+    buttons.info.Height:Set(14)
+    
+    buttons.info:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/Expand.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Expand.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Expand2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/Expand2.dds')
+        )
+    buttons.info.OnCheck = function(control, checked)
+        createPrioMain()
+    end
+    LayoutHelpers.AtLeftTopIn(buttons.info, parent.prioBorder.topright, 2, 4)
+
+    return buttons
+end
+
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
     bg.border = CreateBorder(bg)
+    bg.prioBorder = CreatePrioBorder(bg)
     bg:DisableHitTest(true)
 
+    bg.prioButtons = CreatePrioButtons(bg)
+    
     local function CreateButton(index, info)
         local btn = Checkbox(bg, GetOrderBitmapNames(info.bitmap))
         btn.info = info
@@ -637,7 +847,1020 @@ local function RetaliateOrderBehavior(self, modifiers)
     end
 end
 
+function createPrioMain() --prio sets & settings
+    if main then
+        main:Destroy()
+        main = nil
+    end
+    
+    local function updateList()
+        main.setList:DeleteAllItems()
+        
+        local i = 1
+    
+        for key, val in mainData.sets or {} do
+            main.setList:AddItem(key)
+            main.setList.table[i] = key
+            i = i + 1
+        end
+    end
+
+    local function updateInfo(name)
+        if main.updateCategories then
+            main.updateCategories:Destroy()
+            main.updateCategories = nil
+        end
+        
+        if main.updateDefaults then
+            main.updateDefaults:Destroy()
+            main.updateDefaults = nil
+        end
+        
+        main.updateCategories = Bitmap(main, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+        main.updateCategories.Width:Set(0)
+        main.updateCategories.Height:Set(0)
+        LayoutHelpers.AtLeftTopIn(main.updateCategories, main, 0, 20)
+        
+        local line = 0
+        
+        for key, val in mainData.sets[name] do
+            if line == 0 then
+                main.updateCategories[key] = UIUtil.CreateText(main.updateCategories, categoryID[val], 14, "Calibri")
+                LayoutHelpers.AtLeftTopIn(main.updateCategories[key], main.infoCategories, 30, 20)
+                main.updateCategories[key]:SetColor('B59F7B')
+                line = line + 1
+            else
+                main.updateCategories[key] = UIUtil.CreateText(main.updateCategories, categoryID[val], 14, "Calibri")
+                LayoutHelpers.AtLeftTopIn(main.updateCategories[key], main.infoCategories, 30 , 20 + (line * 20))
+                main.updateCategories[key]:SetColor('B59F7B')
+                line = line + 1
+            end
+        end
+        
+        if mainData.defaults[name] then
+            main.updateDefaults = UIUtil.CreateText(main, "YES", 14, "Calibri")
+            LayoutHelpers.AtLeftTopIn(main.updateDefaults, main.infoDefaults, 90, 0)
+            main.updateDefaults:SetColor('11A02E')
+        else
+            main.updateDefaults = UIUtil.CreateText(main, "NO", 14, "Calibri")
+            LayoutHelpers.AtLeftTopIn(main.updateDefaults, main.infoDefaults, 90, 0)
+            main.updateDefaults:SetColor('B50A19')
+        end    
+    end        
+    
+    mainData.category = {}
+    
+    local width = 800
+    local height = 350
+    
+    main = Bitmap(GetFrame(0))
+    main:SetTexture(UIUtil.UIFile('/game/Weapon-priorities/infoBack.dds'))
+    main.Depth:Set(10000)
+    main.Width:Set(width)
+    main.Height:Set(height)
+    main:SetAlpha(0.6)
+        
+    LayoutHelpers.AtCenterIn(main, GetFrame(0), -200)
+    
+    main.back = Bitmap(main, UIUtil.UIFile('/game/Weapon-priorities/BackMain3.dds'))
+    LayoutHelpers.AtLeftTopIn(main.back, main, 0, 0)
+    main.back:DisableHitTest()
+    
+    main.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            local drag = Dragger()
+            local offX = event.MouseX - self.Left()
+            local offY = event.MouseY - self.Top()
+            
+            drag.OnMove = function(dragself, x, y)
+                self.Left:Set(x - offX)
+                self.Top:Set(y - offY)
+                GetCursor():SetTexture(UIUtil.GetCursor('MOVE_WINDOW'))
+            end
+
+            drag.OnRelease = function(dragself)    
+                GetCursor():Reset()
+                drag:Destroy()
+            end
+            
+            PostDragger(self:GetRootFrame(), event.KeyCode, drag)
+        end
+    end
+    
+    main.closeButton =  Button(main, 
+        UIUtil.UIFile('/game/Weapon-priorities/close1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close2.dds'))
+        
+    LayoutHelpers.AtLeftTopIn(main.closeButton, main, width - 20, 5) 
+        
+    main.closeButton.OnClick = function(self, event)
+        main:Destroy()
+        main = nil
+    end
+    
+    main.infoButton =  Button(main, 
+        UIUtil.UIFile('/game/Weapon-priorities/UnitInfo.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/UnitInfo.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/UnitInfo2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/UnitInfo2.dds'))
+        
+    LayoutHelpers.AtLeftTopIn(main.infoButton, main, width - 110, 5) 
+    
+    main.infoButton.OnClick = function(self, event)
+        createPrioInfoPanel()
+    end
+    
+    -- Dropdowns
+    
+    main.dropdown1 = Combo(main, 14, 10, nil, nil)
+    main.dropdown1.Width:Set(200)
+    LayoutHelpers.AtLeftTopIn(main.dropdown1, main, 550, 100)
+    main.dropdown1.OnClick = function(self, index, text, skipUpdate)
+        if index == 1 then
+            mainData.category[1] = nil
+        else    
+            mainData.category[1] = index - 1
+        end    
+    end
+    
+    main.dropdown1:ClearItems()
+    main.dropdown1.itemArray = {}
+    main.dropdown1.itemArray[1] = "-"
+    
+    local index = 2
+    
+    for key, category in categoryID do
+            main.dropdown1.itemArray[index] = category
+            index = index + 1
+    end   
+    main.dropdown1:AddItems(main.dropdown1.itemArray, 1)
+    
+    
+    main.dropdown2 = Combo(main, 14, 10, nil, nil)
+    main.dropdown2.Width:Set(200)
+    LayoutHelpers.AtLeftTopIn(main.dropdown2, main.dropdown1, 0, 30)
+    main.dropdown2.OnClick = function(self, index, text, skipUpdate)
+        if index == 1 then
+            mainData.category[2] = nil
+        else    
+            mainData.category[2] = index - 1
+        end    
+    end
+
+    main.dropdown2:AddItems(main.dropdown1.itemArray, 1)
+
+    main.dropdown3 = Combo(main, 14, 10, nil, nil)
+    main.dropdown3.Width:Set(200)
+    LayoutHelpers.AtLeftTopIn(main.dropdown3, main.dropdown2, 0, 30)
+    main.dropdown3.OnClick = function(self, index, text, skipUpdate)
+        if index == 1 then
+            mainData.category[3] = nil
+        else    
+            mainData.category[3] = index - 1
+        end    
+    end
+
+    main.dropdown3:AddItems(main.dropdown1.itemArray, 1)
+    
+    
+    main.dropdown4 = Combo(main, 14, 10, nil, nil)
+    main.dropdown4.Width:Set(200)
+    LayoutHelpers.AtLeftTopIn(main.dropdown4, main.dropdown3, 0, 30)
+    main.dropdown4.OnClick = function(self, index, text, skipUpdate)
+        if index == 1 then
+            mainData.category[4] = nil
+        else    
+            mainData.category[4] = index - 1
+        end    
+    end
+
+    main.dropdown4:AddItems(main.dropdown1.itemArray, 1)
+    
+    
+    ---"Add" button
+    main.savePrioSet = UIUtil.CreateButton(main,
+        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
+        'Add', 12)
+    main.savePrioSet.label:SetFont(UIUtil.bodyFont, 12)
+    LayoutHelpers.AtLeftTopIn(main.savePrioSet, main.dropdown4, 0, 70)
+    main.savePrioSet.OnClick = function(self, modifiers)
+        if main.nameDialog then return end
+        
+        main.nameDialog = Bitmap(main, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp.dds'), "Marker Name Dialog")
+        LayoutHelpers.AtCenterIn(main.nameDialog, GetFrame(0))
+        main.nameDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
+
+        main.nameDialog.label = UIUtil.CreateText(main.nameDialog, "Name your set  (6 letters and caps for good UI):", 16, UIUtil.buttonFont)
+        LayoutHelpers.AtLeftTopIn(main.nameDialog.label, main.nameDialog, 35, 30)
+
+        main.nameDialog.cancelButton = UIUtil.CreateButtonStd(main.nameDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
+        LayoutHelpers.AtLeftTopIn(main.nameDialog.cancelButton, main.nameDialog, 480, 110)
+        
+        main.nameDialog.cancelButton.OnClick = function(self, modifiers)
+            main.nameDialog:Destroy()
+            main.nameDialog = nil
+        end
+
+        main.nameDialog.nameEdit = Edit(main.nameDialog)
+        LayoutHelpers.AtLeftTopIn(main.nameDialog.nameEdit, main.nameDialog, 35, 60)
+        main.nameDialog.nameEdit.Width:Set(283)
+        main.nameDialog.nameEdit.Height:Set(main.nameDialog.nameEdit:GetFontHeight())
+        main.nameDialog.nameEdit:ShowBackground(false)
+        main.nameDialog.nameEdit:AcquireFocus()
+        UIUtil.SetupEditStd(main.nameDialog.nameEdit, UIUtil.fontColor, nil, nil, nil, UIUtil.bodyFont, 16, 30)
+
+        main.nameDialog.okButton = UIUtil.CreateButtonStd(main.nameDialog, '/widgets02/small', "<LOC _OK>", 12)
+        LayoutHelpers.AtLeftTopIn(main.nameDialog.okButton, main.nameDialog, 30, 110)
+        
+        main.nameDialog.okButton.OnClick = function(self, modifiers)
+            local newName = main.nameDialog.nameEdit:GetText()
+            local IDs = {}
+            
+            for key, val in mainData.category do
+                table.insert(IDs, val)
+            end  
+            
+            if IDs[1] then
+                mainData.sets[newName] = IDs
+                
+                if mainData.defCheck == true then
+                    mainData.defaults[newName] = true
+                else
+                    mainData.defaults[newName] = nil  
+                end
+                
+                updateList()
+                createPrioButtonSettings()
+                SavePrefs()
+            else
+                print ("Please select at least 1 category")
+            end
+            main.nameDialog:Destroy()
+            main.nameDialog = nil
+        end
+
+        main.nameDialog.nameEdit.OnEnterPressed = function(self, text)
+            main.nameDialog.okButton.OnClick()
+        end
+        
+    end
+    
+    ---Delete----
+    main.deleteSet = UIUtil.CreateButton(main,
+        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
+        'Delete', 12)
+    main.deleteSet.label:SetFont(UIUtil.bodyFont, 12)
+    LayoutHelpers.AtLeftTopIn(main.deleteSet, main.savePrioSet, 120, 0)
+    main.deleteSet.OnClick = function(self, modifiers)
+        local SelcetedSet = main.setList:GetSelection()
+        if SelcetedSet ~= -1 then
+            local name = main.setList.table[SelcetedSet + 1]
+            
+            mainData.sets[name] = nil
+            mainData.defaults[name] = nil
+            
+            for key, val in mainData.buttonLayout do
+                if val == name then
+                    mainData.buttonLayout[key] = nil
+                end
+            end 
+            for key, val in mainData.buttonLayoutExpand do
+                if val == name then
+                    mainData.buttonLayoutExpand[key] = nil
+                end
+            end 
+            
+            updateList()
+            SavePrefs()
+            createPrioButtonSettings()
+        else
+            print("No set selected")
+        end    
+    end
+    
+    ---RESET----
+    main.reset = UIUtil.CreateButton(main,
+        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
+        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
+        'Reset', 12)
+    main.reset.label:SetFont(UIUtil.bodyFont, 12)
+    LayoutHelpers.AtLeftTopIn(main.reset, main.savePrioSet, 120, 30)
+    main.reset.OnClick = function(self, modifiers)
+        if main.resetDialog then return end
+        
+        main.resetDialog = Bitmap(main, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp.dds'), "Marker Name Dialog")
+        LayoutHelpers.AtCenterIn(main.resetDialog, GetFrame(0))
+        main.resetDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
+
+        main.resetDialog.label = UIUtil.CreateText(main.resetDialog, "Reset all settings/presets/buttons to default?", 20, UIUtil.buttonFont)
+        LayoutHelpers.AtLeftTopIn(main.resetDialog.label, main.resetDialog, 125, 45)
+
+        main.resetDialog.cancelButton = UIUtil.CreateButtonStd(main.resetDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
+        LayoutHelpers.AtLeftTopIn(main.resetDialog.cancelButton, main.resetDialog, 480, 110)
+        
+        main.resetDialog.cancelButton.OnClick = function(self, modifiers)
+            main.resetDialog:Destroy()
+            main.resetDialog = nil
+        end
+
+        main.resetDialog.okButton = UIUtil.CreateButtonStd(main.resetDialog, '/widgets02/small', "<LOC _OK>", 12)
+        LayoutHelpers.AtLeftTopIn(main.resetDialog.okButton, main.resetDialog, 30, 110)
+        
+        main.resetDialog.okButton.OnClick = function(self, modifiers)  
+            main.resetDialog:Destroy()
+            main.resetDialog = nil
+            
+            ResetPri()
+            createPrioMain() 
+        end       
+    end
+
+    -------List-----------
+    main.setList = ItemList(main, "setList")
+    main.setList:SetFont(UIUtil.bodyFont, 14)
+    main.setList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
+    main.setList:ShowMouseoverItem(true)
+
+    main.setList.Depth:Set(function() return main.Depth() + 10 end)
+
+    main.setList.Width:Set(200)
+    main.setList.Height:Set(200)
+    LayoutHelpers.AtLeftTopIn(main.setList, main, 290, 110)
+    
+    main.setList:AcquireKeyboardFocus(true)
+    
+    UIUtil.CreateLobbyVertScrollbar(main.setList, 2, -1, -25)
+    
+    main.setList.table = {}
+    local i = 1
+    
+    for key, val in mainData.sets or {} do
+        main.setList:AddItem(key)
+        main.setList.table[i] = key
+        i = i + 1
+    end
+    
+    main.setList.OnClick = function(self, index)
+        main.setList:SetSelection(index)
+        local name = main.setList.table[index + 1] 
+        updateInfo(name)
+    end
+    
+    ---Information & other text---
+    
+    main.infoTitle = UIUtil.CreateText(main, 'Info', 20, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.infoTitle, main, 80, 50)
+    main.infoTitle:SetColor('ff99a3b0')
+
+    main.infoCategories = UIUtil.CreateText(main, 'Categories:', 14, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.infoCategories, main, 30, 100)
+    main.infoCategories:SetColor('ff99a3b0')
+    
+    main.infoDefaults = UIUtil.CreateText(main, 'Use defaults:', 14, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.infoDefaults, main.infoCategories, 0, 120)
+    main.infoDefaults:SetColor('ff99a3b0')
+    
+    main.presets = UIUtil.CreateText(main, 'Presets', 20, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.presets, main, 350, 50)
+    main.presets:SetColor('ff99a3b0')
+    
+    main.selectCat = UIUtil.CreateText(main, 'Categories', 20, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.selectCat, main, 600, 50)
+    main.selectCat:SetColor('ff99a3b0')
+    
+    ---CheckBox----
+    
+    main.CheckBoxDef = UIUtil.CreateCheckbox(main, '/CHECKBOX/')
+    main.CheckBoxDef.Height:Set(13)
+    main.CheckBoxDef.Width:Set(13)
+  
+    if mainData.defCheck == true then
+        main.CheckBoxDef:SetCheck(true, true)
+    else
+        main.CheckBoxDef:SetCheck(false, true)
+    end
+	
+    main.CheckBoxDef.OnClick = function(self)
+        if(main.CheckBoxDef:IsChecked()) then
+            mainData.defCheck = nil
+            main.CheckBoxDef:SetCheck(false, true)
+        else
+            mainData.defCheck = true
+            main.CheckBoxDef:SetCheck(true, true)
+        end
+    end
+    
+    LayoutHelpers.AtLeftTopIn(main.CheckBoxDef, main.savePrioSet, 2, -25)
+    
+    main.CheckBoxDef.text = UIUtil.CreateText(main.CheckBoxDef, "Use default priorities", 14, UIUtil.bodyFont)
+    
+    LayoutHelpers.AtLeftTopIn(main.CheckBoxDef.text, main.CheckBoxDef, 20, -2)
+    
+    createPrioButtonSettings()
+end
+
+function createPrioButtonSettings()
+    if main.buttons then
+        main.buttons:Destroy()
+        main.buttons = nil
+    end
+    
+    if main.hotkeys then
+        main.hotkeys:Destroy()
+        main.hotkeys = nil
+    end                   
+    local width = 800
+    local height = 250
+    
+    main.buttons = Bitmap(main, UIUtil.UIFile('/game/Weapon-priorities/infoBack.dds'))
+    main.buttons.Width:Set(width)
+    main.buttons.Height:Set(height)
+    main.buttons:SetAlpha(0.6)
+    
+    LayoutHelpers.AtLeftTopIn(main.buttons, main, 0, 350)
+    
+    main.buttons.back = Bitmap(main.buttons, UIUtil.UIFile('/game/Weapon-priorities/buttonsBack2.dds'))
+    LayoutHelpers.AtLeftTopIn(main.buttons.back, main.buttons, 0, 0)
+    main.buttons.back:DisableHitTest()
+    
+    main.buttons.but = Checkbox(main.buttons)
+    main.buttons.but:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/ButOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOn.dds')
+        )
+    LayoutHelpers.AtLeftTopIn(main.buttons.but, main.buttons, 290, 20)
+                                           
+
+    
+    main.buttons.hot = Checkbox(main.buttons)
+    main.buttons.hot:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/HotOff.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOff.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOff2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOff2.dds')
+        )
+    LayoutHelpers.AtLeftTopIn(main.buttons.hot, main.buttons.but, 100, 4)
+    main.buttons.hot.OnCheck = function(control, checked)
+        createPrioHotkeys()
+    end
+    
+    local i = 2
+    
+    while i < 8 do
+        main.buttons[i] = Combo(main.buttons, 14, 10, nil, nil)
+        main.buttons[i].Width:Set(130)
+        LayoutHelpers.AtLeftTopIn(main.buttons[i], main.buttons, 200, 230 - i * 20)
+        
+        main.buttons[i].Number = i 
+        
+        main.buttons[i].OnClick = function(self, index, text, skipUpdate)
+            if index == 1 then
+                mainData.buttonLayout[self.Number] = nil
+            else
+                mainData.buttonLayout[self.Number] = main.buttons[2].itemArray[index]
+            end    
+            SavePrefs()
+        end
+        
+        if i == 2 then
+            local index = 2
+            
+            main.buttons[2]:ClearItems()
+            main.buttons[2].itemArray = {}
+            main.buttons[2].ID = {}
+            main.buttons[2].itemArray[1] = "-"
+            
+            for name, set in mainData.sets do
+                main.buttons[2].itemArray[index] = name
+                main.buttons[2].ID[name] = index
+                index = index + 1
+            end 
+            
+            main.buttons[i]:AddItems(main.buttons[i].itemArray, 1)
+            
+            if mainData.buttonLayout[i] then
+                main.buttons[i]:SetItem(main.buttons[2].ID[mainData.buttonLayout[i]])
+            end 
+        
+        else          
+            main.buttons[i]:AddItems(main.buttons[2].itemArray, 1)
+            
+            if mainData.buttonLayout[i] then
+                main.buttons[i]:SetItem(main.buttons[2].ID[mainData.buttonLayout[i]])
+            end 
+        end    
+         
+        i = i + 1      
+    end
+    
+    main.buttons.expand = UIUtil.CreateCheckbox(main.buttons, '/CHECKBOX/')
+    main.buttons.expand.Height:Set(13)
+    main.buttons.expand.Width:Set(13)
+    LayoutHelpers.AtLeftTopIn(main.buttons.expand, main.buttons[2], 150, -120)
+
+    if mainData.expand then
+        main.buttons.expand:SetCheck(true, true)
+    else
+        main.buttons.expand:SetCheck(false, true)
+    end
+	
+    main.buttons.expand.OnClick = function(self)
+        if(main.buttons.expand:IsChecked()) then
+            mainData.expand = nil
+            main.buttons.expand:SetCheck(false, true)
+        else
+            mainData.expand = true
+            main.buttons.expand:SetCheck(true, true)
+        end
+        SavePrefs()
+        createPrioButtonSettings()
+    end
+    
+    main.buttons.expandText = UIUtil.CreateText(main.buttons, "More buttons", 14, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(main.buttons.expandText, main.buttons.expand, 20, -2)
+    
+    if mainData.expand then
+        while i < 15 do
+            main.buttons[i] = Combo(main.buttons, 14, 10, nil, nil)
+            main.buttons[i].Width:Set(130)
+            LayoutHelpers.AtLeftTopIn(main.buttons[i], main.buttons[2], 150, 180 - i * 20)
+            
+            main.buttons[i].Number = i 
+            
+            main.buttons[i].OnClick = function(self, index, text, skipUpdate)
+                if index == 1 then
+                    mainData.buttonLayoutExpand[self.Number] = nil
+                else
+                    mainData.buttonLayoutExpand[self.Number] = main.buttons[2].itemArray[index]
+                end    
+                SavePrefs()
+            end
+                    
+            main.buttons[i]:AddItems(main.buttons[2].itemArray, 1)
+            
+            if mainData.buttonLayoutExpand[i] then
+                main.buttons[i]:SetItem(main.buttons[2].ID[mainData.buttonLayoutExpand[i]])
+            end 
+    
+            i = i + 1      
+        end    
+    end
+end
+
+function createPrioHotkeys()
+
+    if main.buttons then
+        main.buttons:Destroy()
+        main.buttons = nil
+    end
+    
+    if main.hotkeys then
+        main.hotkeys:Destroy()
+        main.hotkeys = nil
+    end
+    
+    local width = 800
+    local height = 250
+    
+    main.hotkeys = Bitmap(main, UIUtil.UIFile('/game/Weapon-priorities/infoBack.dds'))
+    main.hotkeys.Width:Set(width)
+    main.hotkeys.Height:Set(height)
+    main.hotkeys:SetAlpha(0.6)
+    
+    LayoutHelpers.AtLeftTopIn(main.hotkeys, main, 0, 350)
+    
+    main.hotkeys.back = Bitmap(main.hotkeys, UIUtil.UIFile('/game/Weapon-priorities/hotkeysBack.dds'))
+    LayoutHelpers.AtLeftTopIn(main.hotkeys.back, main.hotkeys, 0, 0)
+    main.hotkeys.back:DisableHitTest()
+
+    
+    main.hotkeys.but = Checkbox(main.hotkeys)
+    main.hotkeys.but:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/ButOff.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOff.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOff2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/ButOff2.dds')
+        )
+    LayoutHelpers.AtLeftTopIn(main.hotkeys.but, main.hotkeys, 290, 23)
+    main.hotkeys.but.OnCheck = function(control, checked)
+        createPrioButtonSettings()
+    end
+    
+    
+    main.hotkeys.hot = Checkbox(main.hotkeys)
+    main.hotkeys.hot:SetNewTextures(
+        UIUtil.UIFile('/game/Weapon-priorities/HotOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOn.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/HotOn.dds')
+        )
+    LayoutHelpers.AtLeftTopIn(main.hotkeys.hot, main.hotkeys.but, 100, -2)
+    
+    
+    local i = 2
+    
+    while i < 7 do
+        main.hotkeys[i] = Combo(main.hotkeys, 14, 10, nil, nil)
+        main.hotkeys[i].Width:Set(130)
+        LayoutHelpers.AtLeftTopIn(main.hotkeys[i], main.hotkeys, 230, 40 + i * 25)
+        
+        main.hotkeys[i].Number = i - 1 
+        
+        main.hotkeys[i].OnClick = function(self, index, text, skipUpdate)
+            if index == 1 then
+                mainData.hotkeys[self.Number] = nil
+            else
+                mainData.hotkeys[self.Number] = main.hotkeys[2].itemArray[index]
+            end    
+            SavePrefs()
+        end
+        
+        if i == 2 then
+            local index = 2
+            
+            main.hotkeys[2]:ClearItems()
+            main.hotkeys[2].itemArray = {}
+            main.hotkeys[2].ID = {}
+            main.hotkeys[2].itemArray[1] = "-"
+            
+            for name, set in mainData.sets do
+                main.hotkeys[2].itemArray[index] = name
+                main.hotkeys[2].ID[name] = index
+                index = index + 1
+            end 
+            
+            main.hotkeys[i]:AddItems(main.hotkeys[i].itemArray, 1)
+            
+            if mainData.hotkeys[i - 1] and main.hotkeys[2].ID[mainData.hotkeys[i - 1]] then
+                main.hotkeys[i]:SetItem(main.hotkeys[2].ID[mainData.hotkeys[i - 1]])
+            end 
+        
+        else          
+            main.hotkeys[i]:AddItems(main.hotkeys[2].itemArray, 1)
+            
+            if mainData.hotkeys[i - 1] and main.hotkeys[2].ID[mainData.hotkeys[i - 1]] then
+                main.hotkeys[i]:SetItem(main.hotkeys[2].ID[mainData.hotkeys[i - 1]])
+            end 
+        end
+
+        main.hotkeys[i].text = UIUtil.CreateText(main.hotkeys[i], 'Custom'..(i - 1)..'     =', 14, UIUtil.bodyFont)
+        LayoutHelpers.AtLeftTopIn(main.hotkeys[i].text, main.hotkeys[i], -100, 0)
+        main.hotkeys[i].text:SetColor('E0C498')
+        main.hotkeys[i].text:DisableHitTest()
+         
+        i = i + 1      
+    end
+    
+    
+    while i < 12 do
+        main.hotkeys[i] = Combo(main.hotkeys, 14, 10, nil, nil)
+        main.hotkeys[i].Width:Set(130)
+        LayoutHelpers.AtLeftTopIn(main.hotkeys[i], main.hotkeys[2], 300, -175 + i * 25)
+        
+        main.hotkeys[i].Number = i - 1
+        
+        main.hotkeys[i].OnClick = function(self, index, text, skipUpdate)
+            if index == 1 then
+                mainData.hotkeys[self.Number] = nil
+            else
+                mainData.hotkeys[self.Number] = main.hotkeys[2].itemArray[index]
+            end    
+            SavePrefs()
+        end
+                
+        main.hotkeys[i]:AddItems(main.hotkeys[2].itemArray, 1)
+        
+        if mainData.hotkeys[i - 1] and main.hotkeys[2].ID[mainData.hotkeys[i - 1]] then
+            main.hotkeys[i]:SetItem(main.hotkeys[2].ID[mainData.hotkeys[i - 1]])
+        end 
+        
+        if i < 11 then
+            main.hotkeys[i].text = UIUtil.CreateText(main.hotkeys[i], 'Custom'..(i - 1)..'     =', 14, UIUtil.bodyFont)
+        else
+            main.hotkeys[i].text = UIUtil.CreateText(main.hotkeys[i], 'Custom'..(i - 1)..'   =', 14, UIUtil.bodyFont)
+        end
+        
+        LayoutHelpers.AtLeftTopIn(main.hotkeys[i].text, main.hotkeys[i], -100, 0)
+        main.hotkeys[i].text:SetColor('E0C498')
+        main.hotkeys[i].text:DisableHitTest()
+          
+        i = i + 1      
+    end
+end
+
+function createPrioInfoPanel() --shows unit categories & weapon priorities
+   
+    if infoPanel then
+        infoPanel:Destroy()
+        infoPanel = nil
+    end
+            
+    local width = 400
+    local height = 520
+    
+    infoPanel = Bitmap(GetFrame(0))
+    infoPanel:SetTexture(UIUtil.UIFile('/game/Weapon-priorities/infoBack.dds'))
+    infoPanel.Depth:Set(10000)
+    infoPanel.Width:Set(width)
+    infoPanel.Height:Set(height)
+    infoPanel:SetAlpha(0.75)
+        
+    LayoutHelpers.AtLeftTopIn(infoPanel, GetFrame(0), 10, 100)
+    
+    infoPanel.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            local drag = Dragger()
+            local offX = event.MouseX - self.Left()
+            local offY = event.MouseY - self.Top()
+            
+            drag.OnMove = function(dragself, x, y)
+                self.Left:Set(x - offX)
+                self.Top:Set(y - offY)
+                GetCursor():SetTexture(UIUtil.GetCursor('MOVE_WINDOW'))
+            end
+
+            drag.OnRelease = function(dragself)    
+                GetCursor():Reset()
+                drag:Destroy()
+            end
+            
+            PostDragger(self:GetRootFrame(), event.KeyCode, drag)
+        end
+    end
+    
+    infoPanel.closeButton =  Button(infoPanel, 
+        UIUtil.UIFile('/game/Weapon-priorities/close1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close1.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close2.dds'),
+        UIUtil.UIFile('/game/Weapon-priorities/close2.dds'))
+        
+    LayoutHelpers.AtLeftTopIn(infoPanel.closeButton, infoPanel, width - 20, 5) 
+        
+    infoPanel.closeButton.OnClick = function(self, event)
+        infoPanel:Destroy()
+        infoPanel = nil
+    end
+        
+    infoPanel.Unit = UIUtil.CreateText(infoPanel, 'Unit', 20, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(infoPanel.Unit, infoPanel, 30, 5)
+    infoPanel.Unit:SetColor('ff99a3b0')
+ 
+
+    infoPanel.Weapon = UIUtil.CreateText(infoPanel, 'Weapon', 20, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(infoPanel.Weapon, infoPanel, 180, 5)
+    infoPanel.Weapon:SetColor('ff99a3b0')   
+        
+    infoPanel.CheckBox = UIUtil.CreateCheckbox(infoPanel, '/CHECKBOX/')
+    infoPanel.CheckBox.Height:Set(13)
+    infoPanel.CheckBox.Width:Set(13)
+  
+    if showUnitCat == true then
+        infoPanel.CheckBox:SetCheck(true, true)
+    else
+        infoPanel.CheckBox:SetCheck(false, true)
+    end
+	
+    infoPanel.CheckBox.OnClick = function(self)
+        if(infoPanel.CheckBox:IsChecked()) then
+            showUnitCat = nil
+            infoPanel.CheckBox:SetCheck(false, true)
+        else
+            showUnitCat = true
+            infoPanel.CheckBox:SetCheck(true, true)
+        end
+    end
+    
+    LayoutHelpers.AtLeftTopIn(infoPanel.CheckBox, infoPanel.Unit, -15, 3)
+            
+    infoPanel.CheckBox2 = UIUtil.CreateCheckbox(infoPanel, '/CHECKBOX/')
+    infoPanel.CheckBox2.Height:Set(13)
+    infoPanel.CheckBox2.Width:Set(13)
+  
+    if showTable == true then
+        infoPanel.CheckBox2:SetCheck(true, true)
+    else
+        infoPanel.CheckBox2:SetCheck(false, true)
+    end
+	
+    infoPanel.CheckBox2.OnClick = function(self)
+        if(infoPanel.CheckBox2:IsChecked()) then
+            showTable = nil
+            infoPanel.CheckBox2:SetCheck(false, true)
+        else
+            showTable = true
+            infoPanel.CheckBox2:SetCheck(true, true)
+        end
+    end
+    
+    LayoutHelpers.AtLeftTopIn(infoPanel.CheckBox2, infoPanel.Weapon, 145, 0)
+        
+    infoPanel.CheckBoxText = UIUtil.CreateText(infoPanel, 'Table', 12, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(infoPanel.CheckBoxText, infoPanel.CheckBox2, 15, -2)
+    infoPanel.CheckBoxText:SetColor('ff99a3b0') 
+    
+end
+
+function updatePrioInfoPanel(unit)
+    local unitBP = unit:GetBlueprint()
+    
+    local function CreateWepPriorities(key)
+        local prioTbl = unitBP.Weapon[key].TargetPriorities
+        local line = 0 
+        
+        if infoPanel.update.wepPrio then
+            infoPanel.update.wepPrio:Destroy()        
+            infoPanel.update.wepPrio = nil
+        end    
+
+        infoPanel.update.wepPrio = Bitmap(infoPanel.update, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+        infoPanel.update.wepPrio.Width:Set(200)
+        infoPanel.update.wepPrio.Height:Set(450)
+        LayoutHelpers.AtLeftTopIn(infoPanel.update.wepPrio, infoPanel.update.dropdown, 0, 20)
+        
+        for key, val in prioTbl do
+            if line == 0 then
+                infoPanel.update.wepPrio[key] = UIUtil.CreateText(infoPanel.update.wepPrio, val, 14, "Calibri")
+                LayoutHelpers.AtLeftTopIn(infoPanel.update.wepPrio[key], infoPanel.update.wepPrio, 10, 10)
+                infoPanel.update.wepPrio[key]:SetColor('B59F7B')
+                line = line + 1
+            else
+                infoPanel.update.wepPrio[key] = UIUtil.CreateText(infoPanel.update.wepPrio, val, 14, "Calibri")
+                LayoutHelpers.AtLeftTopIn(infoPanel.update.wepPrio[key],  infoPanel.update.wepPrio, 10 , 10 + (line * 20))
+                infoPanel.update.wepPrio[key]:SetColor('B59F7B')
+                line = line + 1
+            end
+        end
+    end
+    
+    
+        
+    if infoPanel.update then
+        infoPanel.update:Destroy()        
+        infoPanel.update = nil
+    end
+    
+    infoPanel.update = Bitmap(infoPanel, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+    infoPanel.update.Width:Set(0)
+    infoPanel.update.Height:Set(0)
+    LayoutHelpers.AtLeftTopIn(infoPanel.update, infoPanel, 0, 0)
+
+
+    infoPanel.update.text = Bitmap(infoPanel.update, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+    infoPanel.update.text.Width:Set(150)
+    infoPanel.update.text.Height:Set(450)
+    LayoutHelpers.AtLeftTopIn(infoPanel.update.text, infoPanel, 20, 60)
+    
+    infoPanel.update.text.BpID = UIUtil.CreateText(infoPanel.update.text, unitBP.BlueprintId, 14, UIUtil.bodyFont)
+    LayoutHelpers.AtLeftTopIn(infoPanel.update.text.BpID,infoPanel.Unit, 45, 5)
+    infoPanel.update.text.BpID:SetColor('FFEEC9')
+    
+    local line = 0
+    
+    if showUnitCat then
+        for key, val in unitBP.Categories do
+            if line == 0 then
+                infoPanel.update.text[key] = UIUtil.CreateText(infoPanel.update.text, unitBP.Categories[key], 12, "Calibri")
+                LayoutHelpers.AtLeftTopIn(infoPanel.update.text[key], infoPanel.update.text, 5, 5)
+                infoPanel.update.text[key]:SetColor('B59F7B')
+                line = line + 1
+            else
+                infoPanel.update.text[key] = UIUtil.CreateText(infoPanel.update.text, unitBP.Categories[key], 12, "Calibri")
+                LayoutHelpers.AtLeftTopIn(infoPanel.update.text[key], infoPanel.update.text, 5 , 5 + (line * 17))
+                infoPanel.update.text[key]:SetColor('B59F7B')
+                line = line + 1
+            end   
+        end
+    end
+
+
+    if unitBP.Weapon[1] and not showTable then
+        local firstWep
+        
+        infoPanel.update.dropdown = Combo(infoPanel.update.text, 14, 10, nil, nil)
+        infoPanel.update.dropdown.Width:Set(200)
+        LayoutHelpers.AtLeftTopIn(infoPanel.update.dropdown, infoPanel, 180, 40)
+        infoPanel.update.dropdown.OnClick = function(self, index, text, skipUpdate)
+            CreateWepPriorities(self.keyMap[index])
+        end
+    
+        infoPanel.update.dropdown:ClearItems()
+        infoPanel.update.dropdown.itemArray = {}
+        infoPanel.update.dropdown.keyMap = {}
+
+        if unitBP.Weapon then
+            local index = 1
+            for key, weapon in unitBP.Weapon do
+                local priorities = weapon.TargetPriorities
+                if priorities then
+                    if not firstWep then 
+                        CreateWepPriorities(key)
+                        firstWep = true
+                    end
+                    infoPanel.update.dropdown.itemArray[index] = weapon.Label
+                    infoPanel.update.dropdown.keyMap[index] = key
+                    index = index + 1
+                end
+            end   
+        end
+        infoPanel.update.dropdown:AddItems(infoPanel.update.dropdown.itemArray, 1)
+        
+    
+    elseif unitBP.Weapon[1] and showTable then
+    
+        infoPanel.update.weaponPriorities = Bitmap(infoPanel.update, UIUtil.UIFile('/game/Weapon-priorities/infoBack.dds'))
+        infoPanel.update.weaponPriorities.Width:Set(700)
+        infoPanel.update.weaponPriorities.Height:Set(470)
+        LayoutHelpers.AtLeftTopIn(infoPanel.update.weaponPriorities, infoPanel, 170, 50)
+        infoPanel.update.weaponPriorities:SetAlpha(0.8)
+    
+        local tbl = unitBP.Weapon
+        local deltaX = 0
+        local deltaX2 = 0
+        local column = 1
+        
+        for wepNum, weapon in unitBP.Weapon do
+            local line = 0 
+            local prioTb = unitBP.Weapon[wepNum].TargetPriorities
+            
+            
+            if prioTb then
+                infoPanel.update.weaponPriorities[wepNum] = UIUtil.CreateText(infoPanel.update.weaponPriorities, unitBP.Weapon[wepNum].Label, 14, "Calibri")
+                infoPanel.update.weaponPriorities[wepNum]:SetColor('ff99a3b0')
+                
+                if column < 6 then
+                    LayoutHelpers.AtLeftTopIn(infoPanel.update.weaponPriorities[wepNum], infoPanel.update.weaponPriorities, 10 + deltaX, 10)
+                else
+                    LayoutHelpers.AtLeftTopIn(infoPanel.update.weaponPriorities[wepNum], infoPanel.update.weaponPriorities, 10 + deltaX2, 220)
+                    deltaX2 = deltaX2 + 140
+                end
+            
+                for key, val in prioTb do
+                    if line == 0 then
+                        infoPanel.update.weaponPriorities[wepNum][key] = UIUtil.CreateText(infoPanel.update.weaponPriorities, val, 12, "Calibri")
+                        LayoutHelpers.AtLeftTopIn(infoPanel.update.weaponPriorities[wepNum][key], infoPanel.update.weaponPriorities[wepNum], 0, 30)
+                        infoPanel.update.weaponPriorities[wepNum][key]:SetColor('B59F7B')
+                    else
+                        infoPanel.update.weaponPriorities[wepNum][key] = UIUtil.CreateText(infoPanel.update.weaponPriorities, val, 12, "Calibri")
+                        LayoutHelpers.AtLeftTopIn(infoPanel.update.weaponPriorities[wepNum][key], infoPanel.update.weaponPriorities[wepNum], 0, 30 + (15 * line))
+                        infoPanel.update.weaponPriorities[wepNum][key]:SetColor('B59F7B')
+                    end 
+                    line = line + 1
+                end
+                column = column + 1
+                deltaX = deltaX + 140
+            end
+        end
+    end
+end
+
+function prioUpdate(control, unitList) 
+    while true do
+        if unitList[1] and not IsDestroyed(control) then
+            local priority = UnitData[unitList[1]:GetEntityId()].WepPriority
+            --For now it shows prio state only for the first unit in table. We can add loop here, which checks all selected units states
+            --and add question mark if they are different(same as for fire modes), but it's all about performance so idk.
+            
+            if control.prioState then
+                control.prioState:Destroy()
+                control.prioState = nil
+            end
+
+            if not priority then
+                control.prioState = Bitmap(control, UIUtil.UIFile(prioStateTextures.Default))
+            elseif prioStateTextures[priority] then
+                control.prioState = Bitmap(control, UIUtil.UIFile(prioStateTextures[priority]))
+            else
+                control.prioState = Bitmap(control, UIUtil.UIFile('/game/Weapon-priorities/smallBlack.dds'))
+                control.prioState.text = UIUtil.CreateText(control.prioState, priority, 12, "Calibri")
+                
+                LayoutHelpers.AtLeftTopIn(control.prioState.text, control, 7, 1)
+                control.prioState.text:SetColor('ffffff')
+            end
+            
+            LayoutHelpers.AtRightTopIn(control.prioState, control, 2, 4)
+            control.prioState:DisableHitTest()
+            
+            WaitSeconds(0.1)
+        else 
+            break
+        end
+    end
+end
+
 local function RetaliateInitFunction(control, unitList)
+    KillThread(updater)
     control._toggleState = GetFireState(unitList)
     if not retaliateStateInfo[control._toggleState] then
         LOG("Error: orders.lua - invalid toggle state: ", tostring(self._toggleState))
@@ -657,6 +1880,14 @@ local function RetaliateInitFunction(control, unitList)
             end
         end
     end
+    
+    if unitList[1] then --Launches prioUpdate thread if unit selected
+        updater = ForkThread(prioUpdate, control, unitList)
+        if infoPanel then
+            updatePrioInfoPanel(unitList[1])
+        end
+    end
+    
     control.OnEnable = function(self)
         if self.mixedIcon then
             self.mixedIcon:SetAlpha(1)

@@ -374,3 +374,41 @@ function CreateTemplateFactory()
     end
     import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
 end
+
+local priData
+local defaultPriData = {
+    category = {}, 
+    sets = {ACU = {10}, Power = {18,45}, PD = {14,16,45}, Engies = {20, 39}, Shields = {41}, EXP = {21}}, 
+    defaults = {ACU = true, Power = true, PD = true, Engies = true, Shields = true, EXP = true}, 
+    buttonLayout = {[1] = "Default", [2] = "ACU", [3] = "Engies", [4] = "PD", [5] = "Power", [6] = "Shields", [7] = "EXP"},
+    buttonLayoutExpand = {},
+    hotkeys = {[1] = "ACU", [2] = "Engies", [3] = "PD", [4] = "Power", [5] = "Shields", [6] = "EXP"},
+    defCheck = true, 
+    }
+ 
+priData = Prefs.GetFromCurrentProfile("mainPriData") or defaultPriData
+
+function SetWeaponPriorities(key, name, defaults)
+    local units = GetSelectedUnits()
+    if units then
+        local unitIds = {}
+    
+        for _, unit in units do
+            table.insert(unitIds, unit:GetEntityId())
+        end
+
+        SimCallback({Func = 'WeaponPriorities', Args = {SelecetedUnits = unitIds, key = key, name = name, defaults = defaults}})
+    end
+end
+
+function SetWeaponPrioritiesHotkey(key)
+    local name = priData.hotkeys[key]
+    
+    if name then
+        SetWeaponPriorities(priData.sets[name], name, priData.defaults[name])
+    end
+end
+
+function updatePriData()
+    priData = Prefs.GetFromCurrentProfile("mainPriData")
+end

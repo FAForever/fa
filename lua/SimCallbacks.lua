@@ -250,3 +250,5 @@ Callbacks.AttackMove = function(data, units)
     end
     IssueAggressiveMove(units, data.Target)
 end
+
+Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
