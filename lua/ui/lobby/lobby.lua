@@ -179,7 +179,6 @@ local teamNumbers = {
     "5",
     "6",
 }
-
 local function ParseWhisper(params)
     local delimStart = string.find(params, " ")
     if delimStart then
@@ -243,6 +242,1027 @@ function SetWindowedLobby(windowed)
 
     windowedMode = windowed
 end
+
+
+StackPanel = Class(Group) {
+
+    Items = false,
+    Orientation = false,
+    Padding = false,
+    DefaultItemMargin = false,
+
+    __init = function(self, Parent, Options)
+        Group.__init(self, Parent)
+
+        -- Properties init
+        self.Items = {}
+        self.Orientation = "V"
+        self.Padding = {0,0,0,0}
+        self.DefaultItemMargin = {0,0,0,0}
+        if Options then for Name, Value in Options do self[Name] = Value end end
+
+        -- The panel hisself doesn't need hit test
+        self:DisableHitTest()   
+
+        -- Background
+        self.BG = Bitmap(self)
+        self.BG.Top:Set(function() return self.Top() end)
+        self.BG.Left:Set(function() return self.Left() end)
+        self.BG.Bottom:Set(function() return self.Bottom() end)
+        self.BG.Right:Set(function() return self.Right() end)
+    end,
+
+    AddItem = function(self, Item, Index)
+        if not Index then 
+            -- If index is ommited, the item is added at the end of the list
+            Index = table.getn(self.Items) + 1 
+        elseif Index < 1 or Index > table.getn(self.Items) + 1 then
+            -- If index is out of the list range, we just return
+            return
+        end
+        if not Item.Margin then Item.Margin = self.DefaultItemMargin end
+        table.insert(self.Items, Index, Item)
+
+        Item:SetParent(self)
+        Item.Depth:Set(self.Depth()+1)
+        if self:IsHidden() then
+            Item:Hide()
+        else
+            Item:Show()
+        end
+
+        if self.Orientation == "V" then
+           
+            Item.Left:Set(function() return self.Left() + self.Padding[4] + Item.Margin[4] end)
+            Item.Right:Set(function() return self.Right() - self.Padding[2] - Item.Margin[2] end)
+            Item.Width:Set(function() return Item.Right() - Item.Left() end)
+
+            if Index == 1 then
+                -- It's the first item, his top is set to parent top
+                Item.Top:Set(function() return self.Top() + self.Padding[1] + Item.Margin[1] end)
+            else
+                -- It's not the first item, his top is set to previous item's bottom
+                local PrevItem = self.Items[Index-1]
+                Item.Top:Set(function() return PrevItem.Bottom() + PrevItem.Margin[3] + Item.Margin[1] + 1 end)
+            end
+
+            if self.Items[Index + 1] then
+                -- There is a item after this one, need top update the next item's top
+                local NextItem = self.Items[Index + 1]
+                NextItem.Top:Set(function() return Item.Bottom() + Item.Margin[3] + NextItem.Margin[1] + 1 end)
+            end
+
+        else
+            Item.Top:Set(function() return self.Top() + self.Padding[1] + Item.Margin[1] end)
+            Item.Bottom:Set(function() return self.Bottom() - self.Padding[3] - Item.Margin[3] end)
+            Item.Height:Set(function() return Item.Bottom() - Item.Top() end)
+
+            if Index == 1 then
+                -- It's the first item, his left is set to parent left
+                Item.Left:Set(function() return self.Left() + self.Padding[4] + Item.Margin[4] end)
+            else
+                -- It's not the first item, his left is set to previous item's right
+                local PrevItem = self.Items[Index-1]
+                Item.Left:Set(function() return PrevItem.Right() + PrevItem.Margin[2] + Item.Margin[4] + 1 end)
+            end
+
+            if self.Items[Index + 1] then
+                -- There is a item after this one, need top update the next item's left
+                local NextItem = self.Items[Index + 1]
+                NextItem.Left:Set(function() return Item.Right() + Item.Margin[2] + NextItem.Margin[4] + 1 end)
+            end
+
+        end
+        return Index
+    end,
+
+    RemoveAt = function(self, Index)
+        local RemovedItem = table.remove(self.Items, Index)
+        if RemovedItem then
+            RemovedItem:Hide()
+            local Item = self.Items[Index]
+            if Item then
+                -- There is a item after the removed one
+                if self.Orientation == "V" then
+                    -- Update next item's top
+                    if Index == 1 then
+                        -- It's the first item, new first item's top is set to parent top
+                        Item.Top:Set(function() return self.Top() + self.Padding[1] + Item.Margin[1]  end)
+                    else
+                        -- It's not the first item, his top is set to previous item's bottom
+                        local PrevItem = self.Items[index-1]
+                        Item.Top:Set(function() return PrevItem.Bottom() + PrevItem.Margin[3] + Item.Margin[1] + 1  end)
+                    end
+                else
+                    -- Update next item's left
+                    if Index == 1 then
+                        -- It's the first item, new first item's left is set to parent left
+                        Item.Left:Set(function() return self.Left() + self.Padding[4] + Item.Margin[4]  end)
+                    else
+                        -- It's not the first item, his left is set to previous item's right
+                        local PrevItem = self.Items[index-1]
+                        Item.Left:Set(function() return PrevItem.Right() + PrevItem.Margin[2] + Item.Margin[4] + 1  end)
+                    end
+                end
+            end
+            return RemovedItem
+        end
+    end,
+
+    RemoveItem = function(self, Item)
+        local Index = self.IndexOf(Item)
+        if Index > 0 then
+            self.RemoveAt(Index)
+            return Index
+        end
+    end,
+
+    Count = function(self) 
+        return table.getn(self.Items)
+    end,
+
+    IndexOf = function(self, Item)
+        for Index, ListItem in self.Items do
+            if Item == ListItem then return Index end
+        end
+        return 0
+    end,
+
+    Clear = function(self)
+        local Count = table.getn(self.Items)
+        for i = 1, Count do 
+            local Item = table.remove(self.Items)
+            Item:Hide()
+        end
+    end,
+
+}
+local ItemsControl = Class(Group) {
+    Items = false,                     -- All items in the list
+    FirstVisibleItem = false,           -- The first visible item index in the list (= value of the scrollbar)
+    VisibleItemCount = false,           -- The number of visible items
+    Panel = false,                  -- The panel containing the items
+    DeferRefresh = false,           -- Block the refresh of the list when items are added/removed. Set to true when you add many items and call Refresh when done
+    Padding = false,            -- A padding between the items and the external border of the control (Top/right/bottom/left)
+    ScrollBarsSize = false,       -- The sizes of the scrollbars (Right/Bottom)
+    Orientation = false,              -- The stack orientation, vertical or horizontal
+    DefaultItemMargin = false,  -- A margin around each single item (Top/right/bottom/left)
+    BackColor = false,
+
+
+    __init = function(self, Parent, Options)
+        Group.__init(self, Parent)
+
+        -- Properties init
+        self.Items = {}
+        self.FirstVisibleItem = 1
+        self.VisibleItemCount = 0
+        self.DeferRefresh = false
+        self.Padding = {3,3,3,3}
+        self.ScrollBarsSize = 14
+        self.Orientation = "V"
+        self.DefaultItemMargin = {0,0,0,0}
+        self.BackColor = '00000000'
+        if Options then for Name, Value in Options do self[Name] = Value end end
+
+        -- Panel
+        self.Panel = StackPanel(self, {Orientation = self.Orientation})
+        self.Panel.Top:Set(function() return self.Top() + self.Padding[1] end)
+        if self.Orientation == "V" then
+            self.Panel.Right:Set(function() return self.Right() - self.Padding[2] - self.ScrollBarsSize end) 
+            self.Panel.Bottom:Set(function() return self.Bottom() - self.Padding[3] end)
+        else
+            self.Panel.Right:Set(function() return self.Right() - self.Padding[2] end) 
+            self.Panel.Bottom:Set(function() return self.Bottom() - self.Padding[3] - self.ScrollBarsSize end)
+        end
+        self.Panel.Left:Set(function() return self.Left() + self.Padding[4] end)
+
+        -- Background
+        self.BG = Bitmap(self)
+        self.BG:SetSolidColor(self.BackColor)
+        self.BG.Top:Set(function() return self.Top() end)
+        self.BG.Left:Set(function() return self.Left() end)
+        self.BG.Bottom:Set(function() return self.Bottom() end)
+        self.BG.Right:Set(function() return self.Right() end) 
+
+
+        -- Scrollbar
+        self.IsScrollable = function(self, axis)
+            return true
+        end     
+        self.GetScrollValues = function(self, axis)
+            -- First item, Last item, First visible item, Last visible item
+            return 1, table.getn(self.Items), self.FirstVisibleItem, self.FirstVisibleItem + self.VisibleItemCount - 1
+        end 
+        -- called when the scrollbar wants to set a new visible top line
+        self.ScrollSetTop = function(self, axis, top)
+            top = math.floor(top)
+            -- Test top value
+            if top < 1 then top = 1 end
+            if top > table.getn(self.Items) - self.Panel:Count() + 1 then top = table.getn(self.Items) - self.Panel:Count() + 1 end
+            if top == self.FirstVisibleItem then return end
+            -- Set new top and refresh the list
+            self.FirstVisibleItem = top
+            self:Refresh()
+        end         
+        self.ScrollLines = function(self, axis, delta)
+            self:ScrollSetTop(axis, self.FirstVisibleItem + math.floor(delta))
+        end
+        self.ScrollPages = function(self, axis, delta)
+            self:ScrollSetTop(axis, self.FirstVisibleItem + math.floor(delta) * self.Panel:Count())
+        end
+        self.HandleEvent = function(self, event)
+            if event.Type == 'WheelRotation' then
+                if event.WheelRotation > 0 then
+                    self:ScrollLines(nil, -1)
+                else
+                    self:ScrollLines(nil, 1)
+                end
+
+            end
+        end 
+        self.ScrollToBottom = function(self)
+            -- Because the items has not all the same size (number of visible items can change), we need to test if we are really on bottom
+            while not self:IsScrolledToBottom() do
+                self:ScrollSetTop(nil, table.getn(self.Items) - self.Panel:Count() + 1)
+            end        
+        end
+        self.IsScrolledToBottom = function(self)
+            local LastVisibleItem = self.FirstVisibleItem + self.Panel:Count() - 1
+            return LastVisibleItem >= table.getn(self.Items)
+        end
+        if self.Orientation == "V" then
+            self.Scroll = UIUtil.CreateLobbyVertScrollbar(self, -self.ScrollBarsSize)
+        else
+            -- Horizontal scrollbar doesn't exist in UIUtil
+            --self.Scroll = UIUtil.CreateLobbyVertScrollbar(self, -self.ScrollBarsSize)
+        end
+        LayoutHelpers.DepthOverParent(self.Scroll, self, 2)
+
+
+    end,
+
+    AddItem = function(self, Item, Index)
+        -- Check Index
+        if not Index then 
+            -- If index is ommited, the item is added at the end of the list
+            Index = table.getn(self.Items) + 1 
+        elseif Index < 1 or Index > table.getn(self.Items) + 1 then
+            -- If index is out of the list range, we just return
+            return
+        end
+        -- Default margin to item
+        if not Item.Margin then Item.Margin = self.DefaultItemMargin end
+        -- Add the item to the list
+        table.insert(self.Items, Index, Item)
+        Item:SetParent(self)
+        Item:Hide() 
+        -- We refresh the list
+        if not self.DeferRefresh then self:Refresh() end
+        return Index
+    end,
+
+    RemoveAt = function(self, Index)
+        if not Index then 
+            -- If index is ommited, the last item of the list is removed
+            Index = table.getn(self.Items) 
+        elseif Index < 1 or Index > table.getn(self.Items) then
+            -- If index is out of the list range, we just return
+            return
+        end
+        -- Remove the item from the list
+        local Item = table.remove(self.Items, Index)
+        Item:Hide() 
+        -- We refresh the list
+        if not self.DeferRefresh then self:Refresh() end
+        return Item
+    end,
+
+    IndexOf = function(self, Item)
+        for Index, ListItem in self.Items do
+            if Item == ListItem then return Index end
+        end
+        return 0
+    end,
+
+    RemoveItem = function(self, Item)
+        local Index = self.IndexOf(Item)
+        if Index > 0 then
+            self:RemoveAt(Index)
+            return Index
+        end        
+    end,
+
+    Clear = function(self)
+        self.DeferRefresh = true
+        local Count = table.getn(self.Items)
+        for i = Count, 1 do 
+            self:RemoveAt(i)
+        end
+        self:Refresh()
+    end,
+
+    Count = function(self) 
+        return table.getn(self.Items)
+    end,
+
+    Refresh = function(self)
+        -- A call to Refresh cancels the DeferRefresh
+        self.DeferRefresh = false
+
+        -- We hide all current visible items
+        self.Panel:Clear()
+        self.VisibleItemCount = 0
+        
+        -- We place and display the items that must be displayed
+        -- Iterate from the first visible item to the last item in the list
+        Count = table.getn(self.Items)
+        for i = self.FirstVisibleItem, Count do 
+            local Item = self.Items[i]
+
+            self.Panel:AddItem(Item)
+
+            if Item.Bottom() > self.Panel.Bottom() then
+                -- This item's bottom is outside of the display area, this item should not be visible
+                self.Panel:RemoveAt() -- Removes the last item when no index is given
+                return  -- The refresh is done
+            end
+
+            self.VisibleItemCount = self.VisibleItemCount + 1
+        end   
+             
+    end,
+}
+
+local RichTextBox = Class(ItemsControl) {
+
+    Texts = false,
+    DefaultTextOptions = false,
+    DefaultLineOptions = false,
+
+    __init = function(self, Parent, Options)
+        -- Properties init
+        self.Texts = {}
+        self.DefaultTextOptions = {ForeColor = "ffffffff", BackColor = "00000000", FontName = "Arial", FontSize = 12, Padding = {0,0,0,0}, Margin = {0,0,0,0}, DropShadow = false}
+        self.DefaultLineOptions = {BackColor = "00000000", Padding = {0,0,0,0}, Margin = {0,0,0,0}}
+
+        -- Init base class
+        ItemsControl.__init(self, Parent, Options)
+
+        -- AdvanceFunction
+        self.TestTextBlock = Text(self)
+        self.TestTextBlock:Hide()
+        self.CreateAdvanceFunction = function(self, TextOptions)
+            local TextBlock = self.TestTextBlock
+            TextBlock:SetFont(TextOptions.FontName, TextOptions.FontSize)
+            return function(text)
+                TextBlock:SetText(text)
+                return TextBlock:Width()
+            end
+        end
+    end,
+
+    AppendText = function(self, String, NewLine, TextOptions, LineOptions)
+
+        local TextWrapper = import('/lua/maui/text.lua')
+        local DeferRefresh = self.DeferRefresh
+        self.DeferRefresh = true -- We defer the refresh while new lines are added. Refresh is callad at the end
+
+        -- Set text options
+        if not TextOptions then TextOptions = {} end
+        for Name, Value in self.DefaultTextOptions do
+            if not TextOptions[Name] then TextOptions[Name] = Value end
+        end 
+
+        -- Set line options
+        if not LineOptions then LineOptions = {} end
+        for Name, Value in self.DefaultLineOptions do
+            if not LineOptions[Name] then LineOptions[Name] = Value end
+        end 
+
+        -- Save the text entry
+        table.insert(self.Texts, {String, NewLine, TextOptions, LineOptions})
+
+        -- Get available space per line
+        local LineWidth = self.Panel.Width()
+        local GetLineWidth = function(LineNumber)
+            if LineNumber == 1 and not NewLine and table.getn(self.Items) > 0 then 
+                -- Return the remaining space on the last line
+                return LineWidth - self.Items[table.getn(self.Items)].UsedSpace
+            end
+            return LineWidth
+        end
+
+        -- Get the per line wrapped text
+        local wrapped = TextWrapper.WrapText(String, GetLineWidth, self:CreateAdvanceFunction(TextOptions))
+
+        -- Create the lines
+        for i, line in wrapped do
+
+            -- Create the TextLine
+            local TextLine = false
+            if i == 1 and not NewLine and table.getn(self.Items) > 0 then
+                -- Take the previous line
+                TextLine = self.Items[table.getn(self.Items)]
+            else
+                -- We need a new line {BackColor = "00000000", Padding = {0,0,0,0}, Margin = {0,0,0,0}}
+                TextLine = StackPanel(self, {Orientation = "H"})
+                TextLine.BG:SetSolidColor(LineOptions.BackColor)
+                TextLine.Margin = LineOptions.Margin
+                TextLine.Padding = LineOptions.Padding
+                -- Set a height or it wont work
+                TextLine.Height:Set(1)
+                TextLine.UsedSpace = 0
+                self:AddItem(TextLine)
+            end
+
+            -- Create the TextBlock {ForeColor = "ffffffff", BackColor = "00000000", FontName = "Arial", FontSize = 12, Padding = {0,0,0,0}, Margin = {0,0,0,0}}
+            local TextBlock = Text(self)
+            TextBlock:SetFont(TextOptions.FontName, TextOptions.FontSize)
+            TextBlock:SetColor(TextOptions.ForeColor)
+            TextBlock:SetDropShadow(TextOptions.DropShadow)
+            TextBlock.Margin = TextOptions.Margin
+            TextBlock.Padding = TextOptions.Padding
+            TextBlock:SetText(line)
+
+            -- Set the TextLine height
+            local Height = TextBlock.Height() + TextOptions.Margin[1] + TextOptions.Margin[3] + LineOptions.Margin[1] + LineOptions.Margin[3] + LineOptions.Padding[1] + LineOptions.Margin[3]
+            if Height > TextLine.Height() then
+                TextLine.Height:Set(Height)
+            end
+
+            -- Add the TextBlock to the TextLine
+            TextLine:AddItem(TextBlock)
+            TextLine.UsedSpace = TextLine.UsedSpace + TextBlock.Width()
+
+        end
+
+        -- Refresh the list when all lines are added
+        if not DeferRefresh then
+            self:Refresh()
+        end
+  
+    end,
+}
+
+LobbyCommands = {
+	PlayerFilters = {},
+	KyrosLobby = {},
+
+	Handle = function(self, text)
+		if string.sub(text, 1, 1) == '/' then
+			local spaceStart = string.find(text, " ") or string.len(text) + 1
+			local comKey = string.sub(text, 2, spaceStart - 1)
+			local params = string.sub(text, spaceStart + 1)
+			local commands = {
+				pm = self.pm,
+				private = self.pm,
+				w = self.pm,
+				whisper = self.pm,
+				ban = self.ban,
+				unban = self.unban,
+				cpuscores = self.cpuscores,
+				cpuscore = self.cpuscore,
+				cpulimit = self.cpulimit,
+				ranklimit = self.ranklimit,
+				gameslimit = self.gameslimit,
+				myslot = self.myslot,
+				info = self.info,
+				reminfo = self.reminfo,
+				stats = self.stats,
+				help = self.help,
+			}
+			local commandFunc = commands[string.lower(comKey)]
+			if not commandFunc then
+				AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
+			else
+				commandFunc(self, params)
+			end
+			return text
+		else
+			return nil
+		end
+	end,
+
+	pm = function(self, params)
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			local name = string.sub(params, 1, delimStart-1)
+			local targID = false
+			for k, player in gameInfo.PlayerOptions:pairs() do
+				if string.lower(player.PlayerName) == string.lower(name) and player.Human then
+					targID = player.OwnerID
+					break
+				end
+			end                
+			if targID then
+				PrivateChat(targID, string.sub(params, delimStart+1))
+			else
+				AddChatText(LOC("<LOC lobby_0007>Invalid whisper target."))
+			end
+		end
+	end,
+
+	ban = function(self, params) -- [?playername] [?reason]
+		if lobbyComm:IsHost() then
+			local name = params
+			local reason = ""
+			local delimStart = string.find(params, " ")
+			if delimStart then
+				name = string.sub(params, 1, delimStart-1)
+				reason = string.sub(params, delimStart+1)
+			end
+			if name == "" then
+				AddChatText("Banned players : ")
+				for n,r in pairs(self.PlayerFilters.BannedPlayers) do 
+					AddChatText("- " .. n .. " : " .. r)
+				end
+			else
+				local txt = name .. " has been banned."
+				AddChatText(txt .. " Reason : " .. reason)
+
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+				self.PlayerFilters.BannedPlayers[string.lower(name)] = reason
+				self.PlayerFilters.KickPlayerByName(name, reason)
+			end
+		else
+			AddChatText("Only the host can use that command")
+		end
+	end,
+
+	unban = function(self, params)  -- [?playername]
+		if lobbyComm:IsHost() then
+			local name = params
+			local delimStart = string.find(params, " ")
+			if delimStart then
+				name = string.sub(params, 1, delimStart-1)
+			end
+			if name == "" then
+				local txt = "All banned players have benn unbanned."
+				AddChatText(txt)
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+				for n, r in pairs(self.PlayerFilters.BannedPlayers) do self.PlayerFilters.BannedPlayers[n] = nil end
+			else
+				local txt = name .. " has been unbanned."
+				AddChatText(txt)
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+				self.PlayerFilters.BannedPlayers[string.lower(name)] = nil
+			end
+		else
+			AddChatText("Only the host can use that command")
+		end
+	end,
+
+	cpuscores = function(self, params) -- [value]
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			params = string.sub(params, 1, delimStart-1)
+		end
+		local value = tonumber(params)
+
+		if value then
+			for name, result in CPU_Benchmarks do
+				CPU_Benchmarks[name] = value
+				if FindObserverSlotForID(name) then
+					refreshObserverList()
+				else
+					UpdateCPUBar(name)
+				end
+			end
+			lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
+			AddChatText("All CPU scores has been set to " .. value)
+		else
+			AddChatText("Syntax : /cpuscores [value]")
+		end
+	end,
+
+	cpuscore = function(self, params) -- [?playername] [value]
+		local name = localPlayerName
+		local value = params
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			name = string.sub(params, 1, delimStart-1)
+			value = string.sub(params, delimStart+1)
+		end
+		value = tonumber(value)
+		if value then
+			for sname, result in CPU_Benchmarks do
+				if string.lower(sname) == string.lower(name) then
+					CPU_Benchmarks[sname] = value
+					lobbyComm:BroadcastData({ Type = 'CPUBenchmark', PlayerName = sname, Result = value })                
+					if FindObserverSlotForID(sname) then
+						refreshObserverList()
+					else
+						UpdateCPUBar(sname)
+					end
+					AddChatText("The CPU score of " .. sname .. " has been set to " .. value)
+					return
+				end
+			end
+			AddChatText("The player " .. name .. " was not found")
+		else
+			AddChatText("Syntax : /cpuscore [?playername] [value]")
+		end
+	end,
+
+	cpulimit = function(self, params) -- [?max]
+		if lobbyComm:IsHost() then
+			if params ~= "" then
+				local value = tonumber(params)
+				if value then
+					self.PlayerFilters.MaxCpu = value
+					local txt = "Max CPU score limit has been set to " .. value
+					AddChatText(txt)
+					lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+					self.PlayerFilters:Filter()
+				else
+					AddChatText("Syntax : /cpulimit [?max]")
+				end
+			else
+				self.PlayerFilters.MaxCpu = 1000
+				local txt = "The CPU score limit has been removed"
+				AddChatText(txt)
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+			end
+		else
+			AddChatText("Only the host can use that command")
+		end
+	end,
+
+	ranklimit = function(self, params) -- [?min] [?max]
+		if lobbyComm:IsHost() then
+			if params ~= "" then
+				local min = params
+				local max = 10000
+				local delimStart = string.find(params, " ")
+				if delimStart then
+					min = string.sub(params, 1, delimStart-1)
+					max = string.sub(params, delimStart+1)
+				end
+				min = tonumber(min)
+				max = tonumber(max)
+				if min and max then
+					self.PlayerFilters.MinRank = min
+					self.PlayerFilters.MaxRank = max
+					local txt = "Rank limits has been set to " .. min .. "-" .. max
+					AddChatText(txt)
+					lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+					self.PlayerFilters:Filter()
+				else
+					AddChatText("Syntax : /ranklimit [?min] [?max]")
+				end
+			else 
+				self.PlayerFilters.MinRank = -10000
+				self.PlayerFilters.MaxRank = 10000
+				local txt = "The rank limits have been removed"
+				AddChatText(txt)
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+			end
+		else
+			AddChatText("Only the host can use that command")
+		end
+	end,
+
+	gameslimit = function(self, params) -- [?min] [?max]
+		if lobbyComm:IsHost() then
+			if params ~= "" then
+				local min = params
+				local max = 100000
+				local delimStart = string.find(params, " ")
+				if delimStart then
+					min = string.sub(params, 1, delimStart-1)
+					max = string.sub(params, delimStart+1)
+				end
+				min = tonumber(min)
+				max = tonumber(max)
+				if min and max then
+					self.PlayerFilters.MinGames = min
+					self.PlayerFilters.MaxGames = max
+					local txt = "Number of games limits has been set to " .. min .. "-" .. max
+					AddChatText(txt)
+					lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+					self.PlayerFilters:Filter()
+				else
+					AddChatText("Syntax : /gameslimit [?min] [?max]")
+				end
+			else 
+				self.PlayerFilters.MinGames = 0
+				self.PlayerFilters.MaxGames = 100000
+				local txt = "The number of games limits have been removed"
+				AddChatText(txt)
+				lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = txt,})
+			end
+		else
+			AddChatText("Only the host can use that command")
+		end
+	end,
+
+	myslot = function(self, params)
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			params = string.sub(params, 1, delimStart-1)
+		end
+		params = tonumber(params)
+		if params then
+			MapName = string.gsub(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name, "[ .,]", "_")
+			local PreferedSlots = Prefs.GetFromCurrentProfile("PreferedSlots") or {}
+			PreferedSlots[MapName] = params
+			Prefs.SetToCurrentProfile('PreferedSlots', PreferedSlots)
+			AddChatText("Your prefered slot on this map has been set to " .. params)
+		else
+			AddChatText("Syntax : /myspot [spot number]")
+		end
+	end,
+
+	info = function(self, params)
+		local name = params
+		local info = ""
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			name = string.sub(params, 1, delimStart-1)
+			info = string.sub(params, delimStart+1)
+		end
+		local PlayerInfos = Prefs.GetFromCurrentProfile("PlayerInfos") or {}
+		if name == "" then
+			AddChatText("Connected players informations : ")
+			for k, player in gameInfo.PlayerOptions:pairs() do
+				if PlayerInfos[string.lower(player.PlayerName)] then
+					AddChatText("- " .. player.PlayerName .. " : " .. PlayerInfos[string.lower(player.PlayerName)])
+				end
+			end        
+		elseif name == "all" then
+			AddChatText("All players informations : ")
+			for n,v in pairs(PlayerInfos) do 
+				AddChatText("- " .. n .. " : " .. v)
+			end
+		else
+			if info == "" then
+				if PlayerInfos[string.lower(name)] then
+					AddChatText("- " .. name .. " : " .. PlayerInfos[string.lower(name)])
+				else
+					AddChatText("No infos for " .. name)
+				end
+			else
+				PlayerInfos[string.lower(name)] = info
+				Prefs.SetToCurrentProfile("PlayerInfos", PlayerInfos)
+				AddChatText("Infos for " .. name .. " saved")
+			end
+		end
+	end,
+
+	reminfo = function(self, params)
+		local name = params
+		local delimStart = string.find(params, " ")
+		if delimStart then
+			name = string.sub(params, 1, delimStart-1)
+		end
+		if name == "" then
+			AddChatText("Syntax : /reminfo [player name]")
+		else
+			local PlayerInfos = Prefs.GetFromCurrentProfile("PlayerInfos") or {}
+			if PlayerInfos[string.lower(name)] then
+				PlayerInfos[string.lower(name)] = nil;
+				Prefs.SetToCurrentProfile("PlayerInfos", PlayerInfos)
+				AddChatText("Infos for " .. name .. " has been removed")
+			else
+				AddChatText("No infos for " .. name)
+			end
+		end
+	end,
+
+	stats = function(self, params)
+		local text = "Team stats : " .. self.KyrosLobby.team1RatingSum .. " (" .. self.KyrosLobby.team1GamesSum .. ") VS " .. self.KyrosLobby.team2RatingSum .. " (" .. self.KyrosLobby.team2GamesSum .. ")"
+		lobbyComm:BroadcastData({Type = "PublicChat", SenderName = "", Text = text,})
+		AddChatText(text)
+	end,
+
+	help = function(self, params)
+		AddChatText("Welcome to KyrO's Lobby!")
+		AddChatText("This lists all available commands (parameters with ? are optional).")
+		AddChatText("- /help : Displays this")
+		AddChatText("- /pm [playername] : Sends a private message (/pm KyrO Hello)")
+		AddChatText("- /stats : Displays the total rating and number of games of both teams to everyone")
+		AddChatText("- /myslot [slotnbr] : Saves your prefered slot on this map. You will be moved to this slot (if available) as soon as you join a lobby with this map (/myslot 12)")
+		AddChatText("- /ban [playername] [reason?] : Bans a player. This player will be auto-kicked if he tries to join the lobby (/ban KyrO I don't like you)")
+		AddChatText("- /ban : Lists all banned players")
+		AddChatText("- /unban [playername] : Unbans a player")
+		AddChatText("- /unban : Unbans all players")
+		AddChatText("- /cpulimit [max] : Auto-kicks all players who have a higher cpu score than the provided value (/cpulimit 250)")
+		AddChatText("- /cpulimit : Removes the cpu limit")
+		AddChatText("- /ranklimit [min] [max] : Auto-kicks all players who do not have a rating between the provided values (/ranklimit 800 1600)")
+		AddChatText("- /ranklimit : Removes the rank limit")
+		AddChatText("- /gameslimit [min] [max] : Auto-kicks all players who do not have a number of games between the provided values (/gameslimit 100 10000)")
+		AddChatText("- /gameslimit : Removes the number of games limit")
+		AddChatText("- /info [playername] [text] : Saves a comment about a player (/info KyrO Slow cpu)")
+		AddChatText("- /info [playername] : Displays the comment about a player")
+		AddChatText("- /info : Displays the comments of all connected players")
+		AddChatText("- /info all : Displays all saved comments")
+		AddChatText("- /reminfo [playername] : Removes the comment about a player")
+	end,
+
+}
+
+ChatBox = Class(Group) {
+    ChatEdit = false,
+    ChatList = false,
+
+    __init = function(self, Parent, Options)
+        Group.__init(self, Parent)
+
+        -- Properties init
+        if not Options then Options = {} end
+
+        -- Edit background
+        self.EditBackground = Bitmap(self)
+        self.EditBackground:SetSolidColor('FF212123')
+        self.EditBackground.Left:Set(function() return self.Left() end)
+        self.EditBackground.Right:Set(function() return self.Right() end) 
+        self.EditBackground.Bottom:Set(function() return self.Bottom() end)
+        self.EditBackground.Height:Set(25)
+
+        -- Edit
+        self.ChatEdit = Edit(self)
+        self.ChatEdit.Left:Set(function() return self.Left() + 1 end)
+        self.ChatEdit.Width:Set(function() return self.Width() - 2 end) 
+        self.ChatEdit.Bottom:Set(function() return self.Bottom() end)
+        self.ChatEdit.Height:Set(function() return self.EditBackground.Height() - 3 end)
+        self:SetupEdit()
+        self.ChatEdit.Depth:Set(function() return self.EditBackground.Depth() + 10 end)
+
+        -- Messages List
+        self.ChatList = RichTextBox(self, Options)
+        self.ChatList.Width:Set(function() return self.Width() end)
+        self.ChatList.Height:Set(function() return self.Height() - self.EditBackground.Height() end)
+        self.ChatList.Left:Set(function() return self.Left() end)
+        self.ChatList.Top:Set(function() return self.Top() end)        
+        self.ChatList.DefaultTextOptions.FontName = UIUtil.bodyFont
+        self.ChatList.DefaultTextOptions.FontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
+        self.ChatList.DefaultTextOptions.ForeColor = UIUtil.fontColor
+        self.ChatList.DefaultTextOptions.DropShadow = true
+
+
+    end,
+
+    KeepFocus = function(self, value) 
+        self._focus = value
+        if value then 
+            self.ChatEdit:AcquireFocus() 
+        else
+            self.ChatEdit:AbandonFocus()
+        end
+    end,
+
+    SetupEdit = function(self)
+
+        --self.ChatEdit:SetFont("Arial Gras", 12) -- Must be called after Edit's Width has been set !!   - UIUtil.bodyFont    
+        self.ChatEdit:SetForegroundColor(UIUtil.fontColor) -- UIUtil.fontColor
+        self.ChatEdit:ShowBackground(false)
+        self.ChatEdit:SetDropShadow(true)
+        self.ChatEdit:SetMaxChars(200)
+        self:KeepFocus(true)
+
+
+        self.ChatEdit.OnCharPressed = function(self, charcode)
+            if charcode == UIUtil.VK_TAB then
+                return true
+            end
+            local charLim = self:GetMaxChars()
+            if STR_Utf8Len(self:GetText()) >= charLim then
+                local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+                PlaySound(sound)
+            end
+        end
+
+        -- We work extremely hard to keep keyboard focus on the chat box, otherwise users can trigger
+        -- in-game keybindings in the lobby.
+        -- That would be very bad. We should probably instead just not assign those keybindings yet...
+        self.ChatEdit.OnLoseKeyboardFocus = function(self2)
+            if self._focus then        
+                self2:AcquireFocus()
+            end
+        end
+		
+        local commandQueueIndex = 0
+        local commandQueue = {}
+        
+		self.ChatEdit.OnEnterPressed = function(self2, text)
+            if text ~= "" then
+                GpgNetSend('Chat', text)
+                table.insert(commandQueue, 1, text)
+                commandQueueIndex = 0
+                if not LobbyCommands:Handle(text) then
+                    lobbyComm:BroadcastData({Type = "PublicChat", Text = text,})
+                    self:AppendPlayerMessage(localPlayerName, text)
+                end
+            end
+        end
+
+        self.ChatEdit.OnEscPressed = function(self, text)
+            GUI.exitLobbyEscapeHandler()
+            -- Don't clear the textbox, either.
+            return true
+        end
+
+        --- Handle up/down arrow presses for the chat box.
+        self.ChatEdit.OnNonTextKeyPressed = function(self, keyCode)
+            if AddUnicodeCharToEditText(self, keyCode) then
+                return
+            end
+            if commandQueue and table.getsize(commandQueue) > 0 then
+                if keyCode == 38 then
+                    if commandQueue[commandQueueIndex + 1] then
+                        commandQueueIndex = commandQueueIndex + 1
+                        self:SetText(commandQueue[commandQueueIndex])
+                    end
+                end
+                if keyCode == 40 then
+                    if commandQueueIndex ~= 1 then
+                        if commandQueue[commandQueueIndex - 1] then
+                            commandQueueIndex = commandQueueIndex - 1
+                            self:SetText(commandQueue[commandQueueIndex])
+                        end
+                    else
+                        commandQueueIndex = 0
+                        self:ClearText()
+                    end
+                end
+            end
+        end
+    end,
+
+    AppendText = function(self, Message, NewLine, TextOptions, LineOptions)
+        local IsScrolledToBottom = self.ChatList:IsScrolledToBottom()
+        self.ChatList:AppendText(Message, NewLine, TextOptions, LineOptions)
+        if IsScrolledToBottom then self.ChatList:ScrollToBottom() end
+    end,
+
+    AppendLine = function(self, Message, TextOptions, LineOptions)
+        self:AppendText(Message, true, TextOptions, LineOptions)
+    end,
+
+    AppendSystemInfo = function(self, Message) 
+        self:AppendText(Message, true, {ForeColor="ff777777"})
+    end,
+
+    AppendSystemError = function(self, Message) 
+        self:AppendText(Message, true, {ForeColor="ffff0000"})
+    end,
+
+    AppendPrivateMessage = function(self, PlayerName, DestinationPlayer, Message)
+        self:AppendPlayerMessage(PlayerName, "<< To " .. DestinationPlayer .. " >> " .. Message)
+    end,
+
+    AppendPlayerMessage = function(self, PlayerName, Message)
+
+        local Player = false
+        -- Find the PlayerName in the slots
+        for k, p in gameInfo.PlayerOptions:pairs() do
+            if p.PlayerName == PlayerName and p.Human then
+                Player = p
+            end
+        end
+        -- If the player was found, get his color.
+        local PlayerColor = false
+        if not Player then
+            PlayerColor = "ffffffff"
+        else
+            PlayerColor = gameColors.PlayerColors[Player.PlayerColor]
+        end
+
+        self:AppendText(PlayerName, true, {FontName = "Arial Gras", ForeColor = PlayerColor}, {Padding = {3,0,0,0}})
+
+        -- Host slot color : ffc726 
+        -- Own slot color : 6363d2
+
+        -- Find the PlayerName in the observers
+        if not Player then
+            for k, observer in gameInfo.Observers:pairs() do
+                if observer.PlayerName == PlayerName then
+                    Player = observer
+                end
+            end
+        end
+        -- Test if Player is the local player or the host
+        if not Player then
+            -- Should not happen
+            self:AppendText(Message, false, {ForeColor = "ff666666"})
+        elseif Player.OwnerID == localPlayerID then
+            -- Own message = light blue
+            self:AppendText(Message, false, {ForeColor = "ff6666FF"})
+        elseif Player.OwnerID == hostID then
+            -- Host message = white
+            self:AppendText(Message, false, {ForeColor = "ffffffff"})
+        else
+            -- Normal player message
+            self:AppendText(Message, false)
+        end
+    end,
+
+    Refresh = function(self)
+        self.ChatList:Refresh()
+    end,
+
+}
 
 -- String from which to build the various "Move player to slot" labels.
 local slotMenuStrings = {
@@ -436,8 +1456,7 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
                 HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
             else
-                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
-                                   RequestedSlot = slot})
+                lobbyComm:SendData(hostID, {Type = 'MovePlayer', RequestedSlot = slot})
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
@@ -551,7 +1570,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
 
     -- Set up the base escape handler first: want this one at the bottom of the stack.
     GUI.exitLobbyEscapeHandler = function()
-        GUI.chatEdit:AbandonFocus()
+        GUI.chatDisplay:KeepFocus(false)
         local quitDialog = UIUtil.QuickDialog(GUI,
             "<LOC lobby_0000>Exit game lobby?",
             "<LOC _Yes>", function()
@@ -567,7 +1586,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
 
             -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
             "<LOC _Cancel>", function()
-                GUI.chatEdit:AcquireFocus()
+                GUI.chatDisplay:KeepFocus(true)
             end,
             nil, nil,
             true
@@ -1652,16 +2671,6 @@ function SendPersonalSystemMessage(targetID, id, ...)
     end
 end
 
-function PublicChat(text)
-    lobbyComm:BroadcastData(
-        {
-            Type = "PublicChat",
-            Text = text,
-        }
-        )
-    AddChatText("["..localPlayerName.."] " .. text, true)
-end
-
 function PrivateChat(targetID,text)
     if targetID ~= localPlayerID then
         lobbyComm:SendData(
@@ -1955,7 +2964,7 @@ local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
         HostUtils.PlayerMissingMapAlert(localPlayerID)
     else
-        lobbyComm:SendData(hostID, {Type = 'MissingMap', Id = localPlayerID})
+        lobbyComm:SendData(hostID, {Type = 'MissingMap'})
     end
 end
 
@@ -2436,7 +3445,7 @@ function CreateSlotsUI(makeLabel)
         colorSelector.Width:Set(COLUMN_WIDTHS[6])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow })
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index })
                 SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                 UpdateGame()
             else
@@ -2726,11 +3735,17 @@ function CreateUI(maxPlayers)
     GUI.observerPanel.Height:Set(obsHeight)
 
     -- Chat
-    GUI.chatPanel = Group(GUI.panel, "chatPanel")
-    UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 11, 459)
-    GUI.chatPanel.Width:Set(478)
-    GUI.chatPanel.Height:Set(245)
+
+    ---------------------------------------------------------------------------
+    -- set up chat display
+    ---------------------------------------------------------------------------
+    GUI.chatDisplay = ChatBox(GUI.panel, {Padding = {3,3,3,3}})
+    GUI.chatDisplay.Width:Set(478)
+    GUI.chatDisplay.Height:Set(245)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.panel, 11, 459)
+    --GUI.chatDisplay.Top:Set(function() return GUI.panel.Top() + 459 end)
+    --GUI.chatDisplay.Height:Set(245)
+    UIUtil.SurroundWithBorder(GUI.chatDisplay, '/scx_menu/lan-game-lobby/frame/')
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
@@ -2864,92 +3879,6 @@ function CreateUI(maxPlayers)
 
     LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
-
-    ---------------------------------------------------------------------------
-    -- set up chat display
-    ---------------------------------------------------------------------------
-    GUI.chatDisplay = TextArea(
-        GUI.chatPanel,
-        function() return GUI.chatPanel.Width() - 20 end,
-        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
-)
-    local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, fontSize)
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
-    LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
-
-    GUI.chatPanel.top = 0
-    GUI.chatPanel.numberOfLines = numberOfChatLinesForFontSize[fontSize]
-    GUI.chatPanel.GetScrollValues = function(self, axis)
-        local size = GUI.chatDisplay:GetItemCount()
-        return 0, size, self.top, math.min(self.top + self.numberOfLines, size)
-    end
-
-    GUI.chatPanel.ScrollLines = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta))
-    end
-    GUI.chatPanel.ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta) * self.numberOfLines)
-    end
-    GUI.chatPanel.ScrollSetTop = function(self, axis, top)
-        local oldTop = self.top
-        top = math.floor(top)
-        if top == self.top then return end
-        local size = GUI.chatDisplay:GetItemCount()
-        self.top = math.max(math.min(size - self.numberOfLines, top), 0)
-        if oldTop <= self.top then
-            -- ShowItem doesn't scroll the chat if the item is already visible. If it isn't visible yet it'll put it on the top of chat.
-            -- So we scroll down all the way first and then back up if necessary and ShowItem will give us appropriate item at the top then.
-            GUI.chatDisplay:ShowItem(size)
-        end
-        GUI.chatDisplay:ShowItem(self.top)
-        if self.top >= GUI.chatDisplay:GetItemCount() - (self.numberOfLines + 1) then
-            GUI.newMessageArrow:Disable()
-        end
-    end
-    GUI.chatPanel.HandleEvent = function(self, event)
-        if event.Type == 'WheelRotation' then
-            local lines = 1
-            if event.WheelRotation > 0 then
-                lines = -1
-            end
-            self:ScrollLines(nil, lines)
-        end
-    end
-    GUI.chatPanel.IsScrollable = function(self, axis)
-        return true
-    end
-    GUI.chatPanel.ScrollToBottom = function(self)
-        self:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount() - self.numberOfLines)
-    end
-    GUI.chatPanel.IsScrolledToBottom = function(self)
-        return self.top >= GUI.chatDisplay:GetItemCount() - self.numberOfLines
-    end
-
-    local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
-    GUI.newMessageArrow = newMessageArrow
-    -- newMessageArrow:SetTexture('/textures/ui/common/FACTIONSELECTOR/aeon/d_up.dds')
-    LayoutHelpers.AtBottomIn(newMessageArrow, GUI.chatDisplay, 5)
-    LayoutHelpers.AtRightIn(newMessageArrow, GUI.chatDisplay, 5)
-    LayoutHelpers.DepthOverParent(newMessageArrow, GUI.chatDisplay, 5)
-    newMessageArrow.Width:Set(25)
-    newMessageArrow.Height:Set(25)
-    GUI.newMessageArrow.OnClick = function(this, modifiers)
-        GUI.chatPanel:ScrollToBottom()
-    end
-    GUI.newMessageArrow:Disable()
-
-    -- Annoying evil extra Bitmap to make chat box have padding inside its background.
-    local chatBG = Bitmap(GUI.chatPanel)
-    GUI.chatBG = chatBG
-    chatBG:SetSolidColor('FF212123')
-    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 1)
-    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
-    chatBG.Width:Set(GUI.chatPanel.Width() - 16)
-    chatBG.Height:Set(24)
-
-    -- Set up the chat edit buttons and functions
-    setupChatEdit(GUI.chatPanel)
 
     ---------------------------------------------------------------------------
     -- Option display
@@ -3118,7 +4047,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Launch Button
-    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', LOC("<LOC tooltipui0173>Launch Game"))
+    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/large/', LOC("<LOC tooltipui0173>Launch Game"))
     GUI.launchGameButton = launchGameButton
     LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
     LayoutHelpers.AtBottomIn(launchGameButton, GUI.panel, -8)
@@ -3174,8 +4103,8 @@ function CreateUI(maxPlayers)
     CreateSlotsUI(makeLabel)
 
     -- Exit Button
-    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/', LOC("<LOC tooltipui0285>Exit"))
-    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 33)
+    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', LOC("<LOC tooltipui0285>Exit"))
+    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.panel, 33)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, 7)
     if HasCommandLineArg("/gpgnet") then
         -- Quit to desktop
@@ -3335,13 +4264,13 @@ function CreateUI(maxPlayers)
             if isHost then
                 HostUtils.ConvertPlayerToObserver(FindSlotForID(localPlayerID))
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedSlot = FindSlotForID(localPlayerID)})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver'})
             end
         elseif IsObserver(localPlayerID) then
             if isHost then
                 HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID))
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', ObserverSlot = FindObserverSlotForID(localPlayerID)})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer'})
             end
         end
     end
@@ -3435,105 +4364,6 @@ function CreateUI(maxPlayers)
 
     if not singlePlayer then
         CreateCPUMetricUI()
-    end
-end
-
-function setupChatEdit(chatPanel)
-    GUI.chatEdit = Edit(chatPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
-    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - 9)
-    GUI.chatEdit.Height:Set(22)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
-    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:ShowBackground(false)
-    GUI.chatEdit:SetDropShadow(true)
-    GUI.chatEdit:AcquireFocus()
-
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, -2, 0)
-
-    GUI.chatEdit:SetMaxChars(200)
-    GUI.chatEdit.OnCharPressed = function(self, charcode)
-        if charcode == UIUtil.VK_TAB then
-            return true
-        end
-
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
-        end
-    end
-
-    -- We work extremely hard to keep keyboard focus on the chat box, otherwise users can trigger
-    -- in-game keybindings in the lobby.
-    -- That would be very bad. We should probably instead just not assign those keybindings yet...
-    GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
-    end
-
-    local commandQueueIndex = 0
-    local commandQueue = {}
-    GUI.chatEdit.OnEnterPressed = function(self, text)
-        if text ~= "" then
-            GpgNetSend('Chat', text)
-            table.insert(commandQueue, 1, text)
-            commandQueueIndex = 0
-            if string.sub(text, 1, 1) == '/' then
-                local spaceStart = string.find(text, " ") or string.len(text) + 1
-                local comKey = string.sub(text, 2, spaceStart - 1)
-                local params = string.sub(text, spaceStart + 1)
-                local commandFunc = commands[string.lower(comKey)]
-                if not commandFunc then
-                    AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
-                    return
-                end
-
-                commandFunc(params)
-            else
-                PublicChat(text)
-            end
-        end
-    end
-
-    GUI.chatEdit.OnEscPressed = function(self, text)
-        -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
-        -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") then
-            -- Quit to desktop
-            EscapeHandler.HandleEsc(true)
-        else
-            -- Back to main menu
-            GUI.exitButton.OnClick()
-        end
-
-        -- Don't clear the textbox, either.
-        return true
-    end
-
-    --- Handle up/down arrow presses for the chat box.
-    GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
-        if AddUnicodeCharToEditText(self, keyCode) then
-            return
-        end
-        if commandQueue and table.getsize(commandQueue) > 0 then
-            if keyCode == 38 then
-                if commandQueue[commandQueueIndex + 1] then
-                    commandQueueIndex = commandQueueIndex + 1
-                    self:SetText(commandQueue[commandQueueIndex])
-                end
-            end
-            if keyCode == 40 then
-                if commandQueueIndex ~= 1 then
-                    if commandQueue[commandQueueIndex - 1] then
-                        commandQueueIndex = commandQueueIndex - 1
-                        self:SetText(commandQueue[commandQueueIndex])
-                    end
-                else
-                    commandQueueIndex = 0
-                    self:ClearText()
-                end
-            end
-        end
     end
 end
 
@@ -3778,8 +4608,11 @@ function AddChatText(text, scrollToBottom)
         LOG("text=" .. repr(text))
         return
     end
+	
+    GUI.chatDisplay:AppendSystemInfo(text)
     
-    local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
+    --[[
+	local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
     
     GUI.chatDisplay:AppendLine(text)
     if scrolledToBottom then
@@ -3787,6 +4620,7 @@ function AddChatText(text, scrollToBottom)
     else
         GUI.newMessageArrow:Enable()
     end
+	--]]
 end
 
 --- Update a slot display in a single map control.
@@ -3891,7 +4725,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         if lobbyComm:IsHost() then
                             HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
                         else
-                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
+                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', RequestedSlot = slot})
                         end
                         -- if first click is a not empty slot and second click is a empty slot: reset vars
                         if mapPreviewSlotSwap == true then
@@ -3993,6 +4827,443 @@ function UpdateClientModStatus(newHostSimMods)
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
 end
 
+local IsFromHost = function(data) return data.SenderID == hostID end
+local AmHost = function(data) return lobbyComm:IsHost() end
+
+local FromSubjectOrHost = function(data)
+    if IsFromHost(data) then
+        return true
+    end
+
+    -- Do ridiculous things to infer the identity of the subject of the message.
+    -- TODO: A UNIFORM PROTOCOL MAYBE?
+    local subjectID = data.SenderID
+    if data.PlayerName then
+        return data.SenderID == FindIDForName(data.PlayerName)
+    end
+
+    if data.Slot and gameInfo.PlayerOptions[data.Slot] then
+        return data.SenderID == FindIDForName(gameInfo.PlayerOptions[data.Slot].PlayerName)
+    end
+
+    return false
+end
+
+--
+local MessageHandlers = {
+    -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
+    PlayerOptions = {
+        Accept = function(data)
+            for key, val in data.Options do
+                -- The host *is* allowed to set options on slots he doesn't own, of course.
+                if data.SenderID ~= hostID then
+                    if key == 'Team' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
+                        WARN("Attempt to set Team while Auto Teams are on.")
+                        return true
+                    elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
+                        WARN("Attempt to set option on unowned slot.")
+                        return false
+                    end
+                end
+            end
+
+            -- TODO: Players may not change *all* of their own options...
+
+            return true
+        end,
+        Handle = function(data)
+            local options = data.Options
+
+            for key, val in options do
+                gameInfo.PlayerOptions[data.Slot][key] = val
+                if lobbyComm:IsHost() then
+                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
+                    if playerInfo.Human then
+                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
+                    else
+                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
+                    end
+
+                    -- TODO: This should be a global listener on PlayerData objects, but I'm in too
+                    -- much pain to implement that listener system right now. EVIL HACK TIME
+                    if key == "Ready" then
+                        HostUtils.RefreshButtonEnabledness()
+                    end
+                    -- DONE.
+                end
+            end
+
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+        end
+    },
+
+    -- SenderName here is inserted by lobbyComm, so validating it is just a gratuitious effort to
+    -- detect obnoxiousness.
+    PrivateChat = {
+        Accept = function(data)
+            return data.SenderName == FindNameForID(data.SenderID)
+        end,
+        Handle = function(data)
+            GUI.chatDisplay:AppendPrivateMessage(data.SenderName, localPlayerName, data.Text)
+        end
+    },
+
+    CPUBenchmark = {
+        Accept = FromSubjectOrHost,
+        Handle = function(data)
+            local newInfo = false
+            if data.PlayerName and CPU_Benchmarks[data.PlayerName] ~= data.Result then
+                newInfo = true
+            end
+
+            local benchmarks = {}
+            if data.PlayerName then
+                benchmarks[data.PlayerName] = data.Result
+            else
+                benchmarks = data.Benchmarks
+            end
+
+            for name, result in benchmarks do
+                CPU_Benchmarks[name] = result
+                local id = FindIDForName(name)
+                local slot = FindSlotForID(id)
+                if slot then
+                    SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
+                else
+                    refreshObserverList()
+                end
+            end
+
+            -- Host broadcasts new CPU benchmark information to give the info to clients that are not directly connected to data.PlayerName yet.
+            if lobbyComm:IsHost() and newInfo then
+                lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
+            end
+        end
+    },
+
+    SetPlayerNotReady = {
+        Accept = FromSubjectOrHost,
+        Handle = function(data)
+            EnableSlot(data.Slot)
+            GUI.becomeObserver:Enable()
+
+            SetPlayerOption(data.Slot, 'Ready', false)
+        end
+    },
+
+    AutoTeams = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.AutoTeams[data.Slot] = data.Team
+            gameInfo.PlayerOptions[data.Slot]['Team'] = data.Team
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+            UpdateGame()
+        end
+    },
+
+    AddPlayer = {
+        Accept = AmHost,
+        Handle = function(data)
+            -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
+            -- slot or move it to observer
+            SendCompleteGameStateToPeer(data.SenderID)
+
+            if argv.isRehost then
+                local rehostSlot = FindRehostSlotForID(data.SenderID) or 0
+                if rehostSlot ~= 0 and gameInfo.PlayerOptions[rehostSlot] then
+                    -- If the slot is occupied, the occupying player will be moved away or to observer. If it's an
+                    -- AI, it will be removed
+                    local occupyingPlayer = gameInfo.PlayerOptions[rehostSlot]
+                    if not occupyingPlayer.Human then
+                        HostUtils.RemoveAI(rehostSlot)
+                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                    else
+                        HostUtils.ConvertPlayerToObserver(rehostSlot, true)
+                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                        HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(occupyingPlayer.OwnerID))
+                    end
+                else
+                    HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                end
+            else
+                HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
+            end
+            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+        end
+    },
+
+    -- Player requests move.
+    MovePlayer = {
+        Accept = AmHost, -- Forgery would require tricking lobbyComm...
+        Handle = function(data)
+            local CurrentSlot = FindSlotForID(data.SenderID)
+
+            -- Handle ready-races.
+            if gameInfo.PlayerOptions[CurrentSlot].Ready then
+                return
+            end
+
+            -- Player requests to be moved to a different empty slot.
+            HostUtils.MovePlayerToEmptySlot(CurrentSlot, data.RequestedSlot)
+        end
+    },
+
+    RequestConvertToObserver = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.ConvertPlayerToObserver(FindSlotForID(data.SenderID))
+        end
+
+    },
+
+    RequestConvertToPlayer = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(data.SenderID), data.PlayerSlot)
+        end
+    },
+
+    RequestColor = {
+        Accept = AmHost,
+        Handle = function(data)
+            local TargetSlot = FindSlotForID(data.SenderID)
+            if IsColorFree(data.Color) then
+                -- Color is available, let everyone else know
+                SetPlayerColor(gameInfo.PlayerOptions[TargetSlot], data.Color)
+                lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = TargetSlot })
+                SetSlotInfo(TargetSlot, gameInfo.PlayerOptions[TargetSlot])
+            else
+                -- Sorry, it's not free. Force the player back to the color we have for him.
+                lobbyComm:SendData(data.SenderID, {
+                    Type = 'SetColor',
+                    Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
+                })
+            end
+        end
+    },
+
+    -- Really stupid implementation of AI removal...
+    ClearSlot = {
+        Accept = AmHost,
+        Handle = function(data)
+            if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
+                HostUtils.RemoveAI(data.Slot)
+            else
+                WARN("Attempt to clear unowned slot")
+            end
+        end
+    },
+
+    -- Sent to the host to advise them of which mods the players have.
+    SetAvailableMods = {
+        Accept = AmHost,
+        Handle = function(data)
+            availableMods[data.SenderID] = data.Mods
+            HostUtils.UpdateMods(data.SenderID, data.Name)
+        end
+    },
+
+    -- Sent by a non-host peer when a map is selected that they don't have installed.
+    MissingMap = {
+        Accept = AmHost,
+        Handle = function(data)
+            HostUtils.PlayerMissingMapAlert(data.SenderID)
+        end
+    },
+
+    -- This is insane.
+    SystemMessage = {
+        Handle = function(data)
+            PrintSystemMessage(data.Id, data.Args)
+        end
+    },
+
+    -- This is very insane and somewhat insecure...
+    Peer_Really_Disconnected = {
+        Handle = function(data)
+            if data.Observ == false then
+                gameInfo.PlayerOptions[data.Slot] = nil
+            elseif data.Observ == true then
+                gameInfo.Observers[data.Slot] = nil
+            end
+            AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
+            ClearSlotInfo(data.Slot)
+            UpdateGame()
+        end
+    },
+
+    SetAllPlayerNotReady = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            if not IsPlayer(localPlayerID) then
+                return
+            end
+            local localSlot = FindSlotForID(localPlayerID)
+            EnableSlot(localSlot)
+            GUI.becomeObserver:Enable()
+            SetPlayerOption(localSlot, 'Ready', false)
+        end
+    },
+
+    -- Host telling us about things changing in the game configuration...
+
+    GameOptions = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            for key, value in data.Options do
+                gameInfo.GameOptions[key] = value
+            end
+
+            UpdateGame()
+        end
+    },
+    ClearSlot = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.Slot] = nil
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    ModsChanged = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.GameMods = data.GameMods
+
+            UpdateClientModStatus(data.GameMods)
+            UpdateGame()
+            import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
+        end
+    },
+    SlotClosed = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.ClosedSlots[data.Slot] = data.Closed
+            gameInfo.SpawnMex[data.Slot] = false
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    SlotClosedSpawnMex = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
+            gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
+            ClearSlotInfo(data.Slot)
+        end
+    },
+    GameInfo = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            -- Completely update the game state. To be used exactly once: when first connecting.
+            local hostFlatInfo = data.GameInfo
+            gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
+
+            UpdateClientModStatus(gameInfo.GameMods, true)
+            UpdateGame()
+        end
+    },
+    SetColor = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+        end
+    },
+    ConvertObserverToPlayer = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.OldSlot] = nil
+            gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            refreshObserverList()
+            SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
+        end
+    },
+
+    ConvertPlayerToObserver = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
+            gameInfo.PlayerOptions[data.OldSlot] = nil
+            ClearSlotInfo(data.OldSlot)
+            refreshObserverList()
+            UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
+        end
+    },
+
+    SlotAssigned = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
+            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
+            PossiblyAnnounceGameFull()
+        end
+    },
+
+    SlotMove = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.PlayerOptions[data.OldSlot] = nil
+            gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            ClearSlotInfo(data.OldSlot)
+            SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+            UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
+        end
+    },
+
+    SwapPlayers = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            DoSlotSwap(data.Slot1, data.Slot2)
+        end
+    },
+
+    ObserverAdded = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            gameInfo.Observers[data.Slot] = PlayerData(data.Options)
+            refreshObserverList()
+        end
+    },
+
+    -- Start the game!
+    Launch = {
+        Accept = IsFromHost,
+        Handle = function(data)
+            local info = data.GameInfo
+            info.GameMods = Mods.GetGameMods(info.GameMods)
+            SetWindowedLobby(false)
+
+            -- Evil hack to correct the skin for randomfaction players before launch.
+            for index, player in info.PlayerOptions do
+                -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
+                -- random-faction people from ending up with something retarded)
+                if player.OwnerID == localPlayerID then
+                    UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
+                end
+             end
+
+            SavePresetToName(LAST_GAME_PRESET_NAME)
+            lobbyComm:LaunchGame(info)
+        end
+    },
+
+	-- Chat messages ported from Kyros lobby
+	
+	-- public broadcasted message in chat
+	PublicChat = {
+        Accept = function(data)
+            return data.SenderName == FindNameForID(data.SenderID)
+        end,
+        Handle = function(data)
+			GUI.chatDisplay:AppendPlayerMessage(data.SenderName, data.Text)
+        end
+	}
+	
+}
+
+
 -- LobbyComm Callbacks
 function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -4073,250 +5344,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
-    lobbyComm.DataReceived = function(self,data)
-        -- Messages anyone can receive
-        if data.Type == 'PlayerOptions' then
-            local options = data.Options
-            local isHost = lobbyComm:IsHost()
-
-            for key, val in options do
-                -- The host *is* allowed to set options on slots he doesn't own, of course.
-                if data.SenderID ~= hostID then
-                    if key == 'Team' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
-                        WARN("Attempt to set Team while Auto Teams are on.")
-                        return
-                    elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
-                        WARN("Attempt to set option on unowned slot.")
-                        return
-                    end
-                end
-
-                gameInfo.PlayerOptions[data.Slot][key] = val
-                if isHost then
-                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
-                    if playerInfo.Human then
-                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
-                    else
-                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
-                    end
-
-
-                    -- TODO: This should be a global listener on PlayerData objects, but I'm in too
-                    -- much pain to implement that listener system right now. EVIL HACK TIME
-                    if key == "Ready" then
-                        HostUtils.RefreshButtonEnabledness()
-                    end
-                    -- DONE.
-                end
-            end
-            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-        elseif data.Type == 'PublicChat' then
-            AddChatText("["..data.SenderName.."] "..data.Text)
-        elseif data.Type == 'PrivateChat' then
-            AddChatText("<<"..LOCF("<LOC lobui_0442>From %s", data.SenderName)..">> "..data.Text)
-        elseif data.Type == 'CPUBenchmark' then
-            -- CPU benchmark code
-            local newInfo = false
-            if data.PlayerName and CPU_Benchmarks[data.PlayerName] ~= data.Result then
-                newInfo = true
-            end
-
-            local benchmarks = {}
-            if data.PlayerName then
-                benchmarks[data.PlayerName] = data.Result
-            else
-                benchmarks = data.Benchmarks
-            end
-
-            for name, result in benchmarks do
-                CPU_Benchmarks[name] = result
-                local id = FindIDForName(name)
-                local slot = FindSlotForID(id)
-                if slot then
-                    SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
-                else
-                    refreshObserverList()
-                end
-            end
-
-            -- Host broadcasts new CPU benchmark information to give the info to clients that are not directly connected to data.PlayerName yet.
-            if lobbyComm:IsHost() and newInfo then
-                lobbyComm:BroadcastData({Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
-            end
-        elseif data.Type == 'SetPlayerNotReady' then
-            EnableSlot(data.Slot)
-            GUI.becomeObserver:Enable()
-
-            SetPlayerOption(data.Slot, 'Ready', false)
-        elseif data.Type == 'AutoTeams' then
-            gameInfo.AutoTeams[data.Slot] = data.Team
-            gameInfo.PlayerOptions[data.Slot]['Team'] = data.Team
-            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-            UpdateGame()
+    lobbyComm.DataReceived = function(self, data)
+        -- Decide if we should just drop the packet. Violations here are usually people using a
+        -- modified lobby.lua to try to do stupid shit.
+        if not MessageHandlers[data.Type] then
+            WARN("Unknown message type: " .. data.Type)
+            return
         end
 
-        if lobbyComm:IsHost() then
-            -- Host only messages
-            if data.Type == 'AddPlayer' then
-                -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
-                -- slot or move it to observer
-                SendCompleteGameStateToPeer(data.SenderID)
-
-                if argv.isRehost then
-                    local rehostSlot = FindRehostSlotForID(data.SenderID) or 0
-                    if rehostSlot ~= 0 and gameInfo.PlayerOptions[rehostSlot] then
-                        -- If the slot is occupied, the occupying player will be moved away or to observer. If it's an
-                        -- AI, it will be removed
-                        local occupyingPlayer = gameInfo.PlayerOptions[rehostSlot]
-                        if not occupyingPlayer.Human then
-                            HostUtils.RemoveAI(rehostSlot)
-                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                        else
-                            HostUtils.ConvertPlayerToObserver(rehostSlot, true)
-                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(occupyingPlayer.OwnerID))
-                        end
-                    else
-                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
-                    end
-                else
-                    HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
-                end
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
-            elseif data.Type == 'MovePlayer' then
-                -- Handle ready-races.
-                if gameInfo.PlayerOptions[data.CurrentSlot].Ready then
-                    return
-                end
-
-                -- Player requests to be moved to a different empty slot.
-                HostUtils.MovePlayerToEmptySlot(data.CurrentSlot, data.RequestedSlot)
-            elseif data.Type == 'RequestConvertToObserver' then
-                HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
-            elseif data.Type == 'RequestConvertToPlayer' then
-                HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
-            elseif data.Type == 'RequestColor' then
-                if IsColorFree(data.Color) then
-                    -- Color is available, let everyone else know
-                    SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
-                    lobbyComm:BroadcastData({ Type = 'SetColor', Color = data.Color, Slot = data.Slot })
-                    SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-                else
-                    -- Sorry, it's not free. Force the player back to the color we have for him.
-                    lobbyComm:SendData(data.SenderID, { Type = 'SetColor', Color =
-                    gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot })
-                end
-            elseif data.Type == 'ClearSlot' then
-                if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
-                    HostUtils.RemoveAI(data.Slot)
-                else
-                    WARN("Attempt to clear unowned slot")
-                end
-            elseif data.Type == 'SetAvailableMods' then
-                availableMods[data.SenderID] = data.Mods
-                HostUtils.UpdateMods(data.SenderID, data.Name)
-            elseif data.Type == 'MissingMap' then
-                HostUtils.PlayerMissingMapAlert(data.Id)
-            end
-        else -- Non-host only messages
-            if data.Type == 'SystemMessage' then
-                PrintSystemMessage(data.Id, data.Args)
-            elseif data.Type == 'SetAllPlayerNotReady' then
-                if not IsPlayer(localPlayerID) then
-                    return
-                end
-                local localSlot = FindSlotForID(localPlayerID)
-                EnableSlot(localSlot)
-                GUI.becomeObserver:Enable()
-                SetPlayerOption(localSlot, 'Ready', false)
-            elseif data.Type == 'Peer_Really_Disconnected' then
-                if data.Observ == false then
-                    gameInfo.PlayerOptions[data.Slot] = nil
-                elseif data.Observ == true then
-                    gameInfo.Observers[data.Slot] = nil
-                end
-                AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
-                ClearSlotInfo(data.Slot)
-                UpdateGame()
-            elseif data.Type == 'SlotAssigned' then
-                gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
-                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
-                PossiblyAnnounceGameFull()
-            elseif data.Type == 'SlotMove' then
-                gameInfo.PlayerOptions[data.OldSlot] = nil
-                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                ClearSlotInfo(data.OldSlot)
-                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
-            elseif data.Type == 'SwapPlayers' then
-                DoSlotSwap(data.Slot1, data.Slot2)
-            elseif data.Type == 'ObserverAdded' then
-                gameInfo.Observers[data.Slot] = PlayerData(data.Options)
-                refreshObserverList()
-            elseif data.Type == 'ConvertObserverToPlayer' then
-                gameInfo.Observers[data.OldSlot] = nil
-                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                refreshObserverList()
-                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
-                UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
-            elseif data.Type == 'ConvertPlayerToObserver' then
-                gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
-                gameInfo.PlayerOptions[data.OldSlot] = nil
-                ClearSlotInfo(data.OldSlot)
-                refreshObserverList()
-                UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
-            elseif data.Type == 'SetColor' then
-                SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
-                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
-            elseif data.Type == 'GameInfo' then
-                -- Completely update the game state. To be used exactly once: when first connecting.
-                local hostFlatInfo = data.GameInfo
-                gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
-
-                UpdateClientModStatus(gameInfo.GameMods, true)
-                UpdateGame()
-            elseif data.Type == 'GameOptions' then
-                for key, value in data.Options do
-                    gameInfo.GameOptions[key] = value
-                end
-
-                UpdateGame()
-            elseif data.Type == 'Launch' then
-                local info = data.GameInfo
-                info.GameMods = Mods.GetGameMods(info.GameMods)
-                SetWindowedLobby(false)
-
-                -- Evil hack to correct the skin for randomfaction players before launch.
-                for index, player in info.PlayerOptions do
-                    -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
-                    -- random-faction people from ending up with something retarded)
-                    if player.OwnerID == localPlayerID then
-                        UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
-                    end
-                 end
-
-                SavePresetToName(LAST_GAME_PRESET_NAME)
-                lobbyComm:LaunchGame(info)
-            elseif data.Type == 'ClearSlot' then
-                gameInfo.PlayerOptions[data.Slot] = nil
-                ClearSlotInfo(data.Slot)
-            elseif data.Type == 'ModsChanged' then
-                gameInfo.GameMods = data.GameMods
-
-                UpdateClientModStatus(data.GameMods)
-                UpdateGame()
-                import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
-            elseif data.Type == 'SlotClosed' then
-                gameInfo.ClosedSlots[data.Slot] = data.Closed
-                gameInfo.SpawnMex[data.Slot] = false
-                ClearSlotInfo(data.Slot)
-            elseif data.Type == 'SlotClosedSpawnMex' then
-                gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
-                gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
-                ClearSlotInfo(data.Slot)
-            end
+        -- No defined validator is taken to be always-accept.
+        if not MessageHandlers[data.Type].Accept or MessageHandlers[data.Type].Accept(data) then
+            MessageHandlers[data.Type].Handle(data)
+        else
+            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
         end
     end
 
@@ -5230,7 +6270,8 @@ function ShowLobbyOptionsDialog()
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
-        local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
+        --[[
+		local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
     
         local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
@@ -5240,6 +6281,7 @@ function ShowLobbyOptionsDialog()
         if isScrolledDown then
             GUI.chatPanel:ScrollToBottom()
         end
+		--]]
     end
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
