@@ -2252,13 +2252,16 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
     
     -------------------------------------------------------------------------------------------
-    -- TELEPORTING WITH DELAY
+    -- TELEPORTING WITH DISRUPTABLE TELEPORTATION
     -------------------------------------------------------------------------------------------
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
+        
+        --Add a fake unit at the teleport location, this will allow the teleport to be disrupted when it dies.
+        self:AddTeleportTarget(location)
         
         local bp = self:GetBlueprint().Economy
         local energyCost, time
@@ -2269,28 +2272,11 @@ CommandUnit = Class(WalkingLandUnit) {
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
 
-        local teleDelay = self:GetBlueprint().General.TeleportDelay
-
-        if teleDelay then
-            energyCostMod = (time + teleDelay) / time
-            time = time + teleDelay
-            energyCost = energyCost * energyCostMod
-            
-            self.TeleportDestChargeBag = nil 
-            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-            
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
-            -- Create teleport charge effect + exit animation delay
-            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
-            WaitFor(self.TeleportDrain)
-        else 
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
-            -- Create teleport charge effect
-            self:PlayTeleportChargeEffects(location, orientation)
-            WaitFor(self.TeleportDrain)
-        end
+        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+        
+        -- Create teleport charge effect
+        self:PlayTeleportChargeEffects(location, orientation)
+        WaitFor(self.TeleportDrain)
 
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
@@ -2308,12 +2294,31 @@ CommandUnit = Class(WalkingLandUnit) {
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 
+        --remove teleport target
+        if self.TeleportTarget and not self.TeleportTarget.Dead then
+            self.TeleportTarget:Destroy()
+        end
         -- Landing Sound
         self:StopUnitAmbientSound('TeleportLoop')
         self:PlayUnitSound('TeleportEnd')
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
+    end,
+
+    AddTeleportTarget = function(parent, location)
+        local army = parent:GetArmy()
+        parent.TeleportTarget = CreateUnitHPR('ZXB0307', army, location[1], location[2], location[3], 0, 0, 0)
+        parent.TeleportTarget.Parent = parent
+        parent.TeleportTarget:SetCreator(parent)
+        parent.Trash:Add(parent.TeleportTarget)
+    end,
+
+    OnFailedTeleport = function(self)
+        if self.TeleportTarget and not self.TeleportTarget.Dead then
+            self.TeleportTarget:Destroy()
+        end
+        WalkingLandUnit.OnFailedTeleport(self)
     end,
 }
 
