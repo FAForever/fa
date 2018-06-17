@@ -550,9 +550,9 @@ UnitBlueprint {
             },
         },
         Teleporter = {
-            BuildCostEnergy = 1500000,
-            BuildCostMass = 15000,
-            BuildTime = 21000,
+            BuildCostEnergy = 1000000,
+            BuildCostMass = 10000,
+            BuildTime = 7000,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0035>Personal Teleporter',
@@ -691,7 +691,6 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 0,
-        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,

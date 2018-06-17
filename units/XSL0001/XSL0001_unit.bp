@@ -756,9 +756,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Teleporter = {
-            BuildCostEnergy = 1500000,
-            BuildCostMass = 15000,
-            BuildTime = 4200,
+            BuildCostEnergy = 1000000,
+            BuildCostMass = 10000,
+            BuildTime = 2500,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0020>Personal Teleporter',
@@ -821,7 +821,6 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
-        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
