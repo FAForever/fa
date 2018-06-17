@@ -483,11 +483,7 @@ local function DoSlotBehavior(slot, key, name)
 
             CreateInputDialog(GUI, "<LOC lobui_0166>Are you sure?", kickMessage, lastKickMessage)
         else
-            if lobbyComm:IsHost() then
-                HostUtils.RemoveAI(slot)
-            else
-                lobbyComm:SendData(hostID, { Type = 'ClearSlot', Slot = slot })
-            end
+            HostUtils.RemoveAI(slot)
         end
     else
         -- We're adding an AI of some sort.
@@ -4209,12 +4205,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         Type = 'SetColor',
                         Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
                     })
-                end
-            elseif data.Type == 'ClearSlot' then
-                if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
-                    HostUtils.RemoveAI(data.Slot)
-                else
-                    WARN("Attempt to clear unowned slot")
                 end
             elseif data.Type == 'SetAvailableMods' then
                 availableMods[data.SenderID] = data.Mods
