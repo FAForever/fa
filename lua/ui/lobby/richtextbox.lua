@@ -1,12 +1,12 @@
-local ItemsControl = import('./lobbyItemsControl.lua').mainClass
-local StackPanel = import('./lobbyStackPanel.lua').mainClass
+local ItemsControl = import('./itemscontrol.lua').ItemsControl
+local StackPanel = import('./stackpanel.lua').StackPanel
 local Text = import('/lua/maui/text.lua').Text
 
-mainClass = Class(ItemsControl) {
+RichTextBox = Class(ItemsControl) {
 
-    Texts = false,
-    DefaultTextOptions = false,
-    DefaultLineOptions = false,
+    Texts = nil,
+    DefaultTextOptions = nil,
+    DefaultLineOptions = nil,
 
     __init = function(self, Parent, Options)
         -- Properties init
@@ -68,7 +68,7 @@ mainClass = Class(ItemsControl) {
         for i, line in wrapped do
 
             -- Create the TextLine
-            local TextLine = false
+            local TextLine = nil
             if i == 1 and not NewLine and table.getn(self.Items) > 0 then
                 -- Take the previous line
                 TextLine = self.Items[table.getn(self.Items)]

@@ -2,12 +2,13 @@ local Group = import('/lua/maui/group.lua').Group
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
-mainClass = Class(Group) {
+StackPanel = Class(Group) {
 
     Items = false,
     Orientation = false,
     Padding = false,
     DefaultItemMargin = false,
+    ItemParent = nil,
 
     __init = function(self, Parent, Options)
         Group.__init(self, Parent)
@@ -25,6 +26,7 @@ mainClass = Class(Group) {
         -- Background
         self.BG = Bitmap(self)
         LayoutHelpers.FillParent(self.BG, self)
+        ItemParent = Parent
     end,
 
     AddItem = function(self, Item, Index)
@@ -36,10 +38,13 @@ mainClass = Class(Group) {
             return
         end
         if not Item.Margin then Item.Margin = self.DefaultItemMargin end
+        
         table.insert(self.Items, Index, Item)
-
         Item:SetParent(self)
-        Item.Depth:Set(self.Depth()+1)
+        --Item.Depth:Set(self.Depth()+1)
+        
+        LayoutHelpers.DepthOverParent(Item, ItemParent, 1)
+        
         if self:IsHidden() then
             Item:Hide()
         else
@@ -93,35 +98,40 @@ mainClass = Class(Group) {
 
     RemoveAt = function(self, Index)
         local RemovedItem = table.remove(self.Items, Index)
-        if RemovedItem then
-            RemovedItem:Hide()
-            local Item = self.Items[Index]
-            if Item then
-                -- There is a item after the removed one
-                if self.Orientation == "V" then
-                    -- Update next item's top
-                    if Index == 1 then
-                        -- It's the first item, new first item's top is set to parent top
-                        Item.Top:Set(function() return self.Top() + self.Padding[1] + Item.Margin[1]  end)
-                    else
-                        -- It's not the first item, his top is set to previous item's bottom
-                        local PrevItem = self.Items[index-1]
-                        Item.Top:Set(function() return PrevItem.Bottom() + PrevItem.Margin[3] + Item.Margin[1] + 1  end)
-                    end
-                else
-                    -- Update next item's left
-                    if Index == 1 then
-                        -- It's the first item, new first item's left is set to parent left
-                        Item.Left:Set(function() return self.Left() + self.Padding[4] + Item.Margin[4]  end)
-                    else
-                        -- It's not the first item, his left is set to previous item's right
-                        local PrevItem = self.Items[index-1]
-                        Item.Left:Set(function() return PrevItem.Right() + PrevItem.Margin[2] + Item.Margin[4] + 1  end)
-                    end
-                end
-            end
-            return RemovedItem
+        
+        if not RemovedItem then
+            return -- There is no item to remove
         end
+        
+        RemovedItem:Hide()
+        local Item = self.Items[Index]
+        
+        if not Item then
+            return -- Couldn't find the item after the removed one
+        end
+        
+        if self.Orientation == "V" then
+            -- Update next item's top
+            if Index == 1 then
+                -- It's the first item, new first item's top is set to parent top
+                Item.Top:Set(function() return self.Top() + self.Padding[1] + Item.Margin[1]  end)
+            else
+                -- It's not the first item, his top is set to previous item's bottom
+                local PrevItem = self.Items[index-1]
+                Item.Top:Set(function() return PrevItem.Bottom() + PrevItem.Margin[3] + Item.Margin[1] + 1  end)
+            end
+        else
+            -- Update next item's left
+            if Index == 1 then
+                -- It's the first item, new first item's left is set to parent left
+                Item.Left:Set(function() return self.Left() + self.Padding[4] + Item.Margin[4]  end)
+            else
+                -- It's not the first item, his left is set to previous item's right
+                local PrevItem = self.Items[index-1]
+                Item.Left:Set(function() return PrevItem.Right() + PrevItem.Margin[2] + Item.Margin[4] + 1  end)
+            end
+        end
+        return RemovedItem
     end,
 
     RemoveItem = function(self, Item)

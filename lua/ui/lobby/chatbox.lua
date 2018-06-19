@@ -1,5 +1,5 @@
 local Group = import('/lua/maui/group.lua').Group
-local RichTextBox = import('./lobbyRichTextBox.lua').mainClass
+local RichTextBox = import('./richtextbox.lua').RichTextBox
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Edit = import('/lua/maui/edit.lua').Edit
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -11,11 +11,13 @@ local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
 ChatBox = Class(Group) {
     ChatEdit = nil,
     ChatList = nil,
-    UserMessageHandle = nil,
-    localPlayerID = nil,
+    ExecuteCommand = nil,
+    playerData = nil,
     hostID = nil,
+    broadcastChatMessage = nil,
+    gameInfo = nil,
     
-    __init = function(self, Parent, Options, HandlerFunction, LocalPlayerID, HostID)
+    __init = function(self, Parent, Options, GameInfo, HostID, LocalPlayerData, CommandHandler, BroadcastChatMessageHandler)
         Group.__init(self, Parent)
 
         -- Properties init
@@ -49,8 +51,10 @@ ChatBox = Class(Group) {
         self.ChatList.DefaultTextOptions.ForeColor = UIUtil.fontColor
         self.ChatList.DefaultTextOptions.DropShadow = true
         
-        UserMessageHandle = HandlerFunction
-        localPlayerID = LocalPlayerID
+        ExecuteCommand = CommandHandler
+        playerData = LocalPlayerData
+        broadcastChatMessage = BroadcastChatMessageHandler
+        gameInfo = GameInfo
         hostID = HostID
     end,
 
@@ -97,17 +101,16 @@ ChatBox = Class(Group) {
         local commandQueue = {}
         
 		self.ChatEdit.OnEnterPressed = function(self2, text)
-            if text ~= '' then
-                table.insert(commandQueue, 1, text)
-                commandQueueIndex = 0
+            if text:gsub("%s+", "") == '' then  -- If the text, trimmed of all space, is equal to ''
+                return
             end
-            UserMessageHandle(self, text)
-        end
-
-        self.ChatEdit.OnEscPressed = function(self, text)
-            GUI.exitLobbyEscapeHandler()
-            -- Don't clear the textbox, either.
-            return true
+            table.insert(commandQueue, 1, text)
+            commandQueueIndex = 0
+            
+            if (ExecuteCommand(self, text) == nil) then    -- If ExecuteCommand returns "Nil", this means the user DID NOT TRY to fire a command (no command prefix)
+                broadcastChatMessage(text)
+                self:AppendPlayerMessage(playerData.PlayerName, text, gameInfo)
+            end
         end
 
         --- Handle up/down arrow presses for the chat box.
@@ -147,11 +150,11 @@ ChatBox = Class(Group) {
         self:AppendText(Message, true, TextOptions, LineOptions)
     end,
 
-    AppendSystemInfo = function(self, Message) 
+    AppendNotice = function(self, Message) 
         self:AppendText(Message, true, {ForeColor="ff777777"})
     end,
 
-    AppendSystemError = function(self, Message) 
+    AppendError = function(self, Message) 
         self:AppendText(Message, true, {ForeColor="ffff0000"})
     end,
 
@@ -169,8 +172,10 @@ ChatBox = Class(Group) {
             end
         end
         -- If the player was found, get his color.
-        local PlayerColor = false
+        local PlayerColor = nil
         if not Player then
+            -- Should not happen unless Desiredname was not available and player got a rename
+            -- May be fixed in the future by using player ID instead of player name ?
             PlayerColor = "ffffffff"
         else
             PlayerColor = gameColors.PlayerColors[Player.PlayerColor]
@@ -178,8 +183,8 @@ ChatBox = Class(Group) {
 
         self:AppendText(PlayerName, true, {FontName = "Arial Gras", ForeColor = PlayerColor}, {Padding = {3,0,0,0}})
 
-        -- Host slot color : ffc726 
-        -- Own slot color : 6363d2
+        local regularColor = "ffffffff" -- (white)
+        local hostColor = "ffffaa66"    -- (Host messages are orange)
 
         -- Find the PlayerName in the observers
         if not Player then
@@ -191,17 +196,13 @@ ChatBox = Class(Group) {
         end
         -- Test if Player is the local player or the host
         if not Player then
-            -- Should not happen
-            self:AppendText(Message, false, {ForeColor = "ff666666"})
-        elseif Player.OwnerID == localPlayerID then
-            -- Own message = light blue
-            self:AppendText(Message, false, {ForeColor = "ff6666ff"})
+            -- Should not happen - but can happen when joining own lobby with two running copies of the game
+            -- Giving normal color, in doubt
+            self:AppendText(Message, false, {ForeColor = regularColor})
         elseif Player.OwnerID == hostID then
-            -- Host message = white
-            self:AppendText(Message, false, {ForeColor = "ffffffff"})
+            self:AppendText(Message, false, {ForeColor = hostColor})
         else
-            -- Normal player message
-            self:AppendText(Message, false)
+            self:AppendText(Message, false, {ForeColor = regularColor})
         end
     end,
 

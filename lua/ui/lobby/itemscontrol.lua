@@ -1,10 +1,10 @@
 local Group = import('/lua/maui/group.lua').Group
-local StackPanel = import('./lobbyStackPanel.lua').mainClass
+local StackPanel = import('./stackpanel.lua').StackPanel
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-mainClass = Class(Group) {
+ItemsControl = Class(Group) {
     Items = false,                     -- All items in the list
     FirstVisibleItem = false,           -- The first visible item index in the list (= value of the scrollbar)
     VisibleItemCount = false,           -- The number of visible items

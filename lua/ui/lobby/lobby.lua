@@ -43,6 +43,7 @@ local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
+local ChatBox = import('./chatbox.lua').ChatBox
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
 
@@ -234,37 +235,38 @@ function SetWindowedLobby(windowed)
     windowedMode = windowed
 end
 
+local commandsList = {
+    --- Test command - e.g. fire it with /test in the lobby
+    test = function(self, params)
+        AddChatText("Test command. You fired this command with the parameter(s) : "..params)  
+    end
+}
 
-local CommandsHandler = function(self, text)
-    if text ~= "" then
-        GpgNetSend('Chat', text)
-        if string.sub(text, 1, 1) == '/' then
+local ExecuteCommand = function(self, text)
+    if string.sub(text, 1, 1) == '/' then
         
-            local commandsList = {
-                --- Test command - e.g. fire it with /test in the lobby
-                test = function(self, params)
-                    AddChatText("Test command. You fired this command with the parameter(s) : "..params)
-                end
-            }
-            
-            local spaceStart = string.find(text, " ") or string.len(text) + 1
-            local comKey = string.sub(text, 2, spaceStart - 1)
-            local params = string.sub(text, spaceStart + 1)
-            local commandFunc = commandsList[string.lower(comKey)]
-            
-            if not commandFunc then
-                AddChatText(LOCF("<LOC lobui_0396>Command unknown: %s", comKey))
-            else
-                commandFunc(self, params)
-            end 
+        local spaceStart = string.find(text, " ") or string.len(text) + 1
+        local comKey = string.sub(text, 2, spaceStart - 1)
+        local params = string.sub(text, spaceStart + 1)
+        local commandFunc = commandsList[string.lower(comKey)]
+        
+        if not commandFunc then
+            AddChatText(LOCF("<LOC lobui_0396>Command unknown: %s", comKey))
+            return false -- Returns false if a command prefix was found but no command was found
         else
-            lobbyComm:BroadcastData({Type = "PublicChat", Text = text,})
-            self:AppendPlayerMessage(localPlayerName, text, gameInfo)
+            commandFunc(self, params)
+            return true -- Returns true if a command was found and executed properly
         end
+    else
+        return nil -- Returns nil if no command was found
     end
 end
 
-local ChatBox = import('./lobbyChatBox.lua').ChatBox
+local BroadcastChatMessage = function (text)
+    GpgNetSend('Chat', text)
+    lobbyComm:BroadcastData({Type = "PublicChat", Text = text})
+end
+
 
 
 -- String from which to build the various "Move player to slot" labels.
@@ -2742,13 +2744,19 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
-    GUI.chatDisplay = ChatBox(GUI.panel, {Padding = {3,3,3,3}}, CommandsHandler, localPlayerID, hostID)
+    
+    GUI.chatDisplay = ChatBox(GUI.panel, {Padding = {3,3,3,3}}, gameInfo, hostID, GetLocalPlayerData(), ExecuteCommand, BroadcastChatMessage)
     GUI.chatDisplay.Width:Set(478)
     GUI.chatDisplay.Height:Set(245)
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.panel, 11, 459)
-    --GUI.chatDisplay.Top:Set(function() return GUI.panel.Top() + 459 end)
-    --GUI.chatDisplay.Height:Set(245)
+        
     UIUtil.SurroundWithBorder(GUI.chatDisplay, '/scx_menu/lan-game-lobby/frame/')
+    
+    -- Show exit menu when user presses enter in the chatbox
+    GUI.chatDisplay.ChatEdit.OnEscPressed = function(self, text)
+        GUI.exitLobbyEscapeHandler()
+        return true
+    end
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
@@ -3611,8 +3619,8 @@ function AddChatText(text, scrollToBottom)
         LOG("text=" .. repr(text))
         return
     end
-	
-    GUI.chatDisplay:AppendSystemInfo(text)
+    
+    GUI.chatDisplay:AppendNotice(text)
 end
 
 --- Update a slot display in a single map control.
@@ -4241,18 +4249,18 @@ local MessageHandlers = {
         end
     },
 
-	-- Chat messages ported from Kyros lobby
-	
-	-- public broadcasted message in chat
-	PublicChat = {
+    -- Chat messages ported from Kyros lobby
+    
+    -- public broadcasted message in chat
+    PublicChat = {
         Accept = function(data)
             return data.SenderName == FindNameForID(data.SenderID)
         end,
         Handle = function(data)
-			GUI.chatDisplay:AppendPlayerMessage(data.SenderName, data.Text, gameInfo)
+            GUI.chatDisplay:AppendPlayerMessage(data.SenderName, data.Text, gameInfo)
         end
-	}
-	
+    }
+    
 }
 
 
