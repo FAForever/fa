@@ -46,8 +46,8 @@ UnitBlueprint {
             BuffType = 'STUN',
             Duration = 2,
             Radius = 6,
-            TargetAllow = 'ALLUNITS',
-            TargetDisallow = 'EXPERIMENTAL,WALL',
+            TargetAllow = 'MOBILE', --ALLUNITS
+            TargetDisallow = 'EXPERIMENTAL, WALL, COMMAND',
         },
     },
     BuildIconSortPriority = 80,
