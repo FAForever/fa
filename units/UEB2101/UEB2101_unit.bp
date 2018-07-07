@@ -44,6 +44,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
         'SORTDEFENSE',
+        'CQUEMOV',  
     },
     CollisionOffsetY = 0,
     Defense = {

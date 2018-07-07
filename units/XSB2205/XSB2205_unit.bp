@@ -57,6 +57,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
+        'CQUEMOV',
     },
     CollisionOffsetY = -1,
     Defense = {

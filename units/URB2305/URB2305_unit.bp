@@ -65,6 +65,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV',
     },
     Defense = {
         AirThreatLevel = 0,

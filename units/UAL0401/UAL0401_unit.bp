@@ -70,6 +70,7 @@ UnitBlueprint {
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
+        'CQUEMOV',
     },
     CollisionOffsetY = 0.3,
     Defense = {

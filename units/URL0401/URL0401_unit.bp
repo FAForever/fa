@@ -71,6 +71,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'DRAGBUILD',
         'OVERLAYINDIRECTFIRE',
+        'CQUEMOV',
     },
     Defense = {
         AirThreatLevel = 0,

@@ -59,6 +59,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV',
     },
     Defense = {
         AirThreatLevel = 0,

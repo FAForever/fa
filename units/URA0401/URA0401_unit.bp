@@ -110,6 +110,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYDIRECTFIRE',
         'CANNOTUSEAIRSTAGING',
+        'CQUEMOV',
     },
     CollisionOffsetY = 0.9,
     Defense = {

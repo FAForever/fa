@@ -53,6 +53,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
+        'CQUEMOV',
     },
     CollisionOffsetY = 0,
     Defense = {
