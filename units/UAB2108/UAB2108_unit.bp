@@ -60,6 +60,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE'
+        'CQUEMOV',
     },
     CollisionOffsetY = 0,
     Defense = {

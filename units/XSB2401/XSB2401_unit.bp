@@ -75,6 +75,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV',
     },
     CollisionOffsetY = -0.25,
     Defense = {

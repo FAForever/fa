@@ -118,6 +118,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYANTIAIR',
         'DRAGBUILD',
+        'CQUEMOV',
     },
     CollisionOffsetY = -1.5,
     Defense = {

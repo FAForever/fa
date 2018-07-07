@@ -61,6 +61,7 @@ UnitBlueprint {
         'COUNTERINTELLIGENCE',
         'STEALTH',
         'SUBMERSIBLE',
+        'CQUEMOV',
     },
     Defense = {
         AirThreatLevel = 0,

@@ -49,6 +49,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
         'SORTDEFENSE',
+        'CQUEMOV',
     },
     CollisionOffsetY = -0.55,
     CollisionOffsetZ = -0.2,
