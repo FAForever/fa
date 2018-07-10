@@ -44,11 +44,11 @@ Expressions = {
 -- NOTE the following expression were carefully defined and each used category has a purpose!
 -- be careful when editing them or you may brake restriction system in FA game
 
-    -- excluding engineers and factories because players will not progress to higher tech levels
-    T1          = "(TECH1 - (STRUCTURE * FACTORY))",
-    T2          = "(TECH2 - (STRUCTURE * FACTORY))",
-    T3          = "(TECH3)", -- all T3 because no unit can upgrade to T4
-    T4          = "(EXPERIMENTAL)",
+    -- excluding engineers, economy, and factories because players will not progress to higher tech levels
+    T1          = "(TECH1 - ENGINEER - (STRUCTURE * FACTORY) - ECONOMIC)",
+    T2          = "(TECH2 - ENGINEER - (STRUCTURE * FACTORY) - ECONOMIC)",
+    T3          = "(TECH3 - ENGINEER - (STRUCTURE * FACTORY) - ECONOMIC))",
+    T4          = "(EXPERIMENTAL - ENGINEER - (STRUCTURE * FACTORY) - ECONOMIC))",
     -- excluding ACUs because game might crash if someone picks restricted faction
     UEF         = "(UEF - COMMAND)",
     CYBRAN      = "(CYBRAN - COMMAND)",
@@ -412,19 +412,19 @@ local function CreatePresets()
         "/textures/ui/common/faction_icon-lg/nomads_ico.dds")
     -- TECH restrictions
     CreatePreset("T1",
-        "<LOC restricted_units_info_T1>Prevents all T1 units and structures, except factories",
+        "<LOC restricted_units_info_T1>Prevents all T1 units and structures, except factories, engineers, and eco buildings",
         "<LOC restricted_units_data_T1>No T1 Units",
         "/textures/ui/common/icons/presets/tech-1.dds")
     CreatePreset("T2",
-        "<LOC restricted_units_info_T2>Prevents all T2 units and structures, except factories",
+        "<LOC restricted_units_info_T2>Prevents all T2 units and structures, except factories, engineers, and eco buildings",
         "<LOC restricted_units_data_T2>No T2 Units",
         "/textures/ui/common/icons/presets/tech-2.dds")
     CreatePreset("T3",
-        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, including factories",
+        "<LOC restricted_units_info_T3>Prevents all T3 units and structures, except factories, engineers, and eco buildings",
         "<LOC restricted_units_data_T3>No T3 Units",
         "/textures/ui/common/icons/presets/tech-3.dds")
     CreatePreset("T4",
-        "<LOC restricted_units_info_T4>Prevents all T4 (experimental) units and structures",
+        "<LOC restricted_units_info_T4>Prevents all T4 (experimental) units, except factories, engineers, and eco buildings",
         "<LOC restricted_units_data_T4>No Experimental Units",
         "/textures/ui/common/icons/presets/tech-4.dds")
     -- TYPES restrictions
