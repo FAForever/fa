@@ -429,7 +429,7 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/tech-4.dds")
     -- TYPES restrictions
     CreatePreset("LAND",
-        "<LOC restricted_units_info_LAND>Prevents all land units and anti-land structures, except engineers and factories",
+        "<LOC restricted_units_info_LAND>Prevents all land units with weapons, except engineers, commanders, and structures",
         "<LOC restricted_units_data_LAND>No Land Units",
         "/textures/ui/common/icons/presets/type-land.dds")
     CreatePreset("AIR",
