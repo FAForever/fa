@@ -145,7 +145,7 @@ Expressions = {
     SHIELD_AIR  = "(SHIELD * AIR - EXPERIMENTAL)",
     SHIELD_NAVY = "(SHIELD * NAVAL - EXPERIMENTAL)",
     SHIELD_LAND = "(SHIELD * LAND - EXPERIMENTAL - TANK - BOT + uel0301_BubbleShield)", -- excluding personal shields
-    SHIELD_BASE = "(SHIELD * STRUCTURE)",
+    SHIELD_BASE = "(SHIELD * STRUCTURE - HYDROCARBON)", -- excluding modded hydros with shields
 
     AIR_TANSPORTS = "(AIR * TRANSPORTATION)",
 
