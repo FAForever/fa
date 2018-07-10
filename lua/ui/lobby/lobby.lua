@@ -32,6 +32,7 @@ local Mods = import('/lua/mods.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
@@ -198,19 +199,6 @@ local commands = {
     private = ParseWhisper,
     w = ParseWhisper,
     whisper = ParseWhisper,
-}
-
-local numberOfChatLinesForFontSize = {
-    [9] = 18,
-    [10] = 16,
-    [11] = 15,
-    [12] = 14,
-    [13] = 13,
-    [14] = 13,
-    [15] = 12,
-    [16] = 11,
-    [17] = 11,
-    [18] = 10,
 }
 
 local Strings = LobbyComm.Strings
@@ -726,6 +714,10 @@ function FindRehostSlotForID(id)
 end
 
 function FindNameForID(id)
+    if (IsObserver(id)) then
+        return (FindObserverNameForID(id))
+    end
+    
     for k, player in gameInfo.PlayerOptions:pairs() do
         if player.OwnerID == id and player.Human then
             return player.PlayerName
@@ -750,6 +742,15 @@ function FindObserverSlotForID(id)
         end
     end
 
+    return nil
+end
+
+function FindObserverNameForID(id)
+    for k, observer in gameInfo.Observers:pairs() do
+        if observer.OwnerID == id then
+            return observer.PlayerName
+        end
+    end
     return nil
 end
 
@@ -1654,7 +1655,7 @@ function PublicChat(text)
             Text = text,
         }
         )
-    AddChatText("["..localPlayerName.."] " .. text, true)
+    AddChatText(text, localPlayerID, true)
 end
 
 function PrivateChat(targetID,text)
@@ -2727,6 +2728,9 @@ function CreateUI(maxPlayers)
     GUI.chatPanel.Width:Set(478)
     GUI.chatPanel.Height:Set(245)
 
+    
+
+
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
     UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
@@ -2863,63 +2867,82 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
-    GUI.chatDisplay = TextArea(
+    
+    GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea( 
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
-)
-    local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, fontSize)
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
+    )
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2, 5)
     LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
 
-    GUI.chatPanel.top = 0
-    GUI.chatPanel.numberOfLines = numberOfChatLinesForFontSize[fontSize]
-    GUI.chatPanel.GetScrollValues = function(self, axis)
-        local size = GUI.chatDisplay:GetItemCount()
-        return 0, size, self.top, math.min(self.top + self.numberOfLines, size)
-    end
+    ---------------------------------------------------------------------------
+    -- set up all .*Scroll* functions for the chat panel
+    ---------------------------------------------------------------------------
+    GUI.chatPanel.top = 1 -- using 1-based index scrolling
 
+    -- this function get index of 1st line on the last scroll page (when scroll all the way down)
+    GUI.chatPanel.GetScrollLastPage = function(self)
+        return table.getsize(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
+    end
+    -- this function gets scrolling max range and current range
+    GUI.chatPanel.GetScrollValues = function(self, axis)
+        local max = table.getsize(GUI.chatDisplay.ChatLines)
+        local bottom = math.min(self.top + self.linesPerScrollPage - 1, max)
+        return 1, max, self.top, bottom
+    end
+    -- this function controls how many lines to scroll when clicking on up/down arrows of the scrollbar
     GUI.chatPanel.ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.top + math.floor(delta))
     end
+    -- this function controls how many pages to scroll when clicking above/below thumb of the scrollbar
     GUI.chatPanel.ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta) * self.numberOfLines)
+        self:ScrollSetTop(axis, self.top + math.floor(delta) * self.linesPerScrollPage)
     end
+    -- this function controls how to scroll to an item from top index
     GUI.chatPanel.ScrollSetTop = function(self, axis, top)
-        local oldTop = self.top
         top = math.floor(top)
         if top == self.top then return end
-        local size = GUI.chatDisplay:GetItemCount()
-        self.top = math.max(math.min(size - self.numberOfLines, top), 0)
-        if oldTop <= self.top then
-            -- ShowItem doesn't scroll the chat if the item is already visible. If it isn't visible yet it'll put it on the top of chat.
-            -- So we scroll down all the way first and then back up if necessary and ShowItem will give us appropriate item at the top then.
-            GUI.chatDisplay:ShowItem(size)
-        end
-        GUI.chatDisplay:ShowItem(self.top)
-        if self.top >= GUI.chatDisplay:GetItemCount() - (self.numberOfLines + 1) then
-            GUI.newMessageArrow:Disable()
+        local delta = self:GetScrollLastPage()
+        self.top = math.max( math.min(delta + 1, top), 1)
+        self.bottom = self.top + self.linesPerScrollPage
+        GUI.chatDisplay:ShowLines(self.top, self.bottom)
+        if self.top >= delta + 1 then
+           GUI.newMessageArrow:Disable()
         end
     end
+    -- this function triggers scrolling on mouse wheel event
     GUI.chatPanel.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
-            local lines = 1
-            if event.WheelRotation > 0 then
-                lines = -1
-            end
+            -- scroll chat panel by 1 line in up/down direction
+            local lines = event.WheelRotation > 0 and -1 or 1
             self:ScrollLines(nil, lines)
         end
     end
+    -- this function informs vertical scrollbar that the chat panel can be scrolled 
     GUI.chatPanel.IsScrollable = function(self, axis)
         return true
     end
-    GUI.chatPanel.ScrollToBottom = function(self)
-        self:ScrollSetTop(nil,GUI.chatDisplay:GetItemCount() - self.numberOfLines)
+    GUI.chatPanel.ScrollToBottom = function(self) 
+        self:ScrollSetTop(nil, self:GetScrollLastPage() + 1)
     end
-    GUI.chatPanel.IsScrolledToBottom = function(self)
-        return self.top >= GUI.chatDisplay:GetItemCount() - self.numberOfLines
+    GUI.chatPanel.IsScrolledToBottom = function(self) 
+        return self.top >= self:GetScrollLastPage()
     end
+    -- this function set how many chat lines can fit per scroll page (chatPanel)
+    GUI.chatPanel.SetLinesPerScrollPage = function(self, fontSize)
+        self.linesPerScrollPage = math.floor((self.Height() - 10) / (fontSize + 4))
+    end
+    -- --------- Chat Scrolling Functions -----------------------
+
+    -- this function sets font for all chat lines and re-creates them
+    GUI.chatPanel.SetFont = function(self, fontFamily, fontSize)
+        GUI.chatDisplay:SetFont(fontFamily, fontSize)
+        GUI.chatDisplay:ShowLines(self.top, self.bottom)
+    end
+    -- set initial scrolling based on chat font size 
+    local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
+    GUI.chatPanel:SetLinesPerScrollPage(fontSize)
 
     local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
     GUI.newMessageArrow = newMessageArrow
@@ -2933,7 +2956,7 @@ function CreateUI(maxPlayers)
         GUI.chatPanel:ScrollToBottom()
     end
     GUI.newMessageArrow:Disable()
-
+    
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
@@ -3184,7 +3207,7 @@ function CreateUI(maxPlayers)
 
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
 
-
+    
     -- Small buttons are 100 wide, 44 tall
 
     -- Default option button
@@ -3469,24 +3492,24 @@ function setupChatEdit(chatPanel)
     local commandQueueIndex = 0
     local commandQueue = {}
     GUI.chatEdit.OnEnterPressed = function(self, text)
-        if text ~= "" then
-            GpgNetSend('Chat', text)
-            table.insert(commandQueue, 1, text)
-            commandQueueIndex = 0
-            if string.sub(text, 1, 1) == '/' then
-                local spaceStart = string.find(text, " ") or string.len(text) + 1
-                local comKey = string.sub(text, 2, spaceStart - 1)
-                local params = string.sub(text, spaceStart + 1)
-                local commandFunc = commands[string.lower(comKey)]
-                if not commandFunc then
-                    AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
-                    return
-                end
-
-                commandFunc(params)
-            else
-                PublicChat(text)
+        if text:gsub("%s+", "") == '' then  -- If the text, trimmed of all space, is equal to ''
+            return
+        end
+        GpgNetSend('Chat', text)
+        table.insert(commandQueue, 1, text)
+        commandQueueIndex = 0
+        if string.sub(text, 1, 1) == '/' then
+            local spaceStart = string.find(text, " ") or string.len(text) + 1
+            local comKey = string.sub(text, 2, spaceStart - 1)
+            local params = string.sub(text, spaceStart + 1)
+            local commandFunc = commands[string.lower(comKey)]
+            if not commandFunc then
+                AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
+                return
             end
+            commandFunc(params)
+        else
+            PublicChat(text)
         end
     end
 
@@ -3767,7 +3790,7 @@ function EveryoneHasEstablishedConnections(check_observers)
     return result
 end
 
-function AddChatText(text, scrollToBottom)
+function AddChatText(text, playerID, scrollToBottom)
     if not GUI.chatDisplay then
         LOG("Can't add chat text -- no chat display")
         LOG("text=" .. repr(text))
@@ -3775,12 +3798,25 @@ function AddChatText(text, scrollToBottom)
     end
     
     local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
+    local nameColor = "888888" -- Displaying text in grey by default if the player is observer
+    local textColor = "888888"
     
-    GUI.chatDisplay:AppendLine(text)
+    for id, player in gameInfo.PlayerOptions:pairs() do
+        if player.OwnerID == playerID then
+            nameColor = gameColors.PlayerColors[player.PlayerColor]
+            textColor = nil
+            break
+        end
+    end
+    
+    local name = FindNameForID(playerID)
+    
+    
+    GUI.chatDisplay:PostMessage(text, name, {fontColor = textColor}, {fontColor = nameColor})
     if scrolledToBottom then
-        GUI.chatPanel:ScrollToBottom()
+       GUI.chatPanel:ScrollToBottom()
     else
-        GUI.newMessageArrow:Enable()
+       GUI.newMessageArrow:Enable()
     end
 end
 
@@ -4065,7 +4101,7 @@ local MessageHandlers = {
             return data.SenderName == FindNameForID(data.SenderID)
         end,
         Handle = function(data)
-            AddChatText("["..data.SenderName.."] "..data.Text)
+            AddChatText(data.Text, data.SenderID)
         end
     },
 
@@ -5405,23 +5441,30 @@ function ShowLobbyOptionsDialog()
         Prefs.SetToCurrentProfile("LobbyBackground", index)
         RefreshLobbyBackground()
     end
-    --
+    -- label for displaying chat font size
     local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
     local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 136)
 
-    local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    -- slider for changing chat font size
+    local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 20,
+        UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
+        UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), 
+        UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+        UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
-
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
     
-        local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
+        local sliderValue = math.floor(self._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
-        GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
+       
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
-        GUI.chatPanel.numberOfLines = numberOfChatLinesForFontSize[sliderValue]
+        -- updating chat panel with new font size
+        GUI.chatPanel:SetLinesPerScrollPage(sliderValue)
+        GUI.chatPanel:SetFont(nil, sliderValue)
+     
         if isScrolledDown then
             GUI.chatPanel:ScrollToBottom()
         end
