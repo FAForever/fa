@@ -170,10 +170,10 @@ Expressions = {
     INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY)",
     INTEL_LAND   = "(((OMNI + RADAR + SONAR + SCOUT) * LAND) - COMMAND - DEFENSE - SUBCOMMANDER - ANTIAIR - ANTINAVY)",
 
-    STEALTH_BASE = "((STEALTH + COUNTERINTELLIGENCE) * STRUCTURE)",
+    STEALTH_BASE = "((STEALTH + uab4203 + urb4203 + ueb4203 + xsb4203) * STRUCTURE)",
     STEALTH_AIR  = "((STEALTH + ura0302 + ura0303 + ura0304) * AIR)",
     STEALTH_LAND = "((STEALTH + url0402 + url0306) * LAND + url0301_Stealth + url0301_Cloak)",
-    STEALTH_NAVY = "((STEALTH + COUNTERINTELLIGENCE) * NAVAL) + xrs0205",
+    STEALTH_NAVY = "((STEALTH + xrs0205) * NAVAL)",
 }
 --- note that enhancements are defined in tables and not in strings like category expressions are
 Enhancements = {
