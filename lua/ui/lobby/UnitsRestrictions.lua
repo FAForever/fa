@@ -142,10 +142,10 @@ Expressions = {
     DIRECTFIRE_BASE_T2  = "(DIRECTFIRE * STRUCTURE * TECH2)",
     DIRECTFIRE_BASE_T1  = "(DIRECTFIRE * STRUCTURE * TECH1)",
 
-    SHIELD_AIR  = "(SHIELD * AIR - EXPERIMENTAL)",
-    SHIELD_NAVY = "(SHIELD * NAVAL - EXPERIMENTAL)",
-    SHIELD_LAND = "(SHIELD * LAND - EXPERIMENTAL - TANK - BOT + uel0301_BubbleShield)", -- excluding personal shields
-    SHIELD_BASE = "(SHIELD * STRUCTURE - HYDROCARBON)", -- excluding modded hydros with shields
+    SHIELD_AIR  = "(SHIELD * AIR)",
+    SHIELD_NAVY = "(SHIELD * NAVAL)",
+    SHIELD_LAND = "(SHIELD * LAND - TANK - BOT + uel0301_BubbleShield + uel0401)", -- excluding personal shields
+    SHIELD_BASE = "(SHIELD * STRUCTURE)",
 
     AIR_TANSPORTS = "(AIR * TRANSPORTATION)",
 
