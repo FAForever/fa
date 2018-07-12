@@ -59,7 +59,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
-        'SHOWATTACKRETICLE'
+        'SHOWATTACKRETICLE',
         'CQUEMOV',
     },
     CollisionOffsetY = 0,
