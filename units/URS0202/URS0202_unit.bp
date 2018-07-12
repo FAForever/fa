@@ -439,9 +439,9 @@ UnitBlueprint {
             MaxRadius = 75,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
-            MuzzleVelocity = 20,
+            MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CAANanoDart03/CAANanoDart03_proj.bp',
-            ProjectileLifetime = 5.5,
+            ProjectileLifetime = 6.5,
             ProjectilesPerOnFire = 6,
             RackBones = {
                 {
@@ -460,8 +460,8 @@ UnitBlueprint {
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 0,
-            RackSalvoSize = 1,
+            RackSalvoReloadTime = 0, 
+            RackSalvoSize = 1, 
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.8,
