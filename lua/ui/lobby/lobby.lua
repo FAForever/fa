@@ -129,6 +129,8 @@ local function parseCommandlineArguments()
     local CMDLINE_ARGUMENT_KEYS = {
         ["/init"] = true,
         ["/country"] = true,
+		["/avatarurl"] = true,
+		["/avatartlp"] = true,
         ["/numgames"] = true,
         ["/mean"] = true,
         ["/clan"] = true,
@@ -148,6 +150,8 @@ local function parseCommandlineArguments()
 
     return {
         PrefLanguage = tostring(string.lower(GetCommandLineArgOrDefault("/country", "world"))),
+	    Urlava = tostring(string.lower(GetCommandLineArgOrDefault("/avatarurl", "none"))),
+	    Tlpava = tostring(string.lower(GetCommandLineArgOrDefault("/avatartlp", "none"))),
         isRehost = HasCommandLineArg("/rehost"),
         initName = GetCommandLineArgOrDefault("/init", ""),
         numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
@@ -408,6 +412,8 @@ function GetLocalPlayerData()
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
+			Avatar = argv.Urlava,
+			TooltipAvatar = argv.Tlpava,
         }
 )
 end
@@ -1018,8 +1024,18 @@ function SetSlotInfo(slotNum, playerInfo)
 
         Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=LOC(CountryTooltips[playerInfo.Country])})
     end
+	
+	--avatar
+	if playerInfo.Avatar == "none" then
+	    slot.KinderAvatar:Hide()
+	
+	else
+	    slot.KinderAvatar:Show()
+		slot.KinderAvatar:SetTexture(UIUtil.UIFile('C:\\ProgramData\\FAForever\\cache\\avatars\\'..playerInfo.Avatar))
+	    Tooltip.AddControlTooltip(slot.KinderAvatar, {text=LOC("Avatar"), body=LOC(playerInfo.TooltipAvatar)})
+    end
 
-    UpdateSlotBackground(slotNum)
+   UpdateSlotBackground(slotNum)
 
     -- Set the CPU bar
     SetSlotCPUBar(slotNum, playerInfo)
@@ -2302,8 +2318,8 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 395, 465, 535, 605, 677, 749}
-    local COLUMN_WIDTHS = {20, 20, 45, 45, 257, 59, 59, 59, 62, 62, 51}
+    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 380, 425, 495, 565, 637, 709, 749}
+    local COLUMN_WIDTHS = {20, 20, 45, 45, 241, 40, 59, 59, 59, 62, 62, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
@@ -2326,6 +2342,9 @@ function CreateSlotsUI(makeLabel)
 
     local nameLabel = makeLabel(LOC("<LOC NICKNAME>Nickname"), 14)
     labelGroup:AddChild(nameLabel)
+	
+	-- Avatar
+	labelGroup.numChildren = labelGroup.numChildren + 1
 
     local colorLabel = makeLabel(LOC("<LOC lobui_0214>Color"), 14)
     labelGroup:AddChild(colorLabel)
@@ -2427,13 +2446,19 @@ function CreateSlotsUI(makeLabel)
                 associatedMarker.indicator:Stop()
             end
         end
+		
+		--Avatar
+		local avatar = Bitmap(newSlot)
+        newSlot.KinderAvatar = avatar
+        avatar.Width:Set(COLUMN_WIDTHS[6])
+        newSlot:AddChild(avatar)
 
         -- Color
         local colorSelector = BitmapCombo(newSlot, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.color = colorSelector
 
         newSlot:AddChild(colorSelector)
-        colorSelector.Width:Set(COLUMN_WIDTHS[6])
+        colorSelector.Width:Set(COLUMN_WIDTHS[7])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
                 lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow })
@@ -2471,7 +2496,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.faction = factionSelector
         newSlot.AvailableFactions = factionList
         newSlot:AddChild(factionSelector)
-        factionSelector.Width:Set(COLUMN_WIDTHS[7])
+        factionSelector.Width:Set(COLUMN_WIDTHS[8])
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
@@ -2494,7 +2519,7 @@ function CreateSlotsUI(makeLabel)
         local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
-        teamSelector.Width:Set(COLUMN_WIDTHS[8])
+        teamSelector.Width:Set(COLUMN_WIDTHS[9])
         teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
             SetPlayerOption(curRow, 'Team', index)
@@ -2509,7 +2534,7 @@ function CreateSlotsUI(makeLabel)
         local barMin = 0
         local CPUGroup = Group(newSlot)
         newSlot.CPUGroup = CPUGroup
-        CPUGroup.Width:Set(COLUMN_WIDTHS[9])
+        CPUGroup.Width:Set(COLUMN_WIDTHS[10])
         CPUGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(CPUGroup)
         local CPUSpeedBar = StatusBar(CPUGroup, barMin, barMax, false, false,
@@ -2529,7 +2554,7 @@ function CreateSlotsUI(makeLabel)
         barMin = 0
         local pingGroup = Group(newSlot)
         newSlot.pingGroup = pingGroup
-        pingGroup.Width:Set(COLUMN_WIDTHS[10])
+        pingGroup.Width:Set(COLUMN_WIDTHS[11])
         pingGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(pingGroup)
         local pingStatus = StatusBar(pingGroup, barMin, barMax, false, false,
@@ -2560,6 +2585,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HideControls = function()
             -- hide these to clear slot of visible data
             flag:Hide()
+			avatar:Hide()
             ratingText:Hide()
             numGamesText:Hide()
             factionSelector:Hide()
