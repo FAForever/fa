@@ -390,6 +390,7 @@ function UpdateWindow(info)
         -- Control the veterancy stars
         local currentLevel = UnitData[info.entityId].VeteranLevel
         local massKilled = UnitData[info.entityId].totalMassKilled
+        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
         local myValue = UnitData[info.entityId].myValue
 
         for level = 1, 5 do
@@ -421,6 +422,23 @@ function UpdateWindow(info)
                         text = massKilled .. '/' .. nextLevel
                     end
                     controls.nextVet:SetText(text)
+                elseif massKilledTrue then
+                    controls.vetBar:Show()
+                    controls.vetBar:SetValue(1)
+                    controls.vetTitle:SetText('Mass killed')
+                    
+                    local text
+                    if massKilledTrue >= 1000000 then
+                        text = string.format('%.2fM', massKilledTrue / 1000000)
+                    elseif massKilledTrue >= 100000 then
+                        text = string.format('%.0fK', massKilledTrue / 1000)
+                    elseif massKilledTrue >= 10000 then
+                        text = string.format('%.1fK', massKilledTrue / 1000)
+                    else
+                        text = massKilledTrue 
+                    end
+                    
+                    controls.nextVet:SetText(text)    
                 else
                     controls.vetBar:Hide()
                 end
