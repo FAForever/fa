@@ -130,7 +130,7 @@ local function parseCommandlineArguments()
         ["/init"] = true,
         ["/country"] = true,
         ["/avatarurl"] = true,
-        ["/avatartlp"] = true,
+        ["/avatartooltip"] = true,
         ["/numgames"] = true,
         ["/mean"] = true,
         ["/clan"] = true,
@@ -150,8 +150,8 @@ local function parseCommandlineArguments()
 
     return {
         PrefLanguage = tostring(string.lower(GetCommandLineArgOrDefault("/country", "world"))),
-        Urlava = tostring(string.lower(GetCommandLineArgOrDefault("/avatarurl", "none"))),
-        Tlpava = tostring(string.lower(GetCommandLineArgOrDefault("/avatartlp", "none"))),
+        AvatarUrl = tostring(string.lower(GetCommandLineArgOrDefault("/avatarurl", "none"))),
+        AvatarTooltip = tostring(string.lower(GetCommandLineArgOrDefault("/avatartooltip", "none"))),
         isRehost = HasCommandLineArg("/rehost"),
         initName = GetCommandLineArgOrDefault("/init", ""),
         numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
@@ -412,8 +412,8 @@ function GetLocalPlayerData()
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
-            Avatar = argv.Urlava,
-            TooltipAvatar = argv.Tlpava,
+            Avatar = argv.AvatarUrl,
+            TooltipAvatar = argv.AvatarTooltip,
         }
 )
 end
@@ -1024,15 +1024,14 @@ function SetSlotInfo(slotNum, playerInfo)
 
         Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=LOC(CountryTooltips[playerInfo.Country])})
     end
-    
+
     --avatar
     if playerInfo.Avatar == "none" then
-        slot.KinderAvatar:Hide()
-    
-    else
-        slot.KinderAvatar:Show()
-        slot.KinderAvatar:SetTexture(UIUtil.UIFile('C:\\ProgramData\\FAForever\\cache\\avatars\\'..playerInfo.Avatar))
-        Tooltip.AddControlTooltip(slot.KinderAvatar, {text=LOC("Avatar"), body=LOC(playerInfo.TooltipAvatar)})
+        slot.CellAvatar:Hide()
+	else
+        slot.CellAvatar:Show()
+        slot.CellAvatar:SetTexture(UIUtil.UIFile('\\..\\..\\..\\..\\..\\cache\\avatars\\'..playerInfo.Avatar))
+        Tooltip.AddControlTooltip(slot.CellAvatar, {text=LOC("Avatar"), body=LOC(playerInfo.TooltipAvatar)})
     end
 
    UpdateSlotBackground(slotNum)
@@ -2342,7 +2341,7 @@ function CreateSlotsUI(makeLabel)
 
     local nameLabel = makeLabel(LOC("<LOC NICKNAME>Nickname"), 14)
     labelGroup:AddChild(nameLabel)
-    
+	
     -- Avatar
     labelGroup.numChildren = labelGroup.numChildren + 1
 
@@ -2446,10 +2445,10 @@ function CreateSlotsUI(makeLabel)
                 associatedMarker.indicator:Stop()
             end
         end
-        
+		
         --Avatar
         local avatar = Bitmap(newSlot)
-        newSlot.KinderAvatar = avatar
+        newSlot.CellAvatar = avatar
         avatar.Width:Set(COLUMN_WIDTHS[6])
         newSlot:AddChild(avatar)
 

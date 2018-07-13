@@ -26,8 +26,8 @@ local DEFAULT_MAPPING = {
     NG = 0,  -- Number of games.
 
     Country = false,
-    Avatar = false,
-    TooltipAvatar = false,
+    Avatar = "none",
+    TooltipAvatar = "none",
 }
 
 -- Represents player data using the magic of lazy variables.
