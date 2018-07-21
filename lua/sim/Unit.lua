@@ -2479,6 +2479,7 @@ Unit = Class(moho.unit_methods) {
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built:GetUnitId()
         local bp = built:GetBlueprint()
+        local bpSelf = self:GetBlueprint()
         local index = self:GetArmy()
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
@@ -2508,8 +2509,7 @@ Unit = Class(moho.unit_methods) {
             self:CheckAssistersFocus()
         end
 
-        local bp = self:GetBlueprint()
-        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bpSelf.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(built, order)
         end
 
@@ -2519,12 +2519,17 @@ Unit = Class(moho.unit_methods) {
 
         self:DoOnStartBuildCallbacks(built)
 
-        local bp = built:GetBlueprint()
+        
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
             built.IsUpgrade = true
+            
+            --Transfer flag
+            self.TransferUpgradeProgress = true
+            self.UpgradeBuildTime = bp.Economy.BuildTime
+            self.UpgradesTo = bp.BlueprintId
         end
 
         return true
@@ -2536,6 +2541,7 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
+        self.TransferUpgradeProgress = nil
 
         if built.Repairers[self.EntityId] then
             self:OnStopRepair(self, built)
