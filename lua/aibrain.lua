@@ -25,6 +25,7 @@ local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
+local TransferUnfinishedUnits = import('/lua/SimUtils.lua').TransferUnfinishedUnits
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 local observer = false
@@ -561,6 +562,15 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
             local function TransferUnitsToBrain(brains)
                 if table.getn(brains) > 0 then
+                    if shareOption == 'FullShare' then 
+                        local indexes = {}
+                        for _, brain in brains do 
+                            table.insert(indexes, brain.index)
+                        end 
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        TransferUnfinishedUnits(units, indexes)
+                    end
+                    
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
