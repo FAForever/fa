@@ -115,6 +115,8 @@ AIBrain = Class(moho.aibrain_methods) {
             self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
             self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
 
+            WARN('Checking PlanName for the AI:' .. repr(self.CurrentPlan))
+
             self.PlatoonNameCounter = {}
             self.PlatoonNameCounter['AttackForce'] = 0
             self.BaseTemplates = {}
@@ -3443,7 +3445,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
 
                     self:InitializeSkirmishSystems()
-                    self:OnCreateAI(planName)
+                    self:OnCreateAI()
                 end)
             end
         end
