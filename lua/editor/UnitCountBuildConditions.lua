@@ -989,43 +989,15 @@ function UnitsGreaterThanExpansionValue(aiBrain, unitCategory, large, small, nav
 end
 
 function ExpansionBaseCheck(aiBrain)
-    local ArmyCount = 0
-    for index,brain in ArmyBrains do
-        if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-            ArmyCount = ArmyCount + 1
-        end
-    end
-
+    -- Removed automatic setting of Land-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
-
-    #LOG('AI brains is ' .. ArmyCount)
-    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
-        return ExpansionBaseCount(aiBrain, '<', 1)
-    elseif ArmyCount > 2 then
-        return ExpansionBaseCount(aiBrain, '<', 2)
-    else
-        return ExpansionBaseCount(aiBrain, '<', checkNum)
-    end
+    return ExpansionBaseCount(aiBrain, '<', checkNum)
 end
 
 function NavalBaseCheck(aiBrain)
-    local ArmyCount = 0
-    for index,brain in ArmyBrains do
-        if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-            ArmyCount = ArmyCount + 1
-        end
-    end
-
+    -- Removed automatic setting of naval-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
-
-    #LOG('AI brains is ' .. ArmyCount)
-    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
-        return NavalBaseCount(aiBrain, '<', 1)
-    elseif ArmyCount > 2 then
-        return NavalBaseCount(aiBrain, '<', 2)
-    else
-        return NavalBaseCount(aiBrain, '<', checkNum)
-    end
+    return NavalBaseCount(aiBrain, '<', checkNum)
 end
 
 #DUNCAN - added to limit expansion bases.
