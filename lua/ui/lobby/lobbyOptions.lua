@@ -420,18 +420,18 @@ globalOpts = {
     },
     {
         default = 2,
-        label = "AI Replacement",
-        help = "Toggle AI Replacement if a player disconnects.",
+        label = "<LOC aireplace_0001>AI Replacement",
+        help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",
         key = 'AIReplacement',
         values = {
             {
                 text = "<LOC _On>On",
-                help = "If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
+                help = "<LOC aireplace_0003>If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
                 key = 'AIReplacementOn',
             },
             {
                 text = "<LOC _Off>Off",
-                help = "A disconnected player will cause the destruction of their units based on share conditions.",
+                help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",
                 key = 'AIReplacementOff',
             },
         },
