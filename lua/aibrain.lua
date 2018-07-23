@@ -97,10 +97,16 @@ AIBrain = Class(moho.aibrain_methods) {
                 ScenarioInfo.ArmySetup[self.Name].AIPersonality = string.sub(per, 1, cheatPos - 1)
             end
 
+            LOG('* OnCreateAI: AIPersonality: ('..per..')')
             if string.find(per, 'sorian') then
                 self.Sorian = true
             end
-
+            if string.find(per, 'uveso') then
+                self.Uveso = true
+            end
+            if string.find(per, 'dilli') then
+                self.Dilli = true
+            end
             if DiskGetFileInfo('/lua/AI/altaiutilities.lua') then
                 self.Duncan = true
             end
@@ -130,6 +136,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         self.UnitBuiltTriggerList = {}
         self.FactoryAssistList = {}
+        self.DelayEqualBuildPlattons = {}
         self.BrainType = 'AI'
     end,
 
@@ -950,7 +957,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         local plat = self:GetPlatoonUniquelyNamed('ArmyPool')
-        plat:ForkThread(plat.BaseManagersDistressAI)
+        if self.Sorian then
+            plat:ForkThread(plat.BaseManagersDistressAISorian)
+        else
+            plat:ForkThread(plat.BaseManagersDistressAI)
+        end
 
         self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         self.DeadBaseThread = self:ForkThread(self.DeadBaseMonitor)
@@ -967,7 +978,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             -- Spawn locations were fixed. We know exactly where our opponents are.
-            for i = 1, 12 do
+            for i = 1, 16 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
 
@@ -2195,7 +2206,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     PBMSetBuildingHandleFalse = function(self, builder)
         if not builder.PlatoonHandles then
-            ERROR('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
+            error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
             return false
         end
         for k, v in builder.PlatoonHandles do
@@ -3454,7 +3465,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             -- Spawn locations were fixed. We know exactly where our opponents are.
-            for i = 1, 12 do
+            for i = 1, 16 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
 
@@ -3619,7 +3630,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- Spawn locations were fixed. We know exactly where our opponents are.
                 -- Don't scout areas owned by us or our allies.
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     if army and startPos then
@@ -3681,7 +3692,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             else -- Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 
@@ -3759,7 +3770,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- Spawn locations were fixed. We know exactly where our opponents are.
                 -- Don't scout areas owned by us or our allies.
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 
@@ -3828,7 +3839,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             else -- Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 
