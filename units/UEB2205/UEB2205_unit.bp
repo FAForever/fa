@@ -264,7 +264,6 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',

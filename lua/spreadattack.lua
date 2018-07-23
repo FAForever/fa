@@ -86,7 +86,7 @@ end -- function MakeShadowCopyorders(command)
 -- based on its current command queue.
 -- It can only get ability names and positions of current orders,
 -- so it can't retarget orders with a changed entity target.
-function FixOrders(unit)
+local function FixOrders(unit)
 
     -- The factory exclusion is because GetCommandQueue doesn't work right for them.
     -- This means we can't fix orders for Fatboy, Megalith, Tempest, or carriers.
@@ -414,6 +414,7 @@ function GiveOrders(Data)
          ["Patrol"]             = IssuePatrol,
          ["Repair"]             = IssueRepair,
          ["Reclaim"]            = IssueReclaim,
+         ["Repair"]             = IssueRepair,
          ["Tactical"]           = IssueTactical,
         }
     end
@@ -439,9 +440,8 @@ function GiveOrders(Data)
             if order.EntityId then
                 target = GetEntityById(order.EntityId)
             end
-            if target then
-                Function({ unit }, target)
-            end
+            
+            Function({ unit }, target)
         end
     end
 end -- function GiveOrders(Data)

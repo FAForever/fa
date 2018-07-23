@@ -215,7 +215,7 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
         local BallisticsList = import('/lua/sim/CalcBallisticAcceleration.lua').bomb_data
         local id = self.unit:GetEntityId()
         local data = BallisticsList[id]
-        if data and data.usestore and data.targetpos then -- We are repeating, and have lost our original target
+        if data and data.usestore then -- We are repeating, and have lost our original target
             self:SetTargetGround(data.targetpos)
         end
 

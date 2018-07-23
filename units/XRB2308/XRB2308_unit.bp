@@ -59,7 +59,6 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
-        'SUBMERSIBLE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -262,7 +261,6 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',

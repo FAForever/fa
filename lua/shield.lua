@@ -350,13 +350,8 @@ Shield = Class(moho.shield_methods, Entity) {
 
     OnState = State {
         Main = function(self)
-            if self.DamageRecharge then
-                self.Owner:SetMaintenanceConsumptionActive()
-                self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
-                ChangeState(self, self.DamageRechargeState)
-        
             -- If the shield was turned off; use the recharge time before turning back on
-            elseif self.OffHealth >= 0 then
+            if self.OffHealth >= 0 then
                 self.Owner:SetMaintenanceConsumptionActive()
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
@@ -427,10 +422,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
-            
-            if self.DamageRecharge then
-                self.DamageRecharge = self.Owner:GetShieldRatio(self.Owner)
-            end
 
             -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
@@ -450,35 +441,18 @@ Shield = Class(moho.shield_methods, Entity) {
     -- This state happens when the shield has been depleted due to damage
     DamageRechargeState = State {
         Main = function(self)
-            if not self.DamageRecharge then
-                self.DamageRecharge = true
+            self:RemoveShield()
 
-                self:RemoveShield()
+            self.Owner:OnShieldDisabled()
+            self.Owner:PlayUnitSound('ShieldOff')
 
-                self.Owner:OnShieldDisabled()
-                self.Owner:PlayUnitSound('ShieldOff')
+            -- We must make the unit charge up before getting its shield back
+            self:ChargingUp(0, self.ShieldRechargeTime)
 
-                -- We must make the unit charge up before getting its shield back
-                self:ChargingUp(0, self.ShieldRechargeTime)
-            
-                -- Fully charged, get full health
-                self:SetHealth(self, self:GetMaxHealth())
-            
-                self.DamageRecharge = nil
-                ChangeState(self, self.OnState)
-            else
-                self:RemoveShield()
+            -- Fully charged, get full health
+            self:SetHealth(self, self:GetMaxHealth())
 
-                self.Owner:OnShieldDisabled()
-                self.Owner:PlayUnitSound('ShieldOff')
-
-                self:ChargingUp(self.ShieldRechargeTime * self.DamageRecharge, self.ShieldRechargeTime)
-            
-                self:SetHealth(self, self:GetMaxHealth())
-            
-                self.DamageRecharge = nil
-                ChangeState(self, self.OnState)
-            end
+            ChangeState(self, self.OnState)
         end,
 
         IsOn = function(self)

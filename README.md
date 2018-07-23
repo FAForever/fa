@@ -14,8 +14,6 @@ Contributing
 
 See guidelines for contributing [here](CONTRIBUTING.md).
 
-See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
-
 Running the game with your changes
 ----------------------------------
 

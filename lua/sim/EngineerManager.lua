@@ -271,6 +271,199 @@ EngineerManager = Class(BuilderManager) {
         end
     end,
 
+
+    ProductionCheckSorian = function(unit, econ, pauseVal, category)
+        local beingBuilt = false
+        if not unit or unit.Dead or not IsUnit(unit) then
+            return false
+        end
+        if unit:IsUnitState('Building') then
+            beingBuilt = unit.UnitBeingBuilt
+            --return false
+        elseif unit:IsUnitState('Guarding') then
+            local guardedUnit = unit:GetGuardedUnit()
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+                beingBuilt = guardedUnit.UnitBeingBuilt
+            end
+        end
+        -- If built unit is of the category passed in return true
+        if beingBuilt and EntityCategoryContains(category, beingBuilt) then
+            return true
+        end
+        return false
+    end,
+
+    -- ================================== --
+    --     Universal on/off functions
+    -- ================================== --
+    EnableGroupSorian = function(self, group)
+        for k,v in group.Units do
+            if not v.Status and v.Unit and not v.Unit.Dead then
+                LOG('*AI DEBUG: Enabling units')
+                --v.Unit:OnUnpaused()
+                IssuePause(v.Unit)
+                v.Status = true
+            end
+        end
+    end,
+
+    -- ====================================================== --
+    --     Functions for when an AI Brain's mass runs dry
+    -- ====================================================== --
+    LowMassSorian = function(self)
+        local econ = AIUtils.AIGetEconomyNumbers(self.Brain)
+        local pauseVal = 0
+
+        self.Brain.LowMassMode = true
+
+        LOG('*AI DEBUG: Shutting down units for mass needs')
+
+        -- Disable engineers building defenses
+        pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.DEFENSE)
+
+        -- Disable shields
+        if pauseVal != true then
+            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.SHIELD)
+        end
+
+        -- Disable factory builders
+        if pauseVal != true then
+            pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.FACTORY * (categories.TECH2 + categories.TECH3))
+        end
+
+        -- Disable those building mobile units (through assist or experimental)
+        if pauseVal != true then
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck)
+        end
+
+        -- Disable those building mobile units (through assist or experimental)
+        if pauseVal != true then
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.MOBILE - categories.EXPERIMENTAL)
+        end
+
+        -- Disable those building mobile units (through assist or experimental)
+        if pauseVal != true then
+            --pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL)
+        end
+
+        self:ForkThread(self.LowMassRepeatThreadSorian)
+    end,
+
+    LowMassRepeatThreadSorian = function(self)
+        WaitSeconds(3)
+        if self.Brain.LowMassMode then
+            self:LowMassSorian()
+        end
+    end,
+
+    RestoreMassSorian = function(self)
+        LOG('*AI DEBUG: Activating Shut down mass units')
+        self.Brain.LowMassMode = false
+
+        -- enable engineers
+        self:EnableGroupSorian(self.ConsumptionUnits.Engineers)
+    end,
+
+    DisableMassGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
+        for k,v in group.Units do
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
+                LOG('*AI DEBUG: Disabling unit for mass')
+                --v.Unit:OnPaused()
+                IssuePause(v.Unit)
+                pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondMass()
+                v.Status = false
+            end
+            if self:MassCheck(econ, pauseVal) then
+                return true
+            end
+        end
+        return pauseVal
+    end,
+
+    -- ======================================================== --
+    --     Functions for when an AI Brain's energy runs dry
+    -- ======================================================== --
+
+    DisableEnergyGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
+        for k,v in group.Units do
+            if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
+                LOG('*AI DEBUG: Disabling unit for energy')
+                --v.Unit:OnPaused()
+                IssuePause(v.Unit)
+                pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondEnergy()
+                v.Status = false
+            end
+            if self:EnergyCheck(econ, pauseVal) then
+                return true
+            end
+        end
+        return pauseVal
+    end,
+
+    LowEnergySorian = function(self)
+        local econ = AIUtils.AIGetEconomyNumbers(self.Brain)
+        local pauseVal = 0
+
+        self.Brain.LowEnergyMode = true
+
+        LOG('*AI DEBUG: Shutting down units for energy needs')
+
+        -- Disable fabricators if mass in > mass out until 10% under
+        --if pauseVal != true then
+        --    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal, self.MassDrainCheck)
+        --end
+
+        --if pauseVal != true then
+        --    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.MobileIntel, econ, pauseVal)
+        --end
+
+        -- Disable engineers assisting non-econ until 10% under
+        if pauseVal != true then
+            pauseVal = self:DisableEnergyGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.ALLUNITS - categories.ENERGYPRODUCTION - categories.MASSPRODUCTION)
+        end
+
+        -- Disable Intel if mass in > mass out until 10% under
+        --if pauseVal != true then
+        --    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Intel, econ, pauseVal)
+        --end
+
+        -- Disable fabricators until 10% under
+        --if pauseVal != true then
+        --    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal)
+        --end
+
+        -- Disable engineers until 10% under
+        if pauseVal != true then
+            pauseVal = self:DisableEnergyGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.ALLUNITS - categories.ENERGYPRODUCTION)
+        end
+
+        self:ForkThread(self.LowEnergyRepeatThreadSorian)
+    end,
+
+    LowEnergyRepeatThreadSorian = function(self)
+        WaitSeconds(3)
+        if self.Brain.LowEnergyMode then
+            self:LowEnergySorian()
+        end
+    end,
+
+    RestoreEnergySorian = function(self)
+        LOG('*AI DEBUG: Activating Shut down energy units')
+        self.Brain.LowEnergyMode = false
+
+        -- enable intel
+        --self:EnableGroup(self.ConsumptionUnits.Intel)
+
+        -- enable mobile intel
+        --self:EnableGroup(self.ConsumptionUnits.MobileIntel)
+
+        -- enable fabricators
+        --self:EnableGroup(self.ConsumptionUnits.Fabricators)
+
+        -- enable engineers
+        self:EnableGroupSorian(self.ConsumptionUnits.Engineers)
+    end,
+
     -- =============================== --
     --     Builder based functions
     -- =============================== --

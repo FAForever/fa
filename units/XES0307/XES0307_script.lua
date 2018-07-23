@@ -42,7 +42,7 @@ UES0302 = Class(TSeaUnit) {
         },
     },
 
-        OnKilled = function(self, instigator, type, overkillRatio)
+        OnKilled = function(self)
             local wep1 = self:GetWeaponByLabel('HiroCannonFront')
             local bp1 = wep1:GetBlueprint()
             if bp1.Audio.BeamStop then
@@ -67,7 +67,7 @@ UES0302 = Class(TSeaUnit) {
                 v.Beam:Disable()
             end
 
-            TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+            TSeaUnit.OnKilled(self)
         end,
 }
 TypeClass = UES0302

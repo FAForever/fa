@@ -218,7 +218,7 @@ BuilderGroup {
     # Initial builder
     Builder {
         BuilderName = 'CDR Initial Land Rush',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -248,7 +248,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'CDR Initial PreBuilt Land Rush',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -283,7 +283,7 @@ BuilderGroup {
     # Initial builder
     Builder {
         BuilderName = 'CDR Initial Balanced',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -314,7 +314,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'CDR Initial PreBuilt Balanced',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -347,7 +347,7 @@ BuilderGroup {
     # Initial builder
     Builder {
         BuilderName = 'CDR Initial Air Rush',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -374,7 +374,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'CDR Initial PreBuilt Air Rush',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -408,7 +408,7 @@ BuilderGroup {
     # Initial builder
     Builder {
         BuilderName = 'CDR Initial Naval Rush',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -436,7 +436,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'CDR Initial PreBuilt Naval',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -468,7 +468,7 @@ BuilderGroup {
     # Initial builder
     Builder {
         BuilderName = 'CDR Initial Default',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {
@@ -499,7 +499,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'CDR Initial PreBuilt Default',
-        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonAddBehaviors = { 'CommanderBehavior', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
         BuilderConditions = {

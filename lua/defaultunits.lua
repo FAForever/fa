@@ -2032,7 +2032,7 @@ ConstructionUnit = Class(MobileUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 
@@ -2145,7 +2145,7 @@ CommandUnit = Class(WalkingLandUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            ForkThread(function() WaitTicks(1) self:SetImmobile(false) end)
         end
     end,
 

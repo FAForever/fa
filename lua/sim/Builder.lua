@@ -33,8 +33,6 @@ Builder = Class {
         self.Brain = brain
 
         self.BuilderName = data.BuilderName
-        
-        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
 
         self.ReportFailure = data.ReportFailure
 
