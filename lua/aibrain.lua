@@ -3440,8 +3440,6 @@ AIBrain = Class(moho.aibrain_methods) {
                     ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
                     ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
 
-                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
-
                     self:InitializeSkirmishSystems()
                     self:OnCreateAI()
                 end)
