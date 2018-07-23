@@ -394,7 +394,7 @@ PlatoonTemplate {
     Name = 'T3TorpedoBomber',
     FactionSquads = {
         Aeon = {
-            { 'xaa0306', 1, 1, 'attack', 'GrowthFormation' },
+            { 'xaa0305', 1, 1, 'attack', 'GrowthFormation' },
         },
     }
 }

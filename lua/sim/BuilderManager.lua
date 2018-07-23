@@ -105,19 +105,9 @@ BuilderManager = Class {
     AddInstancedBuilder = function(self,newBuilder, builderType)
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
-            -- Warn the programmer that something is wrong. We can continue, hopefully the builder is not too important for the AI ;)
-            -- But good for testing, and the case that a mod has bad builders.
-            -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
-            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
-            return
+            error('*BUILDERMANAGER ERROR: Invalid builder type: ' .. builderType .. ' - in builder: ' .. newBuilder.BuilderName)
         end
         if newBuilder then
-            if not self.BuilderData[builderType] then
-                -- Warn the programmer that something is wrong here. Same here, we can continue.
-                -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
-                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
-                return
-            end
             table.insert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
@@ -227,22 +217,6 @@ BuilderManager = Class {
         end
         return false
     end,
-    
-    -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
-    IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
-        if DelayEqualBuildPlattons then
-            local CheckDelayTime = GetGameTimeSeconds()
-            local PlatoonName = DelayEqualBuildPlattons[1]
-            if not self.Brain.DelayEqualBuildPlattons[PlatoonName] or self.Brain.DelayEqualBuildPlattons[PlatoonName] < CheckDelayTime then
-                --LOG('Setting '..DelayEqualBuildPlattons[2]..' sec. delaytime for builder ['..PlatoonName..']')
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + DelayEqualBuildPlattons[2]
-                return false
-            else
-                --LOG('Builder ['..PlatoonName..'] still delayed for '..(CheckDelayTime - self.Brain.DelayEqualBuildPlattons[PlatoonName])..' seconds.')
-                return true
-            end
-        end
-    end,
 
     GetHighestBuilder = function(self,bType,params)
         if not self.BuilderData[bType] then
@@ -256,10 +230,8 @@ BuilderManager = Class {
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
             if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and (not found or v:GetPriority() == found) and v:GetBuilderStatus() then
-                if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
-                    found = v:GetPriority()
-                    table.insert(possibleBuilders, k)
-                end
+                found = v:GetPriority()
+                table.insert(possibleBuilders, k)
             elseif found and v:GetPriority() < found then
                 break
             end

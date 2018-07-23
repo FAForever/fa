@@ -19,6 +19,8 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+LOG('Active mods in sim: ', repr(__active_mods))
+
 WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
@@ -223,7 +225,6 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
     LOG('BeginSession...')
-    SPEW('Active mods in sim: ', repr(__active_mods))
     ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then

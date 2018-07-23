@@ -86,7 +86,7 @@ end
 
 function AIGetStartLocations(aiBrain)
     local markerList = {}
-    for i = 1, 16 do
+    for i = 1, 12 do
         if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
             table.insert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
         end
@@ -131,11 +131,6 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
     local markerList = AIGetMarkerLocations(aiBrain, 'Mass')
     local newList = {}
     for _, v in markerList do
-        -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
-        if v.Position[1] < 8 or v.Position[1] > ScenarioInfo.size[1] - 8 or v.Position[3] < 8 or v.Position[3] > ScenarioInfo.size[2] - 8 then
-            -- mass marker is too close to border, skip it.
-            continue
-        end
         if aiBrain:CanBuildStructureAt('ueb1103', v.Position) then
             table.insert(newList, v)
         end
@@ -330,66 +325,19 @@ function AIGetMarkerLocations(aiBrain, markerType)
 end
 
 function AIGetMarkerLocationsEx(aiBrain, markerType)
-    local markerList = {}
     local markers = ScenarioUtils.GetMarkers()
-    if markers then
-        markerList = GenerateMarkerList(markerList,markers,markerType)
-        LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType)
-        -- If we have no Amphibious Path Nodes, generate them from Land and Water Nodes
-        if markerType == 'Amphibious Path Node' and table.getn(markerList) <= 0 then
-            markerList = GenerateAmphibiousMarkerList(markerList,markers,'Land Path Node')
-            markerList = GenerateAmphibiousMarkerList(markerList,markers,'Water Path Node')
-            LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType..' (generated from Land/Water markers).')
-            -- Inject the new amphibious marker to the MasterChain
-            for k, v in markerList do
-                if v.type == 'Amphibious Path Node' then
-                    Scenario.MasterChain._MASTERCHAIN_.Markers[v.name] = v
-                end
-            end
-        end
-    end
+    local markerList = {}
+
     -- Make a list of all the markers in the scenario that are of the markerType
-    return markerList
-end
-
-function GenerateMarkerList(markerList,markers,markerType)
-    for k, v in markers do
-        if v.type == markerType then
-            -- copy the marker to a local variable. We don't want to change values inside the original markers array
-            local marker = table.copy(v)
-            marker.name = k
-            -- insert the (default)graph if missing.
-            if not marker.graph then
-                marker.graph = 'Default'..markerType
+    if markers then
+        for k, v in markers do
+            if v.type == markerType then
+                v.name = k
+                table.insert(markerList, v)
             end
-            table.insert(markerList, marker)
         end
     end
-    return markerList
-end
 
-function GenerateAmphibiousMarkerList(markerList,markers,markerType)
-    for k, v in markers do
-        local marker = table.copy(v)
-        if marker.type == markerType then
-            -- transform adjacentTo to Amphibious marker names
-            local adjacentTo = ''
-            for i, node in STR_GetTokens(marker.adjacentTo, ' ') do
-                if adjacentTo == '' then
-                    adjacentTo = 'Amph'..node
-                else
-                    adjacentTo = adjacentTo..' '..'Amph'..node
-                end
-            end
-            marker.adjacentTo = adjacentTo
-            -- Add 'Amph' to marker name
-            marker.name = 'Amph'..k
-            marker.graph = 'DefaultAmphibious'
-            marker.type = 'Amphibious Path Node'
-            marker.color = 'ff00FFFF'
-            table.insert(markerList, marker)
-        end
-    end
     return markerList
 end
 
@@ -871,7 +819,7 @@ function GetAssistees(aiBrain, locationType, assisteeType, buildingCategory, ass
         local manager = aiBrain.BuilderManagers[locationType].PlatoonFormManager
         return manager:GetUnitsBeingBuilt(buildingCategory, assisteeCategory)
     else
-        error('*AI ERROR: Invalid assisteeType - ' .. assisteeType)
+        ERROR('*AI ERROR: Invalid assisteeType - ' .. assisteeType)
     end
 
     return false
@@ -1177,10 +1125,7 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
     local enemyIndex = enemyBrain:GetArmyIndex()
     local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, maxRange, 'Enemy')
     for _, v in atkPri do
-        local category = v
-        if type(category) == 'string' then
-            category = ParseEntityCategory(category)
-        end
+        local category = ParseEntityCategory(v)
         local retUnit = false
         local distance = false
         for num, unit in targetUnits do
@@ -1775,6 +1720,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+
     local pos = unit:GetPosition()
     local result, bestPos = unit:CanPathTo(destination)
     local bUsedTransports = false
@@ -1783,7 +1729,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     and unit.PlatoonHandle and not EntityCategoryContains(categories.COMMAND, unit) then
         -- If we can't path to our destination, we need, rather than want, transports
         local needTransports = not result
-        if VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300 * 300 then
+        if VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
             needTransports = true
         end
 
@@ -1800,7 +1746,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)
@@ -1814,6 +1760,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         -- so don't bother... the build/capture/reclaim command will take care of that after we return
         return true
     end
+
     return false
 end
 

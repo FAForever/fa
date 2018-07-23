@@ -87,7 +87,7 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if not aiBrain.Sorian or markerType != 'Naval Area' then
+        if markerType != 'Naval Area' then
             return 0
         end
 
