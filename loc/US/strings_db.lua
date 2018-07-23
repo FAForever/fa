@@ -7265,3 +7265,8 @@ notify_0030="Notify Disabled"
 notify_0031="Toggle Notify"
 notify_0032="Toggles all aspects of Notify functionality, leaving subsettings intact for when you want to re-enable the feature"
 notify_0033="Notify"
+
+aireplace_0001="AI Replacement"
+aireplace_0002="Toggle AI Replacement if a player disconnects."
+aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
+aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
