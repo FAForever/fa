@@ -3429,6 +3429,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     WaitSeconds(1)
 
+                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
+
                     -- Reassign all Army attributes to better suit the AI.
                     self.BrainType = 'AI'
                     self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
@@ -3439,6 +3441,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
                     ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
+
+                    local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
+                    if cmdUnits then
+                        cmdUnits[1]:SetCustomName(ArmyBrains[self:GetArmyIndex()].Nickname)
+                    end
 
                     self:InitializeSkirmishSystems()
                     self:OnCreateAI()
