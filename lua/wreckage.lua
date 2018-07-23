@@ -83,7 +83,7 @@ Wreckage = Class(Prop) {
 }
 
 --- Create a wreckage prop.
-function CreateWreckage(bp, position, orientation, mass, energy, time)
+function CreateWreckage(bp, position, orientation, mass, energy, time, massRatio)
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
@@ -93,7 +93,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
     prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX * 0.5, bp.SizeY * 0.5, bp.SizeZ * 0.5)
 
     prop:SetMaxHealth(bp.Defense.Health)
-    prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+    prop:SetHealth(nil, bp.Defense.Health * (massRatio or bp.Wreckage.HealthMult or 1))
     prop:SetMaxReclaimValues(time, mass, energy)
 
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
