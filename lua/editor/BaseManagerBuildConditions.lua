@@ -65,7 +65,7 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
         return false
     else
         local base = aiBrain.BaseManagers[baseName]
-        local unitList = aiBrain:GetUnitsAroundPoint(category, base:GetPosition(), base:GetRadius(), 'Ally')
+        local unitList = aiBrain:GetUnitsAroundPoint(category, base:GetPosition(), base.Radius, 'Ally')
         local count = 0
         for i, unit in unitList do
             if unit:GetAIBrain() == aiBrain then
@@ -94,7 +94,7 @@ function BaseManagerNeedsEngineers(aiBrain, baseName)
         return false
     end
     local bManager = aiBrain.BaseManagers[baseName]
-    if bManager:GetMaximumEngineers() > bManager:GetCurrentEngineerCount() then
+    if bManager.EngineerQuantity > bManager.CurrentEngineerCount then
         return true
     end
     return false
@@ -111,8 +111,8 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
     for num, eData in bManager.ExpansionBaseData do
         local eBaseName = eData.BaseName
         local base = aiBrain.BaseManagers[eBaseName]
-        if base and base:GetPosition() and base:GetRadius() then
-            local count = base:GetCurrentEngineerCount()
+        if base and base:GetPosition() and base.Radius then
+            local count = base.CurrentEngineerCount
             count = count + eData.IncomingEngineers
             if count < eData.Engineers then
                 return true
@@ -134,8 +134,8 @@ function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     for num, eData in bManager.ExpansionBaseData do
         if eData.BaseName == eBaseName then
             local base = aiBrain.BaseManagers[eBaseName]
-            if base and base:GetPosition() and base:GetRadius() then
-                local count = base:GetCurrentEngineerCount()
+            if base and base:GetPosition() and base.Radius then
+                local count = base.CurrentEngineerCount
                 count = count + eData.IncomingEngineers
                 if count < eData.Engineers then
                     return true
@@ -245,7 +245,7 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     end
 
     local basePos = aiBrain.BaseManagers[baseName]:GetPosition()
-    local baseRad = aiBrain.BaseManagers[baseName]:GetRadius()
+    local baseRad = aiBrain.BaseManagers[baseName].Radius
     if not basePos or not baseRad then
         return false
     end
@@ -276,8 +276,8 @@ function HighestFactoryLevel(aiBrain, level, baseName)
         return false
     end
 
-    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager:GetRadius())
-    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager:GetRadius())
+    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager.Radius)
+    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager.Radius)
     if t3FacList and table.getn(t3FacList) > 0 then
         if level == 3 then
             return true
@@ -301,7 +301,7 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     end
 
     local facCat = ParseEntityCategory('FACTORY * TECH'..techLevel)
-    local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager:GetPosition(), bManager:GetRadius())
+    local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager:GetPosition(), bManager.Radius)
     local typeCount = {Air = 0, Land = 0, Sea = 0, }
     for k, v in facList do
         if EntityCategoryContains(categories.AIR, v) then
@@ -314,11 +314,11 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     end
 
     if typeCount[pType] >= typeCount['Air'] and typeCount[pType] >= typeCount['Land'] and typeCount[pType] >= typeCount['Sea'] then
-        if typeCount[pType] == engQuantity and bManager:GetMaximumEngineers() >= (bManager:GetCurrentEngineerCount() + bManager:GetEngineersBuilding() + engQuantity) then
+        if typeCount[pType] == engQuantity and bManager.EngineerQuantity >= (bManager.CurrentEngineerCount + bManager:GetEngineersBuilding() + engQuantity) then
             return true
-        elseif bManager:GetMaximumEngineers() - (bManager:GetCurrentEngineerCount() + bManager:GetEngineersBuilding() + engQuantity) == 0 and typeCount[pType] >= engQuantity then
+        elseif bManager.EngineerQuantity - (bManager.CurrentEngineerCount + bManager:GetEngineersBuilding() + engQuantity) == 0 and typeCount[pType] >= engQuantity then
             return true
-        elseif bManager:GetMaximumEngineers() - (bManager:GetCurrentEngineerCount() + bManager:GetEngineersBuilding() + engQuantity) > 0 and engQuantity == 5 and typeCount[pType] >= 5 then
+        elseif bManager.EngineerQuantity - (bManager.CurrentEngineerCount + bManager:GetEngineersBuilding() + engQuantity) > 0 and engQuantity == 5 and typeCount[pType] >= 5 then
             return true
         end
     end
@@ -387,8 +387,8 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
         catCheck = categories.NAVAL
     end
 
-    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager:GetRadius())
-    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager:GetRadius())
+    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager.Radius)
+    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager.Radius)
     if t3FacList and table.getn(t3FacList) > 0 then
         if level == 3 then
             return true

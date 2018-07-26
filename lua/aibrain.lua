@@ -1952,7 +1952,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PBMGetLocation = function(self, locationName)
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == locationName then
                     return v
@@ -1966,7 +1966,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == loc then
                     local height = GetTerrainHeight(v.Location[1], v.Location[3])
@@ -1986,14 +1986,14 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for k, v in self.PBM.Locations do
                 if v.LocationType == loc then
                    return v.Radius
                 end
             end
         elseif self.BuilderManagers[loc] then
-            return self.BuilderManagers[loc].FactoryManager:GetLocationRadius()
+            return self.BuilderManagers[loc].FactoryManager.Radius
         end
         return false
     end,
@@ -2364,7 +2364,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local personality = self:GetPersonality()
         local armyIndex = self:GetArmyIndex()
         local numBuildOrders = nil
-        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType]:IsDead() then
+        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType].Dead then
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()

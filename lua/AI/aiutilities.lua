@@ -795,7 +795,7 @@ end
 
 function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMax, tRings, tType)
     local positions = {}
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for k, v in aiBrain.PBM.Locations do
             if v.LocationType ~= 'MAIN' then
                 table.insert(positions, v.Location)
@@ -832,7 +832,7 @@ end
 
 function AIGetReclaimablesAroundLocation(aiBrain, locationType)
     local position, radius
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for _, v in aiBrain.PBM.Locations do
             if v.LocationType == locationType then
                 position = v.Location
@@ -841,7 +841,7 @@ function AIGetReclaimablesAroundLocation(aiBrain, locationType)
             end
         end
     elseif aiBrain.BuilderManagers[locationType] then
-        radius = aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationRadius()
+        radius = aiBrain.BuilderManagers[locationType].FactoryManager.Radius
         position = aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords()
     end
 
@@ -968,7 +968,7 @@ end
 
 function GetBasePatrolPoints(aiBrain, location, radius, layer)
     if type(location) == 'string' then
-        if aiBrain:PBMHasPlatoonList() then
+        if aiBrain.HasPlatoonList then
             for k, v in aiBrain.PBM.Locations do
                 if v.LocationType == location then
                     radius = v.Radius
@@ -977,7 +977,7 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
                 end
             end
         elseif aiBrain.BuilderManagers[location] then
-            radius = aiBrain.BuilderManagers[location].FactoryManager:GetLocationRadius()
+            radius = aiBrain.BuilderManagers[location].FactoryManager.Radius
             location = aiBrain.BuilderManagers[location].FactoryManager:GetLocationCoords()
         end
         if not radius then
@@ -1958,7 +1958,7 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
         return false
     end
 
-    local filterUnits = GetOwnUnitsAroundPoint(aiBrain, assisteeCategory, manager:GetLocationCoords(), manager:GetLocationRadius())
+    local filterUnits = GetOwnUnitsAroundPoint(aiBrain, assisteeCategory, manager:GetLocationCoords(), manager.Radius)
     local retUnits = {}
     for k, v in filterUnits do
         if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
@@ -1971,7 +1971,7 @@ end
 
 function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
     if type(location) == 'string' then
-        if aiBrain:PBMHasPlatoonList() then
+        if aiBrain.HasPlatoonList then
             for k, v in aiBrain.PBM.Locations do
                 if v.LocationType == location then
                     radius = v.Radius
@@ -1980,7 +1980,7 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
                 end
             end
         elseif aiBrain.BuilderManagers[location] then
-            radius = aiBrain.BuilderManagers[location].FactoryManager:GetLocationRadius()
+            radius = aiBrain.BuilderManagers[location].FactoryManager.Radius
             location = aiBrain.BuilderManagers[location].FactoryManager:GetLocationCoords()
         end
         if not radius then

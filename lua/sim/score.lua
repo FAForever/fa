@@ -169,7 +169,7 @@ function ScoreThread()
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
 
-            for unitId, stats in brain:GetUnitStats() do
+            for unitId, stats in brain.UnitStats do
                 if ArmyScore[index].blueprints[unitId] == nil then
                     ArmyScore[index].blueprints[unitId] = {}
                 end

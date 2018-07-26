@@ -1210,7 +1210,7 @@ end
 -- -----------------------------------------------------
 function FindUnfinishedUnits(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     local retUnfinished = false
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
@@ -1235,7 +1235,7 @@ end
 -- -----------------------------------------------------
 function FindDamagedShield(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local shields = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local shields = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     local retShield = false
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
