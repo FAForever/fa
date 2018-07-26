@@ -472,7 +472,7 @@ BaseManager = Class {
     end,
 
     IsConstructionUnit = function(self, unit)
-        if not unit or unit:IsDead() then
+        if not unit or unit.Dead then
             return false
         end
 
@@ -677,7 +677,7 @@ BaseManager = Class {
 
     -- Determines if a specific unit needs upgrades, returns name of upgrade if needed
     UnitNeedsUpgrade = function(self, unit, unitType)
-        if unit:IsDead() then
+        if unit.Dead then
             return false
         end
 
@@ -759,7 +759,7 @@ BaseManager = Class {
 
     -- Check if a unit has upgrade
     CheckEnhancement = function(self, unit, upgrade)
-        if unit:IsDead() then
+        if unit.Dead then
             return false
         end
 
@@ -906,7 +906,7 @@ BaseManager = Class {
             if self.Active then
                 for k, v in self.UpgradeTable do
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
-                    if unit and not unit:IsDead() then
+                    if unit and not unit.Dead then
                         -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state 
                         if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
@@ -1047,10 +1047,10 @@ BaseManager = Class {
 
         local upgrading = true
         local newUnit = false
-        while not unit:IsDead() and upgrading do
+        while not unit.Dead and upgrading do
             WaitSeconds(3)
             upgrading = false
-            if unit and not unit:IsDead() then
+            if unit and not unit.Dead then
                 if not newUnit then
                     newUnit = unit.UnitBeingBuilt
                 end

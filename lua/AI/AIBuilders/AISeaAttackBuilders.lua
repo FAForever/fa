@@ -29,7 +29,7 @@ function SeaAttackCondition(aiBrain, locationType, targetNumber)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
 
     local position = engineerManager:GetLocationCoords()
-    local radius = engineerManager:GetLocationRadius()
+    local radius = engineerManager.Radius
 
     local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.NAVAL, position, radius)
     local subThreat = pool:GetPlatoonThreat('AntiSub', categories.MOBILE * categories.NAVAL, position, radius)

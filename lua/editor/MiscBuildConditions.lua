@@ -59,7 +59,7 @@ end
 #
 ##############################################################################################################
 function IsAIBrainLayerPref(aiBrain, layerPref)
-    if layerPref == aiBrain:AIGetLayerPreference() then
+    if layerPref == aiBrain.LayerPref then
         return true
     end
     return false
@@ -279,7 +279,7 @@ end
 ##############################################################################################################
 function CheckAvailableGates(aiBrain, locType)
     local pos, rad
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for k,v in aiBrain.PBM.Locations do
             if v.LocationType == locType then
                 pos = v.Location
@@ -289,7 +289,7 @@ function CheckAvailableGates(aiBrain, locType)
         end
     elseif aiBrain.BuilderManagers[locType] then
         pos = aiBrain.BuilderManagers[locType].FactoryManager:GetLocationCoords()
-        rad = aiBrain.BuilderManagers[locType].FactoryManager:GetLocationRadius()
+        rad = aiBrain.BuilderManagers[locType].FactoryManager.Radius
     end
     if not pos then
         return false

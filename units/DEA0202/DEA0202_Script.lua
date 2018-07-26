@@ -106,7 +106,7 @@ DEA0202 = Class(TAirUnit) {
     MonitorWings = function(self)
         local airTargetRight
         local airTargetLeft
-        while self and not self:IsDead() do
+        while self and not self.Dead do
             WaitSeconds(1)
             local airTargetWeapon = self:GetWeaponByLabel('RightBeam')
             if airTargetWeapon then     

@@ -29,7 +29,7 @@ function AirAttackCondition(aiBrain, locationType, targetNumber)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
 
     local position = engineerManager:GetLocationCoords()
-    local radius = engineerManager:GetLocationRadius()
+    local radius = engineerManager.Radius
 
     local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     local airThreat = pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)

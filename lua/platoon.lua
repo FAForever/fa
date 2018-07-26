@@ -388,7 +388,7 @@ Platoon = Class(moho.platoon_methods) {
                 while not target do
 
                     --DUNCAN - Commented out
-                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                     --    aiBrain:PickEnemyLogic()
                     --end
                     --target = AIUtils.AIFindBrainTargetInRange(aiBrain, self, 'Attack', maxRadius, atkPri, aiBrain:GetCurrentEnemy())
@@ -1385,7 +1385,7 @@ Platoon = Class(moho.platoon_methods) {
         local reactionTime = aiBrain.BaseMonitor.PoolReactionTime
         while aiBrain:PlatoonExists(self) do
             local platoonUnits = self:GetPlatoonUnits()
-            if aiBrain:PBMHasPlatoonList() then
+            if aiBrain.HasPlatoonList then
                 for locNum, locData in aiBrain.PBM.Locations do
                     if not locData.DistressCall then
                         local distressLocation = aiBrain:BaseMonitorDistressLocation(locData.Location, aiBrain.BaseMonitor.PoolDistressRange, aiBrain.BaseMonitor.PoolDistressThreshold)
@@ -1432,7 +1432,7 @@ Platoon = Class(moho.platoon_methods) {
             for locName, locData in aiBrain.BuilderManagers do
                 if not locData.BaseSettings.DistressCall then
                     local position = locData.EngineerManager:GetLocationCoords()
-                    local radius = locData.EngineerManager:GetLocationRadius()
+                    local radius = locData.EngineerManager.Radius
                     local distressRange = locData.BaseSettings.DistressRange or aiBrain.BaseMonitor.PoolDistressRange
                     local distressLocation = aiBrain:BaseMonitorDistressLocation(position, distressRange, aiBrain.BaseMonitor.PoolDistressThreshold)
 
@@ -1741,7 +1741,7 @@ Platoon = Class(moho.platoon_methods) {
         --LOG('*AI DEBUG: Engineer Repairing')
         local aiBrain = self:GetBrain()
         local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
-        local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+        local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager.Radius)
         for k,v in Structures do
             -- prevent repairing a unit while reclaim is in progress (see ReclaimStructuresAI)
             if not v.Dead and not v.ReclaimInProgress and v:GetHealthPercent() < .8 then
@@ -2609,7 +2609,7 @@ Platoon = Class(moho.platoon_methods) {
         local movingToScout = false
         while aiBrain:PlatoonExists(self) do
             if not target or target.Dead then
-                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                     aiBrain:PickEnemyLogic()
                 end
                 local mult = { 1,10,25 }
@@ -2865,7 +2865,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                 aiBrain:PickEnemyLogic()
             end
 
@@ -3028,7 +3028,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                 aiBrain:PickEnemyLogic()
             end
 
@@ -3973,7 +3973,7 @@ Platoon = Class(moho.platoon_methods) {
                 if not locData.BaseSettings.DistressCall then
                     local position = locData.EngineerManager:GetLocationCoords()
                     local retPos = AIUtils.RandomLocation(position[1],position[3])
-                    local radius = locData.EngineerManager:GetLocationRadius()
+                    local radius = locData.EngineerManager.Radius
                     local distressRange = locData.BaseSettings.DistressRange or aiBrain.BaseMonitor.PoolDistressRange
                     local distressLocation = aiBrain:BaseMonitorDistressLocation(position, distressRange, aiBrain.BaseMonitor.PoolDistressThreshold)
 
@@ -4178,7 +4178,7 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(7)
                 target = false
                 while not target do
-                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                     --    aiBrain:PickEnemyLogic()
                     --end
 
@@ -4754,7 +4754,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                 aiBrain:PickEnemyLogicSorian()
             end
 
@@ -5546,7 +5546,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                 aiBrain:PickEnemyLogicSorian()
             end
 
@@ -5805,7 +5805,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
             if not target or target.Dead or not target:GetPosition() then
-                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
+                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Result == "defeat" then
                     aiBrain:PickEnemyLogicSorian()
                 end
                 --local mult = { 1,10,25 }
@@ -6468,7 +6468,7 @@ Platoon = Class(moho.platoon_methods) {
         -- if we're too close to a base, forget it
         if aiBrain.BuilderManagers then
             for baseName, base in aiBrain.BuilderManagers do
-                local baseRadius = base.FactoryManager:GetLocationRadius()
+                local baseRadius = base.FactoryManager.Radius
                 if VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3]) <= (baseRadius * baseRadius) + (3 * radiusSq) then
                     return
                 end
@@ -6544,7 +6544,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         for k,v in ArmyBrains do
-            if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+            if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                 local startX, startZ = v:GetArmyStartPos()
                 if VDist2Sq(markerPos[1], markerPos[3], startX, startZ) < baseRadius * baseRadius then
                     return false
