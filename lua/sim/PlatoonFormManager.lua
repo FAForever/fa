@@ -102,7 +102,7 @@ PlatoonFormManager = Class(BuilderManager) {
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
         # Try to form all builders that pass
-        if self.Brain.BuilderManagers[self.LocationType] and builder:GetPriority() >= 1 and builder:CheckInstanceCount() then
+        if self.Brain.BuilderManagers[self.LocationType] and builder.Priority >= 1 and builder:CheckInstanceCount() then
             local personality = self.Brain:GetPersonality()
             local poolPlatoon = self.Brain:GetPlatoonUniquelyNamed('ArmyPool')
             local template = self:GetPlatoonTemplate(builder:GetPlatoonTemplate())
@@ -155,8 +155,8 @@ PlatoonFormManager = Class(BuilderManager) {
                     end
                 end
 
-                hndl.Priority = builder:GetPriority()
-                hndl.BuilderName = builder:GetBuilderName()
+                hndl.Priority = builder.Priority
+                hndl.BuilderName = builder.BuilderName
 
                 hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
 

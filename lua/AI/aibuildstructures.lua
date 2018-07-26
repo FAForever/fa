@@ -291,7 +291,7 @@ end
 function AINewExpansionBase(aiBrain, baseName, position, builder, constructionData)
     local radius = constructionData.ExpansionRadius or 100
     # PBM Style expansion bases here
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
     # Figure out what type of builders to import
         local expansionTypes = constructionData.ExpansionTypes
     if not expansionTypes then

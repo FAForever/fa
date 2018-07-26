@@ -30,9 +30,9 @@ function PlatoonAttackClosestUnit(platoon)
     local cmd = platoon:AggressiveMoveToLocation(target:GetPosition())
     while aiBrain:PlatoonExists(platoon) do
         if target ~= nil then
-            if target:IsDead() or not platoon:IsCommandsActive(cmd) then
+            if target.Dead or not platoon:IsCommandsActive(cmd) then
                 target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
-                if target and not target:IsDead() then
+                if target and not target.Dead then
                     platoon:Stop()
                     cmd = platoon:AggressiveMoveToLocation(target:GetPosition())
                 end
@@ -50,7 +50,7 @@ end
 --------------------------------------------------------
 function BuildOnce(platoon)
     local aiBrain = platoon:GetBrain()
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         aiBrain:PBMSetPriority(platoon, 0)
     else
         platoon.BuilderHandle:SetPriority(0)
@@ -382,7 +382,7 @@ function LandAssaultWithTransports(platoon)
             return
         end
         for num, unit in platoon:GetPlatoonUnits() do
-            if not unit:IsDead() and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit:IsUnitState('Attached') then
+            if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit:IsUnitState('Attached') then
                 attached = true
                 break
             end
@@ -646,9 +646,9 @@ function EngineersBuildPlatoon(platoon)
 
     -- Have all engineers guard main engineer
     if table.getn(engTable) > 0 then
-        if eng:IsDead() then -- Must check if a death occured since platoon was forked
+        if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
-                if not unit:IsDead() then
+                if not unit.Dead then
                     eng = table.remove(engTable, num)
                     if table.getn(engTable) > 0 then
                         IssueGuard(engTable, eng)
@@ -667,7 +667,7 @@ function EngineersBuildPlatoon(platoon)
 
     while aiBrain:PlatoonExists(platoon) do
         -- Set new primary eng
-        if eng:IsDead() then
+        if eng.Dead then
             return
         end
         if not buildingPlatoon then
@@ -702,7 +702,7 @@ function EngineersBuildPlatoon(platoon)
 
                     repeat
                         WaitSeconds(5)
-                        if eng:IsDead() then
+                        if eng.Dead then
                             eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                         else
                             if not unitBeingBuilt then
@@ -712,7 +712,7 @@ function EngineersBuildPlatoon(platoon)
                                 end
                             end
                         end
-                    until not eng or eng:IsDead() or eng:IsIdleState()
+                    until not eng or eng.Dead or eng:IsIdleState()
                     if not aiBrain.EngBuiltPlatoonList[buildingPlatoon] then
                         plat = aiBrain:MakePlatoon('', '')
                         aiBrain.EngBuiltPlatoonList[buildingPlatoon] = plat
@@ -799,7 +799,7 @@ function CategoryHunterPlatoonAI(platoon)
                 if table.getn(unitList) > 0 then
                     local distance = 100000
                     for _, v in unitList do
-                        if not v:IsDead() then
+                        if not v.Dead then
                             local currDist = VDist3(platPos, v:GetPosition())
                             if currDist < distance then
                                 newTarget = v
@@ -822,7 +822,7 @@ function CategoryHunterPlatoonAI(platoon)
         -- If there are no targets, seek out and fight nearest enemy the platoon can find; no cheeting here
         if not newTarget then
             target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
-            if target and not target:IsDead() then
+            if target and not target.Dead then
                 platoon:Stop()
                 platoon:AggressiveMoveToLocation(target:GetPosition())
 
@@ -953,7 +953,7 @@ function StartBaseEngineerThread(platoon)
         error('*SCENARIO PLATOON AI ERROR: No Engineers found in platoon using StartBaseEngineer', 2)
     end
     -- Wait for eng to stop moving
-    while not eng:IsDead() and  eng:IsUnitState('Moving') do
+    while not eng.Dead and  eng:IsUnitState('Moving') do
         WaitSeconds(3)
         if not aiBrain:PlatoonExists(platoon) then
             return
@@ -980,9 +980,9 @@ function StartBaseEngineerThread(platoon)
 
     -- Have all engineers guard main engineer
     if table.getn(engTable) > 0 then
-        if eng:IsDead() then -- Must check if a death occured since platoon was forked
+        if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
-                if not unit:IsDead() then
+                if not unit.Dead then
                     eng = table.remove(engTable, num)
                     if table.getn(engTable) > 0 then
                         IssueGuard(engTable, eng)
@@ -1170,7 +1170,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
                     end
                     repeat
                         WaitSeconds(5)
-                        if eng:IsDead() then
+                        if eng.Dead then
                             eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                             if not eng then
                                 return false
@@ -1211,7 +1211,7 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
                 end
                 repeat
                     WaitSeconds(5)
-                    if eng:IsDead() then
+                    if eng.Dead then
                         eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                         if not eng then
                             return false
@@ -1254,7 +1254,7 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
             end
             repeat
                 WaitSeconds(7)
-                if eng:IsDead() then
+                if eng.Dead then
                     eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                     if not eng then
                         return false
@@ -1279,7 +1279,7 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
             local allBuilt = false
             while not allBuilt do
                 local busy = false
-                if not eng:IsDead() then
+                if not eng.Dead then
                     if eng:IsUnitState('Building') or eng:IsUnitState('Repairing')
                         or eng:IsUnitState('Reclaiming') or eng:IsUnitState('Moving') then
                             busy = true
@@ -1297,7 +1297,7 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
                     end
                 end
                 WaitSeconds(5)
-                if eng:IsDead() then
+                if eng.Dead then
                     eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                     if not eng then
                         return false
@@ -1328,7 +1328,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
     end
     while data.MaintainBaseTemplate do
         local busy = false
-        if eng and not eng:IsDead() then
+        if eng and not eng.Dead then
             if eng:IsUnitState('Building') or eng:IsUnitState('Reclaiming') or eng:IsUnitState('Repairing') or
                               (eng:IsUnitState('Moving') and not eng:IsUnitState('Patrolling')) then
                 busy = true
@@ -1377,7 +1377,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
         if not aiBrain:PlatoonExists(platoon) then
             return false
         end
-        if eng and eng:IsDead()  then
+        if eng and eng.Dead  then
             eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
             if not eng then
                 return false
@@ -1425,18 +1425,18 @@ end
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
     if engTable and table.getn(engTable) > 0 then
         for num, unit in engTable do
-            if not unit:IsDead() then
+            if not unit.Dead then
                 eng = table.remove(engTable, num)
                 if table.getn(engTable) > 0 then
                     IssueGuard(engTable, eng)
                 end
-                if unitBeingBuilt and not unitBeingBuilt:IsDead() then
+                if unitBeingBuilt and not unitBeingBuilt.Dead then
                     IssueRepair({eng}, unitBeingBuilt)
                 end
                 break
             end
         end
-        if eng:IsDead() then
+        if eng.Dead then
             return false
         end
     end
@@ -1546,7 +1546,7 @@ function EngineersAssistFactories(platoon, locationType)
             -- Check for dead factories
             local num = 1
             while num <= table.getn(platoon.PlatoonData.FactoryAssistList) do
-                if platoon.PlatoonData.FactoryAssistList[num].Factory:IsDead() then
+                if platoon.PlatoonData.FactoryAssistList[num].Factory.Dead then
                     reassignEngs = true
                     for engNum, eng in platoon.PlatoonData.FactoryAssistList[num].Engineers do
                         table.insert(reassignEngPool, eng)
@@ -1597,7 +1597,7 @@ function EngineersAssistFactories(platoon, locationType)
             local engNum = 1
             while engNum < table.getn(engTable) do
                 local eng = engTable[engNum]
-                if eng:IsDead() then
+                if eng.Dead then
                     table.remove(engTable, engNum)
                     -- Remove from platoon factory assist list
                     for facNum, facData in platoon.PlatoonData.FactoryAssistList do
@@ -1623,7 +1623,7 @@ function EngineersAssistFactories(platoon, locationType)
             -- If maintain base finished, reassign all engs
             if platoon.PlatoonData.ReassignAssist then
                 for num, unit in platoon:GetPlatoonUnits() do
-                    if not unit:IsDead() and EntityCategoryContains(categories.CONSTRUCTION, unit) then
+                    if not unit.Dead and EntityCategoryContains(categories.CONSTRUCTION, unit) then
                         table.insert(reassignEngPool, unit)
                     end
                 end
@@ -1690,7 +1690,7 @@ function ReorganizeEngineers(platoon, engTable)
             unbalanced = true
             if table.getn(facHighData.Engineers) > 0 then
                 for engNum, engData in facHighData.Engineers do
-                    if not engData:IsDead() then
+                    if not engData.Dead then
                         local moveEng = table.remove(facHighData.Engineers, engNum)
                         facHighData.NumEngs = facHighData.NumEngs - 1
                         -- Decrease number in global fac list
@@ -1725,7 +1725,7 @@ function EngAssist(platoon, engTable)
     local engNum = 1
     while engNum <= table.getn(engTable) do
         eng = engTable[engNum]
-        if not eng:IsDead() and not platoon.PlatoonData.Rebuilding then
+        if not eng.Dead and not platoon.PlatoonData.Rebuilding then
             local lowNum = -1
             local lowFac = false
             for facNum, fac in platoon.PlatoonData.FactoryAssistList do
@@ -1881,7 +1881,7 @@ function GetLoadTransports(platoon)
         end
         attached = true
         for _, v in monitorUnits do
-            if not v:IsDead() and not v:IsIdleState() then
+            if not v.Dead and not v:IsIdleState() then
                 attached = false
                 break
             end
@@ -2156,7 +2156,7 @@ function GetTransportsThread(platoon)
             tempNeeded.Large = neededTable.Large
             -- Find out how many units are needed currently
             for _, v in platoon:GetPlatoonUnits() do
-                if not v:IsDead() then
+                if not v.Dead then
                     if EntityCategoryContains(categories.TRANSPORTATION, v) then
                         local id = v:GetUnitId()
                         if not transSlotTable[id] then

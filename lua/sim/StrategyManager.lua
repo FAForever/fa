@@ -90,11 +90,11 @@ StrategyManager = Class(BuilderManager) {
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
 
-        if builder:GetPriority() >= 70 and builder:GetBuilderStatus() and not builder:IsStrategyActive() then
-            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
+        if builder.Priority >= 70 and builder:GetBuilderStatus() and not builder:IsStrategyActive() then
+            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
             self:ExecuteChanges(builder)
-        elseif (builder:GetPriority() < 70 or not builder:GetBuilderStatus()) and builder:IsStrategyActive() then
-            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder:GetPriority())
+        elseif (builder.Priority < 70 or not builder:GetBuilderStatus()) and builder:IsStrategyActive() then
+            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
             self:UndoChanges(builder)
         end
     end,

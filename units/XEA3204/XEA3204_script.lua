@@ -21,7 +21,7 @@ XEA3204 = Class(TConstructionUnit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        if self.Parent and not self.Parent:IsDead() then
+        if self.Parent and not self.Parent.Dead then
             self.Parent:NotifyOfPodDeath(self.PodName)
             self.Parent = nil
         end
@@ -44,8 +44,8 @@ XEA3204 = Class(TConstructionUnit) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        if self and not self:IsDead() then
-            if self.Parent and not self.Parent:IsDead() then
+        if self and not self.Dead then
+            if self.Parent and not self.Parent.Dead then
                 local myPosition = self:GetPosition()
                 local parentPosition = self.Parent:GetPosition(self.Parent.PodData[self.PodName].PodAttachpoint)
                 local distSq = VDist2Sq(myPosition[1], myPosition[3], parentPosition[1], parentPosition[3])

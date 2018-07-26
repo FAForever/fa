@@ -140,7 +140,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         WaitTicks(1)
         WaitFor(self.Slider)
 
-        if not target:IsDead() then
+        if not target.Dead then
             target.DestructionExplosionWaitDelayMin = 0
             target.DestructionExplosionWaitDelayMax = 0
 
@@ -155,7 +155,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     end,
 
     TractorWatchThread = function(self, target)
-        while not target:IsDead() do
+        while not target.Dead do
             WaitTicks(1)
         end
         KillThread(self.TT1)

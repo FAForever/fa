@@ -68,8 +68,8 @@ BuilderManager = Class {
             local highest = 0
             local key, value
             for k, v in self.BuilderData[bType].Builders do
-                if v:GetPriority() > highest then
-                    highest = v:GetPriority()
+                if v.Priority > highest then
+                    highest = v.Priority
                     value = v
                     key = k
                 end
@@ -131,8 +131,8 @@ BuilderManager = Class {
     GetBuilderPriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
-                    return builder:GetPriority()
+                if builder.BuilderName == builderName then
+                    return builder.Priority
                 end
             end
         end
@@ -142,7 +142,7 @@ BuilderManager = Class {
     GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     return builder:GetActivePriority()
                 end
             end
@@ -153,7 +153,7 @@ BuilderManager = Class {
     SetBuilderPriority = function(self,builderName,priority,temporary,setbystrat)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     builder:SetPriority(priority, temporary, setbystrat)
                     return
                 end
@@ -164,7 +164,7 @@ BuilderManager = Class {
     ResetBuilderPriority = function(self,builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     builder:ResetPriority()
                     return
                 end
@@ -220,7 +220,7 @@ BuilderManager = Class {
     GetBuilder = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     return builder
                 end
             end
@@ -255,12 +255,12 @@ BuilderManager = Class {
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
-            if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and (not found or v:GetPriority() == found) and v:GetBuilderStatus() then
+            if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus() then
                 if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
-                    found = v:GetPriority()
+                    found = v.Priority
                     table.insert(possibleBuilders, k)
                 end
-            elseif found and v:GetPriority() < found then
+            elseif found and v.Priority < found then
                 break
             end
         end
