@@ -22,8 +22,69 @@ local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRollov
 
 local selectedUnit = nil
 local updateThread = nil
-
+local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
+
+function OverchargeCanKill()
+    if unitHP[1] and unitHP.blueprintId then
+        local selected = GetSelectedUnits()
+        local ACU
+        local ACUBp
+        local bp
+    
+        for _, unit in selected do
+            if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
+                ACU = unit
+                break
+            end
+        end  
+        
+        if ACU then
+            ACUBp = ACU:GetBlueprint()
+            
+            if ACUBp.Weapon[2].Overcharge then
+                bp = ACUBp.Weapon[2].Overcharge
+            elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
+                bp = ACUBp.Weapon[3].Overcharge
+            -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
+            end
+            
+            if bp then
+                local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
+                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
+                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+                
+                if damage > bp.maxDamage then
+                    damage = bp.maxDamage
+                end
+            
+                if targetCategories.COMMAND then 
+                    if unitHP[1] < bp.commandDamage then
+                       unitHP[1] = nil
+                       return true
+                    else
+                       unitHP[1] = nil 
+                       return false
+                    end
+                elseif targetCategories.STRUCTURE then
+                    if unitHP[1] < bp.structureDamage then
+                        unitHP[1] = nil
+                        return true
+                    else
+                        unitHP[1] = nil 
+                        return false
+                        end
+                elseif unitHP[1] < damage then
+                    unitHP[1] = nil
+                    return true
+                else
+                    unitHP[1] = nil 
+                    return false
+                end                    
+            end 
+        end
+    end
+end
 
 function Contract()
     controls.bg:SetNeedsFrameUpdate(false)
@@ -295,12 +356,23 @@ function UpdateWindow(info)
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-
+		
+	if info.shieldRatio > 0 and info.fuelRatio > 0 then
+	    controls.store = 1
+	else
+	    controls.store = 0
+	end
+		
         if info.health then
             controls.healthBar:Show()
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
+	    
+        if not info.userUnit then
+            unitHP[1] = info.health
+            unitHP.blueprintId = info.blueprintId
+        end	
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
@@ -318,6 +390,7 @@ function UpdateWindow(info)
         -- Control the veterancy stars
         local currentLevel = UnitData[info.entityId].VeteranLevel
         local massKilled = UnitData[info.entityId].totalMassKilled
+        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
         local myValue = UnitData[info.entityId].myValue
 
         for level = 1, 5 do
@@ -349,6 +422,23 @@ function UpdateWindow(info)
                         text = massKilled .. '/' .. nextLevel
                     end
                     controls.nextVet:SetText(text)
+                elseif massKilledTrue then
+                    controls.vetBar:Show()
+                    controls.vetBar:SetValue(1)
+                    controls.vetTitle:SetText('Mass killed')
+                    
+                    local text
+                    if massKilledTrue >= 1000000 then
+                        text = string.format('%.2fM', massKilledTrue / 1000000)
+                    elseif massKilledTrue >= 100000 then
+                        text = string.format('%.0fK', massKilledTrue / 1000)
+                    elseif massKilledTrue >= 10000 then
+                        text = string.format('%.1fK', massKilledTrue / 1000)
+                    else
+                        text = massKilledTrue 
+                    end
+                    
+                    controls.nextVet:SetText(text)    
                 else
                     controls.vetBar:Hide()
                 end
@@ -581,6 +671,7 @@ function CreateUI()
                 self:SetAlpha(1, true)
             end
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
+	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end

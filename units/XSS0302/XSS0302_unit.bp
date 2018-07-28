@@ -288,7 +288,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0.3,
+            FiringRandomness = 0.25,
             FiringTolerance = 2,
             HeadingArcCenter = 0,
             HeadingArcRange = 160,
@@ -297,7 +297,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 40,
             ProjectileId = '/projectiles/SDFHeavyQuarnonCannon01/SDFHeavyQuarnonCannon01_proj.bp',
             ProjectilesPerOnFire = 1,
             RackBones = {
@@ -370,7 +370,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0.3,
+            FiringRandomness = 0.25,
             FiringTolerance = 2,
             HeadingArcCenter = 0,
             HeadingArcRange = 160,
@@ -379,7 +379,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 40,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SDFHeavyQuarnonCannon01/SDFHeavyQuarnonCannon01_proj.bp',
             ProjectilesPerOnFire = 1,
@@ -453,7 +453,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0.3,
+            FiringRandomness = 0.25,
             FiringTolerance = 2,
             HeadingArcCenter = 180,
             HeadingArcRange = 165,
@@ -462,7 +462,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 40,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SDFHeavyQuarnonCannon01/SDFHeavyQuarnonCannon01_proj.bp',
             ProjectilesPerOnFire = 1,

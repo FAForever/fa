@@ -144,6 +144,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
+        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -578,8 +579,8 @@ UnitBlueprint {
         },
         Shield = {
             BuildCostEnergy = 35000,
-            BuildCostMass = 1000,
-            BuildTime = 1000,
+            BuildCostMass = 1300,
+            BuildTime = 1300,
             Icon = 'ptsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 150,
@@ -606,9 +607,9 @@ UnitBlueprint {
             },
         },
         ShieldHeavy = {
-            BuildCostEnergy = 93750,
-            BuildCostMass = 1500,
-            BuildTime = 1750,
+            BuildCostEnergy = 123750,
+            BuildCostMass = 2300,
+            BuildTime = 2450,
             Icon = 'phtsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 250,
@@ -617,9 +618,9 @@ UnitBlueprint {
             PersonalShield = true,
             Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 29000,
+            ShieldMaxHealth = 25000,
             ShieldRechargeTime = 160,
-            ShieldRegenRate = 37,
+            ShieldRegenRate = 32,
             ShieldRegenStartTime = 1,
             ShowBones = {
                 'Back_Upgrade',
@@ -801,6 +802,7 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
@@ -951,14 +953,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -971,6 +973,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/ADFOverCharge01/ADFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1033,14 +1042,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 12000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1052,6 +1061,13 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
+            Overcharge = {
+                energyMult = 0.9,
+                commandDamage = 400,
+                structureDamage = 800,
+                maxDamage = 15000,
+                minDamage = 1500,
+            },
             ProjectileId = '/projectiles/ADFOverCharge01/ADFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {

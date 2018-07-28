@@ -1,0 +1,32 @@
+PropBlueprint {
+    Categories = {
+        'INVULNERABLE',
+    },
+    CollisionOffsetX = 1,
+    CollisionOffsetY = 1,
+    CollisionOffsetZ = 1,
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Rock4b_albedo.dds',
+                    LODCutoff = 3000,
+                    NormalsName = 'Rock4b_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                    SpecularName = 'Rock4b_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 0.09,
+    },
+    Interface = {
+        HelpText = 'UEF Buildings',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 8,
+    SizeY = 8,
+    SizeZ = 8,
+}

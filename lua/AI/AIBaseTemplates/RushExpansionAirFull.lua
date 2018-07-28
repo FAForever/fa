@@ -59,6 +59,7 @@ BaseBuilderTemplate {
 
         'T1LandAA',
         'T2LandAA',
+        'T3LandResponseBuilders',
 
         'T1ReactionDF',
         'T2ReactionDF',

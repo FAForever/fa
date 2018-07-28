@@ -1,0 +1,41 @@
+PropBlueprint {
+   Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'IceDebris_albedo.dds',
+                    LODCutoff = 4000,
+                    NormalsName = 'IceDebris_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                    SpecularName = 'IceDebris_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 1,
+    },
+    Economy = {
+        ReclaimEnergyMax = '100',
+        ReclaimMassMax = 80,
+        ReclaimTime = 3,
+    },
+     Footprint = {
+        OccupancyCaps = 3,
+    },
+     Interface = {
+        HelpText = 'Large Rock - Ice',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

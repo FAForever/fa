@@ -1337,7 +1337,7 @@ IsHumanUnit = function(self)
     end
 end
 
-function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag)
+function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, teleDelay)
     -- Plays teleport effects for the given unit
     if not unit then
         return
@@ -1385,6 +1385,10 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag)
         else
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
+    end
+    
+    if teleDelay then
+        WaitTicks(teleDelay * 10)
     end
 
     -- Play tele FX at destination, including sounds

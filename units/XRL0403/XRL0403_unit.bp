@@ -222,7 +222,7 @@ UnitBlueprint {
         BuildCostEnergy = 437500,
         BuildCostMass = 37500,
         BuildRate = 45,
-        BuildTime = 18750,
+        BuildTime = 60625,
         BuildableCategory = {
             'xrl0002',
             'xrl0003',
@@ -561,8 +561,9 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'MOBILE',
+                'SUBMERSIBLE',
                 'STRUCTURE DEFENSE',
+                'MOBILE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },

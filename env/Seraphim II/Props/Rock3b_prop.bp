@@ -1,0 +1,41 @@
+PropBlueprint {
+    Categories = {
+        'INVULNERABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Rock3b_albedo.dds',
+                    LODCutoff = 3000,
+                    NormalsName = 'Rock3b_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                    SpecularName = 'Rock3b_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Huge Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 44,
+    SizeY = 40,
+    SizeZ = 48,
+}

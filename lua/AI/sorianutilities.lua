@@ -834,13 +834,13 @@ function LeadTarget(platoon, target)
         -- 1st position of target
         TargetPos = target:GetPosition()
         TargetStartPosition = {TargetPos[1], 0, TargetPos[3]}
-        WaitSeconds(1)
+        WaitTicks(10)
         -- 2nd position of target after 1 second
         TargetPos = target:GetPosition()
         Target1SecPos = {TargetPos[1], 0, TargetPos[3]}
         XmovePerSec = (TargetStartPosition[1] - Target1SecPos[1])
         YmovePerSec = (TargetStartPosition[3] - Target1SecPos[3])
-        WaitSeconds(1)
+        WaitTicks(10)
         -- 3rd position of target after 2 seconds to verify straight movement
         TargetPos = target:GetPosition()
         Target2SecPos = {TargetPos[1], TargetPos[2], TargetPos[3]}

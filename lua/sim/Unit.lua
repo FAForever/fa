@@ -1099,7 +1099,7 @@ Unit = Class(moho.unit_methods) {
             self:DoOnDamagedCallbacks(instigator)
 
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
-            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
             else
                 self:DoTakeDamage(instigator, amount, vector, damageType)
@@ -1289,18 +1289,34 @@ Unit = Class(moho.unit_methods) {
     VeterancyDispersal = function(self, suicide)
         local bp = self:GetBlueprint()
         local mass = self:GetVeterancyValue()
+        local massTrue
         -- Adjust mass based on current health when a unit is self destructed
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
+        end
+        
+        massTrue = mass
+        
+        -- Non-combat structures only give 50% veterancy
+        if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
+            mass = mass * 0.5
         end
 
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
-            if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
-                -- Find the proportion of yourself that each instigator killed
-                local massKilled = math.floor(mass * (data.damage / self.totalDamageTaken))
-                unit:OnKilledUnit(self, massKilled)
+            if unit and not unit.Dead and unit.gainsVeterancy then
+                local proportion = data.damage / self.totalDamageTaken
+                
+                -- True value for "Mass killed"
+                local massKilledTrue = math.floor(massTrue * proportion)
+                unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
+                
+                if unit.Sync.VeteranLevel < 5 then
+                    -- Find the proportion of yourself that each instigator killed
+                    local massKilled = math.floor(mass * proportion)
+                    unit:OnKilledUnit(self, massKilled)
+                end
             end
         end
     end,
@@ -1344,6 +1360,9 @@ Unit = Class(moho.unit_methods) {
     CalculateVeterancyLevel = function(self, massKilled)
         local bp = self:GetBlueprint()
 
+        -- Limit the veterancy gain from one kill to one level worth
+        massKilled = math.min(massKilled, self.Sync.myValue)
+
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
 
@@ -1353,13 +1372,10 @@ Unit = Class(moho.unit_methods) {
         -- Bail if our veterancy hasn't increased
         if newVetLevel == self.Sync.VeteranLevel then return end
 
-        -- If the unit gained more than one level make sure not to skip any
-        for level = self.Sync.VeteranLevel + 1, newVetLevel, 1 do
-            -- Update our recorded veterancy level
-            self.Sync.VeteranLevel = level
+        -- Update our recorded veterancy level
+        self.Sync.VeteranLevel = newVetLevel
 
-            self:SetVeteranLevel(self.Sync.VeteranLevel)
-        end
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
     -- Use this to set a veterancy level directly, usually used by a scenario
@@ -2087,6 +2103,7 @@ Unit = Class(moho.unit_methods) {
 
         if self.gainsVeterancy then
             self.Sync.totalMassKilled = 0
+            self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
 
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
@@ -4123,8 +4140,8 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
 
-    PlayTeleportChargeEffects = function(self, location, orientation)
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
+    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
@@ -4237,7 +4254,7 @@ Unit = Class(moho.unit_methods) {
 
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
-        if self:ShieldIsOn() then
+        if self:ShieldIsOn() or self.MyShield.Charging then
             self:DisableShield()
             self:DisableDefaultToggleCaps()
         end

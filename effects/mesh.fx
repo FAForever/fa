@@ -4159,7 +4159,7 @@ technique VertexNormal_HighFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
@@ -4188,7 +4188,7 @@ technique VertexNormal_MedFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
@@ -4217,7 +4217,7 @@ technique VertexNormal_LowFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "DepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
@@ -4430,7 +4430,7 @@ technique UndulatingNormalMappedAlpha_HighFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
@@ -4459,7 +4459,7 @@ technique UndulatingNormalMappedAlpha_MedFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
@@ -4488,7 +4488,7 @@ technique UndulatingNormalMappedAlpha_LowFidelity
     string cartographicTechnique = "CartographicFeature";
     string depthTechnique = "UndulatingDepthClip";
 
-    int renderStage = STAGE_DEPTH + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {

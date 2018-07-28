@@ -30,10 +30,12 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
+        'BUILTBYTIER3ENGINEER',
+        'BUILTBYTIER3COMMANDER',
         'CYBRAN',
         'STRUCTURE',
         'DEFENSE',
-        'TECH2',
+        'TECH3',
         'SHIELD',
         'DRAGBUILD',
         'SIZE12',
@@ -115,7 +117,7 @@ UnitBlueprint {
         BuildCostEnergy = 41000,
         BuildCostMass = 2460,
         BuildRate = 11.81,
-        BuildTime = 1467,
+        BuildTime = 3667,
         BuildableCategory = {
             'urb4207',
         },

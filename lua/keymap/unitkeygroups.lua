@@ -430,6 +430,7 @@ unitkeygroups = {
     },
     ["Heavy_Shield_Generator"] = {
         "xsb4301",
+        "urb4206",
         "ueb4301",
         "uab4301",
     },

@@ -72,10 +72,10 @@ end
 
 function ToggleAvatars(checked)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
-        return
-    end
-
+    if GameMain.gameUIHidden then
+       return
+    end	
+	
     if UIUtil.GetAnimationPrefs() then
         if controls.avatarGroup:IsHidden() then
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
@@ -142,8 +142,15 @@ function CreateAvatar(unit)
 
     bg.healthbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
-        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),
+        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),		
         true, "avatar RO Health Status Bar")
+		
+    bg.shieldbar = StatusBar(bg, 0, 1, false, false,
+        UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
+        UIUtil.SkinnableFile('/game/avatar/shield-bar-blue.dds'),
+        true, "avatar RO Shield Status Bar")
+	
+
     bg.healthbar.Left:Set(function() return bg.Left() + 8 end)
     bg.healthbar.Right:Set(function() return bg.Right() - 14 end)
     bg.healthbar.Bottom:Set(function() return bg.Bottom() - 5 end)
@@ -151,8 +158,12 @@ function CreateAvatar(unit)
     bg.healthbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.healthbar.Width:Set(function() return bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.healthbar:DisableHitTest(true)
-
-
+	
+    LayoutHelpers.CenteredBelow(bg.shieldbar, bg.healthbar, -5)
+    bg.shieldbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
+    bg.shieldbar.Width:Set(function() return  bg.healthbar.Right() - bg.healthbar.Left() end)
+    bg.shieldbar:DisableHitTest(true)
+	
     bg.curIndex = 1
     bg.HandleEvent = ClickFunc
     bg.idleAnnounced = true
@@ -190,10 +201,22 @@ function CreateAvatar(unit)
                 bg.idle = false
             end
         end
+
         local tempPrevHealth = bg.healthbar._value()
         local tempHealth = self.units[1]:GetHealth()
+        local shieldRatio = self.units[1]:GetShieldRatio()
         bg.healthbar:SetRange(0, self.units[1]:GetMaxHealth())
         bg.healthbar:SetValue(tempHealth)
+        bg.shieldbar:SetValue(shieldRatio)
+		
+        if not GameMain.gameUIHidden then
+           if shieldRatio > 0 and self.units[1]:IsInCategory('COMMAND') then          
+              bg.shieldbar:Show()
+           else
+              bg.shieldbar:Hide()
+           end
+        end
+		
         if tempPrevHealth ~= tempHealth then
             SetHealthbarColor(bg.healthbar, self.units[1]:GetHealth() / self.units[1]:GetMaxHealth())
         end
