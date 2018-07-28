@@ -56,7 +56,9 @@ Sinker = Class(Projectile) {
     OnImpact = function(self, targetType, targetEntity)
         if targetType == 'Terrain' then
             self:Destroy()
-            ForkThread(self.callback)
+            if self.callback then
+                ForkThread(self.callback)
+            end    
         end
     end,
 }

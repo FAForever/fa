@@ -105,7 +105,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
     end
 
     -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
-    prop.AssociatedBP = bp.BlueprintId
+    prop.AssociatedBP = bp.Wreckage.IdHook or bp.BlueprintId
 
     return prop
 end

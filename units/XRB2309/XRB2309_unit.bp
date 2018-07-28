@@ -44,8 +44,6 @@ UnitBlueprint {
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYTIER3COMMANDER',
         'CYBRAN',
         'STRUCTURE',
         'DEFENSE',
@@ -59,10 +57,6 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
-        'STEALTH',
-        'SUBMERSIBLE',
-        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
-        'INSIGNIFICANTUNIT',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -99,8 +93,21 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/XRB2308/XRB2308_albedo.dds',
                     LODCutoff = 215,
+                    MeshName = '/units/XRB2308/XRB2308_lod0.scm',
+                    NormalsName = '/units/XRB2308/XRB2308_normalsTS.dds',
+                    Scrolling = true,
                     ShaderName = 'Insect',
+                    SpecularName = '/units/XRB2308/XRB2308_SpecTeam.dds',
+                },
+                {
+                    AlbedoName = '/units/XRB2308/XRB2308_albedo.dds',
+                    LODCutoff = 215,
+                    MeshName = '/units/XRB2308/XRB2308_lod1.scm',
+                    NormalsName = '/units/XRB2308/XRB2308_normalsTS.dds',
+                    ShaderName = 'Insect',
+                    SpecularName = '/units/XRB2308/XRB2308_SpecTeam.dds',
                 },
             },
         },
@@ -163,9 +170,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealth = false,
+        RadarStealth = true,
         SonarRadius = 42,
-        SonarStealth = false,
+        SonarStealth = true,
         VisionRadius = 20,
         WaterVisionRadius = 45,
     },
@@ -182,8 +189,8 @@ UnitBlueprint {
             LAYER_Land = false,
             LAYER_Orbit = false,
             LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
+            LAYER_Sub = true,
+            LAYER_Water = false,
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
@@ -265,7 +272,6 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
@@ -300,5 +306,6 @@ UnitBlueprint {
             Sub = true,
             Water = true,
         },
+        IdHook = 'xrb2308',
     },
 }
