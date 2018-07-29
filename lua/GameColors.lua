@@ -15,7 +15,6 @@ GameColors = {
     "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
-    "ffffbf80",      -- lt orange
     "ffa79602",      -- Sera golden
     "ffb76518",      -- new brown
     "ff901427",      -- dark red
@@ -38,7 +37,6 @@ GameColors = {
     "FF2929e1",      -- UEF blue
     "FF5F01A7",      -- dark purple
     "ffff32ff",      -- new fuschia
-    "ffffbf80",      -- lt orange
     "ffa79602",      -- Sera golden
     "ffb76518",      -- new brown
     "ff901427",      -- dark red
