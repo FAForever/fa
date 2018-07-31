@@ -90,7 +90,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYINDIRECTFIRE',
-        'CQUEMOV',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = 0.9,
     Defense = {
