@@ -1142,6 +1142,7 @@ Unit = Class(moho.unit_methods) {
                     excessDamageRatio = -excess / maxHealth
                 end
 
+                self:SetReclaimable(false)
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
