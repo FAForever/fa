@@ -438,6 +438,75 @@ function CreateResources()
     end
 end
 
+function CreateWreckage(unit, needToRotate)
+    prop = unit:CreateWreckageProp(0)
+    if needToRotate then -- Some units like naval and air need to rotate for effect like after death in game
+        local roll = 0.5 + Random() - 2 * Random(0, 1) -- Random angle +-(0.5->1.5) radian
+        local pitch = 0.5 + Random() - 2 * Random(0, 1)
+        local yaw = 0
+
+        local unitRotation = unit:GetOrientation()
+        local rotation = EulerToQuaternion(roll, pitch, yaw)
+        local newOrientation = {}
+        -- mmm I`m love quaternions... =3
+        newOrientation[1] = unitRotation[4] * rotation[1] + unitRotation[1] * rotation[4] + unitRotation[2] * rotation[3] - unitRotation[3] * rotation[2]
+        newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] + unitRotation[3] * rotation[1] - unitRotation[1] * rotation[3]
+        newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] + unitRotation[1] * rotation[2] - unitRotation[2] * rotation[1]
+        newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] - unitRotation[2] * rotation[2] - unitRotation[3] * rotation[3]
+        
+        prop:SetOrientation(newOrientation, true)
+    end
+    unit:Destroy()
+end
+
+-- Animate unit death and skip it. Used for create wreckage like after death
+function AnimateDeathThread(unit, deathAnim)
+    local animBlock = unit:ChooseAnimBlock(deathAnim)
+    local animator = CreateAnimator(unit)
+    animator:PlayAnim(animBlock.Animation)
+    local rate = unit.rate or 1
+    
+    if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
+        rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+    end
+    
+    animator:SetRate(rate)
+    animator:SetAnimationTime(1000)
+    unit.Trash:Add(animator)
+    
+    if animator then
+        WaitFor(animator)
+    end
+    
+    CreateWreckage(unit, false)
+end
+
+function CreateWreckageUnit(unit)
+	local bp = unit:GetBlueprint()
+	
+	local isStructure = bp.CategoriesHash.STRUCTURE
+	local isAir = bp.CategoriesHash.AIR
+	local isLand = bp.CategoriesHash.LAND
+	local isExperimental = bp.CategoriesHash.EXPERIMENTAL
+
+	local layer = unit:GetCurrentLayer()
+	local unitPos = unit:GetPosition()
+	local deep = (GetSurfaceHeight(unitPos[1],unitPos[3]) - GetTerrainHeight(unitPos[1],unitPos[3]))
+	local deathAnim = bp.Display['AnimationDeath']
+	
+	-- If unit stay on land or deep<5 and have death animation, animate this
+	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and (layer == 'Land' or deep < 5)
+	-- We want to random rotate all naval and air units whats haven`t death animation
+	local needRotate = not (layer == 'Land' or isStructure or isLand) or (isAir and isExperimental)
+
+	if needAnimate then
+		ForkThread(AnimateDeathThread, unit, deathAnim)
+	else
+		unit.PlayDeathAnimation = false -- Coz some units have broken animation and hold on surfase for ever
+		CreateWreckage(unit, needRotate)
+	end
+end
+
 ----[  InitializeArmies                                                           ]--
 ----[                                                                             ]--
 ----[                                                                             ]--
@@ -486,11 +555,10 @@ function InitializeArmies()
 
             local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
             if wreckageGroup then
-                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-                for num,unit in tblResult do
-                    unit:CreateWreckageProp(0)
-                    unit:Destroy()
-                end
+			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
+				for num, unit in tblResult do
+					CreateWreckageUnit(unit)
+				end
             end
 
             ----[ irumsey                                                         ]--
@@ -588,11 +656,10 @@ function InitializeScenarioArmies()
 
             local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
             if wreckageGroup then
-                local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-                for num,unit in tblResult do
-                    unit:CreateWreckageProp(0)
-                    unit:Destroy()
-                end
+			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
+				for num, unit in tblResult do
+					CreateWreckageUnit(unit)
+				end
             end
 
             ----[ eemerson                                                         ]--
@@ -829,10 +896,9 @@ function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
     end
     if wreckage then
-        for num, unit in tblResult do
-            unit:CreateWreckageProp(0)
-            unit:Destroy()
-        end
+		for num, unit in tblResult do
+			CreateWreckageUnit(unit)
+		end
         return
     end
     return tblResult, treeResult, platoonList
