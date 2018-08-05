@@ -58,6 +58,7 @@ UnitBlueprint {
         'TECH2',
         'ANTIAIR',
         'INDIRECTFIRE',
+        'DIRECTFIRE',
         'SILO',
         'VISIBLETORECON',
         'RECLAIMABLE',

@@ -120,6 +120,7 @@ UnitBlueprint {
         'FACTORY',
         'NEEDMOBILEBUILD',
         'ANTIAIR',
+        'ANTISUB',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DRAGBUILD',

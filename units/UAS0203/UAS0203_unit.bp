@@ -80,6 +80,7 @@ UnitBlueprint {
         'NAVAL',
         'TECH1',
         'ANTINAVY',
+        'DIRECTFIRE',
         'SUBMERSIBLE',
         'VISIBLETORECON',
         'RECLAIMABLE',
