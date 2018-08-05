@@ -59,6 +59,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
         'DUMMYGSRWEAPON',
+        'BOT',
     },
     CollisionOffsetY = 0,
     Defense = {

@@ -73,6 +73,7 @@ UnitBlueprint {
         'EXPERIMENTAL',
         'DIRECTFIRE',
         'ANTIAIR',
+        'ANTISUB',
         'NEEDMOBILEBUILD',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
@@ -86,6 +87,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYINDIRECTFIRE',
+        'BOT',
     },
     CollisionOffsetY = 0.9,
     Defense = {

@@ -45,6 +45,7 @@ UnitBlueprint {
         'LAND',
         'TECH3',
         'DIRECTFIRE',
+        'ANTISUB',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'TANK',

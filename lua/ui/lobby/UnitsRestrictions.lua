@@ -55,9 +55,9 @@ Expressions = {
     AEON        = "(AEON - COMMAND)",
     SERAPHIM    = "(SERAPHIM - COMMAND)",
     NOMADS      = "(NOMADS - COMMAND)",
-    -- Salvation is not categorized as EXPERIMENTAL like Scathis and Mavor so a bit complex expression
-    T4ARTY      = "(ARTILLERY * SIZE20 * TECH3) + (ARTILLERY * EXPERIMENTAL) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
-    T3ARTY      = "(ARTILLERY * SIZE16 * TECH3)",  -- "uab2302 + urb2302 + ueb2302 + xsb2302", Heavy Artillery
+
+    T4ARTY      = "(ARTILLERY * EXPERIMENTAL) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
+    T3ARTY      = "(ARTILLERY * STRUCTURE * TECH3)",  -- "uab2302 + urb2302 + ueb2302 + xsb2302", Heavy Artillery
     T2ARTY      = "(ARTILLERY * STRUCTURE * TECH2)",
     T1ARTY      = "(ARTILLERY * STRUCTURE * TECH1)",
 
@@ -70,17 +70,16 @@ Expressions = {
     NUKESUBS    = "(NUKE * SUBMERSIBLE)",               -- "uas0304 + urs0304 + ues0304"
 
     -- unfortunate, some units must be restricted using their IDs unless their categories are updated with a new TML category
-    TMLNAVAL    = "(NUKE * SUBMERSIBLE) + xss0303 + xss0202 + xas0306 + ues0202", -- SERA Carrier + AEON Missile Ship + UEF Cruiser
+    TMLNAVAL    = "(NUKE * SUBMERSIBLE) + xss0303 + xss0202 + xas0306 + ues0202", -- SERA Carrier + SERA Cruiser + AEON Missile Ship + UEF Cruiser
     TMLDEF      = "(STRUCTURE * TECH2 * ANTIMISSILE)",
-    TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM) - ARTILLERY", -- xsb2108 + urb2108 + ueb2108 + uab2108
+    TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
 
     -- added exclusion of engineers and structures because they are restricted by other presets
-    LAND        = "(LAND - ENGINEER - STRUCTURE)",
+    LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
     AIR         = "((STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD))",
-    -- added restriction of anti-navy structures because they are not needed when all navy units are restricted
-    NAVAL       = "((STRUCTURE * ANTINAVY) + NAVAL - (MOBILESONAR * TECH3))",
+    NAVAL       = "NAVAL - STRUCTURE - (MOBILESONAR * TECH3))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
     AMPHIBIOUS  = "(AMPHIBIOUS + xsl0401 + xsl0303 + xel0305 + xrl0305 + url0203 + urs0201 + url0402 + url0402 + xrl0403 + uel0401 + ual0401 + url0401)", -- Monkey Lord, CYBRIAN T2 Destroyer
     SUBS        = "((NAVAL * SUBMERSIBLE) - STRUCTURE)",
@@ -117,33 +116,33 @@ Expressions = {
     T2_BASE_SPAM  = "(TECH2 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE)",
     T3_BASE_SPAM  = "(TECH3 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
 
-    -- including Soul Ripper, Czar, and Ahwassa
-    SNIPES_AIR    = "(AIR * (TECH2 + TECH3) * (GROUNDATTACK + BOMBER + ANTINAVY) + ura0401 + uaa0310 + xsa0402)",
+    -- including Satellite, Soul Ripper, Czar, and Ahwassa and GhetoGunship
+    SNIPES_AIR    = "(AIR * (TECH2 + TECH3 + EXPERIMENTAL) * (GROUNDATTACK + BOMBER + ANTINAVY) + TRANSPORTATION) + uaa0310", -- CZAR
     SNIPES_LAND   = "(LAND * MOBILE * BOMB + xrl0302)", -- Beetle Bomb
-    SNIPES_BOTS   = "(LAND * SNIPER * BOT + xsl0305 + xal0305)", -- Sniper Bots
+    SNIPES_BOTS   = "(LAND * SNIPER * BOT)",
     SNIPES_BASE   = "(STRUCTURE * MINE)", -- for mods that add LAND MINES
 
     ANTIAIR_FIGHTERS = "(ANTIAIR * AIR - EXPERIMENTAL - GROUNDATTACK)",
-    ANTIAIR_NAVY     = "(ANTIAIR * NAVAL - EXPERIMENTAL)",
-    ANTIAIR_LAND     = "(ANTIAIR * LAND - EXPERIMENTAL)",
+    ANTIAIR_NAVY     = "(ANTIAIR * NAVAL - EXPERIMENTAL - FRIGATE)", -- could include sera T3 sub
+    ANTIAIR_LAND     = "(ANTIAIR * LAND - EXPERIMENTAL + url0301_AntiAir)",
     ANTIAIR_BASE     = "(ANTIAIR * STRUCTURE)",
 
-    TORPEDO_AIR   = "(ANTINAVY * AIR - EXPERIMENTAL - GROUNDATTACK)",
-    TORPEDO_BOATS = "(ANTINAVY * NAVAL - EXPERIMENTAL)",
-    TORPEDO_LAND  = "(ANTINAVY * LAND - EXPERIMENTAL)",
+    TORPEDO_AIR   = "(ANTINAVY * AIR)", -- Include CZAR, as it has torpedo weapon
+    TORPEDO_BOATS = "(ANTISUB * NAVAL + uas0401)", -- Include tempest
+    TORPEDO_LAND  = "(ANTISUB * LAND)",
     TORPEDO_BASE  = "(ANTINAVY * STRUCTURE)",
 
-    DIRECTFIRE_AIR      = "(BOMBER * AIR - EXPERIMENTAL - ANTINAVY)",
-    DIRECTFIRE_GUNSHIPS = "(GROUNDATTACK * AIR - EXPERIMENTAL)",
-    DIRECTFIRE_NAVY     = "(DIRECTFIRE * NAVAL - EXPERIMENTAL - SUBMERSIBLE + xss0201)",
-    DIRECTFIRE_LAND     = "(DIRECTFIRE * LAND - EXPERIMENTAL - COMMAND - SUBCOMMANDER - SCOUT)",
+    DIRECTFIRE_AIR      = "(BOMBER * AIR - ANTINAVY)",
+    DIRECTFIRE_GUNSHIPS = "(GROUNDATTACK * AIR)",
+    DIRECTFIRE_NAVY     = "(DIRECTFIRE * NAVAL)",
+    DIRECTFIRE_LAND     = "(DIRECTFIRE * LAND - COMMAND + SUBCOMMANDER)",
     DIRECTFIRE_BOTS     = "(DIRECTFIRE * BOT)",
     DIRECTFIRE_BASE     = "(DIRECTFIRE * STRUCTURE)",
     DIRECTFIRE_BASE_T3  = "(DIRECTFIRE * STRUCTURE * TECH3)",
     DIRECTFIRE_BASE_T2  = "(DIRECTFIRE * STRUCTURE * TECH2)",
     DIRECTFIRE_BASE_T1  = "(DIRECTFIRE * STRUCTURE * TECH1)",
 
-    SHIELD_AIR  = "(SHIELD * AIR)",
+    SHIELD_AIR  = "(SHIELD * AIR)", 
     SHIELD_NAVY = "(SHIELD * NAVAL)",
     SHIELD_LAND = "(SHIELD * LAND - TANK - BOT + uel0301_BubbleShield + uel0401)", -- excluding personal shields
     SHIELD_BASE = "(SHIELD * STRUCTURE)",
@@ -204,9 +203,12 @@ Enhancements = {
                      "StealthGeneratorRemove",
                      "CloakingGenerator",
                      "CloakingGeneratorRemove"},
-
     SHIELD_LAND = { "ShieldGeneratorField",
                     "ShieldGeneratorField" },
+    ANTIAIR_LAND = { "NaniteMissileSystem",
+                     "NaniteMissileSystemRemove"},
+    TORPEDO_LAND = { "NaniteTorpedoTube",
+                     "NaniteTorpedoTubeRemove"},
 }
 --- defines sorting of preset restrictions and used in UnitsManager.lua
 local presetsOrder = {
@@ -662,8 +664,8 @@ local function CreatePresets()
         "<LOC restricted_units_data_TMLBASE>No Tactical Missile Launchers",
         "/textures/ui/common/icons/presets/tml-base.dds")
     CreatePreset("TMLMOBILE",
-        "<LOC restricted_units_info_TMLMOBILE>Prevents all mobile land units that provide tactical missile launch (TML) ability ",
-        "<LOC restricted_units_data_TMLMOBILE>No Tactical Mobile Launchers",
+        "<LOC restricted_units_info_TMLMOBILE>Prevents all mobile missile launcher (MML)",
+        "<LOC restricted_units_data_TMLMOBILE>No Mobile Missile Launchers",
         "/textures/ui/common/icons/presets/tml-land.dds")
     CreatePreset("TMLNAVAL",
         "<LOC restricted_units_info_TMLNAVAL>Prevents all naval ships that provide tactical missile launch (TML) ability ",
@@ -728,7 +730,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_TORPEDO_AIR>No Torpedo Bombers",
         "/textures/ui/common/icons/presets/torpedo-air.dds")
     CreatePreset("TORPEDO_BOATS",
-        "<LOC restricted_units_info_TORPEDO_BOATS>Prevents naval units with torpedo weapons",
+        "<LOC restricted_units_info_TORPEDO_BOATS>Prevents naval units with torpedo weapons : destroyers, torpedo boat and tempest",
         "<LOC restricted_units_data_TORPEDO_BOATS>No Torpedo Boats",
         "/textures/ui/common/icons/presets/torpedo-navy.dds")
     CreatePreset("TORPEDO_LAND",

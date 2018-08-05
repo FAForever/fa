@@ -61,6 +61,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYRADAR',
+        'BOT',
     },
     CollisionOffsetY = -0.025,
     CollisionOffsetZ = 0.05,

@@ -61,6 +61,7 @@ UnitBlueprint {
         'LAND',
         'TECH3',
         'ANTIAIR',
+        'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',

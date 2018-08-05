@@ -53,7 +53,6 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH3',
-        'DIRECTFIRE',
         'ANTIMISSILE',
         'VISIBLETORECON',
         'RECLAIMABLE',
