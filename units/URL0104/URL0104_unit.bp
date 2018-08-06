@@ -46,12 +46,12 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH1',
+        'DIRECTFIRE',
         'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
         'OVERLAYDIRECTFIRE',
-        'DIRECTFIRE',
     },
     Defense = {
         AirThreatLevel = 0.33,

@@ -62,7 +62,9 @@ UnitBlueprint {
         'AEON',
         'MOBILE',
         'LAND',
+        'BOT',
         'DIRECTFIRE',
+        'AMPHIBIOUS',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
@@ -70,7 +72,6 @@ UnitBlueprint {
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
-        'BOT',
     },
     CollisionOffsetY = 0.3,
     Defense = {

@@ -48,7 +48,7 @@ Expressions = {
     T1          = "(TECH1 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC)",
     T2          = "(TECH2 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC)",
     T3          = "(TECH3 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC + SUBCOMMANDER)",
-    T4          = "EXPERIMENTAL - (MOBILE * ENGINEER)",
+    T4          = "(EXPERIMENTAL - (MOBILE * ENGINEER))",
     -- excluding ACUs because game might crash if someone picks restricted faction
     UEF         = "(UEF - COMMAND)",
     CYBRAN      = "(CYBRAN - COMMAND)",
@@ -78,10 +78,10 @@ Expressions = {
     -- added exclusion of engineers and structures because they are restricted by other presets
     LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
-    AIR         = "((STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD))",
-    NAVAL       = "NAVAL - STRUCTURE - (MOBILESONAR * TECH3))",
+    AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD)",
+    NAVAL       = "(NAVAL - STRUCTURE - (MOBILESONAR * TECH3))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
-    AMPHIBIOUS  = "(AMPHIBIOUS + xsl0401 + xsl0303 + xel0305 + xrl0305 + url0203 + urs0201 + url0402 + url0402 + xrl0403 + uel0401 + ual0401 + url0401)", -- Monkey Lord, CYBRIAN T2 Destroyer
+    AMPHIBIOUS  = "(AMPHIBIOUS)",
     SUBS        = "((NAVAL * SUBMERSIBLE) - STRUCTURE)",
     BOTS        = "(LAND * BOT)",
     BASE        = "(STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
@@ -117,8 +117,8 @@ Expressions = {
     T3_BASE_SPAM  = "(TECH3 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
 
     -- including Satellite, Soul Ripper, Czar, and Ahwassa and GhetoGunship
-    SNIPES_AIR    = "(AIR * (TECH2 + TECH3 + EXPERIMENTAL) * (GROUNDATTACK + BOMBER + ANTINAVY) + TRANSPORTATION) + uaa0310", -- CZAR
-    SNIPES_LAND   = "(LAND * MOBILE * BOMB + xrl0302)", -- Beetle Bomb
+    SNIPES_AIR    = "((AIR * (TECH2 + TECH3 + EXPERIMENTAL) * (GROUNDATTACK + BOMBER + ANTINAVY)) + uaa0310 + ual0106 + uel0106 + url0106)", -- CZAR and labs for GhetoGunship
+    SNIPES_LAND   = "(LAND * MOBILE * BOMB)",
     SNIPES_BOTS   = "(LAND * SNIPER * BOT)",
     SNIPES_BASE   = "(STRUCTURE * MINE)", -- for mods that add LAND MINES
 
@@ -128,8 +128,8 @@ Expressions = {
     ANTIAIR_BASE     = "(ANTIAIR * STRUCTURE)",
 
     TORPEDO_AIR   = "(ANTINAVY * AIR)", -- Include CZAR, as it has torpedo weapon
-    TORPEDO_BOATS = "(ANTISUB * NAVAL + uas0401)", -- Include tempest
-    TORPEDO_LAND  = "(ANTISUB * LAND)",
+    TORPEDO_BOATS = "(ANTINAVY * NAVAL)",
+    TORPEDO_LAND  = "(ANTINAVY * LAND)",
     TORPEDO_BASE  = "(ANTINAVY * STRUCTURE)",
 
     DIRECTFIRE_AIR      = "(BOMBER * AIR - ANTINAVY)",
@@ -149,15 +149,15 @@ Expressions = {
 
     AIR_TANSPORTS = "(AIR * TRANSPORTATION)",
 
-    SUPPFAC      = "SUPPORTFACTORY",
+    SUPPFAC      = "(SUPPORTFACTORY)",
     ENGISTATION  = "(STRUCTURE * ENGINEERSTATION)", -- no need to exclude pod drones
     ENGIDRONES   = "(STRUCTURE * ENGINEERSTATION * UEF) + (SUBCOMMANDER * Pod) + POD", -- UEF COM WITH DRONES
     ENGINEERS    = "(LAND * ENGINEER) - COMMAND - SUBCOMMANDER - Pod - POD + xrl0002", -- civil engineers + Crab Egg (Engineer)
 
     PARAGON      = "(EXPERIMENTAL * MASSPRODUCTION * ENERGYPRODUCTION)",
     FABS         = "(STRUCTURE * MASSFABRICATION) - EXPERIMENTAL",
-    MASSINCOME   = "(STRUCTURE * (MASSEXTRACTION + MASSSTORAGE) - EXPERIMENTAL)",
-    ENGYINCOME   = "(STRUCTURE * (ENERGYPRODUCTION + ENERGYSTORAGE) - EXPERIMENTAL)",
+    MASSINCOME   = "(STRUCTURE * MASSEXTRACTION) - EXPERIMENTAL",
+    ENGYINCOME   = "(STRUCTURE * ENERGYPRODUCTION) - EXPERIMENTAL",
 
     SUPCOMS      = "(SUBCOMMANDER + GATE)",
     RAS          = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)"
@@ -170,10 +170,10 @@ Expressions = {
     INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY)",
     INTEL_LAND   = "(((OMNI + RADAR + SONAR + SCOUT) * LAND) - COMMAND - DEFENSE - SUBCOMMANDER - ANTIAIR - ANTINAVY)",
 
-    STEALTH_BASE = "((STEALTH + uab4203 + urb4203 + ueb4203 + xsb4203) * STRUCTURE)",
-    STEALTH_AIR  = "((STEALTH + ura0302 + ura0303 + ura0304) * AIR)",
-    STEALTH_LAND = "((STEALTH + url0402 + url0306) * LAND + url0301_Stealth + url0301_Cloak)",
-    STEALTH_NAVY = "((STEALTH + xrs0205) * NAVAL)",
+    STEALTH_BASE = "(STEALTHFIELD * STRUCTURE)",
+    STEALTH_AIR  = "(STEALTH * AIR)",
+    STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth + url0301_Cloak)",
+    STEALTH_NAVY = "(STEALTHFIELD * NAVAL)",
 }
 --- note that enhancements are defined in tables and not in strings like category expressions are
 Enhancements = {
@@ -436,11 +436,11 @@ local function CreatePresets()
         "<LOC restricted_units_data_LAND>No Land Units",
         "/textures/ui/common/icons/presets/type-land.dds")
     CreatePreset("AIR",
-        "<LOC restricted_units_info_AIR>Prevents all air units (except drones), air factories, and air staging structures",
+        "<LOC restricted_units_info_AIR>Prevents all air units (except drones), and air staging structures",
         "<LOC restricted_units_data_AIR>No Air Units",
         "/textures/ui/common/icons/presets/type-air.dds")
     CreatePreset("NAVAL",
-        "<LOC restricted_units_info_NAVAL>Prevents all naval units naval factories, and anti-navy structures",
+        "<LOC restricted_units_info_NAVAL>Prevents all naval units",
         "<LOC restricted_units_data_NAVAL>No Naval Units",
         "/textures/ui/common/icons/presets/type-navy.dds")
     CreatePreset("BASE",
@@ -643,7 +643,7 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/intel-optics.dds")
     CreatePreset("INTEL_AIR",
         "<LOC restricted_units_info_INTELAIR>Prevents air units that provide intelligence",
-        "<LOC restricted_units_data_INTELAIR>No Arial Intel",
+        "<LOC restricted_units_data_INTELAIR>No Aerial Intel",
         "/textures/ui/common/icons/presets/intel-air.dds")
     CreatePreset("INTEL_SONAR",
         "<LOC restricted_units_info_INTEL_SONAR>Prevents naval units and structures that provide intelligence",
@@ -653,7 +653,7 @@ local function CreatePresets()
         "<LOC restricted_units_info_INTEL_LAND>Prevents land units that provide intelligence",
         "<LOC restricted_units_data_INTEL_LAND>No Mobile Intel",
         "/textures/ui/common/icons/presets/intel-land.dds")
-
+        
     -- TACTICAL MISSILES restrictions
     CreatePreset("TMLDEF",
         "<LOC restricted_units_info_TMLDEF>Prevents all structures that provide tactical missile defense (TMD) ability",
@@ -691,20 +691,20 @@ local function CreatePresets()
 
     -- STEALTH restrictions
     CreatePreset("STEALTH_AIR",
-        "<LOC restricted_units_info_STEALTH_AIR>Prevents all air units that have stealth field",
+        "<LOC restricted_units_info_STEALTH_AIR>Prevents all air units that have personal stealth",
         "<LOC restricted_units_data_STEALTH_AIR>No Stealth Aircrafts",
         "/textures/ui/common/icons/presets/stealth-air.dds")
     CreatePreset("STEALTH_BASE",
         "<LOC restricted_units_info_STEALTH_BASE>Prevents all structures that provide stealth field for nearby units or structures",
-        "<LOC restricted_units_data_STEALTH_BASE>No Stealth Structures",
+        "<LOC restricted_units_data_STEALTH_BASE>No Stealth Field Structures",
         "/textures/ui/common/icons/presets/stealth-base.dds")
     CreatePreset("STEALTH_LAND",
-        "<LOC restricted_units_info_STEALTH_LAND>Prevents all mobile land units that provide personal stealth or stealth field for nearby units or structures",
+        "<LOC restricted_units_info_STEALTH_LAND>Prevents all mobile land units that have personal stealth or provide stealth field for nearby units or structures",
         "<LOC restricted_units_data_STEALTH_LAND>No Mobile Stealth",
         "/textures/ui/common/icons/presets/stealth-land.dds")
     CreatePreset("STEALTH_NAVY",
         "<LOC restricted_units_info_STEALTH_NAVY>Prevents all naval units that provide stealth field for nearby units or structures",
-        "<LOC restricted_units_data_STEALTH_NAVY>No Stealth Boats",
+        "<LOC restricted_units_data_STEALTH_NAVY>No Stealth Field Boats",
         "/textures/ui/common/icons/presets/stealth-navy.dds")
 
     -- ANTI-AIR restrictions
@@ -730,7 +730,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_TORPEDO_AIR>No Torpedo Bombers",
         "/textures/ui/common/icons/presets/torpedo-air.dds")
     CreatePreset("TORPEDO_BOATS",
-        "<LOC restricted_units_info_TORPEDO_BOATS>Prevents naval units with torpedo weapons : destroyers, torpedo boat and tempest",
+        "<LOC restricted_units_info_TORPEDO_BOATS>Prevents naval units with torpedo weapons",
         "<LOC restricted_units_data_TORPEDO_BOATS>No Torpedo Boats",
         "/textures/ui/common/icons/presets/torpedo-navy.dds")
     CreatePreset("TORPEDO_LAND",
@@ -751,7 +751,7 @@ local function CreatePresets()
         "<LOC restricted_units_data_DIRECTFIRE_GUNSHIPS>No Direct-Fire Gunships",
         "/textures/ui/common/icons/presets/direct-fire-gunships.dds")
     CreatePreset("DIRECTFIRE_NAVY",
-        "<LOC restricted_units_info_DIRECTFIRE_NAVY>Prevents naval units with direct-fire weapons: destroyers and battleships",
+        "<LOC restricted_units_info_DIRECTFIRE_NAVY>Prevents naval units with direct-fire weapons",
         "<LOC restricted_units_data_DIRECTFIRE_NAVY>No Direct-Fire Navy",
         "/textures/ui/common/icons/presets/direct-fire-navy.dds")
     CreatePreset("DIRECTFIRE_LAND",

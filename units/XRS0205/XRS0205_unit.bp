@@ -43,6 +43,8 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH2',
+        'COUNTERINTELLIGENCE',
+        'STEALTHFIELD',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DEFENSIVEBOAT',

@@ -132,6 +132,7 @@ UnitBlueprint {
         'LAND',
         'TECH3',
         'ENGINEER',
+        'AMPHIBIOUS',
         'CONSTRUCTION',
         'REPAIR',
         'RECLAIM',

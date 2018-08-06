@@ -47,12 +47,12 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH1',
+        'BOT',
         'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
         'DUMMYGSRWEAPON',
-        'BOT',
     },
     CollisionOffsetZ = 0.2,
     Defense = {

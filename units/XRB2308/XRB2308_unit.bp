@@ -59,6 +59,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
+        'STEALTH',
         'SUBMERSIBLE',
     },
     Defense = {

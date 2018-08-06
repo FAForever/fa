@@ -54,6 +54,7 @@ UnitBlueprint {
         'NAVAL',
         'TECH3',
         'ANTIMISSILE',
+        'INDIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BATTLESHIP',
