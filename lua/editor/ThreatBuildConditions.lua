@@ -13,7 +13,6 @@ function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, t
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not FactoryManager then
-        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[EnemyThreatGreaterThanValueAtBase]')
         return false
     end
     local position = FactoryManager:GetLocationCoords()
@@ -27,7 +26,6 @@ function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, thre
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not FactoryManager then
-        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[EnemyThreatLessThanValueAtBase]')
         return false
     end
     local position = FactoryManager:GetLocationCoords()
@@ -43,7 +41,6 @@ function HaveLessThreatThanNearby( aiBrain, locationType, poolType, enemyType, r
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not FactoryManager then
-        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[HaveLessThreatThanNearby]')
         return false
     end
     local position = FactoryManager:GetLocationCoords()

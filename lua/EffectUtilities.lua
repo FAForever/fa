@@ -420,10 +420,10 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
     end
 
     local builderArmy = builder:GetArmy()
-    local unitBeingBuiltArmy = unitBeingBuilt:GetArmy()
+    local unitBeingBuiltArmy = unitBeingBuilt:GetArmy() or nil
 
     -- If is new, won't spawn build bots if they might accidentally capture the unit
-    if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) then
+    if unitBeingBuiltArmy and ( builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) ) then
         for k, b in builder.buildBots do
             if b:BeenDestroyed() then
                 builder.buildBots[k] = nil
@@ -661,7 +661,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffe
     slider:SetGoal(0, sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt.Dead then
+    if not unitBeingBuilt.Dead and not unitBeingBuilt:BeenDestroyed() then
         slider:SetGoal(0, 0, 0)
         slider:SetSpeed(0.05)
     end

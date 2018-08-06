@@ -331,8 +331,25 @@ FactoryBuilderManager = Class(BuilderManager) {
                 end
             end
         elseif faction and customData and customData[faction] then
-            -- LOG('*AI DEBUG: New unit found!')
-            local replacement = self:GetCustomReplacement(templateData.FactionSquads[1], templateName, faction)
+            --LOG('*AI DEBUG: New unit found for '..templateName..'!')
+            local Squad = nil
+            if templateData.FactionSquads then
+                -- get the first squad from the template
+                for k,v in templateData.FactionSquads do
+                    -- use this squad as base template for the replacement
+                    Squad = table.copy(v[1])
+                    -- flag this template as dummy
+                    Squad[1] = "NoOriginalUnit"
+                    break
+                end
+            end
+            -- if we don't have a template use a dummy.
+            if not Squad then
+                -- this will only happen if we have a empty template. Warn the programmer!
+                SPEW('*AI WARNING: No faction squad found for '..templateName..'. using Dummy! '..repr(templateData.FactionSquads) )
+                Squad = { "NoOriginalUnit", 1, 1, "attack", "none" }
+            end
+            local replacement = self:GetCustomReplacement(Squad, templateName, faction)
             if replacement then
                 table.insert(template, replacement)
             end
@@ -348,7 +365,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             local rand = Random(1,100)
             local possibles = {}
             for k,v in templateData[faction] do
-                if rand <= v[2] then
+                if rand <= v[2] or template[1] == 'NoOriginalUnit' then
                     -- LOG('*AI DEBUG: Insert possibility.')
                     table.insert(possibles, v[1])
                 end
@@ -370,7 +387,6 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
         local builder = self:GetHighestBuilder(bType,{factory})
         if builder then
-            local personality = self.Brain:GetPersonality()
             local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), factory)
             -- LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))
             self.Brain:BuildPlatoon(template, {factory}, 1)

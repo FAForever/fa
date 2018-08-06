@@ -132,7 +132,7 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
     local newList = {}
     for _, v in markerList do
         -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
-        if v.Position[1] < 8 or v.Position[1] > ScenarioInfo.size[1] - 8 or v.Position[3] < 8 or v.Position[3] > ScenarioInfo.size[2] - 8 then
+        if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
             -- mass marker is too close to border, skip it.
             continue
         end
@@ -149,6 +149,11 @@ function AIGetSortedMassWithEnemy(aiBrain, maxNum, tMin, tMax, tRings, tType, po
     local newList = {}
     local num = 0
     for _, v in markerList do
+        -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
+        if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
+            -- mass marker is too close to border, skip it.
+            continue
+        end
         if aiBrain:GetNumUnitsAroundPoint(categories.MASSEXTRACTION, v.Position, 5, 'Enemy') > 0 then
             table.insert(newList, v)
             num = num + 1

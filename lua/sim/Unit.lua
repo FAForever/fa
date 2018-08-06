@@ -2870,13 +2870,14 @@ Unit = Class(moho.unit_methods) {
 
         local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
+        --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
+                WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            error('*ERROR: Ordered enhancement does not have the proper slot available!', 2)
+            WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper slot available. Slot ['..tempEnhanceBp.Slot..'] has already ['..unitEnhancements[tempEnhanceBp.Slot]..'] installed.')
             return false
         end
 

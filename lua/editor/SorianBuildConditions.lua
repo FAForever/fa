@@ -188,7 +188,12 @@ end
 
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
-    if aiBrain:GetThreatAtPosition(aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords(), testRings, true, threatType or 'Overall') < threatValue then
+    local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+    if not FactoryManager then
+        return false
+    end
+    local position = FactoryManager:GetLocationCoords()
+    if aiBrain:GetThreatAtPosition(position, testRings, true, threatType or 'Overall') < threatValue then
         return true
     end
     return false
@@ -283,7 +288,6 @@ end
 function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
-        WARN('*AI WARNING: Invalid location - ' .. locationType)
         return false
     end
     local position = engineerManager:GetLocationCoords()

@@ -676,6 +676,10 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     AssignEngineerTask = function(self, unit)
+        if unit.UnitBeingAssist or unit.UnitBeingBuilt then
+            return
+        end
+
         unit.DesiresAssist = false
         unit.NumAssistees = nil
         unit.MinNumAssistees = nil

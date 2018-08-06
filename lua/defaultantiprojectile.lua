@@ -144,6 +144,7 @@ MissileRedirect = Class(Entity) {
                         end
                                                 
                         -- aim at right below surface if unit is submerged
+                        enemyPos = enemyPos or projPos
                         local surfaceHeight = GetSurfaceHeight(enemyPos[1], enemyPos[3]) - 0.02
                         enemyPos[2] = math.max(surfaceHeight, enemyPos[2]) 
 

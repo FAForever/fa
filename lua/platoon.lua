@@ -135,7 +135,6 @@ Platoon = Class(moho.platoon_methods) {
 
         --DUNCAN - Added
         self:StopAI()
-        self:PlatoonDisband()
 
         self:DoDestroyCallbacks()
         if self.Trash then
@@ -214,13 +213,20 @@ Platoon = Class(moho.platoon_methods) {
         end
         for k,v in self:GetPlatoonUnits() do
             v.PlatoonHandle = nil
+            v.AssistSet = nil
+            v.AssistPlatoon = nil
+            v.UnitBeingAssist = nil
+            v.UnitBeingBuilt = nil
+            if v:IsPaused() then
+                v:SetPaused( false )
+            end
             if not v.Dead and v.BuilderManagerData then
                 if self.CreationTime == GetGameTimeSeconds() and v.BuilderManagerData.EngineerManager then
                     if self.BuilderName then
-                        --LOG('*AI DEBUG: ERROR - Platoon disbanded same tick as created - ' .. self.BuilderName .. ' - Army: ' .. aiBrain:GetArmyIndex() .. ' - Location: ' .. v.BuilderManagerData.LocationType)
+                        --LOG('*PlatoonDisband: ERROR - Platoon disbanded same tick as created - ' .. self.BuilderName .. ' - Army: ' .. aiBrain:GetArmyIndex() .. ' - Location: ' .. repr(v.BuilderManagerData.LocationType))
                         v.BuilderManagerData.EngineerManager:AssignTimeout(v, self.BuilderName)
                     else
-                        --LOG('*AI DEBUG: ERROR - Platoon disbanded same tick as created - Army: ' .. aiBrain:GetArmyIndex() .. ' - Location: ' .. v.BuilderManagerData.LocationType)
+                        --LOG('*PlatoonDisband: ERROR - Platoon disbanded same tick as created - Army: ' .. aiBrain:GetArmyIndex() .. ' - Location: ' .. repr(v.BuilderManagerData.LocationType))
                     end
                     v.BuilderManagerData.EngineerManager:DelayAssign(v)
                 elseif v.BuilderManagerData.EngineerManager then
@@ -231,6 +237,9 @@ Platoon = Class(moho.platoon_methods) {
                 IssueStop({v})
                 IssueClearCommands({v})
             end
+        end
+        if self.AIThread then
+            self.AIThread:Destroy()
         end
         aiBrain:DisbandPlatoon(self)
     end,
@@ -305,7 +314,7 @@ Platoon = Class(moho.platoon_methods) {
                         TaskName = "EnhanceTask",
                         Enhancement = v
                     }
-                    LOG('*AI DEBUG: '..aiBrain.Nickname..' EnhanceAI Added Enhancement: '..v)
+                    --LOG('*AI DEBUG: '..aiBrain.Nickname..' EnhanceAI Added Enhancement: '..v)
                     IssueScript({unit}, order)
                     lastEnhancement = v
                 end
@@ -315,7 +324,7 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(5)
                 --LOG('*AI DEBUG: '..aiBrain.Nickname..' Com still upgrading ')
             until unit.Dead or unit:HasEnhancement(lastEnhancement)
-            LOG('*AI DEBUG: '..aiBrain.Nickname..' Com finished upgrading ')
+            --LOG('*AI DEBUG: '..aiBrain.Nickname..' Com finished upgrading ')
         end
         self:PlatoonDisband()
     end,
@@ -1734,12 +1743,11 @@ Platoon = Class(moho.platoon_methods) {
 
     --DUNCAN - credit to Sorian
     RepairAI = function(self)
+        local aiBrain = self:GetBrain()
         if not self.PlatoonData or not self.PlatoonData.LocationType then
             self:PlatoonDisband()
         end
         local eng = self:GetPlatoonUnits()[1]
-        --LOG('*AI DEBUG: Engineer Repairing')
-        local aiBrain = self:GetBrain()
         local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
         local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
         for k,v in Structures do
@@ -1757,49 +1765,65 @@ Platoon = Class(moho.platoon_methods) {
                 return
             end
             count = count + 1
-            allIdle = true
-            if not eng:IsIdleState() then allIdle = false end
-        until allIdle or count >= 30
+            if eng:IsIdleState() then break end
+        until count >= 30
         self:PlatoonDisband()
     end,
 
     --DUNCAN - credit to Sorian
     ManagerEngineerFindUnfinished = function(self)
         local aiBrain = self:GetBrain()
-        local beingBuilt = false
-        self:EconUnfinishedBody()
-        WaitSeconds(20)
         local eng = self:GetPlatoonUnits()[1]
-        if eng.UnitBeingBuilt then
-            beingBuilt = eng.UnitBeingBuilt
-        end
-        if beingBuilt then
-            while not beingBuilt:BeenDestroyed() and beingBuilt:GetFractionComplete() < 1 do
-                WaitSeconds(5)
+        local guardedUnit
+        self:EconUnfinishedBody()
+        WaitTicks(10)
+        -- do we assist until the building is finished ?
+        if self.PlatoonData.Assist.AssistUntilFinished then
+            local guardedUnit
+            if eng.UnitBeingAssist then
+                guardedUnit = eng.UnitBeingAssist
+            else 
+                guardedUnit = eng:GetGuardedUnit()
             end
+            -- loop as long as we are not dead and not idle
+            while eng and not eng.Dead and aiBrain:PlatoonExists(self) and not eng:IsIdleState() do
+                if not guardedUnit or guardedUnit.Dead or guardedUnit:BeenDestroyed() then
+                    break
+                end
+                -- stop if our target is finished
+                if guardedUnit:GetFractionComplete() == 1 and not guardedUnit:IsUnitState('Upgrading') then
+                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit:GetBlueprint().BlueprintId..'] ('..guardedUnit:GetBlueprint().Description..') is finished')
+                    break
+                end
+                -- wait 1.5 seconds until we loop again
+                WaitTicks(15)
+            end
+        else
+            WaitSeconds(self.PlatoonData.Assist.Time or 60)
         end
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        -- stop the platoon from endless assisting
+        self.AssistPlatoon = nil
+        eng.UnitBeingAssist = nil
         self:Stop()
         self:PlatoonDisband()
     end,
 
     EconUnfinishedBody = function(self)
+        local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
         if not eng then
             self:PlatoonDisband()
             return
         end
-        local aiBrain = self:GetBrain()
         local assistData = self.PlatoonData.Assist
         local assistee = false
 
-        --eng.AssistPlatoon = self
+        eng.AssistPlatoon = self
 
         if not assistData.AssistLocation then
-            WARN('*AI WARNING: Disbanding EconUnfinishedBody platoon that does not have either AssistLocation')
+            WARN('*AI WARNING: Disbanding EconUnfinishedBody platoon that does not AssistLocation')
             self:PlatoonDisband()
         end
 
@@ -1822,55 +1846,75 @@ Platoon = Class(moho.platoon_methods) {
         if assistee then
             self:Stop()
             eng.AssistSet = true
+            eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
+            --LOG('* EconUnfinishedBody: Assisting now: ['..eng.UnitBeingBuilt:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingBuilt:GetBlueprint().Description..')')
             IssueGuard({eng}, assistee)
         else
-        -- stop the platoon from endless assisting
-        self:Stop()
+            self.AssistPlatoon = nil
+            eng.UnitBeingAssist = nil
+            -- stop the platoon from endless assisting
             self:PlatoonDisband()
         end
     end,
 
     ManagerEngineerAssistAI = function(self)
         local aiBrain = self:GetBrain()
+        local eng = self:GetPlatoonUnits()[1]
         self:EconAssistBody()
-        WaitSeconds(self.PlatoonData.AssistData.Time or 60)
+        WaitTicks(10)
+        -- do we assist until the building is finished ?
+        if self.PlatoonData.Assist.AssistUntilFinished then
+            local guardedUnit
+            if eng.UnitBeingAssist then
+                guardedUnit = eng.UnitBeingAssist
+            else 
+                guardedUnit = eng:GetGuardedUnit()
+            end
+            -- loop as long as we are not dead and not idle
+            while eng and not eng.Dead and aiBrain:PlatoonExists(self) and not eng:IsIdleState() do
+                if not guardedUnit or guardedUnit.Dead or guardedUnit:BeenDestroyed() then
+                    break
+                end
+                -- stop if our target is finished
+                if guardedUnit:GetFractionComplete() == 1 and not guardedUnit:IsUnitState('Upgrading') then
+                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit:GetBlueprint().BlueprintId..'] ('..guardedUnit:GetBlueprint().Description..') is finished')
+                    break
+                end
+                -- wait 1.5 seconds until we loop again
+                WaitTicks(15)
+            end
+        else
+            WaitSeconds(self.PlatoonData.Assist.Time or 60)
+        end
         if not aiBrain:PlatoonExists(self) then
             return
         end
         self.AssistPlatoon = nil
-        -- stop the platoon from endless assisting
+        eng.UnitBeingAssist = nil
         self:Stop()
         self:PlatoonDisband()
     end,
 
     EconAssistBody = function(self)
+        local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
-        if not eng then
-            self:PlatoonDisband()
-            return
-        end
-
-        --DUNCAN - added
-        if eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or  eng:IsUnitState("Enhancing") then
+        if not eng or eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or eng:IsUnitState("Enhancing") then
            return
         end
-
-        local aiBrain = self:GetBrain()
         local assistData = self.PlatoonData.Assist
+        if not assistData.AssistLocation then
+            WARN('*AI WARNING: Builder '..repr(self.BuilderName)..' is missing AssistLocation')
+            return
+        end
+        if not assistData.AssisteeType then
+            WARN('*AI WARNING: Builder '..repr(self.BuilderName)..' is missing AssisteeType')
+            return
+        end
+        eng.AssistPlatoon = self
         local assistee = false
-
         local assistRange = assistData.AssistRange or 80
         local platoonPos = self:GetPlatoonPosition()
-
-        eng.AssistPlatoon = self
-
-        if not assistData.AssistLocation or not assistData.AssisteeType then
-            WARN('*AI WARNING: Disbanding Assist platoon that does not have either AssistLocation or AssisteeType')
-            self:PlatoonDisband()
-        end
-
         local beingBuilt = assistData.BeingBuiltCategories or { 'ALLUNITS' }
-
         local assisteeCat = assistData.AssisteeCategory or categories.ALLUNITS
         if type(assisteeCat) == 'string' then
             assisteeCat = ParseEntityCategory(assisteeCat)
@@ -1879,44 +1923,54 @@ Platoon = Class(moho.platoon_methods) {
         -- loop through different categories we are looking for
         for _,catString in beingBuilt do
             -- Track all valid units in the assist list so we can load balance for factories
-
             local category = ParseEntityCategory(catString)
-
             local assistList = AIUtils.GetAssistees(aiBrain, assistData.AssistLocation, assistData.AssisteeType, category, assisteeCat)
-
             if table.getn(assistList) > 0 then
                 -- only have one unit in the list; assist it
                 if table.getn(assistList) == 1 then
                     assistee = assistList[1]
                     break
                 else
-                    -- Find the unit with the least number of assisters; assist it
-                    local lowNum = false
-                    local lowUnit = false
-
+                    local low = false
+                    local bestUnit = false
                     for k,v in assistList do
-                        --DUNCAN - check unit is inside assist range
+                        --DUNCAN - check unit is inside assist range 
                         local unitPos = v:GetPosition()
-                        if not lowNum or (table.getn(v:GetGuards()) < lowNum
-                        and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange) then
-                            lowNum = v:GetGuards()
-                            lowUnit = v
+                        -- Find the closest unit to assist
+                        if assistData.AssistClosestUnit then
+                            local dist = VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3])
+                            if not low or dist < low and dist < assistRange then
+                                low = dist
+                                bestUnit = v
+                            end
+                        -- Find the unit with the least number of assisters; assist it
+                        else
+                            local UnitAssist = v.UnitBeingBuilt or v.UnitBeingAssist or v
+                            local NumAssist = table.getn(UnitAssist:GetGuards())
+                            if not low or (NumAssist < low
+                            and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange) then
+                                low = NumAssist
+                                bestUnit = v
+                            end
                         end
                     end
-                    assistee = lowUnit
+                    assistee = bestUnit
                     break
                 end
             end
         end
+        
         -- assist unit
         if assistee  then
             self:Stop()
             eng.AssistSet = true
-            IssueGuard({eng}, assistee)
+            eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
+            --LOG('* EconAssistBody: Assisting now: ['..eng.UnitBeingAssist:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingAssist:GetBlueprint().Description..')')
+            IssueGuard({eng}, eng.UnitBeingAssist)
         else
             self.AssistPlatoon = nil
+            eng.UnitBeingAssist = nil
             -- stop the platoon from endless assisting
-            self:Stop()
             self:PlatoonDisband()
         end
     end,
@@ -2018,21 +2072,16 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
             WaitSeconds(1)
-            self.AssistPlatoon = nil
-            -- stop the platoon from endless assisting
-            self:Stop()
-            self:PlatoonDisband()
         end
     end,
 
     EngineerAssistAI = function(self)
         self:ForkThread(self.AssistBody)
         local aiBrain = self:GetBrain()
-        WaitSeconds(self.PlatoonData.AssistData.Time or 60)
+        WaitSeconds(self.PlatoonData.Assist.Time or 60)
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        self.AssistPlatoon = nil
         WaitTicks(1)
         -- stop the platoon from endless assisting
         self:Stop()
@@ -2090,10 +2139,10 @@ Platoon = Class(moho.platoon_methods) {
         local eng
         for k, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.ENGINEER, v) then --DUNCAN - was construction
+                IssueClearCommands({v})
                 if not eng then
                     eng = v
                 else
-                    IssueClearCommands({v})
                     IssueGuard({v}, eng)
                 end
             end
@@ -2365,17 +2414,17 @@ Platoon = Class(moho.platoon_methods) {
             for k, v in cons.BuildStructures do
                 if aiBrain:PlatoonExists(self) then
                     if not eng.Dead then
-                  local faction = SUtils.GetEngineerFaction(eng)
-                  if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
-                     local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction)
-                     if replacement then
-                        buildFunction(aiBrain, eng, v, closeToBuilder, relative, replacement, baseListData, reference, cons.NearMarkerType)
-                     else
-                        buildFunction(aiBrain, eng, v, closeToBuilder, relative, buildingTmpl, baseListData, reference, cons.NearMarkerType)
-                     end
-                  else
-                     buildFunction(aiBrain, eng, v, closeToBuilder, relative, buildingTmpl, baseListData, reference, cons.NearMarkerType)
-                  end
+                        local faction = SUtils.GetEngineerFaction(eng)
+                        if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
+                            local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction, buildingTmpl)
+                            if replacement then
+                                buildFunction(aiBrain, eng, v, closeToBuilder, relative, replacement, baseListData, reference, cons.NearMarkerType)
+                            else
+                                buildFunction(aiBrain, eng, v, closeToBuilder, relative, buildingTmpl, baseListData, reference, cons.NearMarkerType)
+                            end
+                        else
+                            buildFunction(aiBrain, eng, v, closeToBuilder, relative, buildingTmpl, baseListData, reference, cons.NearMarkerType)
+                        end
                     else
                         if aiBrain:PlatoonExists(self) then
                             WaitTicks(1)
@@ -2414,15 +2463,26 @@ Platoon = Class(moho.platoon_methods) {
             local upgradeID
             -- Get the factionindex from the unit to get the right update (in case we have captured this unit from another faction)
             UnitBeingUpgradeFactionIndex = FactionToIndex[v.factionCategory] or factionIndex
-            
-            if EntityCategoryContains(categories.MOBILE, v) then
+            if self.PlatoonData.OverideUpgradeBlueprint then
+                local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
+                if v:CanBuild(tempUpgradeID) then
+                    upgradeID = tempUpgradeID
+                else
+                    -- in case the unit can't upgrade with OverideUpgradeBlueprint, warn the programmer
+                    -- this can happen if the AI relcaimed a factory and tries to upgrade to a support factory without having a HQ factory from the reclaimed factory faction.
+                    -- in this case we fall back to HQ upgrade template and upgrade to a HQ factory instead of support.
+                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed!
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed.' )
+                end
+            end
+            if not upgradeID and EntityCategoryContains(categories.MOBILE, v) then
                 upgradeID = aiBrain:FindUpgradeBP(v:GetUnitId(), UnitUpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a UnitUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ABC1234
                     WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ' .. repr(v:GetUnitId()) )
                 end
-            else
+            elseif not upgradeID then
                 upgradeID = aiBrain:FindUpgradeBP(v:GetUnitId(), StructureUpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
@@ -2431,9 +2491,9 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
-                -- in case the unit can't upgrade with StructureUpgradeTemplate, warn the programmer
-                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t upgrade structure with StructureUpgradeTemplate: ABC1234
-                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t upgrade structure with StructureUpgradeTemplate: ' .. repr(v:GetUnitId()) )
+                -- in case the unit can't upgrade with upgradeID, warn the programmer
+                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: UnitId:CanBuild(upgradeID) failed!
+                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: ' .. repr(v:GetUnitId()) .. ':CanBuild( '..upgradeID..' ) failed!' )
                 continue
             end
             if upgradeID then
@@ -3552,7 +3612,9 @@ Platoon = Class(moho.platoon_methods) {
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 --LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand top " .. eng.Sync.id)
                 --if eng.CDRHome then LOG('*AI DEBUG: Commander process build platoon disband...') end
-                eng.PlatoonHandle:PlatoonDisband()
+                if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist then
+                    eng.PlatoonHandle:PlatoonDisband()
+                end
             end
             if eng then eng.ProcessBuild = nil end
             return
@@ -4983,7 +5045,6 @@ Platoon = Class(moho.platoon_methods) {
             SUtils.AISendPing(eng:GetPosition(), 'move', aiBrain:GetArmyIndex())
             return
         end
-        self.AssistPlatoon = nil
         self:PlatoonDisband()
     end,
 
@@ -5047,7 +5108,6 @@ Platoon = Class(moho.platoon_methods) {
             eng.AssistSet = true
             IssueGuard({eng}, assistee)
         else
-            self.AssistPlatoon = nil
             self:PlatoonDisband()
         end
     end,
@@ -5059,7 +5119,6 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        --self.AssistPlatoon = nil
         self:PlatoonDisband()
     end,
 
@@ -5073,7 +5132,7 @@ Platoon = Class(moho.platoon_methods) {
         local assistData = self.PlatoonData.Assist
         local assistee = false
 
-        --eng.AssistPlatoon = self
+        eng.AssistPlatoon = self
 
         if not assistData.AssistLocation then
             WARN('*AI WARNING: Disbanding ManagerEngineerFindLowShield platoon that does not have either AssistLocation')
@@ -5101,7 +5160,6 @@ Platoon = Class(moho.platoon_methods) {
             eng.AssistSet = true
             IssueGuard({eng}, assistee)
         else
-            --self.AssistPlatoon = nil
             self:PlatoonDisband()
         end
     end,
@@ -5551,9 +5609,9 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- merge with nearby platoons
-            --if aiBrain:GetThreatAtPosition(pos, 1, true, 'AntiSurface') < 1 then
+            if aiBrain:PlatoonExists(self) then
                 self:MergeWithNearbyPlatoonsSorian('AttackForceAISorian', 10)
-            --end
+            end
 
             -- rebuild formation
             platoonUnits = self:GetPlatoonUnits()
@@ -6194,7 +6252,7 @@ Platoon = Class(moho.platoon_methods) {
                     if not eng.Dead then
                         local faction = SUtils.GetEngineerFaction(eng)
                         if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
-                            local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction)
+                            local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction, buildingTmpl)
                             if replacement then
                                 buildFunction(aiBrain, eng, v, closeToBuilder, relative, replacement, baseListData, reference, cons.NearMarkerType)
                             else
@@ -6449,7 +6507,6 @@ Platoon = Class(moho.platoon_methods) {
 
     MergeWithNearbyPlatoonsSorian = function(self, planName, radius, fullrestart)
         -- check to see we're not near an ally base
-
         local aiBrain = self:GetBrain()
         if not aiBrain then
             return
