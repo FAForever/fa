@@ -55,7 +55,6 @@ UnitBlueprint {
         'ANTIAIR',
         'DIRECTFIRE',
         'INTELLIGENCE',
-        'COUNTERINTELLIGENCE',
         'RADAR',
         'SONAR',
         'VISIBLETORECON',

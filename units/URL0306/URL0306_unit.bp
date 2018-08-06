@@ -38,6 +38,7 @@ UnitBlueprint {
         'TECH2',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
+        'STEALTHFIELD',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYCOUNTERINTEL',

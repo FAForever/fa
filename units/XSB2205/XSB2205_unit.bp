@@ -51,6 +51,7 @@ UnitBlueprint {
         'ANTINAVY',
         'DRAGBUILD',
         'SIZE4',
+        'STEALTH',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYSONAR',

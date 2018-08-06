@@ -51,6 +51,7 @@ UnitBlueprint {
         'TECH2',
         'DIRECTFIRE',
         'ANTISUB',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DESTROYER',

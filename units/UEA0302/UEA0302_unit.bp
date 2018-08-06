@@ -84,6 +84,7 @@ UnitBlueprint {
         'AIR',
         'HIGHALTAIR',
         'TECH3',
+        'SCOUT',
         'INTELLIGENCE',
         'RADAR',
         'SONAR',

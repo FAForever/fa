@@ -119,6 +119,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH3',
+        'AMPHIBIOUS',
         'ENGINEER',
         'CONSTRUCTION',
         'REPAIR',

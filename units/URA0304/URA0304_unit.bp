@@ -107,6 +107,8 @@ UnitBlueprint {
         'HIGHALTAIR',
         'TECH3',
         'BOMBER',
+        'COUNTERINTELLIGENCE',
+        'STEALTH',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',

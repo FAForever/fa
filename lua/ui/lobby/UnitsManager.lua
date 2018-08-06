@@ -102,6 +102,7 @@ local sortBy = {
         'TACTICALMISSILEPLATFORM',
         'ANTIMISSILE',
         'NUKE',
+        'BOMB',
     },
     ENGINEERING = {
         'GATE',
@@ -136,6 +137,8 @@ local sortBy = {
         'COUNTERINTELLIGENCE',
         'SHIELD',
         'WALL',
+        'STEALTH',
+        'STEALTHFIELD',
         'HEAVYWALL',
         'AIRSTAGINGPLATFORM',
     },

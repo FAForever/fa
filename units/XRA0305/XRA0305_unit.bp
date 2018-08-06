@@ -94,6 +94,7 @@ UnitBlueprint {
         'GROUNDATTACK',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'COUNTERINTELLIGENCE',
         'OVERLAYANTIAIR',
         'OVERLAYCOUNTERINTEL',
         'OVERLAYDIRECTFIRE',

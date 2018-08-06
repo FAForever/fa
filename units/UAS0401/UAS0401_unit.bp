@@ -90,6 +90,7 @@ UnitBlueprint {
         'EXPERIMENTAL',
         'DIRECTFIRE',
         'SUBMERSIBLE',
+        'ANTINAVY',
         'INTELLIGENCE',
         'FACTORY',
         'CARRIER',

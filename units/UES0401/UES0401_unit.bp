@@ -88,6 +88,7 @@ UnitBlueprint {
         'NAVAL',
         'EXPERIMENTAL',
         'SUBMERSIBLE',
+        'ANTINAVY',
         'AIRSTAGINGPLATFORM',
         'INTELLIGENCE',
         'RADAR',

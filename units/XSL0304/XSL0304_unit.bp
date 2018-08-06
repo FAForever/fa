@@ -58,6 +58,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH3',
+        'BOT',
         'INDIRECTFIRE',
         'REPAIR',
         'RECLAIM',
@@ -66,7 +67,6 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYINDIRECTFIRE',
         'ARTILLERY',
-        'BOT',
     },
     CollisionOffsetY = 0,
     Defense = {
