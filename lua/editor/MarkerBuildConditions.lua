@@ -1,30 +1,29 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/editor/MarkerBuildConditions.lua
-#**  Author(s): John Comes, Dru Staltman
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+-- ****************************************************************************
+-- **
+-- **  File     :  /lua/editor/MarkerBuildConditions.lua
+-- **  Author(s): John Comes, Dru Staltman
+-- **
+-- **  Summary  : Generic AI Platoon Build Conditions
+-- **             Build conditions always return true or false
+-- **
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
-##############################################################################################################
-# function: MarkerGreaterThanDistance = BuildCondition	doc = "Please work function docs."
-# 
-# parameter 0: string	aiBrain         = "default_brain"		
-# parameter 1: string	markerType      = "Defensive_Point"		doc = "docs for param1"
-# parameter 2: float	distance        = 1.0				doc = "docs for param1"
-# parameter 3: float	threatMin       = 1.0				doc = "docs for param1"
-# parameter 4: float	threatMax       = 1.0				doc = "docs for param1"
-# parameter 5: int	threatRings     = 1				doc = "docs for param1"
-# parameter 6: float	startX          = 1.0				doc = "docs for param1"
-# parameter 7: float	startZ          = 1.0				doc = "docs for param1"
-#
-##############################################################################################################
+local AIUtils = import('/lua/ai/aiutilities.lua')
+
+--------------------------------------------------------------------------------------------------------------
+-- function: MarkerGreaterThanDistance = BuildCondition doc = "Please work function docs."
+--
+-- parameter 0: string  aiBrain         = "default_brain"
+-- parameter 1: string  markerType      = "Defensive_Point"     doc = "docs for param1"
+-- parameter 2: float   distance        = 1.0                   doc = "docs for param1"
+-- parameter 3: float   threatMin       = 1.0                   doc = "docs for param1"
+-- parameter 4: float   threatMax       = 1.0                   doc = "docs for param1"
+-- parameter 5: int threatRings         = 1                     doc = "docs for param1"
+-- parameter 6: float   startX          = 1.0                   doc = "docs for param1"
+-- parameter 7: float   startZ          = 1.0                   doc = "docs for param1"
+--
+--------------------------------------------------------------------------------------------------------------
 function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType)
     if not startX and not startZ then
          startX, startZ = aiBrain:GetArmyStartPos()
@@ -41,20 +40,19 @@ function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, thr
     return false
 end
 
-
-##############################################################################################################
-# function: MarkerLessThanDistance = BuildCondition	doc = "Please work function docs."
-# 
-# parameter 0: string	aiBrain		= "default_brain"		
-# parameter 1: string	markerType      = "Defensive_Point"		doc = "docs for param1"
-# parameter 2: float	distance        = 1.0				doc = "docs for param1"
-# parameter 3: float	threatMin       = 1.0				doc = "docs for param1"
-# parameter 4: float	threatMax       = 1.0				doc = "docs for param1"
-# parameter 5: int	threatRings     = 1				doc = "docs for param1"
-# parameter 6: float	startX          = 1.0				doc = "docs for param1"
-# parameter 7: float	startZ          = 1.0				doc = "docs for param1"
-#
-##############################################################################################################
+--------------------------------------------------------------------------------------------------------------
+-- function: MarkerLessThanDistance = BuildCondition    doc = "Please work function docs."
+--
+-- parameter 0: string  aiBrain         = "default_brain"
+-- parameter 1: string  markerType      = "Defensive_Point"     doc = "docs for param1"
+-- parameter 2: float   distance        = 1.0                   doc = "docs for param1"
+-- parameter 3: float   threatMin       = 1.0                   doc = "docs for param1"
+-- parameter 4: float   threatMax       = 1.0                   doc = "docs for param1"
+-- parameter 5: int threatRings         = 1                     doc = "docs for param1"
+-- parameter 6: float   startX          = 1.0                   doc = "docs for param1"
+-- parameter 7: float   startZ          = 1.0                   doc = "docs for param1"
+--
+--------------------------------------------------------------------------------------------------------------
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
          startX, startZ = aiBrain:GetArmyStartPos()
@@ -80,7 +78,6 @@ function CanBuildOnMassLessThanDistance(aiBrain, locationType, distance, threatM
         return false
     end
     local position = engineerManager:GetLocationCoords()
-    
     local markerTable = AIUtils.AIGetSortedMassLocations(aiBrain, maxNum, threatMin, threatMax, threatRings, threatType, position)
     if markerTable[1] and VDist3( markerTable[1], position ) < distance then
         local dist = VDist3( markerTable[1], position )
