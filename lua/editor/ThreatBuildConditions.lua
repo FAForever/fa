@@ -16,7 +16,13 @@ local Utils = import('/lua/utilities.lua')
 
 function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
-    if aiBrain:GetThreatAtPosition( aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords(), testRings, true, threatType or 'Overall' ) > threatValue then
+    local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+    if not FactoryManager then
+        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[EnemyThreatGreaterThanValueAtBase]')
+        return false
+    end
+    local position = FactoryManager:GetLocationCoords()
+    if aiBrain:GetThreatAtPosition( position, testRings, true, threatType or 'Overall' ) > threatValue then
         return true
     end
     return false
@@ -24,7 +30,13 @@ end
 
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
-    if aiBrain:GetThreatAtPosition( aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords(), testRings, true, threatType or 'Overall' ) > threatValue then
+    local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+    if not FactoryManager then
+        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[EnemyThreatLessThanValueAtBase]')
+        return false
+    end
+    local position = FactoryManager:GetLocationCoords()
+    if aiBrain:GetThreatAtPosition( position, testRings, true, threatType or 'Overall' ) > threatValue then
         return true
     end
     return false
@@ -34,7 +46,13 @@ function HaveLessThreatThanNearby( aiBrain, locationType, poolType, enemyType, r
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local poolThreat = pool:GetPlatoonThreat( poolType, categories.ALLUNITS )
     local testRings = rings or 10
-    local enemyThreat = aiBrain:GetThreatAtPosition( aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords(), testRings, true, enemyType )
+    local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+    if not FactoryManager then
+        SPEW('*AI WARNING: No FactoryManager present at location - ' .. locationType, '[HaveLessThreatThanNearby]')
+        return false
+    end
+    local position = FactoryManager:GetLocationCoords()
+    local enemyThreat = aiBrain:GetThreatAtPosition( position, testRings, true, enemyType )
     if poolThreat < enemyThreat then
         return true
     end
