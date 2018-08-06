@@ -1138,3 +1138,12 @@ function GetGuards(aiBrain, Unit)
     end
     return count
 end
+
+-- Buildcondition to check if a platoon is still delayed
+function CheckBuildPlattonDelay(aiBrain, PlatoonName)
+    if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
+        return false
+    end
+    return true
+end
+
