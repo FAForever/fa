@@ -76,7 +76,7 @@ end
 function CanBuildOnMassLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum )
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
-        WARN('*AI WARNING: Invalid location - ' .. locationType)
+        SPEW('*AI WARNING: No EngineerManager present at location - ' .. locationType, '[CanBuildOnMassLessThanDistance]')
         return false
     end
     local position = engineerManager:GetLocationCoords()
