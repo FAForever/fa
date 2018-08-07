@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0307/UAL0307_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Aeon Mobile Shield Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAL0307/UAL0307_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Aeon Mobile Shield Generator Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
 
@@ -18,7 +18,7 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     
     OnStopBeingBuilt = function(self,builder,layer)
         AShieldHoverLandUnit.OnStopBeingBuilt(self,builder,layer)
-		self.ShieldEffectsBag = {}
+        self.ShieldEffectsBag = {}
     end,
     
     OnShieldEnabled = function(self)
@@ -34,8 +34,8 @@ UAL0307 = Class(AShieldHoverLandUnit) {
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
         for k, v in self.ShieldEffects do
             table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self:GetArmy(), v ) )
         end
@@ -51,8 +51,8 @@ UAL0307 = Class(AShieldHoverLandUnit) {
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
     end,
 
 
