@@ -224,6 +224,15 @@ function OnCommandIssued(command)
             local options = Prefs.GetFromCurrentProfile('options')
             if options['assist_mex'] then AssistMex(command) end
         end
+        --EQ:this is the only bit we add - a callback for shields so they can disable their pointers.
+        local shieldCat = categories.MOBILE * categories.SHIELD
+        
+        local mobShields = EntityCategoryFilterDown(shieldCat, command.Units)
+        
+        if mobShields[1] then
+            local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
+            SimCallback(cb, true)
+        end
     elseif command.CommandType == 'BuildMobile' then
     AddCommandFeedbackBlip({
         Position = command.Target.Position,
