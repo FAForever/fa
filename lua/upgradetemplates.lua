@@ -69,7 +69,7 @@ StructureUpgradeTemplates =
 
         # sonar
         { 'ueb3102', 'ueb3202'},
-        { 'ueb3202', 'ues0304'},
+        { 'ueb3202', 'ues0305'},
 
         #Shield
         { 'ueb4202', 'ueb4301'},
@@ -103,7 +103,7 @@ StructureUpgradeTemplates =
 
         # sonar
         { 'uab3102', 'uab3202'},
-        { 'uab3202', 'uas0304'},
+        { 'uab3202', 'uas0305'},
 
 
     },
@@ -169,7 +169,7 @@ StructureUpgradeTemplates =
 
         # sonar
         { 'xsb3102', 'xsb3202'},
-        { 'xsb3202', 'xrs0304'},
+        { 'xsb3202', 'xsb0305'},
 
         #Shield
         { 'xsb4202', 'xsb4301'},
