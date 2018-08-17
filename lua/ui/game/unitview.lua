@@ -356,7 +356,13 @@ function UpdateWindow(info)
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-
+		
+	if info.shieldRatio > 0 and info.fuelRatio > 0 then
+	    controls.store = 1
+	else
+	    controls.store = 0
+	end
+		
         if info.health then
             controls.healthBar:Show()
 
@@ -384,6 +390,7 @@ function UpdateWindow(info)
         -- Control the veterancy stars
         local currentLevel = UnitData[info.entityId].VeteranLevel
         local massKilled = UnitData[info.entityId].totalMassKilled
+        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
         local myValue = UnitData[info.entityId].myValue
 
         for level = 1, 5 do
@@ -415,6 +422,23 @@ function UpdateWindow(info)
                         text = massKilled .. '/' .. nextLevel
                     end
                     controls.nextVet:SetText(text)
+                elseif massKilledTrue then
+                    controls.vetBar:Show()
+                    controls.vetBar:SetValue(1)
+                    controls.vetTitle:SetText('Mass killed')
+                    
+                    local text
+                    if massKilledTrue >= 1000000 then
+                        text = string.format('%.2fM', massKilledTrue / 1000000)
+                    elseif massKilledTrue >= 100000 then
+                        text = string.format('%.0fK', massKilledTrue / 1000)
+                    elseif massKilledTrue >= 10000 then
+                        text = string.format('%.1fK', massKilledTrue / 1000)
+                    else
+                        text = massKilledTrue 
+                    end
+                    
+                    controls.nextVet:SetText(text)    
                 else
                     controls.vetBar:Hide()
                 end
@@ -647,6 +671,7 @@ function CreateUI()
                 self:SetAlpha(1, true)
             end
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
+	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end

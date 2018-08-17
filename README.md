@@ -14,6 +14,8 @@ Contributing
 
 See guidelines for contributing [here](CONTRIBUTING.md).
 
+See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
+
 Running the game with your changes
 ----------------------------------
 
@@ -144,3 +146,4 @@ Will put it into a mode where it will look for updates to files that it has load
 This way, you don't need to restart the game every time you make a change, you simply need to make a new unit of the type, spawn a new projectile or do whatever it is you're doing.
 
 It's not perfect; some changes will require a full game restart, and certain changes can cause crashes. But it's a lot better than reloading the game for every change, every time.
+

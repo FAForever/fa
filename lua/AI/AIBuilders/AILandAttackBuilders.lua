@@ -28,7 +28,7 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
 
     local position = engineerManager:GetLocationCoords()
-    local radius = engineerManager:GetLocationRadius()
+    local radius = engineerManager.Radius
 
     local poolThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, position, radius)
     if poolThreat > targetNumber then

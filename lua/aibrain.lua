@@ -97,10 +97,16 @@ AIBrain = Class(moho.aibrain_methods) {
                 ScenarioInfo.ArmySetup[self.Name].AIPersonality = string.sub(per, 1, cheatPos - 1)
             end
 
+            LOG('* OnCreateAI: AIPersonality: ('..per..')')
             if string.find(per, 'sorian') then
                 self.Sorian = true
             end
-
+            if string.find(per, 'uveso') then
+                self.Uveso = true
+            end
+            if string.find(per, 'dilli') then
+                self.Dilli = true
+            end
             if DiskGetFileInfo('/lua/AI/altaiutilities.lua') then
                 self.Duncan = true
             end
@@ -130,6 +136,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         self.UnitBuiltTriggerList = {}
         self.FactoryAssistList = {}
+        self.DelayEqualBuildPlattons = {}
         self.BrainType = 'AI'
     end,
 
@@ -950,7 +957,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         local plat = self:GetPlatoonUniquelyNamed('ArmyPool')
-        plat:ForkThread(plat.BaseManagersDistressAI)
+        if self.Sorian then
+            plat:ForkThread(plat.BaseManagersDistressAISorian)
+        else
+            plat:ForkThread(plat.BaseManagersDistressAI)
+        end
 
         self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         self.DeadBaseThread = self:ForkThread(self.DeadBaseMonitor)
@@ -967,7 +978,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             -- Spawn locations were fixed. We know exactly where our opponents are.
-            for i = 1, 12 do
+            for i = 1, 16 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
 
@@ -1941,7 +1952,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PBMGetLocation = function(self, locationName)
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == locationName then
                     return v
@@ -1955,7 +1966,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == loc then
                     local height = GetTerrainHeight(v.Location[1], v.Location[3])
@@ -1975,14 +1986,14 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for k, v in self.PBM.Locations do
                 if v.LocationType == loc then
                    return v.Radius
                 end
             end
         elseif self.BuilderManagers[loc] then
-            return self.BuilderManagers[loc].FactoryManager:GetLocationRadius()
+            return self.BuilderManagers[loc].FactoryManager.Radius
         end
         return false
     end,
@@ -2195,7 +2206,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     PBMSetBuildingHandleFalse = function(self, builder)
         if not builder.PlatoonHandles then
-            ERROR('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
+            error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
             return false
         end
         for k, v in builder.PlatoonHandles do
@@ -2353,7 +2364,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local personality = self:GetPersonality()
         local armyIndex = self:GetArmyIndex()
         local numBuildOrders = nil
-        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType]:IsDead() then
+        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType].Dead then
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()
@@ -3410,7 +3421,36 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            self:OnDefeat()
+            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOff' then
+                self:OnDefeat()
+            else
+                ForkThread(function()
+                    local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
+
+                    WaitSeconds(1)
+
+                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
+
+                    -- Reassign all Army attributes to better suit the AI.
+                    self.BrainType = 'AI'
+                    self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
+                    self.NumBases = 1
+                    self.BuilderManagers = {}
+                    self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
+                    SUtils.AddCustomUnitSupport(self)
+
+                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
+                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
+
+                    local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
+                    if cmdUnits then
+                        cmdUnits[1]:SetCustomName(ArmyBrains[self:GetArmyIndex()].Nickname)
+                    end
+
+                    self:InitializeSkirmishSystems()
+                    self:OnCreateAI()
+                end)
+            end
         end
     end,
 
@@ -3430,7 +3470,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             -- Spawn locations were fixed. We know exactly where our opponents are.
-            for i = 1, 12 do
+            for i = 1, 16 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
 
@@ -3595,7 +3635,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- Spawn locations were fixed. We know exactly where our opponents are.
                 -- Don't scout areas owned by us or our allies.
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     if army and startPos then
@@ -3657,7 +3697,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             else -- Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 
@@ -3735,7 +3775,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- Spawn locations were fixed. We know exactly where our opponents are.
                 -- Don't scout areas owned by us or our allies.
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 
@@ -3804,7 +3844,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             else -- Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list
                 local numOpponents = 0
-                for i = 1, 12 do
+                for i = 1, 16 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
 

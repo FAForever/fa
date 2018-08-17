@@ -1,0 +1,48 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSB_SMD_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'PROJECTILE',
+        'ANTIMISSILE',
+        'NOSPLASHDAMAGE',
+        'SERAPHIM',
+    },
+    Description = 'Seraphim Anti Nuclear Missile',
+    Display = {
+        StrategicIconSize = 1,
+        UniformScale = 0.05,
+    },
+    Economy = {
+        BuildCostEnergy = 360000,
+        BuildCostMass = 3600,
+        BuildTime = 259200,
+    },
+    DoNotCollideList = {
+        'AIR',
+    },
+    General = {
+        Category = 'Defense',
+        Faction = 'Seraphim',
+        Weapon = 'Anti Nuke',
+    },
+    Interface = {
+        HelpText = 'Seraphim Anti Nuclear Missile',
+    },
+    Physics = {
+        Acceleration = 30,
+        DestroyOnWater = false,
+        HitAssignedTarget = true,
+        LeadTarget = true,
+        MaxSpeed = 90,
+        TrackTarget = true,
+        TurnRate = 180,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds',
+}

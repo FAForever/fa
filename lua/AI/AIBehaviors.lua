@@ -280,6 +280,14 @@ end
 function CommanderBehavior(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.CommanderThread then
+            v.CommanderThread = v:ForkThread(CommanderThread, platoon)
+        end
+    end
+end
+
+function CommanderBehaviorImproved(platoon)
+    for _, v in platoon:GetPlatoonUnits() do
+        if not v.Dead and not v.CommanderThread then
             v.CommanderThread = v:ForkThread(CommanderThreadImproved, platoon)
         end
     end
@@ -575,7 +583,7 @@ CommanderOverrideCheck = function(self)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 -- Look outside range.
 
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
-    if table.getn(commanders) == 0 or commanders[1]:IsDead() then
+    if table.getn(commanders) == 0 or commanders[1].Dead then
         return false
     end
 
@@ -2269,7 +2277,7 @@ CommanderOverrideCheckSorian = function(self)
     local aiBrain = self:GetBrain()
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
 
-    if table.getn(commanders) == 0 or commanders[1]:IsDead() or commanders[1]:GetCurrentLayer() == 'Seabed' then
+    if table.getn(commanders) == 0 or commanders[1].Dead or commanders[1]:GetCurrentLayer() == 'Seabed' then
         return false
     end
 
@@ -2636,7 +2644,7 @@ function FatBoyBehaviorSorian(self)
                 cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', targetUnit:GetPosition(), 'AttackMove')
             end
         else
-            LOG('*DEBUG: FatBoy no target.')
+            --LOG('*DEBUG: FatBoy no target.')
         end
 
         -- Walk to and kill target loop

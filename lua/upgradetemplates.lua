@@ -132,7 +132,7 @@ StructureUpgradeTemplates =
 
         # sonar
         { 'urb3102', 'urb3202'},
-        { 'urb3202', 'urs0304'},
+        { 'urb3202', 'urs0305'},
 
         # shields
         { 'urb4202', 'urb4204'},

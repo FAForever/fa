@@ -6,7 +6,7 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-aitypes = (function()
+function GetAItypes()
     --Table of AI Names to return
     local aitypes = {
         {
@@ -39,7 +39,7 @@ aitypes = (function()
         }
     }
 
-    --Defualt GPG AIs
+    --Default GPG AIs
 
     local AIFiles = DiskFindFiles('/lua/AI/CustomAIs_v2', '*.lua')
     local AIFilesold = DiskFindFiles('/lua/AI/CustomAIs', '*.lua')
@@ -62,6 +62,35 @@ aitypes = (function()
         end
     end
 
+    --Load Custom AIs from Moddirectory
+    local CustomAIfile
+    local ModAIFiles
+    -- get all sim mods installed in /mods/
+    local simMods = import('/lua/mods.lua').GetGameMods()
+    -- loop over all installed mods
+    for Index, ModData in simMods do
+        -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
+        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+            -- get all AI files from CustomAIs_v2 folder
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            -- check, if we have found at least 1 file
+            if ModAIFiles[1] then
+                -- loop over all AI files
+                for i, v in ModAIFiles do
+                    -- load AI data from file, stored in table AI
+                    CustomAIfile = import(v).AI
+                    -- Check if we have a table with normal AIs (table AIList)
+                    if CustomAIfile.AIList then
+                        -- insert every AI into aitypes
+                        for s, t in CustomAIfile.AIList do
+                            table.insert(aitypes, { key = t.key, name = t.name })
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
     --Default GPG Cheating AIs
     table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive" })
     table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush" })
@@ -87,5 +116,37 @@ aitypes = (function()
         end
     end
 
+    --Load Custom Cheating AIs from Moddirectory
+    ModAIFiles = false
+    -- loop over all installed mods
+    for Index, ModData in simMods do
+        -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
+        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+            -- get all AI files from CustomAIs_v2 folder
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            -- check, if we have found at least 1 file
+            if ModAIFiles[1] then
+                -- loop over all AI files
+                for i, v in ModAIFiles do
+                    -- load AI data from file, stored in table AI
+                    CustomAIfile = import(v).AI
+                    -- Check if we have a table with cheating AIs (table CheatAIList)
+                    if CustomAIfile.CheatAIList then
+                        -- insert every AI into aitypes
+                        for s, t in CustomAIfile.CheatAIList do
+                            table.insert(aitypes, { key = t.key, name = t.name })
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return aitypes
+end
+
+-- Uveso - aitypes are now available as function. This old table version is for hook compatibility.
+aitypes = (function()
+    local aitypes = GetAItypes()
     return aitypes
 end)()

@@ -12,6 +12,7 @@ Blacklist = {
     ['C707618F-D9B3-43CE-A181-1AC80D582078'] = HARMFUL, -- PWN Desync
     ['EF3ADDB4-9D34-437F-B1C8-440DAF896802'] = HARMFUL, -- UI Mass Fab Manager FA by Goom (Causes UI lag because it uses polling rather than interrupts)
     ['b2cde810-15d0-4bfa-af66-ec2d6ecd561d'] = HARMFUL, -- UI Idle Engineers by camelCase (Causes UI lag because it uses polling rather than interrupts)
+    ['edf9fefc-a091-457c-8781-e837710f3c62'] = HARMFUL, -- "Game Stabilizer" -> cheat mod which reduces the build time/mass and energy cost of the paragon to 1
 
     -- Auto-adjust netlag (causes desyncs due to interesting race conditions).
     ['9033139e-2701-4ac1-b330-ec984ebc23f9'] = HARMFUL,
@@ -70,6 +71,9 @@ Blacklist = {
 
     -- Icon Support
     ['9e8ea941-c306-4751-b367-f00000000002'] = INTEGRATED,
+    ['9e8ea941-c306-4751-b367-f00000000003'] = INTEGRATED,
+    ['9e8ea941-c306-4751-b367-f00000000004'] = INTEGRATED,
+    ['9e8ea941-c306-4751-b367-f00000000005'] = INTEGRATED,
 
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0

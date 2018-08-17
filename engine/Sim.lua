@@ -117,8 +117,13 @@ end
 function CreateDecal(position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army, fidelity)
 end
 
---- TODO.
--- INFO: event = CreateEconomyEvent(unit, energy, mass, timeInSeconds).
+--- Creates an economy event for the unit that consumes resources over given time.
+-- The unit shows the orange build bar for this event.
+-- @param unit Target unit.
+-- @param energy Amount of total energy the event will consume.
+-- @param mass Amount of total energy the event will consume.
+-- @param timeInSeconds How many seconds will the event last.
+-- return event Created economy event.
 function CreateEconomyEvent(unit, energy, mass, timeInSeconds)
 end
 
@@ -184,15 +189,24 @@ end
 function CreateResourceDeposit(type, x, y, z, size)
 end
 
---- TODO.
--- INFO: manip = CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed]).
-function CreateRotator()
+--- Create a manipulator which rotates unit's bone.
+-- @param unit Unit to create the manipulator for.
+-- @param bone String, name of the bone to rotate.
+-- @param axis String, 'x', 'Y' or 'z', axis to rotate around.
+-- @param [goal] TODO.
+-- @param [speed] TODO.
+-- @param [accel] TODO.
+-- @param [goalspeed] TODO.
+-- @return manipulator
+function CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
 end
 
 --- Create a manipulator which copies the motion of src_bone onto dst_bone.
 -- Priority matters! Only manipulators which come before the slave manipulator will be copied.
--- INFO: manip = CreateSlaver(unit, dest_bone, src_bone)
--- TODO.
+-- @param unit Unit to create the manipulator for.
+-- @param dest_bone String, name of the bone to paste the motion to.
+-- @param src_bone String, name of the bone to copy the motion from.
+-- @return manipulator
 function CreateSlaver(unit, dest_bone, src_bone)
 end
 
@@ -234,15 +248,34 @@ end
 function CreateUnitHPR(blueprint, army, x, y, z, pitch, yaw, roll)
 end
 
---- TODO.
+--- Deals damage to the target unit.
+-- @param instigator Source of the damage (unit) or nil.
+-- @param target Unit taking the damage
+-- @param amount Number, amount of damage.
+-- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
 function Damage(instigator, target, amount, damageType)
 end
 
---- TODO.
+--- Deals damage to the target unit.
+-- @param instigator Source of the damage (unit) or nil.
+-- @param location Table with position {x, y, z}.
+-- @param radius Number, distance from the location to deal the damage.
+-- @param amount Number, amount of damage.
+-- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
+-- @param damageFriendly true/false if it should damage allied units.
+-- @param [damageSelf] true/false if the unit dealing the damage should take it as well.
 function DamageArea(instigator, location, radius, amount, damageType, damageFriendly, [damageSelf])
 end
 
---- TODO.
+--- Deals damage to the target unit.
+-- @param instigator Source of the damage (unit) or nil.
+-- @param location Table with position {x, y, z}.
+-- @param minRadius Number, distance from the location to start dealing damage.
+-- @param maxRadius Number, distance from the location to stop dealing damage.
+-- @param amount Number, amount of damage.
+-- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
+-- @param damageFriendly true/false if it should damage allied units.
+-- @param [damageSelf] true/false if the unit dealing the damage should take it as well.
 function DamageRing(instigator, location, minRadius, maxRadius, amount, damageType, damageFriendly, [damageSelf])
 end
 
@@ -266,8 +299,9 @@ end
 function DrawLinePop()
 end
 
---- TODO.
--- bool = EconomyEventIsDone(event).
+--- Check if the economy event is finished.
+-- @param event Economy event created by CreateEconomyEvent function.
+-- @return true/false.
 function EconomyEventIsDone(event)
 end
 
@@ -524,7 +558,7 @@ end
 -- @param tblUnits Table containing engineers.
 -- @param position Table with position {x, y, z}.
 -- @param blueprintID ID of the unit to build, example: 'ueb0103'.
--- @param table Unknown TODO.
+-- @param table (Two element table - TODO: find out what it is) or empty table.
 -- @return Returns the issued command.
 function IssueBuildMobile(tblUnits, position, blueprintID, table)
 end
@@ -744,10 +778,10 @@ end
 function IssueTransportUnload(tblUnits, position)
 end
 
---- Orders group of transports to drop specific units at target position.
--- TODO: Working but dropping everything.
--- @param tblUnits Table containing transports.
--- @param category TODO: This function doesn't bug out if second param is category but it drops everything.
+--- Orders group of transports (carriers) to drop specific units at target position.
+-- This seems to work only with carriers and not with air transports.
+-- @param tblUnits Table containing transports (carriers).
+-- @param category Unit category (categories.BOMBER).
 -- @param position Table with position {x, y, z}.
 -- @return Returns the issued command.
 function IssueTransportUnloadSpecific(tblUnits, category, position)
@@ -771,7 +805,8 @@ end
 function LUnitMoveNear(self, target, range)
 end
 
---- TODO.
+--- List all armies in the game.
+-- @return Table containing strings of army names.
 function ListArmies()
 end
 
@@ -812,16 +847,18 @@ end
 function RemoveBuildRestriction(army, category)
 end
 
---- TODO.
+--- Removes economy event created by CreateEconomyEvent function from the unit.
+-- @param unit Unit to remove the event from.
+-- @param event Event to remove.
 function RemoveEconomyEvent(unit, event)
 end
 
---- unit = SelectedUnit() -- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
--- TODO.
+--- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
+-- Example: unit = SelectedUnit().
 function SelectedUnit()
 end
 
---- Set alliances between armies.
+--- Set alliances between 2 armies.
 -- @param army1 Army's index.
 -- @param army2 Army's index.
 -- @param alliance Can be 'Neutral', 'Enemy', 'Ally'.
@@ -840,6 +877,8 @@ function SetAlliedVictory()
 end
 
 --- TODO.
+-- @param army Army's index.
+-- @param personality TODO.
 function SetArmyAIPersonality(army, personality)
 end
 
@@ -852,14 +891,22 @@ function SetArmyColor(army, r, g, b)
 end
 
 --- TODO.
+-- @param army Army's index.
 function SetArmyColorIndex(army, index)
 end
 
---- TODO.
+--- Gives mass and energy to the army.
+-- TODO: Find out if this is in any way special than brain:GiveResource().
+-- @param army Army's index.
+-- @param mass Amount of mass to give.
+-- @param energy Amount of energy to give.
 function SetArmyEconomy(army, mass, energy)
 end
 
---- TODO.
+--- Sets faction for the given army.
+-- 0 - UEF, 1 - Aeon, 2 - Cybran, 3 - Seraphim.
+-- @param army Army's index.
+-- @param index Faction index.
 function SetArmyFactionIndex(army, index)
 end
 
@@ -879,7 +926,10 @@ function SetArmyShowScore(army, bool)
 end
 
 --- Set the arty starting position.
+-- Position where the initial unit will be spawned.
 -- @param army Army's index.
+-- @param x Position on the map on X axis.
+-- @param x Position on the map on Z axis.
 function SetArmyStart(army, x, z)
 end
 
@@ -935,8 +985,10 @@ function SimConExecute(commandString)
 end
 
 --- Split a prop into multiple child props, one per bone.
+-- Used for breaking up tree groups at colision.
+-- @param original Prop to split
+-- @param blueprint_name BP name of the new props to spawn at each bone of the original prop.
 -- @return Returns all the created props.
--- TODO.
 function SplitProp(original, blueprint_name)
 end
 
@@ -949,7 +1001,11 @@ end
 function SubmitXMLArmyStats()
 end
 
---- TODO.
+--- Attempt to copy animation pose from the unit to the prop.
+-- Only works if the mesh and skeletons are the same, but will not produce an error if not.
+-- @param unitFrom Unit to copy pose from.
+-- @param entityTo Entity (prop) to copy pose on.
+-- @param bCopyWorldTransform true/false.
 function TryCopyPose(unitFrom, entityTo, bCopyWorldTransform)
 end
 
@@ -983,8 +1039,9 @@ end
 function moho.CollisionBeamEntity()
 end
 
----
---  Entity:SinkAway(vy) -- sink into the ground
+--- Sinks the entity into the ground.
+-- Used for dead trees for example.
+-- @param vy Velocity at Y axis.
 function SinkAway(vy)
 end
 

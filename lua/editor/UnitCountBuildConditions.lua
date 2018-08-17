@@ -444,7 +444,7 @@ function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCo
         return false
     end
     local positions = {}
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for k,v in aiBrain.PBM.Locations do
             if v.LocationType ~= locationType and Utils.XZDistanceTwoVectors(pos, v.Location) <= locationRadius then
                 table.insert(positions, v.Location)
@@ -519,7 +519,7 @@ function HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCate
         WARN('*AI WARNING: HaveUnitComparisonAtLocation - Invalid location - ' .. locationType)
         return false
     end
-    local numUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius()))
+    local numUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager.Radius))
     return CompareBody(numUnits, unitCount, compareType)
 end
 
@@ -545,7 +545,7 @@ function HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unit
         return false
     end
     local poolPlatoon = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager.Radius)
     return CompareBody(numUnits, unitCount, compareType)
 end
 
@@ -989,43 +989,15 @@ function UnitsGreaterThanExpansionValue(aiBrain, unitCategory, large, small, nav
 end
 
 function ExpansionBaseCheck(aiBrain)
-    local ArmyCount = 0
-    for index,brain in ArmyBrains do
-        if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-            ArmyCount = ArmyCount + 1
-        end
-    end
-
+    -- Removed automatic setting of Land-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
-
-    #LOG('AI brains is ' .. ArmyCount)
-    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
-        return ExpansionBaseCount(aiBrain, '<', 1)
-    elseif ArmyCount > 2 then
-        return ExpansionBaseCount(aiBrain, '<', 2)
-    else
-        return ExpansionBaseCount(aiBrain, '<', checkNum)
-    end
+    return ExpansionBaseCount(aiBrain, '<', checkNum)
 end
 
 function NavalBaseCheck(aiBrain)
-    local ArmyCount = 0
-    for index,brain in ArmyBrains do
-        if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-            ArmyCount = ArmyCount + 1
-        end
-    end
-
+    -- Removed automatic setting of naval-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
-
-    #LOG('AI brains is ' .. ArmyCount)
-    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
-        return NavalBaseCount(aiBrain, '<', 1)
-    elseif ArmyCount > 2 then
-        return NavalBaseCount(aiBrain, '<', 2)
-    else
-        return NavalBaseCount(aiBrain, '<', checkNum)
-    end
+    return NavalBaseCount(aiBrain, '<', checkNum)
 end
 
 #DUNCAN - added to limit expansion bases.
@@ -1122,7 +1094,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     if not engineerManager then
         return false
     end
-    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager.Radius)
     for k,v in Structures do
         if not v.Dead and v:GetHealthPercent() < .8 then
         #LOG('*AI DEBUG: DamagedStructuresInArea return true')
@@ -1138,7 +1110,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     if not engineerManager then
         return false
     end
-    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then

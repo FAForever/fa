@@ -19,8 +19,6 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
-LOG('Active mods in sim: ', repr(__active_mods))
-
 WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
@@ -186,6 +184,9 @@ function SetupSession()
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
+    -- Preloads AI telplates from AI mods
+    AIModTemplatesPreloader()
+    
     ResetSyncTable()
 end
 
@@ -222,6 +223,7 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
     LOG('BeginSession...')
+    SPEW('Active mods in sim: ', repr(__active_mods))
     ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
@@ -335,3 +337,20 @@ end
 
 Prefetcher:Update(DefaultPrefetchSet())
 
+function AIModTemplatesPreloader()
+    local simMods = import('/lua/mods.lua').AllMods()
+    for Index, ModData in simMods do
+        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+        if ModAIFiles[1] then
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
+                import(file)
+            end
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
+                import(file)
+            end
+            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
+                import(file)
+            end
+        end
+    end
+end

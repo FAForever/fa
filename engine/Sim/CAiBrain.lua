@@ -8,7 +8,7 @@
 -- @param threat Number reptresenting the threat.
 -- @param decay Number, the thread is decreasing by time.
 -- @param threatType Types: TODO.
-function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
+function CAiBrain:AssignThreatAtPosition(position, threat, [decay], [threatType])
 end
 
 --- Assign unit to platoon.

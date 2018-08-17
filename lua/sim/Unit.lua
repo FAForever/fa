@@ -1289,11 +1289,14 @@ Unit = Class(moho.unit_methods) {
     VeterancyDispersal = function(self, suicide)
         local bp = self:GetBlueprint()
         local mass = self:GetVeterancyValue()
+        local massTrue
         -- Adjust mass based on current health when a unit is self destructed
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
-
+        
+        massTrue = mass
+        
         -- Non-combat structures only give 50% veterancy
         if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
             mass = mass * 0.5
@@ -1302,10 +1305,18 @@ Unit = Class(moho.unit_methods) {
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
-            if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
-                -- Find the proportion of yourself that each instigator killed
-                local massKilled = math.floor(mass * (data.damage / self.totalDamageTaken))
-                unit:OnKilledUnit(self, massKilled)
+            if unit and not unit.Dead and unit.gainsVeterancy then
+                local proportion = data.damage / self.totalDamageTaken
+                
+                -- True value for "Mass killed"
+                local massKilledTrue = math.floor(massTrue * proportion)
+                unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
+                
+                if unit.Sync.VeteranLevel < 5 then
+                    -- Find the proportion of yourself that each instigator killed
+                    local massKilled = math.floor(mass * proportion)
+                    unit:OnKilledUnit(self, massKilled)
+                end
             end
         end
     end,
@@ -2092,6 +2103,7 @@ Unit = Class(moho.unit_methods) {
 
         if self.gainsVeterancy then
             self.Sync.totalMassKilled = 0
+            self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
 
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
@@ -4242,7 +4254,7 @@ Unit = Class(moho.unit_methods) {
 
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
-        if self:ShieldIsOn() then
+        if self:ShieldIsOn() or self.MyShield.Charging then
             self:DisableShield()
             self:DisableDefaultToggleCaps()
         end

@@ -68,8 +68,8 @@ BuilderManager = Class {
             local highest = 0
             local key, value
             for k, v in self.BuilderData[bType].Builders do
-                if v:GetPriority() > highest then
-                    highest = v:GetPriority()
+                if v.Priority > highest then
+                    highest = v.Priority
                     value = v
                     key = k
                 end
@@ -105,9 +105,19 @@ BuilderManager = Class {
     AddInstancedBuilder = function(self,newBuilder, builderType)
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
-            error('*BUILDERMANAGER ERROR: Invalid builder type: ' .. builderType .. ' - in builder: ' .. newBuilder.BuilderName)
+            -- Warn the programmer that something is wrong. We can continue, hopefully the builder is not too important for the AI ;)
+            -- But good for testing, and the case that a mod has bad builders.
+            -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
+            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
+            return
         end
         if newBuilder then
+            if not self.BuilderData[builderType] then
+                -- Warn the programmer that something is wrong here. Same here, we can continue.
+                -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
+                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
+                return
+            end
             table.insert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
@@ -121,8 +131,8 @@ BuilderManager = Class {
     GetBuilderPriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
-                    return builder:GetPriority()
+                if builder.BuilderName == builderName then
+                    return builder.Priority
                 end
             end
         end
@@ -132,7 +142,7 @@ BuilderManager = Class {
     GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     return builder:GetActivePriority()
                 end
             end
@@ -143,7 +153,7 @@ BuilderManager = Class {
     SetBuilderPriority = function(self,builderName,priority,temporary,setbystrat)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     builder:SetPriority(priority, temporary, setbystrat)
                     return
                 end
@@ -154,7 +164,7 @@ BuilderManager = Class {
     ResetBuilderPriority = function(self,builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     builder:ResetPriority()
                     return
                 end
@@ -210,12 +220,28 @@ BuilderManager = Class {
     GetBuilder = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
-                if builder:GetBuilderName() == builderName then
+                if builder.BuilderName == builderName then
                     return builder
                 end
             end
         end
         return false
+    end,
+    
+    -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
+    IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
+        if DelayEqualBuildPlattons then
+            local CheckDelayTime = GetGameTimeSeconds()
+            local PlatoonName = DelayEqualBuildPlattons[1]
+            if not self.Brain.DelayEqualBuildPlattons[PlatoonName] or self.Brain.DelayEqualBuildPlattons[PlatoonName] < CheckDelayTime then
+                --LOG('Setting '..DelayEqualBuildPlattons[2]..' sec. delaytime for builder ['..PlatoonName..']')
+                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + DelayEqualBuildPlattons[2]
+                return false
+            else
+                --LOG('Builder ['..PlatoonName..'] still delayed for '..(CheckDelayTime - self.Brain.DelayEqualBuildPlattons[PlatoonName])..' seconds.')
+                return true
+            end
+        end
     end,
 
     GetHighestBuilder = function(self,bType,params)
@@ -229,10 +255,12 @@ BuilderManager = Class {
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
-            if v:GetPriority() >= 1 and self:BuilderParamCheck(v,params) and (not found or v:GetPriority() == found) and v:GetBuilderStatus() then
-                found = v:GetPriority()
-                table.insert(possibleBuilders, k)
-            elseif found and v:GetPriority() < found then
+            if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus() then
+                if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
+                    found = v.Priority
+                    table.insert(possibleBuilders, k)
+                end
+            elseif found and v.Priority < found then
                 break
             end
         end

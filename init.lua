@@ -32,6 +32,7 @@ whitelist = {
     "schook.nx5",
     "textures.nx5",
     "units.nx5",
+    "props.nx5",
     "murderparty.nxt",
     "labwars.nxt",
     "units.scd",
