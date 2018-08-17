@@ -1,4 +1,4 @@
-Patch 3697 (Upcoming)
+Patch 3697 (17 August, 2018)
 ============================
 ### Lobby
 - Introduced ability to have mods that affect AI options
