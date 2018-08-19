@@ -1358,8 +1358,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CalculateVeterancyLevel = function(self, massKilled)
-        local bp = self:GetBlueprint()
-
         -- Limit the veterancy gain from one kill to one level worth
         massKilled = math.min(massKilled, self.Sync.myValue)
 
@@ -1375,6 +1373,17 @@ Unit = Class(moho.unit_methods) {
         -- Update our recorded veterancy level
         self.Sync.VeteranLevel = newVetLevel
 
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
+    end,
+    
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled)
+        self.Sync.totalMassKilled = math.floor(massKilled)
+        
+        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+
+        if newVetLevel == self.Sync.VeteranLevel then return end
+
+        self.Sync.VeteranLevel = newVetLevel
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 

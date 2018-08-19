@@ -137,7 +137,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
 
         -- A F T E R
         if massKilled and massKilled > 0 then
-            unit:CalculateVeterancyLevel(massKilled)
+            unit:CalculateVeterancyLevelAfterTransfer(massKilled)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do
