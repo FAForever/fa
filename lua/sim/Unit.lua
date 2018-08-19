@@ -1376,8 +1376,9 @@ Unit = Class(moho.unit_methods) {
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
     
-    CalculateVeterancyLevelAfterTransfer = function(self, massKilled)
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, massKilledTrue)
         self.Sync.totalMassKilled = math.floor(massKilled)
+        self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
         
         local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 

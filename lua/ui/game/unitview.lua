@@ -409,6 +409,7 @@ function UpdateWindow(info)
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
+                    controls.vetTitle:SetText('Veterancy')
 
                     local nextLevel = myValue * (currentLevel + 1)
                     local text
