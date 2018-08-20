@@ -3421,7 +3421,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOff' then
+            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOff' or not ScenarioInfo.Options.AIReplacement then
                 self:OnDefeat()
             else
                 ForkThread(function()
