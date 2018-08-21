@@ -3421,9 +3421,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOff' or not ScenarioInfo.Options.AIReplacement then
-                self:OnDefeat()
-            else
+            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOn' then
                 ForkThread(function()
                     local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
 
@@ -3450,6 +3448,8 @@ AIBrain = Class(moho.aibrain_methods) {
                     self:InitializeSkirmishSystems()
                     self:OnCreateAI()
                 end)
+            else -- If ScenarioInfo.Options.AIReplacement return nil or any other value, make sure the ACU explodes.
+                self:OnDefeat()
             end
         end
     end,
