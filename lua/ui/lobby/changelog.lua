@@ -1,4 +1,4 @@
-last_version = 3697
+last_version = 3698
 changelog = {
     {
         version = 3,
@@ -1768,6 +1768,16 @@ changelog = {
             '- ChrisKitching',
             '- crotalus',
             '- dk0x',
+        },
+    },
+    {
+        version = 3698,
+        name = 'Game Version 3698',
+        description = {
+            '- Remove AI Takeover from ladder as it is intended to be an option for custom games',
+            '',
+            '**Contributors**',
+            '- TheAdDad',
         },
     },
 }
