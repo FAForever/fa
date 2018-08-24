@@ -1,4 +1,4 @@
-Hotfix Patch 3698 (23 August, 2018)
+Hotfix Patch 3698 (24 August, 2018)
 ============================
 - Remove AI Takeover from ladder as it is intended to be an option for custom games
 
