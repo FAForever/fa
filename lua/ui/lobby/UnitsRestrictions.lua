@@ -79,7 +79,7 @@ Expressions = {
     LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
     AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD)",
-    NAVAL       = "(NAVAL - STRUCTURE - (MOBILESONAR * TECH3))",
+    NAVAL       = "((STRUCTURE * NAVAL * FACTORY) + (NAVAL * MOBILE - MOBILESONAR))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
     AMPHIBIOUS  = "(AMPHIBIOUS)",
     SUBS        = "((NAVAL * SUBMERSIBLE) - STRUCTURE)",
