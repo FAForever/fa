@@ -46,8 +46,8 @@ Expressions = {
 
     -- excluding engineers, economy, and factories because players will not progress to higher tech levels
     T1          = "(TECH1 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC)",
-    T2          = "(TECH2 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC)",
-    T3          = "(TECH3 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC + SUBCOMMANDER)",
+    T2          = "(TECH2 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC + (TECH2 * CRABEGG))",
+    T3          = "(TECH3 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC + (TECH3 * CRABEGG) + SUBCOMMANDER)",
     T4          = "(EXPERIMENTAL - (MOBILE * ENGINEER))",
     -- excluding ACUs because game might crash if someone picks restricted faction
     UEF         = "(UEF - COMMAND)",
