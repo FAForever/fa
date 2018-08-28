@@ -116,14 +116,14 @@ Expressions = {
     T2_BASE_SPAM  = "(TECH2 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE)",
     T3_BASE_SPAM  = "(TECH3 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
 
-    -- including Satellite, Soul Ripper, Czar, and Ahwassa and GhetoGunship
+    -- including Satellite, Soul Ripper, Czar, and Ahwassa and Ghetto-Gunship
     SNIPES_AIR    = "((AIR * (TECH2 + TECH3 + EXPERIMENTAL) * (GROUNDATTACK + BOMBER + ANTINAVY)) + uaa0310 + ual0106 + uel0106 + url0106)", -- CZAR and labs for GhetoGunship
     SNIPES_LAND   = "(LAND * MOBILE * BOMB)",
     SNIPES_BOTS   = "(LAND * SNIPER * BOT)",
     SNIPES_BASE   = "(STRUCTURE * MINE)", -- for mods that add LAND MINES
 
     ANTIAIR_FIGHTERS = "(ANTIAIR * AIR - EXPERIMENTAL - GROUNDATTACK)",
-    ANTIAIR_NAVY     = "(ANTIAIR * NAVAL - EXPERIMENTAL - FRIGATE)", -- could include sera T3 sub
+    ANTIAIR_NAVY     = "(ANTIAIR * NAVAL - EXPERIMENTAL - FRIGATE)", -- could include SERA T3 sub
     ANTIAIR_LAND     = "(ANTIAIR * LAND - EXPERIMENTAL + url0301_AntiAir)",
     ANTIAIR_BASE     = "(ANTIAIR * STRUCTURE)",
 
@@ -175,7 +175,8 @@ Expressions = {
     STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth + url0301_Cloak)",
     STEALTH_NAVY = "(STEALTHFIELD * NAVAL)",
 }
---- note that enhancements are defined in tables and not in strings like category expressions are
+--- note that enhancements are defined in tables and not in strings like category expressions are.
+--- Use the same key in above and below table to combine units and enhancements into a single restriction preset
 Enhancements = {
     TELE =    { "Teleporter",
                 "TeleporterRemove"},
@@ -340,7 +341,9 @@ local function CreatePreset(key, tooltip, name, icon)
     end
 end
 --- Creates restriction preset from a list of restriction presets
---- by merging all category expressions and enhancements in passed presets
+--- by merging all category expressions and enhancements in passed preset keys
+--- Note unit and enhancement restrictions will be combined when presetsKeys has the same key
+--- in the Expressions and Enhancements tables defined at top of this file
 local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
 
     local presetMerging = false
@@ -391,6 +394,8 @@ local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
     presetsRestrictions[key] = preset
 end
 --- Initializes presets and groups some presets
+--- Note that you need to copy LOCalization strings to \LOC\US\strings_db.lua file
+--- if you make any changes to strings "<LOC restricted*>..." strings in this function
 local function CreatePresets()
     -- FACTION restrictions
     CreatePreset("UEF",
