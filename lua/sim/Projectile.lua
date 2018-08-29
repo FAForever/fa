@@ -452,17 +452,20 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.MyFlare = Flare {
             Owner = self,
             Radius = tbl.Radius or 5,
+            Category = tbl.Category or 'MISSILE',  -- We pass the category bp value along so that it actually has a function.
         }
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
             self.MyUpperFlare = Flare {
                 Owner = self,
                 Radius = tbl.Radius,
                 OffsetMult = tbl.OffsetMult,
+                Category = tbl.Category or 'MISSILE',
             }
             self.MyLowerFlare = Flare {
                 Owner = self,
                 Radius = tbl.Radius,
                 OffsetMult = -tbl.OffsetMult,
+                Category = tbl.Category or 'MISSILE',
             }
             self.Trash:Add(self.MyUpperFlare)
             self.Trash:Add(self.MyLowerFlare)
