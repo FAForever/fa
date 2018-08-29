@@ -73,10 +73,12 @@ local sortBy = {
         'ORBITALSYSTEM',
         'SATELLITE',
         -- Additional sorting
+        'SCOUT',
         'DIRECTFIRE',
+        'BOMBER',
         'ANTIAIR',
-        'TRANSPORTATION',
         'GROUNDATTACK',
+        'TRANSPORTATION',
         'ANTINAVY',
         'SUBMERSIBLE',
         'INDIRECTFIRE',
@@ -85,11 +87,12 @@ local sortBy = {
     },
     -- Order blueprints first by their WEAPON categories and then TECH level
     WEAPON = {
+        'SCOUT',
         'MINE',
         'DIRECTFIRE',
         'ANTIAIR',
-        'TRANSPORTATION',
         'GROUNDATTACK',
+        'TRANSPORTATION',
         'ANTINAVY',
         'BOMBER',
         'INDIRECTFIRE',
