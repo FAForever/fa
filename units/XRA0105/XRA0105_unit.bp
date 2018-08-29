@@ -96,7 +96,6 @@ UnitBlueprint {
         'AIR',
         'TECH1',
         'GROUNDATTACK',
-        'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
