@@ -462,7 +462,7 @@ UnitBlueprint {
             },
             FiringTolerance = 360,
             Flare = {
-                Category = 'MISSILE',
+                Category = 'MISSILE TACTICAL',
                 Stack = true, --added special flag to trigger multi-sphere collision
                 OffsetMult = 1.33,
                 Radius = 15,
