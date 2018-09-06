@@ -1841,9 +1841,10 @@ local function TryLaunch(skipNoObserversCheck)
 
     -- Ensure, for a non-sandbox game, there are some teams to fight.
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' and numTeams < 2 then
-        AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set "..
-                "to Sandbox."))
-        return
+        --AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set to Sandbox."))
+        -- In case we start a game as single player we set the game temporarily to Sandbox mode. This will not change the lobby option itself!
+        SPEW('GameOptions[\'Victory\'] changed temporarily from "'..gameInfo.GameOptions['Victory']..'" to "sandbox"')
+        gameInfo.GameOptions['Victory'] = 'sandbox'
     end
 
     if numPlayers == 0 then
