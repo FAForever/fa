@@ -1514,7 +1514,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if EntityCategoryContains(categories.PROJECTILE, other) then
-            if self:GetArmy() == other:GetArmy() then
+            if IsAlly(self:GetArmy(), other:GetArmy()) then
                 return other.CollideFriendly
             end
         end
@@ -1549,7 +1549,7 @@ Unit = Class(moho.unit_methods) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if self:GetArmy() == firingWeapon.unit:GetArmy() then
+            if IsAlly(self:GetArmy(), firingWeapon.unit:GetArmy()) then
                 return false
             end
         end
