@@ -445,7 +445,7 @@ OverchargeProjectile = Class() {
         local launcher = self:GetLauncher() 
         local maxHP = 0
         
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) do
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do
                 if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
                     maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
                 elseif unit:GetHealth() > maxHP then
@@ -453,7 +453,7 @@ OverchargeProjectile = Class() {
                 end
         end
                
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) do
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) or {} do
             -- Special for fatty's shield
             if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
                 maxHP = unit.MyShield:GetMaxHealth()
