@@ -54,6 +54,7 @@ local categoriesID = {
     [51] = categories.TRANSPORTATION    
 }
 
+--Fast & simple parser (can be replaced by ParseEntityCategory())
 local customPatterns = {
     [1] = function(cat)
         local parsed = cat[1]
@@ -82,21 +83,26 @@ local customPatterns = {
 }
 
 function SetWeaponPriorities(data)
-    local SelecetedUnits = data.SelecetedUnits
+    local selectedUnits = data.SelectedUnits
     local showMsg
     local lineToInsert
     local default
+    local name
     
+    
+    -- parse and save all priorities (we do it only once)
     if not parsedPriorities then
         parsedPriorities = parse()
     end
    
-    if not SelecetedUnits then
+    if not selectedUnits then
         return
-    elseif GetEntityById(SelecetedUnits[1]):GetArmy() == GetFocusArmy() then
+    elseif GetEntityById(selectedUnits[1]):GetArmy() == GetFocusArmy() then
+        -- show warning/success msgs to owner
         showMsg = true
     end
-        
+    
+    
     if data.key == 0 then
         default = true
     elseif data.key[1] then     
@@ -124,13 +130,15 @@ function SetWeaponPriorities(data)
     
     local units = {}
     
-    for _, unitId in SelecetedUnits do
+    -- secure units
+    for _, unitId in selectedUnits do
         local unit = GetEntityById(unitId)
         
         if unit and OkayToMessWithArmy(unit:GetArmy()) then 
             table.insert(units, unit)
         end
     end
+    
     
     if default then
         name = "Default"
@@ -144,7 +152,7 @@ function SetWeaponPriorities(data)
   
     for _, unit in units do
     
-        local bplueprintId = unit:GetBlueprint().BlueprintId
+        local blueprintId = unit:GetBlueprint().BlueprintId
         local weaponCount = unit:GetWeaponCount()
         
         if weaponCount > 0 and unit.Sync.WepPriority ~= name then --checks if unit is already in requested mode
@@ -153,7 +161,7 @@ function SetWeaponPriorities(data)
             
             for i = 1, weaponCount do
                 local weapon = unit:GetWeapon(i)
-                local parsedTable = parsedPriorities[bplueprintId][i]
+                local parsedTable = parsedPriorities[blueprintId][i]
                 local priorities = {[1] = lineToInsert}
                 
                 if parsedTable[1] then
@@ -181,6 +189,8 @@ function SetWeaponPriorities(data)
     end
 end
 
+
+-- Parse and caching all TargetPriorities tables for every unit
 function parse()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}

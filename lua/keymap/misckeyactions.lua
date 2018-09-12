@@ -397,7 +397,7 @@ function SetWeaponPriorities(key, name, defaults)
             table.insert(unitIds, unit:GetEntityId())
         end
 
-        SimCallback({Func = 'WeaponPriorities', Args = {SelecetedUnits = unitIds, key = key, name = name, defaults = defaults}})
+        SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, key = key, name = name, defaults = defaults}})
     end
 end
 
