@@ -46,6 +46,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -0.25,
     Defense = {
