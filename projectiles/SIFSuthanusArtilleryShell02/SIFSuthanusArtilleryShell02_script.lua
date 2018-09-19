@@ -12,8 +12,11 @@ local SSuthanusArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanus
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
-	OnImpact = function(self, TargetType, TargetEntity)
-		SSuthanusArtilleryShell.OnImpact(self, TargetType, TargetEntity)
+    OnImpact = function(self, TargetType, TargetEntity)
+        if TargetType == 'Shield' and self.Data then
+            self.DamageData.DamageAmount = self.Data
+        end
+        SSuthanusArtilleryShell.OnImpact(self, TargetType, TargetEntity)
 		if TargetType != 'Shield' and TargetType != 'Water' and TargetType != 'UnitAir' then
 			local rotation = RandomFloat(0,2*math.pi)
 	        
