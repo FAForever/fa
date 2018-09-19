@@ -14,7 +14,9 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
     OnImpact = function(self, TargetType, TargetEntity)
         if TargetType == 'Shield' and self.Data then
-            self.DamageData.DamageAmount = self.Data
+            DamageArea(self, self:GetPosition(), self.DamageData.DamageRadius, self.DamageData.DamageAmount, self.DamageData.DamageType, self.DamageData.DamageFriendly)
+            self.DamageData.DamageAmount = self.Data - self.DamageData.DamageAmount
+            self.DamageData.DamageRadius = 0
         end
         SSuthanusArtilleryShell.OnImpact(self, TargetType, TargetEntity)
 		if TargetType != 'Shield' and TargetType != 'Water' and TargetType != 'UnitAir' then
