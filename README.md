@@ -45,7 +45,7 @@ The actual loading in `init_faf.lua` is done here:
     -- these are the classic supcom directories. They don't work with accents or other foreign characters in usernames
     mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
     mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the uppder ones.
+    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the upper ones.
     mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
     mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
     mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
