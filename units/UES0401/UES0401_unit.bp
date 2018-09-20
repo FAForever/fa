@@ -79,6 +79,7 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 20,
     Categories = {
+        'ANTINAVY',
         'PRODUCTSC1',
         'SELECTABLE',
         'BUILTBYTIER3COMMANDER',
