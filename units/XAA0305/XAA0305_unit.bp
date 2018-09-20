@@ -17,7 +17,7 @@ UnitBlueprint {
         KTurn = 0.8,
         KTurnDamping = 1.5,
         LiftFactor = 7,
-        MaxAirspeed = 8,
+        MaxAirspeed = 10,
         MinAirspeed = 3,
         StartTurnDistance = 5,
         Winged = false,
@@ -251,7 +251,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 24,
+            Damage = 28,
             DamageType = 'Normal',
             DisplayName = 'Quad Light Laser',
             FireTargetLayerCapsTable = {

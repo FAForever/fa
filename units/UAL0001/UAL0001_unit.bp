@@ -366,6 +366,7 @@ UnitBlueprint {
             BuildTime = 1225,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
+            NewHealth = 2000,
             ShowBones = {
                 'Back_Upgrade',
             },
@@ -1127,7 +1128,7 @@ UnitBlueprint {
                         OnFire = true,
                     },
                     BuffType = 'STUN',
-                    Duration = 3.5,
+                    Duration = 2.5,
                     Radius = 35,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL, COMMAND',
