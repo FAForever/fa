@@ -101,7 +101,26 @@ UAL0001 = Class(ACUUnit) {
         -- Chrono Dampener
         elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
+            if not Buffs['AeonACUChronoDampener'] then
+                BuffBlueprint {
+                    Name = 'AeonACUChronoDampener',
+                    DisplayName = 'AeonACUChronoDampener',
+                    BuffType = 'DamageStabilization',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.NewHealth,
+                            Mult = 1.0,
+                        },
+                    },
+                }
+            end
+            Buff.ApplyBuff(self, 'AeonACUChronoDampener')
         elseif enh == 'ChronoDampenerRemove' then
+            if Buff.HasBuff(self, 'AeonACUChronoDampener') then
+                Buff.RemoveBuff(self, 'AeonACUChronoDampener')
+            end
             self:SetWeaponEnabledByLabel('ChronoDampener', false)
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
