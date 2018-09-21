@@ -62,7 +62,6 @@ UnitBlueprint {
         'STEALTH',
         'SUBMERSIBLE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
-        'INSIGNIFICANTUNIT',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -229,7 +228,7 @@ UnitBlueprint {
             DoTPulses = 5,
             DoTTime = 0.5,
             FireTargetLayerCapsTable = {
-                Sub = 'Seabed|Sub|Water',
+                Water = 'Seabed|Sub|Water',
             },
             FiringTolerance = 2,
             Label = 'Turret01',
