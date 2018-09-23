@@ -255,7 +255,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 100,
-            DamageRadius = 1,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Gatling Plasma Cannon',
             EnergyDrainPerSecond = 0,
