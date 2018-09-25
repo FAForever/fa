@@ -34,7 +34,6 @@ PlayerData = Class(WatchedValueTable) {
     __init = function(self, initialMapping)
         local mapping = table.assimilate(initialMapping, DEFAULT_MAPPING)
         mapping.ArmyColor = mapping.PlayerColor
-        table.print(mapping)
         WatchedValueTable.__init(self, mapping)
     end
 }

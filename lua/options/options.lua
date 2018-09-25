@@ -436,7 +436,7 @@ options = {
                 title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
                 key = 'faction_font_color',
                 type = 'toggle',
-                default = true,
+                default = false,
                 set = function(key,value,startup)
                     import('/lua/ui/uiutil.lua').UpdateCurrentSkin({faction_font_color = value})
                 end,

@@ -88,7 +88,8 @@ ChatArea = Class(Group){
 
         -- ensure we have a style for the author name
         if authorStyle == nil then
-           authorStyle = self:GetDefaultStyle()
+            authorStyle = self:GetDefaultStyle()
+            authorStyle.fontFamily = "Arial Gras"
         else
             -- ensure author style has all required values otherwise use values of default style
             for k,v in pairs(defaultStyle) do
@@ -102,7 +103,6 @@ ChatArea = Class(Group){
         authorStyle.padding.right = 0 
 
         -- always use bolder font for the Author name 
-        authorStyle.fontFamily = "Arial Gras"
         
         -- keep track of chat history by storing messages and their authors
         if self.ChatHistoryActive then
