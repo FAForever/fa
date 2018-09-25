@@ -7544,6 +7544,7 @@ lobui_0524="Réinitialiser tous les paramètres"
 lobui_0501="Carte aléatoire"
 lobui_0502="Selectionner une carte au hasard"
 lobui_0413="Pays"
+lobui_0460="Noms colorés dans le chat"
 
 lobui_0592="Autoriser les spectateurs"
 lobui_0593="Autoriser les spectateurs après le début de la partie"
