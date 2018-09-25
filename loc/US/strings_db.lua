@@ -4364,6 +4364,7 @@ lobui_0403="Lobby is windowed until launch"
 lobui_0404="Chat Font Size:"
 lobui_0405="Lobby Background"
 lobui_0411="Faction Font Color"
+lobui_0460="Player color in chat"
 
 # Lobby background options
 lobui_0406="Factions"

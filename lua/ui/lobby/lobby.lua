@@ -3797,22 +3797,25 @@ function AddChatText(text, playerID, scrollToBottom)
         LOG("text=" .. repr(text))
         return
     end
-    
+
+    local chatPlayerColor = Prefs.GetFromCurrentProfile('ChatPlayerColor') or false
+
     local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
     local nameColor = "888888" -- Displaying text in grey by default if the player is observer
     local textColor = "888888"
-    
-    for id, player in gameInfo.PlayerOptions:pairs() do
-        if player.OwnerID == playerID then
-            nameColor = gameColors.PlayerColors[player.PlayerColor]
-            textColor = nil
-            break
+
+    if chatPlayerColor then
+        for id, player in gameInfo.PlayerOptions:pairs() do
+            if player.OwnerID == playerID then
+                nameColor = gameColors.PlayerColors[player.PlayerColor]
+                textColor = nil
+                break
+            end
         end
     end
-    
+
     local name = FindNameForID(playerID)
-    
-    
+
     GUI.chatDisplay:PostMessage(text, name, {fontColor = textColor}, {fontColor = nameColor})
     if scrolledToBottom then
        GUI.chatPanel:ScrollToBottom()
@@ -5407,7 +5410,7 @@ end
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
     dialogContent.Width:Set(420)
-    dialogContent.Height:Set(240)
+    dialogContent.Height:Set(260)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -5445,7 +5448,7 @@ function ShowLobbyOptionsDialog()
     -- label for displaying chat font size
     local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
     local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 136)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 162)
 
     -- slider for changing chat font size
     local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 20,
@@ -5453,7 +5456,7 @@ function ShowLobbyOptionsDialog()
         UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), 
         UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
         UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 156)
+        LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 182)
     slider_Chat_SizeFont:SetValue(currentFontSize)
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
@@ -5507,6 +5510,17 @@ function ShowLobbyOptionsDialog()
         end
         UIUtil.UpdateCurrentSkin()
     end
+
+    local cbox_ChatPlayerColor = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0460>Player color in chat"))
+    LayoutHelpers.AtRightTopIn(cbox_ChatPlayerColor, dialogContent, 20, 120)
+    cbox_ChatPlayerColor.OnCheck = function(self, checked)
+        if checked then
+            Prefs.SetToCurrentProfile('ChatPlayerColor', true)
+        else
+            Prefs.SetToCurrentProfile('ChatPlayerColor', false)
+        end
+    end
+
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
@@ -5523,11 +5537,14 @@ function ShowLobbyOptionsDialog()
         cbox_WindowedLobby:Disable()
     end
     --
-    local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
-    cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
+    local lobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
+    cbox_StretchBG:SetCheck(lobbyBackgroundStretch == 'true', true)
     --
-    local FactionFontColor = Prefs.GetOption('faction_font_color')
-    cbox_FactionFontColor:SetCheck(FactionFontColor, true)
+    local factionFontColor = Prefs.GetOption('faction_font_color')
+    cbox_FactionFontColor:SetCheck(factionFontColor == true, true)
+
+    local chatPlayerColor = Prefs.GetFromCurrentProfile('ChatPlayerColor')
+    cbox_ChatPlayerColor:SetCheck(chatPlayerColor == true, true)
 end
 
 -- Load and return the current list of presets from persistent storage.
