@@ -488,6 +488,7 @@ function CreateWreckageUnit(unit)
 	local isAir = bp.CategoriesHash.AIR
 	local isLand = bp.CategoriesHash.LAND
 	local isExperimental = bp.CategoriesHash.EXPERIMENTAL
+	local isNaval = bp.CategoriesHash.NAVAL
 
 	local layer = unit:GetCurrentLayer()
 	local unitPos = unit:GetPosition()
@@ -497,7 +498,7 @@ function CreateWreckageUnit(unit)
 	-- If unit stay on land or deep<5 and have death animation, animate this
 	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and (layer == 'Land' or deep < 5)
 	-- We want to random rotate all naval and air units whats haven`t death animation
-	local needRotate = not (layer == 'Land' or isStructure or isLand) or (isAir and isExperimental)
+	local needRotate = not (layer == 'Land' or isStructure or isLand or (isNaval and deep < 2)) or (isAir and isExperimental)
 
 	if needAnimate then
 		ForkThread(AnimateDeathThread, unit, deathAnim)
