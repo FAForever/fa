@@ -1,0 +1,43 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTITORPEDO',
+        'DEFENSE',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.1,
+    },
+    General = {
+        Category = 'Defense',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 30,
+        DestroyOnWater = false,
+        MaxSpeed = 10,
+
+        # this is a workaround for tracking projectiles not intercepting correctly.  Original value: true
+        StayUnderwater = true,
+        TrackTarget = true,
+        TurnRate = 720,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
