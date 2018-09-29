@@ -31,7 +31,7 @@ ProjectileBlueprint {
     Physics = {
         Acceleration = 30,
         DestroyOnWater = false,
-        MaxSpeed = 10,
+        MaxSpeed = 20,
 
         # this is a workaround for tracking projectiles not intercepting correctly.  Original value: true
         StayUnderwater = true,
