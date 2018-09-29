@@ -391,9 +391,9 @@ UnitBlueprint {
             MinRadius = 10,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 2,
+            MuzzleVelocity = 30,
             ProjectileId = '/projectiles/AIMAntiTorpedo01/AIMAntiTorpedo01_proj.bp',
-            ProjectileLifetime = 1,
+            ProjectileLifetime = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -410,7 +410,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
-            RateOfFire = 0.08,
+            RateOfFire = 0.15,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
