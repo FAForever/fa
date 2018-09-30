@@ -320,7 +320,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -403,7 +403,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -486,7 +486,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
