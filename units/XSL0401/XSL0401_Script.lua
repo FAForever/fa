@@ -37,14 +37,10 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     OnReclaimed = function(self, entity)
-        --save before destroy
         local army = self:GetArmy()
 
         SWalkingLandUnit.OnReclaimed(self, entity)
 
-        if army == entity:GetArmy() or IsAlly(army,entity:GetArmy()) then  -- for reclaim from self player (defuse)
-            return
-        end
         -- Spawn the Energy Being
         self:SpawnElectroStorm()
     end,
