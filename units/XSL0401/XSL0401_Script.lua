@@ -37,7 +37,6 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     OnReclaimed = function(self, entity)
-        local army = self:GetArmy()
 
         SWalkingLandUnit.OnReclaimed(self, entity)
 
