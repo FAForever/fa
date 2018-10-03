@@ -15,6 +15,14 @@ UEA0304 = Class(TAirUnit) {
         LinkedRailGun1 = Class(TAirToAirLinkedRailgun) {},
         LinkedRailGun2 = Class(TAirToAirLinkedRailgun) {},
     },
+    
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator:GetArmy() == self:GetArmy() then
+            return
+        end
+        
+        TAirUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
 }
 
 TypeClass = UEA0304

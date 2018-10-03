@@ -22,5 +22,13 @@ URA0304 = Class(CAirUnit) {
         CAirUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetScriptBit('RULEUTC_StealthToggle', true)
     end,
+    
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator:GetArmy() == self:GetArmy() then
+            return
+        end
+        
+        CAirUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
 }
 TypeClass = URA0304
