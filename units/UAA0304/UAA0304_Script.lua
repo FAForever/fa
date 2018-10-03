@@ -13,6 +13,14 @@ UAA0304 = Class(AAirUnit) {
     Weapons = {
         Bomb = Class(AIFBombQuarkWeapon) {},
     },
+    
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator:GetArmy() == self:GetArmy() then
+            return
+        end
+        
+        AAirUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
 }
 
 TypeClass = UAA0304

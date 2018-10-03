@@ -12,5 +12,13 @@ XSA0304 = Class(SAirUnit) {
     Weapons = {
         Bomb = Class(SIFBombZhanaseeWeapon) {},
     },
+    
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator:GetArmy() == self:GetArmy() then
+            return
+        end
+        
+        SAirUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
 }
 TypeClass = XSA0304
