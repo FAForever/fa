@@ -1,0 +1,73 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+        'TACTICAL',
+        'MISSILE',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 2,
+        MaxHealth = 2,
+    },
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        ImpactEffects = {
+            Type = 'Medium01',
+        },
+        Mesh = {
+            LODs = {
+                {
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 3,
+        UniformScale = 0.15,
+    },
+    Economy = {
+        BuildCostEnergy = 3600,
+        BuildCostMass = 180,
+        BuildTime = 2400,
+    },
+    General = {
+        Category = 'Missile',
+        Faction = 'UEF',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 3,
+        DestroyOnWater = true,
+        InitialSpeed = 3,
+        LifeTime = 30,
+        MaxSpeed = 12,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TrackTarget = true,
+        TrackTargetGround = true,
+        TurnRate = 0,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
