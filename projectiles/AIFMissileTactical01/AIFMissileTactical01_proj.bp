@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'XSS_Missile_Impact',
+            Cue = 'AEON_Expl_Med_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'XSS_Missile_Impact',
+            Cue = 'Impact_Land_Gen_AEON',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -17,7 +17,7 @@ ProjectileBlueprint {
         },
     },
     Categories = {
-        'SERAPHIM',
+        'AEON',
         'PROJECTILE',
         'INDIRECTFIRE',
         'TACTICAL',
@@ -34,26 +34,26 @@ ProjectileBlueprint {
         ImpactEffects = {
             Type = 'Medium01',
         },
-        MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 2,
+        MeshBlueprint = '/projectiles/AIFMissileSerpentine01/AIFMissileSerpentine01_mesh.bp',
+        StrategicIconSize = 3,
+        UniformScale = 0.035,
     },
     Economy = {
         BuildCostEnergy = 3600,
         BuildCostMass = 250,
-        BuildTime = 300,
+        BuildTime = 2400,
     },
     General = {
         Category = 'Missile',
-        Faction = 'Seraphim',
-    },
-    Interface = {
-        HelpText = 0,
+        Faction = 'AEON',
     },
     Physics = {
         Acceleration = 3,
-        DestroyOnWater = false,
+        DestroyOnWater = true,
         InitialSpeed = 3,
+        LifeTime = 30,
         MaxSpeed = 12,
+        MaxZigZag = 5,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -61,5 +61,6 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+        ZigZagFrequency = 0.2,
     },
 }

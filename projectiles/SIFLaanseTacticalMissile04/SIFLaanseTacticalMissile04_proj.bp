@@ -17,7 +17,7 @@ ProjectileBlueprint {
         },
     },
     Categories = {
-        'SERAPHIM',
+        'UEF',
         'PROJECTILE',
         'INDIRECTFIRE',
         'TACTICAL',
@@ -35,12 +35,13 @@ ProjectileBlueprint {
             Type = 'Medium01',
         },
         MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 2,
+        StrategicIconSize = 3,
+        UniformScale = 0.05,
     },
     Economy = {
         BuildCostEnergy = 3600,
         BuildCostMass = 250,
-        BuildTime = 300,
+        BuildTime = 2400,
     },
     General = {
         Category = 'Missile',
@@ -51,8 +52,9 @@ ProjectileBlueprint {
     },
     Physics = {
         Acceleration = 3,
-        DestroyOnWater = false,
+        DestroyOnWater = true,
         InitialSpeed = 3,
+        LifeTime = 30,
         MaxSpeed = 12,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
