@@ -245,7 +245,7 @@ function UpgradeTransferredUnits(units)
     end
 end
 
-function TransferUnfinishedUnits(units, armies)
+function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unfinishedUnits = {}
     local noUnits = true
     local failedToTransfer = {}
@@ -279,7 +279,7 @@ function TransferUnfinishedUnits(units, armies)
                 local progress = unit:GetFractionComplete()     
                 
                 --create invisible drone which belongs to allied army. BuildRange = 10000
-                local builder = CreateUnitHPR('UEA0004', army, 5, 20, 5, 0, 0, 0)
+                local builder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0)
                 table.insert(builders, builder)
                 
                 builder.UnitHealth = health
@@ -355,7 +355,7 @@ function TransferUnfinishedUnits(units, armies)
                 local pos = data.UnitPos
                 local progress = data.DefaultProgress    
                 
-                local builder = CreateUnitHPR('UEA0004', army, 5, 20, 5, 0, 0, 0) 
+                local builder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0) 
                 table.insert(builders, builder)
                 
                 builder.UnitHealth = health

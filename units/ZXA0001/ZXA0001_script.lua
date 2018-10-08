@@ -6,7 +6,7 @@
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
-UEA0004 = Class(TConstructionUnit) {
+ZXA0001 = Class(TConstructionUnit) {
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         
@@ -20,4 +20,4 @@ UEA0004 = Class(TConstructionUnit) {
     end,
 }
     
-TypeClass = UEA0004
+TypeClass = ZXA0001
