@@ -25,7 +25,7 @@ local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local TransferUnfinishedUnits = import('/lua/SimUtils.lua').TransferUnfinishedUnits
+local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 local observer = false
@@ -568,7 +568,7 @@ AIBrain = Class(moho.aibrain_methods) {
                             table.insert(indexes, brain.index)
                         end 
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        TransferUnfinishedUnits(units, indexes)
+                        TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
                     
                     for k, brain in brains do
