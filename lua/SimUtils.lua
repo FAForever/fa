@@ -72,6 +72,9 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     
     local newUnits = {}
     local upUnits = {}
+    local pauseKennels = {}
+    local upgradeKennels = {}
+    
     for k,v in units do
         local owner = v:GetArmy()
         -- Only allow units not attached to be given. This is because units will give all of it's children over
@@ -104,6 +107,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local upgradesTo = unit.UpgradesTo
         local defaultBuildRate
         local upgradeBuildRate
+        local exclude
 
         if unit.MyShield then
             shieldIsOn = unit:ShieldIsOn()
@@ -188,10 +192,26 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             end
         end
         if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
-            unit:SetPaused(true)
+            if not upgradeBuildRate or not shareUpgrades then
+                if bp.CategoriesHash.UEF then 
+                    --use special thread for UEF Kennels.
+                    --Give them 1 tick to spawn their drones and then pause both station and drone.
+                    table.insert(pauseKennels, unit)   
+                else --pause cybran hives immediately
+                    unit:SetPaused(true)
+                end
+            elseif bp.CategoriesHash.UEF then
+                unit.UpgradesTo = upgradesTo
+                unit.DefaultBuildRate = defaultBuildRate
+                unit.UpgradeBuildRate = upgradeBuildRate
+                
+                table.insert(upgradeKennels, unit)
+                
+                exclude = true
+            end
         end
         
-        if upgradeBuildRate then
+        if upgradeBuildRate and not exclude then
             unit.UpgradesTo = upgradesTo
             unit.DefaultBuildRate = defaultBuildRate
             unit.UpgradeBuildRate = upgradeBuildRate
@@ -216,8 +236,30 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     if upUnits[1] then
         ForkThread(UpgradeTransferredUnits, upUnits)
     end
+    
+    if pauseKennels[1] then
+        ForkThread(PauseTransferredKennels, pauseKennels)
+    end
+    
+    if upgradeKennels[1] then
+        ForkThread(UpgradeTransferredKennels, upgradeKennels)
+    end
 
     return newUnits
+end
+
+function PauseTransferredKennels(pauseKennels)
+    WaitTicks(1) -- spawn drones
+    
+    for _, unit in pauseKennels do
+        unit:SetPaused(true)
+        
+        for _, pod in unit.PodData or {} do --pause drones
+            if pod.PodHandle then
+                pod.PodHandle:SetPaused(true)
+            end    
+        end
+    end
 end
 
 function UpgradeTransferredUnits(units)
@@ -238,6 +280,41 @@ function UpgradeTransferredUnits(units)
     WaitTicks(1)
     
     for _, unit in units do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.DefaultBuildRate)
+            unit:SetPaused(true) --SetPaused() updates ConsumptionPerSecond values
+        end    
+    end
+end
+
+function UpgradeTransferredKennels(upgradeKennels)
+    WaitTicks(1) --spawn drones
+
+    for _, unit in upgradeKennels do  
+        if not unit:BeenDestroyed() then
+            for _, pod in unit.PodData or {} do --pause Kennels drones
+                if pod.PodHandle then
+                    pod.PodHandle:SetPaused(true)
+                end    
+            end
+            
+            IssueUpgrade({unit}, unit.UpgradesTo)
+        end
+    end
+    
+    WaitTicks(3)
+    
+    for _, unit in upgradeKennels do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.UpgradeBuildRate)
+            unit:SetConsumptionPerSecondMass(0)
+            unit:SetConsumptionPerSecondEnergy(0)
+        end    
+    end
+
+    WaitTicks(1)
+    
+    for _, unit in upgradeKennels do
         if not unit:BeenDestroyed() then
             unit:SetBuildRate(unit.DefaultBuildRate)
             unit:SetPaused(true) --SetPaused() updates ConsumptionPerSecond values
