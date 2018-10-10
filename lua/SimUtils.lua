@@ -126,6 +126,14 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             end
         end
         
+        if bp.CategoriesHash.ENGINEERSTATION and bp.CategoriesHash.UEF then
+            --We have to kill drones which are idling inside Kennel at the moment of transfer
+            --otherwise additional dummy drone will appear after transfer
+            for _,drone in unit:GetCargo() do
+                drone:Destroy()
+            end    
+        end
+        
         if unit.TransferUpgradeProgress and shareUpgrades then
             local progress = unit:GetWorkProgress()
             local upgradeBuildTime = unit.UpgradeBuildTime
