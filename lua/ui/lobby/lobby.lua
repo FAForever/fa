@@ -368,6 +368,17 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     return keys, strings, tooltips
 end
 
+--- Get the value of the LastColor, sanitised in case it's an unsafe value.
+-- In case a new patch removes a color
+function GetSanitisedLastColor()
+    local lastColor = Prefs.GetFromCurrentProfile('LastColorFAF') or 1
+    if lastColor > table.getn(gameColors.PlayerColors) or lastColor < 1 then
+        lastColor = 1
+    end
+
+    return lastColor
+end
+
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
 --
 -- This means when some retarded mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
@@ -388,7 +399,7 @@ function GetLocalPlayerData()
             PlayerName = localPlayerName,
             OwnerID = localPlayerID,
             Human = true,
-            PlayerColor = Prefs.GetFromCurrentProfile('LastColorFAF'),
+            PlayerColor = GetSanitisedLastColor(),
             Faction = GetSanitisedLastFaction(),
             PlayerClan = argv.playerClan,
             PL = playerRating,
