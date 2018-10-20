@@ -3431,7 +3431,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            if ScenarioInfo.Options.AIReplacement == 'AIReplacementOn' then
+            if ScenarioInfo.Options.AIReplacement == 'On' then
                 ForkThread(function()
                     local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
 
