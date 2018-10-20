@@ -427,12 +427,12 @@ globalOpts = {
             {
                 text = "<LOC _On>On",
                 help = "<LOC aireplace_0003>If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
-                key = 'AIReplacementOn',
+                key = 'On',
             },
             {
                 text = "<LOC _Off>Off",
                 help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",
-                key = 'AIReplacementOff',
+                key = 'Off',
             },
         },
     },
