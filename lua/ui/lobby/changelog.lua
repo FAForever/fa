@@ -1,4 +1,4 @@
-last_version = 3699
+last_version = 3700
 changelog = {
     {
         version = 3,
@@ -1820,6 +1820,16 @@ changelog = {
             '- Crotalus',
             '- Exotic_Retard',
             '- PhilipJFry',      
+        },
+    },
+    {
+        version = 3700,
+        name = 'Game Version 3700',
+        description = {
+            '- Fixed bug that caused users to get stuck when trying to host/join a game',
+            '',
+            '**Contributors**',
+            '- speed2',
         },
     },
 }
