@@ -1663,7 +1663,9 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Create some ambient wreckage smoke
-        explosion.CreateWreckageEffects(self, prop)
+        if layer == 'Land' then
+            explosion.CreateWreckageEffects(self, prop)
+        end
 
         return prop
     end,
