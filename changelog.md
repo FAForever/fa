@@ -1,3 +1,10 @@
+Hotfix Patch 3700 (20 October, 2018)
+============================
+- Fixed bug that caused users to get stuck when trying to host/join a game
+
+### Contributors
+- speed2
+
 Patch 3699 (20 October, 2018)
 ============================
 ### Lobby
