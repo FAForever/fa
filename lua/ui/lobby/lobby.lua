@@ -2705,9 +2705,15 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     -- Version texts
-    local gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
-    gameVersionText:SetColor('677983')
-    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.panel, 70, 3)
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
+    GUI.gameVersionText:SetColor('677983')
+    LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
+	GUI.gameVersionText.HandleEvent = function (self, event)
+		if event.Type == 'ButtonPress' then
+			ShowPatch = true
+			GUI_Changelog()
+		end
+	end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -5988,6 +5994,9 @@ function GUI_Changelog()
     InfoList.OnClick = function(self) end
     -- See only new Changelog by version
     local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+	if ShowPatch == true then
+		Last_Changelog_Version = Last_Changelog_Version -1
+	end
     for i, d in Changelog.changelog do
         if Last_Changelog_Version < d.version then
             InfoList:AddItem(d.name)
