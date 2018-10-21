@@ -74,6 +74,11 @@ Blacklist = {
     ['9e8ea941-c306-4751-b367-f00000000003'] = INTEGRATED,
     ['9e8ea941-c306-4751-b367-f00000000004'] = INTEGRATED,
     ['9e8ea941-c306-4751-b367-f00000000005'] = INTEGRATED,
+	
+	-- Better Allies
+	['8c4fe91a-714d-11e7-8cf7-a6006ad3dba0'] = INTEGRATED,
+	-- No Friendly Fire Collision V2
+	['7af9e2cf-bb50-4778-9bf3-169aad1ebdc7'] = INTEGRATED,
 
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0
