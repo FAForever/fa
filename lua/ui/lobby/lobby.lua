@@ -2705,9 +2705,9 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     -- Version texts
-    local gameVersionText = UIUtil.CreateText(GUI, GameVersion(), 9, UIUtil.bodyFont)
+    local gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
     gameVersionText:SetColor('677983')
-    LayoutHelpers.CenteredRightOf(gameVersionText, GUI.logo, 4)
+    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.panel, 70, 3)
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
