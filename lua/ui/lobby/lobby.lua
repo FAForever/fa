@@ -6014,6 +6014,13 @@ function GUI_Changelog()
     OkButton.OnClick = function()
         changelogPopup:Close()
     end
+	-- Link to the changelog on github --
+	local ChangelogButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "All Changes")
+	LayoutHelpers.AtRightIn(ChangelogButton, dialogContent, 0)
+	LayoutHelpers.AtBottomIn(ChangelogButton, dialogContent, 10)
+    ChangelogButton.OnClick = function()
+		OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+    end
 end
 
 function CheckModCompatability()
