@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
+local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
 local TOrbitalDeathLaserBeamWeapon = import('/lua/terranweapons.lua').TOrbitalDeathLaserBeamWeapon
 
 XEA0002 = Class(TAirUnit) {
@@ -14,7 +15,16 @@ XEA0002 = Class(TAirUnit) {
     HideBones = {'Shell01', 'Shell02', 'Shell03', 'Shell04',},
 
     Weapons = {
-        OrbitalDeathLaserWeapon = Class(TOrbitalDeathLaserBeamWeapon){},
+        OrbitalDeathLaserWeapon = Class(TOrbitalDeathLaserBeamWeapon){
+        
+            IdleState = State (DefaultProjectileWeapon.IdleState) {
+                Main = function(self)
+                    DefaultProjectileWeapon.IdleState.Main(self)
+                    --This is basically a copy of DefaultBeamWeapon.IdleState.Main without PlayFxBeamEnd() as we don't want satellite to stop firing when idle
+                    --Beam will be turned off by DefaultBeamWeapon.BeamLifetimeThread later anyway.
+                end,
+            },
+        },
     },
     
     OnDestroy = function(self)
