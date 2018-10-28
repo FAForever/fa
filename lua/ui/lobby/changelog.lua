@@ -16,12 +16,12 @@ function CreateUI(parent, showPatch)
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
     end
 
-    -- Title --
+    -- Title
     local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
     LayoutHelpers.AtTopIn(text0, dialogContent, 10)
 
-    -- Info List --
+    -- Info List
     local InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
@@ -31,12 +31,14 @@ function CreateUI(parent, showPatch)
     LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
-    InfoList.OnClick = function(self) end
+    InfoList.OnClick = function(self)
+    end
+
     -- See only new Changelog by version
     local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-	if showPatch == true then
-		Last_Changelog_Version = Last_Changelog_Version -1
-	end
+    if showPatch == true then
+        Last_Changelog_Version = Last_Changelog_Version -1
+    end
     for i, d in Changelog.changelog do
         if Last_Changelog_Version < d.version then
             InfoList:AddItem(d.name)
@@ -47,19 +49,20 @@ function CreateUI(parent, showPatch)
         end
     end
 
-    -- OK button --
+    -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
     LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
     OkButton.OnClick = function()
         changelogPopup:Close()
     end
-	-- Link to the changelog on github --
-	local ChangelogButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "All Changes")
-	LayoutHelpers.AtRightIn(ChangelogButton, dialogContent, 0)
-	LayoutHelpers.AtBottomIn(ChangelogButton, dialogContent, 10)
+
+    -- Link to the changelog on github
+    local ChangelogButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "All Changes")
+    LayoutHelpers.AtRightIn(ChangelogButton, dialogContent, 0)
+    LayoutHelpers.AtBottomIn(ChangelogButton, dialogContent, 10)
     ChangelogButton.OnClick = function()
-		OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+        OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
     end
 end
 
