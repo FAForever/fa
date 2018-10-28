@@ -5954,7 +5954,7 @@ end
 
 -- Changelog dialog
 function Need_Changelog()
-    local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
+    local Changelog = import('/lua/ui/lobby/changelogData.lua').changelog
     local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
     local result = false
     for i, d in Changelog do
@@ -5971,7 +5971,7 @@ function GUI_Changelog()
     dialogContent.Width:Set(1000)
     dialogContent.Height:Set(700)
 
-    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local Changelog = import('/lua/ui/lobby/changelogData.lua')
     local changelogPopup = Popup(GUI, dialogContent)
     changelogPopup.OnClosed = function()
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
