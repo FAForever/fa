@@ -45,6 +45,10 @@ function CreateUI(parent, showPatch)
     LayoutHelpers.AtTopIn(VersionSelection, dialogContent, 10)
     LayoutHelpers.AtRightIn(VersionSelection, dialogContent, 55)
 
+    local VersionText = UIUtil.CreateText(dialogContent, "Select a patch: ", 15, UIUtil.bodyFont)
+    VersionText:SetDropShadow(true)
+    LayoutHelpers.CenteredLeftOf(VersionText, VersionSelection)
+
     -- Info List
     local InfoList = ItemList(dialogContent)
     dialogContent.InfoList = InfoList
