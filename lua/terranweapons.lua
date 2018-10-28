@@ -262,12 +262,4 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
         end
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
     end,
-    
-    IdleState = State (DefaultProjectileWeapon.IdleState) {
-        Main = function(self)
-            DefaultProjectileWeapon.IdleState.Main(self)
-            --This is basically a copy of DefaultBeamWeapon.IdleState.Main without PlayFxBeamEnd() as we don't want satellite to stop firing when idle
-            --Beam will be turned off by DefaultBeamWeapon.BeamLifetimeThread later anyway.
-        end,
-    },
 }
