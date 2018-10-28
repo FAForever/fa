@@ -1832,4 +1832,23 @@ changelog = {
             '- speed2',
         },
     },
+	{
+        version = 3701,
+        name = 'Game Version 3701',
+        description = {
+            '- Fixed bug that caused the Kennel structure to stay after being upgraded which resulted into having two buildings stacked upon each other',
+            '- Changed Novax Sat fix in order to not potentially break mods',
+			'- Updated mod blacklist',
+			'- Removed smoke effect on the water surface caused by wrecks on the bottom of the ocean',
+			'- Moved current patch number in the lobby to a more visible location',
+			'- Allow Users to open the Changelog by clicking on the patch number in the game',
+			'- Allow Users to open the changelog on github by adding a button to the changelog popup in the lobby',
+			'',
+            '**Contributors**',
+            '- speed2',
+            '- Strogo',
+            '- Exotic-Retard',
+            '- PhilipJFry',
+        },
+    },
 }
