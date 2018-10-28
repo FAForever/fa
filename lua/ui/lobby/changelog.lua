@@ -1,3 +1,4 @@
+local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -23,8 +24,30 @@ function CreateUI(parent, showPatch)
     LayoutHelpers.AtHorizontalCenterIn(Title, dialogContent, 0)
     LayoutHelpers.AtTopIn(Title, dialogContent, 10)
 
+    -- Dropdown menu to select a patch
+    local VersionSelection = Combo(dialogContent, 12, 20, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+    VersionSelection._text:SetFont('Arial Gras', 15)
+    VersionSelection.Width:Set(70)
+    -- Fill it with all patch numbers
+    local items = {}
+    for _, patch in data.gamePatches do
+        table.insert(items, patch.version)
+    end
+    VersionSelection:AddItems(items, 1)
+    VersionSelection.OnClick = function(self, index, text)
+        dialogContent.InfoList:DeleteAllItems()
+        dialogContent.InfoList:AddItem(data.gamePatches[index].name)
+        for _, v in data.gamePatches[index].description do
+            dialogContent.InfoList:AddItem(v)
+        end
+        dialogContent.InfoList:AddItem('')
+    end
+    LayoutHelpers.AtTopIn(VersionSelection, dialogContent, 10)
+    LayoutHelpers.AtRightIn(VersionSelection, dialogContent, 55)
+
     -- Info List
     local InfoList = ItemList(dialogContent)
+    dialogContent.InfoList = InfoList
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(972)
