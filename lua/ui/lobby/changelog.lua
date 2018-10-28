@@ -49,11 +49,11 @@ function CreateUI(parent, showPatch)
         end
     end
 
-    -- OK button
-    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
-    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
-    OkButton.OnClick = function()
+    -- Close button
+    local CloseButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', '<LOC _Close>Close')
+    LayoutHelpers.AtLeftIn(CloseButton, dialogContent, 0)
+    LayoutHelpers.AtBottomIn(CloseButton, dialogContent, 10)
+    CloseButton.OnClick = function()
         changelogPopup:Close()
     end
 
