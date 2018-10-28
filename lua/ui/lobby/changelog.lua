@@ -5,6 +5,8 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+local data = import('/lua/ui/lobby/changelogData.lua')
+
 function CreateUI(parent, showPatch)
     local dialogContent = Group(parent)
     dialogContent.Width:Set(1000)
@@ -66,16 +68,13 @@ function CreateUI(parent, showPatch)
     end
 end
 
--- Changelog dialog
+--- Test if we should display the changelog of the new game version.
+-- @return true/false
 function NeedChangelog()
-    local Changelog = import('/lua/ui/lobby/changelogData.lua').changelog
-    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-    local result = false
-    for i, d in Changelog do
-        if Last_Changelog_Version < d.version then
-            result = true
-            break
-        end
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+
+    if LastChangelogVersion < data.last_version then
+        return true
     end
-    return result
+    return false
 end
