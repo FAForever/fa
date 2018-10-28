@@ -7,15 +7,15 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 
 local data = import('/lua/ui/lobby/changelogData.lua')
 
+--- Creates the popup window with the game patch changelog.
 function CreateUI(parent, showPatch)
     local dialogContent = Group(parent)
     dialogContent.Width:Set(1000)
     dialogContent.Height:Set(700)
 
-    local Changelog = import('/lua/ui/lobby/changelogData.lua')
     local changelogPopup = Popup(parent, dialogContent)
     changelogPopup.OnClosed = function()
-        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
+        Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
     end
 
     -- Title
@@ -37,14 +37,14 @@ function CreateUI(parent, showPatch)
     end
 
     -- See only new Changelog by version
-    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
     if showPatch == true then
-        Last_Changelog_Version = Last_Changelog_Version -1
+        LastChangelogVersion = LastChangelogVersion -1
     end
-    for i, d in Changelog.changelog do
-        if Last_Changelog_Version < d.version then
-            InfoList:AddItem(d.name)
-            for k, v in d.description do
+    for _, patch in data.gamePatches do
+        if LastChangelogVersion < patch.version then
+            InfoList:AddItem(patch.name)
+            for _, v in patch.description do
                 InfoList:AddItem(v)
             end
             InfoList:AddItem('')
