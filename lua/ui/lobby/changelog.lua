@@ -17,9 +17,9 @@ function CreateUI(parent, showPatch)
     end
 
     -- Title
-    local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
-    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+    local Title = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>What's new to FAF?"), 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(Title, dialogContent, 0)
+    LayoutHelpers.AtTopIn(Title, dialogContent, 10)
 
     -- Info List
     local InfoList = ItemList(dialogContent)
