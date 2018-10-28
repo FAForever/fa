@@ -2706,20 +2706,20 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     -- Version texts
-	local bool ShowPatch = false
+    local bool ShowPatch = false
     GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-	GUI.gameVersionText.HandleEvent = function (self, event)
-		if event.Type == 'MouseEnter' then
+    GUI.gameVersionText.HandleEvent = function (self, event)
+        if event.Type == 'MouseEnter' then
             self:SetColor('ffffff')
         elseif event.Type == 'MouseExit' then
             self:SetColor('677983')
         elseif event.Type == 'ButtonPress' then
-			Changelog.CreateUI(GUI, true)
-		end
-	end
+            Changelog.CreateUI(GUI, true)
+        end
+    end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
