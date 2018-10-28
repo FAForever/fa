@@ -2705,6 +2705,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     -- Version texts
+	local bool ShowPatch = false
     GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
