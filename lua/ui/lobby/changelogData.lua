@@ -1,5 +1,5 @@
 last_version = 3701
-changelog = {
+gamePatches = {
     {
         version = 3,
         name = 'Lobby 2.5 (3636 patch)',
