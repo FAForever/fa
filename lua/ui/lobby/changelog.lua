@@ -60,7 +60,7 @@ function CreateUI(parent, showPatch)
     -- Info List
     local InfoList = ItemList(dialogContent)
     dialogContent.InfoList = InfoList
-    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetFont(UIUtil.bodyFont, Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 12)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(972)
     InfoList.Height:Set(610)
