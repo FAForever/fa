@@ -20,6 +20,7 @@ local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
+local SetWeaponPriorities = import('/lua/keymap/misckeyactions.lua').SetWeaponPriorities
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -551,12 +552,258 @@ local function CreateBorder(parent)
     return border
 end
 
+-------------------------------------------------------------------------
+---------------------Weapon priorities-----------------------------------
+-------------------------------------------------------------------------
+local prioUI
+local currentPreset = "Default"
+
+local prioStateTextures = {
+    Default = '/game/Weapon-priorities/default.dds',
+    ACU = '/game/Weapon-priorities/ACU.dds',
+    Power = '/game/Weapon-priorities/power.dds',
+    PD = '/game/Weapon-priorities/PD.dds',
+    Units = '/game/Weapon-priorities/units.dds',
+    Shields = '/game/Weapon-priorities/shields.dds',
+    EXP = '/game/Weapon-priorities/EXP.dds',
+    Engies = '/game/Weapon-priorities/engies.dds',
+    Arty = '/game/Weapon-priorities/arty.dds',
+    Fighters = '/game/Weapon-priorities/fighters.dds',
+    SMD = '/game/Weapon-priorities/SMD.dds',
+    Gunship = '/game/Weapon-priorities/gunship.dds',
+    Mex = '/game/Weapon-priorities/mex.dds',
+    Snipe = '/game/Weapon-priorities/snipe.dds',
+    Mixed = '/game/Weapon-priorities/mixed.dds',
+    Empty = '/game/Weapon-priorities/smallBlack.dds',
+}
+
+local PrioritySettings = {
+    category = {},
+    --putting {categories.AllUNITS} doesnt work since the code thinks its the default preset, which it kinda is.
+    priorityTables = {
+        ACU = "{categories.COMMAND}",
+        Power = "{categories.ENERGYPRODUCTION * categories.STRUCTURE}",
+        PD = "{categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE}",
+        Units = "{categories.MOBILE - categories.COMMAND - categories.EXPERIMENTAL - categories.ENGINEER}",
+        Shields = "{categories.SHIELD}",
+        EXP = "{categories.EXPERIMENTAL}",
+        Engies = "{categories.ENGINEER * categories.RECLAIMABLE}",
+        Arty = "{categories.ARTILLERY}",
+        Fighters = "{categories.AIR * categories.ANTIAIR - categories.EXPERIMENTAL}",
+        SMD = "{categories.TECH3 * categories.STRUCTURE * categories.ANTIMISSILE}",
+        Gunship = "{categories.AIR * categories.GROUNDATTACK}",
+        Mex = "{categories.MASSEXTRACTION}",
+        Snipe = "{categories.COMMAND, categories.STRATEGIC, categories.ANTIMISSILE * categories.TECH3, "..
+            "categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH2, "..
+            "categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH3, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH2, ".. 
+            "categories.MASSFABRICATION * categories.STRUCTURE, categories.SHIELD,}",
+    },
+    exclusive = {ACU = false, Power = false, PD = false, Units = false, Shields = false, EXP = false}, 
+    buttonLayout = {
+        {"ACU", "Units", "PD", "Engies", "Shields", "EXP"},
+        {"Mex", "Power", "SMD", "Arty", "Gunship", "Fighters"},
+        },
+}
+
+
+local function CreatePrioBorder(parent)
+    local prioBorder = {}
+    
+    prioBorder.topleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ul.dds'))
+    prioBorder.bottomleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ll.dds'))
+    prioBorder.topright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_ur.dds'))
+    prioBorder.bottomright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lr.dds'))
+    
+    prioBorder.topmid = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_horz_um.dds'))
+    prioBorder.bottommid = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_lm.dds'))
+    
+    prioBorder.midleft = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_vert_l.dds'))
+    prioBorder.midright = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_vert_r.dds'))
+    
+    prioBorder.back = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+    
+    
+    local x = 56 --topleft relative coordinates
+    local y = -18
+    
+    local width = 140
+    local height = 155
+
+    --corners
+    LayoutHelpers.AtLeftTopIn(prioBorder.topleft, parent, x, y)
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottomleft, prioBorder.topleft, 0, height)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.topright, prioBorder.topleft, width, 0)
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottomright, prioBorder.topleft, width, height)
+    
+    
+    --mid
+    LayoutHelpers.AtLeftTopIn(prioBorder.topmid, prioBorder.topleft, 18, 0)
+    prioBorder.topmid.Width:Set(width - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.bottommid, prioBorder.topleft, 18, height)
+    prioBorder.bottommid.Width:Set(width - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.midleft, prioBorder.topleft, 0, 18)
+    prioBorder.midleft.Height:Set(height - 18)
+    
+    LayoutHelpers.AtLeftTopIn(prioBorder.midright, prioBorder.topleft, width, 18)
+    prioBorder.midright.Height:Set(height - 18)
+ 
+    --background
+    LayoutHelpers.AtLeftTopIn(prioBorder.back, prioBorder.topleft, 18 , 18)
+    prioBorder.back.Width:Set(width - 18)
+    prioBorder.back.Height:Set(height - 18)
+    
+    return prioBorder
+end
+
+local function CreatePrioButtons(parent)
+    local buttons = {{},{}}
+    local active = false
+    
+    local function CreateButton(prioTable, name, exclusive)
+        local btn = Checkbox(parent)
+      
+        btn.Width:Set(70)
+        btn.Height:Set(20)
+    
+        if not active and name == currentPreset then
+            btn:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2.dds')
+            )
+            
+            active = true
+        else
+            btn:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2.dds')
+            )
+        end
+        
+        if name then 
+            btn.OnCheck = function(control, checked)
+                SetWeaponPriorities(prioTable, name, exclusive)
+            end
+            
+            LayoutHelpers.AtLeftTopIn(UIUtil.CreateText(parent, name, 14, UIUtil.bodyFont), btn, 10, 0)  
+        else -- empty button
+            btn:DisableHitTest()
+        end   
+        
+        return btn
+    end
+    
+    
+    --"Default" button
+    buttons.default = Checkbox(parent)
+    
+    buttons.default.Width:Set(70)
+    buttons.default.Height:Set(30)
+    
+    if currentPreset == "Default" then
+        buttons.default:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds')
+        )
+        
+        active = true
+    else
+        buttons.default:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds')
+        )
+    end    
+    
+    LayoutHelpers.AtLeftTopIn(buttons.default, parent, 65, 117)
+    buttons.default.OnCheck = function(control, checked)
+        SetWeaponPriorities(0, "Default")
+    end
+    LayoutHelpers.AtCenterIn(UIUtil.CreateText(parent, "Default", 18, UIUtil.bodyFont), buttons.default)
+    
+    
+    --"Snipe" button
+    buttons.snipe = Checkbox(parent)
+    
+    buttons.snipe.Width:Set(70)
+    buttons.snipe.Height:Set(30)
+    
+    if not active and currentPreset == "Snipe" then
+        buttons.snipe:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1active.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds')
+        )
+        
+        active = true
+    else
+        buttons.snipe:SetNewTextures(
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button1.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds'),
+            UIUtil.UIFile('/game/Weapon-priorities/Button2big.dds')
+        )
+    end
+    
+    LayoutHelpers.AtLeftTopIn(buttons.snipe, buttons.default, 70, 0)
+    buttons.snipe.OnCheck = function(control, checked)
+        SetWeaponPriorities(PrioritySettings.priorityTables.Snipe, "Snipe", false)
+    end
+    LayoutHelpers.AtCenterIn(UIUtil.CreateText(parent, "Snipe", 18, UIUtil.bodyFont), buttons.snipe)
+    
+    
+  
+    --first column
+    for i, name in PrioritySettings.buttonLayout[1] or {} do
+        
+        local name = PrioritySettings.buttonLayout[1][i]
+        
+        buttons[1][i] = CreateButton(PrioritySettings.priorityTables[name], name, PrioritySettings.exclusive[name])
+        
+        if i == 1 then   
+            LayoutHelpers.AtLeftTopIn(buttons[1][i], parent, 65, 95)
+        else
+            LayoutHelpers.Above(buttons[1][i], buttons[1][i-1])
+        end
+    end
+    
+    
+    --second column
+    for i, name in PrioritySettings.buttonLayout[2] or {} do
+        
+        local name = PrioritySettings.buttonLayout[2][i]
+        
+        buttons[2][i] = CreateButton(PrioritySettings.priorityTables[name], name, PrioritySettings.exclusive[name])
+        
+        if i == 1 then 
+            LayoutHelpers.AtLeftTopIn(buttons[2][i], buttons[1][1], 70, 0)
+        else
+            LayoutHelpers.Above(buttons[2][i], buttons[2][i-1])
+        end
+    end
+    
+    return buttons
+end
+
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
     bg.border = CreateBorder(bg)
+    bg.prioBorder = CreatePrioBorder(bg)
     bg:DisableHitTest(true)
 
+    bg.prioButtons = CreatePrioButtons(bg)
+    
     local function CreateButton(index, info)
         local btn = Checkbox(bg, GetOrderBitmapNames(info.bitmap))
         btn.info = info
@@ -606,35 +853,84 @@ local function CreateFirestatePopup(parent, selected)
 end
 
 local function RetaliateOrderBehavior(self, modifiers)
-    if not self._OnFirestateSelection then
-        self._OnFirestateSelection = function(self, newState, id)
-            self._toggleState = newState
-            SetFireState(currentSelection, id)
-            self:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
-            self._curHelpText = retaliateStateInfo[newState].helpText
-            self._popup:Destroy()
-            self._popup = nil
+    if modifiers.Right then --toggle "Snipe" mode
+        if currentPreset ~= "Snipe" then
+            SetWeaponPriorities(PrioritySettings.priorityTables.Snipe, 'Snipe', false)
+        else
+            SetWeaponPriorities(0, "Default")
         end
-    end
-    if self._popup then
-        self._popup:Destroy()
-        self._popup = nil
     else
-        self._popup = CreateFirestatePopup(self, self._toggleState)
-        local function CollapsePopup(event)
-            if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+        if not self._OnFirestateSelection then
+            self._OnFirestateSelection = function(self, newState, id)
+                self._toggleState = newState
+                SetFireState(currentSelection, id)
+                self:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
+                self._curHelpText = retaliateStateInfo[newState].helpText
                 self._popup:Destroy()
                 self._popup = nil
             end
         end
+        if self._popup then
+            self._popup:Destroy()
+            self._popup = nil
+        else
+            self._popup = CreateFirestatePopup(self, self._toggleState)
+            local function CollapsePopup(event)
+                if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+                    self._popup:Destroy()
+                    self._popup = nil
+                end
+            end
 
-        UIMain.AddOnMouseClickedFunc(CollapsePopup)
+            UIMain.AddOnMouseClickedFunc(CollapsePopup)
 
-        self._popup.OnDestroy = function(self)
-            UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
-            Checkbox.OnDestroy(self)
+            self._popup.OnDestroy = function(self)
+                UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
+                Checkbox.OnDestroy(self)
+            end
+        end
+    end    
+end
+
+function CheckForMixedPriorities(units)
+    local name
+    
+    for key, unit in units do
+        if not name then
+            name = UnitData[unit:GetEntityId()].WepPriority or "Default"
+        else
+            local preset = UnitData[unit:GetEntityId()].WepPriority or "Default"
+            
+            if name ~= preset then
+                return "Mixed"
+            end    
         end
     end
+    
+    return name
+end
+
+function UpdatePrioState(control, unitList)
+    local units = unitList or GetSelectedUnits()
+    local control = control or prioUI
+
+    if not control.prioState then
+        control.prioState = Bitmap(control, UIUtil.UIFile('/game/Weapon-priorities/smallBlack.dds'))
+        LayoutHelpers.AtRightTopIn(control.prioState, control, 2, 4)
+        control.prioState:DisableHitTest()
+        prioUI = control
+    end
+    
+    if units[1] then
+        local priority = CheckForMixedPriorities(units)
+        currentPreset = priority
+        
+        if prioStateTextures[priority] then
+            control.prioState:SetTexture(UIUtil.UIFile(prioStateTextures[priority]))
+        else
+            control.prioState:SetTexture(UIUtil.UIFile(prioStateTextures.Empty))
+        end
+    end    
 end
 
 local function RetaliateInitFunction(control, unitList)
@@ -668,6 +964,10 @@ local function RetaliateInitFunction(control, unitList)
             self.mixedIcon:SetAlpha(0)
         end
         Checkbox.OnDisable(self)
+    end
+    
+    if unitList[1] then 
+        UpdatePrioState(control, unitList)
     end
 end
 

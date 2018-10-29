@@ -374,3 +374,44 @@ function CreateTemplateFactory()
     end
     import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
 end
+
+function SetWeaponPriorities(prioritiesString, name, exclusive)
+    local priotable
+    if type(prioritiesString) == 'string' then
+        priotable = prioritiesString
+    end
+    local units = GetSelectedUnits()
+    local unitIds = {}
+
+    for _, unit in units or {} do
+        table.insert(unitIds, unit:GetEntityId())
+    end
+
+    SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
+end
+
+local PrioritySettings = {
+    priorityTables = {
+        ACU = "{categories.COMMAND}",
+        Power = "{categories.ENERGYPRODUCTION * categories.STRUCTURE}",
+        PD = "{categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE}",
+        Units = "{categories.MOBILE - categories.COMMAND - categories.EXPERIMENTAL}",
+        Shields = "{categories.SHIELD}",
+        EXP = "{categories.EXPERIMENTAL}",
+        Engies = "{categories.ENGINEER * categories.RECLAIMABLE}",
+        Arty = "{categories.ARTILLERY}",
+        Fighters = "{categories.AIR * categories.ANTIAIR - categories.EXPERIMENTAL}",
+        SMD = "{categories.TECH3 * categories.STRUCTURE * categories.ANTIMISSILE}",
+        Gunship = "{categories.AIR * categories.GROUNDATTACK}",
+        Mex = "{categories.MASSEXTRACTION}",
+        Snipe = "{categories.COMMAND, categories.STRATEGIC, categories.ANTIMISSILE * categories.TECH3, "..
+            "categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH2, "..
+            "categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH3, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH2, ".. 
+            "categories.MASSFABRICATION * categories.STRUCTURE, categories.SHIELD,}",
+    },
+    exclusive = {ACU = false, Power = false, PD = false, Units = false, Shields = false, EXP = false},
+}
+
+function SetWeaponPrioritiesHotkey(name)
+    SetWeaponPriorities(PrioritySettings.priorityTables[name], name, PrioritySettings.exclusive[name]) 
+end
