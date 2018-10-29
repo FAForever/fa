@@ -100,8 +100,5 @@ end
 function NeedChangelog()
     local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
 
-    if LastChangelogVersion < data.last_version then
-        return true
-    end
-    return false
+    return LastChangelogVersion < data.last_version
 end
