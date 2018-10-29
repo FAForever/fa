@@ -1,3 +1,4 @@
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
@@ -19,13 +20,20 @@ function CreateUI(parent, showPatch)
         Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
     end
 
+    local TextBG = Bitmap(dialogContent)
+    TextBG:SetSolidColor('ff000000')
+    TextBG.Left:Set(function() return dialogContent.Left() + 10 end)
+    TextBG.Right:Set(function() return dialogContent.Right() - 10 end)
+    TextBG.Height:Set(24)
+    LayoutHelpers.AtTopIn(TextBG, dialogContent, 7)
+
     -- Title
-    local Title = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>What's new to FAF?"), 17, 'Arial Gras', true)
+    local Title = UIUtil.CreateText(TextBG, LOC("<LOC lobui_0412>What's new to FAF?"), 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(Title, dialogContent, 0)
     LayoutHelpers.AtTopIn(Title, dialogContent, 10)
 
     -- Dropdown menu to select a patch
-    local VersionSelection = Combo(dialogContent, 12, 20, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+    local VersionSelection = Combo(TextBG, 12, 20, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
     VersionSelection._text:SetFont('Arial Gras', 15)
     VersionSelection.Width:Set(70)
     -- Fill it with all patch numbers
@@ -45,7 +53,7 @@ function CreateUI(parent, showPatch)
     LayoutHelpers.AtTopIn(VersionSelection, dialogContent, 10)
     LayoutHelpers.AtRightIn(VersionSelection, dialogContent, 55)
 
-    local VersionText = UIUtil.CreateText(dialogContent, "Select a patch: ", 15, UIUtil.bodyFont)
+    local VersionText = UIUtil.CreateText(TextBG, "Select a patch: ", 15, UIUtil.bodyFont)
     VersionText:SetDropShadow(true)
     LayoutHelpers.CenteredLeftOf(VersionText, VersionSelection)
 
