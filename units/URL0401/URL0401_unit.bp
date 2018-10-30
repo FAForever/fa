@@ -281,7 +281,7 @@ UnitBlueprint {
                     Duration = 8,
                     Radius = 9,
                     TargetAllow = 'TECH1',
-                    TargetDisallow = 'WALL',
+                    TargetDisallow = 'STRUCTURE',
                 },
                 {
                     Add = {
@@ -292,6 +292,7 @@ UnitBlueprint {
                     Duration = 4,
                     Radius = 9,
                     TargetAllow = 'TECH2',
+                    TargetDisallow = 'STRUCTURE',
                 },
                 {
                     Add = {
@@ -302,6 +303,7 @@ UnitBlueprint {
                     Duration = 2,
                     Radius = 9,
                     TargetAllow = 'TECH3',
+                    TargetDisallow = 'STRUCTURE',
                 },
             },
             CollideFriendly = false,
