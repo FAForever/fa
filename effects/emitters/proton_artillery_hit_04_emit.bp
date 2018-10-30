@@ -1,9 +1,9 @@
 EmitterBlueprint {
-    BlueprintId = 'proton_bomb_hit_02',
-    Lifetime = 17.00,
-    Repeattime = 17.00,
+    BlueprintId = 'proton_artillery_hit_04',
+    Lifetime = 80.00, -- Must be kept up to date with EMP time on weapon
+    Repeattime = 0.00,
     TextureFramecount = 1.00,
-    Blendmode = 3.00,
+    Blendmode = 3,
     LocalVelocity = true,
     LocalAcceleration = false,
     Gravity = false,
@@ -21,124 +21,44 @@ EmitterBlueprint {
     SortOrder = 0.00,
     Texture = [[/textures/particles/neutron_bomb_01.dds]],
     RampTexture = [[/textures/particles/ramp_sonic_pulse_02.dds]],
-    XDirectionCurve = {
-        XRange = 17.00,
+    EmitRateCurve = { -- Effect density
         Keys = {
-            { x=8.500,y=0.000,z=0.000 },
+            {y=50},
         },
     },
-    YDirectionCurve = {
-        XRange = 17.00,
+    LifetimeCurve = { -- Rate of effect. Higher Y, lower start speed. Higher Z, lower end speed?
         Keys = {
-            { x=8.568,y=0.000,z=0.000 },
+            {y=2,z=0.5},
         },
     },
-    ZDirectionCurve = {
-        XRange = 17.00,
+    SizeCurve = { -- Size of effect, diameter
         Keys = {
-            { x=8.500,y=0.000,z=0.000 },
+            {y=18},
         },
     },
-    EmitRateCurve = {
-        XRange = 17.00,
+    YPosCurve = { -- Vertical position of effect
         Keys = {
-            { x=8.164,y=39.612,z=0.000 },
-        },
-    },
-    LifetimeCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.653,y=0.889,z=1.000 },
-        },
-    },
-    VelocityCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=1.000,z=0.000 },
-        },
-    },
-    XAccelCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
-        },
-    },
-    YAccelCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
-        },
-    },
-    ZAccelCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
-        },
-    },
-    SizeCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.567,y=7.385,z=0.000 },
-        },
-    },
-    XPosCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
-        },
-    },
-    YPosCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.100,z=0.000 },
-        },
-    },
-    ZPosCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
+            {y=0.2},
         },
     },
     StartSizeCurve = {
-        XRange = 17.00,
         Keys = {
-            { x=8.789,y=0.000,z=0.000 },
+            {y=0.2},
         },
     },
     EndSizeCurve = {
-        XRange = 17.00,
         Keys = {
-            { x=8.526,y=1.952,z=0.100 },
+            {y=1},
         },
     },
-    InitialRotationCurve = {
-        XRange = 17.00,
+    InitialRotationCurve = { -- Effect particle rotation
         Keys = {
-            { x=8.500,y=180.000,z=360.000 },
+            {z=360},
         },
     },
-    RotationRateCurve = {
-        XRange = 17.00,
+    RotationRateCurve = { -- Rotation throughout lifetime
         Keys = {
-            { x=8.389,y=0.000,z=0.000 },
-        },
-    },
-    FrameRateCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=1.000,z=0.000 },
-        },
-    },
-    TextureSelectionCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
-        },
-    },
-    RampSelectionCurve = {
-        XRange = 17.00,
-        Keys = {
-            { x=8.500,y=0.000,z=0.000 },
+            {y=1,z=1},
         },
     },
 }

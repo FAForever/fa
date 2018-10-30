@@ -7,20 +7,12 @@ CIFArtilleryProton01 = Class(CArtilleryProtonProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         CArtilleryProtonProjectile.OnImpact(self, targetType, targetEntity)
         local army = self:GetArmy()
-        CreateLightParticle( self, -1, army, 24, 12, 'glow_03', 'ramp_red_06' )
-        CreateLightParticle( self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02' )
+        CreateLightParticle(self, -1, army, 18, 10, 'glow_03', 'ramp_red_06') -- Initial massive blast flash. Diameter
+        CreateLightParticle(self, -1, army, 6, 30, 'glow_03', 'ramp_antimatter_02') -- Diameter
         if targetType == 'Terrain' or targetType == 'Prop' then
-            CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 10, 10, 350, 200, army)
+            CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 6, 6, 350, 200, army) -- Radius
         end
-        ForkThread(self.ForceThread, self, self:GetPosition())
-        self:ShakeCamera(20, 3, 0, 1)
-    end,
-
-    ForceThread = function(self, pos)
-        DamageArea(self, pos, 10, 1, 'Force', true)
-        WaitTicks(2)
-        DamageArea(self, pos, 10, 1, 'Force', true)
-        DamageRing(self, pos, 10, 15, 1, 'Fire', true)
+        self:ShakeCamera(10, 1, 0, 1)
     end,
 }
 

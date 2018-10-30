@@ -25,7 +25,7 @@ ProjectileBlueprint {
         CameraFollowTimeout = 5,
         CameraFollowsProjectile = true,
         ImpactEffects = {
-            Type = 'Large01',
+            Type = 'Large01', -- Dust plume on impact
         },
         Mesh = {
             LODs = {
@@ -36,7 +36,7 @@ ProjectileBlueprint {
             },
         },
         StrategicIconSize = 3,
-        UniformScale = 0.45,
+        UniformScale = 0.4,
     },
     General = {
         Category = 'Artillery',

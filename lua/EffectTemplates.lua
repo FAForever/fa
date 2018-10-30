@@ -1692,11 +1692,11 @@ CProtonCannonFXTrail01 =  {EmtBpPath .. 'proton_cannon_fxtrail_01_emit.bp'}
 CProtonCannonFXTrail02 =  {EmtBpPath .. 'proton_cannon_fxtrail_02_emit.bp'}
 CProtonArtilleryPolytrail01 = EmtBpPath .. 'proton_artillery_polytrail_01_emit.bp'
 CProtonArtilleryHit01 = {
-    EmtBpPath .. 'proton_bomb_hit_02_emit.bp',
-    EmtBpPath .. 'proton_artillery_hit_01_emit.bp',
-    EmtBpPath .. 'proton_artillery_hit_02_emit.bp',
-    EmtBpPath .. 'proton_artillery_hit_03_emit.bp',
-    EmtBpPath .. 'shockwave_01_emit.bp',
+    EmtBpPath .. 'proton_artillery_hit_01_emit.bp', -- White spark fountain
+    EmtBpPath .. 'proton_artillery_hit_02_emit.bp', -- Dark purple spark spray
+    EmtBpPath .. 'proton_artillery_hit_03_emit.bp', -- White cloudlike shockwave
+    EmtBpPath .. 'proton_artillery_hit_04_emit.bp', -- Purple and white sparkles -- Scathis version
+    EmtBpPath .. 'shockwave_01_emit.bp', -- Blue ring shockwave
 }
 
 CTorpedoUnitHit01 = table.concatenate(DefaultProjectileWaterImpact, DefaultProjectileUnderWaterImpact)
