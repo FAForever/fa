@@ -1688,8 +1688,8 @@ CProtonCannonHit01 = {
 
 CProtonCannonPolyTrail =  EmtBpPath .. 'proton_cannon_polytrail_01_emit.bp'
 CProtonCannonPolyTrail02 =  EmtBpPath .. 'proton_cannon_polytrail_02_emit.bp'
-CProtonCannonFXTrail01 =  { EmtBpPath .. 'proton_cannon_fxtrail_01_emit.bp' }
-CProtonCannonFXTrail02 =  { EmtBpPath .. 'proton_cannon_fxtrail_02_emit.bp' }
+CProtonCannonFXTrail01 =  {EmtBpPath .. 'proton_cannon_fxtrail_01_emit.bp'}
+CProtonCannonFXTrail02 =  {EmtBpPath .. 'proton_cannon_fxtrail_02_emit.bp'}
 CProtonArtilleryPolytrail01 = EmtBpPath .. 'proton_artillery_polytrail_01_emit.bp'
 CProtonArtilleryHit01 = {
     EmtBpPath .. 'proton_bomb_hit_02_emit.bp',

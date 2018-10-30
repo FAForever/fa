@@ -242,7 +242,7 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     # Hit Effects
     FxImpactUnit = EffectTemplate.CProtonArtilleryHit01,
     FxImpactProp = EffectTemplate.CProtonArtilleryHit01,
-    FxImpactLand = EffectTemplate.CProtonArtilleryHit01,
+    FxImpactLand = EffectTemplate.CProtonArtilleryHit01, -- This group of effects is the sparkle, blue ring, white cloud ring, etc
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
