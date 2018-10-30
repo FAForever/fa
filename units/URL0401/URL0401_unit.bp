@@ -243,6 +243,7 @@ UnitBlueprint {
         SkirtSizeZ = 8,
         TurnRadius = 2,
         TurnRate = 40,
+        WaterSpeedMultiplier = 1.2,
     },
     SelectionSizeX = 4,
     SelectionSizeZ = 5,

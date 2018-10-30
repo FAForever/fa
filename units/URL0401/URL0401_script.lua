@@ -146,6 +146,21 @@ URL0401 = Class(CLandUnit) {
                     self.rotatedbarrel = true
                 end
             end,
+
+            -- Move faster underwater
+            OnLayerChange = function(self, new, old)
+                CLandUnit.OnLayerChange(self, new, old)
+
+                if new == 'Land' then
+                    self:DisableUnitIntel('Layer', 'Sonar')
+                    -- Set movement speed to default
+                    self:SetSpeedMult(1)
+                elseif new == 'Seabed' then
+                    self:EnableUnitIntel('Layer', 'Sonar')
+                    -- Increase speed while in water
+                    self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
+                end
+            end,
         },
     },
 }
