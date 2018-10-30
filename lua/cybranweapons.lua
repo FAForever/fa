@@ -407,10 +407,21 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
-        local army = self.unit:GetArmy()
-        for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit,-2,army,v)
+        for _, v in self.FxDeath do
+            CreateEmitterAtBone(self.unit, -2, self.unit:GetArmy(), v)
         end
-        KamikazeWeapon.OnFire(self)
+        self:DoOnFireBuffs()
+
+        KamikazeWeapon.OnFire(self) -- Kamikaze OnFire doesn't call through to Weapon, so DoOnFireBuffs is called above to handle EMP
+    end,
+
+    -- When the weapon picks up a target, issue a full command to the unit to move in for the kill
+    OnGotTarget = function(self)
+        local target = self:GetCurrentTarget()
+        if target then
+            IssueAttack({self.unit}, target)
+        end
+
+        KamikazeWeapon.OnGotTarget(self)
     end,
 }

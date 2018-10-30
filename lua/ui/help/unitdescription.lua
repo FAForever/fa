@@ -209,7 +209,7 @@ Description = {
     ['url0304'] = "<LOC Unit_Description_0135> Slow-moving heavy artillery. Must be stationary to fire.",
     ['url0402'] = "<LOC Unit_Description_0136>Experimental bot. Consumes massive amounts of Energy. Its main laser sweeps across any enemy to its front. Also armed with AA defenses.",
     ['url0401'] = "<LOC Unit_Description_0137>Experimental, rapid-fire artillery. Consumes massive amounts of Energy with each shot. Must be stationary to fire. ",
-    ['xrl0302'] = "<LOC Unit_Description_0317> Mobile bomb. Must be moved into position and manually detonated.",
+    ['xrl0302'] = "<LOC Unit_Description_0317> Mobile bomb that hides until it can attack nearby enemies, leaving survivors stunned. Can be manually detonated.",
     ['xrl0305'] = "<LOC Unit_Description_0318> Amphibious assault bot. Capable of attacking land and naval units.",
     ['xrl0403'] = "<LOC Unit_Description_0319> Massive experimental bot. Equipped with Dual-Proton cannons, AA defenses, torpedo launchers and anti-torpedo flares. Drops 'eggs' that can be transformed into a single unit.",
 

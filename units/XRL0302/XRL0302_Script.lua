@@ -4,29 +4,43 @@
 -- Summary  :  Cybran Mobile Bomb Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
+--[[
+    Mobile land mine
+    ----------------
+    Gains Stealth and Cloaking while stationary for a moderate energy cost
+    Detects units which come nearby, targets them, disables intel and moves to destroy
+    Hold Fire should have the Beetle ignore units in range and stay hidden
+    Suicide button should instantly blow up the unit
+
+    Present Implementation Notes
+    ----------------------------
+    Instant suicide - Yes
+    Suicide (Instant by bp flag) - Yes
+    Killed by enemy - Yes
+    Reclaimed by enemy - No
+    Detonate button - Yes
+]]--
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
+local HiderUnit = import('/lua/defaultunits.lua').HiderUnit
 local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
-local EMPDeathWeapon = Class(Weapon) {
-    OnCreate = function(self)
-        Weapon.OnCreate(self)
-        self:SetWeaponEnabled(false)
-    end,
-
-    Fire = function(self)
-        local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
-                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
-    end,
-}
-
-XRL0302 = Class(CWalkingLandUnit) {
-
+XRL0302 = Class(CWalkingLandUnit, HiderUnit) {
     Weapons = {
         Suicide = Class(CMobileKamikazeBombWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
     },
+    
+    OnMotionHorzEventChange = function(self, new, old)
+        CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+        self:StealthMotionHandler(new, old)
+    end,
+    
+    -- Turn off the cloak to begin with
+    OnStopBeingBuilt = function(self, builder, layer)
+        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:RevealUnit()
+    end,
 
     -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
     OnProductionPaused = function(self)
@@ -38,30 +52,6 @@ XRL0302 = Class(CWalkingLandUnit) {
         if instigator then
             self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
-    end,
-    
-    DoDeathWeapon = function(self)
-        if self:IsBeingBuilt() then return end
-
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
-
-        -- Now handle our special buff
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            self:AddBuff(bp)
-        end
-    end,
-    
-    OnDestroy = function(self)
-        CWalkingLandUnit.OnDestroy(self)
-        self:DoDeathWeapon()
     end,
 }
 
