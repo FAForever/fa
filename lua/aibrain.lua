@@ -532,7 +532,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Used to have units which were transferred to allies noted permanently as belonging to the new player
             local function TransferOwnershipOfBorrowedUnits(brains)
                 for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
                     if units and table.getn(units) > 0 then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then
