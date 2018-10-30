@@ -5,9 +5,10 @@
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
+local HiderUnit = import('/lua/defaultunits.lua').HiderUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
 
-XSL0101 = Class(SWalkingLandUnit) {
+XSL0101 = Class(SWalkingLandUnit, HiderUnit) {
     Weapons = {
         LaserTurret = Class(SDFPhasicAutoGunWeapon) {
             OnWeaponFired = function(self)
@@ -41,39 +42,6 @@ XSL0101 = Class(SWalkingLandUnit) {
         end
     end,
 
-    RevealUnit = function(self)
-        if self.CloakThread then
-            KillThread(self.CloakThread)
-            self.CloakThread = nil
-        end
-
-        -- Ensure weapon state
-        self:SetWeaponEnabledByLabel('LaserTurret', true)
-
-        -- Toggle stealth off
-        self:SetMaintenanceConsumptionInactive()
-        self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
-        self:DisableUnitIntel('ToggleBit8', 'Cloak')
-    end,
-
-    HideUnit = function(self)
-        if not self.Dead and self:GetFractionComplete() == 1 and self.Sync.LowPriority then
-            WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
-
-            if self:IsMoving() then return end
-
-            -- Ensure weapon state
-            self:SetWeaponEnabledByLabel('LaserTurret', false)
-
-            -- Toggle stealth on
-            self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
-            self:EnableUnitIntel('ToggleBit8', 'Cloak')
-
-            self.CloakThread = nil
-        end
-    end,
-
     -- Turn off the cloak to begin with
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
@@ -82,18 +50,24 @@ XSL0101 = Class(SWalkingLandUnit) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        -- If we stopped moving, hide
-        if new == 'Stopped' then
-            -- We need to fork in order to use WaitSeconds
-            self.CloakThread = self:ForkThread(self.HideUnit)
-        end
-
-        -- If we begin moving, reveal ourselves
-        if old == 'Stopped' then
-            self:RevealUnit()
-        end
-
         SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+        self:StealthMotionHandler(new, old)
+    end,
+
+    HideUnit = function(self)
+        if not self.Sync.LowPriority then return end
+
+        HiderUnit.HideUnit(self)
+
+        -- Ensure weapon state
+        self:SetWeaponEnabledByLabel('LaserTurret', false)
+    end,
+
+    RevealUnit = function(self)
+        HiderUnit.RevealUnit(self)
+
+        -- Ensure weapon state
+        self:SetWeaponEnabledByLabel('LaserTurret', true)
     end,
 }
 

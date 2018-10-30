@@ -1850,6 +1850,48 @@ BaseTransport = Class() {
     end
 }
 
+HiderUnit = Class(MobileUnit) {
+    StealthMotionHandler = function(self, new, old)
+        -- If we stopped moving, hide
+        if old and new == 'Stopped' then
+            -- We need to fork in order to use WaitSeconds
+            self.CloakThread = self:ForkThread(self.HideUnit)
+        end
+
+        -- If we begin moving, reveal ourselves
+        if old == 'Stopped' then
+            self:RevealUnit()
+        end
+    end,
+
+    HideUnit = function(self)
+        if not self.Dead and self:GetFractionComplete() == 1 then
+            WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime or 1)
+
+            if self:IsMoving() then return end -- No tricks
+
+            -- Toggle stealth on
+            self:SetMaintenanceConsumptionActive()
+            self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
+            self:EnableUnitIntel('ToggleBit8', 'Cloak')
+
+            self.CloakThread = nil
+        end
+    end,
+
+    RevealUnit = function(self)
+        if self.CloakThread then
+            KillThread(self.CloakThread)
+            self.CloakThread = nil
+        end
+
+        -- Toggle stealth off
+        self:SetMaintenanceConsumptionInactive()
+        self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
+        self:DisableUnitIntel('ToggleBit8', 'Cloak')
+    end,
+}
+
 --- Base class for air transports.
 AirTransport = Class(AirUnit, BaseTransport) {
     OnTransportAborted = function(self)
