@@ -169,5 +169,10 @@ Blacklist = {
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1200'] = UPGRADE,
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1230'] = UPGRADE,
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1300'] = UPGRADE,
+	
+	-- old versions of BlackOps
+	['9e8ea941-c306-4751-b367-a00000014000'] = UPGRADE, --BlackOps FAF: ACUs v14
+	['9e8ea941-c306-aaaf-b367-u00000014000'] = UPGRADE, --BlackOps FAF: Unleashed v14
+	['9e8ee941-c406-4751-b367-e10000015000'] = UPGRADE, --BlackOpsFAF: EXUnits v15
 
 }
