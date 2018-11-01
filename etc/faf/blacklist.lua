@@ -174,5 +174,6 @@ Blacklist = {
 	['9e8ea941-c306-4751-b367-a00000014000'] = UPGRADE, --BlackOps FAF: ACUs v14
 	['9e8ea941-c306-aaaf-b367-u00000014000'] = UPGRADE, --BlackOps FAF: Unleashed v14
 	['9e8ee941-c406-4751-b367-e10000015000'] = UPGRADE, --BlackOpsFAF: EXUnits v15
+	['9e8ee941-c306-4751-b367-e10000000104'] = Upgrade, --BlackOpsFAF: EXUnits v14
 
 }
