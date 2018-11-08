@@ -21,6 +21,10 @@ XEA0002 = Class(TAirUnit) {
         -- If we were destroyed without triggering OnKilled and our parent exists, notify that we just died
         if not self.IsDying and self.Parent then
             self.Parent.Satellite = nil
+            -- Rebuild a new satellite for the AI
+            if self:GetAIBrain().BrainType ~= 'Human' then
+                IssueBuildFactory({self.Parent}, 'XEA0002', 1)
+            end
         end
 
         TAirUnit.OnDestroy(self)
@@ -41,6 +45,10 @@ XEA0002 = Class(TAirUnit) {
         -- If our parent exists, notify that we just died
         if self.Parent then
             self.Parent.Satellite = nil
+            -- Rebuild a new satellite for the AI
+            if self:GetAIBrain().BrainType ~= 'Human' then
+                IssueBuildFactory({self.Parent}, 'XEA0002', 1)
+            end
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
