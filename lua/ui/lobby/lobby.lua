@@ -2721,6 +2721,45 @@ function CreateUI(maxPlayers)
         end
     end
 
+    -- Scrolling text with live updates from he server.
+    -- TODO: Make it work with server (just the small things).
+    -- Uses command line argumets /newsText and /newsURL
+    local newsText = GetCommandLineArg('/newsText', 1)
+    if newsText then
+        -- Black background behind the text
+        local scrollingBG = Bitmap(GUI)
+        scrollingBG:SetSolidColor('ff000000')
+        scrollingBG.Left:Set(function() return GUI.Left() end)
+        scrollingBG.Right:Set(function() return GUI.Right() end)
+        scrollingBG.Height:Set(25)
+        LayoutHelpers.AtBottomIn(scrollingBG, GUI)
+        -- The text itself
+        local scrollingText = UIUtil.CreateText(scrollingBG, newsText[1], 13, UIUtil.bodyFont)
+        scrollingText:SetColor('ffa5a5a5')
+        scrollingText.Depth:Set(function() return GUI.Depth() + 2 end)
+        scrollingBG.Depth:Set(function() return scrollingText.Depth() - 1 end)
+        LayoutHelpers.AtBottomIn(scrollingText, GUI, 6)
+        scrollingText.Left:Set(scrollingBG.Right)
+        scrollingText:SetDropShadow(true)
+        scrollingText:SetNeedsFrameUpdate(true)
+        scrollingText.OnFrame = function(self, delta)
+            local newLeft = math.floor(self.Left() - (delta * 50))
+            if newLeft + self.Width() < scrollingBG.Left() then
+                newLeft = scrollingBG.Right()
+            end
+            self.Left:Set(newLeft)
+        end
+        -- External link if we have one
+        local newsURL = GetCommandLineArg('/newsURL', 1)
+        if newsURL then
+            scrollingBG.HandleEvent = function(self, event)
+                if event.Type == 'ButtonPress' then
+                    OpenURL(newsURL[1])
+                end
+            end
+        end
+    end
+
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 6, 70)
