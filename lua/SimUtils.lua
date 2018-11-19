@@ -56,7 +56,7 @@ function KillSharedUnits(owner)
     end
 end
 
-function TransferUnitsOwnership(units, ToArmyIndex)
+function TransferUnitsOwnership(units, ToArmyIndex, captured)
     local toBrain = GetArmyBrain(ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
@@ -241,18 +241,20 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
     end
     
-    if upUnits[1] then
-        ForkThread(UpgradeTransferredUnits, upUnits)
+    if not captured then
+        if upUnits[1] then
+            ForkThread(UpgradeTransferredUnits, upUnits)
+        end
+        
+        if pauseKennels[1] then
+            ForkThread(PauseTransferredKennels, pauseKennels)
+        end
+        
+        if upgradeKennels[1] then
+            ForkThread(UpgradeTransferredKennels, upgradeKennels)
+        end
     end
     
-    if pauseKennels[1] then
-        ForkThread(PauseTransferredKennels, pauseKennels)
-    end
-    
-    if upgradeKennels[1] then
-        ForkThread(UpgradeTransferredKennels, upgradeKennels)
-    end
-
     return newUnits
 end
 

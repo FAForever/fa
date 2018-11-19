@@ -870,7 +870,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex) or {}
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
