@@ -507,7 +507,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 42,
             DamageType = 'Normal',
             DisplayName = 'Uall Cavitation Torpedo Launcher',
             FireTargetLayerCapsTable = {

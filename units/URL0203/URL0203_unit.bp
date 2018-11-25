@@ -362,7 +362,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 6,
+            Damage = 22,
             DamageType = 'Normal',
             DisplayName = 'Meson Torpedo',
             FireTargetLayerCapsTable = {
