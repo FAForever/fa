@@ -254,7 +254,7 @@ Platoon = Class(moho.platoon_methods) {
         return threat
     end,
 
-    GetUnitsAroundPoint = function(self, category, point, radius)
+    GetPlatoonUnitsAroundPoint = function(self, category, point, radius)
         local units = {}
         for k,v in self:GetPlatoonUnits() do
 
@@ -1450,7 +1450,7 @@ Platoon = Class(moho.platoon_methods) {
                         --LOG('*AI DEBUG: ARMY '.. aiBrain:GetArmyIndex() ..': --- POOL DISTRESS RESPONSE ---')
 
                         -- Grab the units at the location
-                        local group = self:GetUnitsAroundPoint(categories.MOBILE, position, radius)
+                        local group = self:GetPlatoonUnitsAroundPoint(categories.MOBILE, position, radius)
 
                         -- Move the group to the distress location and then back to the location of the base
                         IssueClearCommands(group)
@@ -1579,13 +1579,23 @@ Platoon = Class(moho.platoon_methods) {
         local radius = aiBrain:PBMGetLocationRadius(data.Location)
         local categories = data.Reclaim
         local counter = 0
+        local reclaimcat
+        local reclaimables
+        local unitPos
+        local reclaimunit
+        local distance
+        local allIdle
         while aiBrain:PlatoonExists(self) do
-            local unitPos = self:GetPlatoonPosition()
-            local reclaimunit = false
-            local distance = false
+            unitPos = self:GetPlatoonPosition()
+            reclaimunit = false
+            distance = false
             for num,cat in categories do
-                local reclaimcat = ParseEntityCategory(cat)
-                local reclaimables = aiBrain:GetListOfUnits(reclaimcat, false)
+                if type(cat) == 'string' then
+                    reclaimcat = ParseEntityCategory(cat)
+                else
+                    reclaimcat = cat
+                end
+                reclaimables = aiBrain:GetListOfUnits(reclaimcat, false)
                 for k,v in reclaimables do
                     if not v.Dead and (not reclaimunit or VDist3(unitPos, v:GetPosition()) < distance) and unitPos then
                         reclaimunit = v
@@ -1599,7 +1609,6 @@ Platoon = Class(moho.platoon_methods) {
                 IssueReclaim(self:GetPlatoonUnits(), reclaimunit)
                 -- Set ReclaimInProgress to prevent repairing (see RepairAI)
                 reclaimunit.ReclaimInProgress = true
-                local allIdle
                 repeat
                     WaitSeconds(2)
                     if not aiBrain:PlatoonExists(self) then
@@ -1749,7 +1758,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         local eng = self:GetPlatoonUnits()[1]
         local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
-        local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager.Radius)
+        local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
         for k,v in Structures do
             -- prevent repairing a unit while reclaim is in progress (see ReclaimStructuresAI)
             if not v.Dead and not v.ReclaimInProgress and v:GetHealthPercent() < .8 then
@@ -1831,7 +1840,6 @@ Platoon = Class(moho.platoon_methods) {
 
         -- loop through different categories we are looking for
         for _,catString in beingBuilt do
-            -- Track all valid units in the assist list so we can load balance for factories
 
             local category = ParseEntityCategory(catString)
 
@@ -1922,44 +1930,37 @@ Platoon = Class(moho.platoon_methods) {
 
         -- loop through different categories we are looking for
         for _,catString in beingBuilt do
-            -- Track all valid units in the assist list so we can load balance for factories
+            -- Track all valid units in the assist list so we can load balance for builders
             local category = ParseEntityCategory(catString)
             local assistList = AIUtils.GetAssistees(aiBrain, assistData.AssistLocation, assistData.AssisteeType, category, assisteeCat)
             if table.getn(assistList) > 0 then
                 -- only have one unit in the list; assist it
-                if table.getn(assistList) == 1 then
-                    assistee = assistList[1]
-                    break
-                else
-                    local low = false
-                    local bestUnit = false
-                    for k,v in assistList do
-                        --DUNCAN - check unit is inside assist range 
-                        local unitPos = v:GetPosition()
-                        -- Find the closest unit to assist
-                        if assistData.AssistClosestUnit then
-                            local dist = VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3])
-                            if not low or dist < low and dist < assistRange then
-                                low = dist
-                                bestUnit = v
-                            end
-                        -- Find the unit with the least number of assisters; assist it
-                        else
-                            local UnitAssist = v.UnitBeingBuilt or v.UnitBeingAssist or v
-                            local NumAssist = table.getn(UnitAssist:GetGuards())
-                            if not low or (NumAssist < low
-                            and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange) then
-                                low = NumAssist
-                                bestUnit = v
-                            end
+                local low = false
+                local bestUnit = false
+                for k,v in assistList do
+                    --DUNCAN - check unit is inside assist range 
+                    local unitPos = v:GetPosition()
+                    local UnitAssist = v.UnitBeingBuilt or v.UnitBeingAssist or v
+                    local NumAssist = table.getn(UnitAssist:GetGuards())
+                    local dist = VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3])
+                    -- Find the closest unit to assist
+                    if assistData.AssistClosestUnit then
+                        if (not low or dist < low) and NumAssist < 20 and dist < assistRange then
+                            low = dist
+                            bestUnit = v
+                        end
+                    -- Find the unit with the least number of assisters; assist it
+                    else
+                        if (not low or NumAssist < low) and NumAssist < 20 and dist < assistRange then
+                            low = NumAssist
+                            bestUnit = v
                         end
                     end
-                    assistee = bestUnit
-                    break
                 end
+                assistee = bestUnit
+                break
             end
         end
-        
         -- assist unit
         if assistee  then
             self:Stop()
@@ -2101,22 +2102,12 @@ Platoon = Class(moho.platoon_methods) {
     --       nil (tail calls into a behavior function)
     -------------------------------------------------------
     EngineerBuildAI = function(self)
-        --DUNCAN - removed
-        --self:Stop()
-
         local aiBrain = self:GetBrain()
         local platoonUnits = self:GetPlatoonUnits()
         local armyIndex = aiBrain:GetArmyIndex()
         local x,z = aiBrain:GetArmyStartPos()
         local cons = self.PlatoonData.Construction
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
-
-        local factionIndex = cons.FactionIndex or self:GetFactionIndex()
-
-        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
-        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
-        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
-        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
 
         -- Old version of delaying the build of an experimental.
         -- This was implemended but a depricated function from sorian AI. 
@@ -2158,6 +2149,14 @@ Platoon = Class(moho.platoon_methods) {
         if eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or  eng:IsUnitState("Enhancing") then
            return
         end
+
+        local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+
+        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
+        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
+        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
+        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
 
         --LOG('*AI DEBUG: EngineerBuild AI ' .. eng.Sync.id)
 
@@ -2471,8 +2470,8 @@ Platoon = Class(moho.platoon_methods) {
                     -- in case the unit can't upgrade with OverideUpgradeBlueprint, warn the programmer
                     -- this can happen if the AI relcaimed a factory and tries to upgrade to a support factory without having a HQ factory from the reclaimed factory faction.
                     -- in this case we fall back to HQ upgrade template and upgrade to a HQ factory instead of support.
-                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed!
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed.' )
+                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed!
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed. (Override tree not available, upgrading to default instead.)' )
                 end
             end
             if not upgradeID and EntityCategoryContains(categories.MOBILE, v) then
@@ -4044,7 +4043,7 @@ Platoon = Class(moho.platoon_methods) {
                         --LOG('*AI DEBUG: ARMY '.. aiBrain:GetArmyIndex() ..': --- POOL DISTRESS RESPONSE ---')
 
                         -- Grab the units at the location
-                        local group = self:GetUnitsAroundPoint(categories.MOBILE - categories.EXPERIMENTAL - categories.COMMAND - categories.ENGINEER, position, radius)
+                        local group = self:GetPlatoonUnitsAroundPoint(categories.MOBILE - categories.EXPERIMENTAL - categories.COMMAND - categories.ENGINEER, position, radius)
 
                         -- Move the group to the distress location and then back to the location of the base
                         IssueClearCommands(group)
