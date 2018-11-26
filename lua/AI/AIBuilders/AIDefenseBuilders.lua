@@ -926,7 +926,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncome',  { 5, 150}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
         },
@@ -939,7 +939,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncome',  { 5, 200}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
         },
@@ -953,7 +953,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } }, #DUNCAN - Added
             { EBC, 'GreaterThanEconIncome',  { 5, 300}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
         },
@@ -967,7 +967,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } }, #DUNCAN - Added
             { EBC, 'GreaterThanEconIncome',  { 5, 400}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
         },

@@ -28,6 +28,8 @@ end
 function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
         AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
+    else
+        WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *AddGlobalBuilderGroup ERROR: BuilderGroup ' .. repr(builderGroupName) .. ' does not exist!' )
     end
 end
 

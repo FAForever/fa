@@ -140,29 +140,6 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
             table.insert(newList, v)
         end
     end
-
-    return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
-end
-
-function AIGetSortedMassWithEnemy(aiBrain, maxNum, tMin, tMax, tRings, tType, position, category)
-    local markerList = AIGetMarkerLocations(aiBrain, 'Mass')
-    local newList = {}
-    local num = 0
-    for _, v in markerList do
-        -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
-        if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
-            -- mass marker is too close to border, skip it.
-            continue
-        end
-        if aiBrain:GetNumUnitsAroundPoint(categories.MASSEXTRACTION, v.Position, 5, 'Enemy') > 0 then
-            table.insert(newList, v)
-            num = num + 1
-            if num >= maxNum then
-                break
-            end
-        end
-    end
-
     return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
 end
 
@@ -1827,24 +1804,39 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     if not pos then
         return false
     end
-
+    local Reclaiming = false
     -- Check if enemy units are at location
-    local checkUnits = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE + (categories.MOBILE * categories.LAND), pos, 10, 'Enemy')
-
+    local checkUnits = aiBrain:GetUnitsAroundPoint( (categories.STRUCTURE + categories.MOBILE) - categories.AIR, pos, 10, 'Enemy')
+    -- reclaim units near our building place.
     if checkUnits and table.getn(checkUnits) > 0 then
         for num, unit in checkUnits do
-            if not unit.Dead and EntityCategoryContains(categories.ENGINEER, unit) and (unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex()) then
-                IssueReclaim({eng}, unit)
-            elseif not EntityCategoryContains(categories.COMMAND, eng) then
+            if unit.Dead or unit:BeenDestroyed() then
+                continue
+            end
+            if not IsEnemy( aiBrain:GetArmyIndex(), unit:GetAIBrain():GetArmyIndex() ) then
+                continue
+            end
+            if unit:IsCapturable() then 
+                -- if we can capture the unit/building then do so
                 IssueCapture({eng}, unit)
+            else
+                -- if we can't capture then reclaim
+                IssueReclaim({eng}, unit)
             end
         end
-        return true
+        Reclaiming = true
     end
-
-    return false
+    -- reclaim rocks etc or we can't build mexes or hydros
+    local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
+    if Reclaimables and table.getn( Reclaimables ) > 0 then
+        for k,v in Reclaimables do
+            if v.MaxMassReclaim and v.MaxMassReclaim > 0 or v.MaxEnergyReclaim and v.MaxEnergyReclaim > 0 then
+                IssueReclaim({eng}, v)
+            end
+        end
+    end
+    return Reclaiming
 end
-
 
 function EngineerTryRepair(aiBrain, eng, whatToBuild, pos)
     if not pos then
