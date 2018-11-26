@@ -102,4 +102,8 @@ function OnSync()
     if Sync.StartPositions then
         import('/lua/ui/game/worldview.lua').MarkStartPositions(Sync.StartPositions)
     end
+
+    if Sync.GameEnded then
+        GpgNetSend('GameEnded')
+    end
 end
