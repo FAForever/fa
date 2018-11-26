@@ -100,7 +100,7 @@ function CallEndGame()
     ForkThread(function()
         WaitSeconds(2.9)
         import('/lua/sim/score.lua').SyncScores()
-        GpgNetSend('GameEnded')
+        Sync.GameEnded = true
         WaitSeconds(0.1)
         EndGame()
     end)
