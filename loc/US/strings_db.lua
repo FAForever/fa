@@ -5282,6 +5282,7 @@ tooltipui0506="Pause/unpause current construction order"
 tooltipui0507="Current and maximum unit counts"
 tooltipui0707="Post Feedback"
 tooltipui0708="Open a forum thread about this mission"
+tooltipui0709="Open a web page to share your opinion about the current ladder map pool"
 
 -- Begin unit restrictions
 tooltipui0508="No Tech 1"

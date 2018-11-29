@@ -7587,6 +7587,7 @@ tooltipui0705="Paramètres"
 tooltipui0706="Cette fenêtre permet de créer une sauvegarde des paramètres pour la restaurer plus tard.\n\nUne fois les paramètres à votre convenance, utilisez le bouton \"Créer\" pour les sauvegarder. Vous pouvez restaurer la configuration sauvegardée en la selectionnant, puis en appuyant sur le bouton \"Charger\". \n\nLe bouton \"Créer\" écrasera toute sauvegarde selectionnée avec la configuration actuelle."
 tooltipui0707="Donner un avis"
 tooltipui0708="Créer une discussion sur cette mission"
+tooltipui0709="Open a web page to share your opinion about the current ladder map pool"
 uimod_0010 = "Ce mod entre en conflit avec un ou plusieurs autres mods activés. Voulez-vous automatiquement désactiver les autres mods conflictuels ?"
 uimod_0016 = "Mod de jeu activé" --[[ r: "Game mod" est par la suite systèmatiquement traduit par << Mod de jeu >> --]]
 uimod_0017 = "Mod d'interface activé"

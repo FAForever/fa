@@ -517,17 +517,36 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     elapsedTime = UIUtil.CreateText(bg, "", 16, UIUtil.bodyFont)
     LayoutHelpers.RightOf(elapsedTime, elapsedTimeLabel, 5)
 
-    -- Create a Feedback button with a link to the specified forum thread
+    -- Create a Feedback button with a link to the specified web page
+    local feedbackButtonData = {
+        ladder = {
+            tooltip = 'LadderScore_Feedback',
+            url = 'http://voting.faforever.com/vote',
+        },
+        campaign = {
+            tooltip = 'CampaignScore_Feedback',
+            url = operationVictoryTable.opData.feedbackURL,
+        },
+    }
+
+    local feedbackType = false
     if showCampaign then
-        bg.feedbackButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC _Feedback>Post Feedback", 14, 2)
+        feedbackType = 'campaign'
+    elseif GetCommandLineArg('/init', 1)[1] == 'init_ladder1v1.lua' then
+        feedbackType = 'ladder'
+    end
+
+    if feedbackType then
+        bg.feedbackButton = UIUtil.CreateButtonStd(bg, '/scx_menu/medium-no-br-btn/medium-uef', '<LOC _Feedback>Post Feedback', 14, 2)
         LayoutHelpers.AtLeftIn(bg.feedbackButton, bg, 5)
         LayoutHelpers.AtBottomIn(bg.feedbackButton, bg, 20)
-        Tooltip.AddButtonTooltip(bg.feedbackButton, "CampaignScore_Feedback")
-        bg.feedbackButton.OnClick = function(self, modifiers)
-            OpenURL(operationVictoryTable.opData.feedbackURL)
-        end
-
-        if not operationVictoryTable.opData.feedbackURL then
+        Tooltip.AddButtonTooltip(bg.feedbackButton, feedbackButtonData[feedbackType].tooltip)
+        -- Add an URL to the button, else disable it
+        if feedbackButtonData[feedbackType].url then
+            bg.feedbackButton.OnClick = function(self, modifiers)
+                OpenURL(feedbackButtonData[feedbackType].url)
+            end
+        else
             bg.feedbackButton:Disable()
         end
     end
