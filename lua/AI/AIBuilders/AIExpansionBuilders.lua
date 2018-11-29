@@ -574,7 +574,7 @@ BuilderGroup {
                     'T1AADefense',
                     'T2StrategicMissile',
                     'T2ShieldDefense',
-                    'T2StrategicMissileDefense',
+                    'T2MissileDefense',
                     'T2GroundDefense',
                     'T2AADefense',
                     'T2StrategicMissile',
