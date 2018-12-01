@@ -1203,9 +1203,9 @@ buildModeKeys = {
         ['U'] = 'xsb3202',
     },
     -- T2 Sonar
-    ['xsb3202'] = {
-        ['U'] = 'xss0305',
-    },
+--    ['xsb3202'] = {
+--        ['U'] = 'xss0305', -- unit xsb3202 can't upgrade to xsb0305 (building does not exist).
+--    },
     -- Shield Generators
     ['xsb4202'] = {
         ['U'] = 'xsb4204',
