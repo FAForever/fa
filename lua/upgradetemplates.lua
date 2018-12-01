@@ -169,7 +169,7 @@ StructureUpgradeTemplates =
 
         # sonar
         { 'xsb3102', 'xsb3202'},
-        { 'xsb3202', 'xsb0305'},
+--        { 'xsb3202', 'xsb0305'}, -- unit xsb3202 can't upgrade to xsb0305 (building does not exist).
 
         #Shield
         { 'xsb4202', 'xsb4301'},

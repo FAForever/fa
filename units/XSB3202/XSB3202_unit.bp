@@ -142,7 +142,6 @@ UnitBlueprint {
         UnitName = '<LOC xsb3202_name>Shou-esel',
         UnitWeight = 1,
         UpgradesFrom = 'xsb3102',
-        UpgradesTo = 'xsb0305',
     },
     Intel = {
         ShowIntelOnSelect = true,
