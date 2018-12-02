@@ -214,7 +214,7 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            BallisticArc = 'RULEUBA_None',
+            BallisticArc = 'RULEUBA_LowArc',
             BeamCollisionDelay = 0,				#0.3
             BeamLifetime = 1,					#0.9
             CollideFriendly = false,
