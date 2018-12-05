@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'UEF_truck_Albedo.dds',
-	  	    		SpecName = 'UEF_truck_SpecTeam.dds',
+                    SpecName = 'UEF_truck_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Unit',
                 },

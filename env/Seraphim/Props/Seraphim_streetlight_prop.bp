@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'seraphim_streetlight_Albedo.dds',
-	  	    		SpecName = 'seraphim_streetlight_SpecTeam.dds',
+                    SpecName = 'seraphim_streetlight_SpecTeam.dds',
                     LODCutoff = 200,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',

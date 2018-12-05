@@ -11,13 +11,12 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'Aeon_dock_Albedo.dds',
-	  	    		SpecName = 'Aeon_dock_SpecTeam.dds',
+                    SpecName = 'Aeon_dock_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Aeon',
                 },
-		{
+                {
                     AlbedoName = 'Aeon_dock_lod1_albedo.dds',
                     LODCutoff = 300,
                     ShaderName = 'Aeon',
