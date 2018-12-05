@@ -5,7 +5,7 @@ PropBlueprint {
             LODs = {
                 {
 
-                    # share other rock's albedo and specteam
+                    -- share other rock's albedo and specteam
                     LODCutoff = 1000,
                     MeshName = 'sphere_lod0.scm',
                     ShaderName = 'TMeshZFill',
