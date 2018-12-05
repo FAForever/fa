@@ -1,0 +1,36 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '',
+                    LODCutoff = -1,
+                    ShaderName = '',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'A dude',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.1,
+    SizeY = 0.25,
+    SizeZ = 0.1,
+}

@@ -1,0 +1,36 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Des_boulder01_albedo.dds',
+                    LODCutoff = 250,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 5,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Small Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
+}

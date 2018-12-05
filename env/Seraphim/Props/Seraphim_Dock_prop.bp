@@ -1,0 +1,46 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 200,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                },
+		{
+                    AlbedoName = 'seraphim_dock_lod1_albedo.dds',
+                    LODCutoff = 300,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                    SpecularName = 'seraphim_dock_lod1_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Seraphim Dock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = .5,
+    SizeY = .5,
+    SizeZ = 1,
+}

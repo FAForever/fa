@@ -1,0 +1,39 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'IceBerg01_albedo.dds',
+                    LODCutoff = 250,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.025,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 37.5,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Medium Rock - Ice',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 1.5,
+    SizeY = 0.25,
+    SizeZ = 1.5,
+}

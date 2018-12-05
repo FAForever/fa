@@ -1,0 +1,34 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'UEF_Building_002_albedo.dds',
+                    LODCutoff = 350,
+                    NormalsName = 'UEF_Building_002_normalsTS.dds',
+                    ShaderName = 'VertexNormal',
+                    SpecularName = 'UEF_Building_002_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'UEF Buildings',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2,
+    SizeY = 2,
+    SizeZ = 2,
+}
