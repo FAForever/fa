@@ -1,0 +1,39 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 400,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'pillar test',
+    },
+    Physics = {
+        BlockPath = true,
+        Footprint = {
+            SizeX = 4,
+            SizeZ = 4,
+        },
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

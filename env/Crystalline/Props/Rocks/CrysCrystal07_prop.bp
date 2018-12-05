@@ -1,0 +1,40 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'CrysCrystal07_albedo.dds',
+                    LODCutoff = 400,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.02,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Huge Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 8,
+    SizeY = 5,
+    SizeZ = 12,
+}

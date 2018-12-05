@@ -1,0 +1,34 @@
+PropBlueprint {
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'roadwayMarking01_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = 'roadwayMarking01_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+                {
+                    AlbedoName = 'roadwayMarking01_albedo.dds',
+                    LODCutoff = 175,
+                    NormalsName = 'roadwayMarking01_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Interface = {
+        HelpText = 'Power Line Tower',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.1,
+    SizeY = 1,
+    SizeZ = 0.1,
+}

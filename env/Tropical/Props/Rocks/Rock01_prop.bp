@@ -1,0 +1,39 @@
+PropBlueprint {
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    # share other rock's albedo and specteam
+                    LODCutoff = 1000,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 75,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Large Rock',
+    },
+    Physics = {
+        BlockPath = true,
+        FootprintSizeX = 8,
+        FootprintSizeZ = 9,
+    },
+    SizeX = 4,
+    SizeY = 3,
+    SizeZ = 3,
+}

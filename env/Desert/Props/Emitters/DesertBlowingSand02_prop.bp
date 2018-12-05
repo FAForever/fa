@@ -1,0 +1,28 @@
+PropBlueprint {
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '/env/common/props/marker01_albedo.dds',
+                    MeshName = '/env/common/props/marker01_lod0.scm',
+                    ShaderName = 'TMeshNoNormals',
+                },
+            },
+        },
+        UniformScale = 0,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = '',
+    },
+    Interface = {
+        HelpText = 'Desert Blowing Sand (dark)',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

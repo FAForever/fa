@@ -1,0 +1,38 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+   
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'kelp_01_Albedo.dds',
+                    LODCutoff = 50,
+                    SpecName = 'kelp_01_SpecTeam.dds',
+		    NormalsName = 'kelp_01_normalsTS.dds',
+		    ShaderName = 'UnderwaterClutter',
+			
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = '',
+        },
+
+   
+    Interface = {
+        HelpText = 'Kelp Bed',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 2,
+    SizeY = 5,
+    SizeZ = 12,
+}
