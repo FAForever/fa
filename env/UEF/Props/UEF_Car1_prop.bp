@@ -1,0 +1,41 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'UEF_car1_Albedo.dds',
+	  	    		SpecName = 'UEF_car1_SpecTeam.dds',
+                    LODCutoff = 200,
+                    ShaderName = 'Unit',
+                },
+            },
+        },
+        UniformScale = .1,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'UEF Car 1',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = .5,
+    SizeY = .5,
+    SizeZ = 1,
+}

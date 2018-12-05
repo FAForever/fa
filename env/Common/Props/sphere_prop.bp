@@ -1,0 +1,33 @@
+PropBlueprint {
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    # share other rock's albedo and specteam
+                    LODCutoff = 1000,
+                    MeshName = 'sphere_lod0.scm',
+                    ShaderName = 'TMeshShield',
+                },
+            },
+            SortOrder = 1000,
+            StraddleWater = true,
+        },
+        UniformScale = 20,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 0,
+        ReclaimTime = 0,
+    },
+    Interface = {
+        HelpText = 'shield sphere',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

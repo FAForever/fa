@@ -1,0 +1,43 @@
+PropBlueprint {
+    0,
+    'C:\\work\\rts\\main\\data\\env\\geothermal\\props\\rocks\\georock01_prop.bp',
+    '1817A6A0C8C9A7A99ACCB6D41AC7E4C2',
+    '1817A6A0C8C9A7A99ACCB6D41AC7E4C2',
+    {
+        'RECLAIMABLE',
+    },
+    {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '/env/geothermal/props/rocks/GeoRock01_albedo.dds',
+                    LODCutoff = 250,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 37.5,
+        ReclaimTime = 5,
+    },
+    {
+        OccupancyCaps = 3,
+    },
+    {
+        HelpText = 'Medium Rock',
+    },
+    {
+        BlockPath = true,
+    },
+    1,
+    1,
+    1,
+}

@@ -1,0 +1,34 @@
+PropBlueprint {
+    Categories = {
+        'SELECTABLE',
+        'RECLAIMABLE',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    # share other rock's albedo and specteam
+                    LODCutoff = 400,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.08,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 5,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'A big round thing',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
+}

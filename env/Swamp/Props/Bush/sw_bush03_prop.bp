@@ -1,0 +1,36 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'sw_bush01_albedo.dds',
+                    LODCutoff = 400,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = 10,
+        ReclaimMassMax = 1,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Large Bush - Swamp',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2.25,
+    SizeY = 0.25,
+    SizeZ = 0.75,
+}

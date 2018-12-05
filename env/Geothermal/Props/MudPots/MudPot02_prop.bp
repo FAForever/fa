@@ -1,0 +1,35 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 250,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 75,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Large Rock - Geyser',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2.5,
+    SizeY = 0.25,
+    SizeZ = 3,
+}

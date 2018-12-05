@@ -1,0 +1,33 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    # share other rock's albedo and specteam
+                    LODCutoff = 100,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 37.5,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Medium Wreckage',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 1,
+    SizeY = 0.25,
+    SizeZ = 1,
+}
