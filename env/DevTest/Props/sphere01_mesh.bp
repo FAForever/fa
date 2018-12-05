@@ -1,8 +1,8 @@
 MeshBlueprint {
     LODs = {
         {
-#            ShaderName = 'Metal',
-#            AlbedoName = '',
+--            ShaderName = 'Metal',
+--            AlbedoName = '',
             LODCutoff = -1,
         },
     },
