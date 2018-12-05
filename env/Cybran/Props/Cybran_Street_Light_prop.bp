@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'cybran_street_light_Albedo.dds',
-	  	    		SpecName = 'cybran_street_light_SpecTeam.dds',
+                    SpecName = 'cybran_street_light_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Unit',
                 },
@@ -30,7 +29,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Cybran Strret Light',
+        HelpText = 'Cybran Street Light',
     },
     Physics = {
         BlockPath = true,

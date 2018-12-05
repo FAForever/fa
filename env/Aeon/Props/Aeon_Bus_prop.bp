@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'aeon_bus_Albedo.dds',
-	  	    		SpecName = 'aeon_bus_SpecTeam.dds',
+                    SpecName = 'aeon_bus_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Unit',
                 },
