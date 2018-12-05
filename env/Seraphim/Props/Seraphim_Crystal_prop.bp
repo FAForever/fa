@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'seraphim_crystal_Albedo.dds',
-	  	    		SpecName = 'seraphim_crystal_SpecTeam.dds',
+                    SpecName = 'seraphim_crystal_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Unit',
                 },

@@ -1,7 +1,7 @@
 PropBlueprint {
     Categories = {
         'INVULNERABLE',
-	    'UNTARGETABLE',
+        'UNTARGETABLE',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = 0,
