@@ -374,3 +374,18 @@ function CreateTemplateFactory()
     end
     import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
 end
+
+function SetWeaponPriorities(prioritiesString, name, exclusive)
+    local priotable
+    if type(prioritiesString) == 'string' then
+        priotable = prioritiesString
+    end
+    local units = GetSelectedUnits()
+    local unitIds = {}
+
+    for _, unit in units or {} do
+        table.insert(unitIds, unit:GetEntityId())
+    end
+
+    SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
+end
