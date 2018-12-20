@@ -18,7 +18,7 @@ Tooltips = {
     },
     attack = {
         title = "<LOC tooltipui0002>Attack",
-        description = "",
+        description = "<LOC tooltipui0003>Left click for attack order. Right click to toggle target priorities for sniping.",
         keyID = "attack",
     },
     attack_move = {
