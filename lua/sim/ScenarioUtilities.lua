@@ -495,10 +495,10 @@ function CreateWreckageUnit(unit)
 	local deep = (GetSurfaceHeight(unitPos[1],unitPos[3]) - GetTerrainHeight(unitPos[1],unitPos[3]))
 	local deathAnim = bp.Display['AnimationDeath']
 	
-	-- If unit stay on land or deep<5 and have death animation, animate this
-	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and (layer == 'Land' or deep < 5)
-	-- We want to random rotate all naval and air units whats haven`t death animation
-	local needRotate = not (layer == 'Land' or isStructure or isLand or (isNaval and deep < 2)) or (isAir and isExperimental)
+	-- If t4 stay on land or deep<5 and have death animation, animate this
+	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and isExperimental and (layer == 'Land' or deep < 5)
+	-- We want to random rotate all naval units and t4 air whats haven`t death animation
+	local needRotate = not isStructure and layer ~= 'Land' and isNaval and deep > 2 or isAir and isExperimental
 
 	if needAnimate then
 		ForkThread(AnimateDeathThread, unit, deathAnim)
