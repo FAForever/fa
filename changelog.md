@@ -1,3 +1,40 @@
+Patch 3702 (28 December, 2018)
+============================
+### Lobby
+- Added a feedback button for the ladder map pool in the score screen
+- Improved changelog popup
+
+### UI
+- Disable notify during cinematics
+
+### Gameplay
+- Allow walls to be handed over in fullshare games
+- Allow switching to different target priorities for units
+- Improved AI
+
+### Bugs
+- Improved the aiming of the sera pd
+- Fixed AI not rebuilding satellite
+- Fixed a bug causing capture to keep the upgrade progress
+- Fixed several rare bugs that were causing a crash
+- Removed CZAR from AA fighter hotkey
+
+### Other
+- Improved parser to allow complex default target priorities for weapons
+- Updated mod blacklist
+- Optimized unit range rings
+
+### Contributors
+- Faether
+- Strogo
+- Uveso
+- speed2
+- Exotic_Retard
+- PhilipJFry
+- Evildrew
+- shalkya
+
+
 Hotfix Patch 3701 (28. October 2018)
 ============================
 - Fixed bug that caused the Kennel structure to stay after being upgraded which resulted into having two buildings stacked upon each other
@@ -1951,7 +1988,7 @@ Patch 3658 (August 29th, 2016)
 - JaggedAppliance
 - JJ173
 - Justify87
-- Shalkya
+- shalkya
 - Sheeo
 - Speed2
 - Uveso
