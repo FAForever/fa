@@ -33,7 +33,7 @@ gamePatches = {
             '- Strogo',
             '- Uveso',
             '- speed2',
-            '- Exotic_Retard'
+            '- Exotic_Retard',
             '- PhilipJFry',
             '- Evildrew',
             '- shalkya',
