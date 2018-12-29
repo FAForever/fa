@@ -3,17 +3,22 @@ local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEn
 
 --we are loading an arbitrary string that a user can send to us on the sim side.
 --in order to not break things, we sanitize the input first before doing anything with it.
-function HangleInputString(inputString)
+function HandleInputString(inputString)
     local inputTable = false
-    --this checks for syntax errors in the string so we can continue onwards.
-    --given that it compiled successfully we also check that its a table by its first character
-    --for some reason the compiling also works out if the categories even exist? well whatever that just makes this work better i guess.
-    if pcall(loadstring("return "..inputString)) and string.sub(inputString, 1, 1) == "{" then
-        --WARN('loaded string successfully'..inputString)
-        inputTable = loadstring("return "..inputString)()
+    --we check that its a table by its first character    
+    --we also check that it doesnt contain any functions that would have been run, by looking for "("
+    if string.sub(inputString, 1, 1) == "{" and not string.find(inputString,"%(") then
+        --this checks for syntax errors in the string so we can continue onwards.       
+        --for some reason the compiling also works out if the categories even exist? well whatever that just makes this work better i guess.
+        if pcall(loadstring("return "..inputString)) then
+            --WARN('would have totally run this string just now: '..inputString)
+            inputTable = loadstring("return "..inputString)()
+        else
+            WARN('Syntax error in target priorities string, was discarded: '..inputString)
+        end
     else
-        WARN('Syntax error in target priorities string: '..inputString)
-    end
+        WARN('Target priorities string contained improper content, so was discarded: '..inputString)
+    end    
     return inputTable
 end
 
@@ -32,7 +37,7 @@ function SetWeaponPriorities(data)
     if not selectedUnits[1] then return end
 
     if data.prioritiesTable then
-        prioritiesTable = HangleInputString(data.prioritiesTable)
+        prioritiesTable = HandleInputString(data.prioritiesTable)
 
         --this is needed to prevent crashes when there is a mistake in the middle of input string
         --and priTable has such structure: {[1] = userdata: EntityCategory, [2] = empty!, [3] = userdata: EntityCategory}
