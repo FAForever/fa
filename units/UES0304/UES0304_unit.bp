@@ -419,7 +419,7 @@ UnitBlueprint {
             Damage = 0,
             DamageFriendly = true,
             DamageRadius = 0,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'Nuclear Warhead',
             FireTargetLayerCapsTable = {
                 Sub = 'Land|Water|Seabed',

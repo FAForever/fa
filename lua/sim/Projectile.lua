@@ -68,8 +68,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
         if self.InnerRing and self.OuterRing then
             local pos = self:GetPosition()
-            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
-            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army)
+            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
         end
     end,
 

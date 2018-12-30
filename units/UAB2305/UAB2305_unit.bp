@@ -246,7 +246,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 0,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'Quantum Warhead',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,
