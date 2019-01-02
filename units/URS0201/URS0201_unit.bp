@@ -4,7 +4,7 @@ UnitBlueprint {
         TargetBones = {
             'URS0201',
             'Muzzle_Back',
-            'Muzzle_Front',
+            'Turret_Mount_Front',
         },
     },
     Audio = {
