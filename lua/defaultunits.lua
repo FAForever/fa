@@ -8,7 +8,7 @@
 local Unit = import('/lua/sim/Unit.lua').Unit
 local Shield = import('shield.lua').Shield
 local explosion = import('defaultexplosions.lua')
-local Util = import('utilities.lua')
+local Util = import('/lua/utilities.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -17,6 +17,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local GetTrueEnemyUnitsInSphere = Util.GetTrueEnemyUnitsInSphere
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
@@ -2260,8 +2261,12 @@ CommandUnit = Class(WalkingLandUnit) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
         
+        
+        --adjust the location of the teleport effect to make sure we dont land too close to enemy units.
+        local teleLocation = self:AdjustTeleportLocation(location)
+        
         --Add a fake unit at the teleport location, this will allow the teleport to be disrupted when it dies.
-        self:AddTeleportTarget(location)
+        self:AddTeleportTarget(teleLocation)
         
         local bp = self:GetBlueprint().Economy
         local energyCost, time
@@ -2275,7 +2280,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
         
         -- Create teleport charge effect
-        self:PlayTeleportChargeEffects(location, orientation)
+        self:PlayTeleportChargeEffects(teleLocation, orientation)
         WaitFor(self.TeleportDrain)
 
         if self.TeleportDrain then
@@ -2287,10 +2292,10 @@ CommandUnit = Class(WalkingLandUnit) {
         self:CleanupTeleportChargeEffects()
         WaitSeconds(0.1)
         self:SetWorkProgress(0.0)
-        Warp(self, location, orientation)
+        Warp(self, teleLocation, orientation)
         self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
-        teleportTime[self.EntityId] = GetGameTick()
+        teleportTime[self.EntityId] = GetGameTick()--why is this here
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 
@@ -2306,6 +2311,80 @@ CommandUnit = Class(WalkingLandUnit) {
         self.TeleportThread = nil
     end,
 
+    AdjustTeleportLocation = function(self, location)
+        --check for nearby units. consider changing ALLUNITS to some more specific category
+        local teleLocation = location
+        local unitsAroundTarget = {}
+        unitsAroundTarget = Util.GetTrueEnemyUnitsInSphere(self, Vector(teleLocation[1],GetTerrainHeight(location[1],location[3]),teleLocation[3]), 6, categories.ALLUNITS) or false
+        --grab the two highest mass units
+        --take two vectors of the units to the teleport target. lengthen them by a factor of inverse distance, so closer units mean more
+        --add them together to get a third vector, convert that into a unit vector and then multiply that by a distance to get the desired translation.
+        ----[[
+        if not unitsAroundTarget then return teleLocation end
+        
+        local mass1 = 0
+        local mass2 = 0
+        local expensiveUnit1 = false
+        local expensiveUnit2 = false
+        
+        for k,unit in unitsAroundTarget do
+            local cost = unit:GetBlueprint().Economy.BuildCostMass or false
+            if not cost then WARN('no mass cost found when looking up cost for teleportation, ignoring unit') continue end
+            
+            if cost > mass1 then
+                mass2 = mass1
+                mass1 = cost
+                expensiveUnit2 = expensiveUnit1
+                expensiveUnit1 = unit
+            elseif cost > mass2 then
+                mass2 = cost
+                expensiveUnit2 = unit
+            end
+        end
+        
+        if expensiveUnit1 then
+            local position1 = expensiveUnit1:GetPosition()
+            local position2 = false
+            local vector1 = self.CalculateScaledVector2D(teleLocation,position1)
+            local vector2 = {0,0,0}
+            
+            if expensiveUnit2 then
+                position2 = expensiveUnit2:GetPosition()
+                vector2 = self.CalculateScaledVector2D(teleLocation,position2)
+            end
+            
+            vector1 = VAdd(vector1,vector2)
+            
+            --make the distance equal to 3 units
+            vector1 = VMult(Util.NormalizeVector(vector1),3)
+            
+            --adjust the telelocation
+            teleLocation = VAdd(vector1,teleLocation)
+            --check terrain height at that position
+            --if its too high/low, then abort adjustment
+            local heightDiff = math.abs(GetTerrainHeight(location[1],location[3])-GetTerrainHeight(teleLocation[1],teleLocation[3]))
+            if heightDiff > 2 then
+                --WARN('aborting teleport location adjustment due to large height difference - not really an error')
+                teleLocation = location
+            end
+        end
+        return teleLocation
+        --]]
+    end,
+    
+    --calculate a unit vector between two positions, in 2d, and scale it inversely with its length
+    CalculateScaledVector2D = function(baselocation, otherlocation)
+        local vector = {0,0,0}--we return a 3d vector but the y value will be 0
+        vector = Util.GetDifferenceVector(baselocation,otherlocation)
+        vector[2] = 0 --remove the y difference
+        local length = Util.GetVectorLength(vector)
+        if length > 0 then
+            vector[1] = vector[1]/(length*length)
+            vector[3] = vector[3]/(length*length)
+        end
+        return vector
+    end,
+        
     AddTeleportTarget = function(parent, location)
         local army = parent:GetArmy()
         parent.TeleportTarget = CreateUnitHPR('ZXB0307', army, location[1], location[2], location[3], 0, 0, 0)
