@@ -1,16 +1,12 @@
 PropBlueprint {
-    0,
-    'C:\\work\\rts\\main\\data\\env\\geothermal\\props\\rocks\\georock01_prop.bp',
-    '1817A6A0C8C9A7A99ACCB6D41AC7E4C2',
-    '1817A6A0C8C9A7A99ACCB6D41AC7E4C2',
-    {
+    Categories = {
         'RECLAIMABLE',
     },
-    {
+    Defense = {
         Health = 50,
         MaxHealth = 50,
     },
-    {
+    Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
@@ -23,21 +19,21 @@ PropBlueprint {
         },
         UniformScale = 0.05,
     },
-    {
+    Economy = {
         ReclaimEnergyMax = '',
         ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
-    {
+    Footprint = {
         OccupancyCaps = 3,
     },
-    {
+    Interface = {
         HelpText = 'Medium Rock',
     },
-    {
+    Physics = {
         BlockPath = true,
     },
-    1,
-    1,
-    1,
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
 }
