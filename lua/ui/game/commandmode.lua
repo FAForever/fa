@@ -280,5 +280,9 @@ function OnCommandIssued(command)
         end
     end
 
+    if command.CommandType == 'Reclaim' and (command.Target.Type == 'Position' or IsKeyDown('Menu')) then
+        import('/lua/reclaimground.lua').ReclaimGround(command)
+    end
+
     import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
