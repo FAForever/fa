@@ -88,7 +88,7 @@ function CreateUI(parent, showPatch)
 
     -- Close button
     local CloseButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', '<LOC _Close>Close')
-    LayoutHelpers.AtLeftIn(CloseButton, dialogContent)
+    LayoutHelpers.AtRightIn(GithubButton, dialogContent)
     LayoutHelpers.AtBottomIn(CloseButton, dialogContent, 10)
     CloseButton.OnClick = function()
         changelogPopup:Close()
@@ -96,7 +96,7 @@ function CreateUI(parent, showPatch)
 
     -- Link to the changelog on github
     local GithubButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Github")
-    LayoutHelpers.AtRightIn(GithubButton, dialogContent)
+    LayoutHelpers.AtLeftIn(CloseButton, dialogContent)
     LayoutHelpers.AtBottomIn(GithubButton, dialogContent, 10)
     GithubButton.OnClick = function()
         OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
