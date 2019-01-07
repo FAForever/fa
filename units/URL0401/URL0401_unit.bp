@@ -240,7 +240,7 @@ UnitBlueprint {
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
         TurnRadius = 2,
-        TurnRate = 40,
+        TurnRate = 80,
     },
     SelectionSizeX = 4,
     SelectionSizeZ = 5,
