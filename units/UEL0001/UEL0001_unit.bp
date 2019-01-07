@@ -722,7 +722,7 @@ UnitBlueprint {
         TacticalMissile = {
             BuildCostEnergy = 50000,
             BuildCostMass = 1500,
-            BuildTime = 1400,
+            BuildTime = 2800,
             Icon = 'tm',
             Name = '<LOC enhancements_0055>Tactical Missile Launcher',
             ShowBones = {
