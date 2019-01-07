@@ -279,8 +279,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Proton Artillery',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 2000,
-            EnergyRequired = 2000,
+            EnergyDrainPerSecond = 5000,
+            EnergyRequired = 5000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
