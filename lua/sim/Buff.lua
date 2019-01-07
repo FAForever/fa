@@ -366,12 +366,17 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local mults = 1.0
     local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
+    local floor = 0
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
     for k, v in unit.Buffs.Affects[affectType] do
         if v.Add and v.Add ~= 0 then
             adds = adds + (v.Add * v.Count)
+        end
+
+        if v.Floor then
+            floor = v.Floor
         end
 
         if v.Mult then
@@ -404,7 +409,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     end
 
     -- Adds are calculated first, then the mults.
-    local returnVal = (initialVal + adds + multsTotal) * mults
+    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
 
     return returnVal, bool
 end
