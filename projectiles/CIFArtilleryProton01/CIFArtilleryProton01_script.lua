@@ -10,9 +10,9 @@ CIFArtilleryProton01 = Class(CArtilleryProtonProjectile) {
         CArtilleryProtonProjectile.OnImpact(self, targetType, targetEntity)
         local army = self:GetArmy()
         CreateLightParticle( self, -1, army, 24, 12, 'glow_03', 'ramp_red_06' )
-        CreateLightParticle( self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02' )
+        CreateLightParticle( self, -1, army, 18, 22, 'glow_03', 'ramp_antimatter_02' )
         if targetType == 'Terrain' or targetType == 'Prop' then
-            CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 10, 10, 350, 200, army )  
+            CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 20, 20, 350, 200, army )  
         end
         ForkThread(self.ForceThread, self, self:GetPosition())
         self:ShakeCamera( 20, 3, 0, 1 )        
