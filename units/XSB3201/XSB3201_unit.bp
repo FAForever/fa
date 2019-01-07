@@ -159,7 +159,7 @@ UnitBlueprint {
         BuildableCategory = {
             'xsb3104',
         },
-        MaintenanceConsumptionPerSecondEnergy = 200,
+        MaintenanceConsumptionPerSecondEnergy = 150,
         RebuildBonusIds = {
             'xsb3201',
             'xsb3104',
