@@ -116,7 +116,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 41000,
         BuildCostMass = 2460,
-        BuildRate = 11.81,
+        BuildRate = 50,
         BuildTime = 3667,
         BuildableCategory = {
             'urb4207',
