@@ -116,25 +116,19 @@ URL0401 = Class(CLandUnit) {
                 
                 CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
                 self:ForkThread(self.LaunchEffects)
+                self:ForkThread(self.RotateBarrels)
             end,
-            PlayRackRecoil = function(self, rackList)
-                #self:ForkThread(self:FakeRecoil())
-                local currentfakerack = {}
-                currentfakerack.RackBone = recoilBones[self.currentbarrel]
-                currentfakerack.MuzzleBones = muzzleBones[self.currentbarrel]
-                
-                table.insert( rackList, currentfakerack )
-                CIFArtilleryWeapon.PlayRackRecoil(self, rackList)
+	RotateBarrels = function(self)
                 if not self.losttarget then
-                    self.Rotator:SetSpeed(120)
+                    self.Rotator:SetSpeed(320)
                     self.Goal = self.Goal + 60
                     if self.Goal >= 360 then
                         self.Goal = 0
                     end
-                    WaitSeconds(0.5)
+                    WaitSeconds(0.1)
                     self.Rotator:SetGoal(self.Goal)
                     self.currentbarrel = self.currentbarrel + 1
-                    #Increment barrel number
+                    --Increment barrel number
                     if self.currentbarrel > 6 then
                         self.currentbarrel = 1
                     end

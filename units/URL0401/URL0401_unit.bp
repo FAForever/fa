@@ -289,7 +289,7 @@ UnitBlueprint {
             FiringTolerance = 0,
             Label = 'Gun01',
             LeadTarget = true,
-            MaxRadius = 30000,
+            MaxRadius = 2000,
             MinRadius = 50,
             MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 20,
@@ -297,7 +297,7 @@ UnitBlueprint {
             MuzzleVelocityReduceDistance = 2350,
             ProjectileId = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_proj.bp',
             ProjectileLifetime = 100,
-            ProjectilesPerOnFire = 20,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -316,6 +316,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
+            RenderFireClock = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
