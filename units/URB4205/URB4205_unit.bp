@@ -120,7 +120,7 @@ UnitBlueprint {
             'urb4206',
         },
         DifferentialUpgradeCostCalculation = true,
-        MaintenanceConsumptionPerSecondEnergy = 300,
+        MaintenanceConsumptionPerSecondEnergy = 250,
     },
     Footprint = {
         SizeX = 1,
