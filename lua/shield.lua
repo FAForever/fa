@@ -169,11 +169,13 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+        local ownerCategory = self.Owner:GetBlueprint().CategoriesHash
+        
         if dmgType == 'Overcharge' and instigator.EntityId then 
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            if self.Owner:GetBlueprint().CategoriesHash.COMMAND then --fixed damage for all ACU shields
+            if ownerCategory.COMMAND then --fixed damage for all ACU shields
                 amount = wep:GetBlueprint().Overcharge.commandDamage
-            elseif self.Owner:GetBlueprint().CategoriesHash.STRUCTURE then -- fixed damage for static shields
+            elseif ownerCategory.STRUCTURE then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
                 -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2. 
             end	  
@@ -199,6 +201,14 @@ Shield = Class(moho.shield_methods, Entity) {
                 self:UpdateShieldRatio(0)
             end
         end
+        
+        --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
+        --no need to launch our thread in this case
+        if ownerCategory.STRUCTURE and self.RegenThread and not self.AssistersThread and not self.Owner.ActiveConsumption then
+            self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
+            self.Owner.Trash:Add(self.AssistersThread)
+        end
+        
         -- Only do overspill on events where we have an instigator.
         -- "Force" damage events from stratbombs are one example
         -- where we don't.
@@ -217,6 +227,65 @@ Shield = Class(moho.shield_methods, Entity) {
 
             WaitTicks(1)
         end
+        self.RegenThread = nil
+    end,
+    
+    --Fix "free" shield regen. Assist efficiency never drops, no matter what mass income you have
+    --We have to compensate it in this thread.
+    ValidateAssistersThread = function(self)
+        local shieldBP = self.Owner:GetBlueprint().Defense.Shield
+        local RegenPerBR = shieldBP.ShieldRegenRate / shieldBP.RegenAssistMult / 10 --amount of hp per 1 buildrate (for 1 tick). Weird formula
+        
+        local previousTickTotalBR
+        local previousTickAssisters
+        
+        while self.RegenThread and not self.Owner.ActiveConsumption do
+            if previousTickAssisters then
+                local realBuildRate = 0
+                
+                for key, unit in previousTickAssisters do
+                    if not unit.Dead then
+                        realBuildRate = realBuildRate + (unit:GetResourceConsumed() * unit.AssistBuildRate)
+                    else
+                        realBuildRate = realBuildRate + unit.AssistBuildRate
+                    end    
+                end
+                
+                if realBuildRate ~= previousTickTotalBR then
+                    local health = (previousTickTotalBR - realBuildRate) * RegenPerBR --calculate "free" hp that should be subtracted
+                    
+                    self:AdjustHealth(self.Owner, -health)
+                end
+                
+                previousTickAssisters = nil
+                previousTickTotalBR = nil
+            end
+            
+            local assisters = self.Owner:GetGuards()
+
+            if assisters[1] then
+                local engineers = {}
+                local totalBR = 0
+                
+                for key, unit in assisters do
+                    if unit:GetFocusUnit() == self.Owner then
+                        unit.AssistBuildRate = unit:GetBuildRate()
+                        totalBR = totalBR + unit.AssistBuildRate
+                        
+                        table.insert(engineers, unit)
+                    end
+                end
+                
+                if engineers[1] then
+                    previousTickAssisters = engineers
+                    previousTickTotalBR = totalBR
+                end    
+            end
+
+            WaitTicks(1)
+        end
+        
+        self.AssistersThread = nil
     end,
 
     CreateImpactEffect = function(self, vector)
