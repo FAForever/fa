@@ -1,5 +1,23 @@
-last_version = 3702
+last_version = 3703
 gamePatches = {
+    {
+        version = 3703,
+        name = 'Game Version 3703',
+        description = {
+            '- Fixed a bug in lobby related to obsolete maps',
+            '- Switched the position of the github and close button on the changelog screen',
+            '- Remove hardcoding on nuke weapon for mod support',
+            '- Fixed a bug causing weapons to miss the Salem while on land',
+            '- Other miscellaneous bug fixes',
+            '',
+            '**Contributors**',
+            '- speed2',
+            '- Strogo',
+            '- Exotic-Retard',
+            '- PhilipJFry',
+            '- Rackover',
+        },
+    },
     {
         version = 3702,
         name = 'Game Version 3702',
@@ -35,7 +53,6 @@ gamePatches = {
             '- speed2',
             '- Exotic_Retard',
             '- PhilipJFry',
-            '- Evildrew',
             '- shalkya',
         },
     },

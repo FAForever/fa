@@ -1,3 +1,19 @@
+Hotfix Patch 3703 (13 January 2019)
+============================
+- Fixed a bug in lobby related to obsolete maps
+- Switched the position of the github and close button on the changelog screen
+- Remove hardcoding on nuke weapon for mod support
+- Fixed a bug causing weapons to miss the Salem while on land
+- Other miscellaneous bug fixes
+
+### Contributors
+- speed2
+- Strogo
+- Exotic-Retard
+- PhilipJFry
+- Rackover
+
+
 Patch 3702 (28 December, 2018)
 ============================
 ### Lobby
@@ -31,11 +47,10 @@ Patch 3702 (28 December, 2018)
 - speed2
 - Exotic_Retard
 - PhilipJFry
-- Evildrew
 - shalkya
 
 
-Hotfix Patch 3701 (28. October 2018)
+Hotfix Patch 3701 (28 October 2018)
 ============================
 - Fixed bug that caused the Kennel structure to stay after being upgraded which resulted into having two buildings stacked upon each other
 - Changed Novax Sat fix in order to not potentially break mods
