@@ -76,6 +76,13 @@ Shield = Class(moho.shield_methods, Entity) {
         self.OffHealth = -1
 
         self.PassOverkillDamage = spec.PassOverkillDamage
+        
+        local ownerCategories = self.Owner:GetBlueprint().CategoriesHash
+        if ownerCategories.STRUCTURE then
+            self.StaticShield = true
+        elseif ownerCategories.COMMAND then
+            self.CommandShield = true
+        end    
 
         ChangeState(self, self.OnState)
     end,
@@ -169,15 +176,13 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        local ownerCategory = self.Owner:GetBlueprint().CategoriesHash
-        
         if dmgType == 'Overcharge' and instigator.EntityId then 
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            if ownerCategory.COMMAND then --fixed damage for all ACU shields
-                amount = wep:GetBlueprint().Overcharge.commandDamage
-            elseif ownerCategory.STRUCTURE then -- fixed damage for static shields
+            if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
-                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2. 
+                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
+            elseif self.CommandShield then --fixed damage for all ACU shields
+                amount = wep:GetBlueprint().Overcharge.commandDamage        
             end	  
         end
         if self.Owner ~= instigator then
@@ -201,14 +206,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 self:UpdateShieldRatio(0)
             end
         end
-        
-        --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
-        --no need to launch our thread in this case
-        if ownerCategory.STRUCTURE and self.RegenThread and not self.AssistersThread and not self.Owner.ActiveConsumption then
-            self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
-            self.Owner.Trash:Add(self.AssistersThread)
-        end
-        
+
         -- Only do overspill on events where we have an instigator.
         -- "Force" damage events from stratbombs are one example
         -- where we don't.
@@ -218,6 +216,13 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     RegenStartThread = function(self)
+        --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
+        --no need to launch validation thread in this case
+        if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
+            self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
+            self.Owner.Trash:Add(self.AssistersThread)
+        end
+    
         WaitSeconds(self.RegenStartTime)
         while self:GetHealth() < self:GetMaxHealth() do
 
@@ -239,12 +244,13 @@ Shield = Class(moho.shield_methods, Entity) {
         local previousTickTotalBR
         local previousTickAssisters
         
-        while self.RegenThread and not self.Owner.ActiveConsumption do
+        while self.RegenThread and not self.Owner.ActiveConsumption or self.OnStateCharging and self:GetHealth() ~= shieldBP.ShieldMaxHealth do
             if previousTickAssisters then
                 local realBuildRate = 0
                 
                 for key, unit in previousTickAssisters do
-                    if not unit.Dead then
+                    -- ActiveConsumption means unit is not on pause. Without this, rapid pausing/unpausing engies causes hp drops
+                    if not unit.Dead and unit.ActiveConsumption then
                         realBuildRate = realBuildRate + (unit:GetResourceConsumed() * unit.AssistBuildRate)
                     else
                         realBuildRate = realBuildRate + unit.AssistBuildRate
@@ -268,7 +274,8 @@ Shield = Class(moho.shield_methods, Entity) {
                 local totalBR = 0
                 
                 for key, unit in assisters do
-                    if unit:GetFocusUnit() == self.Owner then
+                    --only engies can have shield as FocusUnit, also checking for pause
+                    if unit:GetFocusUnit() == self.Owner and unit.ActiveConsumption then
                         unit.AssistBuildRate = unit:GetBuildRate()
                         totalBR = totalBR + unit.AssistBuildRate
                         
@@ -427,8 +434,19 @@ Shield = Class(moho.shield_methods, Entity) {
             -- If the shield was turned off; use the recharge time before turning back on
             elseif self.OffHealth >= 0 then
                 self.Owner:SetMaintenanceConsumptionActive()
+                self.OnStateCharging = true
+                
+                -- In this particular case (OnState + charging) shield can be assisted by engineers
+                -- It's unfixable without changing the state (and changing state causes even more issues)
+                -- so we have to launch assisters thread here too
+                if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
+                    self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
+                    self.Owner.Trash:Add(self.AssistersThread)       
+                end
+                
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
-
+                self.OnStateCharging = nil
+                
                 -- If the shield has less than full health, allow the shield to begin regening
                 if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
@@ -487,6 +505,7 @@ Shield = Class(moho.shield_methods, Entity) {
     OffState = State {
         Main = function(self)
             self.Owner:OnShieldDisabled()
+            self.OnStateCharging = nil
 
             -- No regen during off state
             if self.RegenThread then
