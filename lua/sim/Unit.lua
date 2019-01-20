@@ -4051,23 +4051,27 @@ Unit = Class(moho.unit_methods) {
     end,
 
     TransportAnimationThread = function(self, rate)
-        local bp = self:GetBlueprint().Display.TransportAnimation
+        local bp = self:GetBlueprint().Display
+        local animbp
+        rate = rate or 1
 
-        if rate and rate < 0 and self:GetBlueprint().Display.TransportDropAnimation then
-            bp = self:GetBlueprint().Display.TransportDropAnimation
-            rate = -rate
+        if rate < 0 and bp.TransportDropAnimation then
+            animbp = bp.TransportDropAnimation
+            rate = bp.TransportDropAnimationSpeed or -rate
+        else
+            animbp = bp.TransportAnimation
+            rate = bp.TransportAnimationSpeed or rate
         end
 
         WaitSeconds(.5)
-        if bp then
-            local animBlock = self:ChooseAnimBlock(bp)
+        if animbp then
+            local animBlock = self:ChooseAnimBlock(animbp)
             if animBlock.Animation then
                 if not self.TransAnimation then
                     self.TransAnimation = CreateAnimator(self)
                     self.Trash:Add(self.TransAnimation)
                 end
                 self.TransAnimation:PlayAnim(animBlock.Animation)
-                rate = rate or 1
                 self.TransAnimation:SetRate(rate)
                 WaitFor(self.TransAnimation)
             end
