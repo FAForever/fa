@@ -109,18 +109,17 @@ XSL0001 = Class(ACUUnit) {
                         Regen = {
                             Add = 0,
                             Mult = bp.RegenPerSecond,
+                            Floor = bp.RegenFloor,
                             Ceil = bp.RegenCeiling,
                         },
                     },
                 }
 
-                if enh == 'AdvancedRegenAura' then
-                    buff_bp.Affects.MaxHealth = {
-                        Add = 0,
-                        Mult = bp.MaxHealthFactor,
-                        DoNotFill = true,
-                    }
-                end
+                buff_bp.Affects.MaxHealth = {
+                    Add = 0,
+                    Mult = bp.MaxHealthFactor,
+                    DoNotFill = true,
+                }
 
                 BuffBlueprint(buff_bp)
             end
