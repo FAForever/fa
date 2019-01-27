@@ -1509,6 +1509,8 @@ function FactionConvert(template, factionIndex)
         if factionIndex == 2 then
             if template[i][1] == 'uel0203' then
                 template[i][1] = 'xal0203'
+            elseif template[i][1] == 'xes0204' then
+                template[i][1] = 'xas0204'
             elseif template[i][1] == 'uea0305' then
                 template[i][1] = 'xaa0305'
             elseif template[i][1] == 'xel0305' then
@@ -1519,6 +1521,10 @@ function FactionConvert(template, factionIndex)
         elseif factionIndex == 3 then
             if template[i][1] == 'uea0305' then
                 template[i][1] = 'xra0305'
+            elseif template[i][1] == 'xes0204' then
+                template[i][1] = 'xrs0204'
+            elseif template[i][1] == 'xes0205' then
+                template[i][1] = 'xrs0205'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xrl0305'
             elseif template[i][1] == 'uel0307' then
