@@ -162,12 +162,12 @@ Scenario = {
         ['OST_NavalAttacks_T2SubmarinePlatoon1'] = {
             'OST_NavalAttacks_T2SubmarinePlatoon1',
             '',
-            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'xes0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
         },
         ['OST_NavalAttacks_T2SubmarinePlatoon2'] = {
             'OST_NavalAttacks_T2SubmarinePlatoon2',
             '',
-            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'xes0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
             { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
         },
         ['OST_NavalAttacks_UtilityPlatoon'] = {
@@ -178,7 +178,7 @@ Scenario = {
         ['OST_NavalAttacks_CarrierPlatoon'] = {
             'OST_NavalAttacks_CarrierPlatoon',
             '',
-            { 'uas0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
+            { 'ues0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
         },
         ['OST_NavalAttacks_NukeSubmarinePlatoon'] = {
             'OST_NavalAttacks_NukeSubmarinePlatoon',
@@ -188,21 +188,21 @@ Scenario = {
         ['OST_NavalAttacks_T2MixedPlatoon1'] = {
             'OST_NavalAttacks_T2MixedPlatoon1',
             '',
-            { 'uas0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
-            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'xes0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
         },
         ['OST_NavalAttacks_T2MixedPlatoon2'] = {
             'OST_NavalAttacks_T2MixedPlatoon2',
             '',
-            { 'uas0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
-            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'xes0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
         },
         ['OST_NavalAttacks_T2MixedPlatoon3'] = {
             'OST_NavalAttacks_T2MixedPlatoon3',
             '',
-            { 'uas0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
-            { 'uas0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
-            { 'xas0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'xes0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
         },
         ['OST_NavalAttacks_T2MixedPlatoon4'] = {
             'OST_NavalAttacks_T2MixedPlatoon4',
@@ -226,14 +226,14 @@ Scenario = {
         ['OST_NavalAttacks_T3MixedPlatoon1'] = {
             'OST_NavalAttacks_T3MixedPlatoon1',
             '',
-            { 'uas0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
-            { 'uas0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
         },
         ['OST_NavalAttacks_T3MixedPlatoon2'] = {
             'OST_NavalAttacks_T3MixedPlatoon2',
             '',
-            { 'uas0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
-            { 'uas0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0303', -1, 1, 'attack', 'AttackFormation' }, -- Carriers
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
         },
 
 
