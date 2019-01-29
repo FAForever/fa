@@ -111,9 +111,11 @@ end
 function KillThread(thread)
 end
 
----
---  Print a log message
-function LOG()
+---  Print a log message
+-- @param TextOne Log message
+-- @param TextTwo Optional text
+-- Output: "INFO: TextOne\000TextTwo"
+function LOG('TextOne','TextTwo')
 end
 
 ---
@@ -196,9 +198,11 @@ end
 function ResumeThread(thread)
 end
 
----
---  Spew to log
-function SPEW()
+---  Print a debug message
+-- @param TextOne Debug message
+-- @param TextTwo Optional text
+-- Output: "DEBUG: TextOne\000TextTwo"
+function SPEW('TextOne','TextTwo')
 end
 
 ---
@@ -306,9 +310,11 @@ end
 function Vector2()
 end
 
----
---  Pop up a warning dialog
-function WARN()
+---  Print a warning message
+-- @param TextOne Warning message
+-- @param TextTwo Optional text
+-- Output: "WARNING: TextOne\000TextTwo"
+function WARN('TextOne','TextTwo')
 end
 
 ---

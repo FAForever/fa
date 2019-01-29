@@ -54,7 +54,7 @@ UnitBlueprint {
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 15000,
+            ShieldMaxHealth = 17000,
             ShieldRechargeTime = 23,
             ShieldRegenRate = 131,
             ShieldRegenStartTime = 1,
@@ -106,8 +106,8 @@ UnitBlueprint {
         UniformScale = 0.4,
     },
     Economy = {
-        BuildCostEnergy = 50000,
-        BuildCostMass = 3000,
+        BuildCostEnergy = 55000,
+        BuildCostMass = 3300,
         BuildTime = 4988,
         MaintenanceConsumptionPerSecondEnergy = 400,
         RebuildBonusIds = {

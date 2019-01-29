@@ -59,8 +59,11 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
+        'STEALTH',
         'SUBMERSIBLE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
+    CollisionOffsetY = -0.375,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -160,9 +163,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealth = true,
+        RadarStealth = false,
         SonarRadius = 42,
-        SonarStealth = true,
+        SonarStealth = false,
         VisionRadius = 20,
         WaterVisionRadius = 45,
     },
@@ -179,8 +182,8 @@ UnitBlueprint {
             LAYER_Land = false,
             LAYER_Orbit = false,
             LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
@@ -226,7 +229,7 @@ UnitBlueprint {
             DoTPulses = 5,
             DoTTime = 0.5,
             FireTargetLayerCapsTable = {
-                Sub = 'Seabed|Sub|Water',
+                Water = 'Seabed|Sub|Water',
             },
             FiringTolerance = 2,
             Label = 'Turret01',

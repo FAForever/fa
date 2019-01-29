@@ -25,6 +25,7 @@ local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 local observer = false
@@ -531,7 +532,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Used to have units which were transferred to allies noted permanently as belonging to the new player
             local function TransferOwnershipOfBorrowedUnits(brains)
                 for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
                     if units and table.getn(units) > 0 then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then
@@ -561,6 +562,15 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
             local function TransferUnitsToBrain(brains)
                 if table.getn(brains) > 0 then
+                    if shareOption == 'FullShare' then 
+                        local indexes = {}
+                        for _, brain in brains do 
+                            table.insert(indexes, brain.index)
+                        end 
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        TransferUnfinishedUnitsAfterDeath(units, indexes)
+                    end
+                    
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
@@ -1002,19 +1012,17 @@ AIBrain = Class(moho.aibrain_methods) {
             local changed = false
             for k, v in self.BuilderManagers do
                 if k ~= 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-                    if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
-                        v.EngineerManager:SetEnabled(false)
-                        v.FactoryManager:SetEnabled(false)
-                        v.PlatoonFormManager:SetEnabled(false)
-                        v.StrategyManager:SetEnabled(false)
-                        v.FactoryManager:Destroy()
-                        v.PlatoonFormManager:Destroy()
-                        v.EngineerManager:Destroy()
-                        v.StrategyManager:Destroy()
-                        self.BuilderManagers[k] = nil
-                        self.NumBases = self.NumBases - 1
-                        changed = true
-                    end
+                    v.EngineerManager:SetEnabled(false)
+                    v.FactoryManager:SetEnabled(false)
+                    v.PlatoonFormManager:SetEnabled(false)
+                    v.StrategyManager:SetEnabled(false)
+                    v.FactoryManager:Destroy()
+                    v.PlatoonFormManager:Destroy()
+                    v.EngineerManager:Destroy()
+                    v.StrategyManager:Destroy()
+                    self.BuilderManagers[k] = nil
+                    self.NumBases = self.NumBases - 1
+                    changed = true
                 end
             end
             if changed then
@@ -1952,7 +1960,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PBMGetLocation = function(self, locationName)
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == locationName then
                     return v
@@ -1966,7 +1974,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == loc then
                     local height = GetTerrainHeight(v.Location[1], v.Location[3])
@@ -1986,14 +1994,14 @@ AIBrain = Class(moho.aibrain_methods) {
         if not loc then
             return false
         end
-        if self:PBMHasPlatoonList() then
+        if self.HasPlatoonList then
             for k, v in self.PBM.Locations do
                 if v.LocationType == loc then
                    return v.Radius
                 end
             end
         elseif self.BuilderManagers[loc] then
-            return self.BuilderManagers[loc].FactoryManager:GetLocationRadius()
+            return self.BuilderManagers[loc].FactoryManager.Radius
         end
         return false
     end,
@@ -2364,7 +2372,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local personality = self:GetPersonality()
         local armyIndex = self:GetArmyIndex()
         local numBuildOrders = nil
-        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType]:IsDead() then
+        if location.PrimaryFactories[platoonType] and not location.PrimaryFactories[platoonType].Dead then
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()
@@ -3421,7 +3429,36 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            self:OnDefeat()
+            if ScenarioInfo.Options.AIReplacement == 'On' then
+                ForkThread(function()
+                    local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
+
+                    WaitSeconds(1)
+
+                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
+
+                    -- Reassign all Army attributes to better suit the AI.
+                    self.BrainType = 'AI'
+                    self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
+                    self.NumBases = 1
+                    self.BuilderManagers = {}
+                    self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
+                    SUtils.AddCustomUnitSupport(self)
+
+                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
+                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
+
+                    local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
+                    if cmdUnits then
+                        cmdUnits[1]:SetCustomName(ArmyBrains[self:GetArmyIndex()].Nickname)
+                    end
+
+                    self:InitializeSkirmishSystems()
+                    self:OnCreateAI()
+                end)
+            else -- If ScenarioInfo.Options.AIReplacement return nil or any other value, make sure the ACU explodes.
+                self:OnDefeat()
+            end
         end
     end,
 

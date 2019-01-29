@@ -4,7 +4,7 @@ UnitBlueprint {
         TargetBones = {
             'URS0201',
             'Muzzle_Back',
-            'Muzzle_Front',
+            'Turret_Mount_Front',
         },
     },
     Audio = {
@@ -83,7 +83,7 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH2',
-        'ANTISUB',
+        'AMPHIBIOUS',
         'ANTINAVY',
         'DIRECTFIRE',
         'VISIBLETORECON',

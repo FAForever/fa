@@ -267,7 +267,7 @@ AttackManager = Class({
                                 end
                             end
                             if not location then
-                                error('*AI WARNING: Invalid location type - ' .. v.LocationType, 2)
+                                SPEW('*AI WARNING: No EngineerManager present at location - ' .. v.LocationType, '[FormAttackPlatoon]')
                                 break
                             end
                             for i,unit in poolUnits do

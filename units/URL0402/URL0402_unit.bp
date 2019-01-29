@@ -71,11 +71,15 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'EXPERIMENTAL',
+        'BOT',
         'DIRECTFIRE',
+        'AMPHIBIOUS',
         'ANTIAIR',
+        'ANTINAVY',
         'NEEDMOBILEBUILD',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
+        'STEALTHFIELD',
         'SONAR',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -86,6 +90,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYINDIRECTFIRE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = 0.9,
     Defense = {

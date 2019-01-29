@@ -65,6 +65,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     Defense = {
         AirThreatLevel = 0,
@@ -122,7 +123,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 210000,
         BuildCostMass = 15000,
-        BuildRate = 1080,
+        BuildRate = 1890,
         BuildTime = 10453,
         RebuildBonusIds = {
             'ueb2305',
@@ -217,7 +218,7 @@ UnitBlueprint {
             CountedProjectile = true,
             Damage = 0,
             DamageFriendly = true,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'Nuclear Warhead',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,

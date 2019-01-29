@@ -870,7 +870,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex) or {}
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1289,11 +1289,14 @@ Unit = Class(moho.unit_methods) {
     VeterancyDispersal = function(self, suicide)
         local bp = self:GetBlueprint()
         local mass = self:GetVeterancyValue()
+        local massTrue
         -- Adjust mass based on current health when a unit is self destructed
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
-
+        
+        massTrue = mass
+        
         -- Non-combat structures only give 50% veterancy
         if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
             mass = mass * 0.5
@@ -1302,10 +1305,18 @@ Unit = Class(moho.unit_methods) {
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
-            if unit and not unit.Dead and unit.gainsVeterancy and unit.Sync.VeteranLevel < 5 then
-                -- Find the proportion of yourself that each instigator killed
-                local massKilled = math.floor(mass * (data.damage / self.totalDamageTaken))
-                unit:OnKilledUnit(self, massKilled)
+            if unit and not unit.Dead and unit.gainsVeterancy then
+                local proportion = data.damage / self.totalDamageTaken
+                
+                -- True value for "Mass killed"
+                local massKilledTrue = math.floor(massTrue * proportion)
+                unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
+                
+                if unit.Sync.VeteranLevel < 5 then
+                    -- Find the proportion of yourself that each instigator killed
+                    local massKilled = math.floor(mass * proportion)
+                    unit:OnKilledUnit(self, massKilled)
+                end
             end
         end
     end,
@@ -1347,8 +1358,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CalculateVeterancyLevel = function(self, massKilled)
-        local bp = self:GetBlueprint()
-
         -- Limit the veterancy gain from one kill to one level worth
         massKilled = math.min(massKilled, self.Sync.myValue)
 
@@ -1364,6 +1373,18 @@ Unit = Class(moho.unit_methods) {
         -- Update our recorded veterancy level
         self.Sync.VeteranLevel = newVetLevel
 
+        self:SetVeteranLevel(self.Sync.VeteranLevel)
+    end,
+    
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, massKilledTrue)
+        self.Sync.totalMassKilled = math.floor(massKilled)
+        self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
+        
+        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+
+        if newVetLevel == self.Sync.VeteranLevel then return end
+
+        self.Sync.VeteranLevel = newVetLevel
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
@@ -1493,7 +1514,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if EntityCategoryContains(categories.PROJECTILE, other) then
-            if self:GetArmy() == other:GetArmy() then
+            if IsAlly(self:GetArmy(), other:GetArmy()) then
                 return other.CollideFriendly
             end
         end
@@ -1528,7 +1549,7 @@ Unit = Class(moho.unit_methods) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if self:GetArmy() == firingWeapon.unit:GetArmy() then
+            if IsAlly(self:GetArmy(), firingWeapon.unit:GetArmy()) then
                 return false
             end
         end
@@ -1642,7 +1663,9 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Create some ambient wreckage smoke
-        explosion.CreateWreckageEffects(self, prop)
+        if layer == 'Land' then
+            explosion.CreateWreckageEffects(self, prop)
+        end
 
         return prop
     end,
@@ -2092,6 +2115,7 @@ Unit = Class(moho.unit_methods) {
 
         if self.gainsVeterancy then
             self.Sync.totalMassKilled = 0
+            self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
 
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
@@ -2457,6 +2481,7 @@ Unit = Class(moho.unit_methods) {
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built:GetUnitId()
         local bp = built:GetBlueprint()
+        local bpSelf = self:GetBlueprint()
         local index = self:GetArmy()
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
@@ -2486,8 +2511,7 @@ Unit = Class(moho.unit_methods) {
             self:CheckAssistersFocus()
         end
 
-        local bp = self:GetBlueprint()
-        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bpSelf.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(built, order)
         end
 
@@ -2497,12 +2521,17 @@ Unit = Class(moho.unit_methods) {
 
         self:DoOnStartBuildCallbacks(built)
 
-        local bp = built:GetBlueprint()
+        
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
             built.IsUpgrade = true
+            
+            --Transfer flag
+            self.TransferUpgradeProgress = true
+            self.UpgradeBuildTime = bp.Economy.BuildTime
+            self.UpgradesTo = bp.BlueprintId
         end
 
         return true
@@ -2514,6 +2543,7 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
+        self.TransferUpgradeProgress = nil
 
         if built.Repairers[self.EntityId] then
             self:OnStopRepair(self, built)
@@ -2858,13 +2888,14 @@ Unit = Class(moho.unit_methods) {
 
         local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
+        --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
+                WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            error('*ERROR: Ordered enhancement does not have the proper slot available!', 2)
+            WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper slot available. Slot ['..tempEnhanceBp.Slot..'] has already ['..unitEnhancements[tempEnhanceBp.Slot]..'] installed.')
             return false
         end
 

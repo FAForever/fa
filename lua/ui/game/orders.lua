@@ -20,6 +20,7 @@ local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
+local SetWeaponPriorities = import('/lua/keymap/misckeyactions.lua').SetWeaponPriorities
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -176,6 +177,125 @@ local function StandardOrderBehavior(self, modifiers)
         import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     else
         import('/lua/ui/game/commandmode.lua').StartCommandMode("order", {name=self._order})
+    end
+end
+
+--TODO: set up these functions so they are abstracted for all orders, so you can check them for anything like OC, diving, production, whatever.
+--returns 0 for no units found, 1 for only snipes on, 2 for only snipes off, 3 for mixed.
+local function IsToggleMode(unitList, variable, value)
+
+    local toggleStateTrue
+    local toggleStateFalse
+    -- we search the unit list for the either condition to determine the icon state.
+
+    for k, unit in unitList do
+        local toggleState = UnitData[unit:GetEntityId()][variable] == value
+        if toggleState == true then
+            toggleStateTrue = 1
+        elseif toggleState == false then
+            toggleStateFalse = 2
+        end
+        -- if we find out we have mixed states we dont need to continue, so we bail
+        if toggleStateTrue and toggleStateFalse then
+            break
+        end
+    end
+    return ((toggleStateTrue or 0) + (toggleStateFalse or 0))
+end
+
+-- we store all the things we want to run when we toggle the toggle in here, in one neat table :>
+local OrderTogglesTable = {
+    Attack = {
+        ToggleFromOn = function() SetWeaponPriorities(0, 'Default') end,
+        ToggleFromOff = function() SetWeaponPriorities("{categories.COMMAND, categories.STRATEGIC, categories.ANTIMISSILE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH2, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH3, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH2, categories.MASSFABRICATION * categories.STRUCTURE, categories.SHIELD,}",
+                                    'Snipe', false) end,
+    },
+}
+-- we can add duplicate fields in like this:
+OrderTogglesTable.Attack.ToggleFromBoth = OrderTogglesTable.Attack.ToggleFromOff
+
+
+-- toggle mode: 1 - true; 2 - false; 3 - both; 0 - error
+-- call the functions from the OrderTogglesTable
+local function ToggleOrder(control, ordertype)
+    if control._toggleMode == 1 then
+        OrderTogglesTable[ordertype].ToggleFromOn()
+        control._toggleMode = 2
+    elseif control._toggleMode == 2 then
+        OrderTogglesTable[ordertype].ToggleFromOff()
+        control._toggleMode = 1
+    elseif control._toggleMode == 3 then
+        OrderTogglesTable[ordertype].ToggleFromBoth()
+        control._toggleMode = 1
+    end
+end
+
+-- toggle mode: 1 - true; 2 - false; 3 - both; 0 - error
+local function UpdateToggleIcon(control)
+    if control._toggleMode == 1 then
+        control.toggleModeIcon:SetAlpha(1)
+        control.mixedModeIcon:SetAlpha(0)
+    elseif control._toggleMode == 2 then
+        control.toggleModeIcon:SetAlpha(0)
+        control.mixedModeIcon:SetAlpha(0)
+    elseif control._toggleMode == 3 then
+        control.toggleModeIcon:SetAlpha(0)
+        control.mixedModeIcon:SetAlpha(1)
+    else
+        WARN('found a toggle value of 0 which shouldnt ever happen, showing as mixed')
+        control.toggleModeIcon:SetAlpha(0)
+        control.mixedModeIcon:SetAlpha(1)
+    end
+end
+
+--------------------------------
+--Weapon priority switching
+--------------------------------
+
+local function AttackOrderInit(control, unitList)
+    if not unitList[1] then
+        return true
+    end
+    
+    --set up the icons that will be toggled on/off
+    if not control.toggleModeIcon then
+        control.toggleModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/toggle_red.dds'))
+        LayoutHelpers.AtCenterIn(control.toggleModeIcon, control)
+        control.toggleModeIcon:DisableHitTest()
+        control.toggleModeIcon:SetAlpha(0)
+        control.toggleModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
+        end
+    end 
+
+    if not control.mixedModeIcon then
+        control.mixedModeIcon = Bitmap(control.toggleModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control.mixedModeIcon, control)
+        control.mixedModeIcon:DisableHitTest()
+        control.mixedModeIcon:SetAlpha(0)
+        control.mixedModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
+        end
+    end
+
+    control._curHelpText = control._data.helpText
+    control._toggleMode = IsToggleMode(unitList, 'WepPriority', 'Snipe')
+    UpdateToggleIcon(control)
+end
+
+
+-- Allow the right button on the attack order to change target priorities, while the left button stays as before.
+-- would be cool to implement overloading like this onto other orders too for epic things.
+local function AttackOrderBehavior(self, modifiers)
+    if modifiers.Left then
+        StandardOrderBehavior(self, modifiers)
+    elseif modifiers.Right then
+        ToggleOrder(self,'Attack')
+        UpdateToggleIcon(self)
     end
 end
 
@@ -688,7 +808,7 @@ local function disPauseFunc()
 end
 
 local function NukeBtnText(button)
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return '' end
+    if not currentSelection[1] or currentSelection[1].Dead then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -704,7 +824,7 @@ local function NukeBtnText(button)
 end
 
 local function TacticalBtnText(button)
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return '' end
+    if not currentSelection[1] or currentSelection[1].Dead then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -798,7 +918,7 @@ end
 
 function EnterOverchargeMode()
     local unit = currentSelection[1]
-    if not unit or unit:IsDead() or unit:IsOverchargePaused() then return end
+    if not unit or unit.Dead or unit:IsOverchargePaused() then return end
     local bp = unit:GetBlueprint()
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then return end
@@ -811,7 +931,7 @@ end
 
 local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
-    if not unit or unit:IsDead() then return end
+    if not unit or unit.Dead then return end
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then
         self:SetNeedsFrameUpdate(false)
@@ -849,7 +969,7 @@ local defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
     RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
-    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = StandardOrderBehavior},
+    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
     RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
     RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
     RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},

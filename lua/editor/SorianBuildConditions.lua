@@ -174,9 +174,9 @@ function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     local enemies = 0
     local allies = 0
     for k,v in ArmyBrains do
-        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             enemies = enemies + 1
-        elseif not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        elseif not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             allies = allies + 1
         end
     end
@@ -188,7 +188,12 @@ end
 
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
-    if aiBrain:GetThreatAtPosition(aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords(), testRings, true, threatType or 'Overall') < threatValue then
+    local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+    if not FactoryManager then
+        return false
+    end
+    local position = FactoryManager:GetLocationCoords()
+    if aiBrain:GetThreatAtPosition(position, testRings, true, threatType or 'Overall') < threatValue then
         return true
     end
     return false
@@ -232,7 +237,7 @@ function ClosestEnemyLessThan(aiBrain, distance)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local closest
     for k,v in ArmyBrains do
-        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             local tempDistance = VDist2Sq(startX, startZ, estartX, estartZ)
             if not closest or tempDistance < closest then
@@ -251,7 +256,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     if not engineerManager then
         return false
     end
-    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager.Radius)
     for k,v in Structures do
         if not v.Dead and v:GetHealthPercent() < .8 then
         #LOG('*AI DEBUG: DamagedStructuresInArea return true')
@@ -283,7 +288,6 @@ end
 function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
-        WARN('*AI WARNING: Invalid location - ' .. locationType)
         return false
     end
     local position = engineerManager:GetLocationCoords()
@@ -362,7 +366,7 @@ function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, utty
     end
     local StartX, StartZ = enemy:GetArmyStartPos()
     local position = engineerManager:GetLocationCoords()
-    local radius = engineerManager:GetLocationRadius()
+    local radius = engineerManager.Radius
 
     local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, ttype or 'Overall', enemyIndex)
     local Threat = pool:GetPlatoonThreat(uttype or 'Overall', ucat, position, radius)
@@ -438,7 +442,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     if not engineerManager then
         return false
     end
-    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
         if donePercent < 1 and SUtils.GetGuards(aiBrain, unit) < 1 then
@@ -460,7 +464,7 @@ function ShieldDamaged(aiBrain, locationType)
     if not engineerManager then
         return false
     end
-    local shields = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local shields = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
             shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
@@ -549,7 +553,7 @@ function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, location
     if not engineerManager then
         return false
     end
-    local myUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, myCategory, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius()))
+    local myUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, myCategory, engineerManager:GetLocationCoords(), engineerManager.Radius))
     local numUnits = aiBrain:GetNumUnitsAroundPoint(eCategory, Vector(0,0,0), 100000, alliance)
     if alliance == 'Ally' then
         numUnits = numUnits - aiBrain:GetCurrentUnits(myCategory)
@@ -695,7 +699,7 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
         radius = 825 + offset
     end
     for k,v in ArmyBrains do
-        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             if (VDist2Sq(start[1], start[3], estartX, estartZ) <= radius * radius) and inrange then
                 return true
@@ -723,7 +727,7 @@ function AIOutnumbered(aiBrain, bool)
     end
 
     for k,v in ArmyBrains do
-        if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
+        if not v.Result == "defeat" and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             #LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
             if v.CheatEnabled then

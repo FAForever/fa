@@ -60,6 +60,9 @@ UnitBlueprint {
         'LAND',
         'DIRECTFIRE',
         'EXPERIMENTAL',
+        'BOT',
+        'ANTIAIR',
+        'AMPHIBIOUS',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -67,6 +70,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'DRAGBUILD',
         'SHOWATTACKRETICLE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0.6,

@@ -26,8 +26,8 @@ ProjectileBlueprint {
     },
     Physics = {
         DestroyOnWater = true,
-        LeadTarget = false,
-        Lifetime = 1.5,
+        LeadTarget = true,
+        Lifetime = 2.5,
         MaxSpeed = 110,
         TrackTarget = true,
         TurnRate = 20,

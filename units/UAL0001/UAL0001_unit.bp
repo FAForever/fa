@@ -366,6 +366,7 @@ UnitBlueprint {
             BuildTime = 1225,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
+            NewHealth = 2000,
             ShowBones = {
                 'Back_Upgrade',
             },
@@ -590,7 +591,7 @@ UnitBlueprint {
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 8000,
-            ShieldRechargeTime = 90,
+            ShieldRechargeTime = 75,
             ShieldRegenRate = 30,
             ShieldRegenStartTime = 1,
             ShowBones = {
@@ -1127,7 +1128,7 @@ UnitBlueprint {
                         OnFire = true,
                     },
                     BuffType = 'STUN',
-                    Duration = 3.5,
+                    Duration = 2.5,
                     Radius = 35,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL, COMMAND',

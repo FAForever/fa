@@ -242,7 +242,7 @@ UnitBlueprint {
             Label = 'RocketBackpack',
             LeadTarget = true,
             MaxRadius = 37,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 15,
             ProjectileId = '/projectiles/CDFRocketIridium02/CDFRocketIridium02_proj.bp',

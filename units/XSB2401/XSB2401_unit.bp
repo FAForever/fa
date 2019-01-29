@@ -75,6 +75,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -269,7 +270,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 0,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'Experimental Strategic Missile Launcher',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,

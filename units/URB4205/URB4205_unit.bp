@@ -59,7 +59,7 @@ UnitBlueprint {
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 10000,
-            ShieldRechargeTime = 18,
+            ShieldRechargeTime = 30,
             ShieldRegenRate = 112,
             ShieldRegenStartTime = 3,
             ShieldSize = 28,
@@ -120,7 +120,7 @@ UnitBlueprint {
             'urb4206',
         },
         DifferentialUpgradeCostCalculation = true,
-        MaintenanceConsumptionPerSecondEnergy = 300,
+        MaintenanceConsumptionPerSecondEnergy = 250,
     },
     Footprint = {
         SizeX = 1,

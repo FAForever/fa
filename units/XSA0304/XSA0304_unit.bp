@@ -106,6 +106,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
+        'STRATEGICBOMBER',
     },
     Defense = {
         AirThreatLevel = 1.5,

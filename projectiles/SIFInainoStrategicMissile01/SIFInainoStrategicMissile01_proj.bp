@@ -1,0 +1,90 @@
+ProjectileBlueprint {
+    Audio = {
+        ExistLoop = Sound {
+            Bank = 'UELWeapon',
+            Cue = 'UEF_Nuke_Flight',
+            LodCutoff = 'DefaultLodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        NukeExplosion = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+        'STRATEGIC',
+        'MISSILE',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 25,
+        MaxHealth = 25,
+    },
+    Description = 'Seraphim Inferno Strategic Missile',
+    DesiredShooterCap = 1,
+    Display = {
+        CameraFollowTimeout = 5,
+        CameraFollowsProjectile = true,
+        Mesh = {
+            IconFadeInZoom = 200,
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/SIFExperimentalStrategicMissile01/SIFExperimentalStrategicMissile01_albedo.dds',
+                    MeshName = '/projectiles/SIFExperimentalStrategicMissile01/SIFExperimentalStrategicMissile01_lod0.scm',
+                    ShaderName = 'TMeshGlow',
+                },
+            },
+        },
+        UniformScale = 0.015,
+    },
+    Economy = {
+        BuildCostEnergy = 1350000,
+        BuildCostMass = 12000,
+        BuildTime = 567000,
+    },
+    General = {
+        Category = 'Missile',
+        EntityCategory = {
+            'SERAPHIM',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+            'STRATEGIC',
+            'MISSILE',
+            'NOSPLASHDAMAGE',
+        },
+        Faction = 'Seraphim',
+    },
+    Interface = {
+        HelpText = 'Seraphim Inferno Strategic Missile',
+    },
+    Physics = {
+        Acceleration = 3,
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        InitialSpeed = 0,
+        Lifetime = 600,
+        MaxSpeed = 40,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TrackTarget = true,
+        TrackTargetGround = true,
+        TurnRate = 0,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+    StrategicIconName = '/textures/ui/common/game/unit-over/icon-nuke_bmp.dds',
+}

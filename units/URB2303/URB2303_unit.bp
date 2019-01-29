@@ -46,6 +46,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -0.25,
     CollisionOffsetZ = -0.1,
@@ -202,7 +203,7 @@ UnitBlueprint {
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 128,
-            MinRadius = 5,
+            MinRadius = 50,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 26.13,

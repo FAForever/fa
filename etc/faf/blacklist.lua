@@ -74,6 +74,11 @@ Blacklist = {
     ['9e8ea941-c306-4751-b367-f00000000003'] = INTEGRATED,
     ['9e8ea941-c306-4751-b367-f00000000004'] = INTEGRATED,
     ['9e8ea941-c306-4751-b367-f00000000005'] = INTEGRATED,
+	
+	-- Better Allies
+	['8c4fe91a-714d-11e7-8cf7-a6006ad3dba0'] = INTEGRATED,
+	-- No Friendly Fire Collision V2
+	['7af9e2cf-bb50-4778-9bf3-169aad1ebdc7'] = INTEGRATED,
 
     -- INTEGRATED mods due to added preset restrictions in Units Manager:
     -- No TML v1.0
@@ -164,5 +169,11 @@ Blacklist = {
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1200'] = UPGRADE,
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1230'] = UPGRADE,
     ['HUSSAR-PL-a1e2-c4t4-scfa-ssbmod-v1300'] = UPGRADE,
+	
+	-- old versions of BlackOps
+	['9e8ea941-c306-4751-b367-a00000014000'] = UPGRADE, --BlackOps FAF: ACUs v14
+	['9e8ea941-c306-aaaf-b367-u00000014000'] = UPGRADE, --BlackOps FAF: Unleashed v14
+	['9e8ee941-c406-4751-b367-e10000015000'] = UPGRADE, --BlackOpsFAF: EXUnits v15
+	['9e8ee941-c306-4751-b367-e10000000104'] = UPGRADE, --BlackOpsFAF: EXUnits v14
 
 }

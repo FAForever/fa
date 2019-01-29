@@ -341,7 +341,7 @@ globalOpts = {
                 help = "<LOC lobui_0319>Rules not enforced",
                 key = 'Off',
             },
-            '5', '10', '20'
+            '1','2','3','4','5','10','15','20','25','30','35','40','45','50','55','60'
         },
     },
     {
@@ -415,6 +415,24 @@ globalOpts = {
                 text = "<LOC lobui_0764>Civilian Desertion",
                 help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
                 key = 'CivilianDeserter',
+            },
+        },
+    },
+    {
+        default = 2,
+        label = "<LOC aireplace_0001>AI Replacement",
+        help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",
+        key = 'AIReplacement',
+        values = {
+            {
+                text = "<LOC _On>On",
+                help = "<LOC aireplace_0003>If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
+                key = 'On',
+            },
+            {
+                text = "<LOC _Off>Off",
+                help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",
+                key = 'Off',
             },
         },
     },

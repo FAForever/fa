@@ -46,6 +46,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH1',
+        'DIRECTFIRE',
         'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -113,7 +114,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 275,
-        BuildCostMass = 50,
+        BuildCostMass = 55,
         BuildTime = 220,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,

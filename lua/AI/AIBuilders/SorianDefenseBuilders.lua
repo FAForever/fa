@@ -1726,7 +1726,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { SIBC, 'GreaterThanEconIncome',  { 5, 150}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
@@ -1740,7 +1740,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { SIBC, 'GreaterThanEconIncome',  { 5, 200}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
@@ -1754,7 +1754,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { SIBC, 'GreaterThanEconIncome',  { 5, 300}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
@@ -1768,7 +1768,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderConditions = {
             { SIBC, 'GreaterThanEconIncome',  { 5, 400}},
-            { MIBC, 'FactionIndex', {3, 3}},
+            { MIBC, 'FactionIndex', {3}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },

@@ -56,6 +56,8 @@ UnitBlueprint {
         'LAND',
         'TECH2',
         'DIRECTFIRE',
+        'AMPHIBIOUS',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'TANK',
@@ -360,7 +362,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 6,
+            Damage = 15,
             DamageType = 'Normal',
             DisplayName = 'Meson Torpedo',
             FireTargetLayerCapsTable = {

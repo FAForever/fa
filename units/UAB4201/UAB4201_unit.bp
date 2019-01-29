@@ -103,7 +103,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3200,
         BuildCostMass = 280,
-        BuildTime = 600,
+        BuildTime = 400,
         RebuildBonusIds = {
             'uab4201',
         },
@@ -200,7 +200,7 @@ UnitBlueprint {
             },
             FiringTolerance = 360,
             Flare = {
-                Category = 'MISSILE',
+                Category = 'MISSILE TACTICAL',
                 Radius = 15,
                 Stack = true,   -- Special flag to trigger multi-sphere collision
                 OffsetMult = 1.33,

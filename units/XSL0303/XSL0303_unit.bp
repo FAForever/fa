@@ -45,6 +45,8 @@ UnitBlueprint {
         'LAND',
         'TECH3',
         'DIRECTFIRE',
+        'AMPHIBIOUS',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'TANK',
@@ -505,7 +507,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 30,
             DamageType = 'Normal',
             DisplayName = 'Uall Cavitation Torpedo Launcher',
             FireTargetLayerCapsTable = {

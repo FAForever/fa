@@ -18,7 +18,7 @@ Tooltips = {
     },
     attack = {
         title = "<LOC tooltipui0002>Attack",
-        description = "",
+        description = "<LOC tooltipui0003>Left click for attack order. Right click to toggle target priorities for sniping.",
         keyID = "attack",
     },
     attack_move = {
@@ -1460,6 +1460,10 @@ Tooltips = {
     PostScore_Quit = {
         title = "<LOC tooltipui0271>Continue",
         description = "<LOC tooltipui0272>Exit the Score Screen",
+    },
+    LadderScore_Feedback = {
+        title = "<LOC tooltipui0707>Post Feedback",
+        description = "<LOC tooltipui0709>Open a web page to share your opinion about the current ladder map pool",
     },
 
     -- **********************

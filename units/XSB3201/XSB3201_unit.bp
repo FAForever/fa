@@ -41,6 +41,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYRADAR',
         'SORTINTEL',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -158,7 +159,7 @@ UnitBlueprint {
         BuildableCategory = {
             'xsb3104',
         },
-        MaintenanceConsumptionPerSecondEnergy = 200,
+        MaintenanceConsumptionPerSecondEnergy = 150,
         RebuildBonusIds = {
             'xsb3201',
             'xsb3104',

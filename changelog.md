@@ -1,29 +1,181 @@
-Patch 3698 (Upcoming)
+Hotfix Patch 3703 (13 January 2019)
+============================
+- Fixed a bug in lobby related to obsolete maps
+- Switched the position of the github and close button on the changelog screen
+- Remove hardcoding on nuke weapon for mod support
+- Fixed a bug causing weapons to miss the Salem while on land
+- Other miscellaneous bug fixes
+
+### Contributors
+- speed2
+- Strogo
+- Exotic-Retard
+- PhilipJFry
+- Rackover
+
+
+Patch 3702 (28 December, 2018)
+============================
+### Lobby
+- Added a feedback button for the ladder map pool in the score screen
+- Improved changelog popup
+
+### UI
+- Disable notify during cinematics
+
+### Gameplay
+- Allow walls to be handed over in fullshare games
+- Allow switching to different target priorities for units
+- Improved AI
+
+### Bugs
+- Improved the aiming of the sera pd
+- Fixed AI not rebuilding satellite
+- Fixed a bug causing capture to keep the upgrade progress
+- Fixed several rare bugs that were causing a crash
+- Removed CZAR from AA fighter hotkey
+
+### Other
+- Improved parser to allow complex default target priorities for weapons
+- Updated mod blacklist
+- Optimized unit range rings
+
+### Contributors
+- Faether
+- Strogo
+- Uveso
+- speed2
+- Exotic_Retard
+- PhilipJFry
+- shalkya
+
+
+Hotfix Patch 3701 (28 October 2018)
+============================
+- Fixed bug that caused the Kennel structure to stay after being upgraded which resulted into having two buildings stacked upon each other
+- Changed Novax Sat fix in order to not potentially break mods
+- Updated mod blacklist
+- Removed smoke effect on the water surface caused by wrecks on the bottom of the ocean
+- Moved current patch number in the lobby to a more visible location
+- Allow Users to open the Changelog by clicking on the patch number in the game lobby
+- Allow Users to open the changelog on github by adding a button to the changelog popup in the lobby
+
+### Contributors
+- speed2
+- Strogo
+- Exotic-Retard
+- PhilipJFry
+
+Hotfix Patch 3700 (20 October, 2018)
+============================
+- Fixed bug that caused users to get stuck when trying to host/join a game
+
+### Contributors
+- speed2
+
+Patch 3699 (20 October, 2018)
+============================
+### Lobby
+- Added an option for coloured name in the chat
+- Fixed units restriction menu
+- Removed a player color that is too similar to civilian colour
+
+### Gameplay
+- Removed friendly collisions
+- Allowed the selection of upgradable/offensive building and all experimentals while they are being built
+- Improved AI
+- Saved upgrade progress of building and exp/T3 arty build progression after transfer for game with full share condition
+
+### Bugs
+- Fixed units losing veterancy after transfer
+- Fixed nuke being deflected by aeon TMD
+- Fixed HARMS not being seen by surface units while being built
+- Fixed satellite weapon firing when retargeting
+- Fixed OC not impacting on mobile shield
+- Fixed the way wreckages spawn from map script
+- Fixed ythotha lightning being triggered by alt-delete and by the wreck spawn from map script
+- Fixed mobile shield stopping when assisting friendly units and enemy units are nearby
+- Fixed strats killing each other when bomb connect with opponent asf, by making them immune to allies strat
+- Fixed kennel's drones not being paused after transfer
+- Fixed kennel spawning drone after transfer
+
+### Contributors
+- Hussar
+- shalkya
+- Strogo
+- Uveso
+- Rackover
+- JeroenDeDauw
+- Zkov96
+- c0_okieZ
+- Crotalus
+- Exotic_Retard
+- PhilipJFry
+
+
+Hotfix Patch 3698 (24 August, 2018)
+============================
+- Remove AI Takeover from ladder as it is intended to be an option for custom games
+
+### Contributors
+- TheAdDad
+
+
+Patch 3697 (17 August, 2018)
 ============================
 ### Lobby
 - Introduced ability to have mods that affect AI options
 - Fixed official maps being hidden at the wrong time by the filter
+- Added chat name colors
+- Lobby refactor
+- Allow more "No Rush" timer
 
 ### UI
 - Fixed shielded air units having their shield and fuel UI bars collide
+- Added a shield bar under the ACU icon
+- Added the mass killed meter for full veted units.
+- Updated the tips to the actual balance
 
 ### Gameplay
 - Allow Novax Command Center to have rally points
+- Allow torpedo to target subs first
+- Allow the missile from SMD to not collide with air
+- Allow nuke to be invulnerable to satellite laser
 
 ### Bugs
 - Fixed Aeon Hydrocarbon not being targetable during construction
 - Fixed some underwater props being rendered as though they were above the water
 - Fixed objective units not being properly highlighted in COOP
+- Fixed T2 fighter/bomber slowing down on move order when there is land/naval target nearby
+- Fixed wrong civilian blueprints
+- Fixed sera T3 static arty shots landing too short
+- Fixed UEF Battlecruiser leaving no mass behind
+- Fixed being able to shield transport and having a personal shield of 0 hp
+- Fixed a crash with "Game object have been destroyed"
+- Fixed OC draining more e than available
+- Fixed omen and exodus not retargeting as soon as possible
+- Fixed T3 static arty having issue shooting at targets on higher ground
+- Fixed the deflected missiles by loyalist missing the target
+- Fixed walls not being selectable on double-click
 
 ### Other
 - Improved engine documentation
+- Improved performance
 - Updated mod blacklist
 - Updated map blacklist
 - Added blueprints for unit database
 - Cleaned up some blueprint entries and unit IDs for unit database
-- Further translation into French
+- Further game translation into French
+- Added a chinese translation
+- Optimized the AI sim speed
+- Make game load props folder
+- Make game send message when the simulation ends
+- Added an option allowing AI to take over a player when disconnection occurs
+- Added russian, german and french translation to adaptative map options
 
 ### Contributors
+- strogo
+- rackover
 - speed2
 - CookieNoob
 - PhilipJFry
@@ -31,6 +183,10 @@ Patch 3698 (Upcoming)
 - shalkya
 - Uveso
 - FAETHER
+- TheAdDad
+- ChrisKitching
+- crotalus
+- dk0x
 
 
 Patch 3696 (26 May, 2018)
@@ -1847,7 +2003,7 @@ Patch 3658 (August 29th, 2016)
 - JaggedAppliance
 - JJ173
 - Justify87
-- Shalkya
+- shalkya
 - Sheeo
 - Speed2
 - Uveso

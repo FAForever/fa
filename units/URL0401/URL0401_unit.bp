@@ -63,6 +63,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'EXPERIMENTAL',
+        'AMPHIBIOUS',
         'INDIRECTFIRE',
         'ARTILLERY',
         'NEEDMOBILEBUILD',
@@ -71,6 +72,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'DRAGBUILD',
         'OVERLAYINDIRECTFIRE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     Defense = {
         AirThreatLevel = 0,

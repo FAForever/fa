@@ -116,6 +116,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH3',
+        'AMPHIBIOUS',
         'CONSTRUCTION',
         'REPAIR',
         'RECLAIM',

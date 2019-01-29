@@ -51,6 +51,7 @@ UnitBlueprint {
         'TECH2',
         'DIRECTFIRE',
         'ANTISUB',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DESTROYER',
@@ -251,7 +252,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 1060,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Oblivion Cannon',
             FireTargetLayerCapsTable = {
@@ -285,7 +286,7 @@ UnitBlueprint {
             RateOfFire = 0.2,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 4,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',

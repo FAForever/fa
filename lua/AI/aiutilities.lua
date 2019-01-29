@@ -132,7 +132,7 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
     local newList = {}
     for _, v in markerList do
         -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
-        if v.Position[1] < 8 or v.Position[1] > ScenarioInfo.size[1] - 8 or v.Position[3] < 8 or v.Position[3] > ScenarioInfo.size[2] - 8 then
+        if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
             -- mass marker is too close to border, skip it.
             continue
         end
@@ -140,24 +140,6 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
             table.insert(newList, v)
         end
     end
-
-    return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
-end
-
-function AIGetSortedMassWithEnemy(aiBrain, maxNum, tMin, tMax, tRings, tType, position, category)
-    local markerList = AIGetMarkerLocations(aiBrain, 'Mass')
-    local newList = {}
-    local num = 0
-    for _, v in markerList do
-        if aiBrain:GetNumUnitsAroundPoint(categories.MASSEXTRACTION, v.Position, 5, 'Enemy') > 0 then
-            table.insert(newList, v)
-            num = num + 1
-            if num >= maxNum then
-                break
-            end
-        end
-    end
-
     return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
 end
 
@@ -795,7 +777,7 @@ end
 
 function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMax, tRings, tType)
     local positions = {}
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for k, v in aiBrain.PBM.Locations do
             if v.LocationType ~= 'MAIN' then
                 table.insert(positions, v.Location)
@@ -832,7 +814,7 @@ end
 
 function AIGetReclaimablesAroundLocation(aiBrain, locationType)
     local position, radius
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for _, v in aiBrain.PBM.Locations do
             if v.LocationType == locationType then
                 position = v.Location
@@ -841,7 +823,7 @@ function AIGetReclaimablesAroundLocation(aiBrain, locationType)
             end
         end
     elseif aiBrain.BuilderManagers[locationType] then
-        radius = aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationRadius()
+        radius = aiBrain.BuilderManagers[locationType].FactoryManager.Radius
         position = aiBrain.BuilderManagers[locationType].FactoryManager:GetLocationCoords()
     end
 
@@ -968,7 +950,7 @@ end
 
 function GetBasePatrolPoints(aiBrain, location, radius, layer)
     if type(location) == 'string' then
-        if aiBrain:PBMHasPlatoonList() then
+        if aiBrain.HasPlatoonList then
             for k, v in aiBrain.PBM.Locations do
                 if v.LocationType == location then
                     radius = v.Radius
@@ -977,7 +959,7 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
                 end
             end
         elseif aiBrain.BuilderManagers[location] then
-            radius = aiBrain.BuilderManagers[location].FactoryManager:GetLocationRadius()
+            radius = aiBrain.BuilderManagers[location].FactoryManager.Radius
             location = aiBrain.BuilderManagers[location].FactoryManager:GetLocationCoords()
         end
         if not radius then
@@ -1822,24 +1804,39 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     if not pos then
         return false
     end
-
+    local Reclaiming = false
     -- Check if enemy units are at location
-    local checkUnits = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE + (categories.MOBILE * categories.LAND), pos, 10, 'Enemy')
-
+    local checkUnits = aiBrain:GetUnitsAroundPoint( (categories.STRUCTURE + categories.MOBILE) - categories.AIR, pos, 10, 'Enemy')
+    -- reclaim units near our building place.
     if checkUnits and table.getn(checkUnits) > 0 then
         for num, unit in checkUnits do
-            if not unit.Dead and EntityCategoryContains(categories.ENGINEER, unit) and (unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex()) then
-                IssueReclaim({eng}, unit)
-            elseif not EntityCategoryContains(categories.COMMAND, eng) then
+            if unit.Dead or unit:BeenDestroyed() then
+                continue
+            end
+            if not IsEnemy( aiBrain:GetArmyIndex(), unit:GetAIBrain():GetArmyIndex() ) then
+                continue
+            end
+            if unit:IsCapturable() then 
+                -- if we can capture the unit/building then do so
                 IssueCapture({eng}, unit)
+            else
+                -- if we can't capture then reclaim
+                IssueReclaim({eng}, unit)
             end
         end
-        return true
+        Reclaiming = true
     end
-
-    return false
+    -- reclaim rocks etc or we can't build mexes or hydros
+    local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
+    if Reclaimables and table.getn( Reclaimables ) > 0 then
+        for k,v in Reclaimables do
+            if v.MaxMassReclaim and v.MaxMassReclaim > 0 or v.MaxEnergyReclaim and v.MaxEnergyReclaim > 0 then
+                IssueReclaim({eng}, v)
+            end
+        end
+    end
+    return Reclaiming
 end
-
 
 function EngineerTryRepair(aiBrain, eng, whatToBuild, pos)
     if not pos then
@@ -1958,7 +1955,7 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
         return false
     end
 
-    local filterUnits = GetOwnUnitsAroundPoint(aiBrain, assisteeCategory, manager:GetLocationCoords(), manager:GetLocationRadius())
+    local filterUnits = GetOwnUnitsAroundPoint(aiBrain, assisteeCategory, manager:GetLocationCoords(), manager.Radius)
     local retUnits = {}
     for k, v in filterUnits do
         if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
@@ -1971,7 +1968,7 @@ end
 
 function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
     if type(location) == 'string' then
-        if aiBrain:PBMHasPlatoonList() then
+        if aiBrain.HasPlatoonList then
             for k, v in aiBrain.PBM.Locations do
                 if v.LocationType == location then
                     radius = v.Radius
@@ -1980,7 +1977,7 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
                 end
             end
         elseif aiBrain.BuilderManagers[location] then
-            radius = aiBrain.BuilderManagers[location].FactoryManager:GetLocationRadius()
+            radius = aiBrain.BuilderManagers[location].FactoryManager.Radius
             location = aiBrain.BuilderManagers[location].FactoryManager:GetLocationCoords()
         end
         if not radius then

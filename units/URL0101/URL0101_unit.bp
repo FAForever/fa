@@ -37,6 +37,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH1',
+        'BOT',
         'SCOUT',
         'INTELLIGENCE',
         'RADAR',

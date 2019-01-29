@@ -141,9 +141,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarRadius = 150,
-        OmniRadius = 50,
-        VisionRadius = 40,
+        RadarRadius = 200,
+        OmniRadius = 60,
+        VisionRadius = 60,
     },
     Interface = {
         HelpText = '<LOC xea0002_help>Defense Satellite',
@@ -236,7 +236,7 @@ UnitBlueprint {
                 },
             },
             RackFireTogether = false,
-            RackRecoilDistance = 0,
+            RackRecoilDistance = -1,
             RackReloadTimeout = 0,
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,

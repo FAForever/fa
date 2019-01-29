@@ -118,6 +118,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYANTIAIR',
         'DRAGBUILD',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -1.5,
     Defense = {

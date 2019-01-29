@@ -323,19 +323,13 @@ PlatoonBuilder = Class(Builder) {
                 platoon.InstanceNumber = k
                 local destroyedCallback = function(brain,platoon)
                     if platoon.BuilderHandle then
-                        #platoon.BuilderHandle:RemoveHandle(platoon)
-                        self:ForkThread(self.DelayRemove, self, platoon)
+                        platoon.BuilderHandle:RemoveHandle(platoon)
                     end
                 end
                 platoon:AddDestroyCallback(destroyedCallback)
                 break
             end
         end
-    end,
-
-    DelayRemove = function(self,platoon)
-        WaitSeconds(1)
-        platoon.BuilderHandle:RemoveHandle(platoon)
     end,
 
     RemoveHandle = function(self,platoon)

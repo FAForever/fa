@@ -1082,10 +1082,10 @@ function GUI_OldMap(over)
     dialogContent.Width:Set(1000)
     dialogContent.Height:Set(100)
 
-    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local ChangelogData = import('/lua/ui/lobby/changelogData.lua')
     local OldMapPopup = Popup(GUI, dialogContent)
     OldMapPopup.OnClosed = function()
-        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
+        Prefs.SetToCurrentProfile('LobbyChangelog', ChangelogData.last_version)
     end
 
     -- Title --

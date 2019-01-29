@@ -558,7 +558,7 @@ function HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, u
         return false
     end
     local poolPlatoon = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() * 2.5)
+    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager.Radius * 2.5)
     return CompareBody(numUnits, unitCount, compareType)
 end
 

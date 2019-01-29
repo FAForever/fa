@@ -2291,11 +2291,11 @@ PlatoonTemplates = {
             "UnitUpgradeAI",
             { "xsb4206", 1, 1, "attack", "None" }
         },
-        T2SonarUpgrade={
-            "T2SonarUpgrade",
-            "UnitUpgradeAI",
-            { "xsb3202", 1, 1, "support", "None" }
-        },
+--        T2SonarUpgrade={
+--            "T2SonarUpgrade",
+--            "UnitUpgradeAI",
+--            { "xsb3202", 1, 1, "support", "None" } -- unit xsb3202 can't upgrade to xsb0305 (building does not exist).
+--        },
         T2TacticalLauncher={
             "T2TacticalLauncher",
             "TacticalAI",

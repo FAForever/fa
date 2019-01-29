@@ -23,6 +23,27 @@ XSL0401 = Class(SWalkingLandUnit) {
         '/effects/emitters/seraphim_othuy_spawn_04_emit.bp',
     },
 
+    SpawnElectroStorm = function(self)
+        local army = self:GetArmy()
+        local position = self:GetPosition()
+        local spawnEffects = self.SpawnEffects
+        
+        -- Spawn the Energy Being
+        local spiritUnit = CreateUnitHPR('XSL0402', army, position[1], position[2], position[3], 0, 0, 0)
+        -- Create effects for spawning of energy being
+        for k, v in spawnEffects do
+            CreateAttachedEmitter(spiritUnit, -1, army, v)
+        end
+    end,
+
+    OnReclaimed = function(self, entity)
+
+        SWalkingLandUnit.OnReclaimed(self, entity)
+
+        -- Spawn the Energy Being
+        self:SpawnElectroStorm()
+    end,
+
     Weapons = {
         EyeWeapon = Class(SDFExperimentalPhasonProj) {},
         LeftArm = Class(SDFAireauWeapon) {},
@@ -111,25 +132,14 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
 
+        if self:GetFractionComplete() == 1 then
+            self:SpawnElectroStorm()
+        end
+
         self:PlayUnitSound('Destroyed')
         self:Destroy()
     end,
 
-    OnDestroy = function(self)
-        SWalkingLandUnit.OnDestroy(self)
-
-        -- Don't make the energy being if not built, or if this is a unit transfer
-        if self:GetFractionComplete() ~= 1 or self.IsBeingTransferred then return end
-
-        -- Spawn the Energy Being
-        local position = self:GetPosition()
-        local spiritUnit = CreateUnitHPR('XSL0402', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)
-
-        -- Create effects for spawning of energy being
-        for k, v in self.SpawnEffects do
-            CreateAttachedEmitter(spiritUnit, -1, self:GetArmy(), v)
-        end
-    end,
 }
 
 TypeClass = XSL0401

@@ -444,7 +444,7 @@ function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCo
         return false
     end
     local positions = {}
-    if aiBrain:PBMHasPlatoonList() then
+    if aiBrain.HasPlatoonList then
         for k,v in aiBrain.PBM.Locations do
             if v.LocationType ~= locationType and Utils.XZDistanceTwoVectors(pos, v.Location) <= locationRadius then
                 table.insert(positions, v.Location)
@@ -519,7 +519,7 @@ function HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCate
         WARN('*AI WARNING: HaveUnitComparisonAtLocation - Invalid location - ' .. locationType)
         return false
     end
-    local numUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius()))
+    local numUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, engineerManager:GetLocationCoords(), engineerManager.Radius))
     return CompareBody(numUnits, unitCount, compareType)
 end
 
@@ -545,7 +545,7 @@ function HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unit
         return false
     end
     local poolPlatoon = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+    local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager.Radius)
     return CompareBody(numUnits, unitCount, compareType)
 end
 
@@ -1094,7 +1094,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     if not engineerManager then
         return false
     end
-    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius())
+    local Structures = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager.Radius)
     for k,v in Structures do
         if not v.Dead and v:GetHealthPercent() < .8 then
         #LOG('*AI DEBUG: DamagedStructuresInArea return true')
@@ -1110,7 +1110,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     if not engineerManager then
         return false
     end
-    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
@@ -1138,3 +1138,12 @@ function GetGuards(aiBrain, Unit)
     end
     return count
 end
+
+-- Buildcondition to check if a platoon is still delayed
+function CheckBuildPlattonDelay(aiBrain, PlatoonName)
+    if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
+        return false
+    end
+    return true
+end
+

@@ -7,7 +7,7 @@
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
-local OCProjectiles = 0                                                                                            
+local OCProjectiles = {}                                                                                            
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -358,6 +358,7 @@ OverchargeProjectile = Class() {
         -- Set the damage dealt by the projectile for hitting the floor or an ACUUnit
         -- Energy drained is calculated by the relationship equations
         local damage = data.minDamage
+        local army = self:GetArmy()
 
         if targetEntity then
             -- Handle hitting shields. We want the unit underneath, not the shield itself
@@ -375,8 +376,8 @@ OverchargeProjectile = Class() {
                 -- Get max energy available to drain according to how much we have
                 local energyLimit = launcher:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
                 
-                if OCProjectiles > 1 then
-                    energyLimit = energyLimit / OCProjectiles
+                if OCProjectiles[army] > 1 then
+                    energyLimit = energyLimit / OCProjectiles[army]
                 end
                 
                 local energyLimitDamage = self:EnergyAsDamage(energyLimit)
@@ -423,7 +424,7 @@ OverchargeProjectile = Class() {
             launcher:ForkThread(function()
                 WaitFor(launcher.EconDrain)
                 RemoveEconomyEvent(launcher, launcher.EconDrain)
-                OCProjectiles = OCProjectiles - 1
+                OCProjectiles[army] = OCProjectiles[army] - 1
                 launcher.EconDrain = nil
             end)
         end
@@ -444,7 +445,7 @@ OverchargeProjectile = Class() {
         local launcher = self:GetLauncher() 
         local maxHP = 0
         
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) do
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do
                 if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
                     maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
                 elseif unit:GetHealth() > maxHP then
@@ -452,7 +453,7 @@ OverchargeProjectile = Class() {
                 end
         end
                
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) do
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) or {} do
             -- Special for fatty's shield
             if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
                 maxHP = unit.MyShield:GetMaxHealth()
@@ -478,6 +479,12 @@ OverchargeProjectile = Class() {
     end,
     
     OnCreate = function(self)
-        OCProjectiles = OCProjectiles + 1
+        local army = self:GetArmy()
+                
+        if not OCProjectiles[army] then
+            OCProjectiles[army] = 0
+        end
+        
+        OCProjectiles[army] = OCProjectiles[army] + 1
     end,
 }

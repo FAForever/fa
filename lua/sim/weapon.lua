@@ -11,6 +11,30 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 local Set = import('/lua/system/setutils.lua')
+local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
+local cachedPriorities = false
+
+local function ParsePriorities()
+    local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
+    local finalPriorities = {}
+
+    for _, id in idlist do
+        local weapons = GetUnitBlueprintByName(id).Weapon
+        
+        for weaponNum, weapon in weapons or {} do
+            for line, priority in weapon.TargetPriorities or {} do
+                if not finalPriorities[priority] then
+                    if string.find(priority, '%(') then
+                        finalPriorities[priority] = ParseEntityCategoryProperly(priority) 
+                    else
+                        finalPriorities[priority] = ParseEntityCategory(priority)
+                    end
+                end
+            end
+        end     
+    end
+    return finalPriorities
+end
 
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
@@ -364,12 +388,27 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetWeaponPriorities = function(self, priTable)
+    
+        if not cachedPriorities then
+            cachedPriorities = ParsePriorities()
+        end 
+        
         if not priTable then
             local bp = self:GetBlueprint().TargetPriorities
             if bp then
                 local priorityTable = {}
                 for k, v in bp do
-                    table.insert(priorityTable, ParseEntityCategory(v))
+                    if cachedPriorities[v] then
+                        table.insert(priorityTable, cachedPriorities[v])
+                    else
+                        if string.find(v, '%(') then
+                            cachedPriorities[v] = ParseEntityCategoryProperly(v)
+                            table.insert(priorityTable, cachedPriorities[v])
+                        else
+                            cachedPriorities[v] = ParseEntityCategory(v)
+                            table.insert(priorityTable, cachedPriorities[v])
+                        end    
+                    end
                 end
                 self:SetTargetingPriorities(priorityTable)
             end

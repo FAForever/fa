@@ -686,7 +686,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self:StopUpgradeEffects(unitBuilding)
                 self:PlayUnitSound('UpgradeEnd')
                 -- Iterate through pod data and transfer pods to the new unit
-                for k,v in self.PodData do
+                for k,v in self.PodData or {} do
                     if v.Active then
                         unitBuilding:PodTransfer(v.PodHandle, v)
                         v.Active = false

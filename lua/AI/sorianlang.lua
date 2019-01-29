@@ -314,4 +314,9 @@ AIChatText = {
         'I got it.',
         'No problem.',
     },
+    takingcontrol = {
+        '[AI Replacement]: Taking control of this army!',
+        '[AI Replacement]: Don\'t panic, I am here!',
+        '[AI Replacement]: The other Commander has been relieved, let\'s get this party started.',
+    }
 }

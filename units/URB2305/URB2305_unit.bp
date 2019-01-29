@@ -65,6 +65,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     Defense = {
         AirThreatLevel = 0,
@@ -155,7 +156,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 210000,
         BuildCostMass = 15000,
-        BuildRate = 1080,
+        BuildRate = 1890,
         BuildTime = 10453,
         RebuildBonusIds = {
             'urb2305',
@@ -258,7 +259,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 0,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'EMP Flux Warhead',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,

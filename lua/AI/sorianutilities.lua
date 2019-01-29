@@ -476,23 +476,31 @@ end
 --    Function: GetTemplateReplacement
 --    Args:
 --        aiBrain       - AI Brain
---        building          - Unit type to find a replacement for
---      faction         - AI Faction
+--        building      - Unit type to find a replacement for
+--        faction       - AI Faction
 --    Description:
 --        Finds a custom engineer built unit to replace a default one.
 --    Returns:
 --        Custom Unit or false
 -- -----------------------------------------------------
-function GetTemplateReplacement(aiBrain, building, faction)
+function GetTemplateReplacement(aiBrain, building, faction, buildingTmpl)
     local retTemplate = false
     local templateData = aiBrain.CustomUnits[building]
+    -- check if we have an original building
+    local BuildingExist = nil
+    for k,v in buildingTmpl do
+        if v[1] == building then
+            BuildingExist = true
+            break
+        end
+    end
     -- If there are Custom Units for this unit type and faction
     if templateData and templateData[faction] then
         local rand = Random(1,100)
         local possibles = {}
         -- Add all the possibile replacements into a table
         for k,v in templateData[faction] do
-            if rand <= v[2] then
+            if rand <= v[2] or not BuildingExist then
                 table.insert(possibles, v[1])
             end
         end
@@ -1210,7 +1218,7 @@ end
 -- -----------------------------------------------------
 function FindUnfinishedUnits(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     local retUnfinished = false
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
@@ -1235,7 +1243,7 @@ end
 -- -----------------------------------------------------
 function FindDamagedShield(aiBrain, locationType, buildCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-    local shields = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally')
+    local shields = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     local retShield = false
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then

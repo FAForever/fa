@@ -51,12 +51,14 @@ UnitBlueprint {
         'ANTINAVY',
         'DRAGBUILD',
         'SIZE4',
+        'STEALTH',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYSONAR',
         'OVERLAYANTINAVY',
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -1,
     Defense = {

@@ -272,7 +272,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 160,
             Label = 'FrontTurret',
-            MaxRadius = 105,
+            MaxRadius = 110,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -298,7 +298,7 @@ UnitBlueprint {
             RateOfFire = 0.17,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -359,7 +359,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 160,
             Label = 'MidTurret',
-            MaxRadius = 114,
+            MaxRadius = 110,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -386,7 +386,7 @@ UnitBlueprint {
             RateOfFire = 0.17,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -447,7 +447,7 @@ UnitBlueprint {
             HeadingArcCenter = 180,
             HeadingArcRange = 165,
             Label = 'BackTurret',
-            MaxRadius = 114,
+            MaxRadius = 110,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -474,7 +474,7 @@ UnitBlueprint {
             RateOfFire = 0.17,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 8,
+            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -514,7 +514,7 @@ UnitBlueprint {
             },
             FiringTolerance = 360,
             Flare = {
-                Category = 'MISSILE',
+                Category = 'MISSILE TACTICAL',
                 Stack = true, --added special flag to trigger multi-sphere collision
                 OffsetMult = 1.33,
                 Radius = 15,

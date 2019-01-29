@@ -16,77 +16,60 @@ XRB2308 = Class(CStructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
-        self:StartSinkingFromBuild()
-
-        local army = self:GetArmy() -- Add inital sinking effects
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
-
-        ChangeState(self, self.IdleState)
-    end,
-
-    StartSinkingFromBuild = function(self)
-        -- do not start sinking when unit is below water surface already
-        local position = self:GetPosition()
-        if GetSurfaceHeight(position[1], position[3]) > position[2] then return end
-
-        -- Add sinking effect for the duration of the sinking
-        local army = self:GetArmy()
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
-
-        -- Create sinker projectile
-        local bone = 0
-        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
-        self.sinkProjectile = proj
-
-        -- Start the sinking after a delay of the given number of seconds, attaching to a given bone and entity.
-        proj:SetLocalAngularVelocity(0, 0, 0) -- Change this to make it rotate some while sinking
-        proj:Start(0, self, bone)
-        proj:SetBallisticAcceleration(-0.75)
-
-        self.Trash:Add(proj)
-        self.Depthwatcher = self:ForkThread(self.DepthWatcher)
-    end,
-
-    -- Sink to the bottom, or to a pre-set depth
-    DepthWatcher = function(self)
-        self.sinkingFromBuild = true
-
-        local sinkFor = 3.4 -- Use this to set the depth - Basic maths required
-        while self.sinkProjectile and sinkFor > 0 do
-            WaitTicks(1)
-            sinkFor = sinkFor - 0.1
-        end
-
-        local bottom = true
-        if not self.Dead then
-            if self.sinkProjectile then
-                bottom = false -- We must have timed out
-                self.sinkProjectile:Destroy()
-                self.sinkProjectile = nil
+        
+        local pos = self:GetPosition()
+        local armySelf = self:GetArmy()
+        local health = self:GetHealth()
+        local armies = ListArmies()
+        local spottedByArmy = {}
+        local fireState = self:GetFireState()
+        
+        for _,army in armies do
+            if not IsAlly(armySelf, army) then
+                local blip = self:GetBlip(army)
+                
+                if blip and blip:IsSeenEver(army) then
+                    table.insert(spottedByArmy, ScenarioInfo.ArmySetup[army].ArmyIndex)
+                end
             end
-
-            -- Stop the unit's momentum
-            self:SetPosition(self:GetPosition(), true)
-            self:FinalAnimation()
         end
 
-        self.sinkingFromBuild = false
-        self.Bottom = bottom
+        
+        if not self:IsIdleState() then --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
+            ForkThread(self.CreateNewHarmsWithDelay, self, armySelf, pos, spottedByArmy, fireState)
+        else
+            self:Destroy()
+            
+            local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
+        
+            newHARMS:SetHealth(newHARMS, health)
+            newHARMS.SpottedByArmy = spottedByArmy
+            newHARMS:SetFireState(fireState)
+        end
     end,
-
-    -- Do the deploy animation
-    FinalAnimation = function(self)
-        local bp = self:GetBlueprint()
-        local bpAnim = bp.Display.AnimationDeploy
-
-        self.OpenAnim = CreateAnimator(self)
-        self.OpenAnim:PlayAnim(bpAnim)
-        self.Trash:Add(self.OpenAnim)
-        self:PlaySound(bp.Audio.Deploy)
+    
+    CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState) 
+        WaitTicks(1) --wait 1 tick to determine HARMS target
+        
+        if not self:IsDead() then
+            local health = self:GetHealth()
+            local target = self:GetTargetEntity()
+            
+            self:Destroy()
+            
+            local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
+        
+            newHARMS:SetHealth(newHARMS, health)
+            newHARMS.SpottedByArmy = spottedByArmy
+            newHARMS:SetFireState(fireState)
+            
+            if target then
+                IssueAttack({newHARMS}, target)
+            end    
+        end    
     end,
-
-    DeathThread = function(self, overkillRatio, instigator)
+    
+    DeathThread = function(self, overkillRatio, instigator) --dummy HARMS needs this death thread in case it dies during CreateNewHarmsWithDelay()
         local bp = self:GetBlueprint()
 
         -- Add an initial death explosion

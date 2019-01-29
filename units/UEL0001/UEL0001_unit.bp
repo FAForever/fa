@@ -1264,7 +1264,7 @@ UnitBlueprint {
             Damage = 0,
             DamageFriendly = true,
             DamageRadius = 0,
-            DamageType = 'Normal',
+            DamageType = 'Nuke',
             DisplayName = 'Nuclear Warhead',
             EffectiveRadius = 0,
             EnabledByEnhancement = 'TacticalNukeMissile',

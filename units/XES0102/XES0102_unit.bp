@@ -46,7 +46,7 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH2',
-        'ANTIAIR',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'LIGHTBOAT',
