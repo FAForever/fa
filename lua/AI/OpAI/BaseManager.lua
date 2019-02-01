@@ -815,6 +815,8 @@ BaseManager = Class {
         AdvancedEngineering = {false, 'LCH', {'all'}},
         T3Engineering = {'AdvancedEngineering', 'LCH', {'all'}},
         ResourceAllocation = {false, 'RCH', {'all'}},
+        ResourceAllocationAdvanced = {'ResourceAllocation', 'Back', {'aeon', 'seraphim'}},
+        Shield = {false, 'Back', {'uef', 'aeon'}},
         Teleporter = {false, 'Back', {'all'}},
 
         -- UEF
@@ -822,24 +824,22 @@ BaseManager = Class {
         HeavyAntiMatterCannon = {false, 'RCH', {'uef'}},
         LeftPod = {false, 'Back', {'uef'}},
         RightPod = {'LeftPod', 'Back', {'uef'}},
-        Shield = {false, 'Back', {'uef', 'aeon'}},
         ShieldGeneratorField = {'Shield', 'Back', {'uef'}},
         TacticalMissile = {false, 'Back', {'uef'}},
         TacticalNukeMissile = {'TacticalMissile', 'Back', {'uef'}},
 
         -- Cybran
-        CloakingGenerator = {false, 'Back', {'cybran'}},
+        CloakingGenerator = {'StealthGenerator', 'Back', {'cybran'}},
         CoolingUpgrade = {false, 'LCH', {'cybran'}},
         MicrowaveLaserGenerator = {false, 'RCH', {'cybran'}},
         NaniteTorpedoTube = {false, 'RCH', {'cybran'}},
-        StealthGenerator = {'CloakingGenerator', 'Back', {'cybran'}},
+        StealthGenerator = {false, 'Back', {'cybran'}},
 
         -- Aeon
         ChronoDampener = {false, 'Back', {'aeon'}},
         CrysalisBeam = {false, 'LCH', {'aeon'}},
         EnhancedSensors = {false, 'RCH', {'aeon'}},
         HeatSink = {false, 'RCH', {'aeon'}},
-        ResourceAllocationAdvanced = {false, 'Back', {'aeon'}},
         ShieldHeavy = {'Shield', 'Back', {'aeon'}},
 
         -- Seraphim
@@ -850,7 +850,6 @@ BaseManager = Class {
         Missile = {false, 'Back', {'seraphim'}},
         RateOfFire = {false, 'RCH', {'seraphim'}},
         RegenAura = {false, 'RCH', {'seraphim'}},
-        ResourceAllocationAdvanced = {false, 'Back', {'seraphim'}},
     },
 
     -- Table for upgrade requirements for SACU
@@ -868,7 +867,7 @@ BaseManager = Class {
         ShieldGeneratorField = {'Shield', 'Back', {'uef'}},
 
         -- Cybran
-        CloakingGenerator = {false, 'Back', {'cybran'}},
+        CloakingGenerator = {'StealthGenerator', 'Back', {'cybran'}},
         EMPCharge = {false, 'LCH', {'cybran'}},
         FocusConverter = {false, 'RCH', {'cybran'}},
         NaniteMissileSystem = {false, 'Back', {'cybran'}},
