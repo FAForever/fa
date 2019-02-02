@@ -334,13 +334,13 @@ Scenario = {
         ['OST_BasicLandAttack_T2HoverAttack2'] = {
             'OST_BasicLandAttack_T2HoverAttack2', '',
             { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
-            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0307', -1, 1, 'attack', 'AttackFormation' },
         },
         ['OST_BasicLandAttack_T2HoverAttack3'] = {
             'OST_BasicLandAttack_T2HoverAttack3', '',
             { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
-            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0307', -1, 1, 'attack', 'AttackFormation' },
         },
 
     --[[------[ CYBRAN SPECIFIC ]------]]--
