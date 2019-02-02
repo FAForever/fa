@@ -1529,6 +1529,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xrl0305'
             elseif template[i][1] == 'uel0307' then
                 template[i][1] = 'url0306'
+            elseif template[i][1] == 'del0204' then
+                template[i][1] = 'drl0204'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ur')
             end
