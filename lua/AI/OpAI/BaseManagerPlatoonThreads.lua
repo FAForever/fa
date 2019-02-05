@@ -1259,6 +1259,11 @@ function UnitUpgradeThread(unit)
             local upgradeName = bManager:UnitNeedsUpgrade(unit, unitType)
 
             if upgradeName and not unit:IsUnitState('Building') then
+                -- Remove the unit from the builders list
+                if bManager:IsConstructionUnit(unit) then
+                    bManager:RemoveConstructionEngineer(unit)
+                end
+
                 local platoon = aiBrain:MakePlatoon('', '')
                 aiBrain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
 
