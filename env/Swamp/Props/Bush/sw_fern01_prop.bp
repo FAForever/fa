@@ -1,4 +1,21 @@
 PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
     Categories = {
         'RECLAIMABLE',
     },
@@ -11,7 +28,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 400,
+                    LODCutoff = 750,
                     ShaderName = 'TMeshAlpha',
                 },
             },
@@ -27,7 +44,7 @@ PropBlueprint {
         HelpText = 'Small Bush - Swamp',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.5,
     SizeY = 0.25,

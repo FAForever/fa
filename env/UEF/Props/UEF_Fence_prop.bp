@@ -19,6 +19,9 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -30,7 +33,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'UEF_fence_Albedo.dds',
                     SpecName = 'UEF_fence_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 300,
                     ShaderName = 'Unit',
                 },
             },
@@ -39,8 +42,11 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 0.5,
+        ReclaimMassMax = 5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'UEF Fence',
@@ -50,7 +56,7 @@ PropBlueprint {
     },
     ScriptClass = 'Tree',
     ScriptModule = '/lua/proptree.lua',
-    SizeX = 1.5,
+    SizeX = 1,
     SizeY = 0.5,
-    SizeZ = 0.2,
+    SizeZ = 0.1,
 }

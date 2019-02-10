@@ -29,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'eg_fern01_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 750,
                     ShaderName = 'TMeshAlpha',
                 },
             },
@@ -45,7 +45,7 @@ PropBlueprint {
         HelpText = 'Large Fern',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 1.5,
     SizeY = 0.25,

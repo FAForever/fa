@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'IceBerg01_albedo.dds',
-                    LODCutoff = 250,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -20,7 +20,7 @@ PropBlueprint {
         UniformScale = 0.025,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },

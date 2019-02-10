@@ -2,13 +2,17 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     AlbedoName = '/env/Wreckage/props/Walls/Wall01_Albedo.dds',
-                    LODCutoff = 175,
+                    LODCutoff = 300,
                     MeshName = '/env/Wreckage/props/Walls/Wall01_lod0.scm',
                     NormalsName = '/env/Wreckage/props/Walls/Wall01_normalsTS.dds',
                     ShaderName = 'Unit',
@@ -21,9 +25,12 @@ PropBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 0,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Wreckage',

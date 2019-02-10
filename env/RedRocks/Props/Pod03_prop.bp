@@ -1,4 +1,7 @@
 PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -8,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
-                    LODCutoff = 100,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -22,11 +24,14 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
     Interface = {
         HelpText = 'Tiny Pod',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.25,
     SizeY = 0.25,

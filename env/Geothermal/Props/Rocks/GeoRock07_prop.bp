@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 250,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -19,8 +19,8 @@ PropBlueprint {
         UniformScale = 0.5,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 10,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -33,6 +33,6 @@ PropBlueprint {
         BlockPath = true,
     },
     SizeX = 4,
-    SizeY = 0.25,
+    SizeY = 3,
     SizeZ = 3,
 }

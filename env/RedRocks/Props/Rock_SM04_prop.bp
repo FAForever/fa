@@ -1,4 +1,7 @@
 PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -9,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Rock_SM01_albedo.dds',
-                    LODCutoff = 100,
+                    LODCutoff = 300,
                     NormalsName = 'Rock_SM01_normalsTS.dds',
                     ShaderName = 'NormalMappedTerrain',
                 },
@@ -18,17 +21,18 @@ PropBlueprint {
         UniformScale = 0.04,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 1,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Very Tiny Rock',
     },
     Physics = {
         BlockPath = false,
-        FootprintSizeX = 1,
-        FootprintSizeZ = 1,
     },
     SizeX = 0.25,
     SizeY = 0.25,

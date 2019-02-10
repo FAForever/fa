@@ -1,6 +1,27 @@
 PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
     Categories = {
         'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
@@ -8,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Clutter02_albedo.dds',
-                    LODCutoff = 10,
+                    LODCutoff = 300,
                     ShaderName = 'UndulatingClutter',
                 },
             },

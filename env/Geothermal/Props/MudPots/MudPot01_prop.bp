@@ -1,6 +1,6 @@
 PropBlueprint {
     Categories = {
-        'RECLAIMABLE',
+        'INVULNERABLE',
     },
     Defense = {
         Health = 50,
@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 250,
+                    LODCutoff = 3000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -19,9 +19,12 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 75,
-        ReclaimTime = 5,
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'Large Rock - Geyser',

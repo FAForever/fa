@@ -11,13 +11,13 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 300,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',
                 },
                 {
                     AlbedoName = 'seraphim_dock_lod1_albedo.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 750,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',
                     SpecularName = 'seraphim_dock_lod1_specteam.dds',
@@ -40,7 +40,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 16,
+    SizeY = 4.5,
+    SizeZ = 5,
 }

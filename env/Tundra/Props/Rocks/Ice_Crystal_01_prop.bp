@@ -1,14 +1,16 @@
 PropBlueprint {
     Categories = {
-        'SELECTABLE',
         'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
                     LODCutoff = 400,
                     ShaderName = 'NormalMappedTerrain',
@@ -18,17 +20,20 @@ PropBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'A big round thing',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = 1,
-    SizeY = 1,
-    SizeZ = 1,
+    SizeX = 0.75,
+    SizeY = 0.75,
+    SizeZ = 0.75,
 }

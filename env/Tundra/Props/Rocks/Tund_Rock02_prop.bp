@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Tund_Rock02_albedo.dds',
-                    LODCutoff = 100,
+                    LODCutoff = 300,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -20,15 +20,18 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 2.5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Tiny Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.5,
     SizeY = 0.25,

@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_dock_Albedo.dds',
                     SpecName = 'cybran_dock_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 750,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,19 +22,19 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Cybran Dock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 5,
+    SizeY = 0.1,
+    SizeZ = 3,
 }

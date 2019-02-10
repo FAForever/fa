@@ -2,13 +2,17 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
                     AlbedoName = 'UEF_Building_002_albedo.dds',
-                    LODCutoff = 350,
+                    LODCutoff = 750,
                     NormalsName = 'UEF_Building_002_normalsTS.dds',
                     ShaderName = 'VertexNormal',
                     SpecularName = 'UEF_Building_002_specteam.dds',
@@ -18,9 +22,12 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 0,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 75,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'UEF Buildings',
