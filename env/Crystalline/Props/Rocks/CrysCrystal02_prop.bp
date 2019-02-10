@@ -11,31 +11,29 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'CrysCrystal01_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedTerrain',
-                    
                 },
             },
         },
-        UniformScale = 0.250,
+        UniformScale = 0.25,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 0,
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'Crystal Formation',
     },
     Physics = {
-        BlockPath = false,
+        BlockPath = true,
     },
-    SizeX = 2,
-    SizeY = 2.25,
-    SizeZ = 3,
+    SizeX = 1,
+    SizeY = 2,
+    SizeZ = 1,
 }

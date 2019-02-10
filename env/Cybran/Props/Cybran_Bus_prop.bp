@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_bus_Albedo.dds',
                     SpecName = 'cybran_bus_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 750,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,7 +22,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -34,7 +34,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = .5,
-    SizeY = .5,
+    SizeX = 1.5,
+    SizeY = 0.5,
     SizeZ = 1,
 }

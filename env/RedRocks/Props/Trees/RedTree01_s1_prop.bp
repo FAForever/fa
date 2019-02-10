@@ -32,7 +32,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'RedTree01_s1_albedo.dds',
-                    LODCutoff = 40,
+                    LODCutoff = 30,
                     NormalsName = 'RedTree01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'RedTree01_s1_albedo.dds',
-                    LODCutoff = 700,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

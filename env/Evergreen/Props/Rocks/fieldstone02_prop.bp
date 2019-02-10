@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedAlpha',
                 },
             },
@@ -19,7 +19,7 @@ PropBlueprint {
         UniformScale = 0.015,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 137.5,
         ReclaimTime = 5,
     },

@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     AlbedoName = 'CrysCrystal07_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 300,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -21,20 +20,20 @@ PropBlueprint {
         UniformScale = 0.01,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 300,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 2.5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Huge Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = 8,
-    SizeY = 5,
-    SizeZ = 12,
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
 }

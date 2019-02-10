@@ -15,15 +15,20 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Dead01_s1_albedo.dds',
-                    LODCutoff = 30,
+                    LODCutoff = 80,
                     NormalsName = '../Dead01_s1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
                 {
                     AlbedoName = '../Dead01_s1_albedo.dds',
-                    LODCutoff = 250,
+                    LODCutoff = 200,
                     NormalsName = '../Dead01_s1_normalsTS.dds',
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = 'VertexNormal',
+                },
+                {
+                    AlbedoName = 'Dead01_Group1_LOD2_albedo.dds',
+                    LODCutoff = 750,
+                    ShaderName = 'VertexNormal',
                 },
             },
         },

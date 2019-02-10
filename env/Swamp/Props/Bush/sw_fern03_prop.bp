@@ -1,4 +1,21 @@
 PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
     Categories = {
         'RECLAIMABLE',
     },
@@ -12,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'sw_fern01_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 750,
                     ShaderName = 'TMeshAlpha',
                 },
             },
@@ -28,7 +45,7 @@ PropBlueprint {
         HelpText = 'Large Bush - Swamp',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 2,
     SizeY = 0.25,

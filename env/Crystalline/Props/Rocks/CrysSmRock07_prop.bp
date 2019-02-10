@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'CrysSmRock06_albedo.dds',
-                    LODCutoff = 100,
+                    LODCutoff = 300,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -20,7 +20,7 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },

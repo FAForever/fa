@@ -11,9 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '',
-                    LODCutoff = -1,
-                    ShaderName = '',
+                    LODCutoff = 300,
                 },
             },
         },
