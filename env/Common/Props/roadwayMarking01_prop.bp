@@ -1,7 +1,31 @@
 PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Categories = {
+        'RECLAIMABLE',
+    },
     CollisionOffsetX = 0,
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
@@ -14,7 +38,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'roadwayMarking01_albedo.dds',
-                    LODCutoff = 175,
+                    LODCutoff = 750,
                     NormalsName = 'roadwayMarking01_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
@@ -22,13 +46,23 @@ PropBlueprint {
         },
         UniformScale = 0.2,
     },
+    Economy = {
+        ReclaimEnergyMax = 5,
+        ReclaimMassMax = 5,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
     Interface = {
         HelpText = 'Power Line Tower',
     },
     Physics = {
         BlockPath = false,
     },
-    SizeX = 0.1,
-    SizeY = 1,
-    SizeZ = 0.1,
+    ScriptClass = 'Tree',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
 }

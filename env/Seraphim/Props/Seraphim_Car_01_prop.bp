@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'seraphim_car_01_Albedo.dds',
                     SpecName = 'seraphim_car_01_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 750,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',
                 },
@@ -35,7 +35,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 7,
+    SizeY = 4,
+    SizeZ = 11,
 }

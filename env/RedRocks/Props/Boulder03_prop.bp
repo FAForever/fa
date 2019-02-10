@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Boulder01_albedo.dds',
-                    LODCutoff = 250,
+                    LODCutoff = 300,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -20,15 +20,18 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 2.5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Tiny Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.25,
     SizeY = 0.25,

@@ -1,5 +1,6 @@
 PropBlueprint {
     Categories = {
+        'INVULNERABLE',
     },
     Defense = {
         Health = 50,
@@ -10,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
-                    LODCutoff = 500,
+                    LODCutoff = 3000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -20,20 +20,20 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 150,
-        ReclaimTime = 5,
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Very Large Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = 0,
-    SizeY = 0,
-    SizeZ = 0,
+    SizeX = 12,
+    SizeY = 5.5,
+    SizeZ = 16,
 }

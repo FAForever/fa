@@ -13,16 +13,16 @@ PropBlueprint {
                 {
                     AlbedoName = 'UEF_car1_Albedo.dds',
                     SpecName = 'UEF_car1_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 400,
                     ShaderName = 'Unit',
                 },
             },
         },
-        UniformScale = .1,
+        UniformScale = 0.1,
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -34,7 +34,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 0.2,
+    SizeY = 0.25,
+    SizeZ = 0.5,
 }

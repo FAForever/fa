@@ -1,7 +1,27 @@
 PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
     Categories = {
         'RECLAIMABLE',
     },
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -13,7 +33,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_street_light_Albedo.dds',
                     SpecName = 'cybran_street_light_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 300,
                     ShaderName = 'Unit',
                 },
             },
@@ -21,20 +41,22 @@ PropBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimEnergyMax = 5,
+        ReclaimMassMax = 5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Cybran Street Light',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    ScriptClass = 'Tree',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 0.5,
+    SizeY = 1.5,
+    SizeZ = 0.5,
 }

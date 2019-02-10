@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -20,8 +20,11 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 10,
-        ReclaimMassMax = 1,
+        ReclaimMassMax = 37.5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'Medium Rock',

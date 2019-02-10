@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -21,7 +20,7 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 150,
         ReclaimTime = 5,
     },

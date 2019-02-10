@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybranadjacencynodethree_Albedo.dds',
                     SpecName = 'cybranadjacencynodethree_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 300,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,19 +22,19 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimMassMax = 5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'cybran Adjacency Node',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 0,
+    SizeY = 0,
+    SizeZ = 0,
 }

@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '/env/geothermal/props/rocks/GeoRock04_albedo.dds',
-                    LODCutoff = 250,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -20,9 +20,12 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 175,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'Medium Rockpile',
@@ -30,7 +33,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = 4.5,
+    SizeX = 4,
     SizeY = 0.25,
     SizeZ = 4,
 }

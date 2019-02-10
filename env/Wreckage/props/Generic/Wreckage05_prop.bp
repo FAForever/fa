@@ -2,14 +2,17 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
-                    LODCutoff = 100,
+                    LODCutoff = 300,
                     ShaderName = 'TMeshNoNormals',
                 },
             },
@@ -17,16 +20,21 @@ PropBlueprint {
         UniformScale = 0.085,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 2.5,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Tiny Wreckage',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
+    ScriptClass = 'Wreckage',
+    ScriptModule = '/lua/wreckage.lua',
     SizeX = 0.25,
     SizeY = 0.25,
     SizeZ = 0.25,

@@ -21,13 +21,13 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = '../Tund_Pine01_s1_albedo.dds',
-                    LODCutoff = 175,
+                    LODCutoff = 200,
                     NormalsName = '../Tund_Pine01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
                 {
-                    AlbedoName = 'Tund_Pine01_Group1_LOD2_albedo.dds',
-                    LODCutoff = 300,
+                    AlbedoName = 'Tund_Pine01_Group2_LOD2_albedo.dds',
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

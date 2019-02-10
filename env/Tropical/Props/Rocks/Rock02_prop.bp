@@ -11,9 +11,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
                     -- share other rock's albedo and specteam
-                    LODCutoff = 100,
+                    LODCutoff = 300,
                     ShaderName = 'TMeshNoNormals',
                 },
             },
@@ -21,18 +20,18 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 2.5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Tiny Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.5,
     SizeY = 0.25,

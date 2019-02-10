@@ -13,16 +13,16 @@ PropBlueprint {
                 {
                     AlbedoName = 'aeon_car_01_Albedo.dds',
                     SpecName = 'aeon_car_01_SpecTeam.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 400,
                     ShaderName = 'Unit',
                 },
             },
         },
-        UniformScale = .05,
+        UniformScale = 0.05,
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
+        ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -34,7 +34,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = .5,
-    SizeY = .5,
-    SizeZ = 1,
+    SizeX = 0.5,
+    SizeY = 0.5,
+    SizeZ = 0.5,
 }

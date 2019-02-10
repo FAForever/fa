@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 250,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -33,6 +33,6 @@ PropBlueprint {
         BlockPath = true,
     },
     SizeX = 3,
-    SizeY = 3,
+    SizeY = 0.5,
     SizeZ = 3,
 }

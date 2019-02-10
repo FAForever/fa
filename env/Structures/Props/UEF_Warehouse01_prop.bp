@@ -2,12 +2,16 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 350,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -15,9 +19,12 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 0,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 75,
         ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'UEF Warehouse',
