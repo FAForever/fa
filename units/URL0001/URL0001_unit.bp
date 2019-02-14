@@ -374,6 +374,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 3000,
             Name = '<LOC enhancements_0079>Personal Cloaking Generator',
             NewHealth = 15000,
+            NewRegenRate = 100,
             Prerequisite = 'StealthGenerator',
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
