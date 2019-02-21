@@ -66,7 +66,9 @@ local function RadiusDecalFunction(filterFunc)
     -- The maximum damage radius of a selected missile weapon.
     local maxRadius = 0
     for _, w in weapons do
-        if w.DamageRadius > maxRadius then
+        if w.FixedSpreadRadius and w.FixedSpreadRadius > maxRadius then
+            maxRadius = w.FixedSpreadRadius    
+        elseif w.DamageRadius > maxRadius then
             maxRadius = w.DamageRadius
         end
     end
