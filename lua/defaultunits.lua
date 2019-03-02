@@ -2336,6 +2336,7 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
 
         self:SendNotifyMessage('completed', enh)
+        self:SetImmobile(false)
     end,
 
     OnWorkBegin = function(self, work)
@@ -2343,13 +2344,15 @@ ACUUnit = Class(CommandUnit) {
         if not legalWork then return end
 
         self:SendNotifyMessage('started', work)
+        self:SetImmobile(true)
 
         return true
     end,
 
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
-
+        self:SetImmobile(false)
+        
         CommandUnit.OnWorkFail(self, work)
     end,
 
