@@ -66,11 +66,9 @@ AttackManager = Class({
         local alertLocation, alertLevel, tempLevel
         while true do
             WaitSeconds(ad.AttackCheckInterval)
-            if self.brain:IsOpponentAIRunning() then
-                if ad.AttackManagerState == 'ACTIVE' and self.Platoons then
-                    self:AttackManageAttackVectors()
-                    self:FormAttackPlatoon()
-                end
+            if ad.AttackManagerState == 'ACTIVE' and self.Platoons then
+                self:AttackManageAttackVectors()
+                self:FormAttackPlatoon()
             end
         end
     end,
