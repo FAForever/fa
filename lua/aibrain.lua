@@ -718,6 +718,9 @@ AIBrain = Class(moho.aibrain_methods) {
                 v.StrategyManager:Destroy()
             end
         end
+        
+        -- delete the pathcache
+        self.PathCache = nil
 
         if self.Trash then
             self.Trash:Destroy()
@@ -771,26 +774,23 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     EvaluateAIPlanList = function(self)
-        if self:IsOpponentAIRunning() then
-            local factionIndex = self:GetFactionIndex()
-            local bestPlan = nil
-            local bestValue = 0
-            for _, v in self.AIPlansList[factionIndex] do
-                local value = self:EvaluatePlan(v)
-                if value > bestValue then
-                    bestPlan = v
-                    bestValue = value
-                end
+        local factionIndex = self:GetFactionIndex()
+        local bestPlan = nil
+        local bestValue = 0
+        for _, v in self.AIPlansList[factionIndex] do
+            local value = self:EvaluatePlan(v)
+            if value > bestValue then
+                bestPlan = v
+                bestValue = value
             end
-
-            if bestPlan then
-                self:SetCurrentPlan(bestPlan)
-                local bPlan = import(bestPlan)
-                if bPlan ~= self.CurrentPlanScript then
-                    self.CurrentPlanScript = import(bestPlan)
-                    self:SetRepeatExecution(true)
-                    self:ExecutePlan(self.CurrentPlan)
-                end
+        end
+        if bestPlan then
+            self:SetCurrentPlan(bestPlan)
+            local bPlan = import(bestPlan)
+            if bPlan ~= self.CurrentPlanScript then
+                self.CurrentPlanScript = import(bestPlan)
+                self:SetRepeatExecution(true)
+                self:ExecutePlan(self.CurrentPlan)
             end
         end
     end,
@@ -799,7 +799,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local personality = self:GetPersonality()
 
         while true do
-            if self:IsOpponentAIRunning() and self.CurrentPlan and self.RepeatExecution then
+            if self.CurrentPlan and self.RepeatExecution then
                 self:ExecutePlan(self.CurrentPlan)
             end
             local delay = personality:AdjustDelay(20, 4)
@@ -973,7 +973,6 @@ AIBrain = Class(moho.aibrain_methods) {
             plat:ForkThread(plat.BaseManagersDistressAI)
         end
 
-        self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         self.DeadBaseThread = self:ForkThread(self.DeadBaseMonitor)
         if self.Sorian then
             self.EnemyPickerThread = self:ForkThread(self.PickEnemySorian)
@@ -2247,115 +2246,108 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         while true do
-            if self:IsOpponentAIRunning() then
-                self:PBMCheckBusyFactories()
-                if self.BrainType == 'AI' then
-                    self:PBMSetPrimaryFactories()
-                end
-                local platoonList = self.PBM.Platoons
-                -- clear the cache so we can get fresh new responses!
-                self:PBMClearBuildConditionsCache()
-                -- Go through the different types of platoons
-                for typek, typev in self.PBM.PlatoonTypes do
-                    -- First go through the list of locations and see if we can build stuff there.
-                    for k, v in self.PBM.Locations do
-                        -- See if we have platoons to build in that type
-                        if table.getn(platoonList[typev]) > 0 then
-                            -- Sort the list of platoons via priority
-                            if self.PBM.NeedSort[typev] then
-                                self:PBMSortPlatoonsViaPriority(typev)
-                            end
-
-                            -- FORM PLATOONS
-                            self:PBMFormPlatoons(true, typev, v)
-
-                            -- BUILD PLATOONS
-                            -- See if our primary factory is busy.
-                            if v.PrimaryFactories[typev] then
-                                local priFac = v.PrimaryFactories[typev]
-                                local numBuildOrders = nil
-                                if priFac and not priFac.Dead then
-                                    numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
-                                    if numBuildOrders == 0 then
-                                        local guards = priFac:GetGuards()
-                                        if guards and table.getn(guards) > 0 then
-                                            for kg, vg in guards do
-                                                numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
-                                                if numBuildOrders == 0 and vg:IsUnitState('Building') then
-                                                    numBuildOrders = 1
-                                                end
-                                                if numBuildOrders > 0 then
-                                                    break
-                                                end
+            self:PBMCheckBusyFactories()
+            if self.BrainType == 'AI' then
+                self:PBMSetPrimaryFactories()
+            end
+            local platoonList = self.PBM.Platoons
+            -- clear the cache so we can get fresh new responses!
+            self:PBMClearBuildConditionsCache()
+            -- Go through the different types of platoons
+            for typek, typev in self.PBM.PlatoonTypes do
+                -- First go through the list of locations and see if we can build stuff there.
+                for k, v in self.PBM.Locations do
+                    -- See if we have platoons to build in that type
+                    if table.getn(platoonList[typev]) > 0 then
+                        -- Sort the list of platoons via priority
+                        if self.PBM.NeedSort[typev] then
+                            self:PBMSortPlatoonsViaPriority(typev)
+                        end
+                        -- FORM PLATOONS
+                        self:PBMFormPlatoons(true, typev, v)
+                        -- BUILD PLATOONS
+                        -- See if our primary factory is busy.
+                        if v.PrimaryFactories[typev] then
+                            local priFac = v.PrimaryFactories[typev]
+                            local numBuildOrders = nil
+                            if priFac and not priFac.Dead then
+                                numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
+                                if numBuildOrders == 0 then
+                                    local guards = priFac:GetGuards()
+                                    if guards and table.getn(guards) > 0 then
+                                        for kg, vg in guards do
+                                            numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
+                                            if numBuildOrders == 0 and vg:IsUnitState('Building') then
+                                                numBuildOrders = 1
+                                            end
+                                            if numBuildOrders > 0 then
+                                                break
                                             end
                                         end
                                     end
                                 end
-                                if numBuildOrders and numBuildOrders == 0 then
-                                    local possibleTemplates = {}
-                                    local priorityLevel = false
-                                    -- Now go through the platoon templates and see which ones we can build.
-                                    for kp, vp in platoonList[typev] do
-                                        -- Don't try to build things that are higher pri than 0
-                                        -- This platoon requires construction and isn't just a form-only platoon.
-                                        local globalBuilder = ScenarioInfo.BuilderTable[self.CurrentPlan][typev][vp.BuilderName]
-                                        if priorityLevel and (vp.Priority ~= priorityLevel or not self.PBM.RandomSamePriority) then
-                                                break
-                                        elseif (not priorityLevel or priorityLevel == vp.Priority)
-                                                and vp.Priority > 0 and globalBuilder.RequiresConstruction and
-                                                -- The location we're looking at is an allowed location
-                                                (vp.LocationType == v.LocationType or not vp.LocationType) and
-                                                -- Make sure there is a handle slot available
-                                                (self:PBMHandleAvailable(vp)) then
-                                            -- Fix up the primary factories to fit the proper table required by CanBuildPlatoon
-                                            local suggestedFactories = {v.PrimaryFactories[typev]}
-                                            local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
-                                            if factories and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex) then
-                                                priorityLevel = vp.Priority
-                                                for i = 1, self:PBMNumHandlesAvailable(vp) do
-                                                    table.insert(possibleTemplates, {Builder = vp, Index = kp, Global = globalBuilder})
-                                                end
+                            end
+                            if numBuildOrders and numBuildOrders == 0 then
+                                local possibleTemplates = {}
+                                local priorityLevel = false
+                                -- Now go through the platoon templates and see which ones we can build.
+                                for kp, vp in platoonList[typev] do
+                                    -- Don't try to build things that are higher pri than 0
+                                    -- This platoon requires construction and isn't just a form-only platoon.
+                                    local globalBuilder = ScenarioInfo.BuilderTable[self.CurrentPlan][typev][vp.BuilderName]
+                                    if priorityLevel and (vp.Priority ~= priorityLevel or not self.PBM.RandomSamePriority) then
+                                            break
+                                    elseif (not priorityLevel or priorityLevel == vp.Priority)
+                                            and vp.Priority > 0 and globalBuilder.RequiresConstruction and
+                                            -- The location we're looking at is an allowed location
+                                            (vp.LocationType == v.LocationType or not vp.LocationType) and
+                                            -- Make sure there is a handle slot available
+                                            (self:PBMHandleAvailable(vp)) then
+                                        -- Fix up the primary factories to fit the proper table required by CanBuildPlatoon
+                                        local suggestedFactories = {v.PrimaryFactories[typev]}
+                                        local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
+                                        if factories and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex) then
+                                            priorityLevel = vp.Priority
+                                            for i = 1, self:PBMNumHandlesAvailable(vp) do
+                                                table.insert(possibleTemplates, {Builder = vp, Index = kp, Global = globalBuilder})
                                             end
                                         end
                                     end
-                                    if priorityLevel then
-                                        local builderData = possibleTemplates[ Random(1, table.getn(possibleTemplates)) ]
-                                        local vp = builderData.Builder
-                                        local kp = builderData.Index
-                                        local globalBuilder = builderData.Global
-                                        local suggestedFactories = {v.PrimaryFactories[typev]}
-                                        local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
-                                        vp.BuildTemplate = self:PBMBuildNumFactories(vp.PlatoonTemplate, v, typev, factories)
-                                        local template = vp.BuildTemplate
-                                        local factionIndex = self:GetFactionIndex()
-
-                                        -- Check all the requirements to build the platoon
-                                        -- The Primary Factory can actually build this platoon
-                                        -- The platoon build condition has been met
-                                        local ptnSize = personality:GetPlatoonSize()
-
-                                        -- Finally, build the platoon.
-                                        self:BuildPlatoon(template, factories, ptnSize)
-                                        self:PBMSetHandleBuilding(self.PBM.Platoons[typev][kp])
-                                        if globalBuilder.GenerateTimeOut then
-                                            vp.BuildTimeOut = self:PBMGenerateTimeOut(globalBuilder, factories, v, typev)
-                                        else
-                                            vp.BuildTimeOut = globalBuilder.BuildTimeOut
-                                        end
-
-                                        vp.PlatoonTimeOutThread = self:ForkThread(self.PBMPlatoonTimeOutThread, vp)
-                                        if globalBuilder.PlatoonBuildCallbacks then
-                                            for cbk, cbv in globalBuilder.PlatoonBuildCallbacks do
-                                                import(cbv[1])[cbv[2]](self, globalBuilder.PlatoonData)
-                                            end
+                                end
+                                if priorityLevel then
+                                    local builderData = possibleTemplates[ Random(1, table.getn(possibleTemplates)) ]
+                                    local vp = builderData.Builder
+                                    local kp = builderData.Index
+                                    local globalBuilder = builderData.Global
+                                    local suggestedFactories = {v.PrimaryFactories[typev]}
+                                    local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
+                                    vp.BuildTemplate = self:PBMBuildNumFactories(vp.PlatoonTemplate, v, typev, factories)
+                                    local template = vp.BuildTemplate
+                                    local factionIndex = self:GetFactionIndex()
+                                    -- Check all the requirements to build the platoon
+                                    -- The Primary Factory can actually build this platoon
+                                    -- The platoon build condition has been met
+                                    local ptnSize = personality:GetPlatoonSize()
+                                     -- Finally, build the platoon.
+                                    self:BuildPlatoon(template, factories, ptnSize)
+                                    self:PBMSetHandleBuilding(self.PBM.Platoons[typev][kp])
+                                    if globalBuilder.GenerateTimeOut then
+                                        vp.BuildTimeOut = self:PBMGenerateTimeOut(globalBuilder, factories, v, typev)
+                                    else
+                                        vp.BuildTimeOut = globalBuilder.BuildTimeOut
+                                    end
+                                    vp.PlatoonTimeOutThread = self:ForkThread(self.PBMPlatoonTimeOutThread, vp)
+                                    if globalBuilder.PlatoonBuildCallbacks then
+                                        for cbk, cbv in globalBuilder.PlatoonBuildCallbacks do
+                                            import(cbv[1])[cbv[2]](self, globalBuilder.PlatoonData)
                                         end
                                     end
                                 end
                             end
                         end
                     end
-                    WaitSeconds(.1)
                 end
+                WaitSeconds(.1)
             end
             -- Do it all over again in 13 seconds.
             WaitSeconds(self.PBM.BuildCheckInterval or 13)
@@ -2836,37 +2828,6 @@ AIBrain = Class(moho.aibrain_methods) {
         -- Create the distress call if it doesn't exist
         if not self.BaseMonitor.PlatoonDistressThread then
             self.BaseMonitor.PlatoonDistressThread = self:ForkThread(self.BaseMonitorPlatoonDistressThread)
-        end
-    end,
-
-    BaseMonitorPlatoonDistressThread = function(self)
-        self.BaseMonitor.PlatoonAlertSounded = true
-        while true do
-            local numPlatoons = 0
-            for k, v in self.BaseMonitor.PlatoonDistressTable do
-                if self:PlatoonExists(v.Platoon) then
-                    local threat = self:GetThreatAtPosition(v.Platoon:GetPlatoonPosition(), 0, true)
-                    -- Platoons still threatened
-                    if threat > 0 then
-                        v.Threat = threat
-                        numPlatoons = numPlatoons + 1
-                    -- Platoon not threatened
-                    else
-                        self.BaseMonitor.PlatoonDistressTable[k] = nil
-                        v.Platoon.DistressCall = false
-                    end
-                else
-                    self.BaseMonitor.PlatoonDistressTable[k] = nil
-                end
-            end
-
-            -- If any platoons still want help; continue sounding
-            if numPlatoons > 0 then
-                self.BaseMonitor.PlatoonAlertSounded = true
-            else
-                self.BaseMonitor.PlatoonAlertSounded = false
-            end
-            WaitSeconds(self.BaseMonitor.BaseMonitorTime)
         end
     end,
 

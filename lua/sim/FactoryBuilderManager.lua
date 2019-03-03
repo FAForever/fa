@@ -304,10 +304,12 @@ FactoryBuilderManager = Class(BuilderManager) {
     GetFactoryTemplate = function(self, templateName, factory)
         local templateData = PlatoonTemplates[templateName]
         if not templateData then
-            error('*AI ERROR: Invalid platoon template named - ' .. templateName)
+            SPEW('*AI WARNING: No templateData found for template '..templateName..'. ')
+            return false
         end
         if not templateData.FactionSquads then
-            error('*AI ERROR: PlatoonTemplate named: ' .. templateName .. ' does not have a GlobalSquads')
+            SPEW('*AI ERROR: PlatoonTemplate named: ' .. templateName .. ' does not have a FactionSquads')
+            return false
         end
         local template = {
             templateData.Name,
