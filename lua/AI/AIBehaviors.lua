@@ -1118,7 +1118,7 @@ TempestBehavior = function(self)
             numNaval = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.NAVAL) * (categories.EXPERIMENTAL + categories.TECH3 + categories.TECH2), position, 65, 'Enemy')
         end
 
-        if aiBrain:PlatoonExists(self) and self:IsOpponentAIRunning() and not self.Patrolling then
+        if aiBrain:PlatoonExists(self) and not self.Patrolling then
             self:Stop()
             self.Patrolling = true
             scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())

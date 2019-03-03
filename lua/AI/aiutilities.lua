@@ -354,22 +354,24 @@ function GenerateAmphibiousMarkerList(markerList,markers,markerType)
     for k, v in markers do
         local marker = table.copy(v)
         if marker.type == markerType then
-            -- transform adjacentTo to Amphibious marker names
-            local adjacentTo = ''
-            for i, node in STR_GetTokens(marker.adjacentTo, ' ') do
-                if adjacentTo == '' then
-                    adjacentTo = 'Amph'..node
-                else
-                    adjacentTo = adjacentTo..' '..'Amph'..node
+            if marker.adjacentTo and marker.adjacentTo ~= '' then 
+                -- transform adjacentTo to Amphibious marker names
+                local adjacentTo = ''
+                for i, node in STR_GetTokens(marker.adjacentTo or '', ' ') do
+                    if adjacentTo == '' then
+                        adjacentTo = 'Amph'..node
+                    else
+                        adjacentTo = adjacentTo..' '..'Amph'..node
+                    end
                 end
+                marker.adjacentTo = adjacentTo
+                -- Add 'Amph' to marker name
+                marker.name = 'Amph'..k
+                marker.graph = 'DefaultAmphibious'
+                marker.type = 'Amphibious Path Node'
+                marker.color = 'ff00FFFF'
+                table.insert(markerList, marker)
             end
-            marker.adjacentTo = adjacentTo
-            -- Add 'Amph' to marker name
-            marker.name = 'Amph'..k
-            marker.graph = 'DefaultAmphibious'
-            marker.type = 'Amphibious Path Node'
-            marker.color = 'ff00FFFF'
-            table.insert(markerList, marker)
         end
     end
     return markerList
@@ -1818,9 +1820,11 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
             end
             if unit:IsCapturable() then 
                 -- if we can capture the unit/building then do so
+                unit.CaptureInProgress = true
                 IssueCapture({eng}, unit)
             else
                 -- if we can't capture then reclaim
+                unit.ReclaimInProgress = true
                 IssueReclaim({eng}, unit)
             end
         end
@@ -1912,9 +1916,11 @@ function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
         local checkUnits = aiBrain:GetUnitsAroundPoint(v, pos, 10, 'Enemy')
         for num, unit in checkUnits do
             if not unit.Dead and EntityCategoryContains(categories.ENGINEER, unit) then
+                unit.CaptureInProgress = true
                 IssueCapture({eng}, unit)
                 return true
             elseif not unit.Dead and not EntityCategoryContains(categories.ENGINEER, unit) then
+                unit.ReclaimInProgress = true
                 IssueReclaim({eng}, unit)
                 return true
             end

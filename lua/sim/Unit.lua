@@ -2208,7 +2208,6 @@ Unit = Class(moho.unit_methods) {
 
         -- Prevent UI mods from violating game/scenario restrictions
         local id = self:GetUnitId()
-        local bp = self:GetBlueprint()
         local index = self:GetArmy()
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))

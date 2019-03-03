@@ -661,7 +661,8 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffe
     slider:SetGoal(0, sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt.Dead and not unitBeingBuilt:BeenDestroyed() then
+
+    if not slider:BeenDestroyed() then
         slider:SetGoal(0, 0, 0)
         slider:SetSpeed(0.05)
     end

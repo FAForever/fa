@@ -1343,7 +1343,9 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     DestroyIdleEffects = function(self)
-        self.TimedSonarEffectsThread:Destroy()
+        if self.TimedSonarEffectsThread then
+            self.TimedSonarEffectsThread:Destroy()
+        end
         StructureUnit.DestroyIdleEffects(self)
     end,
 
