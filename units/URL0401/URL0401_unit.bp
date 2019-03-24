@@ -1,4 +1,4 @@
-UnitBlueprint {
+	UnitBlueprint {
     AI = {
         GuardScanRadius = 30,
         NeedUnpack = true,
@@ -275,9 +275,9 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_HighArc',
             CollideFriendly = false,
-            Damage =2000,
+            Damage =1600,
             DamageFriendly = true,
-            DamageRadius = 14,
+            DamageRadius = 12,
             DamageType = 'Normal',
             DisplayName = 'Proton Artillery',
             EnergyChargeForFirstShot = false,
@@ -287,12 +287,13 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0.85,
+            FiringRandomness = 0,
             FiringTolerance = 0,
+	FixedSpreadRadius = 80,
             Label = 'Gun01',
             LeadTarget = true,
             MaxRadius = 2000,
-            MinRadius = 50,
+            MinRadius = 150,
             MuzzleSalvoDelay = 0.25,
             MuzzleSalvoSize = 20,
             MuzzleVelocity = 160,
