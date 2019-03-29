@@ -2,8 +2,8 @@ UnitBlueprint {
     AI = {
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 5,
-        RepairConsumeMass = 0.5,
+        RepairConsumeEnergy = 0,
+        RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
     },
     Audio = {

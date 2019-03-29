@@ -3,8 +3,8 @@ UnitBlueprint {
         GuardScanRadius = 300,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 5,
-        RepairConsumeMass = 0.5,
+        RepairConsumeEnergy = 0,
+        RepairConsumeMass = 0,
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 300,
     },
@@ -39,6 +39,7 @@ UnitBlueprint {
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
+        'BUILTBYTIER1ENGINEER',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER2COMMANDER',
@@ -46,7 +47,7 @@ UnitBlueprint {
         'SERAPHIM',
         'STRUCTURE',
         'STRATEGIC',
-        'TECH2',
+        'TECH1',
         'AIRSTAGINGPLATFORM',
         'DRAGBUILD',
         'SIZE12',
@@ -118,8 +119,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 2100,
-        BuildCostMass = 175,
-        BuildTime = 534,
+        BuildCostMass = 125,
+        BuildTime = 300,
         RebuildBonusIds = {
             'xsb5202',
         },
