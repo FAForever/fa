@@ -221,7 +221,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 15,
+            Damage = 18,
             DamageType = 'Normal',
             DisplayName = 'Gatling Plasma Cannon',
             EnergyDrainPerSecond = 0,
