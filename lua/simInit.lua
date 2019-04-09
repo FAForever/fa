@@ -184,7 +184,7 @@ function SetupSession()
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
-    -- Preloads AI telplates from AI mods
+    -- Preloads AI templates from AI mods
     AIModTemplatesPreloader()
     
     ResetSyncTable()
@@ -337,7 +337,7 @@ end
 Prefetcher:Update(DefaultPrefetchSet())
 
 function AIModTemplatesPreloader()
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = __active_mods or {}
     for Index, ModData in simMods do
         ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
         if ModAIFiles[1] then
