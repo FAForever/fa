@@ -125,7 +125,7 @@
       BuildCostMass = 480,
       BuildRate = 13.66,
       BuildTime = 950,
-      MaintenanceConsumptionPerSecondEnergy = 125,
+      MaintenanceConsumptionPerSecondEnergy = 150,
       RebuildBonusIds = {
           'uab4202',
           'uab4301',

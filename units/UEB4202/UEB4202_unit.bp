@@ -118,7 +118,7 @@ UnitBlueprint {
         BuildableCategory = {
             'ueb4301',
         },
-        MaintenanceConsumptionPerSecondEnergy = 150,
+        MaintenanceConsumptionPerSecondEnergy = 200,
         RebuildBonusIds = {
             'ueb4202',
             'ueb4301',
