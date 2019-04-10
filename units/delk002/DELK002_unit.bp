@@ -257,6 +257,7 @@ UnitBlueprint {
             Damage = 100,
             DamageRadius = 1.5,
             DamageType = 'Normal',
+            DetonatesAtTargetHeight = true,
             DisplayName = 'Gatling Plasma Cannon',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,
