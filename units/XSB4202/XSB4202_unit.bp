@@ -129,14 +129,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 10000,
-        BuildCostMass = 1000,
+        BuildCostEnergy = 700,
+        BuildCostMass = 700,
         BuildRate = 12.98,
-        BuildTime = 1200,
+        BuildTime = 1250,
         BuildableCategory = {
             'xsb4301',
         },
-        MaintenanceConsumptionPerSecondEnergy = 175,
+        MaintenanceConsumptionPerSecondEnergy = 250,
         RebuildBonusIds = {
             'xsb4202',
             'xsb4301',
