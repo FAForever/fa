@@ -369,6 +369,7 @@ local AirCategories = {
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
 local Transports = { 'Trans3', 'Trans2', 'Trans1', }
 local Bombers = { 'Bomb3', 'Bomb2', 'Bomb1', }
+local T3Bombers = {'Bomb3',}                            
 local AntiAir = { 'AA3', 'AA2', 'AA1', }
 local AntiNavy = { 'AN3', 'AN2', 'AN1', }
 local Intel = { 'AIntel3', 'AIntel2', 'AIntel1', }
@@ -377,6 +378,7 @@ local EngAir = { 'AEngineer', }
 
 -- === Air Block Arrangement ===
 local ChevronSlot = { AntiAir, ExperAir, AntiNavy, GroundAttack, Bombers, Intel, Transports, EngAir, RemainingCategory }
+local StratSlot = { T3Bombers }                                
 
 local AttackChevronBlock = {
     RepeatAllRows = false,
@@ -738,7 +740,6 @@ function AttackFormation(formationUnits)
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
-
     BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
 
     CacheResults(FormationPos, formationUnits, 'AttackFormation')
@@ -793,8 +794,27 @@ function GrowthFormation(formationUnits)
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
+    
+    if unitsList.Air.Bomb3[1] then
+        local count = unitsList.Air.Bomb3[1].Count
+        local oldAirArea = unitsList.Air.AreaTotal
+        local oldUnitTotal = unitsList.Air.UnitTotal
 
-    BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+        unitsList.Air.AreaTotal = count 
+        unitsList.Air.UnitTotal = count
+        
+        BlockBuilderAirT3Bombers(unitsList.Air, 1.5) --strats formation
+        
+        --strats are already in formation so we remove them from table and adjust all parameters.
+        unitsList.Air.Bomb3 = {}
+        unitsList.Air.AreaTotal = oldAirArea - count 
+        unitsList.Air.UnitTotal = oldUnitTotal - count
+        
+        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+    else
+        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+    end   
+    
 
     CacheResults(FormationPos, formationUnits, 'GrowthFormation')
     return FormationPos
@@ -1140,6 +1160,110 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
             end
         end
     end
+
+    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+        chevronPos = 2
+    end
+
+    while unitsList.UnitTotal > 0 do
+        if chevronPos > chevronSize then
+            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+                chevronPos = 2
+            else
+                chevronPos = 1
+            end
+            chevronType = false
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+                if whichRow >= numRows then
+                    if airBlock.RepeatAllRows then
+                        whichRow = 1
+                        currRowLen = table.getn(airBlock[whichRow])
+                    end
+                else
+                    whichRow = whichRow + 1
+                    currRowLen = table.getn(airBlock[whichRow])
+                end
+                formationLength = formationLength + 1
+                whichCol = 1
+            else
+                whichCol = whichCol + 1
+            end
+        end
+
+        local currSlot = airBlock[whichRow][whichCol]
+        local inserted = false
+        for _, type in currSlot do
+            if inserted then
+                break
+            end
+            for _, group in type do
+                if not airBlock.HomogenousBlocks or chevronType == false or chevronType == type then
+                    local fs = 0
+                    local groupData = nil
+                    for k, v in unitsList[group] do
+                        if v.Count > 0 then
+                            fs = k
+                            groupData = v
+                            break
+                        end
+                    end
+                    if groupData then
+                        local xPos, yPos = GetChevronPosition(chevronPos, whichCol, formationLength)
+                        if airBlock.HomogenousBlocks and not chevronType then
+                            chevronType = type
+                        end
+                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
+                        inserted = true
+
+                        groupData.Count = groupData.Count - 1
+                        if groupData.Count <= 0 then
+                            unitsList[group][fs] = nil
+                        end
+                        break
+                    end
+                end
+            end
+        end
+        if inserted then
+            unitsList.UnitTotal = unitsList.UnitTotal - 1
+        end
+        chevronPos = chevronPos + 1
+    end
+    return FormationPos
+end
+
+function BlockBuilderAirT3Bombers(unitsList, spacing)
+    --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
+    --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
+    
+    spacing = (spacing or 1) * unitsList.Scale
+    local airBlock = {}
+    
+    if unitsList.Bomb3[1].Count > 20 then
+        airBlock = {
+            RepeatAllRows = false,
+            HomogenousBlocks = true,
+            {StratSlot}, --flight leader
+            {StratSlot,StratSlot,StratSlot}, -- 3 lines
+        }
+    else
+        airBlock = {
+            RepeatAllRows = false,
+            HomogenousBlocks = true,
+            {StratSlot}, --flight leader
+            {StratSlot,StratSlot}, -- 2 lines
+        }
+    end
+    
+    local numRows = table.getn(airBlock)
+    local whichRow = 1
+    local whichCol = 1
+    local chevronPos = 1
+    local currRowLen = table.getn(airBlock[whichRow])
+    local chevronSize = 1
+    local chevronType = false
+    local formationLength = 0
+
 
     if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
         chevronPos = 2
