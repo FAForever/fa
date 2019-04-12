@@ -366,7 +366,7 @@ UnitBlueprint {
             BuildTime = 1225,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
-            NewHealth = 2000,
+            NewHealth = 3000,
             ShowBones = {
                 'Back_Upgrade',
             },
