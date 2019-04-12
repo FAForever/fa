@@ -375,7 +375,7 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            AutoInitiateAttackCommand = true,
+            AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
