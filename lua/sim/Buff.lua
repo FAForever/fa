@@ -485,7 +485,7 @@ function PlayBuffEffect(unit, buffName, trsh)
             bufffx:ScaleEmitter(def.EffectsScale)
         end
         trsh:Add(bufffx)
-        unit.TrashOnKilled:Add(bufffx)
+        unit.Trash:Add(bufffx)
     end
 end
 
