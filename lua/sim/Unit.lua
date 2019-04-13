@@ -2091,7 +2091,16 @@ Unit = Class(moho.unit_methods) {
 
             -- Allow units to require more or less mass to level up. Decimal multipliers mean
             -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-            local defaultMult = 2
+            local techMultipliers = {
+                TECH1 = 2,
+                TECH2 = 1.5,
+                TECH3 = 1.25,
+                SUBCOMMANDER = 2,
+                EXPERIMENTAL = 2,
+                COMMAND = 2,
+            }
+            local defaultMult = techMultipliers[self.techCategory] or 2
+            
             self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
         end
 
