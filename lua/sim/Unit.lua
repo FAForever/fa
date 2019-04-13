@@ -1354,19 +1354,27 @@ Unit = Class(moho.unit_methods) {
 
     CalculateVeterancyLevel = function(self, massKilled)
         -- Limit the veterancy gain from one kill to one level worth
-        massKilled = math.min(massKilled, self.Sync.myValue)
+        massKilled = math.min(massKilled, self.Sync.myValue or self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1])
 
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
-
+        
         -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
-        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+        if self.Sync.myValue then
+            local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+            
+            -- Bail if our veterancy hasn't increased
+            if newVetLevel == self.Sync.VeteranLevel then return end
 
-        -- Bail if our veterancy hasn't increased
-        if newVetLevel == self.Sync.VeteranLevel then return end
-
-        -- Update our recorded veterancy level
-        self.Sync.VeteranLevel = newVetLevel
+            -- Update our recorded veterancy level
+            self.Sync.VeteranLevel = newVetLevel
+        else
+            if self.Sync.totalMassKilled - self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1] >= 0 then
+                self.Sync.VeteranLevel = self.Sync.VeteranLevel + 1
+            else
+                return
+            end
+        end    
 
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
@@ -1375,11 +1383,28 @@ Unit = Class(moho.unit_methods) {
         self.Sync.totalMassKilled = math.floor(massKilled)
         self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
         
-        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+        if self.Sync.myValue then
+            local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
-        if newVetLevel == self.Sync.VeteranLevel then return end
+            if newVetLevel == self.Sync.VeteranLevel then return end
 
-        self.Sync.VeteranLevel = newVetLevel
+            self.Sync.VeteranLevel = newVetLevel
+        else
+            if self.Sync.totalMassKilled  < self.Sync.manualVeterancy[1] then
+                return
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[2] then
+                self.Sync.VeteranLevel = 1
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[3] then
+                self.Sync.VeteranLevel = 2
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[4] then
+                self.Sync.VeteranLevel = 3
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[5] then
+                self.Sync.VeteranLevel = 4
+            else
+                self.Sync.VeteranLevel = 5
+            end
+        end
+        
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
@@ -1387,8 +1412,12 @@ Unit = Class(moho.unit_methods) {
     SetVeterancy = function(self, veteranLevel)
         if veteranLevel <= 0 or veteranLevel > 5 then return end
         if not self.gainsVeterancy then return end
-
-        self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+        
+        if self.Sync.myValue then
+            self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+        else
+            self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel])
+        end    
     end,
 
     -- Set the veteran level to the level specified
@@ -2112,20 +2141,31 @@ Unit = Class(moho.unit_methods) {
             self.Sync.totalMassKilled = 0
             self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
-
-            -- Allow units to require more or less mass to level up. Decimal multipliers mean
-            -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-            local techMultipliers = {
-                TECH1 = 2,
-                TECH2 = 1.5,
-                TECH3 = 1.25,
-                SUBCOMMANDER = 2,
-                EXPERIMENTAL = 2,
-                COMMAND = 2,
-            }
-            local defaultMult = techMultipliers[self.techCategory] or 2
             
-            self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
+            -- Values can be setting up manually via bp.
+            if bp.VeteranMass then
+                self.Sync.manualVeterancy = {
+                    [1] = bp.VeteranMass[1],
+                    [2] = bp.VeteranMass[1] + bp.VeteranMass[2],
+                    [3] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3],
+                    [4] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4],
+                    [5] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4] + bp.VeteranMass[5],
+                }
+            else
+                -- Allow units to require more or less mass to level up. Decimal multipliers mean
+                -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
+                local techMultipliers = {
+                    TECH1 = 2,
+                    TECH2 = 1.5,
+                    TECH3 = 1.25,
+                    SUBCOMMANDER = 2,
+                    EXPERIMENTAL = 2,
+                    COMMAND = 2,
+                }
+                local defaultMult = techMultipliers[self.techCategory] or 2
+                
+                self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
+            end
         end
 
         self:EnableUnitIntel('NotInitialized', nil)

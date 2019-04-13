@@ -392,7 +392,9 @@ function UpdateWindow(info)
         local massKilled = UnitData[info.entityId].totalMassKilled
         local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
         local myValue = UnitData[info.entityId].myValue
-
+        local manualVeterancy = UnitData[info.entityId].manualVeterancy
+        local bp = __blueprints[info.blueprintId]
+        
         for level = 1, 5 do
             if currentLevel >= level then
                 controls.vetIcons[level]:Show()
@@ -403,16 +405,32 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy progress bar
-        if massKilled and myValue then
-            local progress = math.min(massKilled / myValue, 5) - currentLevel
+        if massKilled then
+            local progress = false
+            if myValue then
+                progress = math.min(massKilled / myValue, 5) - currentLevel
+            elseif manualVeterancy then
+                local m = manualVeterancy[currentLevel] or 0
+                local lvl = math.min(currentLevel + 1, 5)
+                
+                progress = (massKilled - m) / bp.VeteranMass[lvl]
+            end
+            
             if progress then
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
                     controls.vetTitle:SetText('Veterancy')
-
-                    local nextLevel = myValue * (currentLevel + 1)
+                    
+                    local nextLevel
                     local text
+                    
+                    if myValue then
+                        nextLevel = myValue * (currentLevel + 1)
+                    else
+                        nextLevel = manualVeterancy[currentLevel + 1]
+                    end    
+                    
                     if nextLevel >= 1000000 then
                         text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
                     elseif nextLevel >= 100000 then
