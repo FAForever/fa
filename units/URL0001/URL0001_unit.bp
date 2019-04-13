@@ -764,6 +764,13 @@ UnitBlueprint {
         Level4 = 90,
         Level5 = 120,
     },
+    VeteranMass = {
+        1000,
+        1250,
+        1750,
+        2500,
+        3500,
+    },
     VeteranHealingMult = { -- This table is used to override the vet instant heal multiplier per level
         0.1,
         0.2,
