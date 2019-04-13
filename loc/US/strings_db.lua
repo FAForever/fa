@@ -5,14 +5,14 @@
 ##SACU Presets
 
 ##Aeon
+ual0301_AdvancedCombat_desc="Support Armoured Command Unit (Advanced Combatant preset)"
+ual0301_AdvancedCombat_help="Enhanced during construction with the Reacton Refractor, ChronoDampener and Nano-Repair System."
+ual0301_AdvancedCombat_name="SACU (Advanced Combat Preset)"
 ual0301_Engineer_desc="Support Armoured Command Unit (Engineer Preset)"
 ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator."
 ual0301_Engineer_name="SACU (Engineer Preset)"
-ual0301_NanoCombat_desc="Support Armoured Command Unit (Nano Combatant Preset)"
-ual0301_NanoCombat_help="Enhanced during construction with the Reacton Refractor and Nano-Repair System."
-ual0301_NanoCombat_name="SACU (Nano Combatant Preset)"
 ual0301_Rambo_desc="Support Armoured Command Unit (Rambo Preset)"
-ual0301_Rambo_help="Enhanced during construction with the Heavy Personal Shield and Reacton Refractor."
+ual0301_Rambo_help="Enhanced during construction with the Heavy Personal Shield, Nano-Repair System and Reacton Refractor."
 ual0301_Rambo_name="SACU (Rambo Preset)"
 ual0301_ShieldCombat_desc="Support Armoured Command Unit (Shield Combatant Preset)"
 ual0301_ShieldCombat_help="Enhanced during construction with the Personal Shield and Reacton Refractor."

@@ -10,11 +10,13 @@ local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
 
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
+        ChronoDampener = Class(ADFChronoDampener) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
     },
 
@@ -27,6 +29,7 @@ UAL0301 = Class(CommandUnit) {
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
+        self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
@@ -98,10 +101,12 @@ UAL0301 = Class(CommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonSCUBuildRate')
+            self:AddCommandCap('RULEUCC_Sacrifice')
         elseif enh == 'EngineeringFocusingModuleRemove' then
             if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
+            self:RemoveCommandCap('RULEUCC_Sacrifice')
         -- SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
             local name = 'AeonSCURegenRate'
@@ -125,11 +130,30 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCURegenRate') then
                 Buff.RemoveBuff(self, 'AeonSCURegenRate')
             end
-        -- Sacrifice
-        elseif enh == 'Sacrifice' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
-        elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')
+        -- ChronoDampener
+        elseif enh == 'ChronoDampener' then
+            self:SetWeaponEnabledByLabel('ChronoDampener', true)
+			if not Buffs['AeonSCUChronoDampener'] then
+                BuffBlueprint {
+                    Name = 'AeonSCUChronoDampener',
+                    DisplayName = 'AeonSCUChronoDampener',
+                    BuffType = 'DamageStabilization',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.NewHealth,
+                            Mult = 1.0,
+                        },
+                    },
+                }
+            end
+            Buff.ApplyBuff(self, 'AeonSCUChronoDampener')
+        elseif enh == 'ChronoDampenerRemove' then
+            self:SetWeaponEnabledByLabel('ChronoDampener', false)
+			if Buff.HasBuff(self, 'AeonSCUChronoDampener') then
+                Buff.RemoveBuff(self, 'AeonSCUChronoDampener')
+            end
         -- StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
