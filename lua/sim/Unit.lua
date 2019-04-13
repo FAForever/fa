@@ -1272,11 +1272,6 @@ Unit = Class(moho.unit_methods) {
         
         massTrue = mass
         
-        -- Non-combat structures only give 50% veterancy
-        if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
-            mass = mass * 0.5
-        end
-
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
