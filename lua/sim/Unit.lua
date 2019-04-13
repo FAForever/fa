@@ -1256,6 +1256,12 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
+        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
+
+        if self.DeathWeaponEnabled ~= false then
+            self:DoDeathWeapon()
+        end
+
         -- Notify instigator of kill and spread veterancy
         -- We prevent any vet spreading if the instigator isn't part of the vet system (EG - Self destruct)
         -- This is so that you can bring a damaged Experimental back to base, kill, and rebuild, without granting
@@ -1263,13 +1269,7 @@ Unit = Class(moho.unit_methods) {
         if self.totalDamageTaken > 0 and not self.veterancyDispersed then
             self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
-
-        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
-
-        if self.DeathWeaponEnabled ~= false then
-            self:DoDeathWeapon()
-        end
-
+        
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
