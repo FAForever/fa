@@ -29,7 +29,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 10,
         LiftFactor = 7,
-        MaxAirspeed = 8,
+        MaxAirspeed = 12,
         MinAirspeed = 0,
         StartTurnDistance = 50,
     },
@@ -350,6 +350,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 300,
+            DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
@@ -359,12 +360,12 @@ UnitBlueprint {
             HeadingArcCenter = 230,
             HeadingArcRange = 120,
             Label = 'SonicPulseBattery1',
-            MaxRadius = 64,
+            MaxRadius = 120,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,
             ProjectileId = '/projectiles/AAAZealotMissile01/AAAZealotMissile01_proj.bp',
-            ProjectileLifetime = 4,
+            ProjectileLifetime = 6,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -418,7 +419,8 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 300,
+           DamageRadius = 2,
+           Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
@@ -428,7 +430,7 @@ UnitBlueprint {
             HeadingArcCenter = 310,
             HeadingArcRange = 120,
             Label = 'SonicPulseBattery2',
-            MaxRadius = 64,
+            MaxRadius = 120,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,
@@ -488,6 +490,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
+            DamageRadius = 2,
             Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
@@ -498,7 +501,7 @@ UnitBlueprint {
             HeadingArcCenter = 130,
             HeadingArcRange = 120,
             Label = 'SonicPulseBattery3',
-            MaxRadius = 64,
+            MaxRadius = 120,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,
@@ -559,6 +562,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 300,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
@@ -568,13 +572,13 @@ UnitBlueprint {
             HeadingArcCenter = 50,
             HeadingArcRange = 120,
             Label = 'SonicPulseBattery4',
-            MaxRadius = 64,
+            MaxRadius = 120,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AAAZealotMissile01/AAAZealotMissile01_proj.bp',
-            ProjectileLifetime = 4,
+            ProjectileLifetime = 6,
             RackBones = {
                 {
                     MuzzleBones = {
