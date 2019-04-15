@@ -588,8 +588,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnPaused = function(self)
-        self:SetActiveConsumptionInactive()
-        self:StopUnitAmbientSound('ConstructLoop')
+        if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
+            self:SetActiveConsumptionInactive()
+            self:StopUnitAmbientSound('ConstructLoop')
+        end
     end,
 
     OnUnpaused = function(self)
