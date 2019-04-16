@@ -465,7 +465,7 @@ UnitBlueprint {
             MuzzleVelocity = 100,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AAAZealotMissile01/AAAZealotMissile01_proj.bp',
-            ProjectileLifetime = 4,
+            ProjectileLifetime = 6,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -536,7 +536,7 @@ UnitBlueprint {
             MuzzleVelocity = 100,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AAAZealotMissile01/AAAZealotMissile01_proj.bp',
-            ProjectileLifetime = 4,
+            ProjectileLifetime = 6,
             RackBones = {
                 {
                     MuzzleBones = {
