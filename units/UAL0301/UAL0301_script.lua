@@ -14,6 +14,7 @@ local Buff = import('/lua/sim/Buff.lua')
 
 UAL0301 = Class(CommandUnit) {
     Weapons = {
+        ChronoDampener = Class(ADFChronoDampener) {},
         RightReactonCannon = Class(ADFReactonCannon) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
     },
@@ -26,6 +27,7 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
+        self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self.UnitBeingBuilt = nil
@@ -48,6 +50,13 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
+        -- Chrono Dampener
+        elseif enh == 'ChronoDampener' then
+            self:SetWeaponEnabledByLabel('ChronoDampener', true)
+        elseif enh == 'ChronoDampenerRemove' then
+            if Buff.HasBuff(self, 'AeonACUChronoDampener') then
+                Buff.RemoveBuff(self, 'AeonACUChronoDampener')
+            self:SetWeaponEnabledByLabel('ChronoDampener', false)
         -- Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
@@ -130,6 +139,15 @@ UAL0301 = Class(CommandUnit) {
             self:AddCommandCap('RULEUCC_Sacrifice')
         elseif enh == 'SacrificeRemove' then
             self:RemoveCommandCap('RULEUCC_Sacrifice')
+        --GunUpgrade
+        elseif enh =='GunUpgrade' then
+             local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 0)
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+        elseif enh =='GunUpgradeRemove' then
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
         -- StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
