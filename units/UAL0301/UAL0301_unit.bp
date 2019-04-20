@@ -377,6 +377,33 @@ UnitBlueprint {
             },
             Slot = 'LCH',
         },
+		GunUpgrade = {
+            BuildCostEnergy = 7000,
+            BuildCostMass = 500,
+            BuildTime = 2300,
+            Icon = 'hsa',
+  	        -- NewDamageRadiusMod = 3.5,
+            NewMaxRadius = 40,
+			-- NewRateOfFire= 2,
+			-- NewDamageRadiusMod = -4,
+            Name = '<LOC enhancements_0158>Gun Upgrade',
+            Slot = 'LCH',
+        },
+        GunUpgradeRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'hsa',
+            Name = '<LOC enhancements_0027>Remove Gun Upgrade',
+			NewMaxRadius=-10,
+			--NewDamageRadiusMod = -4,
+            Prerequisite = 'GunUpgrade',
+            RemoveEnhancements = {
+                'GunUpgrade',
+                'GunUpgradeRemove',
+            },
+            Slot = 'LCH',
+        },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,
@@ -536,7 +563,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
 
-            NewMaxRadius = 40,
+        --    NewMaxRadius = 40,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',

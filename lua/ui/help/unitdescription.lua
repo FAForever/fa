@@ -347,7 +347,9 @@ Description = {
     ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
 	['ual0301-cd'] = "<LOC Unit_Description_0157>Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption.",
-
+	['ual0301-gun'] = "<LOC Unit_Description_0158>Upgrades Gun.",
+	
+	
     -- AEON -- Support Commander Presets
     ['ual0301_Engineer']     = "<LOC ual0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with rapid fabrication enhancement.",
     ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",

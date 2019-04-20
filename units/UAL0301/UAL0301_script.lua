@@ -125,6 +125,21 @@ UAL0301 = Class(CommandUnit) {
             wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+			elseif enh =='StabilitySuppressant' then
+		--GunUpgrade
+		elseif enh =='GunUpgrade' then
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 0)
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+			wep:ChangeRateOfFire(bp.NewRateOfFire)
+        elseif enh =='GunUpgradeRemove' then
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+			wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
+		-- ChronoDampener
          elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
             if not Buffs['AeonSACUChronoDampener'] then
