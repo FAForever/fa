@@ -300,8 +300,8 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 27100,
         BuildCostMass = 1950,
-        BuildRate = 56,
-        BuildTime = 14400,
+        BuildRate = 20,
+        BuildTime = 9000,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
         },
@@ -556,40 +556,6 @@ UnitBlueprint {
             },
             Slot = 'RCH',
         },
-        SystemIntegrityCompensator = {
-            BuildCostEnergy = 74000,
-            BuildCostMass = 1500,
-            BuildTime = 6720,
-            Icon = 'sic',
-            Name = '<LOC enhancements_0033>Nano-Repair System',
-            NewRegenRate = 300,
-            ShowBones = {
-                'Turbine',
-            },
-            Slot = 'Back',
-            UpgradeEffectBones = {
-                'Turbine',
-            },
-            UpgradeUnitAmbientBones = {
-                'UAL0301',
-            },
-        },
-        SystemIntegrityCompensatorRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = {
-                'Turbine',
-            },
-            Icon = 'sic',
-            Name = '<LOC enhancements_0034>Remove Nano-Repair System',
-            Prerequisite = 'SystemIntegrityCompensator',
-            RemoveEnhancements = {
-                'SystemIntegrityCompensator',
-                'SystemIntegrityCompensatorRemove',
-            },
-            Slot = 'Back',
-        },
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
@@ -635,17 +601,6 @@ UnitBlueprint {
             HelpText = '<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid replicator enhancement.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_Engineer_name>SACU (Engineer preset)',
-        },
-        NanoCombat = {
-            BuildIconSortPriority = 25,
-            Description = '<LOC ual0301_NanoCombat_desc>SACU (Nano Combatant preset)',
-            Enhancements = {
-                'StabilitySuppressant',
-                'SystemIntegrityCompensator',
-            },
-            HelpText = '<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.',
-            SortCategory = 'SORTOTHER',
-            UnitName = '<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)',
         },
         Rambo = {
             BuildIconSortPriority = 35,
