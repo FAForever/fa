@@ -318,6 +318,40 @@ UnitBlueprint {
         TeleportTimeMod = 0.0001,
     },
     Enhancements = {
+		ChronoDampener = {
+            BuildCostEnergy = 52500,
+            BuildCostMass = 1750,
+            BuildTime = 1225,
+            Icon = 'cd',
+            Name = '<LOC enhancements_0002>Chrono Dampener',
+            NewHealth = 3000,
+            ShowBones = {
+                'Turbine',
+            },
+            Slot = 'Back',
+            UpgradeEffectBones = {
+                'Turbine',
+            },
+            UpgradeUnitAmbientBones = {
+                'UAL0301',
+            },
+        },
+        ChronoDampenerRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = {
+                'Turbine',
+            },
+            Icon = 'cd',
+            Name = '<LOC enhancements_0003>Remove Chrono Dampener',
+            Prerequisite = 'ChronoDampener',
+            RemoveEnhancements = {
+                'ChronoDampener',
+                'ChronoDampenerRemove',
+            },
+            Slot = 'Back',
+        },
         EngineeringFocusingModule = {
             BuildCostEnergy = 50500,
             BuildCostMass = 800,
@@ -830,6 +864,82 @@ UnitBlueprint {
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
+        },
+		{
+            AboveWaterFireOnly = true,
+            AboveWaterTargetsOnly = true,
+            BallisticArc = 'RULEUBA_None',
+            Buffs = {
+                {
+                    Add = {
+                        OnFire = true,
+                    },
+                    BuffType = 'STUN',
+                    Duration = 2.5,
+                    Radius = 35,
+                    TargetAllow = 'MOBILE',
+                    TargetDisallow = 'EXPERIMENTAL, COMMAND',
+                },
+            },
+            CanFireFromTransport = true,
+            CollideFriendly = false,
+            Damage = 1,
+            DamageRadius = 0,
+            DamageType = 'Normal',
+            DisplayName = 'Chrono Dampener',
+            EnabledByEnhancement = 'ChronoDampener',
+            EnergyChargeForFirstShot = false,
+            EnergyDrainPerSecond = 200,
+            EnergyRequired = 200,
+            FireTargetLayerCapsTable = {
+                Land = 'Land|Water|Seabed',
+                Seabed = 'Land|Water|Seabed',
+                Water = 'Land|Water|Seabed',
+            },
+            FiringTolerance = 360,
+            Label = 'ChronoDampener',
+            MaxRadius = 35,
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
+            MuzzleVelocity = 30,
+            ProjectileLifetimeUsesMultiplier = 1.15,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Torso',
+                    },
+                    RackBone = 'Torso',
+                },
+            },
+            RackFireTogether = false,
+            RackRecoilDistance = 0,
+            RackReloadTimeout = 10,
+            RackSalvoChargeTime = 0,
+            RackSalvoReloadTime = 0,
+            RackSalvoSize = 1,
+            RackSlavedToTurret = false,
+            RangeCategory = 'UWRC_IndirectFire',
+
+            -- Chrono firing is limited by the weapon script timer mechanism
+            -- Check and try to fire every tick so that OC does not cause an
+            -- additional 5s delay, and repeated OC doesn't jam the system.
+            RateOfFire = 10,
+            TargetCheckInterval = 0.1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TurretDualManipulators = false,
+            TurretPitch = 0,
+            TurretPitchRange = 0,
+            TurretPitchSpeed = 0,
+            TurretYaw = 0,
+            TurretYawRange = 0,
+            TurretYawSpeed = 0,
+            Turreted = false,
+            WeaponCategory = 'Direct Fire',
+            WeaponRepackTimeout = 0,
+            WeaponUnpacks = false,
         },
         {
             AboveWaterTargetsOnly = true,

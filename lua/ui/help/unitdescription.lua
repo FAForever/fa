@@ -346,6 +346,7 @@ Description = {
     ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
     ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
+	['ual0301-cd'] = "<LOC Unit_Description_0157>Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption.",
 
     -- AEON -- Support Commander Presets
     ['ual0301_Engineer']     = "<LOC ual0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with rapid fabrication enhancement.",
