@@ -319,16 +319,16 @@ UnitBlueprint {
     },
     Enhancements = {
 		ChronoDampener = {
-            BuildCostEnergy = 52500,
-            BuildCostMass = 1750,
-            BuildTime = 1225,
+            BuildCostEnergy = 60000,
+            BuildCostMass = 3000,
+            BuildTime = 9900,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
             NewHealth = 3000,
             ShowBones = {
                 'Turbine',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeEffectBones = {
                 'Turbine',
             },
@@ -350,7 +350,7 @@ UnitBlueprint {
                 'ChronoDampener',
                 'ChronoDampenerRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         EngineeringFocusingModule = {
             BuildCostEnergy = 50500,
@@ -359,7 +359,7 @@ UnitBlueprint {
             Icon = 'efm',
             Name = '<LOC enhancements_0022>Rapid Fabricator',
             NewBuildRate = 98,
-            Slot = 'LCH',
+            Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
             },
@@ -375,12 +375,12 @@ UnitBlueprint {
                 'EngineeringFocusingModule',
                 'EngineeringFocusingModuleRemove',
             },
-            Slot = 'LCH',
+            Slot = 'RCH',
         },
 		GunUpgrade = {
             BuildCostEnergy = 7000,
             BuildCostMass = 500,
-            BuildTime = 2300,
+            BuildTime = 1000,
             Icon = 'hsa',
   	        -- NewDamageRadiusMod = 3.5,
             NewMaxRadius = 40,
@@ -395,7 +395,7 @@ UnitBlueprint {
             BuildTime = 0.1,
             Icon = 'hsa',
             Name = '<LOC enhancements_0027>Remove Gun Upgrade',
-			NewMaxRadius=-10,
+			NewMaxRadius=30,
 			--NewDamageRadiusMod = -4,
             Prerequisite = 'GunUpgrade',
             RemoveEnhancements = {
@@ -412,7 +412,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0024>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
             ProductionPerSecondMass = 10,
-            Slot = 'RCH',
+            Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
             },
@@ -428,7 +428,7 @@ UnitBlueprint {
                 'ResourceAllocation',
                 'ResourceAllocationRemove',
             },
-            Slot = 'RCH',
+            Slot = 'Back',
         },
         Sacrifice = {
             BuildCostEnergy = 2500,
@@ -455,9 +455,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 64950,
+            BuildCostEnergy = 24000,
             BuildCostMass = 1200,
-            BuildTime = 5040,
+            BuildTime = 2400,
             Icon = 'tsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 300,
@@ -482,7 +482,7 @@ UnitBlueprint {
             },
         },
         ShieldHeavy = {
-            BuildCostEnergy = 100000,
+            BuildCostEnergy = 80000,
             BuildCostMass = 1800,
             BuildTime = 7000,
             Icon = 'htsg',
@@ -556,14 +556,15 @@ UnitBlueprint {
             },
         },
         StabilitySuppressant = {
-            BuildCostEnergy = 46200,
-            BuildCostMass = 1250,
-            BuildTime = 6048,
+            BuildCostEnergy = 60000,
+            BuildCostMass = 3000,
+            BuildTime = 9900,
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
-            NewDamageRadiusMod = 3.5,
-
+            NewDamageRadius = 3.5,
+			NewRateOfFire= 2,
         --    NewMaxRadius = 40,
+		
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
@@ -575,7 +576,7 @@ UnitBlueprint {
             BuildTime = 0.1,
             Icon = 'ss',
             Name = '<LOC enhancements_0032>Remove Reacton Refractor',
-            NewDamageRadiusMod = -4,
+            NewDamageRadius = -3.5,
             Prerequisite = 'StabilitySuppressant',
             RemoveEnhancements = {
                 'StabilitySuppressant',

@@ -117,28 +117,28 @@ UAL0301 = Class(CommandUnit) {
         -- StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+            --wep:AddDamageMod(bp.NewDamageMod or 0)
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+            --wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+			wep:ChangeRateOfFire(bp.NewRateOfFire)
         elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-			elseif enh =='StabilitySuppressant' then
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+            --wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+			wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
 		--GunUpgrade
 		elseif enh =='GunUpgrade' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+            --wep:AddDamageMod(bp.NewDamageMod or 0)
+            --wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
-			wep:ChangeRateOfFire(bp.NewRateOfFire)
+			--wep:ChangeRateOfFire(bp.NewRateOfFire)
         elseif enh =='GunUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+            --wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            --wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-			wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
+			--wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
 		-- ChronoDampener
          elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
