@@ -51,7 +51,7 @@ ProjectileBlueprint {
     Economy = {
         BuildCostEnergy = 1350000,
         BuildCostMass = 12000,
-        BuildTime = 567000,
+        BuildTime = 450000,
     },
     General = {
         Category = 'Missile',
