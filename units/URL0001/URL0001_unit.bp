@@ -600,7 +600,7 @@ UnitBlueprint {
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER CYBRAN',
             Icon = 'ees',
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
-            NewBuildRate = 100,
+            NewBuildRate = 126,
             NewHealth = 3500,
             NewRegenRate = 20,
             Prerequisite = 'AdvancedEngineering',
