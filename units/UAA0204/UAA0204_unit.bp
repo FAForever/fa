@@ -185,8 +185,8 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
+        BuildCostEnergy = 5400,
+        BuildCostMass = 270,
         BuildTime = 1600,
     },
     Footprint = {
@@ -219,7 +219,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        SonarRadius = 90,
+        SonarRadius = 45,
         VisionRadius = 32,
     },
     Interface = {
