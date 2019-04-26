@@ -4,8 +4,8 @@ UnitBlueprint {
         StagingPlatformScanRadius = 300,
         RefuelingMultiplier = 75,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 5,
-        RepairConsumeMass = 0.5,
+        RepairConsumeEnergy = 50,
+        RepairConsumeMass = 0,
         TargetBones = {
             'Bay_Cover',
             'Front_Core',
