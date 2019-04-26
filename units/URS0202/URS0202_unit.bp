@@ -5,7 +5,7 @@ UnitBlueprint {
         StagingPlatformScanRadius = 300,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 50,
+        RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         TargetBones = {
             'URS0202',

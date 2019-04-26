@@ -2,7 +2,7 @@ UnitBlueprint {
     AI = {
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 50,
+        RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
     },
