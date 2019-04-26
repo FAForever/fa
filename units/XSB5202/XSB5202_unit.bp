@@ -39,6 +39,7 @@ UnitBlueprint {
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
+        'BUILTBYTIER1ENGINEER',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER2COMMANDER',
@@ -46,7 +47,7 @@ UnitBlueprint {
         'SERAPHIM',
         'STRUCTURE',
         'STRATEGIC',
-        'TECH2',
+        'TECH1',
         'AIRSTAGINGPLATFORM',
         'DRAGBUILD',
         'SIZE12',

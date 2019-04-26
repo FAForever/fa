@@ -29,6 +29,7 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
+        'BUILTBYTIER1ENGINEER',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER2COMMANDER',
@@ -36,7 +37,7 @@ UnitBlueprint {
         'CYBRAN',
         'STRUCTURE',
         'STRATEGIC',
-        'TECH2',
+        'TECH1',
         'AIRSTAGINGPLATFORM',
         'DRAGBUILD',
         'SIZE12',
