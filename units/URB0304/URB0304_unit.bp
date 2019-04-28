@@ -151,8 +151,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 30000,
-        BuildCostMass = 3000,
-        BuildRate = 120,
+        BuildCostMass = 2000,
+        BuildRate = 150,
         BuildTime = 4097,
         BuildableCategory = {
             'BUILTBYQUANTUMGATE CYBRAN',
