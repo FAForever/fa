@@ -36,20 +36,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Stun = {   
-            Add = {
-                OnImpact = true,
-                OnDeath = true,
-            },
-            AppliedToTarget = false,
-            BuffType = 'STUN',
-            Duration = 2,
-            Radius = 6,
-            TargetAllow = 'MOBILE', --ALLUNITS
-            TargetDisallow = 'EXPERIMENTAL, WALL, COMMAND',
-        },
-    },
     BuildIconSortPriority = 80,
     Categories = {
         'PRODUCTFA',
@@ -72,8 +58,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'FireBeetle',
         EconomyThreatLevel = 0,
-        Health = 500,
-        MaxHealth = 500,
+        Health = 700,
+        MaxHealth = 700,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
@@ -124,9 +110,9 @@ UnitBlueprint {
         UniformScale = 0.054,
     },
     Economy = {
-        BuildCostEnergy = 1800,
-        BuildCostMass = 300,
-        BuildTime = 1200,
+        BuildCostEnergy = 3000,
+        BuildCostMass = 400,
+        BuildTime = 1500,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -207,16 +193,16 @@ UnitBlueprint {
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
-        TransportClass = 1,
+        TransportClass = 2,
         CanFireFromTransport = false,
     },
     Weapon = {
         {            
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1499,
+            Damage = 3500,
             DamageFriendly = false,
-            DamageRadius = 6,
+            DamageRadius = 2,
             DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
             FireOnSelfDestruct = true,
