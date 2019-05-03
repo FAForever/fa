@@ -608,7 +608,7 @@ UnitBlueprint {
             Enhancements = {
                 'EngineeringFocusingModule',
             },
-            HelpText = '<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid replicator enhancement.',
+            HelpText = '<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with Rapid Fabricator and Sacrificial module.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_Engineer_name>SACU (Engineer preset)',
         },

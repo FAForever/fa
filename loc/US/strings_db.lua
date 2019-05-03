@@ -9,7 +9,7 @@ ual0301_AdvancedCombat_desc="Support Armoured Command Unit (Advanced Combatant p
 ual0301_AdvancedCombat_help="Enhanced during construction with the Reacton Refractor, ChronoDampener and Nano-Repair System."
 ual0301_AdvancedCombat_name="SACU (Advanced Combat Preset)"
 ual0301_Engineer_desc="Support Armoured Command Unit (Engineer Preset)"
-ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator."
+ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator and Sacrificial module."
 ual0301_Engineer_name="SACU (Engineer Preset)"
 ual0301_Rambo_desc="Support Armoured Command Unit (Rambo Preset)"
 ual0301_Rambo_help="Enhanced during construction with the Heavy Personal Shield, Nano-Repair System and Reacton Refractor."
@@ -1736,9 +1736,9 @@ Unit_Description_0166="Adds Teleportation capability. Requires considerable ener
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU build-power."
+Unit_Description_0168="Massively increases SACU build-power, Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
 Unit_Description_0169="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
-Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
+Unit_Description_0170="Creates a Quantum Stasis Field around the SACU. Immobilizes enemy units within its radius."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
 Unit_Description_0172="Greatly increases Personal Shield HP. Requires energy to run."
 Unit_Description_0173="Equips the standard SACU cannon with Area-Of-Effect damage."
