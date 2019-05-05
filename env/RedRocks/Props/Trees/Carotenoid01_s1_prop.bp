@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Carotenoid01_s1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -57,7 +57,7 @@ PropBlueprint {
         ReclaimTime = 5,
     },
     Interface = {
-        HelpText = 'Small Tree - Bug',
+        HelpText = 'Small Tree - Carotenoid',
     },
     Physics = {
         BlockPath = false,

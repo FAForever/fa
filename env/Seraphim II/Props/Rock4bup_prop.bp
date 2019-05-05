@@ -2,9 +2,10 @@ PropBlueprint {
     Categories = {
         'INVULNERABLE',
     },
-    CollisionOffsetX = 1,
-    CollisionOffsetY = 1,
-    CollisionOffsetZ = 1,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
@@ -20,13 +21,21 @@ PropBlueprint {
         },
         UniformScale = 0.09,
     },
+    Economy = {
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
     Interface = {
-        HelpText = 'UEF Buildings',
+        HelpText = 'Huge Rock',
     },
     Physics = {
         BlockPath = true,
     },
-    SizeX = 8,
-    SizeY = 8,
-    SizeZ = 8,
+    SizeX = 30,
+    SizeY = 15,
+    SizeZ = 24,
 }

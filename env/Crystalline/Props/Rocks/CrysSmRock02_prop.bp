@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'CrysSmRock01_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -28,7 +28,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Small Rock',
+        HelpText = 'Ice Crystal',
     },
     Physics = {
         BlockPath = true,

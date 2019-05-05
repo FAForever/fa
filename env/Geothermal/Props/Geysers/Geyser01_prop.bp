@@ -27,7 +27,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Large Rock - Geyser',
+        HelpText = 'Geyser',
     },
     Physics = {
         BlockPath = true,

@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'UEF_car1_Albedo.dds',
                     SpecName = 'UEF_car1_SpecTeam.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,7 +22,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 10,
+        ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
     Footprint = {

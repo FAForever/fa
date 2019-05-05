@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '/env/geothermal/props/rocks/GeoRock01_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -33,7 +33,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = 1,
-    SizeY = 1,
-    SizeZ = 1,
+    SizeX = 0.75,
+    SizeY = 0.75,
+    SizeZ = 0.75,
 }

@@ -42,7 +42,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {

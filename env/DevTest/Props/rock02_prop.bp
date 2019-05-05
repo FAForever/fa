@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -27,7 +27,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'A big round thing',
+        HelpText = 'Sphere',
     },
     Physics = {
         BlockPath = true,

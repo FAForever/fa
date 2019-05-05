@@ -43,14 +43,14 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Seraphim Streetlight',
+        HelpText = 'Seraphim Streetlight - Light',
     },
     Physics = {
         BlockPath = false,
@@ -58,6 +58,6 @@ PropBlueprint {
     ScriptClass = 'Tree',
     ScriptModule = '/lua/proptree.lua',
     SizeX = 0.5,
-    SizeY = 2,
+    SizeY = 1.5,
     SizeZ = 0.5,
 }

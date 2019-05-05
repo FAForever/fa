@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     -- share other rock's albedo and specteam
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'TMeshAlpha',
                 },
             },
@@ -21,17 +21,17 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 37.5,
+        ReclaimMassMax = 150,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 0,
+        OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Medium Wreckage',
+        HelpText = 'Obsidian Wreckage',
     },
     Physics = {
-        BlockPath = false,
+        BlockPath = true,
     },
     ScriptClass = 'Wreckage',
     ScriptModule = '/lua/wreckage.lua',

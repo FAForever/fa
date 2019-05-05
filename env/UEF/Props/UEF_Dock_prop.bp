@@ -13,12 +13,12 @@ PropBlueprint {
                 {
                     AlbedoName = 'UEF_dock_Albedo.dds',
                     SpecName = 'UEF_dock_SpecTeam.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 225,
                     ShaderName = 'Unit',
                 },
                 {
                     AlbedoName = 'UEF_dock_lod1_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'Unit',
                     SpecularName = 'UEF_dock_lod1_specteam.dds',
                 },
@@ -28,19 +28,19 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 75,
+        ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 0,
+        OccupancyCaps = 3,
     },
     Interface = {
         HelpText = 'UEF Dock',
     },
     Physics = {
-        BlockPath = false,
+        BlockPath = true,
     },
-    SizeX = 8,
+    SizeX = 8.5,
     SizeY = 0.1,
     SizeZ = 6,
 }

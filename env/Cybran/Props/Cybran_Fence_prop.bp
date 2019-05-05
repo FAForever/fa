@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_fence_Albedo.dds',
                     SpecName = 'cybran_fence_SpecTeam.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'Unit',
                 },
             },
@@ -21,8 +21,8 @@ PropBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        ReclaimEnergyMax = 5,
-        ReclaimMassMax = 75,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
     Footprint = {

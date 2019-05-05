@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'UEF_Bus_Albedo.dds',
                     SpecName = 'UEF_Bus_SpecTeam.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,7 +22,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 10,
+        ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
     Footprint = {

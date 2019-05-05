@@ -1,6 +1,6 @@
 PropBlueprint {
     Categories = {
-        'RECLAIMABLE',
+        'INVULNERABLE',
     },
     Defense = {
         Health = 50,
@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybranadjacencynodethree_Albedo.dds',
                     SpecName = 'cybranadjacencynodethree_SpecTeam.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 3000,
                     ShaderName = 'Unit',
                 },
             },
@@ -21,18 +21,18 @@ PropBlueprint {
         UniformScale = 0.5,
     },
     Economy = {
-        ReclaimEnergyMax = 0,
-        ReclaimMassMax = 5,
-        ReclaimTime = 5,
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
     },
     Footprint = {
-        OccupancyCaps = 0,
+        OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'cybran Adjacency Node',
+        HelpText = 'Cybran Adjacency Node',
     },
     Physics = {
-        BlockPath = false,
+        BlockPath = true,
     },
     SizeX = 0,
     SizeY = 0,

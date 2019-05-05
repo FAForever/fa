@@ -38,18 +38,18 @@ PropBlueprint {
                 },
             },
         },
-        UniformScale = 0.05,
+        UniformScale = 0.2,
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Street Light',
+        HelpText = 'Seraphim Streetlight - Dark',
     },
     Physics = {
         BlockPath = false,

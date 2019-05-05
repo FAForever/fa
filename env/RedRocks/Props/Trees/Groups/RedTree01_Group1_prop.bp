@@ -2,9 +2,9 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
-    CollisionOffsetX = -0.05,
+    CollisionOffsetX = 0.1,
     CollisionOffsetY = 0,
-    CollisionOffsetZ = -0.4,
+    CollisionOffsetZ = -0.7,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -27,7 +27,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'RedTree01_Group1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -40,7 +40,7 @@ PropBlueprint {
         ReclaimTime = 80,
     },
     Interface = {
-        HelpText = 'Group of Medium Trees - Bug',
+        HelpText = 'Group of Medium Trees - RedTree',
     },
     Physics = {
         BlockPath = false,

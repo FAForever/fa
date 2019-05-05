@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'RedTree01_s1_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -57,7 +57,7 @@ PropBlueprint {
         ReclaimTime = 5,
     },
     Interface = {
-        HelpText = 'Medium Tree - Bug',
+        HelpText = 'Medium Tree - RedTree',
     },
     Physics = {
         BlockPath = false,

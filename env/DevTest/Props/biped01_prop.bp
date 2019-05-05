@@ -12,6 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     LODCutoff = 300,
+                    ShaderName = 'Unit',
                 },
             },
         },
@@ -23,7 +24,7 @@ PropBlueprint {
         ReclaimTime = 5,
     },
     Interface = {
-        HelpText = 'A dude',
+        HelpText = 'A dude - DDS missing',
     },
     Physics = {
         BlockPath = false,

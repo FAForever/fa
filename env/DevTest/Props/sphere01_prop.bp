@@ -25,7 +25,7 @@ PropBlueprint {
         ReclaimTime = 5,
     },
     Interface = {
-        HelpText = 'A big round thing',
+        HelpText = 'Sphere - DDS missing',
     },
     Physics = {
         BlockPath = false,

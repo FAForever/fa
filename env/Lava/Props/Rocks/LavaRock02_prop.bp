@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     -- share other rock's albedo and specteam
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -35,5 +35,5 @@ PropBlueprint {
     },
     SizeX = 3,
     SizeY = 1,
-    SizeZ = 3.5,
+    SizeZ = 4,
 }

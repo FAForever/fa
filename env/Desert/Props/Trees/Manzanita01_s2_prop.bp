@@ -32,9 +32,9 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Manzanita01_s1_albedo.dds',
-                    LODCutoff = 80,
+                    LODCutoff = 30,
                     NormalsName = 'Manzanita01_s1_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
+                    ShaderName = 'UndulatingNormalMappedAlpha',
                 },
                 {
                     AlbedoName = 'Manzanita01_s1_albedo.dds',
@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Manzanita01_s1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },

@@ -42,14 +42,14 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Cybran Street Light',
+        HelpText = 'Cybran Streetlight',
     },
     Physics = {
         BlockPath = false,
