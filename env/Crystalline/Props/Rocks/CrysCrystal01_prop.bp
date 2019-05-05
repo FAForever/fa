@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'CrysCrystal01_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -28,7 +28,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Crystal Formation',
+        HelpText = 'Huge Crystal Formation',
     },
     Physics = {
         BlockPath = true,

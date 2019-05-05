@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'CrystalRock01_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -21,7 +21,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 112.5,
+        ReclaimMassMax = 150,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -35,5 +35,5 @@ PropBlueprint {
     },
     SizeX = 2.5,
     SizeY = 1.5,
-    SizeZ = 4,
+    SizeZ = 4.5,
 }

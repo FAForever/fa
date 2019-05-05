@@ -34,7 +34,7 @@ PropBlueprint {
                     AlbedoName = 'aeon_street_light_Albedo.dds',
                     SpecName = 'aeon_street_light_SpecTeam.dds',
                     LODCutoff = 300,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Aeon',
                 },
             },
         },
@@ -42,14 +42,14 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Aeon Street Light',
+        HelpText = 'Aeon Streetlight',
     },
     Physics = {
         BlockPath = false,

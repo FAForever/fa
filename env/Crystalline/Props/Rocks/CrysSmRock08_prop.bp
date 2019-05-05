@@ -21,19 +21,19 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 10,
+        ReclaimMassMax = 5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
         HelpText = 'Small Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.5,
     SizeY = 0.25,
-    SizeZ = 1,
+    SizeZ = 0.5,
 }

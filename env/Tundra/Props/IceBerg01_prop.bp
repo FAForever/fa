@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'IceBerg01_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },
@@ -35,5 +35,5 @@ PropBlueprint {
     },
     SizeX = 5,
     SizeY = 1.5,
-    SizeZ = 6,
+    SizeZ = 5.5,
 }

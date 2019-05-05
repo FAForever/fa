@@ -13,12 +13,12 @@ PropBlueprint {
                 {
                     AlbedoName = 'Aeon_dock_Albedo.dds',
                     SpecName = 'Aeon_dock_SpecTeam.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 225,
                     ShaderName = 'Aeon',
                 },
                 {
                     AlbedoName = 'Aeon_dock_lod1_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'Aeon',
                     SpecularName = 'Aeon_dock_lod1_specteam.dds',
                 },
@@ -28,7 +28,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 75,
+        ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
     Footprint = {
@@ -42,5 +42,5 @@ PropBlueprint {
     },
     SizeX = 4.5,
     SizeY = 1,
-    SizeZ = 1.5,
+    SizeZ = 2,
 }

@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_car2_Albedo.dds',
                     SpecName = 'cybran_car2_SpecTeam.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'Unit',
                 },
             },
@@ -22,7 +22,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 75,
+        ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
     Footprint = {

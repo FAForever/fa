@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'CrysCrystal01_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },

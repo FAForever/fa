@@ -28,7 +28,7 @@ PropBlueprint {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Tiny Rock',
+        HelpText = 'Tiny Rockpile',
     },
     Physics = {
         BlockPath = false,

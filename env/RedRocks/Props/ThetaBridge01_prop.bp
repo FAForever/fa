@@ -28,7 +28,7 @@ PropBlueprint {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Very Large Rock',
+        HelpText = 'Very Large Rock - Theta Bridge',
     },
     Physics = {
         BlockPath = false,

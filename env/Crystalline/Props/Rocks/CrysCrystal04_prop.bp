@@ -21,17 +21,17 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 30,
+        ReclaimMassMax = 7.5,
         ReclaimTime = 5,
     },
     Footprint = {
-        OccupancyCaps = 3,
+        OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Crystal Formation',
+        HelpText = 'Small Crystal Formation',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.25,
     SizeY = 0.5,
