@@ -2,9 +2,9 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
-    CollisionOffsetX = -0.45,
+    CollisionOffsetX = 1,
     CollisionOffsetY = 0,
-    CollisionOffsetZ = 1.4,
+    CollisionOffsetZ = 0,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -27,7 +27,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Tund_Pine01_Group1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },

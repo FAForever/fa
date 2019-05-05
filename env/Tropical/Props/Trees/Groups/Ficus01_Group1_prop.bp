@@ -27,7 +27,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Ficus01_Group1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },

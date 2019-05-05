@@ -29,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     -- share other rock's albedo and specteam
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'TMeshNoNormals',
                 },
             },
@@ -47,7 +47,7 @@ PropBlueprint {
     Physics = {
         BlockPath = false,
     },
-    SizeX = 0.5,
+    SizeX = 1,
     SizeY = 0.25,
     SizeZ = 0.25,
 }

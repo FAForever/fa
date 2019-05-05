@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Tund_Rock02_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'NormalMappedTerrain',
                 },
             },

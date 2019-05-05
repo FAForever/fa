@@ -27,7 +27,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Pine06_Big_GroupB_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'VertexNormal',
                 },
             },

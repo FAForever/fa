@@ -38,7 +38,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'roadwayMarking01_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     NormalsName = 'roadwayMarking01_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
@@ -48,14 +48,14 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 5,
-        ReclaimMassMax = 5,
+        ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 0,
     },
     Interface = {
-        HelpText = 'Power Line Tower',
+        HelpText = 'Roadway Marking',
     },
     Physics = {
         BlockPath = false,

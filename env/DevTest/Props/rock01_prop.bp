@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     -- share other rock's albedo and specteam
                     AlbedoName = 'rock02_albedo.dds',
-                    LODCutoff = 400,
+                    LODCutoff = 500,
                     ShaderName = 'NormalMappedAlpha',
                     SpecularName = 'rock02_specteam.dds',
                 },
@@ -30,7 +30,7 @@ PropBlueprint {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'A big round thing',
+        HelpText = 'Round Thing',
     },
     Physics = {
         BlockPath = true,

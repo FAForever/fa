@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'UEF_Building_002_albedo.dds',
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     NormalsName = 'UEF_Building_002_normalsTS.dds',
                     ShaderName = 'VertexNormal',
                     SpecularName = 'UEF_Building_002_specteam.dds',
@@ -23,7 +23,7 @@ PropBlueprint {
     },
     Economy = {
         ReclaimEnergyMax = 0,
-        ReclaimMassMax = 75,
+        ReclaimMassMax = 1,
         ReclaimTime = 5,
     },
     Footprint = {

@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'NormalMappedAlpha',
                 },
             },
@@ -34,5 +34,5 @@ PropBlueprint {
     },
     SizeX = 3.5,
     SizeY = 1.25,
-    SizeZ = 5,
+    SizeZ = 6,
 }

@@ -28,7 +28,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 1000,
                     ShaderName = 'TMeshAlpha',
                 },
             },
