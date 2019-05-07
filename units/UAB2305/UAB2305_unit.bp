@@ -148,7 +148,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 210000,
         BuildCostMass = 15000,
-        BuildRate = 1890,
+        BuildRate = 1500,
         BuildTime = 25000,
         RebuildBonusIds = {
             'uab2305',
