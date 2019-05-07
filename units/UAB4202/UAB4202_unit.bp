@@ -61,7 +61,7 @@
           RegenAssistMult = 60,
           ShieldEnergyDrainRechargeTime = 5,
           ShieldMaxHealth = 11000,
-          ShieldRechargeTime = 27,
+          ShieldRechargeTime = 24,
           ShieldRegenRate = 138,
           ShieldRegenStartTime = 3,
           ShieldSize = 20,
