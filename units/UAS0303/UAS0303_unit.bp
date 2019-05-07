@@ -2,8 +2,8 @@ UnitBlueprint {
     AI = {
         RefuelingMultiplier = 100,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 5,
-        RepairConsumeMass = 0.5,
+        RepairConsumeEnergy = 30,
+        RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
             'UAS0303',
