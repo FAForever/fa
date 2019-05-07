@@ -7,7 +7,7 @@ UnitBlueprint {
         AutoLandTime = 1,
         BankFactor = 4,
         BankForward = false,
-        BreakOffDistance = 34,
+        BreakOffDistance = 45,
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
@@ -26,7 +26,7 @@ UnitBlueprint {
         MinAirspeed = 13,
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
-        TurnSpeed = 0.48,
+        TurnSpeed = 1,
         Winged = true,
     },
     Audio = {
@@ -193,8 +193,8 @@ UnitBlueprint {
         UniformScale = 0.04,
     },
     Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
+        BuildCostEnergy = 8000,
+        BuildCostMass = 270,
         BuildTime = 1600,
     },
     Footprint = {
@@ -227,7 +227,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        SonarRadius = 90,
+        SonarRadius = 45,
         VisionRadius = 32,
     },
     Interface = {
