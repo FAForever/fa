@@ -190,8 +190,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 30000,
-        BuildCostMass = 2000,
-        BuildRate = 150,
+        BuildCostMass = 3000,
+        BuildRate = 180,
         BuildTime = 4097,
         BuildableCategory = {
             'BUILTBYQUANTUMGATE AEON',
