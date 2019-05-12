@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '/env/Wreckage/props/Walls/Wall01_Albedo.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 500,
                     MeshName = '/env/Wreckage/props/Walls/Wall01_lod0.scm',
                     NormalsName = '/env/Wreckage/props/Walls/Wall01_normalsTS.dds',
                     ShaderName = 'Unit',

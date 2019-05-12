@@ -32,7 +32,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Carotenoid01_s1_albedo.dds',
-                    LODCutoff = 30,
+                    LODCutoff = 60,
                     NormalsName = 'Carotenoid01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
