@@ -32,7 +32,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'cypress01_s1_albedo.dds',
-                    LODCutoff = 30,
+                    LODCutoff = 60,
                     NormalsName = 'cypress01_s1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
