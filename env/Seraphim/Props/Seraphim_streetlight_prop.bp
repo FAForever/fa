@@ -33,7 +33,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'seraphim_streetlight_Albedo.dds',
                     SpecName = 'seraphim_streetlight_SpecTeam.dds',
-                    LODCutoff = 300,
+                    LODCutoff = 500,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',
                 },
