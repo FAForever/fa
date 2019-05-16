@@ -842,7 +842,7 @@ UnitBlueprint {
                     },
                     BuffType = 'STUN',
                     Duration = 2.5,
-                    Radius = 35,
+                    Radius = 30,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL, COMMAND',
                 },
