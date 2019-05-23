@@ -362,10 +362,8 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

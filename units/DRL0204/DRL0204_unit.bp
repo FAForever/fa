@@ -269,12 +269,10 @@ UnitBlueprint {
             RateOfFire = 0.25,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

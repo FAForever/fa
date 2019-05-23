@@ -229,10 +229,8 @@ UnitBlueprint {
             MaxRadius = 5.8,
             TargetCheckInterval = 999999,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

@@ -280,8 +280,6 @@ UnitBlueprint {
             RateOfFire = 1.25,
             TargetCheckInterval = 0.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',

@@ -284,9 +284,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 145,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -355,9 +353,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 145,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

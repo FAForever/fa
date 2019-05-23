@@ -294,12 +294,10 @@ UnitBlueprint {
             SlavedToBodyArcRange = 25,
             TargetCheckInterval = 0.66,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

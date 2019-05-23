@@ -248,12 +248,10 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

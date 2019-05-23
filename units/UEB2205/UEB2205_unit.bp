@@ -265,11 +265,9 @@ UnitBlueprint {
             SalvoSize = 1,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

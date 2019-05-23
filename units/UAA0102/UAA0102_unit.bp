@@ -324,10 +324,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -397,10 +395,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',

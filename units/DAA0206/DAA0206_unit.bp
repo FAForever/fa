@@ -283,12 +283,10 @@ UnitBlueprint {
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 999999,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH4',
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
