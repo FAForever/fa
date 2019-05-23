@@ -279,9 +279,7 @@ UnitBlueprint {
             -- ShieldDamage = 8000,
             TargetCheckInterval = 8,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'STRUCTURE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

@@ -314,10 +314,8 @@ UnitBlueprint {
             RateOfFire = 0.4,
             TargetCheckInterval = 1.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -384,10 +382,8 @@ UnitBlueprint {
             RateOfFire = 0.4,
             TargetCheckInterval = 1.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -454,10 +450,8 @@ UnitBlueprint {
             RateOfFire = 0.4,
             TargetCheckInterval = 1.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -524,10 +518,8 @@ UnitBlueprint {
             RateOfFire = 0.4,
             TargetCheckInterval = 1.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',

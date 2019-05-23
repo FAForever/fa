@@ -330,7 +330,6 @@ UnitBlueprint {
                 'NAVAL * TECH3',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

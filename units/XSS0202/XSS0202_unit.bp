@@ -269,8 +269,6 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -336,7 +334,6 @@ UnitBlueprint {
             RateOfFire = 2,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
@@ -344,7 +341,6 @@ UnitBlueprint {
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -410,7 +406,6 @@ UnitBlueprint {
             RateOfFire = 3,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
@@ -418,7 +413,6 @@ UnitBlueprint {
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                'SPECIALLOWPRI',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
