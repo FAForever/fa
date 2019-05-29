@@ -2344,7 +2344,11 @@ ACUUnit = Class(CommandUnit) {
         if not legalWork then return end
 
         self:SendNotifyMessage('started', work)
-        self:SetImmobile(true)
+
+        -- No need to do it for AI
+        if self:GetAIBrain().BrainType == 'Human' then
+            self:SetImmobile(true)
+        end
 
         return true
     end,
