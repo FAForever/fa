@@ -2711,6 +2711,13 @@ function CreateUI(maxPlayers)
         ShowLobbyOptionsDialog()
     end
     Tooltip.AddButtonTooltip(GUI.LobbyOptions, 'lobby_click_Settings')
+	
+	-- curated Maps
+	GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', 'Curated Maps')
+	LayoutHelpers.AtRightTopIn(GUI.LobbyOptions, GUI.panel, 44, 50)
+	GUI.LobbyOptions.OnClick = function()
+		OpenURL('http://faforever.com')
+	end
 
     -- Logo
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
