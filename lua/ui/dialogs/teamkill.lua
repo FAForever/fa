@@ -13,7 +13,6 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local dialog = false
 local shouldReport = false
 local waitingTimeBeforeReport = 3;
-local waitedTime = 0;
 
 function CreateDialog(teamkill)
     if dialog then
@@ -67,6 +66,7 @@ function CreateDialog(teamkill)
 end
 
 function WaitBeforeEnablingReportButton(reportBtn)
+    local waitedTime = 0;
     while waitedTime < waitingTimeBeforeReport do
         reportBtn.label:SetText(LOC("<LOC teamkill_0003>Report").."["..(waitingTimeBeforeReport-waitedTime).."]")
         WaitSeconds(1)
