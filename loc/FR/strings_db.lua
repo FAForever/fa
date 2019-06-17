@@ -7746,7 +7746,7 @@ sorian_0028="IAx: IA Sorian Naval"
 sorian_0029="IAx: IA Sorian Tortue"
 sorian_0030="IAx: IA Sorian Adaptative"
 teamkill_0001 = "Fratricide détecté"
-teamkill_0002 = "Vous avez été tué.e par un tir allié. L'assassinat délibéré de coéquipiers est proscrit par le règlement de FA Forever. Si vous considérez que votre défaite était délibérée ou déloyale, appuyez sur le bouton ci-dessous pour le signaler." --[[ r: "death" traduit par << Défaite >>, car il est bizarre de demander au joueur si sa mort était délibérée. --]]
+teamkill_0002 = "Vous avez été tué par un tir allié. L'assassinat délibéré de coéquipiers est proscrit par le règlement de FA Forever. Si vous considérez que votre défaite était délibérée ou déloyale, appuyez sur le bouton ci-dessous pour le signaler." --[[ r: "death" traduit par << Défaite >>, car il est bizarre de demander au joueur si sa mort était délibérée. --]]
 teamkill_0003 = "Signaler"
 teamkill_0004 = "Pardonner"
 
