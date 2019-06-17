@@ -37,14 +37,14 @@ function CreateDialog(teamkill)
 
     local forgiveBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0004>Forgive")
     LayoutHelpers.AtBottomIn(forgiveBtn, dialogContent, 10)
-    LayoutHelpers.AtRightIn(forgiveBtn, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(forgiveBtn, dialogContent, 10)
     forgiveBtn.OnClick = function(self, modifiers)
         dialog:Close()
     end
 
     local reportBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0003>Report")
     LayoutHelpers.AtBottomIn(reportBtn, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(reportBtn, dialogContent, 10)
+    LayoutHelpers.AtRightIn(reportBtn, dialogContent, 10)
     reportBtn.OnClick = function(self, modifiers)
         GpgNetSend('TeamkillReport',  teamkill.time, teamkill.victim.id, teamkill.victim.name, teamkill.instigator.id, teamkill.instigator.name)
         WARN("TEAMKILL WAS REPORTED")
