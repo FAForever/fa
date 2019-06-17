@@ -12,6 +12,8 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 
 local dialog = false
 local shouldReport = false
+local waitingTimeBeforeReport = 3;
+local waitedTime = 0;
 
 function CreateDialog(teamkill)
     if dialog then
@@ -58,4 +60,18 @@ function CreateDialog(teamkill)
 
     dialog.OnShadowClicked = function(self)
     end
+    
+    UIUtil.setEnabled(reportBtn, false)
+    ForkThread(WaitBeforeEnablingReportButton, reportBtn)
+    
+end
+
+function WaitBeforeEnablingReportButton(reportBtn)
+    while waitedTime < waitingTimeBeforeReport do
+        reportBtn.label:SetText(LOC("<LOC teamkill_0003>Report").."["..(waitingTimeBeforeReport-waitedTime).."]")
+        WaitSeconds(1)
+        waitedTime = waitedTime + 1
+    end
+    reportBtn.label:SetText(LOC("<LOC teamkill_0003>Report"))
+    UIUtil.setEnabled(reportBtn, true)
 end
