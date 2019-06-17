@@ -35,7 +35,8 @@ XSL0101 = Class(SWalkingLandUnit) {
     OnScriptBitClear = function(self, bit)
         if bit == 8 then
             self.Sync.LowPriority = true
-            self.CloakThread = self:ForkThread(self.HideUnit) -- Only actually hides if stationary
+            -- Only actually hides if stationary and doesn't have an attack order
+            self.CloakThread = self:ForkThread(self.HideUnit)
         else
             SWalkingLandUnit.OnScriptBitClear(self, bit)
         end
@@ -59,8 +60,8 @@ XSL0101 = Class(SWalkingLandUnit) {
     HideUnit = function(self)
         if not self.Dead and self:GetFractionComplete() == 1 and self.Sync.LowPriority then
             WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
+            if self:IsMoving() or self:IsUnitState("Attacking") then return end
 
-            if self:IsMoving() then return end
 
             -- Ensure weapon state
             self:SetWeaponEnabledByLabel('LaserTurret', false)
