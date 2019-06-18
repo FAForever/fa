@@ -87,7 +87,7 @@ gamePatches = {
             '- Mass cost: 240 → 270',
             '- Energy cost: 4800 → 8000',
             '- BreakOffDistance: 34 → 45',
-            '- TurnSpeed: 0.48 → 1','
+            '- TurnSpeed: 0.48 → 1',
             '- Sonar Radius: 90 → 45',
             '- Restorer',
             '- Speed: 8 → 10',
