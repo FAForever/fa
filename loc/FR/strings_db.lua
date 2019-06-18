@@ -8346,3 +8346,4 @@ adaptive_lightning_key_1_help = "Peu d'effets visuels."
 adaptive_lightning_key_2_help = "Défault."
 adaptive_lightning_key_3 = "activé - beaucoup"
 adaptive_lightning_key_3_help = "Tempête d'éclair."
+
