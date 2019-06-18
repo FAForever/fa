@@ -24,7 +24,7 @@ function CreateDialog(teamkill)
     dialogContent.Height:Set(180)
 
     dialog = Popup(GetFrame(0), dialogContent)
-
+    
     local title = UIUtil.CreateText(dialogContent, "<LOC teamkill_0001>Teamkill Detected", 14, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(title, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
@@ -38,12 +38,14 @@ function CreateDialog(teamkill)
     LayoutHelpers.AtBottomIn(forgiveBtn, dialogContent, 10)
     LayoutHelpers.AtLeftIn(forgiveBtn, dialogContent, 10)
     forgiveBtn.OnClick = function(self, modifiers)
+        KillThread(dialog.countdownThread)
         dialog:Close()
     end
 
     local reportBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0003>Report")
     LayoutHelpers.AtBottomIn(reportBtn, dialogContent, 10)
     LayoutHelpers.AtRightIn(reportBtn, dialogContent, 10)
+    UIUtil.setEnabled(reportBtn, false)
     reportBtn.OnClick = function(self, modifiers)
         GpgNetSend('TeamkillReport',  teamkill.time, teamkill.victim.id, teamkill.victim.name, teamkill.instigator.id, teamkill.instigator.name)
         WARN("TEAMKILL WAS REPORTED")
@@ -60,9 +62,7 @@ function CreateDialog(teamkill)
     dialog.OnShadowClicked = function(self)
     end
     
-    UIUtil.setEnabled(reportBtn, false)
-    ForkThread(WaitBeforeEnablingReportButton, reportBtn)
-    
+    dialog.countdownThread = ForkThread(WaitBeforeEnablingReportButton, reportBtn)
 end
 
 function WaitBeforeEnablingReportButton(reportBtn)
