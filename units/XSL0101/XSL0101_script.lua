@@ -11,12 +11,14 @@ XSL0101 = Class(SWalkingLandUnit) {
     Weapons = {
         LaserTurret = Class(SDFPhasicAutoGunWeapon) {
             OnWeaponFired = function(self)
-                self.unit:RevealUnit()
-
-                -- Each time we fire, reveal cancels CloakThread so we only cloak after firing is over
-                -- Messy, but can't use weapon IdleState because it's called during and immediately after
-                -- construction, and before motion events
-                self.unit.CloakThread = self.unit:ForkThread(self.unit.HideUnit)
+                if not self.unit.WaitingForCloak then
+                    self.unit:RevealUnit()
+                    -- Firing uncloaks but doesn't stop cloaking attempt (StealthWaitTime)
+                    -- Attack order firing also cancels cloaking attempts
+                    -- Messy, but can't use weapon IdleState because it's called during and immediately after
+                    -- construction, and before motion events
+                    self.unit.CloakThread = self.unit:ForkThread(self.unit.HideUnit)
+                end
             end,
         },
     },
@@ -59,9 +61,12 @@ XSL0101 = Class(SWalkingLandUnit) {
 
     HideUnit = function(self)
         if not self.Dead and self:GetFractionComplete() == 1 and self.Sync.LowPriority then
+            self.WaitingForCloak = true
             WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
-            if self:IsMoving() or self:IsUnitState("Attacking") then return end
-
+            if self:IsMoving() or self:IsUnitState("Attacking") then
+                self.WaitingForCloak = false
+                return
+            end
 
             -- Ensure weapon state
             self:SetWeaponEnabledByLabel('LaserTurret', false)
@@ -70,21 +75,25 @@ XSL0101 = Class(SWalkingLandUnit) {
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
-
-            self.CloakThread = nil
+            self.WaitingForCloak = false
         end
+        self.CloakThread = nil
     end,
 
     -- Turn off the cloak to begin with
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetScriptBit('RULEUTC_CloakToggle', true)
+        self.WaitingForCloak = false
         self:ForkThread(self.HideUnit)
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
         -- If we stopped moving, hide
         if new == 'Stopped' then
+            -- Kill possible existing cloak thread from toggle first
+            KillThread(self.CloakThread)
+            self.CloakThread = nil
             -- We need to fork in order to use WaitSeconds
             self.CloakThread = self:ForkThread(self.HideUnit)
         end
