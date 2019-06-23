@@ -322,7 +322,7 @@ UnitBlueprint {
                 'SPECIALHIGHPRI',
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
-                '(STRUCTURE DEFENSE * ANTIAIR)',
+                '(STRUCTURE * DEFENSE * ANTIAIR)',
                 '(TECH3 * NAVAL * CARRIER)',
                 'SUBMERSIBLE',
                 'NAVAL * TECH2',

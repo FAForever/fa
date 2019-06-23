@@ -359,7 +359,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
-                '(STRUCTURE DEFENSE - ANTIAIR)',
+                '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 '(CYBRAN * EXPERIMENTAL * FACTORY)',
                 'MOBILE',
