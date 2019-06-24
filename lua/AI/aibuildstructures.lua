@@ -112,14 +112,16 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     -- If the c-engine can't decide what to build, then search the build template manually.
     if not whatToBuild then
         if AntiSpamList[buildingType] then
-            return
+            return false
         end
-        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory))
+        local FactionIndexToName = {[1] = 'UEF', [2] = 'AEON', [3] = 'CYBRAN', [4] = 'SERAPHIM', [5] = 'NOMADS' }
+        local AIFactionName = FactionIndexToName[factionIndex]
+        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..repr(buildingType)..', engineer-faction: '..repr(builder.factionCategory))
         -- Get the UnitId for the actual buildingType
         local BuildUnitWithID
         for Key, Data in buildingTemplate do
             if Data[1] and Data[2] and Data[1] == buildingType then
-                --SPEW('*AIExecuteBuildStructure: Found template: '..repr(Data[1])..' - Using UnitID: '..repr(Data[2]))
+                SPEW('*AIExecuteBuildStructure: Found template: '..repr(Data[1])..' - Using UnitID: '..repr(Data[2]))
                 BuildUnitWithID = Data[2]
                 break
             end
@@ -128,7 +130,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         if not BuildUnitWithID then
             AntiSpamList[buildingType] = true
             WARN('*AIExecuteBuildStructure: No '..repr(builder.factionCategory)..' unit found for template: '..repr(buildingType)..'! ')
-            return
+            return false
         end
         -- get the needed tech level to build buildingType
         local BBC = __blueprints[BuildUnitWithID].CategoriesHash
@@ -142,8 +144,10 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we want to build, then return
         if not NeedTech then
-            WARN('*AIExecuteBuildStructure: Cant find techlevel for BuildUnitWithID: '..repr(BuildUnitWithID))
-            return
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for BuildUnitWithID: '..repr(BuildUnitWithID))
+            return false
+        else
+            SPEW('*AIExecuteBuildStructure: Need engineer with Techlevel ('..NeedTech..') for BuildUnitWithID: '..repr(BuildUnitWithID))
         end
         -- get the actual tech level from the builder
         local BC = builder:GetBlueprint().CategoriesHash
@@ -156,31 +160,36 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we  want to build, return
         if not HasTech then
-            WARN('*AIExecuteBuildStructure: Cant find techlevel for Builder: '..__blueprints[BuildUnitWithID].Description or  "Unknown")
-            return
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for Builder: '..__blueprints[BuildUnitWithID].Description or  "Unknown")
+            return false
+        else
+            SPEW('*AIExecuteBuildStructure: Building ('..repr(BuildUnitWithID)..') has Techlevel ('..HasTech..')')
         end
         --LOG('*AIExecuteBuildStructure: We have TECH'..HasTech..' engineer.')
         if HasTech < NeedTech then
             WARN('*AIExecuteBuildStructure: TECH'..NeedTech..' Unit "'..BuildUnitWithID..'" is assigned to TECH'..HasTech..' buildplatoon! ('..repr(buildingType)..')')
-            return
+            return false
+        else
+            SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..NeedTech..') can build BuildUnitWithID: '..repr(BuildUnitWithID))
         end
         local IsRestricted = import('/lua/game.lua').IsRestricted
         if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
             WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
             AntiSpamList[buildingType] = true
-            return
+            return false
         end
-        return
-    else
-        -- Sometimes the AI is building a unit that is different from the buildingTemplate table. So we validate the unitID here.
-        for Key, Data in buildingTemplate do
-            if Data[1] and Data[2] and Data[1] == buildingType then
-                if whatToBuild ~= Data[2] then
-                    WARN('*AIExecuteBuildStructure: Missmatch whatToBuild: '..whatToBuild..' ~= buildingTemplate.Data[2]: '..repr(Data[2]))
-                end
-                break
-            end
+        
+        HasFaction = builder.factionCategory
+        NeedFaction = string.upper(__blueprints[string.lower(BuildUnitWithID)].General.FactionName)
+        if HasFaction ~= NeedFaction then
+            WARN('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', ('..HasFaction..') engineers can\'t build ('..NeedFaction..') structures!')
+            return false
+        else
+            SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
         end
+       
+        WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
+        return false
     end
     -- find a place to build it (ignore enemy locations if it's a resource)
     -- build near the base the engineer is part of, rather than the engineer location
@@ -240,9 +249,10 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build
         AddToBuildQueue(aiBrain, builder, whatToBuild, NormalToBuildLocation(relativeLoc), false)
-        return
+        return true
     end
     -- At this point we're out of options, so move on to the next thing
+    return false
 end
 
 function AIBuildBaseTemplate(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)

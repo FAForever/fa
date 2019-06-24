@@ -704,18 +704,20 @@ AIBrain = Class(moho.aibrain_methods) {
 
         ForkThread(KillArmy)
 
-        -- For Sorian AI
         if self.BuilderManagers then
             self.ConditionsMonitor:Destroy()
             for k, v in self.BuilderManagers do
                 v.EngineerManager:SetEnabled(false)
-                v.FactoryManager:SetEnabled(false)
-                v.PlatoonFormManager:SetEnabled(false)
-                v.StrategyManager:SetEnabled(false)
-                v.FactoryManager:Destroy()
-                v.PlatoonFormManager:Destroy()
                 v.EngineerManager:Destroy()
-                v.StrategyManager:Destroy()
+                v.FactoryManager:SetEnabled(false)
+                v.FactoryManager:Destroy()
+                v.PlatoonFormManager:SetEnabled(false)
+                v.PlatoonFormManager:Destroy()
+                if v.StrategyManager then
+                    v.StrategyManager:SetEnabled(false)
+                    v.StrategyManager:Destroy()
+                end
+                self.BuilderManagers[k] = nil
             end
         end
         
@@ -949,7 +951,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.LowEnergyMode = false
 
         -- Add default main location and setup the builder managers
-        self.NumBases = 1
+        self.NumBases = 0 -- AddBuilderManagers will increase the number
 
         self.BuilderManagers = {}
         SUtils.AddCustomUnitSupport(self)
@@ -1008,23 +1010,25 @@ AIBrain = Class(moho.aibrain_methods) {
     DeadBaseMonitor = function(self)
         while true do
             WaitSeconds(5)
-            local changed = false
+            local needSort = false
             for k, v in self.BuilderManagers do
                 if k ~= 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
                     v.EngineerManager:SetEnabled(false)
-                    v.FactoryManager:SetEnabled(false)
-                    v.PlatoonFormManager:SetEnabled(false)
-                    v.StrategyManager:SetEnabled(false)
-                    v.FactoryManager:Destroy()
-                    v.PlatoonFormManager:Destroy()
                     v.EngineerManager:Destroy()
-                    v.StrategyManager:Destroy()
+                    v.FactoryManager:SetEnabled(false)
+                    v.FactoryManager:Destroy()
+                    v.PlatoonFormManager:SetEnabled(false)
+                    v.PlatoonFormManager:Destroy()
+                    if v.StrategyManager then
+                        v.StrategyManager:SetEnabled(false)
+                        v.StrategyManager:Destroy()
+                    end
                     self.BuilderManagers[k] = nil
                     self.NumBases = self.NumBases - 1
-                    changed = true
+                    needSort = true
                 end
             end
-            if changed then
+            if needSort then
                 self.BuilderManagers = self:RebuildTable(self.BuilderManagers)
             end
         end
@@ -1413,20 +1417,24 @@ AIBrain = Class(moho.aibrain_methods) {
     -- ECONOMY MONITOR
     -- Monitors the economy over time for skirmish; allows better trend analysis
     EconomyMonitor = function(self)
-        while true do
-            if not self.EconomyData[self.EconomyCurrentTick] then
-                self.EconomyData[self.EconomyCurrentTick] = {}
+        -- build "eco trend over time" table
+        for i = 1, self.EconomyTicksMonitor do
+            self.EconomyData[i] = { EnergyIncome=0, EnergyRequested=0, MassIncome=0, MassRequested=0 }
+        end
+        -- make counters local (they are not used anywhere else)
+        local EconomyTicksMonitor = self.EconomyTicksMonitor
+        local EconomyCurrentTick = self.EconomyCurrentTick
+        -- loop until the AI is dead
+        while self.Result ~= "defeat" do
+            self.EconomyData[EconomyCurrentTick].EnergyIncome = self:GetEconomyIncome('ENERGY')
+            self.EconomyData[EconomyCurrentTick].MassIncome = self:GetEconomyIncome('MASS')
+            self.EconomyData[EconomyCurrentTick].EnergyRequested = self:GetEconomyRequested('ENERGY')
+            self.EconomyData[EconomyCurrentTick].MassRequested = self:GetEconomyRequested('MASS')
+            -- store eco trend for the last 50 ticks (5 seconds)
+            EconomyCurrentTick = EconomyCurrentTick + 1
+            if EconomyCurrentTick > EconomyTicksMonitor then
+                EconomyCurrentTick = 1
             end
-            self.EconomyData[self.EconomyCurrentTick].EnergyIncome = self:GetEconomyIncome('ENERGY')
-            self.EconomyData[self.EconomyCurrentTick].MassIncome = self:GetEconomyIncome('MASS')
-            self.EconomyData[self.EconomyCurrentTick].EnergyRequested = self:GetEconomyRequested('ENERGY')
-            self.EconomyData[self.EconomyCurrentTick].MassRequested = self:GetEconomyRequested('MASS')
-
-            self.EconomyCurrentTick = self.EconomyCurrentTick + 1
-            if self.EconomyCurrentTick > self.EconomyTicksMonitor then
-                self.EconomyCurrentTick = 1
-            end
-
             WaitTicks(1)
         end
     end,
@@ -2962,7 +2970,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         for k, v in self.BaseMonitor.AlertsTable do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
-                self.BaseMonitor.AlertsTable[k] = nil
+                table.remove(self.BaseMonitor.AlertsTable, k)
                 break
             end
         end
@@ -2988,18 +2996,21 @@ AIBrain = Class(moho.aibrain_methods) {
                 local found = false
                 for subk, subv in self.BaseMonitor.BaseMonitorPoints do
                     if v[1] == subv.Position[1] and v[3] == subv.Position[3] then
-                        continue
+                        found = true
+                        -- if we found this point already stored, we don't need to continue searching the rest
+                        break
                     end
                 end
-                table.insert(self.BaseMonitor.BaseMonitorPoints,
-                    {
-                        Position = v,
-                        Threat = self:GetThreatAtPosition(v, 0, true, 'Overall'),
-                        Alert = false
-                    }
-                )
+                if not found then
+                    table.insert(self.BaseMonitor.BaseMonitorPoints,
+                        {
+                            Position = v,
+                            Threat = self:GetThreatAtPosition(v, 0, true, 'Overall'),
+                            Alert = false
+                        }
+                    )
+                end
             end
-
             -- Remove any points that we dont monitor anymore
             for k, v in self.BaseMonitor.BaseMonitorPoints do
                 local found = false
@@ -3010,11 +3021,10 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
                 -- If point not in list and the num units around the point is small
-                if not found and not self:GetNumUnitsAroundPoint(categories.STRUCTURE, v.Position, 16, 'Ally') > 1 then
-                    self.BaseMonitor.BaseMonitorPoints[k] = nil
+                if not found and self:GetNumUnitsAroundPoint(categories.STRUCTURE, v.Position, 16, 'Ally') <= 1 then
+                    table.remove(self.BaseMonitor.BaseMonitorPoints, k)
                 end
             end
-
             -- Check monitor points for change
             local alertThreat = self.BaseMonitor.AlertLevel
             for k, v in self.BaseMonitor.BaseMonitorPoints do
@@ -3401,7 +3411,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     -- Reassign all Army attributes to better suit the AI.
                     self.BrainType = 'AI'
                     self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
-                    self.NumBases = 1
+                    self.NumBases = 0 -- AddBuilderManagers will increase the number
                     self.BuilderManagers = {}
                     self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
                     SUtils.AddCustomUnitSupport(self)

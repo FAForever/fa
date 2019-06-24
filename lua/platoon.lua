@@ -1058,8 +1058,11 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
 
-        -- Build always BuildScoutLocations. We need this also for the Cheating AI's with Omniview.
-        aiBrain:BuildScoutLocations()
+        -- build scoutlocations if not already done.
+        if not aiBrain.InterestList then
+            aiBrain:BuildScoutLocations()
+        end
+
         --If we have cloaking (are cybran), then turn on our cloaking
         --DUNCAN - Fixed to use same bits
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -1174,8 +1177,11 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local aiBrain = self:GetBrain()
-        -- Build always BuildScoutLocations. We need this also for the Cheating AI's with Omniview.
-        aiBrain:BuildScoutLocations()
+
+        -- build scoutlocations if not already done.
+        if not aiBrain.InterestList then
+            aiBrain:BuildScoutLocations()
+        end
 
         --If we have Stealth (are cybran), then turn on our Stealth
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -1815,7 +1821,7 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        self.AssistPlatoon = nil
+        eng.AssistPlatoon = nil
         eng.UnitBeingAssist = nil
         self:Stop()
         self:PlatoonDisband()
@@ -2474,13 +2480,17 @@ Platoon = Class(moho.platoon_methods) {
             --LOG('* UnitUpgradeAI: UnitBeingUpgradeFactionIndex '..UnitBeingUpgradeFactionIndex)
             if self.PlatoonData.OverideUpgradeBlueprint then
                 local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
-                if v:CanBuild(tempUpgradeID) then
+                if not tempUpgradeID then
+                    --WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unitID is empty' )
+                elseif type(tempUpgradeID) ~= 'string' then
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unit not present.)' )
+                elseif v:CanBuild(tempUpgradeID) then
                     upgradeID = tempUpgradeID
                 else
                     -- in case the unit can't upgrade with OverideUpgradeBlueprint, warn the programmer
                     -- this can happen if the AI relcaimed a factory and tries to upgrade to a support factory without having a HQ factory from the reclaimed factory faction.
                     -- in this case we fall back to HQ upgrade template and upgrade to a HQ factory instead of support.
-                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed!
+                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed. (Override tree not available, upgrading to default instead.)
                     WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed. (Override tree not available, upgrading to default instead.)' )
                 end
             end
@@ -2501,7 +2511,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
                 -- in case the unit can't upgrade with upgradeID, warn the programmer
-                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: UnitId:CanBuild(upgradeID) failed!
+                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: ABC1234:CanBuild(upgradeID) failed!
                 WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: ' .. repr(v:GetUnitId()) .. ':CanBuild( '..upgradeID..' ) failed!' )
                 continue
             end
@@ -5149,7 +5159,10 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
 
-        aiBrain:BuildScoutLocationsSorian()
+        -- build scoutlocations if not already done.
+        if not aiBrain.InterestList then
+            aiBrain:BuildScoutLocationsSorian()
+        end
 
         --If we have cloaking (are cybran), then turn on our cloaking
         if self.PlatoonData.UseCloak and scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -5211,8 +5224,11 @@ Platoon = Class(moho.platoon_methods) {
         local scout = self:GetPlatoonUnits()[1]
         local badScouting = false
 
-        aiBrain:BuildScoutLocationsSorian()
-
+        -- build scoutlocations if not already done.
+        if not aiBrain.InterestList then
+            aiBrain:BuildScoutLocationsSorian()
+        end
+        
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
             scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
@@ -5947,19 +5963,6 @@ Platoon = Class(moho.platoon_methods) {
         local x,z = aiBrain:GetArmyStartPos()
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
 
-        local factionIndex = cons.FactionIndex or self:GetFactionIndex()
-
-        if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
-        cons.NearMarkerType == 'Protected Experimental Construction') then
-            cons.NearMarkerType = nil
-            cons.BaseTemplate = nil
-        end
-
-        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
-        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
-        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
-        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
-
         local eng
         for k, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.CONSTRUCTION, v) then
@@ -5977,6 +5980,20 @@ Platoon = Class(moho.platoon_methods) {
             self:PlatoonDisband()
             return
         end
+
+        local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+
+        if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
+        cons.NearMarkerType == 'Protected Experimental Construction') then
+            cons.NearMarkerType = nil
+            cons.BaseTemplate = nil
+        end
+
+        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
+        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
+        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
+        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
 
         if self.PlatoonData.NeedGuard then
             eng.NeedGuard = true

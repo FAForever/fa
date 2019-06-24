@@ -1586,6 +1586,8 @@ function UseTransports(units, transports, location, transportPlatoon)
         return false
     end
 
+    -- Adding Surface Height, so thetransporter get not confused, because the target is under the map (reduces unload time)
+    location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
     IssueTransportUnload(transports, location)
     local attached = true
     while attached do
@@ -1760,6 +1762,10 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         return false
     end
     local pos = unit:GetPosition()
+    -- don't check a path if we are in build range
+    if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
+        return true
+    end
     local result, bestPos = unit:CanPathTo(destination)
     local bUsedTransports = false
     -- Increase check to 300 for transports
