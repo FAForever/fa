@@ -317,7 +317,7 @@ UnitBlueprint {
                 helpText = 'deploy',
             },
         },
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC ues0401_name>Atlantis',
         UnitWeight = 1,
     },

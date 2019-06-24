@@ -204,7 +204,7 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC xsb2401_name>Yolona Oss',
         UnitWeight = 1,
     },

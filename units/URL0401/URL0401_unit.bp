@@ -202,7 +202,7 @@
         },
         FactionName = 'Cybran',
         Icon = 'amph',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC url0401_name>Scathis',
         UnitWeight = 1,
     },

@@ -142,7 +142,7 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC ueb2401_name>Mavor',
         UnitWeight = 1,
     },

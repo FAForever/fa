@@ -214,7 +214,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xra0105_name>Jester',
         UnitWeight = 1,
     },

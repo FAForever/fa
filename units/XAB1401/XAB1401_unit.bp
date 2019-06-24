@@ -182,7 +182,7 @@ UnitBlueprint {
         FactionName = 'Aeon',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         ToggleCaps = {
             RULEUTC_ProductionToggle = false,
         },
