@@ -205,7 +205,7 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         Icon = 'amph',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC ual0401_name>Galactic Colossus',
         UnitWeight = 1,
     },

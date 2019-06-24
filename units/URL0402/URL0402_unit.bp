@@ -259,7 +259,7 @@ UnitBlueprint {
                 helpText = 'toggle_stealth_field',
             },
         },
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         ToggleCaps = {
             RULEUTC_StealthToggle = true,
         },

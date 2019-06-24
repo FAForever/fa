@@ -227,7 +227,7 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC dea0202_name>Janus',
         UnitWeight = 1,
     },

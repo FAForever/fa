@@ -137,7 +137,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC ueb5202_name>Refuel & Repair',
         UnitWeight = 1,
     },

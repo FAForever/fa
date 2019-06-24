@@ -200,7 +200,7 @@ UnitBlueprint {
                 helpText = 'deploy',
             },
         },
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC uaa0310_name>CZAR',
         UnitWeight = 1,
     },

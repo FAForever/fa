@@ -151,7 +151,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xsb5202_name>Iathu-uhthe',
         UnitWeight = 1,
     },

@@ -131,7 +131,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC uab5202_name>Cradle',
         UnitWeight = 1,
     },

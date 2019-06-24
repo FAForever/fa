@@ -125,7 +125,7 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xeb2306_name>Ravager',
         UnitWeight = 1,
     },

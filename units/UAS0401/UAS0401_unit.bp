@@ -285,7 +285,7 @@ UnitBlueprint {
         ConstructionBar = true,
         FactionName = 'Aeon',
         Icon = 'sea',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC uas0401_name>Tempest',
         UnitWeight = 1,
     },

@@ -211,7 +211,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC dra0202_name>Corsair',
         UnitWeight = 1,
     },
