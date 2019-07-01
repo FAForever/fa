@@ -1244,7 +1244,6 @@ UnitBlueprint {
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
-                '(CYBRAN * EXPERIMENTAL * FACTORY)',
                 'MOBILE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',
