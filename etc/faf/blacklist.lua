@@ -22,7 +22,6 @@ Blacklist = {
     ['xxxx-NetLag-Experimental-v3'] = HARMFUL,
 
 -- Broken --
-    ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = BROKEN, -- Experimental Wars
 
 -- Obselete --
 
@@ -175,5 +174,8 @@ Blacklist = {
     ['9e8ea941-c306-aaaf-b367-u00000014000'] = UPGRADE, --BlackOps FAF: Unleashed v14
     ['9e8ee941-c406-4751-b367-e10000015000'] = UPGRADE, --BlackOpsFAF: EXUnits v15
     ['9e8ee941-c306-4751-b367-e10000000104'] = UPGRADE, --BlackOpsFAF: EXUnits v14
+
+    -- old versions of Experimental Wars
+    ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = UPGRADE,
 
 }
