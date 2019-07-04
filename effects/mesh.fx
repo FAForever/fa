@@ -2845,41 +2845,49 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
 
     float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-      float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal)) * specular.r;
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     // Calculate lookup into falloff ramp
     float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
-    //float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x));
+    float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x));
 
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    light = light * (0.8 - (light * 0.125)) * (1 - diffuse.a) * 0.125;
-
-      // Calculate specular highlights based on current sun direction
-    float reflection = reflect( sunDirection, normal);
+    light = light + ( 1 - light ) * shadowFill;
+    
+    // Calculate specular highlights of the sun
+    float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-      float3 phongAdditive = pow( specularAmount, 30) * specular.g * light * pow(diffuse.rgb * 5, 2) * 2.0;
-    float phongMultiplicativeAmount = (diffuse.r + diffuse.g + diffuse.b) / 3;
-    phongMultiplicativeAmount = pow(phongMultiplicativeAmount * 10, 0.3) * 2;
-      float3 phongMultiplicative = (light + 0.03) * specular.r * (1.0 - (phongMultiplicativeAmount * 0.25)) * environment * (1 - (diffuse.a * 0.5) ) * 15;
-    float3 defaultphongMultiplicative = (phongMultiplicative.r + phongMultiplicative.b + phongMultiplicative.b) / 3;
-    defaultphongMultiplicative *= (float3(0.5, 0.7, 0.9) + phongMultiplicative) * 1;
-    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b) / 3;
-    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b) / 3;
-
-    float3 teamColSpec = (NdotV * vertex.color.rgb) * 1;
-    float3 fallOff = lerp( teamColSpec, 0, 1 - diffuse.a );
-
-    // Determine our final output color
-    float3 color = (fallOff.rgb * 2) + defaultphongMultiplicative + phongAdditive + specular.b;
-    //color = teamColSpec;
-    float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
-    teamColGlow = (pow(diffuse.a * 1.5, 2) * (1.0 - teamColGlow)) * 0.05;
-    //float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.6 * (1.4 - teamColGlowCompensation)) + (phongMultiplicativeGlow + phongAdditiveGlow) * 0.2;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + teamColGlow +((phongMultiplicativeGlow + phongAdditiveGlow) * 0.07);
-    //alpha = 0;
+    float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * 0.7;
+	
+    // Calculate environment map reflection
+    float reflectivity = saturate(specular.r * 2.5); //reduce artifacts of texture
+    environment *= reflectivity * fallOff.a;
+    float3 phongMultiplicative = light * environment * (1 - (diffuse.a * 0.5) ) * 0.7;
+    
+    //make reflection more intense depending on the diffuse color
+    //could be cool but looks like shit because the diffuse texture is not interpolated for unknown reasons
+    //float Amount = (diffuse.r + diffuse.g + diffuse.b) / 3;
+    //Amount = pow(Amount * 10, 0.3) * 2;
+    //Amount = 1.0 - (Amount * 0.25);
+    //phongMultiplicative *= (float3(0.5, 0.7, 0.9) + Amount);
+    
+    float3 teamColSpec = NdotV * vertex.color.rgb * 2;
+    float whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4)); //there are also white highlights in the diffuse texture in some models
+    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.4;
+    color += phongAdditive + phongMultiplicative + (teamColSpec.rgb * diffuse.a) + whiteness;
+    //substitute all the computations on pure glowig parts with the pure brightness texture to get rid of reflections and shadows
+    float mask = saturate( saturate(specular.b * 2) - diffuse.a );
+    color *= 1 - mask;
+    color += specular.b * 2 * mask;
+	
+	
+	float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
+    teamColGlow = diffuse.a * (1 - teamColGlow) * 0.06;
+	
+    //alpha affects bloom
+    float alpha = mirrored ? 0.5 : specular.b * 0.4 + teamColGlow;
     return float4( color, alpha );
 }
 
@@ -3115,7 +3123,7 @@ float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) :
 
     // Determine our final output color
     float3 color = diffuse.rgb * ( sunAmbient + ( 1 - sunAmbient ) * shadowFill) ;
-    color += environment + (fallOff.rgb * diffuse.a);
+    color += environment * 0.7 + (NdotV * vertex.color.rgb * 2 * diffuse.a);
 
     return float4( color, max(vertex.material.y, 0.25) );
 }
