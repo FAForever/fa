@@ -1,3 +1,7 @@
+Patch 3706 (5 July, 2019)
+============================
+- revert to 3704
+
 Patch 3705 (5 July, 2019)
 ============================
 - Fixed various desync Issues for replays

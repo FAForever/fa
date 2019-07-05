@@ -1,5 +1,12 @@
-last_version = 3705
+last_version = 3706
 gamePatches = {
+    {
+		version = 3706,
+		name = 'Game Version 3706',
+		description = {
+            '- revert to 3704',
+        },
+	},
 	{
 		version = 3705,
 		name = 'Game Version 3705',
@@ -30,7 +37,7 @@ gamePatches = {
 			'- JaggedAppliance',
 			'- Strogo',
 			'- Exotic-Retard',
-			'- Keyer',
+			'- Keyser',
 		},
 	},
     {
