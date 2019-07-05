@@ -2975,7 +2975,7 @@ Unit = Class(moho.unit_methods) {
 
         if bp.UpgradeEffectBones then
             for _, v in bp.UpgradeEffectBones do
-                if self:IsValidBone(v) then
+                if self:ValidateBone(v) then
                     EffectUtilities.CreateEnhancementEffectAtBone(self, v, self.UpgradeEffectsBag)
                 end
             end
@@ -2983,7 +2983,7 @@ Unit = Class(moho.unit_methods) {
 
         if bp.UpgradeUnitAmbientBones then
             for _, v in bp.UpgradeUnitAmbientBones do
-                if self:IsValidBone(v) then
+                if self:ValidateBone(v) then
                     EffectUtilities.CreateEnhancementUnitAmbient(self, v, self.UpgradeEffectsBag)
                 end
             end
