@@ -2998,12 +2998,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     HasEnhancement = function(self, enh)
-        local unitEnh = SimUnitEnhancements[self.EntityId]
-        if unitEnh then
-            for k, v in unitEnh do
-                if v == enh then
-                    return true
-                end
+        local myEnhancements = SimUnitEnhancements[self.EntityId] or {}
+        for _, v in myEnhancements do
+            if v == enh then
+                return true
             end
         end
 
