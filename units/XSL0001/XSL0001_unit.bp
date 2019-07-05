@@ -318,6 +318,7 @@ UnitBlueprint {
                 'Right_Upgrade',
                 'Left_Upgrade',
             },
+            PhaseShieldMesh = '/units/xsl0001/XSL0001_PhaseShield_mesh',
         },
     },
     Economy = {
