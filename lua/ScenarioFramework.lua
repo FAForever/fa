@@ -858,69 +858,39 @@ function CheckObjectives(list)
     return true
 end
 
-function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
-    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
-    local bp = ACU:GetBlueprint()
-    local bonesToHide = bp.WarpInEffect.HideBones
-    local delay = 0
+-- Used to spawn commanders in situations other than the beginning of a standard skirmish or multiplayer game
+function SpawnCommander(brain, unitString, effect, name, PauseAtDeath, DeathTrigger, enhancements)
+    local unit = ScenarioUtils.CreateArmyUnit(brain, unitString)
 
-    local function CreateEnhancements(unit, enhancements, delay)
-        if delay then
-            WaitSeconds(delay)
-        end
-
-        for _, enhancement in enhancements do
-            unit:CreateEnhancement(enhancement)
-        end
-    end
-
-    local function GateInEffect(unit, effect, bonesToHide)
-        if effect == 'Gate' then
-            delay = 0.75
-            ForkThread(FakeGateInUnit, unit, nil, bonesToHide)
-        elseif effect == 'Warp' then
-            delay = 2.1
-            unit:PlayCommanderWarpInEffect(bonesToHide)
+    if effect then
+        if effect == 'Gate' then -- Walking through a quantum gateway
+            local fx = '/effects/entities/UnitTeleport03/UnitTeleport03_proj.bp'
+            unit:PlayCommanderWarpInEffect(enhancements, 0.8, 2, fx)
+        elseif effect == 'Warp' then -- Full teleport-explosion entry
+            unit:PlayCommanderWarpInEffect(enhancements)
         else
             WARN('*WARNING: Invalid effect type: ' .. effect .. '. Available types: Gate, Warp.')
         end
-    end
-
-    if enhancements and effect then
-        -- Don't hide upgrade bones that we want add on the command unit
-        for _, enh in enhancements do
-            if bp.Enhancements[enh].ShowBones then
-                for _, bone in bp.Enhancements[enh].ShowBones do
-                    table.removeByValue(bonesToHide, bone)
-                end
-            end
-        end
-
-        GateInEffect(ACU, effect, bonesToHide)
-        -- Creating upgrades needs to be delayed until the effect plays, else the upgrade bone would show up before the rest of the unit
-        ForkThread(CreateEnhancements, ACU, enhancements, delay)
-    elseif enhancements then
-        CreateEnhancements(ACU, enhancements)
-    elseif effect then
-        GateInEffect(ACU, effect)
+    elseif enhancements then -- The warp-in sequence handles enhancements for units with effect set
+        unit:CreateEnhancements(enhancements)
     end
 
     -- If true is passed as parameter then it uses default name.
     if name == true then
-        ACU:SetCustomName(GetArmyBrain(brain).Nickname)
+        unit:SetCustomName(GetArmyBrain(brain).Nickname)
     elseif type(name) == 'string' then
-        ACU:SetCustomName(name)
+        unit:SetCustomName(name)
     end
 
     if PauseAtDeath then
-        PauseUnitDeath(ACU)
+        PauseUnitDeath(unit)
     end
 
     if DeathTrigger then
-        CreateUnitDeathTrigger(DeathTrigger, ACU)
+        CreateUnitDeathTrigger(DeathTrigger, unit)
     end
 
-    return ACU
+    return unit
 end
 
 -- FakeTeleportUnitThread
@@ -944,54 +914,18 @@ function FakeTeleportUnit(unit, killUnit)
     end
 end
 
-function FakeGateInUnit(unit, callbackFunction, bonesToHide)
-    local bp = unit:GetBlueprint()
-
+-- Have a unit arrive via a quantum gateway building, but without having been built
+-- Primarily used to stream units through the final mission Seraphim quantum archway
+function FakeGateInUnit(unit)
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
-        unit:HideBone(0, true)
-        unit:SetUnSelectable(true)
-        unit:SetBusy(true)
-        unit:PlayUnitSound('CommanderArrival')
-        unit:CreateProjectile('/effects/entities/UnitTeleport03/UnitTeleport03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-        WaitSeconds(0.75)
-
-        local psm = bp.Display.WarpInEffect.PhaseShieldMesh
-        if psm then
-            unit:SetMesh(psm, true)
-        end
-
-        unit:ShowBone(0, true)
-
-        for _, v in bonesToHide or bp.Display.WarpInEffect.HideBones do
-            unit:HideBone(v, true)
-        end
-
-        unit:SetUnSelectable(false)
-        unit:SetBusy(false)
-
-        local totalBones = unit:GetBoneCount() - 1
-        local army = unit:GetArmy()
-        for _, v in import('/lua/EffectTemplates.lua').UnitTeleportSteam01 do
-            for bone = 1, totalBones do
-                CreateAttachedEmitter(unit, bone, army, v)
-            end
-        end
-
-        if psm then
-            WaitSeconds(2)
-            unit:SetMesh(bp.Display.MeshBlueprint, true)
-        end
-    else
-        LOG ('debug:non commander')
-        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-        unit:PlayUnitSound('GateCharge')
-        WaitSeconds(2)
-        unit:CleanupTeleportChargeEffects()
+        error('*ERROR: Called FakeGateInUnit with an ACU or SCU. Use SpawnCommander instead please!', 2)
+        return
     end
 
-    if callbackFunction then
-        callbackFunction()
-    end
+    unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+    unit:PlayUnitSound('GateCharge')
+    WaitSeconds(2)
+    unit:CleanupTeleportChargeEffects()
 end
 
 -- Upgrades unit - for use with engineers, factories, radar, and other single upgrade path units.

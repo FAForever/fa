@@ -2199,45 +2199,63 @@ CommandUnit = Class(WalkingLandUnit) {
         self.Sync.AutoOvercharge = auto
     end,
 
-    PlayCommanderWarpInEffect = function(self, bones)
-        self:HideBones({0}, true)
+    -- This is called to summon an ACU or SCU. Yes, it's called "Warp In" but actually this is used for both
+    -- arrival by gate and arrival by kaboom
+    --
+    -- enhancements - Optional table of enhancements to enter with, usually used by map scripts
+    --
+    -- All behaviour defaults to explosive arrival. Use the below parameters when using gate arrival
+    -- effectDelay, steamDelay - Delays to use for the initial entry, and the steam effect afterwards
+    -- effect - Initial entry visual effect blueprint string.
+    PlayCommanderWarpInEffect = function(self, enhancements, effectDelay, steamDelay, effect)
         self:SetUnSelectable(true)
         self:SetBusy(true)
-        self:ForkThread(self.WarpInEffectThread, bones)
+
+        self:ForkThread(self.WarpInEffectThread, enhancements, effectDelay, steamDelay, effect)
     end,
 
-    WarpInEffectThread = function(self, bones)
+    WarpInEffectThread = function(self, enhancements, effectDelay, steamDelay, effect)
+        local bpdisplay = self:GetBlueprint().Display
+
+        -- Hide the model entirely
+        self:HideBones({0}, true)
+
+        -- Play audio and visual effects, then wait for them
         self:PlayUnitSound('CommanderArrival')
-        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-        WaitSeconds(2.1)
+        self:CreateProjectile((effect or '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp'), 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(effectDelay or 2.1)
 
-        local bp = self:GetBlueprint()
-        local psm = bp.Display.WarpInEffect.PhaseShieldMesh
-        if psm then
-            self:SetMesh(psm, true)
-        end
-
-        self:ShowBone(0, true)
+        -- Turn on the unit now the main delay is done
         self:SetUnSelectable(false)
         self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
+        self:SetBlockCommandQueue(false) -- Block put in place by the game-start code in ScenarioUtilities
 
-        self:HideBones((bones or bp.Display.WarpInEffect.HideBones), true)
+        -- Set the phase shield mesh (Visual, looks like shrugging off the warp)
+        -- This function is only accessible by ACUs and SCUs. Ensure they have a phase shield mesh.
+        self:SetMesh(bpdisplay.WarpInEffect.PhaseShieldMesh, true)
 
+        -- Show the model, then immediately hide any necessary bones
+        self:ShowBones({0}, true)
+        self:HideBones(bpdisplay.WarpInEffect.HideBones, true)
+
+        -- Apply any necessary enhancements
+        -- This also shows and hides bones as needed
+        self:CreateEnhancements(enhancements)
+
+        -- Add steam effects
         local totalBones = self:GetBoneCount() - 1
         local army = self:GetArmy()
-        for k, v in EffectTemplate.UnitTeleportSteam01 do
+        for _, v in EffectTemplate.UnitTeleportSteam01 do
             for bone = 1, totalBones do
                 CreateAttachedEmitter(self, bone, army, v)
             end
         end
 
-        if psm then
-            WaitSeconds(6)
-            self:SetMesh(bp.Display.MeshBlueprint, true)
-        end
+        -- Wait for the steam to fade, then go to normal mesh
+        WaitSeconds(steamDelay or 6)
+        self:SetMesh(bpdisplay.MeshBlueprint, true)
     end,
-    
+
     -------------------------------------------------------------------------------------------
     -- TELEPORTING WITH DELAY
     -------------------------------------------------------------------------------------------
