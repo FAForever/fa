@@ -17,6 +17,7 @@ Patch 3705 (5 July, 2019)
 - Added Exit button to the endscreen
 - Optimized unitcount for VictoryConditions
 - Check for dead status before killing beams
+- Improved targeting of torpedo bomber and subs
 
 ### Contributors ###
 - Uveso
@@ -25,6 +26,7 @@ Patch 3705 (5 July, 2019)
 - JaggedAppliance
 - Strogo
 - Exotic-Retard
+- Keyser
 
 Patch 3704 (18 June, 2019)
 ============================

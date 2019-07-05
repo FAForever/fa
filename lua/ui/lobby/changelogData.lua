@@ -21,6 +21,7 @@ gamePatches = {
 			'- Added Exit button to the endscreen',
 			'- Optimized unitcount for VictoryConditions',
 			'- Check for dead status before killing beams',
+			'- Improved targeting of torpedo bomber and subs',
 			'',
 			'**Contributors**',
 			'- Uveso',
@@ -29,6 +30,7 @@ gamePatches = {
 			'- JaggedAppliance',
 			'- Strogo',
 			'- Exotic-Retard',
+			'- Keyer',
 		}
 	}
     {
