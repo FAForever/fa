@@ -31,8 +31,8 @@ gamePatches = {
 			'- Strogo',
 			'- Exotic-Retard',
 			'- Keyer',
-		}
-	}
+		},
+	},
     {
         version = 3704,
         name = 'Game Version 3704',
