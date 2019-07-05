@@ -1,5 +1,36 @@
-last_version = 3704
+last_version = 3705
 gamePatches = {
+	{
+		version = 3705
+		name = 'Game Version 3705',
+		description = {
+			'- Fixed various desync Issues for replays',
+			'- Improved In Game Cheat Menu [ALT]+[F2] to support 16 players',
+			'- Various AI Improvements',
+			'- Changed Novax Background Icon to AIR',
+			'- Fixed Seraphim Arty Shells not disappearing',
+			'- Removed controversial dots from the french translation',
+			'- Added a 3 second timer to the teamkill report feature',
+			'- Restricted ACU immobilization feature to human players to avoid breaking the AI',
+			'- Fixed a bug that gave you free resources by pausing a factory',
+			'- Fixed loading AI mod templates being loaded without mods being enabled',
+			'- Fixed unfinished unit transfer in fullshare games',
+			'- Remove "Assist" command from factory during upgrade',
+			'- Fixed free shield assist bug',
+			'- Enable transport rates to be set vs blueprint',
+			'- Added Exit button to the endscreen',
+			'- Optimized unitcount for VictoryConditions',
+			'- Check for dead status before killing beams',
+			'',
+			'**Contributors**',
+			'- Uveso',
+			'- Rackover',
+			'- FAETHER',
+			'- JaggedAppliance',
+			'- Strogo',
+			'- Exotic-Retard',
+		}
+	}
     {
         version = 3704,
         name = 'Game Version 3704',
