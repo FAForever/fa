@@ -676,9 +676,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     AssignEngineerTask = function(self, unit)
-        unit.LastActive = GetGameTimeSeconds()
         if unit.UnitBeingAssist or unit.UnitBeingBuilt then
-            self:DelayAssign(self, unit)
             return
         end
 
@@ -687,7 +685,7 @@ EngineerManager = Class(BuilderManager) {
         unit.MinNumAssistees = nil
 
         if self.AssigningTask then
-            self:DelayAssign(self, unit)
+            DelayAssign(self, unit)
             return
         else
             self.AssigningTask = true
@@ -702,10 +700,10 @@ EngineerManager = Class(BuilderManager) {
             unit.PlatoonHandle = hndl
 
             --if EntityCategoryContains(categories.COMMAND, unit) then
-            --    LOG('*AI DEBUG: ARMY '..self.Brain.Nickname..': Engineer Manager Forming - '..builder.BuilderName..' - Priority: '..builder:GetPriority())
+            --    LOG('*AI DEBUG: ARMY '..self.Brain.Nickname..': Engineer Manager Forming - '..builder.BuilderName..' - Priority: '..builder.Priority)
             --end
 
-            --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Engineer Manager Forming - ',repr(builder.BuilderName),' - Priority: ', builder:GetPriority())
+            --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Engineer Manager Forming - ',repr(builder.BuilderName),' - Priority: ', builder.Priority)
             hndl.PlanName = template[2]
 
             --If we have specific AI, fork that AI thread
@@ -738,8 +736,8 @@ EngineerManager = Class(BuilderManager) {
                 end
             end
 
-            hndl.Priority = builder:GetPriority()
-            hndl.BuilderName = builder:GetBuilderName()
+            hndl.Priority = builder.Priority
+            hndl.BuilderName = builder.BuilderName
 
             hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
 

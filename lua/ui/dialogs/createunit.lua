@@ -84,7 +84,7 @@ local function CreateNameFilter(data)
                 elseif activeFilters[self.key][self.filterKey] then
                     local otherChecked = false
                     for _, control in group.items do
-                        if control ~= self then
+                        if control != self then
                             if control:IsChecked() then
                                 otherChecked = true
                                 break
@@ -111,7 +111,7 @@ local function CreateNameFilter(data)
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
         group.edit.Height:Set(15)
-        group.edit.Width:Set(400)
+        group.edit.Width:Set(200)
         group.edit:SetText(filterSet[data.key].editText or '')
         group.edit:SetFont(UIUtil.bodyFont, 12)
         group.edit:SetMaxChars(20)
@@ -178,10 +178,8 @@ function CreateDialog(x, y)
 
     dialog = Bitmap(GetFrame(0))
     dialog:SetSolidColor('CC000000')
-    local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
-    -- set window high. 400 pixel for the window + 30 pixel for every army line
-    dialog.Height:Set(450 + 30 * NoArmies)
-    dialog.Width:Set(550)
+    dialog.Height:Set(600)
+    dialog.Width:Set(600)
     dialog.Left:Set(function() return math.max(math.min(x, GetFrame(0).Right() - dialog.Width()), 0) end)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -231,14 +229,14 @@ function CreateDialog(x, y)
     local function SetFilters(filterTable)
         for filterGroup, groupControls in filterGroups do
             local key = groupControls.check.key
-            if filterTable[key] ~= nil then
+            if filterTable[key] != nil then
                 LOG('setting key: ', key, ' to: ', filterTable[key].value)
-                if groupControls.check:IsChecked() ~= filterTable[key].value then
+                if groupControls.check:IsChecked() != filterTable[key].value then
                     groupControls.check:SetCheck(filterTable[key].value)
                 end
                 if groupControls.items then
                     for choiceIndex, choiceControl in groupControls.items do
-                        if filterTable[key].choices[choiceControl.filterKey] ~= nil and choiceControl:IsChecked() ~= filterTable[key].choices[choiceControl.filterKey] then
+                        if filterTable[key].choices[choiceControl.filterKey] != nil and choiceControl:IsChecked() != filterTable[key].choices[choiceControl.filterKey] then
                             choiceControl:SetCheck(filterTable[key].choices[choiceControl.filterKey])
                         end
                     end
@@ -271,7 +269,6 @@ function CreateDialog(x, y)
         LayoutHelpers.FillParent(icon, iconBG)
         icon:DisableHitTest()
 
-        -- Player / Ai name
         local name = UIUtil.CreateText(group, armyData.nickname, 12, UIUtil.bodyFont)
         LayoutHelpers.RightOf(name, icon, 2)
         LayoutHelpers.AtTopIn(name, group)
@@ -320,16 +317,13 @@ function CreateDialog(x, y)
 
     armiesGroup.armySlots = {}
     local lowestControl = false
-    local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
-    for i, val in GetArmiesTable().armiesTable do
-                       
+    for index, val in GetArmiesTable().armiesTable do
+        local i = index
         armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
-        -- set the layout to left at the first army
         if i == 1 then
             LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i],armiesGroup)
             lowestControl = armiesGroup.armySlots[i]
-        -- Change layout to right after half army count
-        elseif i == NoArmies then
+        elseif i == 5 then
             LayoutHelpers.RightOf(armiesGroup.armySlots[i],armiesGroup.armySlots[1])
             LayoutHelpers.AtTopIn(armiesGroup.armySlots[i],armiesGroup)
         else
@@ -343,7 +337,7 @@ function CreateDialog(x, y)
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
     local filterSetCombo = Combo(dialog, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    filterSetCombo.Width:Set(340)
+    filterSetCombo.Width:Set(250)
     LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
     filterSetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])

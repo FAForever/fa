@@ -235,7 +235,7 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xsa0402_name>Ahwassa',
         UnitWeight = 1,
     },

@@ -1,5 +1,5 @@
 PropBlueprint {
-    Categories = {
+   Categories = {
         'RECLAIMABLE',
     },
     Defense = {
@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'IceDebris_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 4000,
                     NormalsName = 'IceDebris_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                     SpecularName = 'IceDebris_specteam.dds',
@@ -22,20 +22,20 @@ PropBlueprint {
         UniformScale = 1,
     },
     Economy = {
-        ReclaimEnergyMax = 0,
-        ReclaimMassMax = 300,
-        ReclaimTime = 5,
+        ReclaimEnergyMax = '100',
+        ReclaimMassMax = 80,
+        ReclaimTime = 3,
     },
-    Footprint = {
+     Footprint = {
         OccupancyCaps = 3,
     },
-    Interface = {
+     Interface = {
         HelpText = 'Large Rock - Ice',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
-    SizeX = 17,
-    SizeY = 3,
-    SizeZ = 14,
+    SizeX = 1,
+    SizeY = 1,
+    SizeZ = 1,
 }

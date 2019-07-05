@@ -259,7 +259,7 @@ UnitBlueprint {
                 helpText = 'toggle_stealth_field',
             },
         },
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_StealthToggle = true,
         },
@@ -772,8 +772,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
-                '(STRUCTURE * DEFENSE - ANTIAIR)',
-                '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'STRUCTURE DEFENSE',
                 'MOBILE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',

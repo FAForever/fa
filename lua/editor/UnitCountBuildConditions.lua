@@ -621,7 +621,7 @@ function FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, u
         testCat2 = ParseEntityCategory(unitCategory2)
     end
     if not factoryManager then
-        WARN('*AI WARNING: FactoryRatioComparisonAtLocation - Invalid location - ' .. locationType)
+        WARN('*AI WARNING: FactoryComparisonAtLocation - Invalid location - ' .. locationType)
         return false
     end
     local numUnits = factoryManager:GetNumCategoryFactories(testCat)
@@ -825,7 +825,7 @@ end
 function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not factoryManager then
-        WARN('*AI WARNING: AdjacencyCheck - Invalid location - ' .. locationType)
+        WARN('*AI WARNING: FactoryCapCheck - Invalid location - ' .. locationType)
         return false
     end
 

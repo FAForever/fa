@@ -77,16 +77,19 @@ Builder = Class {
 
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false
-        if Builders[self.BuilderName].PriorityFunction then
-            --LOG('Calculate new Priority '..self.BuilderName..' - '..self.Priority)
-            local newPri = Builders[self.BuilderName]:PriorityFunction(self.Brain)
+
+        # Builders can have a function to update the priority
+        if self.PriorityFunction then
+            local newPri = self.PriorityFunction[1](self, self.Brain, builderManager, unpack(self.PriorityFunction[2]))
             if newPri != self.Priority then
                 self.Priority = newPri
                 self.PriorityAltered = true
             end
-            --LOG('New Priority '..self.BuilderName..' - '..self.Priority)
         end
-        return self.PriorityAltered
+
+        # Returns true if a priority change happened
+        local returnVal = self.PriorityAltered
+        return returnVal
     end,
 
     AdjustPriority = function(self, val)

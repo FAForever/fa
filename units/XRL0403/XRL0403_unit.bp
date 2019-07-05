@@ -255,7 +255,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'amph',
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xrl0403_name>Megalith',
         UnitWeight = 1,
     },

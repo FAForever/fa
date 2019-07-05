@@ -22,9 +22,9 @@ PropBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = 1,
-        ReclaimMassMax = 1,
-        ReclaimTime = 1,
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 3,
@@ -35,7 +35,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = 12,
+    SizeX = 24,
     SizeY = 11,
-    SizeZ = 12,
+    SizeZ = 11,
 }

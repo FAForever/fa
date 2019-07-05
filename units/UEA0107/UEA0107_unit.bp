@@ -214,7 +214,7 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'air',
         SelectionPriority = 2,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC uea0107_name>C-6 Courier',
         UnitWeight = 1,
     },

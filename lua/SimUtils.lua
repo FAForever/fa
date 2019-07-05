@@ -338,7 +338,6 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     local failedToTransfer = {}
     local failedToTransferCounter = 0
     local modifiedWrecks = {}
-    local modifiedUnits = {}
     local createWreckIfTransferFailed = {}
     
     for _, unit in EntityCategoryFilterDown(categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, units) do
@@ -396,10 +395,6 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                     end
                 end       
                
-                for _,u in GetUnitsInRect(unit:GetSkirtRect()) do --same as for wrecks
-                    u:SetCollisionShape('None')
-                    table.insert(modifiedUnits, u)
-                end 
                 
                 if progress > 0.5 then --if transfer failed, we have to create wreck manually. progress should be more than 50%
                     createWreckIfTransferFailed[ID] = true    
@@ -485,8 +480,6 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
         end   
     end
     
-    local createWreckage = import('/lua/wreckage.lua').CreateWreckage
-    
     for ID,_ in createWreckIfTransferFailed do --create 50% wreck. Copied from Unit:CreateWreckageProp()
         local data = failedToTransfer[ID]
         local bp = data.Bp
@@ -496,7 +489,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
         local energy = 0
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
         
-        local wreck = createWreckage(bp, pos, orientation, mass, energy, time)    
+        local wreck = Wreckage.CreateWreckage(bp, pos, orientation, mass, energy, time)    
     end
     
     for key, wreck in modifiedWrecks do --revert wrecks collision shape. Copied from Prop.lua SetPropCollision()
@@ -515,12 +508,6 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
             wreck:SetCollisionShape(shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end
-    
-    for _, u in modifiedUnits do
-        if not u:BeenDestroyed() then
-            u:RevertCollisionShape()
-        end   
-    end    
 end
 
 function GiveUnitsToPlayer(data, units)

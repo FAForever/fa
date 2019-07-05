@@ -195,7 +195,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xeb0104_name>The Kennel',
         UnitWeight = 1,
         UpgradesTo = 'xeb0204',

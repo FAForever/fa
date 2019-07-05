@@ -15,7 +15,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Cactus01_s1_albedo.dds',
-                    LODCutoff = 60,
+                    LODCutoff = 30,
                     NormalsName = '../Cactus01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
@@ -24,11 +24,6 @@ PropBlueprint {
                     LODCutoff = 200,
                     NormalsName = '../Cactus01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
-                },
-                {
-                    AlbedoName = 'Cactus01_Group2_LOD2_albedo.dds',
-                    LODCutoff = 1000,
-                    ShaderName = 'VertexNormal',
                 },
             },
         },

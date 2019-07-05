@@ -125,15 +125,13 @@ URL0402 = Class(CWalkingLandUnit) {
         if self.AmbientExhaustEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
         end
-        if not self.Dead then
-            local wep = self:GetWeapon(1)
-            if wep.Beams then
-                if wep.Audio.BeamLoop and wep.Beams[1].Beam then
-                    wep.Beams[1].Beam:SetAmbientSound(nil, nil)
-                end
-                for k, v in wep.Beams do
-                    v.Beam:Disable()
-                end
+        local wep = self:GetWeapon(1)
+        if wep.Beams then
+            if wep.Audio.BeamLoop and wep.Beams[1].Beam then
+                wep.Beams[1].Beam:SetAmbientSound(nil, nil)
+            end
+            for k, v in wep.Beams do
+                v.Beam:Disable()
             end
         end
         CWalkingLandUnit.OnKilled(self, inst, type, okr)

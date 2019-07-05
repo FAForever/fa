@@ -221,7 +221,7 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         Icon = 'amph',
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xsl0401_name>Ythotha',
         UnitWeight = 1,
     },

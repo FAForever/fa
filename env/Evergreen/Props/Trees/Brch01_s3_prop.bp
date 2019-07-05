@@ -19,9 +19,6 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -32,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'Brch01_s1_albedo.dds',
-                    LODCutoff = 60,
+                    LODCutoff = 30,
                     NormalsName = 'Brch01_s1_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },
@@ -44,7 +41,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Brch01_s1_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

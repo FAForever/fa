@@ -217,8 +217,6 @@ Platoon = Class(moho.platoon_methods) {
             v.AssistPlatoon = nil
             v.UnitBeingAssist = nil
             v.UnitBeingBuilt = nil
-            v.ReclaimInProgress = nil
-            v.CaptureInProgress = nil
             if v:IsPaused() then
                 v:SetPaused( false )
             end
@@ -338,14 +336,17 @@ Platoon = Class(moho.platoon_methods) {
         local target
         local blip
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            if target then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
-                --DUNCAN - added to try and stop AI getting stuck.
-                local position = AIUtils.RandomLocation(target:GetPosition()[1],target:GetPosition()[3])
-                self:MoveToLocation(position, false)
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+                if target then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
+
+                    --DUNCAN - added to try and stop AI getting stuck.
+                    local position = AIUtils.RandomLocation(target:GetPosition()[1],target:GetPosition()[3])
+                    self:MoveToLocation(position, false)
+                end
             end
             WaitSeconds(17)
         end
@@ -1015,28 +1016,32 @@ Platoon = Class(moho.platoon_methods) {
         local homeRadius = self.PlatoonData.HomeRadius or 200
 
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            --DUNCAN - added to target experimentals if they exist.
-            local newtarget
-            if AIAttackUtils.GetSurfaceThreatOfUnits(self) > 0 then
-                newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE))
-            elseif AIAttackUtils.GetAirThreatOfUnits(self) > 0 then
-                newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
-            end
-            if newtarget then
-                target = newtarget
-            end
-            --DUNCAN - use the base position to work out radius rather than self:GetPlatoonPosition()
-            if target and not target.Dead and VDist3(target:GetPosition(), basePosition) < guardRadius then
-                self:Stop()
-                self:AggressiveMoveToLocation(target:GetPosition())
-            else
-                local PlatoonPosition = self:GetPlatoonPosition()
-                if PlatoonPosition and VDist3(basePosition, PlatoonPosition) > homeRadius then
-                    --DUNCAN - still try to move closer to the base if outside the radius
-                    local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+
+                --DUNCAN - added to target experimentals if they exist.
+                local newtarget
+                if AIAttackUtils.GetSurfaceThreatOfUnits(self) > 0 then
+                    newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE))
+                elseif AIAttackUtils.GetAirThreatOfUnits(self) > 0 then
+                    newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
+                end
+                if newtarget then
+                    target = newtarget
+                end
+
+                --DUNCAN - use the base position to work out radius rather than self:GetPlatoonPosition()
+                if target and not target.Dead and VDist3(target:GetPosition(), basePosition) < guardRadius then
                     self:Stop()
-                    self:MoveToLocation(position, false)
+                    self:AggressiveMoveToLocation(target:GetPosition())
+                else
+                    local PlatoonPosition = self:GetPlatoonPosition()
+                    if PlatoonPosition and VDist3(basePosition, PlatoonPosition) > homeRadius then
+                        --DUNCAN - still try to move closer to the base if outside the radius
+                        local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
+                        self:Stop()
+                        self:MoveToLocation(position, false)
+                    end
                 end
             end
             WaitSeconds(5)
@@ -1058,11 +1063,8 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
 
-        -- build scoutlocations if not already done.
-        if not aiBrain.InterestList then
-            aiBrain:BuildScoutLocations()
-        end
-
+        -- Build always BuildScoutLocations. We need this also for the Cheating AI's with Omniview.
+        aiBrain:BuildScoutLocations()
         --If we have cloaking (are cybran), then turn on our cloaking
         --DUNCAN - Fixed to use same bits
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -1177,11 +1179,8 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local aiBrain = self:GetBrain()
-
-        -- build scoutlocations if not already done.
-        if not aiBrain.InterestList then
-            aiBrain:BuildScoutLocations()
-        end
+        -- Build always BuildScoutLocations. We need this also for the Cheating AI's with Omniview.
+        aiBrain:BuildScoutLocations()
 
         --If we have Stealth (are cybran), then turn on our Stealth
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -1440,7 +1439,7 @@ Platoon = Class(moho.platoon_methods) {
             local platoonUnits = self:GetPlatoonUnits()
 
             for locName, locData in aiBrain.BuilderManagers do
-                if not locData.DistressCall then
+                if not locData.BaseSettings.DistressCall then
                     local position = locData.EngineerManager:GetLocationCoords()
                     local radius = locData.EngineerManager.Radius
                     local distressRange = locData.BaseSettings.DistressRange or aiBrain.BaseMonitor.PoolDistressRange
@@ -1459,7 +1458,7 @@ Platoon = Class(moho.platoon_methods) {
                         IssueMove(group, position)
 
                         -- Set distress active for duration
-                        locData.DistressCall = true
+                        locData.BaseSettings.DistressCall = true
                         self:ForkThread(self.UnlockBaseManagerDistressLocation, locData)
                     end
                 end
@@ -1470,7 +1469,7 @@ Platoon = Class(moho.platoon_methods) {
 
     UnlockBaseManagerDistressLocation = function(self, locData)
         WaitSeconds(15)
-        locData.DistressCall = false
+        locData.BaseSettings.DistressCall = false
     end,
 
     DisbandAI = function(self)
@@ -1510,8 +1509,6 @@ Platoon = Class(moho.platoon_methods) {
                 local blip = target:GetBlip(index)
                 if blip then
                     IssueClearCommands(self:GetPlatoonUnits())
-                    -- Set CaptureInProgress to prevent attacking
-                    target.CaptureInProgress = true
                     IssueCapture(engineers, target)
                     local guardTarget
 
@@ -1536,7 +1533,6 @@ Platoon = Class(moho.platoon_methods) {
                             end
                         end
                     until allIdle or blip:BeenDestroyed() or blip:IsKnownFake(index) or blip:IsMaybeDead(index)
-                    target.CaptureInProgress = nil
                 end
             else
                 if data.TransportReturn then
@@ -1610,9 +1606,9 @@ Platoon = Class(moho.platoon_methods) {
             end
             if reclaimunit and not reclaimunit.Dead then
                 counter = 0
+                IssueReclaim(self:GetPlatoonUnits(), reclaimunit)
                 -- Set ReclaimInProgress to prevent repairing (see RepairAI)
                 reclaimunit.ReclaimInProgress = true
-                IssueReclaim(self:GetPlatoonUnits(), reclaimunit)
                 repeat
                     WaitSeconds(2)
                     if not aiBrain:PlatoonExists(self) then
@@ -1628,7 +1624,6 @@ Platoon = Class(moho.platoon_methods) {
                 until allIdle
             elseif not reclaimunit or counter >= 5 then
                 self:PlatoonDisband()
-                return
             else
                 counter = counter + 1
                 WaitSeconds(5)
@@ -1729,8 +1724,6 @@ Platoon = Class(moho.platoon_methods) {
                 if blip then
                     IssueClearCommands(self:GetPlatoonUnits())
                     IssueReclaim(self:GetPlatoonUnits(), target)
-                    -- Set ReclaimInProgress to prevent repairing (see RepairAI)
-                    target.ReclaimInProgress = true
                     local allIdle
                     repeat
                         WaitSeconds(2)
@@ -1762,7 +1755,6 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         if not self.PlatoonData or not self.PlatoonData.LocationType then
             self:PlatoonDisband()
-            return
         end
         local eng = self:GetPlatoonUnits()[1]
         local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
@@ -1821,7 +1813,7 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        eng.AssistPlatoon = nil
+        self.AssistPlatoon = nil
         eng.UnitBeingAssist = nil
         self:Stop()
         self:PlatoonDisband()
@@ -1842,7 +1834,6 @@ Platoon = Class(moho.platoon_methods) {
         if not assistData.AssistLocation then
             WARN('*AI WARNING: Disbanding EconUnfinishedBody platoon that does not AssistLocation')
             self:PlatoonDisband()
-            return
         end
 
         local beingBuilt = assistData.BeingBuiltCategories or { 'ALLUNITS' }
@@ -2155,7 +2146,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         --DUNCAN - added
-        if eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or eng:IsUnitState("Enhancing") then
+        if eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or  eng:IsUnitState("Enhancing") then
            return
         end
 
@@ -2227,7 +2218,6 @@ Platoon = Class(moho.platoon_methods) {
                                                 cons.MarkerUnitCount, cons.MarkerUnitCategory, cons.MarkerRadius)
             if not reference or not refName then
                 self:PlatoonDisband()
-                return
             end
 
         elseif cons.NearMarkerType and cons.ExpansionBase then
@@ -2240,7 +2230,6 @@ Platoon = Class(moho.platoon_methods) {
                 -- didn't find a location to build at
                 if not reference or not refName then
                     self:PlatoonDisband()
-                    return
                 end
             elseif cons.NearMarkerType == 'Naval Area' then
                 reference, refName = AIUtils.AIFindNavalAreaNeedsEngineer(aiBrain, cons.LocationType,
@@ -2248,7 +2237,6 @@ Platoon = Class(moho.platoon_methods) {
                 -- didn't find a location to build at
                 if not reference or not refName then
                     self:PlatoonDisband()
-                    return
                 end
             else
                 --DUNCAN - use my alternative expansion finder on large maps below a certain time
@@ -2267,7 +2255,6 @@ Platoon = Class(moho.platoon_methods) {
                 -- didn't find a location to build at
                 if not reference or not refName then
                     self:PlatoonDisband()
-                    return
                 end
             end
 
@@ -2471,26 +2458,19 @@ Platoon = Class(moho.platoon_methods) {
         local UnitBeingUpgradeFactionIndex = nil
         local upgradeIssued = false
         self:Stop()
-        --LOG('* UnitUpgradeAI: PlatoonName:'..repr(self.BuilderName))
         for k, v in platoonUnits do
-            --LOG('* UnitUpgradeAI: Upgrading unit '..v:GetUnitId()..' ('..v.factionCategory..')')
             local upgradeID
             -- Get the factionindex from the unit to get the right update (in case we have captured this unit from another faction)
             UnitBeingUpgradeFactionIndex = FactionToIndex[v.factionCategory] or factionIndex
-            --LOG('* UnitUpgradeAI: UnitBeingUpgradeFactionIndex '..UnitBeingUpgradeFactionIndex)
             if self.PlatoonData.OverideUpgradeBlueprint then
                 local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
-                if not tempUpgradeID then
-                    --WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unitID is empty' )
-                elseif type(tempUpgradeID) ~= 'string' then
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unit not present.)' )
-                elseif v:CanBuild(tempUpgradeID) then
+                if v:CanBuild(tempUpgradeID) then
                     upgradeID = tempUpgradeID
                 else
                     -- in case the unit can't upgrade with OverideUpgradeBlueprint, warn the programmer
                     -- this can happen if the AI relcaimed a factory and tries to upgrade to a support factory without having a HQ factory from the reclaimed factory faction.
                     -- in this case we fall back to HQ upgrade template and upgrade to a HQ factory instead of support.
-                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed. (Override tree not available, upgrading to default instead.)
+                    -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed!
                     WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed. (Override tree not available, upgrading to default instead.)' )
                 end
             end
@@ -2506,19 +2486,18 @@ Platoon = Class(moho.platoon_methods) {
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ABC1234
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v:GetUnitId()) .. '  faction: ' .. repr(v.factionCategory) )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v:GetUnitId()) .. '  factionIndex: ' .. repr(factionIndex) )
                 end
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
                 -- in case the unit can't upgrade with upgradeID, warn the programmer
-                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: ABC1234:CanBuild(upgradeID) failed!
+                -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: UnitId:CanBuild(upgradeID) failed!
                 WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: ' .. repr(v:GetUnitId()) .. ':CanBuild( '..upgradeID..' ) failed!' )
                 continue
             end
             if upgradeID then
                 upgradeIssued = true
                 IssueUpgrade({v}, upgradeID)
-                --LOG('-- Upgrading unit '..v:GetUnitId()..' ('..v.factionCategory..') with '..upgradeID)
             end
         end
         if not upgradeIssued then
@@ -2581,27 +2560,30 @@ Platoon = Class(moho.platoon_methods) {
         local blip
         local hadtarget = false
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE))
-            if not target then
-                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            end
-            if target then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
-                hadtarget = true
-            elseif not target and hadtarget then
-                local x,z = aiBrain:GetArmyStartPos()
-                local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
-                if safePath then
-                    for _,p in safePath do
-                        self:MoveToLocation(p, false)
-                    end
-                else
-                    self:MoveToLocation(position, false)
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE))
+                if not target then
+                    target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
                 end
-                hadtarget = false
+
+                if target then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
+                    hadtarget = true
+                elseif not target and hadtarget then
+                    local x,z = aiBrain:GetArmyStartPos()
+                    local position = AIUtils.RandomLocation(x,z)
+                    local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                    if safePath then
+                        for _,p in safePath do
+                            self:MoveToLocation(p, false)
+                        end
+                    else
+                        self:MoveToLocation(position, false)
+                    end
+                    hadtarget = false
+                end
             end
             WaitSeconds(17)
         end
@@ -2631,28 +2613,36 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
-            if not target then
-                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            end
-            if target and target:GetFractionComplete() == 1 then
-                local airThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'Air')
-                --LOG("Air threat: " .. airThreat)
-                local antiAirThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'AntiAir') - airThreat
-                --LOG("AntiAir threat: " .. antiAirThreat)
-                if antiAirThreat < 1.5 then
-                    blip = target:GetBlip(armyIndex)
-                    self:Stop()
-                    self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
-                    hadtarget = true
+            --if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
+                if not target then
+                    target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
                 end
-           elseif not target and hadtarget then
-                --DUNCAN - move back to base
-                local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                self:Stop()
-                self:MoveToLocation(position, false)
-                hadtarget = false
-            end
+
+                if target and target:GetFractionComplete() == 1 then
+                    local airThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'Air')
+                    --LOG("Air threat: " .. airThreat)
+                    local antiAirThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'AntiAir') - airThreat
+                    --LOG("AntiAir threat: " .. antiAirThreat)
+                    if antiAirThreat < 1.5 then
+                        blip = target:GetBlip(armyIndex)
+                        self:Stop()
+                        self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
+                        hadtarget = true
+                    end
+                elseif not target and hadtarget then
+                    --DUNCAN - move back to base
+                    local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
+                    self:Stop()
+                    self:MoveToLocation(position, false)
+
+                    --DUNCAN - this doesnt seem to work
+                    --for k,v in AIUtils.GetBasePatrolPoints(aiBrain, self.PlatoonData.Location or 'MAIN', self.PlatoonData.Radius or 100, 'Air') do
+                    --      self:Patrol(v)
+                    --end
+                    hadtarget = false
+                end
+            --end
             WaitSeconds(5) --DUNCAN - was 5
         end
     end,
@@ -4041,7 +4031,7 @@ Platoon = Class(moho.platoon_methods) {
             local platoonUnits = self:GetPlatoonUnits()
 
             for locName, locData in aiBrain.BuilderManagers do
-                if not locData.DistressCall then
+                if not locData.BaseSettings.DistressCall then
                     local position = locData.EngineerManager:GetLocationCoords()
                     local retPos = AIUtils.RandomLocation(position[1],position[3])
                     local radius = locData.EngineerManager.Radius
@@ -4061,7 +4051,7 @@ Platoon = Class(moho.platoon_methods) {
                         IssueMove(group, retPos)
 
                         -- Set distress active for duration
-                        locData.DistressCall = true
+                        locData.BaseSettings.DistressCall = true
                         self:ForkThread(self.UnlockBaseManagerDistressLocation, locData)
                     end
                 end
@@ -4148,21 +4138,26 @@ Platoon = Class(moho.platoon_methods) {
         unit:SetTargetPriorities(atkPriTable)
 
         while aiBrain:PlatoonExists(self) do
-            target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
-            local newtarget = false
-            if aiBrain.AttackPoints and table.getn(aiBrain.AttackPoints) > 0 then
-                newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
-                if newtarget then
-                    target = newtarget
+            if self:IsOpponentAIRunning() then
+                target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
+                local newtarget = false
+                if aiBrain.AttackPoints and table.getn(aiBrain.AttackPoints) > 0 then
+                    newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
+                    if newtarget then
+                        target = newtarget
+                    end
                 end
-            end
-            if target and not unit.Dead then
-                IssueClearCommands({unit})
-                IssueAttack({unit}, target)
-                attacking = true
-            elseif not target and attacking then
-                IssueClearCommands({unit})
-                attacking = false
+                if target and not unit.Dead then
+                    --self:Stop()
+                    --self:AttackTarget(target)
+                    IssueClearCommands({unit})
+                    IssueAttack({unit}, target)
+                    attacking = true
+                elseif not target and attacking then
+                    --self:Stop()
+                    IssueClearCommands({unit})
+                    attacking = false
+                end
             end
             WaitSeconds(20)
         end
@@ -4189,11 +4184,20 @@ Platoon = Class(moho.platoon_methods) {
 
         while aiBrain:PlatoonExists(self) do
             self:MergeWithNearbyPlatoonsSorian('SatelliteAISorian', 50, true)
-            target = AIUtils.AIFindUndefendedBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri)
-            if target and target != oldTarget and not target.Dead then
-                self:Stop()
-                self:AttackTarget(target)
-                oldTarget = target
+            if self:IsOpponentAIRunning() then
+                target = AIUtils.AIFindUndefendedBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri)
+                --local newtarget = false
+                --if aiBrain.AttackPoints and table.getn(aiBrain.AttackPoints) > 0 then
+                --  newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri)
+                --  if newtarget then
+                --      target = newtarget
+                --  end
+                --end
+                if target and target != oldTarget and not target.Dead then
+                    self:Stop()
+                    self:AttackTarget(target)
+                    oldTarget = target
+                end
             end
             WaitSeconds(30)
         end
@@ -4287,41 +4291,43 @@ Platoon = Class(moho.platoon_methods) {
         'MOBILE ANTIAIR', 'ALLUNITS',
         }
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            local newtarget = false
-            if aiBrain.T4ThreatFound['Land'] or aiBrain.T4ThreatFound['Naval'] or aiBrain.T4ThreatFound['Structure'] then
-                newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE + categories.ARTILLERY))
-                if newtarget then
-                    target = newtarget
-                end
-            elseif aiBrain.AirAttackPoints and table.getn(aiBrain.AirAttackPoints) > 0 then
-                newtarget = AIUtils.AIFindAirAttackTargetInRangeSorian(aiBrain, self, 'Attack', atkPri, self.AirAttackPoints[1].Position)
-                if newtarget then
-                    target = newtarget
-                end
-            end
-            if target and newtarget then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AttackTarget(target)
-                hadtarget = true
-            elseif target then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
-                hadtarget = true
-            elseif not target and hadtarget then
-                local x,z = aiBrain:GetArmyStartPos()
-                local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
-                if safePath then
-                    for _,p in safePath do
-                        self:MoveToLocation(p, false)
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+                local newtarget = false
+                if aiBrain.T4ThreatFound['Land'] or aiBrain.T4ThreatFound['Naval'] or aiBrain.T4ThreatFound['Structure'] then
+                    newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE + categories.ARTILLERY))
+                    if newtarget then
+                        target = newtarget
                     end
-                else
-                    self:MoveToLocation(position, false)
+                elseif aiBrain.AirAttackPoints and table.getn(aiBrain.AirAttackPoints) > 0 then
+                    newtarget = AIUtils.AIFindAirAttackTargetInRangeSorian(aiBrain, self, 'Attack', atkPri, self.AirAttackPoints[1].Position)
+                    if newtarget then
+                        target = newtarget
+                    end
                 end
-                hadtarget = false
+                if target and newtarget then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AttackTarget(target)
+                    hadtarget = true
+                elseif target then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
+                    hadtarget = true
+                elseif not target and hadtarget then
+                    local x,z = aiBrain:GetArmyStartPos()
+                    local position = AIUtils.RandomLocation(x,z)
+                    local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                    if safePath then
+                        for _,p in safePath do
+                            self:MoveToLocation(p, false)
+                        end
+                    else
+                        self:MoveToLocation(position, false)
+                    end
+                    hadtarget = false
+                end
             end
             local waitLoop = 0
             repeat
@@ -4393,32 +4399,34 @@ Platoon = Class(moho.platoon_methods) {
         local blip
         local hadtarget = false
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.AIR - categories.POD)
-            local newtarget = false
-            if aiBrain.T4ThreatFound['Air'] then
-                newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
-                if newtarget then
-                    target = newtarget
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.AIR - categories.POD)
+                local newtarget = false
+                if aiBrain.T4ThreatFound['Air'] then
+                    newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
+                    if newtarget then
+                        target = newtarget
+                    end
                 end
-            end
-            if target and newtarget and target:GetFractionComplete() == 1
-            and SUtils.GetThreatAtPosition(aiBrain, target:GetPosition(), 1, 'AntiAir', {'Air'}) < (AIAttackUtils.GetAirThreatOfUnits(self) * .6) then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AttackTarget(target)
-                hadtarget = true
-            elseif target and target:GetFractionComplete() == 1
-            and SUtils.GetThreatAtPosition(aiBrain, target:GetPosition(), 1, 'AntiAir', {'Air'}) < (AIAttackUtils.GetAirThreatOfUnits(self) * .6) then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
-                hadtarget = true
-            elseif not target and hadtarget then
-                for k,v in AIUtils.GetBasePatrolPoints(aiBrain, location, radius, 'Air') do
-                   self:Patrol(v)
+                if target and newtarget and target:GetFractionComplete() == 1
+                and SUtils.GetThreatAtPosition(aiBrain, target:GetPosition(), 1, 'AntiAir', {'Air'}) < (AIAttackUtils.GetAirThreatOfUnits(self) * .6) then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AttackTarget(target)
+                    hadtarget = true
+                elseif target and target:GetFractionComplete() == 1
+                and SUtils.GetThreatAtPosition(aiBrain, target:GetPosition(), 1, 'AntiAir', {'Air'}) < (AIAttackUtils.GetAirThreatOfUnits(self) * .6) then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
+                    hadtarget = true
+                elseif not target and hadtarget then
+                    for k,v in AIUtils.GetBasePatrolPoints(aiBrain, location, radius, 'Air') do
+                        self:Patrol(v)
+                    end
+                    hadtarget = false
+                    return self:GuardExperimentalSorian(self.FighterHuntAI)
                 end
-                hadtarget = false
-                return self:GuardExperimentalSorian(self.FighterHuntAI)
             end
             local waitLoop = 0
             repeat
@@ -4731,31 +4739,33 @@ Platoon = Class(moho.platoon_methods) {
         local T4Radius = math.sqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ)) / 2
 
         while aiBrain:PlatoonExists(self) do
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            local newtarget = false
-            if aiBrain.T4ThreatFound['Air'] then
-                newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
-                if newtarget then
-                    target = newtarget
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+                local newtarget = false
+                if aiBrain.T4ThreatFound['Air'] then
+                    newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * categories.AIR)
+                    if newtarget then
+                        target = newtarget
+                    end
                 end
-            end
-            if target and newtarget and not target.Dead and target:GetFractionComplete() == 1
-            and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), basePosition) < T4Radius * T4Radius then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                self:AttackTarget(target)
-                patrolling = false
-            elseif target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), basePosition) < guardRadius * guardRadius then
-                self:Stop()
-                self:AggressiveMoveToLocation(target:GetPosition())
-                patrolling = false
-            elseif not patrolling then
-                local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                self:MoveToLocation(position, false)
-                for k,v in AIUtils.GetBasePatrolPoints(aiBrain, basePosition, radius, 'Air') do
-                    self:Patrol(v)
+                if target and newtarget and not target.Dead and target:GetFractionComplete() == 1
+                and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), basePosition) < T4Radius * T4Radius then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    self:AttackTarget(target)
+                    patrolling = false
+                elseif target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), basePosition) < guardRadius * guardRadius then
+                    self:Stop()
+                    self:AggressiveMoveToLocation(target:GetPosition())
+                    patrolling = false
+                elseif not patrolling then
+                    local position = AIUtils.RandomLocation(basePosition[1],basePosition[3])
+                    self:MoveToLocation(position, false)
+                    for k,v in AIUtils.GetBasePatrolPoints(aiBrain, basePosition, radius, 'Air') do
+                        self:Patrol(v)
+                    end
+                    patrolling = true
                 end
-                patrolling = true
             end
             WaitSeconds(5)
         end
@@ -5159,10 +5169,7 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
 
-        -- build scoutlocations if not already done.
-        if not aiBrain.InterestList then
-            aiBrain:BuildScoutLocationsSorian()
-        end
+        aiBrain:BuildScoutLocationsSorian()
 
         --If we have cloaking (are cybran), then turn on our cloaking
         if self.PlatoonData.UseCloak and scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -5224,11 +5231,8 @@ Platoon = Class(moho.platoon_methods) {
         local scout = self:GetPlatoonUnits()[1]
         local badScouting = false
 
-        -- build scoutlocations if not already done.
-        if not aiBrain.InterestList then
-            aiBrain:BuildScoutLocationsSorian()
-        end
-        
+        aiBrain:BuildScoutLocationsSorian()
+
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
             scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
@@ -5374,24 +5378,26 @@ Platoon = Class(moho.platoon_methods) {
         end
         WaitSeconds(5)
         while aiBrain:PlatoonExists(self) do
-            target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri)
-            if target then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                cmd = self:AggressiveMoveToLocation(target:GetPosition())
-            end
-            WaitSeconds(1)
-            if (not cmd or not self:IsCommandsActive(cmd)) then
-                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+            if self:IsOpponentAIRunning() then
+                target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri)
                 if target then
                     blip = target:GetBlip(armyIndex)
                     self:Stop()
                     cmd = self:AggressiveMoveToLocation(target:GetPosition())
-                else
-                    local scoutPath = {}
-                    scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
-                    for k, v in scoutPath do
-                        self:Patrol(v)
+                end
+                WaitSeconds(1)
+                if (not cmd or not self:IsCommandsActive(cmd)) then
+                    target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
+                    if target then
+                        blip = target:GetBlip(armyIndex)
+                        self:Stop()
+                        cmd = self:AggressiveMoveToLocation(target:GetPosition())
+                    else
+                        local scoutPath = {}
+                        scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
+                        for k, v in scoutPath do
+                            self:Patrol(v)
+                        end
                     end
                 end
             end
@@ -5413,14 +5419,16 @@ Platoon = Class(moho.platoon_methods) {
             local inWater = AIAttackUtils.InWaterCheck(self)
             local pos = self:GetPlatoonPosition()
             local threatatLocation = aiBrain:GetThreatAtPosition(pos, 1, true, 'AntiSurface')
-            target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
-            if target then
-                blip = target:GetBlip(armyIndex)
-                self:Stop()
-                if not inWater then
-                    IssueAggressiveMove(platoonUnits, target:GetPosition())
-                else
-                    IssueMove(platoonUnits, target:GetPosition())
+            if self:IsOpponentAIRunning() then
+                target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
+                if target then
+                    blip = target:GetBlip(armyIndex)
+                    self:Stop()
+                    if not inWater then
+                        IssueAggressiveMove(platoonUnits, target:GetPosition())
+                    else
+                        IssueMove(platoonUnits, target:GetPosition())
+                    end
                 end
             end
             WaitSeconds(17)
@@ -5455,33 +5463,36 @@ Platoon = Class(moho.platoon_methods) {
         while aiBrain:PlatoonExists(self) do
             local mySurfaceThreat = eng:GetBlueprint().Defense.SurfaceThreatLevel or 75
             local pos = self:GetPlatoonPosition()
-            local target = self:FindClosestUnit('support', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
-            if target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), eng.CDRHome) < (leashRange * leashRange) and
-            aiBrain:GetThreatBetweenPositions(pos, target:GetPosition(), nil, 'AntiSurface') < mySurfaceThreat then
-                movingToScout = false
-                local targetLoc = target:GetPosition()
-                self:Stop()
-                if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and VDist2Sq(targetLoc[1], targetLoc[3], pos[1], pos[3]) <= weapRange * weapRange then
-                    IssueClearCommands({eng})
-                    IssueOverCharge({eng}, target)
-                else
-                    IssueClearCommands({eng})
-                    IssueMove({eng}, targetLoc)
-                end
-            elseif not movingToScout then
-                self:Stop()
-                local DefSpots = AIUtils.AIGetSortedDefensiveLocationsFromLast(aiBrain, 10)
-                if table.getn(DefSpots) > 0 then
-                    for k,v in DefSpots do
-                        if SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) < (leashRange * leashRange) and (SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) > SUtils.XZDistanceTwoVectorsSq(pos, eng.CDRHome) and initialMove) then
-                            movingToScout = true
-                            self:MoveToLocation(v, false)
+            if self:IsOpponentAIRunning() then
+                local target = self:FindClosestUnit('support', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
+                if target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), eng.CDRHome) < (leashRange * leashRange) and
+                aiBrain:GetThreatBetweenPositions(pos, target:GetPosition(), nil, 'AntiSurface') < mySurfaceThreat then
+                --aiBrain:GetThreatAtPosition(target:GetPosition(), 1, true, 'AntiSurface') < mySurfaceThreat * 1.5 then
+                    movingToScout = false
+                    local targetLoc = target:GetPosition()
+                    self:Stop()
+                    if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and VDist2Sq(targetLoc[1], targetLoc[3], pos[1], pos[3]) <= weapRange * weapRange then
+                        IssueClearCommands({eng})
+                        IssueOverCharge({eng}, target)
+                    else
+                        IssueClearCommands({eng})
+                        IssueMove({eng}, targetLoc)
+                    end
+                elseif not movingToScout then
+                    self:Stop()
+                    local DefSpots = AIUtils.AIGetSortedDefensiveLocationsFromLast(aiBrain, 10)
+                    if table.getn(DefSpots) > 0 then
+                        for k,v in DefSpots do
+                            if SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) < (leashRange * leashRange) and (SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) > SUtils.XZDistanceTwoVectorsSq(pos, eng.CDRHome) and initialMove) then
+                                movingToScout = true
+                                self:MoveToLocation(v, false)
+                            end
+                        end
+                        if not movingToScout then
+                            initialMove = false
                         end
                     end
-                    if not movingToScout then
-                        initialMove = false
-                    end
-                 end
+                end
             end
             WaitSeconds(5)
         end
@@ -5533,9 +5544,11 @@ Platoon = Class(moho.platoon_methods) {
 
         while aiBrain:PlatoonExists(self) do
             local pos = self:GetPlatoonPosition()
-            target = AIUtils.AIFindBrainTargetInRange(aiBrain, self, 'Attack', maxRadius * 25, atkPri, aiBrain:GetCurrentEnemy())
-            if target then
-                self:AttackTarget(target)
+            if self:IsOpponentAIRunning() then
+                target = AIUtils.AIFindBrainTargetInRange(aiBrain, self, 'Attack', maxRadius * 25, atkPri, aiBrain:GetCurrentEnemy())
+                if target then
+                    self:AttackTarget(target)
+                end
             end
             if transport:GetHealthPercent() < .35 then
                 IssueTransportUnload(transport, self:GetPlatoonPosition())
@@ -5963,6 +5976,19 @@ Platoon = Class(moho.platoon_methods) {
         local x,z = aiBrain:GetArmyStartPos()
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
 
+        local factionIndex = cons.FactionIndex or self:GetFactionIndex()
+
+        if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
+        cons.NearMarkerType == 'Protected Experimental Construction') then
+            cons.NearMarkerType = nil
+            cons.BaseTemplate = nil
+        end
+
+        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
+        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
+        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
+        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
+
         local eng
         for k, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.CONSTRUCTION, v) then
@@ -5980,20 +6006,6 @@ Platoon = Class(moho.platoon_methods) {
             self:PlatoonDisband()
             return
         end
-
-        local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
-        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
-
-        if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
-        cons.NearMarkerType == 'Protected Experimental Construction') then
-            cons.NearMarkerType = nil
-            cons.BaseTemplate = nil
-        end
-
-        buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
-        baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
-        buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
-        baseTmpl = baseTmplFile[(cons.BaseTemplate or 'BaseTemplates')][factionIndex]
 
         if self.PlatoonData.NeedGuard then
             eng.NeedGuard = true

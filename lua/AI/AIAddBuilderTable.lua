@@ -49,11 +49,10 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
         tableType = 'EngineerManager'
     elseif builderTable.BuildersType == 'FactoryBuilder' then
         tableType = 'FactoryManager'
-    elseif builderTable.BuildersType == 'StrategyBuilder' and managers.StrategyManager then
+    elseif builderTable.BuildersType == 'StrategyBuilder' then
         tableType = 'StrategyManager'
     else
-        WARN('*AI ERROR: Invalid BuildersType ('..repr(builderTable.BuildersType)..') for table of builder to add to brain')
-        return
+        error('*AI ERROR: Invalid BuildersType for table of builder to add to brain')
     end
 
     for k,v in builderTable do

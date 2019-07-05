@@ -12,7 +12,6 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 
 local dialog = false
 local shouldReport = false
-local waitingTimeBeforeReport = 3;
 
 function CreateDialog(teamkill)
     if dialog then
@@ -24,7 +23,7 @@ function CreateDialog(teamkill)
     dialogContent.Height:Set(180)
 
     dialog = Popup(GetFrame(0), dialogContent)
-    
+
     local title = UIUtil.CreateText(dialogContent, "<LOC teamkill_0001>Teamkill Detected", 14, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(title, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
@@ -36,16 +35,14 @@ function CreateDialog(teamkill)
 
     local forgiveBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0004>Forgive")
     LayoutHelpers.AtBottomIn(forgiveBtn, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(forgiveBtn, dialogContent, 10)
+    LayoutHelpers.AtRightIn(forgiveBtn, dialogContent, 10)
     forgiveBtn.OnClick = function(self, modifiers)
-        KillThread(dialog.countdownThread)
         dialog:Close()
     end
 
     local reportBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC teamkill_0003>Report")
     LayoutHelpers.AtBottomIn(reportBtn, dialogContent, 10)
-    LayoutHelpers.AtRightIn(reportBtn, dialogContent, 10)
-    UIUtil.setEnabled(reportBtn, false)
+    LayoutHelpers.AtLeftIn(reportBtn, dialogContent, 10)
     reportBtn.OnClick = function(self, modifiers)
         GpgNetSend('TeamkillReport',  teamkill.time, teamkill.victim.id, teamkill.victim.name, teamkill.instigator.id, teamkill.instigator.name)
         WARN("TEAMKILL WAS REPORTED")
@@ -61,17 +58,4 @@ function CreateDialog(teamkill)
 
     dialog.OnShadowClicked = function(self)
     end
-    
-    dialog.countdownThread = ForkThread(WaitBeforeEnablingReportButton, reportBtn)
-end
-
-function WaitBeforeEnablingReportButton(reportBtn)
-    local waitedTime = 0;
-    while waitedTime < waitingTimeBeforeReport do
-        reportBtn.label:SetText(LOC("<LOC teamkill_0003>Report").."["..(waitingTimeBeforeReport-waitedTime).."]")
-        WaitSeconds(1)
-        waitedTime = waitedTime + 1
-    end
-    reportBtn.label:SetText(LOC("<LOC teamkill_0003>Report"))
-    UIUtil.setEnabled(reportBtn, true)
 end

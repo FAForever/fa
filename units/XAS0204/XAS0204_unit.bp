@@ -243,7 +243,7 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         Icon = 'sea',
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xas0204_name>Vesper',
         UnitWeight = 1,
     },
@@ -350,8 +350,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
-                '(STRUCTURE * DEFENSE - ANTIAIR)',
-                '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'STRUCTURE DEFENSE',
                 'MOBILE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',

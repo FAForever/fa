@@ -727,20 +727,12 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
-        elseif unitBeingBuilt:GetBlueprint().CategoriesHash.RESEARCH then
-            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory 
-            self:RemoveCommandCap('RULEUCC_Guard')
-            self.DisabledAssist = true
         end
         self.FactoryBuildFailed = false
     end,
 
     --- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order)
-        if self.DisabledAssist then
-            self:AddCommandCap('RULEUCC_Guard')
-            self.DisabledAssist = nil
-        end
         local bp = self:GetBlueprint()
         if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
             self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
@@ -1351,9 +1343,7 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     DestroyIdleEffects = function(self)
-        if self.TimedSonarEffectsThread then
-            self.TimedSonarEffectsThread:Destroy()
-        end
+        self.TimedSonarEffectsThread:Destroy()
         StructureUnit.DestroyIdleEffects(self)
     end,
 
@@ -2354,11 +2344,7 @@ ACUUnit = Class(CommandUnit) {
         if not legalWork then return end
 
         self:SendNotifyMessage('started', work)
-
-        -- No need to do it for AI
-        if self:GetAIBrain().BrainType == 'Human' then
-            self:SetImmobile(true)
-        end
+        self:SetImmobile(true)
 
         return true
     end,

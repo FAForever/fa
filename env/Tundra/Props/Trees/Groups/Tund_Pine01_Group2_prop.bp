@@ -2,9 +2,9 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
-    CollisionOffsetX = 0,
+    CollisionOffsetX = -0.45,
     CollisionOffsetY = 0,
-    CollisionOffsetZ = -0.5,
+    CollisionOffsetZ = 1.4,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -15,19 +15,19 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Tund_Pine01_s1_albedo.dds',
-                    LODCutoff = 60,
+                    LODCutoff = 30,
                     NormalsName = '../Tund_Pine01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
                 {
                     AlbedoName = '../Tund_Pine01_s1_albedo.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 175,
                     NormalsName = '../Tund_Pine01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
                 {
-                    AlbedoName = 'Tund_Pine01_Group2_LOD2_albedo.dds',
-                    LODCutoff = 1000,
+                    AlbedoName = 'Tund_Pine01_Group1_LOD2_albedo.dds',
+                    LODCutoff = 300,
                     ShaderName = 'VertexNormal',
                 },
             },

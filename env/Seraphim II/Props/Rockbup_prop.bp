@@ -11,6 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
+
                     AlbedoName = 'Rockb_albedo.dds',
                     LODCutoff = 3000,
                     NormalsName = 'Rockb_normalsTS.dds',
@@ -22,9 +23,9 @@ PropBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = 1,
-        ReclaimMassMax = 1,
-        ReclaimTime = 1,
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 3,
@@ -35,7 +36,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = 27,
-    SizeY = 15,
-    SizeZ = 22,
+    SizeX = 24,
+    SizeY = 40,
+    SizeZ = 23,
 }

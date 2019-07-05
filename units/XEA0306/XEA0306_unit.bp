@@ -270,7 +270,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 2,
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Advanced',
         ToggleCaps = {
             RULEUTC_ShieldToggle = true,
         },

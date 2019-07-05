@@ -228,7 +228,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC ura0401_name>Soul Ripper',
         UnitWeight = 1,
     },

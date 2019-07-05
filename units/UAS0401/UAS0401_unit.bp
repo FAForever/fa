@@ -285,7 +285,7 @@ UnitBlueprint {
         ConstructionBar = true,
         FactionName = 'Aeon',
         Icon = 'sea',
-        TechLevel = 'RULEUTL_Experimental',
+        TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC uas0401_name>Tempest',
         UnitWeight = 1,
     },
@@ -493,8 +493,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
-                '(STRUCTURE * DEFENSE - ANTIAIR)',
-                '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'STRUCTURE DEFENSE',
                 'MOBILE',
                 'SPECIALLOWPRI',
                 'ALLUNITS',

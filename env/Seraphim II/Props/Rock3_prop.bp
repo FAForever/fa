@@ -22,20 +22,20 @@ PropBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = 1,
-        ReclaimMassMax = 1,
-        ReclaimTime = 1,
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
     },
     Footprint = {
         OccupancyCaps = 3,
     },
     Interface = {
-        HelpText = 'Enormous Rock',
+        HelpText = 'Huge Rock',
     },
     Physics = {
         BlockPath = true,
     },
-    SizeX = 50,
-    SizeY = 35,
-    SizeZ = 50,
+    SizeX = 44,
+    SizeY = 40,
+    SizeZ = 48,
 }

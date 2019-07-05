@@ -15,7 +15,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Pine07_albedo.dds',
-                    LODCutoff = 60,
+                    LODCutoff = 20,
                     NormalsName = '../Pine07_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },

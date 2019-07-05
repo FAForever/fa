@@ -21,14 +21,6 @@ function OnSync()
         ExitGame()
     end
 
-    if not table.empty(Sync.UnitData) then
-        UnitData = table.merged(UnitData,Sync.UnitData)
-    end
-
-    for id, v in Sync.ReleaseIds do
-        UnitData[id] = nil
-    end
-
     --Play Sounds
     for k, v in Sync.Sounds do
         PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
@@ -56,6 +48,14 @@ function OnSync()
         for num, execRequest in Sync.UserConRequests do
             ConExecute(execRequest)
         end
+    end
+
+    if not table.empty(Sync.UnitData) then
+        UnitData = table.merged(UnitData,Sync.UnitData)
+    end
+
+    for id, v in Sync.ReleaseIds do
+        UnitData[id] = nil
     end
 
     if Sync.NukeLaunchData then

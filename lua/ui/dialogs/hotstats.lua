@@ -1031,7 +1031,6 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             bar_btn:SetCheck(false)
             graph_btn:SetCheck(false)
             dual_btn:SetCheck(false)
-            exit_btn:SetCheck(false)
         end
     end
     -- main title
@@ -1053,7 +1052,6 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             standardBtn:SetCheck(false)
             graph_btn:SetCheck(false)
             dual_btn:SetCheck(false)
-            exit_btn:SetCheck(false)
         end
     end
     graph_btn = CreateDialogTabs(dialog, LOC("<LOC tooltipui0207>Graph"), "m")
@@ -1072,10 +1070,9 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             bar_btn:SetCheck(false)
             standardBtn:SetCheck(false)
             dual_btn:SetCheck(false)
-            exit_btn:SetCheck(false)
         end
     end
-    dual_btn = CreateDialogTabs(dialog, "Dual", "m")
+    dual_btn = CreateDialogTabs(dialog, "Dual", "r")
     LayoutHelpers.AtLeftIn(dual_btn, dialog, 467)
     dual_btn.Bottom:Set(dialog.Bottom() - 73)
     dual_btn:UseAlphaHitTest(false)
@@ -1092,35 +1089,8 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             bar_btn:SetCheck(false)
             standardBtn:SetCheck(false)
             graph_btn:SetCheck(false)
-            exit_btn:SetCheck(false)
         end
     end
-
-    if HasCommandLineArg("/gpgnet") then
-        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Exit_to_FAF>Exit to FAF"), "r")
-    else
-        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Continue>"), "r")
-    end
-    LayoutHelpers.AtLeftIn(exit_btn, dialog, 608)
-    exit_btn.Bottom:Set(dialog.Bottom() - 73)
-    exit_btn:UseAlphaHitTest(false)
-    exit_btn.Depth:Set(dialog.Depth() + 100)
-    exit_btn.OnClick = function(self)
-        if self:IsChecked() then
-            return
-        else
-            clean_view()
-            ConExecute("ren_Oblivion false")
-            if HasCommandLineArg("/gpgnet") then
-                -- Quit to desktop
-                import('/lua/ui/dialogs/eschandler.lua').SafeQuit()
-            else
-                -- Back to main menu
-                ExitGame()
-            end
-        end
-    end
-
     graph_btn:SetCheck(true)
     page_graph(dialog)
     -- create first graph

@@ -4,7 +4,6 @@ UnitBlueprint {
         'REPAIR',
         'ENGINEER',
         'INVULNERABLE',
-        'INSIGNIFICANTUNIT'
     },
     CollisionOffsetY = -0.5,
     Defense = {

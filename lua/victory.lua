@@ -6,14 +6,15 @@ local victoryCategories = {
     eradication=categories.ALLUNITS - categories.WALL,
 }
 
-function AllUnitsInCategoryDead(brain,categoryCheck)
+function CountCurrentUnits(brain,categoryCheck)
     local ListOfUnits = brain:GetListOfUnits(categoryCheck, false)
-    for index, unit in ListOfUnits do
-        if unit.CanBeKilled and not unit.Dead and unit:GetFractionComplete() == 1 then
-            return false
+    local count = 0
+    for index,unit in ListOfUnits do
+        if unit.CanBeKilled and not unit.Dead then
+            count = count + 1
         end
     end
-    return true
+    return count
 end
 
 function CheckVictory(scenarioInfo)
@@ -29,7 +30,7 @@ function CheckVictory(scenarioInfo)
         local stillAlive = {}
         for _, brain in ArmyBrains do
             if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-                if AllUnitsInCategoryDead(brain,categoryCheck) then
+                if CountCurrentUnits(brain,categoryCheck) == 0 then
                     brain:OnDefeat()
                 else
                     table.insert(stillAlive, brain)

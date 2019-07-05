@@ -228,7 +228,7 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'air',
         TarmacGlowDecal = 0.5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xsa0202_name>Notha',
         UnitWeight = 1,
     },

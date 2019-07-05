@@ -164,7 +164,7 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         Icon = 'amph',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC dal0310_name>Absolver',
         UnitWeight = 1,
     },

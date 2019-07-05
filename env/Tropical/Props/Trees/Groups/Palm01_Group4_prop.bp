@@ -15,13 +15,13 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Palm01_s1_albedo.dds',
-                    LODCutoff = 60,
+                    LODCutoff = 80,
                     NormalsName = '../Palm01_s1_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },
                 {
                     AlbedoName = '../Palm01_s1_albedo.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 400,
                     NormalsName = '../Palm01_s1_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },

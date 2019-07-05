@@ -588,10 +588,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnPaused = function(self)
-        if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
-            self:SetActiveConsumptionInactive()
-            self:StopUnitAmbientSound('ConstructLoop')
-        end
+        self:SetActiveConsumptionInactive()
+        self:StopUnitAmbientSound('ConstructLoop')
     end,
 
     OnUnpaused = function(self)
@@ -2210,6 +2208,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Prevent UI mods from violating game/scenario restrictions
         local id = self:GetUnitId()
+        local bp = self:GetBlueprint()
         local index = self:GetArmy()
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))
@@ -4051,27 +4050,23 @@ Unit = Class(moho.unit_methods) {
     end,
 
     TransportAnimationThread = function(self, rate)
-        local bp = self:GetBlueprint().Display
-        local animbp
-        rate = rate or 1
+        local bp = self:GetBlueprint().Display.TransportAnimation
 
-        if rate < 0 and bp.TransportDropAnimation then
-            animbp = bp.TransportDropAnimation
-            rate = bp.TransportDropAnimationSpeed or -rate
-        else
-            animbp = bp.TransportAnimation
-            rate = bp.TransportAnimationSpeed or rate
+        if rate and rate < 0 and self:GetBlueprint().Display.TransportDropAnimation then
+            bp = self:GetBlueprint().Display.TransportDropAnimation
+            rate = -rate
         end
 
         WaitSeconds(.5)
-        if animbp then
-            local animBlock = self:ChooseAnimBlock(animbp)
+        if bp then
+            local animBlock = self:ChooseAnimBlock(bp)
             if animBlock.Animation then
                 if not self.TransAnimation then
                     self.TransAnimation = CreateAnimator(self)
                     self.Trash:Add(self.TransAnimation)
                 end
                 self.TransAnimation:PlayAnim(animBlock.Animation)
+                rate = rate or 1
                 self.TransAnimation:SetRate(rate)
                 WaitFor(self.TransAnimation)
             end
