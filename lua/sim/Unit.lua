@@ -2309,12 +2309,7 @@ Unit = Class(moho.unit_methods) {
     CreatePresetEnhancements = function(self)
         local bp = self:GetBlueprint()
         if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
-            for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                -- Enhancements may already have been created by SimUtils.TransferUnitsOwnership
-                if not self:HasEnhancement(v) then
-                    self:CreateEnhancement(v)
-                end
-            end
+            self:CreateEnhancements(bp.EnhancementPresetAssigned.Enhancements)
         end
     end,
 
@@ -2933,11 +2928,25 @@ Unit = Class(moho.unit_methods) {
         self:HideBones(bp.HideBones, true)
 
         AddUnitEnhancement(self, enh, bp.Slot or '')
-        for _, v in bp.RemoveEnhancements or {} do
-            RemoveUnitEnhancement(self, v)
-        end
+        self:RemoveEnhancements(bp.RemoveEnhancements)
 
         self:RequestRefreshUI()
+    end,
+
+    -- Loop a table of enhancement names and create them all
+    CreateEnhancements = function(self, enhancements)
+        for _, enhancement in enhancements or {} do
+            if not self:HasEnhancement(enhancement) then
+                self:CreateEnhancement(enhancement)
+            end
+        end
+    end,
+
+    -- Loop a table of enhancements and remove them all
+    RemoveEnhancements = function(self, enhancements)
+        for _, enhancement in enhancements or {} do
+            RemoveUnitEnhancement(self, enhancement)
+        end
     end,
 
     CreateEnhancementEffects = function(self, enhancement)
