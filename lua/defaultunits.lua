@@ -941,8 +941,6 @@ AirFactoryUnit = Class(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
 AirStagingPlatformUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -958,14 +956,10 @@ ConcreteStructureUnit = Class(StructureUnit) {
 }
 
 -- ENERGY CREATION UNITS
-EnergyCreationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+EnergyCreationUnit = Class(StructureUnit) {}
 
 -- ENERGY STORAGE UNITS
 EnergyStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         local aiBrain = GetArmyBrain(self:GetArmy())
@@ -994,8 +988,6 @@ LandFactoryUnit = Class(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
 MassCollectionUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
         self:ApplyAdjacencyBuffs()
@@ -1143,8 +1135,6 @@ MassCollectionUnit = Class(StructureUnit) {
 
 -- MASS FABRICATION UNITS
 MassFabricationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1213,8 +1203,6 @@ MassFabricationUnit = Class(StructureUnit) {
 
 -- MASS STORAGE UNITS
 MassStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         local aiBrain = GetArmyBrain(self:GetArmy())
@@ -1240,8 +1228,6 @@ MassStorageUnit = Class(StructureUnit) {
 
 -- RADAR UNITS
 RadarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1264,8 +1250,6 @@ RadarUnit = Class(StructureUnit) {
 
 -- RADAR JAMMER UNITS
 RadarJammerUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     -- Shut down intel while upgrading
     OnStartBuild = function(self, unitbuilding, order)
         StructureUnit.OnStartBuild(self, unitbuilding, order)
@@ -1313,8 +1297,6 @@ RadarJammerUnit = Class(StructureUnit) {
 
 -- SONAR UNITS
 SonarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1401,7 +1383,6 @@ ShieldStructureUnit = Class(StructureUnit) {
 
 -- TRANSPORT BEACON UNITS
 TransportBeaconUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
 
@@ -1418,9 +1399,7 @@ TransportBeaconUnit = Class(StructureUnit) {
 }
 
 -- WALL STRCUTURE UNITS
-WallStructureUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+WallStructureUnit = Class(StructureUnit) {}
 
 -- QUANTUM GATE UNITS
 QuantumGateUnit = Class(FactoryUnit) {
