@@ -2959,10 +2959,8 @@ Unit = Class(moho.unit_methods) {
         end
 
         AddUnitEnhancement(self, enh, bp.Slot or '')
-        if bp.RemoveEnhancements then
-            for _, v in bp.RemoveEnhancements do
-                RemoveUnitEnhancement(self, v)
-            end
+        for _, v in bp.RemoveEnhancements or {} do
+            RemoveUnitEnhancement(self, v)
         end
 
         self:RequestRefreshUI()
