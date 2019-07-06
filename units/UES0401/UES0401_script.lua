@@ -49,7 +49,7 @@ UES0401 = Class(AircraftCarrier) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
@@ -140,7 +140,7 @@ UES0401 = Class(AircraftCarrier) {
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            unitBuilding:HideBones({0}, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -160,7 +160,7 @@ UES0401 = Class(AircraftCarrier) {
             else
                 local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
                 IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                unitBuilding:ShowBones({0},true)
             end
 
             self:RequestRefreshUI()

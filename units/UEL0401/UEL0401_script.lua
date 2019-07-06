@@ -91,10 +91,10 @@ UEL0401 = Class(TMobileFactoryUnit) {
                 local unitHeight = unitBuilding:GetBlueprint().SizeY
                 self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
                 self.AttachmentSliderManip:SetSpeed(-1)
-                unitBuilding:HideBone(0, true)
+                unitBuilding:HideBones({0}, true)
             end
             WaitSeconds(3)
-            unitBuilding:ShowBone(0, true)
+            unitBuilding:ShowBones({0}, true)
             WaitFor(self.PrepareToBuildManipulator)
             local unitBuilding = self.UnitBeingBuilt
             self.UnitDoneBeingBuilt = false
@@ -111,7 +111,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             if not unitBuilding.Dead then
-                unitBuilding:ShowBone(0, true)
+                unitBuilding:ShowBones({0}, true)
             end
             WaitFor(self.PrepareToBuildManipulator)
             WaitFor(self.AttachmentSliderManip)

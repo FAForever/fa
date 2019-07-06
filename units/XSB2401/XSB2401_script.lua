@@ -90,7 +90,7 @@ XSB2401 = Class(SStructureUnit) {
 
         local missileBone = self:GetBlueprint().Display.MissileBone
         if missileBone and self.NotCancelled then
-            self:ShowBone(missileBone, true)
+            self:ShowBones({missileBone}, true)
             if self.MissileSlider then
                 self.MissileSlider:SetGoal(0, 0, 115)
                 self.MissileSlider:SetSpeed(1.93)
@@ -106,7 +106,7 @@ XSB2401 = Class(SStructureUnit) {
     RetractMissile = function(self)
         local missileBone = self:GetBlueprint().Display.MissileBone
         if missileBone then
-            self:HideBone(missileBone, true)
+            self:HideBones({missileBone}, true)
             if self.MissileSlider then
                 self.MissileSlider:SetSpeed(400)
                 self.MissileSlider:SetGoal(0,0,0)

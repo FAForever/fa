@@ -215,7 +215,7 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
@@ -241,7 +241,7 @@ TMobileFactoryUnit = Class(LandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
@@ -333,7 +333,7 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
     StartBeingBuiltEffects = function(self,builder,layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if builder and EntityCategoryContains(categories.MOBILE, builder) then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)	)
         end
     end,

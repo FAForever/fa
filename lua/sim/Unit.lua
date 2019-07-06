@@ -1232,7 +1232,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
-            self:ShowBone(0, true)
+            self:ShowBones({0}, true)
             self:ShowEnhancementBones()
         end
 
@@ -1686,7 +1686,7 @@ Unit = Class(moho.unit_methods) {
         if high and HighDestructionParts > 0 then
             HighPartLimit = Random(1, HighDestructionParts)
             for i = 1, HighPartLimit do
-                self:ShowBone(self.DestructionPartsHighToss[i], false)
+                self:ShowBones({self.DestructionPartsHighToss[i]}, false)
                 local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp', self.DestructionPartsHighToss[i])
 
                 self:AttachBoneToEntityBone(self.DestructionPartsHighToss[i], boneProj, -1, false)
@@ -1696,7 +1696,7 @@ Unit = Class(moho.unit_methods) {
         if low and LowDestructionParts > 0 then
             LowPartLimit = Random(1, LowDestructionParts)
             for i = 1, LowPartLimit do
-                self:ShowBone(self.DestructionPartsLowToss[i], false)
+                self:ShowBones({self.DestructionPartsLowToss[i]}, false)
                 local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp', self.DestructionPartsLowToss[i])
 
                 self:AttachBoneToEntityBone(self.DestructionPartsLowToss[i], boneProj, -1, false)
@@ -1706,7 +1706,7 @@ Unit = Class(moho.unit_methods) {
         if chassis and ChassisDestructionParts > 0 then
             ChassisPartLimit = Random(1, ChassisDestructionParts)
             for i = 1, Random(1, ChassisDestructionParts) do
-                self:ShowBone(self.DestructionPartsChassisToss[i], false)
+                self:ShowBones({self.DestructionPartsChassisToss[i]}, false)
                 local boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp', self.DestructionPartsChassisToss[i])
 
                 self:AttachBoneToEntityBone(self.DestructionPartsChassisToss[i], boneProj, -1, false)
@@ -1947,12 +1947,8 @@ Unit = Class(moho.unit_methods) {
 
     HideLandBones = function(self)
         -- Hide the bones for buildings built on land
-        if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
-            for _, v in self.LandBuiltHiddenBones do
-                if self:IsValidBone(v) then
-                    self:HideBone(v, true)
-                end
-            end
+        if self:GetCurrentLayer() == 'Land' then
+            self:HideBones(self.LandBuiltHiddenBones, true)
         end
     end,
 
@@ -2289,29 +2285,21 @@ Unit = Class(moho.unit_methods) {
         if bp.Enhancements and (bp.CategoriesHash.USEBUILDPRESETS or bp.CategoriesHash.ISPREENHANCEDUNIT) then
 
             -- Create a blank slate: Hide all enhancement bones as specified in the unit BP
-            for k, enh in bp.Enhancements do
-                if enh.HideBones then
-                    for _, bone in enh.HideBones do
-                        self:HideBone(bone, true)
-                    end
-                end
+            for _, enh in bp.Enhancements do
+                self:HideBones(enh.HideBones, true)
             end
 
             -- For the barebone version we're done here. For the presets versions: show the bones of the enhancements we'll create later on
             if bp.EnhancementPresetAssigned then
                 for _, v in bp.EnhancementPresetAssigned.Enhancements do
                     -- First show all relevant bones
-                    if bp.Enhancements[v] and bp.Enhancements[v].ShowBones then
-                        for _, bone in bp.Enhancements[v].ShowBones do
-                            self:ShowBone(bone, true)
-                        end
+                    if bp.Enhancements[v] then
+                        self:ShowBones(bp.Enhancements[v].ShowBones, true)
                     end
 
                     -- Now hide child bones of previously revealed bones, that should remain hidden
-                    if bp.Enhancements[v] and bp.Enhancements[v].HideBones then
-                        for _, bone in bp.Enhancements[v].HideBones do
-                            self:HideBone(bone, true)
-                        end
+                    if bp.Enhancements[v] then
+                        self:HideBones(bp.Enhancements[v].HideBones, true)
                     end
                 end
             end
@@ -2344,17 +2332,11 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         if bp.Enhancements then
             for _, enh in bp.Enhancements do
-                if enh.HideBones then
-                    for _, bone in enh.HideBones do
-                        self:HideBone(bone, true)
-                    end
-                end
+                self:HideBones(enh.HideBones, true)
             end
             for k, enh in bp.Enhancements do
-                if self:HasEnhancement(k) and enh.ShowBones then
-                    for _, bone in enh.ShowBones do
-                        self:ShowBone(bone, true)
-                    end
+                if self:HasEnhancement(k) then
+                    self:ShowBones(enh.ShowBones, true)
                 end
             end
         end
@@ -2947,21 +2929,8 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        if bp.ShowBones then
-            for _, v in bp.ShowBones do
-                if self:IsValidBone(v) then
-                    self:ShowBone(v, true)
-                end
-            end
-        end
-
-        if bp.HideBones then
-            for _, v in bp.HideBones do
-                if self:IsValidBone(v) then
-                    self:HideBone(v, true)
-                end
-            end
-        end
+        self:ShowBones(bp.ShowBones, true)
+        self:HideBones(bp.HideBones, true)
 
         AddUnitEnhancement(self, enh, bp.Slot or '')
         for _, v in bp.RemoveEnhancements or {} do
@@ -4027,9 +3996,9 @@ Unit = Class(moho.unit_methods) {
         self:MarkWeaponsOnTransport(loading)
 
         if loading then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
         else
-            self:ShowBone(0, true)
+            self:ShowBones({0}, true)
         end
 
         self:SetCanTakeDamage(not loading)

@@ -20,11 +20,12 @@ XRB0304 = Class(CConstructionStructureUnit) {
         local candidates = GetUnitsInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         for k, v in candidates do
             if target == v:GetBlueprint().BlueprintId then
-                self:HideBone('xrb0304', true)
-                self:ShowBone('TurretT3', true)
-                self:ShowBone('Door3_B03', true)
-                self:ShowBone('B03', true)
-                self:ShowBone('Attachpoint03', true)
+                self:HideBones({'xrb0304'}, true)
+                self:ShowBones({'TurretT3',
+                               'Door3_B03',
+                               'B03',
+                               'Attachpoint03'},
+                               true)
                 return
             end
         end

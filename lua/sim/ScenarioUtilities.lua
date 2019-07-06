@@ -334,7 +334,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
-                cdrUnit:HideBone(0, true)
+                cdrUnit:HideBones({0}, true)
                 ForkThread(CommanderWarpDelay, cdrUnit, 3)
             end
 

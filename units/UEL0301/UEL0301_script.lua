@@ -31,8 +31,7 @@ UEL0301 = Class(CommandUnit) {
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('Jetpack', true)
-        self:HideBone('SAM', true)
+        self:HideBones({'Jetpack', 'SAM'}, true)
         self:SetupBuildBones()
     end,
 

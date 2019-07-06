@@ -39,9 +39,7 @@ XSL0001 = Class(ACUUnit) {
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetupBuildBones()
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
+        self:HideBones({'Back_Upgrade', 'Right_Upgrade', 'Left_Upgrade'}, true)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,

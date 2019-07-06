@@ -448,9 +448,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
-                    for mk, mv in v.MuzzleBones do
-                        self.unit:ShowBone(mv, true)
-                    end
+                    self.unit:ShowBones(v.MuzzleBones, true)
                 end
             end
             self:StartEconomyDrain()
@@ -653,7 +651,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
                     local muzzle = rackInfo.MuzzleBones[muzzleIndex]
                     if rackInfo.HideMuzzle == true then
-                        self.unit:ShowBone(muzzle, true)
+                        self.unit:ShowBones({muzzle}, true)
                     end
 
                     -- Deal with Muzzle charging sequence
@@ -674,7 +672,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                     self:PlayFxMuzzleSequence(muzzle)
 
                     if rackInfo.HideMuzzle == true then
-                        self.unit:HideBone(muzzle, true)
+                        self.unit:HideBones({muzzle}, true)
                     end
 
                     if self.HaltFireOrdered then

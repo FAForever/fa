@@ -61,7 +61,7 @@ URS0303 = Class(AircraftCarrier) {
             self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            unitBuilding:HideBones({0}, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -82,7 +82,7 @@ URS0303 = Class(AircraftCarrier) {
             else
                 local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
                 IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                unitBuilding:ShowBones({0},true)
             end
             self:SetBusy(false)
             self:RequestRefreshUI()

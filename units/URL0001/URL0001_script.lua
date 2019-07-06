@@ -51,8 +51,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
+        self:HideBones({'Back_Upgrade', 'Right_Upgrade'}, true)
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
         end
@@ -82,8 +81,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self:DisableUnitIntel('Enhancement', 'Sonar')
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
+        self:HideBones({'Back_Upgrade', 'Right_Upgrade'}, true)
         self:ForkThread(self.GiveInitialResources)
     end,
 

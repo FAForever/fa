@@ -36,7 +36,7 @@ UAL0301 = Class(CommandUnit) {
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('Turbine', true)
+        self:HideBones({'Turbine'}, true)
         self:SetupBuildBones()
     end,
 

@@ -46,7 +46,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('AAGun', false)
         self:SetWeaponEnabledByLabel('Torpedo01', false)
 
-        self:ShowBone('Missile_Turret', true)
+        self:ShowBones({'Missile_Turret'}, true)
     end,
 
     EnableHackPegLauncher= function(self)
@@ -56,9 +56,7 @@ XRL0403 = Class(CWalkingLandUnit) {
     OnCreate= function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
-        if self:IsValidBone('Missile_Turret') then
-            self:HideBone('Missile_Turret', true)
-        end
+        self:HideBones({'Missile_Turret'}, true)
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
@@ -73,9 +71,7 @@ XRL0403 = Class(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
 
-        if self:IsValidBone('Missile_Turret') then
-            self:HideBone('Missile_Turret', true)
-        end
+        self:HideBones({'Missile_Turret'}, true)
 
         if self.AnimationManipulator then
             self:SetUnSelectable(true)

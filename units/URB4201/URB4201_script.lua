@@ -15,7 +15,7 @@ URB4201 = Class(CStructureUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        self:HideBone('Turret_Muzzle', false)
+        self:HideBones({'Turret_Muzzle'}, false)
     end,
 }
 

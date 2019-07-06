@@ -32,9 +32,7 @@ UEL0001 = Class(ACUUnit) {
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
-        self:HideBone('Back_Upgrade_B01', true)
+        self:HideBones({'Right_Upgrade', 'Left_Upgrade', 'Back_Upgrade_B01'}, true)
         self:SetupBuildBones()
         self.HasLeftPod = false
         self.HasRightPod = false

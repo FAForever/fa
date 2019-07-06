@@ -35,7 +35,7 @@ XSL0301 = Class(CommandUnit) {
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('Back_Upgrade', true)
+        self:HideBones({'Back_Upgrade'}, true)
         self:SetupBuildBones()
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true

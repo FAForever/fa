@@ -117,9 +117,7 @@ XEA0002 = Class(TAirUnit) {
             WaitFor(self.OpenAnim)
 
             -- Hide desired bones and play part two
-            for _, v in self.HideBones do
-                self:HideBone(v, true)
-            end
+            self:HideBones(self.HideBones, true)
             self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca')
         end,
     },

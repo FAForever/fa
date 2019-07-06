@@ -19,11 +19,12 @@ XRB0204 = Class(CConstructionStructureUnit) {
         local candidates = GetUnitsInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         for k, v in candidates do
             if target == v:GetBlueprint().BlueprintId then
-                self:HideBone('xrb0304', true)
-                self:ShowBone('TurretT2', true)
-                self:ShowBone('Door2_B02', true)
-                self:ShowBone('B02', true)
-                self:ShowBone('Attachpoint02', true)
+                self:HideBones({'xrb0304'}, true)
+                self:ShowBones({'TurretT2',
+                                'Door2_B02',
+                                'B02',
+                                'Attachpoint02'},
+                                true)
                 return
             end
         end
@@ -32,7 +33,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        self:ShowBone('xrb0304', true)
+        self:ShowBones({'xrb0304'}, true)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)

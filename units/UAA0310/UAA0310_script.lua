@@ -88,7 +88,7 @@ UAA0310 = Class(AirTransport) {
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            unitBuilding:HideBones({0}, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -108,7 +108,7 @@ UAA0310 = Class(AirTransport) {
             else
                 local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
                 IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                unitBuilding:ShowBones({0},true)
             end
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)

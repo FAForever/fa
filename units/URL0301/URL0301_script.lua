@@ -33,11 +33,12 @@ URL0301 = Class(CCommandUnit) {
     OnCreate = function(self)
         CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        self:HideBone('AA_Gun', true)
-        self:HideBone('Power_Pack', true)
-        self:HideBone('Rez_Protocol', true)
-        self:HideBone('Torpedo', true)
-        self:HideBone('Turbine', true)
+        self:HideBones({'AA_Gun',
+                       'Power_Pack',
+                       'Rez_Protocol',
+                       'Torpedo',
+                       'Turbine'},
+                       true)
         self:SetWeaponEnabledByLabel('NMissile', false)
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
@@ -120,10 +121,10 @@ URL0301 = Class(CCommandUnit) {
             self.StealthEnh = false
             self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
-            self:ShowBone('AA_Gun', true)
+            self:ShowBones({'AA_Gun'}, true)
             self:SetWeaponEnabledByLabel('NMissile', true)
         elseif enh == 'NaniteMissileSystemRemove' then
-            self:HideBone('AA_Gun', true)
+            self:HideBones({'AA_Gun'}, true)
             self:SetWeaponEnabledByLabel('NMissile', false)
         elseif enh == 'SelfRepairSystem' then
             CCommandUnit.CreateEnhancement(self, enh)

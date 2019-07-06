@@ -117,7 +117,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
         BuildBaseEffect:SetVelocity(0)
     end
 
-    unitBeingBuilt:ShowBone(0, true)
+    unitBeingBuilt:ShowBones({0}, true)
     unitBeingBuilt:HideLandBones()
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
 
@@ -1263,7 +1263,7 @@ end
 
 function SeraphimRiftIn(unit)
     local army = unit:GetArmy()
-    unit:HideBone(0, true)
+    unit:HideBones({0}, true)
 
     for _, v in EffectTemplate.SerRiftIn_Small do
         CreateAttachedEmitter (unit, -1, army, v)
@@ -1273,7 +1273,7 @@ function SeraphimRiftIn(unit)
     CreateLightParticle(unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01')
     WaitSeconds (0.1)
 
-    unit:ShowBone(0, true)
+    unit:ShowBones({0}, true)
     WaitSeconds (0.25)
 
     for _, v in EffectTemplate.SerRiftIn_SmallFlash do
@@ -1283,7 +1283,7 @@ end
 
 function SeraphimRiftInLarge(unit)
     local army = unit:GetArmy()
-    unit:HideBone(0, true)
+    unit:HideBones({0}, true)
 
     for _, v in EffectTemplate.SerRiftIn_Large do
         CreateAttachedEmitter (unit, -1, army, v)
@@ -1293,7 +1293,7 @@ function SeraphimRiftInLarge(unit)
     CreateLightParticle(unit, -1, army, 25, 15, 'glow_05', 'ramp_jammer_01')
     WaitSeconds (0.1)
 
-    unit:ShowBone(0, true)
+    unit:ShowBones({0}, true)
     WaitSeconds (0.25)
 
     for _, v in EffectTemplate.SerRiftIn_LargeFlash do
@@ -1704,11 +1704,11 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
                 unit.TeleportFx_IsInvisible = true
-                unit:HideBone(0, true)
+                unit:HideBones({0}, true)
 
                 WaitSeconds(0.3)
 
-                unit:ShowBone(0, true)
+                unit:ShowBones({0}, true)
                 unit:ShowEnhancementBones()
                 unit.TeleportFx_IsInvisible = false
 
@@ -1735,11 +1735,11 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             local fn = function(unit)
                 unit.TeleportFx_IsInvisible = true
-                unit:HideBone(0, true)
+                unit:HideBones({0}, true)
 
                 WaitSeconds(0.3)
 
-                unit:ShowBone(0, true)
+                unit:ShowBones({0}, true)
                 unit:ShowEnhancementBones()
                 unit.TeleportFx_IsInvisible = false
 
@@ -1760,7 +1760,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 local Yoffset = TeleportGetUnitYOffset(unit)
 
                 unit.TeleportFx_IsInvisible = true
-                unit:HideBone(0, true)
+                unit:HideBones({0}, true)
 
                 local templ = unit.TeleportInFxOverride or EffectTemplate.SeraphimTeleportIn01
                 for _, v in templ do
@@ -1776,7 +1776,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
                 WaitSeconds (0.3)
 
-                unit:ShowBone(0, true)
+                unit:ShowBones({0}, true)
                 unit:ShowEnhancementBones()
                 unit.TeleportFx_IsInvisible = false
 

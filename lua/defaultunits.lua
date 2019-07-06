@@ -374,7 +374,7 @@ StructureUnit = Class(Unit) {
         local FactionName = bp.General.FactionName
 
         if FactionName == 'UEF' then
-            self:HideBone(0, true)
+            self:HideBones({0}, true)
             self.BeingBuiltShowBoneTriggered = false
             if bp.General.UpgradesFrom ~= builder:GetUnitId() then
                 self:ForkThread(EffectUtil.CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)
@@ -395,7 +395,7 @@ StructureUnit = Class(Unit) {
         if FactionName == 'Aeon' then
             WaitSeconds(2.0)
         elseif FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
-            self:ShowBone(0, true)
+            self:ShowBones({0}, true)
             self:HideLandBones()
         end
         Unit.StopBeingBuiltEffects(self, builder, layer)
@@ -410,11 +410,11 @@ StructureUnit = Class(Unit) {
     end,
 
     StartUpgradeEffects = function(self, unitBeingBuilt)
-        unitBeingBuilt:HideBone(0, true)
+        unitBeingBuilt:HideBones({0}, true)
     end,
 
     StopUpgradeEffects = function(self, unitBeingBuilt)
-        unitBeingBuilt:ShowBone(0, true)
+        unitBeingBuilt:ShowBones({0}, true)
     end,
 
     PlayActiveAnimation = function(self)
@@ -587,7 +587,7 @@ StructureUnit = Class(Unit) {
     end,
     
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-	    -- Handle incoming OC damage
+        -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             amount = wep:GetBlueprint().Overcharge.structureDamage
@@ -2200,7 +2200,7 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 
     PlayCommanderWarpInEffect = function(self, bones)
-        self:HideBone(0, true)
+        self:HideBones({0}, true)
         self:SetUnSelectable(true)
         self:SetBusy(true)
         self:ForkThread(self.WarpInEffectThread, bones)
@@ -2222,9 +2222,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
 
-        for _, v in bones or bp.Display.WarpInEffect.HideBones do
-            self:HideBone(v, true)
-        end
+        self:HideBones((bones or bp.Display.WarpInEffect.HideBones), true)
 
         local totalBones = self:GetBoneCount() - 1
         local army = self:GetArmy()
