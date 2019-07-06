@@ -2554,8 +2554,7 @@ Unit = Class(moho.unit_methods) {
         self.BuildEffectsBag:Add(self:ForkThread(self.CreateBuildEffects, built, order))
     end,
 
-    CreateBuildEffects = function(self, built, order)
-    end,
+    CreateBuildEffects = function(self, built, order) end,
 
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()

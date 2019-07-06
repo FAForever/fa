@@ -43,7 +43,7 @@ local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local EffectUtil = import('EffectUtilities.lua')
 local PlayEffectsAtBones = EffectUtil.CreateBoneTableRangedScaleEffects
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
-local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
+local CreateSliceBeam = EffectUtil.CreateSliceBeam
 
 --------------------------------------------------------------
 --  AIR FACTORY STRUCTURES
@@ -51,9 +51,9 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 TAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, {v}, self.BuildEffectsBag)
         end
     end,
 
@@ -128,7 +128,7 @@ TConstructionUnit = Class(ConstructionUnit) {
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom  ~= 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         else
-            CreateUEFBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            CreateSliceBeam(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -188,9 +188,9 @@ THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 TLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, {v}, self.BuildEffectsBag)
         end
     end,
 }
@@ -263,9 +263,9 @@ TSonarUnit = Class(SonarUnit) {
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, {v}, self.BuildEffectsBag)
         end
     end,
 

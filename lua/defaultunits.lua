@@ -728,7 +728,7 @@ FactoryUnit = Class(StructureUnit) {
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
         elseif unitBeingBuilt:GetBlueprint().CategoriesHash.RESEARCH then
-            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory 
+            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
@@ -2145,14 +2145,9 @@ CommandUnit = Class(WalkingLandUnit) {
 
         local bp = self:GetBlueprint()
         local isUpgrade = order == 'Upgrade'
-        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
 
         if not isUpgrade then
             self.BuildingUnit = true
-        end
-
-        if showEffects then
-            self:StartBuildingEffects(unitBeingBuilt, order)
         end
 
         -- Check if we're about to try and build something we shouldn't. This can only happen due to

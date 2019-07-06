@@ -12,8 +12,6 @@ local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
 UEL0401 = Class(TMobileFactoryUnit) {
     FxDamageScale = 2.5,
