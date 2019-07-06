@@ -116,7 +116,6 @@ function ParseEntityCategoryProperly(categoryExpression)
         local i = start
         while i <= finish do
             local token = tokens[i]
-            LOG('Parsing token: ' .. token)
 
             if expectingIdentifier then
                 -- Bracket expressions are effectively identifiers
