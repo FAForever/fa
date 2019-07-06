@@ -81,16 +81,22 @@ function ScaleEmittersParam(Emitters, param, minRange, maxRange)
     end
 end
 
+function CalculateBuildCubeSize(bp)
+    local mul = 1.15
+    local x = bp.Physics.MeshExtentsX or (bp.Footprint.SizeX * mul)
+    local z = bp.Physics.MeshExtentsZ or (bp.Footprint.SizeZ * mul)
+    local y = bp.Physics.MeshExtentsY or (0.5 + (x + z) * 0.1)
+
+    return x, y, z
+end
+
 function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     local bp = unitBeingBuilt:GetBlueprint()
-    local mul = 1.15
     local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
     local proj = nil
     yPos = yPos + (bp.Physics.MeshExtentsOffsetY or 0)
 
-    local x = bp.Physics.MeshExtentsX or (bp.Footprint.SizeX * mul)
-    local z = bp.Physics.MeshExtentsZ or (bp.Footprint.SizeZ * mul)
-    local y = bp.Physics.MeshExtentsY or (0.5 + (x + z) * 0.1)
+    local x, y, z = CalculateBuildCubeSize(bp)
 
     -- Create a quick glow effect at location where unit is goig to be built
     proj = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0, nil, nil, nil)
@@ -176,11 +182,8 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, Bui
         end
     end
 
-    -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
-    local mul = 1.15
-    local ox = buildbp.Physics.MeshExtentsX or (buildbp.Footprint.SizeX * mul)
-    local oz = buildbp.Physics.MeshExtentsZ or (buildbp.Footprint.SizeZ * mul)
-    local oy = (buildbp.Physics.MeshExtentsY or (0.5 + (ox + oz) * 0.1))
+    -- Determine beam positioning on build cube
+    local ox, oy, oz = CalculateBuildCubeSize(buildBp)
 
     ox = ox * 0.5
     oz = oz * 0.5
@@ -249,11 +252,8 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectB
         end
     end
 
-    -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
-    local mul = 1.15
-    local ox = buildbp.Physics.MeshExtentsX or (buildbp.Footprint.SizeX * mul)
-    local oz = buildbp.Physics.MeshExtentsZ or (buildbp.Footprint.SizeZ * mul)
-    local oy = (buildbp.Physics.MeshExtentsY or (0.5 + (ox + oz) * 0.1))
+    -- Determine beam positioning on build cube
+    local ox, oy, oz = CalculateBuildCubeSize(buildBp)
 
     ox = ox * 0.5
     oz = oz * 0.5
