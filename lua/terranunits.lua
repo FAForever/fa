@@ -49,7 +49,6 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 --  AIR FACTORY STRUCTURES
 --------------------------------------------------------------
 TAirFactoryUnit = Class(AirFactoryUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
@@ -123,7 +122,6 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {
 --  Construction Units
 --------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
@@ -263,7 +261,6 @@ TSonarUnit = Class(SonarUnit) {
 --  SEA FACTORY STRUCTURES
 --------------------------------------------------------------
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do

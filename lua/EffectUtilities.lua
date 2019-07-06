@@ -197,8 +197,8 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, Bui
             table.remove(VectorExtentsList, k)
         end
     end
-
     local endVec2 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
+
     local cx1, cy1, cz1 = unpack(endVec1)
     local cx2, cy2, cz2 = unpack(endVec2)
 
@@ -1387,7 +1387,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
     end
-    
+
     if teleDelay then
         WaitTicks(teleDelay * 10)
     end

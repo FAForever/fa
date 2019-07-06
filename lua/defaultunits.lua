@@ -585,7 +585,7 @@ StructureUnit = Class(Unit) {
             end
         end
     end,
-    
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
@@ -2140,6 +2140,7 @@ CommandUnit = Class(WalkingLandUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+
         self.UnitBeingBuilt = unitBeingBuilt
 
         local bp = self:GetBlueprint()
@@ -2264,7 +2265,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
-        
+
         local bp = self:GetBlueprint().Economy
         local energyCost, time
         if bp then
@@ -2280,18 +2281,18 @@ CommandUnit = Class(WalkingLandUnit) {
             energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
             energyCost = energyCost * energyCostMod
-            
-            self.TeleportDestChargeBag = nil 
+
+            self.TeleportDestChargeBag = nil
             self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-            
+
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
+
             -- Create teleport charge effect + exit animation delay
             self:PlayTeleportChargeEffects(location, orientation, teleDelay)
             WaitFor(self.TeleportDrain)
-        else 
+        else
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
+
             -- Create teleport charge effect
             self:PlayTeleportChargeEffects(location, orientation)
             WaitFor(self.TeleportDrain)
@@ -2361,7 +2362,7 @@ ACUUnit = Class(CommandUnit) {
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
         self:SetImmobile(false)
-        
+
         CommandUnit.OnWorkFail(self, work)
     end,
 
@@ -2370,7 +2371,7 @@ ACUUnit = Class(CommandUnit) {
         ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
-    
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then

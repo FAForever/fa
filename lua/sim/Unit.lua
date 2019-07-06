@@ -1296,9 +1296,9 @@ Unit = Class(moho.unit_methods) {
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
-        
+
         massTrue = mass
-        
+
         -- Non-combat structures only give 50% veterancy
         if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
             mass = mass * 0.5
@@ -1309,11 +1309,11 @@ Unit = Class(moho.unit_methods) {
             -- Make sure the unit is something which can vet, and is not maxed
             if unit and not unit.Dead and unit.gainsVeterancy then
                 local proportion = data.damage / self.totalDamageTaken
-                
+
                 -- True value for "Mass killed"
                 local massKilledTrue = math.floor(massTrue * proportion)
                 unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
-                
+
                 if unit.Sync.VeteranLevel < 5 then
                     -- Find the proportion of yourself that each instigator killed
                     local massKilled = math.floor(mass * proportion)
@@ -1377,11 +1377,11 @@ Unit = Class(moho.unit_methods) {
 
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
-    
+
     CalculateVeterancyLevelAfterTransfer = function(self, massKilled, massKilledTrue)
         self.Sync.totalMassKilled = math.floor(massKilled)
         self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
-        
+
         local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
         if newVetLevel == self.Sync.VeteranLevel then return end
@@ -1436,14 +1436,14 @@ Unit = Class(moho.unit_methods) {
                 SUBCOMMANDER = 4,
                 EXPERIMENTAL = 5,
             }
-            
+
             local techLevel = techLevels[self.techCategory] or 1
-            
+
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
                 techLevel = techLevel + 1
             end
-            
+
             -- Regen values by tech level and veterancy level
             local regenBuffs = {
                 {1,  2,  3,  4,  5}, -- T1
@@ -1452,7 +1452,7 @@ Unit = Class(moho.unit_methods) {
                 {9,  18, 27, 36, 45}, -- SACU
                 {25, 50, 75, 100,125}, -- Experimental
             }
-        
+
             BuffBlueprint {
                 Name = regenBuffName,
                 DisplayName = regenBuffName,
@@ -1466,7 +1466,7 @@ Unit = Class(moho.unit_methods) {
                 },
             }
         end
-        
+
         return {regenBuffName, healthBuffName}
     end,
 
@@ -2504,13 +2504,12 @@ Unit = Class(moho.unit_methods) {
 
         self:DoOnStartBuildCallbacks(built)
 
-        
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
             built.IsUpgrade = true
-            
+
             --Transfer flag
             self.TransferUpgradeProgress = true
             self.UpgradeBuildTime = bp.Economy.BuildTime
