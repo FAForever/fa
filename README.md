@@ -164,5 +164,5 @@ This goes for both future and past work on the SCFA translation and for all lang
 - Median point and/or parenthesis, or gendering a word twice, should be avoided to the maximum.
 
 3) *Consistency of keywords*
-- Game specific keywords, like unit names and building names, should always be translated in the same manner consistently accross the whole game.
-- If a new keyword appear, that is not translated elsewhere, it should be translated in a consistent manner regarding the other translated keywords.
+- Game specific keywords, like unit names and building names, should always be translated in the same manner consistently across the whole game.
+- If a new keyword appears, that is not translated elsewhere, it should be translated in a consistent manner regarding the other translated keywords.
