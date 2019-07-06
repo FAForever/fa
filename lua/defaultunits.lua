@@ -39,7 +39,6 @@ DummyUnit = Class(Unit) {
 
 -- STRUCTURE UNITS
 StructureUnit = Class(Unit) {
-    LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
 
@@ -396,7 +395,6 @@ StructureUnit = Class(Unit) {
             WaitSeconds(2.0)
         elseif FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
             self:ShowBones({0}, true)
-            self:HideLandBones()
         end
         Unit.StopBeingBuiltEffects(self, builder, layer)
     end,

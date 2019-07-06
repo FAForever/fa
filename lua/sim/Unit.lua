@@ -154,8 +154,6 @@ Unit = Class(moho.unit_methods) {
 
     OnCreate = function(self)
         Entity.OnCreate(self)
-        -- Turn off land bones if this unit has them.
-        self:HideLandBones()
 
         -- Set number of effects per damage depending on its volume
         local x, y, z = self:GetUnitSizes()
@@ -1945,13 +1943,6 @@ Unit = Class(moho.unit_methods) {
         ChangeState(self, self.DeadState)
     end,
 
-    HideLandBones = function(self)
-        -- Hide the bones for buildings built on land
-        if self:GetCurrentLayer() == 'Land' then
-            self:HideBones(self.LandBuiltHiddenBones, true)
-        end
-    end,
-
     -- Generic functions for showing or hiding a table of bones
     -- affectChildren = boolean to affect child bones
     ShowBones = function(self, bones, affectChildren)
@@ -2156,8 +2147,6 @@ Unit = Class(moho.unit_methods) {
             self.IsUpgrade = nil
         end
 
-        -- Turn off land bones if this unit has them.
-        self:HideLandBones()
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit

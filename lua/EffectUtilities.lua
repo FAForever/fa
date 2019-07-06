@@ -124,7 +124,12 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     end
 
     unitBeingBuilt:ShowBones({0}, true)
-    unitBeingBuilt:HideLandBones()
+
+    -- This is a rather evil hack, but better than ALL UEF structures having a function they never use,
+    -- trying to hide a bone they don't have
+    if unitBeingBuilt.HideLandBones then
+        unitBeingBuilt:HideLandBones()
+    end
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
 
     local lComplete = unitBeingBuilt:GetFractionComplete()
