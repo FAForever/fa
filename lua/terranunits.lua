@@ -39,6 +39,7 @@ local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
+local AmphibiousStructureUnit = DefaultUnitsFile.AmphibiousStructureUnit
 
 local EffectUtil = import('EffectUtilities.lua')
 local PlayEffectsAtBones = EffectUtil.CreateBoneTableRangedScaleEffects
@@ -339,8 +340,9 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
 --------------------------------------------------------------
 --  STRUCTURES
 --------------------------------------------------------------
-TStructureUnit = Class(StructureUnit) {
-}
+TStructureUnit = Class(StructureUnit) {}
+
+TAmphibiousStructureUnit = Class(AmphibiousStructureUnit) {}
 
 TRadarJammerUnit = Class(RadarJammerUnit) {
     OnIntelEnabled = function(self)

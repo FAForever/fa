@@ -31,6 +31,7 @@ local SonarUnit = DefaultUnitsFile.SonarUnit
 local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+local AmphibiousStructureUnit = DefaultUnitsFile.AmphibiousStructureUnit
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
@@ -212,6 +213,8 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 #  STRUCTURES
 #-------------------------------------------------------------
 AStructureUnit = Class(StructureUnit) {}
+
+AAmphibiousStructureUnit = Class(AmphibiousStructureUnit) {}
 
 #-------------------------------------------------------------
 #  SUBMARINE UNITS

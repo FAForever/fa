@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AAmphibiousStructureUnit = import('/lua/aeonunits.lua').AAmphibiousStructureUnit
 local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
 
-UAB2204 = Class(AStructureUnit) {
+UAB2204 = Class(AAmphibiousStructureUnit) {
     Weapons = {
         AAFizz = Class(AAATemporalFizzWeapon) {
             ChargeEffectMuzzles = {'Turret_Right_Muzzle', 'Turret_Left_Muzzle'},

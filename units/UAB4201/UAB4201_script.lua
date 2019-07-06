@@ -5,37 +5,34 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AAmphibiousStructureUnit = import('/lua/aeonunits.lua').AAmphibiousStructureUnit
 local AAMWillOWisp = import('/lua/aeonweapons.lua').AAMWillOWisp
 
-UAB4201 = Class(AStructureUnit) {
+UAB4201 = Class(AAmphibiousStructureUnit) {
     Weapons = {
         AntiMissile = Class(AAMWillOWisp) {
-                PlayRackRecoil = function(self, rackList)
-                    AAMWillOWisp.PlayRackRecoil(self, rackList)
-                     #CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
-                    if not self.RotatorManipulator then
-                        self.RotatorManipulator = CreateRotator(self.unit, 'Dome', 'z', 20, 40, 40, 40)
-                        self.RotatorManipulator:SetGoal(45)
-                        self.RotatorManipulatorCounter = 1
-                    else
-                        self.RotatorManipulatorCounter = self.RotatorManipulatorCounter + 1
-                        self.RotatorManipulator:SetGoal(45 * self.RotatorManipulatorCounter)
-                    end
-                    self.unit.Trash:Add(self.RotatorManipulator)
-                end,
+            PlayRackRecoil = function(self, rackList)
+                AAMWillOWisp.PlayRackRecoil(self, rackList)
+                if not self.RotatorManipulator then
+                    self.RotatorManipulator = CreateRotator(self.unit, 'Dome', 'z', 20, 40, 40, 40)
+                    self.RotatorManipulator:SetGoal(45)
+                    self.RotatorManipulatorCounter = 1
+                else
+                    self.RotatorManipulatorCounter = self.RotatorManipulatorCounter + 1
+                    self.RotatorManipulator:SetGoal(45 * self.RotatorManipulatorCounter)
+                end
+                self.unit.Trash:Add(self.RotatorManipulator)
+            end,
 
-                PlayRackRecoilReturn = function(self, rackList)
-                    AAMWillOWisp.PlayRackRecoilReturn(self, rackList)
-                    if self.RotatorManipulatorCounter == 8 then
-                        self.RotatorManipulator:Destroy()
-                        self.RotatorManipulator = nil
-                    end
-                end,
-
-            },
+            PlayRackRecoilReturn = function(self, rackList)
+                AAMWillOWisp.PlayRackRecoilReturn(self, rackList)
+                if self.RotatorManipulatorCounter == 8 then
+                    self.RotatorManipulator:Destroy()
+                    self.RotatorManipulator = nil
+                end
+            end,
+        },
     },
-
 }
 
 TypeClass = UAB4201

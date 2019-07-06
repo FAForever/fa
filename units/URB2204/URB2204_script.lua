@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
+local CAmphibiousStructureUnit = import('/lua/cybranunits.lua').CAmphibiousStructureUnit
 local CAABurstCloudFlakArtilleryWeapon = import('/lua/cybranweapons.lua').CAABurstCloudFlakArtilleryWeapon
 
-URB2204 = Class(CStructureUnit) {
+URB2204 = Class(CAmphibiousStructureUnit) {
     Weapons = {
         AAGun = Class(CAABurstCloudFlakArtilleryWeapon) {},
     },

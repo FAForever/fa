@@ -4,10 +4,10 @@
 -- Summary  :  Terran Anti-Air Gun Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
+local TAmphibiousStructureUnit = import('/lua/terranunits.lua').TAmphibiousStructureUnit
 local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
 
-UEB2104 = Class(TStructureUnit) {
+UEB2104 = Class(TAmphibiousStructureUnit) {
     Weapons = {
         AAGun = Class(TAALinkedRailgun) {},
     },

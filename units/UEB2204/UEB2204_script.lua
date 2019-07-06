@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
+local TAmphibiousStructureUnit = import('/lua/terranunits.lua').TAmphibiousStructureUnit
 local TAAFlakArtilleryCannon = import('/lua/terranweapons.lua').TAAFlakArtilleryCannon
 
-UEB2204 = Class(TStructureUnit) {
+UEB2204 = Class(TAmphibiousStructureUnit) {
     Weapons = {
         AAGun = Class(TAAFlakArtilleryCannon) {},
 

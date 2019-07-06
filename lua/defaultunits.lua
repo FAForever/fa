@@ -596,6 +596,27 @@ StructureUnit = Class(Unit) {
     end,
 }
 
+-- Amphibious Structures
+-- These structures deploy visible floatation devices when on water. Those elements must be hidden
+-- when built on land or it looks weird.
+AmphibiousStructureUnit = Class(StructureUnit) {
+    OnCreate = function(self)
+        StructureUnit.OnCreate(self)
+        self:HideLandBones()
+    end,
+
+    StopBeingBuiltEffects = function(self, builder, layer)
+        StructureUnit.StopBeingBuiltEffects(self, builder, layer)
+        self:HideLandBones()
+    end,
+
+    HideLandBones = function(self)
+        if self:GetCurrentLayer() == 'Land' then
+            self:HideBones({'Floatation'}, true)
+        end
+    end,
+}
+
 -- FACTORY UNITS
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)

@@ -21,6 +21,7 @@ local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
+local AmphibiousStructureUnit = DefaultUnitsFile.AmphibiousStructureUnit
 
 local Util = import('utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -264,6 +265,8 @@ CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 -- STRUCTURES
 CStructureUnit = Class(StructureUnit) {}
+
+CAmphibiousStructureUnit = Class(AmphibiousStructureUnit) {}
 
 -- SUBMARINE UNITS
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}

@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
+local CAmphibiousStructureUnit = import('/lua/cybranunits.lua').CAmphibiousStructureUnit
 local CAAAutocannon = import('/lua/cybranweapons.lua').CAAAutocannon
 
-URB2104 = Class(CStructureUnit) {
+URB2104 = Class(CAmphibiousStructureUnit) {
     Weapons = {
         AAGun = Class(CAAAutocannon) {
             FxMuzzleScale = 2.25,

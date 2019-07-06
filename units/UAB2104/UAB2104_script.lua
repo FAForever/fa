@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AAmphibiousStructureUnit = import('/lua/aeonunits.lua').AAmphibiousStructureUnit
 local AAASonicPulseBatteryWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
 
-UAB2104 = Class(AStructureUnit) {
+UAB2104 = Class(AAmphibiousStructureUnit) {
     Weapons = {
         AAGun = Class(AAASonicPulseBatteryWeapon) {
             FxMuzzleScale = 2.25,
