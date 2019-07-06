@@ -18,6 +18,7 @@ Patch 3705 (5 July, 2019)
 - Optimized unitcount for VictoryConditions
 - Check for dead status before killing beams
 - Improved targeting of torpedo bomber and subs
+- Integration of the Supreme Props mod
 
 ### Contributors ###
 - Uveso
@@ -27,6 +28,8 @@ Patch 3705 (5 July, 2019)
 - Strogo
 - Exotic-Retard
 - Keyser
+- speed2
+- svenni_badbwoi
 
 Patch 3704 (18 June, 2019)
 ============================

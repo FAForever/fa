@@ -22,6 +22,7 @@ gamePatches = {
 			'- Optimized unitcount for VictoryConditions',
 			'- Check for dead status before killing beams',
 			'- Improved targeting of torpedo bomber and subs',
+			'- Integration of the Supreme Props mod',
 			'',
 			'**Contributors**',
 			'- Uveso',
@@ -31,6 +32,8 @@ gamePatches = {
 			'- Strogo',
 			'- Exotic-Retard',
 			'- Keyer',
+			'- speed2',
+			'- svenni_badbwoi',
 		},
 	},
     {
