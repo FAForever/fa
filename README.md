@@ -146,3 +146,23 @@ Will put it into a mode where it will look for updates to files that it has load
 This way, you don't need to restart the game every time you make a change, you simply need to make a new unit of the type, spawn a new projectile or do whatever it is you're doing.
 
 It's not perfect; some changes will require a full game restart, and certain changes can cause crashes. But it's a lot better than reloading the game for every change, every time.
+
+Translation guidelines
+----------------------------------
+
+
+The translation of both the game and the faf patch should be written in the way that they follow those guidelines. 
+This goes for both future and past work on the SCFA translation and for all languages.
+
+1) *Compliance with the game's UI*
+- Text should never overflow from anywhere
+- As much as possible, try to keep a few pixels of margin between the text and its parent element boundaries
+- Use obvious abreviations if a shorter translation is impossible, but the abreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abreviated.
+
+2) *Gender-neutral writing*
+- The translation should never adopt gendered formulations when addressing the player directly, and should respect gender-neutral writing everywhere possible
+- Median point and/or parenthesis, or gendering a word twice, should be avoided to the maximum.
+
+3) *Consistency of keywords*
+- Game specific keywords, like unit names and building names, should always be translated in the same manner consistently accross the whole game.
+- If a new keyword appear, that is not translated elsewhere, it should be translated in a consistent manner regarding the other translated keywords.
