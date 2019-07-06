@@ -1956,15 +1956,20 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    -- Generic function for showing a table of bones
-    -- Table = List of bones
-    -- Childrend = True/False to show child bones
-    ShowBones = function(self, table, children)
-        for _, v in table do
-            if self:IsValidBone(v) then
-                self:ShowBone(v, children)
-            else
-                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self:GetUnitId()), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+    -- Generic functions for showing or hiding a table of bones
+    -- affectChildren = boolean to affect child bones
+    ShowBones = function(self, bones, affectChildren)
+        for _, bone in bones or {} do
+            if self:ValidateBone(bone) then
+                self:ShowBone(bone, affectChildren)
+            end
+        end
+    end,
+
+    HideBones = function(self, bones, affectChildren)
+        for _, bone in bones or {} do
+            if self:ValidateBone(bone) then
+                self:HideBone(bone, affectChildren)
             end
         end
     end,
