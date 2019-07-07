@@ -416,12 +416,13 @@ end
 
 --Removes buffs
 function RemoveBuff(unit, buffName, removeAllCounts, instigator)
-    local def = Buffs[buffName]
-    local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]
-    if not unitBuff.Count or unitBuff.Count <= 0 then
+    if not HasBuff(unit, buffName) then
         -- This buff wasn't previously applied to the unit
         return
     end
+
+    local def = Buffs[buffName]
+    local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]
 
     for atype,_ in def.Affects do
         local list = unit.Buffs.Affects[atype]
