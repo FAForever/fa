@@ -6,6 +6,32 @@
 import('/lua/sim/AdjacencyBuffs.lua')
 import('/lua/sim/CheatBuffs.lua') -- Buffs for AI Cheating
 
+DefineBasicBuff = function(name, type, stacks, rate, health, regen)
+    if not Buffs[name] then
+        BuffBlueprint {
+            Name = name,
+            DisplayName = name,
+            BuffType = type,
+            Stacks = stacks,
+            Duration = -1,
+            Affects = {
+                BuildRate = {
+                    Add = rate or 0,
+                    Mult = 1,
+                },
+                MaxHealth = {
+                    Add = health or 0,
+                    Mult = 1,
+                },
+                Regen = {
+                    Add = regen or 0,
+                    Mult = 1,
+                },
+            },
+        }
+    end
+end
+
 -- VETERANCY BUFFS - UNIT MAX HEALTH ONLY
 BuffBlueprint {
     Name = 'VeterancyMaxHealth1',
@@ -83,74 +109,10 @@ BuffBlueprint {
 }
 
 -- VETERANCY BUFFS - UNIT REGEN
-BuffBlueprint {
-    Name = 'VeterancyRegen1',
-    DisplayName = 'VeterancyRegen1',
-    BuffType = 'VETERANCYREGEN',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        Regen = {
-            Add = 2,
-            Mult = 1,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyRegen2',
-    DisplayName = 'VeterancyRegen2',
-    BuffType = 'VETERANCYREGEN',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        Regen = {
-            Add = 4,
-            Mult = 1,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyRegen3',
-    DisplayName = 'VeterancyRegen3',
-    BuffType = 'VETERANCYREGEN',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        Regen = {
-            Add = 6,
-            Mult = 1,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyRegen4',
-    DisplayName = 'VeterancyRegen4',
-    BuffType = 'VETERANCYREGEN',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        Regen = {
-            Add = 8,
-            Mult = 1,
-        },
-    },
-}
-
-BuffBlueprint {
-    Name = 'VeterancyRegen5',
-    DisplayName = 'VeterancyRegen5',
-    BuffType = 'VETERANCYREGEN',
-    Stacks = 'REPLACE',
-    Duration = -1,
-    Affects = {
-        Regen = {
-            Add = 10,
-            Mult = 1,
-        },
-    },
-}
+DefineBasicBuff('VeterancyRegen1', 'VETERANCYREGEN', 'REPLACE', nil, nil, 2)
+DefineBasicBuff('VeterancyRegen2', 'VETERANCYREGEN', 'REPLACE', nil, nil, 4)
+DefineBasicBuff('VeterancyRegen3', 'VETERANCYREGEN', 'REPLACE', nil, nil, 6)
+DefineBasicBuff('VeterancyRegen4', 'VETERANCYREGEN', 'REPLACE', nil, nil, 8)
+DefineBasicBuff('VeterancyRegen5', 'VETERANCYREGEN', 'REPLACE', nil, nil, 10)
 
 __moduleinfo.auto_reload = true
