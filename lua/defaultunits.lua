@@ -2069,6 +2069,13 @@ SeaUnit = Class(MobileUnit){
 
 --- Base class for aircraft carriers.
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
+    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
+         -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
+        local instigator = arg[1]
+        self:KillAllCargo(not instigator or not IsUnit(instigator), true)
+        SeaUnit.Kill(self, unpack(arg))
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         self:SaveCargoMass()
         SeaUnit.OnKilled(self, instigator, type, overkillRatio)
