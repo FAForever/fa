@@ -902,7 +902,7 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
@@ -992,11 +992,11 @@ UnitBlueprint {
             BeamCollisionDelay = 0.2,
             BeamLifetime = 0.4,
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
-            DisplayName = 'Overcharge Cannon',
+            DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
