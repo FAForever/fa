@@ -449,7 +449,7 @@ UnitBlueprint {
             TurretYawSpeed = 90,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
-            WeaponCategory = 'Direct Fire',
+            WeaponCategory = 'Direct Fire Experimental',
         },
         {
             AboveWaterFireOnly = true,
