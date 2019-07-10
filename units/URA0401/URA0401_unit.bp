@@ -349,7 +349,7 @@ UnitBlueprint {
             TurretYawRange = 80,
             TurretYawSpeed = 360,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Experimental',
+            WeaponCategory = 'Direct Fire',
         },
         {
             AboveWaterTargetsOnly = true,
@@ -421,7 +421,7 @@ UnitBlueprint {
             TurretYawRange = 360,
             TurretYawSpeed = 360,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Experimental',
+            WeaponCategory = 'Direct Fire',
         },
         {
             Audio = {
@@ -640,7 +640,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 360,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Experimental',
+            WeaponCategory = 'Direct Fire',
         },
         {
             AboveWaterTargetsOnly = true,
@@ -713,7 +713,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 360,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Experimental',
+            WeaponCategory = 'Direct Fire',
         },
         {
             AboveWaterTargetsOnly = true,
