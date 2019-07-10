@@ -405,7 +405,7 @@ UnitBlueprint {
             TurretYawRange = 55,
             TurretYawSpeed = 45,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Naval',
+            WeaponCategory = 'Direct Fire',
         },
         {
             AboveWaterFireOnly = true,
@@ -495,7 +495,7 @@ UnitBlueprint {
             TurretYawRange = 55,
             TurretYawSpeed = 45,
             Turreted = true,
-            WeaponCategory = 'Direct Fire Experimental',
+            WeaponCategory = 'Direct Fire',
         },
         {
             Audio = {
