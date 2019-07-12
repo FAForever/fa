@@ -12,7 +12,7 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 
 local dialog = false
 local shouldReport = false
-local waitingTimeBeforeReport = 3;
+local waitingTimeBeforeReport = 10;
 
 function CreateDialog(teamkill)
     if dialog then
