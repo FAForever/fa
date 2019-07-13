@@ -603,13 +603,15 @@ end
 
 function GiveResourcesToPlayer(data)
     SendChatToReplay(data)
-    if data.From != -1 then
+    -- Ignore observers and players trying to send resources to themselves
+    if data.From ~= -1 and data.From ~= data.To then
         if not OkayToMessWithArmy(data.From) then
             return
         end
         local fromBrain = GetArmyBrain(data.From)
         local toBrain = GetArmyBrain(data.To)
-        if fromBrain:IsDefeated() or toBrain:IsDefeated() then
+        -- Abort if any of the armies is defeated or if trying to send a negative value
+        if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
             return
         end
         local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
