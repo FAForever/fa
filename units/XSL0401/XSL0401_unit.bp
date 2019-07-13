@@ -707,7 +707,7 @@ UnitBlueprint {
             Damage = 10000,
             DamageFriendly = true,
             DamageRadius = 8,
-            DamageType = 'Normal',
+            DamageType = 'DeathExplosion',
             DisplayName = 'Collossus Death',
             DummyWeapon = true,
             Label = 'CollossusDeath',
