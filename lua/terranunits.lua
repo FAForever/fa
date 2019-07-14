@@ -88,7 +88,9 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     StartArmsMoving = function(self)
-        self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+        if not self.ArmsThread then
+            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+        end
     end,
 
     MovingArmsThread = function(self)
@@ -276,7 +278,9 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 
     StartArmsMoving = function(self)
-        self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+        if not self.ArmsThread then
+            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+        end
     end,
 
     MovingArmsThread = function(self)
