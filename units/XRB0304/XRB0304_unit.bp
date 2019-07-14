@@ -159,6 +159,9 @@ UnitBlueprint {
                 'Attachpoint01',
                 'Attachpoint02',
                 'Attachpoint03',
+                'Attachpoint01',
+                'Attachpoint02',
+                'Attachpoint03',
             },
         },
 
