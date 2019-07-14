@@ -1,3 +1,7 @@
+Patch 3707 (14 July, 2019)
+============================
+- Revert exe change to stable 3704 exe
+
 Patch 3706 (14 July, 2019)
 ============================
 - Improved the team kill detection

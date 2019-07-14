@@ -1,5 +1,12 @@
-last_version = 3706
+last_version = 3707
 gamePatches = {
+	{
+		version = 3707,
+		name = 'Game Version 3707',
+		description = {
+			'- Revert exe change to stable 3704 exe',
+		},
+	},
 	{
 		version = 3706,
 		name = 'Game Version 3706',
