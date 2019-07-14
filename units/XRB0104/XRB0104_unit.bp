@@ -161,6 +161,8 @@ UnitBlueprint {
             AimBone = 0,
             BuildEffectBones = {
                 'Attachpoint01',
+                'Attachpoint01',
+                'Attachpoint01',
             },
         },
         Category = 'Construction',
