@@ -31,6 +31,9 @@ local SonarUnit = DefaultUnitsFile.SonarUnit
 local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
+local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
+local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
@@ -41,7 +44,7 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 ---------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 }
@@ -111,7 +114,7 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 ---------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 }
@@ -151,7 +154,7 @@ ASonarUnit = Class(SonarUnit) {}
 ---------------------------------------------------------------
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 }
@@ -212,17 +215,17 @@ ASubUnit = Class(DefaultUnitsFile.SubUnit) {
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 ---------------------------------------------------------------
-ATransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+ATransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 ---------------------------------------------------------------
 --  WALKING LAND UNITS
 ---------------------------------------------------------------
-AWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
+AWalkingLandUnit = Class(WalkingLandUnit) {}
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
-AWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
+AWallStructureUnit = Class(WallStructureUnit) {}
 
 ---------------------------------------------------------------
 --  CIVILIAN STRUCTURES
