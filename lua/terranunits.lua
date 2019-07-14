@@ -23,6 +23,7 @@ local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
 local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
 local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
 local LandUnit = DefaultUnitsFile.LandUnit
+local HoverLandUnit = DefaultUnitsFile.HoverLandUnit
 local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
 local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
@@ -39,6 +40,7 @@ local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
+local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
 
 local EffectUtil = import('EffectUtilities.lua')
 local PlayEffectsAtBones = EffectUtil.CreateBoneTableRangedScaleEffects
@@ -353,12 +355,12 @@ TSubUnit = Class(SubUnit) {}
 --------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 --------------------------------------------------------------
-TTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+TTransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
-TWalkingLandUnit = WalkingLandUnit
+TWalkingLandUnit = Class(WalkingLandUnit) {}
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
