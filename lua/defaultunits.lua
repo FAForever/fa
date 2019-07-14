@@ -587,7 +587,7 @@ StructureUnit = Class(Unit) {
     end,
     
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-	    -- Handle incoming OC damage
+        -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             amount = wep:GetBlueprint().Overcharge.structureDamage
@@ -638,12 +638,16 @@ FactoryUnit = Class(StructureUnit) {
     OnPaused = function(self)
         -- When factory is paused take some action
         self:StopUnitAmbientSound('ConstructLoop')
+        if self.UnitBeingBuilt then
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
-        if self.BuildingUnit then
+        if self.UnitBeingBuilt then
             self:PlayUnitAmbientSound('ConstructLoop')
+            StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         StructureUnit.OnUnpaused(self)
     end,
@@ -723,6 +727,8 @@ FactoryUnit = Class(StructureUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         self:ChangeBlinkingLights('Yellow')
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self.UnitBeingBuilt = unitBeingBuilt
+        self.UnitBuildOrder = order
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
@@ -747,6 +753,8 @@ FactoryUnit = Class(StructureUnit) {
         else
             self:DoStopBuild(unitBeingBuilt, order)
         end
+        self.UnitBeingBuilt = nil
+        self.UnitBuildOrder = nil
     end,
 
     --- Adds a pause between unit productions
