@@ -43,7 +43,6 @@ local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
 
 local EffectUtil = import('EffectUtilities.lua')
-local PlayEffectsAtBones = EffectUtil.CreateBoneTableRangedScaleEffects
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
@@ -200,19 +199,7 @@ TLandUnit = Class(LandUnit) {}
 --------------------------------------------------------------
 --  MASS COLLECTION UNITS
 --------------------------------------------------------------
-TMassCollectionUnit = Class(MassCollectionUnit) {
-
-    ---- FIXME ---- Until these units get an upgrade animation, these will be visible during upgrade
-    -- This causes them both to be shown while it upgrades, this over-riden function can be removed
-    -- once it is.
-    StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
-            self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
-        end
-    end,
-}
+TMassCollectionUnit = Class(MassCollectionUnit) {}
 
 --------------------------------------------------------------
 -- MASS FABRICATION STRUCTURES
