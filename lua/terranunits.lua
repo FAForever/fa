@@ -49,10 +49,9 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 --  AIR FACTORY STRUCTURES
 --------------------------------------------------------------
 TAirFactoryUnit = Class(AirFactoryUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
@@ -105,8 +104,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
 --------------------------------------------------------------
 --  AIR STAGING STRUCTURES
 --------------------------------------------------------------
-TAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {
-}
+TAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 --------------------------------------------------------------
 --  AIR UNITS
@@ -116,14 +114,12 @@ TAirUnit = Class(AirUnit) {}
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
-TConcreteStructureUnit = Class(ConcreteStructureUnit) {
-}
+TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 --------------------------------------------------------------
 --  Construction Units
 --------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
@@ -169,20 +165,17 @@ TConstructionUnit = Class(ConstructionUnit) {
 --------------------------------------------------------------
 -- ENERGY CREATION STRUCTURES
 --------------------------------------------------------------
-TEnergyCreationUnit = Class(EnergyCreationUnit) {
-}
+TEnergyCreationUnit = Class(EnergyCreationUnit) {}
 
 --------------------------------------------------------------
 -- ENERGY STORAGE STRUCTURES
 --------------------------------------------------------------
-TEnergyStorageUnit = Class(EnergyStorageUnit) {
-}
+TEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 --------------------------------------------------------------
 --  HOVER LAND UNITS
 --------------------------------------------------------------
-THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
-}
+THoverLandUnit = Class(HoverLandUnit) {}
 
 --------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
@@ -190,7 +183,7 @@ THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 TLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
@@ -200,9 +193,7 @@ TLandFactoryUnit = Class(LandFactoryUnit) {
 --------------------------------------------------------------
 --  LAND UNITS
 --------------------------------------------------------------
-TLandUnit = Class(LandUnit) {
-
-}
+TLandUnit = Class(LandUnit) {}
 
 --------------------------------------------------------------
 --  MASS COLLECTION UNITS
@@ -224,20 +215,17 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
 --------------------------------------------------------------
 -- MASS FABRICATION STRUCTURES
 --------------------------------------------------------------
-TMassFabricationUnit = Class(MassFabricationUnit) {
-}
+TMassFabricationUnit = Class(MassFabricationUnit) {}
 
 --------------------------------------------------------------
 -- MASS STORAGE STRUCTURES
 --------------------------------------------------------------
-TMassStorageUnit = Class(MassStorageUnit) {
-}
+TMassStorageUnit = Class(MassStorageUnit) {}
 
 --------------------------------------------------------------
 --  MOBILE FACTORY UNIT
 --------------------------------------------------------------
 TMobileFactoryUnit = Class(LandUnit) {
-
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
@@ -250,23 +238,20 @@ TMobileFactoryUnit = Class(LandUnit) {
 --------------------------------------------------------------
 --  RADAR STRUCTURES
 --------------------------------------------------------------
-TRadarUnit = Class(RadarUnit) {
-}
+TRadarUnit = Class(RadarUnit) {}
 
 --------------------------------------------------------------
 --  SONAR STRUCTURES
 --------------------------------------------------------------
-TSonarUnit = Class(SonarUnit) {
-}
+TSonarUnit = Class(SonarUnit) {}
 
 --------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
 --------------------------------------------------------------
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
-
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
-        for k, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
+        for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
@@ -334,7 +319,7 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if builder and EntityCategoryContains(categories.MOBILE, builder) then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)	)
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
 }
@@ -342,8 +327,7 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
 --------------------------------------------------------------
 --  STRUCTURES
 --------------------------------------------------------------
-TStructureUnit = Class(StructureUnit) {
-}
+TStructureUnit = Class(StructureUnit) {}
 
 TRadarJammerUnit = Class(RadarJammerUnit) {
     OnIntelEnabled = function(self)
@@ -379,8 +363,7 @@ TWalkingLandUnit = WalkingLandUnit
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
-TWallStructureUnit = Class(WallStructureUnit) {
-}
+TWallStructureUnit = Class(WallStructureUnit) {}
 
 --------------------------------------------------------------
 --  CIVILIAN STRUCTURES
@@ -390,9 +373,7 @@ TCivilianStructureUnit = Class(StructureUnit) {}
 --------------------------------------------------------------
 --  QUANTUM GATE UNITS
 --------------------------------------------------------------
-TQuantumGateUnit = Class(QuantumGateUnit) {
-
-}
+TQuantumGateUnit = Class(QuantumGateUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD SEA UNITS
@@ -451,7 +432,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         TStructureUnit.OnDestroy(self)
         -- Iterate through pod data, kill all the pods and set them inactive
         if self.PodData then
-            for k,v in self.PodData do
+            for _, v in self.PodData do
                 if v.Active and not v.PodHandle.Dead then
                     v.PodHandle:Kill()
                 end
@@ -536,10 +517,9 @@ TPodTowerUnit = Class(TStructureUnit) {
             -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
             -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
             -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
-
             self.TowerCaptured = nil
             local bp = self:GetBlueprint()
-            for k,v in bp.Economy.EngineeringPods do
+            for _, v in bp.Economy.EngineeringPods do
                 if v.CreateWithUnit and not self.PodData[v.PodName].Active then
                     if not self.PodData then
                         self.PodData = {}
@@ -562,7 +542,7 @@ TPodTowerUnit = Class(TStructureUnit) {
             end
             local bp = self:GetBlueprint()
             while true and not self.Rebuilding do
-                for k,v in bp.Economy.EngineeringPods do
+                for _, v in bp.Economy.EngineeringPods do
                     -- Check if all the pods are active
                     if not self.PodData[v.PodName].Active then
                         -- Cost of new pod
