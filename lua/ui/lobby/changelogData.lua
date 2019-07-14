@@ -1,5 +1,24 @@
-last_version = 3705
+last_version = 3706
 gamePatches = {
+	{
+		version = 3706,
+		name = 'Game Version 3706',
+		description = {
+			'- Improved the team kill detection',
+			'- Increased the team kill report wait time',
+			'- Weapon category fixes',
+			'- Mod blacklist update',
+			'- Fixed Sera ACU PhaseShield mesh',
+			'- Pushed the new (fixed) exe after more testing',
+			'',
+			'**Contributors**',
+			'- speed2',
+			'- PhilipJFry',
+			'- keyser',
+			'- Uveso',
+			'- FAETHER',
+		},
+	},
 	{
 		version = 3705,
 		name = 'Game Version 3705',
