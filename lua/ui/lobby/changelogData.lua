@@ -50,7 +50,7 @@ gamePatches = {
 			'- JaggedAppliance',
 			'- Strogo',
 			'- Exotic-Retard',
-			'- Keyer',
+			'- keyser',
 			'- speed2',
 			'- svenni_badbwoi',
 		},
