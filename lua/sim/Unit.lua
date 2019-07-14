@@ -1246,7 +1246,7 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 then
+        if self.PlayDeathAnimation and self:GetFractionComplete() == 1 then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
