@@ -275,7 +275,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 0,
-    MaxBuildDistance = 10,
+        MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
