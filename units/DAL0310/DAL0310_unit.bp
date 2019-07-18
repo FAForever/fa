@@ -274,8 +274,8 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.75,
+            TranscendentPriorities = 'SHIELD',
             TargetPriorities = {
-                'SHIELD',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
                 'ALLUNITS',
