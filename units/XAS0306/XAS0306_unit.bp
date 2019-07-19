@@ -291,7 +291,7 @@ UnitBlueprint {
             TargetCheckInterval = 3.5,
             TargetPriorities = {
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -369,7 +369,7 @@ UnitBlueprint {
             TargetCheckInterval = 3.5,
             TargetPriorities = {
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

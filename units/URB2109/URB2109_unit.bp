@@ -233,7 +233,7 @@ UnitBlueprint {
                 'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

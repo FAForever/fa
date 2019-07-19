@@ -388,7 +388,7 @@ UnitBlueprint {
             TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'STRUCTURE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

@@ -364,7 +364,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

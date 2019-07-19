@@ -371,7 +371,7 @@ UnitBlueprint {
             RateOfFire = 2.5,
             TargetCheckInterval = 0.27,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TurretBoneDualMuzzle = 'Turret_Down_Muzzle_02',
@@ -441,7 +441,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

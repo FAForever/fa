@@ -275,7 +275,7 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 'STRUCTURE DEFENSE',
                 'STRUCTURE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

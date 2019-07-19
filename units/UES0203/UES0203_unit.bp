@@ -361,7 +361,7 @@ UnitBlueprint {
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'MOBILE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,
@@ -424,7 +424,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
