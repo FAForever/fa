@@ -271,7 +271,7 @@ UnitBlueprint {
             TargetCheckInterval = 15,
             TargetPriorities = {
                 'STRUCTURE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

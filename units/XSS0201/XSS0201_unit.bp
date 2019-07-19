@@ -325,7 +325,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.125,
@@ -410,7 +410,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.125,
@@ -479,7 +479,7 @@ UnitBlueprint {
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'MOBILE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,

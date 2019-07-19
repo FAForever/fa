@@ -43,7 +43,7 @@ UnitBlueprint {
         BuildRate = 0,
         BuildTime = 400,
         BuildableCategory = {
-            'ALLUNITS',
+            '(ALLUNITS - SPECIALLOWPRI)',
         },
         NaturalProducer = true,
     },

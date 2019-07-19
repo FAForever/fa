@@ -286,7 +286,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'STRUCTURE DEFENSE',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretDualManipulators = false,

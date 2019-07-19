@@ -253,7 +253,7 @@ UnitBlueprint {
                     BuffType = 'STUN',
                     Duration = 15,
                     Radius = 40,
-                    TargetAllow = 'ALLUNITS',
+                    TargetAllow = '(ALLUNITS - SPECIALLOWPRI)',
                 },
             },
             CollideFriendly = false,
