@@ -2860,34 +2860,39 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
     float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * 0.7;
-	
+
     // Calculate environment map reflection
-    float reflectivity = saturate(specular.r * 2.5); //reduce artifacts of texture
+    float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
     environment *= reflectivity * fallOff.a;
     float3 phongMultiplicative = light * environment * (1 - (diffuse.a * 0.5) ) * 0.7;
     
-    //make reflection more intense depending on the diffuse color
-    //could be cool but looks like shit because the diffuse texture is not interpolated for unknown reasons
-    //float Amount = (diffuse.r + diffuse.g + diffuse.b) / 3;
-    //Amount = pow(Amount * 10, 0.3) * 2;
-    //Amount = 1.0 - (Amount * 0.25);
-    //phongMultiplicative *= (float3(0.5, 0.7, 0.9) + Amount);
+    // Makes reflection more intense depending on the diffuse color. Could be cool, but
+    // looks like shit because the diffuse texture is not interpolated for unknown reasons
+    // TODO: find out why the diffuse texture is not interpolated
+    // float Amount = (diffuse.r + diffuse.g + diffuse.b) / 3;
+    // Amount = pow(Amount * 10, 0.3) * 2;
+    // Amount = 1.0 - (Amount * 0.25);
+    // phongMultiplicative *= (float3(0.5, 0.7, 0.9) + Amount);
     
     float3 teamColSpec = NdotV * vertex.color.rgb * 2;
-    float whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4)); //there are also white highlights in the diffuse texture in some models
+    // There are also white highlights in the diffuse texture in some models
+    float whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4));
+    
+    // Combine all previous computations
     float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.4;
     color += phongAdditive + phongMultiplicative + (teamColSpec.rgb * diffuse.a) + whiteness;
-    //substitute all the computations on pure glowig parts with the pure brightness texture to get rid of reflections and shadows
+    
+    // Substitute all the computations on pure glowing parts with the pure brightness texture
+    // to get rid of reflections and shadows
     float mask = saturate( saturate(specular.b * 2) - diffuse.a );
     color *= 1 - mask;
     color += specular.b * 2 * mask;
-	
-	
-	float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
+
+    // Bloom is only rendered where alpha > 0
+    float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColGlow = diffuse.a * (1 - teamColGlow) * 0.06;
-	
-    //alpha affects bloom
     float alpha = mirrored ? 0.5 : specular.b * 0.4 + teamColGlow;
+    
     return float4( color, alpha );
 }
 
