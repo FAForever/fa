@@ -119,7 +119,7 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 250,
                     ShaderName = 'Aeon',
                 },
                 {
