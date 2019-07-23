@@ -8,7 +8,7 @@ Tips = {
     "<LOC loadingtip_0006>Upgrade a Mass Extractor to T2 before you build Mass Storages around it",
     "<LOC loadingtip_0007>ACUs in the water are harder to spot and snipe - use this, especially in the late game",
     "<LOC loadingtip_0008>Nuke silos take 5 minutes to build a missile un-assisted; Anti-Nukes take 4 minutes",
-    "<LOC loadingtip_0009>You can use attack move from factory to increase engineers’ reclaim range",
+    "<LOC loadingtip_0009>You can use attack-move from factory to increase engineers’ reclaim range",
     "<LOC loadingtip_0010>Use attack-move with engineers in order to reclaim",
     "<LOC loadingtip_0011>Loyalists can deflect tactical missiles",
     "<LOC loadingtip_0012>The Monkeylord is the cheapest land experimental unit",
@@ -19,7 +19,7 @@ Tips = {
     "<LOC loadingtip_0017>Rebuilding structures on their wrecks saves you 50% of the construction cost and time",
     "<LOC loadingtip_0018>An un-upgraded ACU is equivalent to 20 T1 tanks and 2 T1 Engineers",
     "<LOC loadingtip_0019>Always build Tactical Missile Defense as soon as you have T2",
-    "<LOC loadingtip_0020>Hydrocarbon generator has the same power outcome as 5 T1 Power Generators, but it’s much cheaper",
+    "<LOC loadingtip_0020>A hydrocarbon generator has the same power outcome as 5 T1 Power Generators, but it’s much cheaper",
     "<LOC loadingtip_0021>Aeon T3 Mobile Artillery can shoot while it’s moving",
     "<LOC loadingtip_0022>Include reclaiming rocks around your start position into your build order",
     "<LOC loadingtip_0023>The small yellow ring around the ACU and Engineers shows their build range",
@@ -34,6 +34,6 @@ Tips = {
     "<LOC loadingtip_0032>Use T1 Mobile Artillery to kill T1 Point Defenses",
     "<LOC loadingtip_0033>Power Generators adjacent to Static Artilleries will increase their rate of fire",
     "<LOC loadingtip_0034>Engineers are more efficient for build power than Engineering Stations",
-    "<LOC loadingtip_0035>Overcharge can deal up to 15 000 damage to a unit, depending on your energy stock",
+    "<LOC loadingtip_0035>Overcharge can deal up to 15,000 damage to a unit, depending on your energy stock",
 }
 
