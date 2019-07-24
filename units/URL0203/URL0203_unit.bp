@@ -78,15 +78,22 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_amphibious>Amphibious', # added this [172]
+            '<LOC ability_amphibious>Amphibious',
         },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    LODCutoff = 100,
+                    Scrolling = true,
+                    ShaderName = 'Insect',
+                },
+                {
+                    AlbedoName = 'url0203_lod1_albedo.dds',
                     LODCutoff = 215,
                     Scrolling = true,
                     ShaderName = 'Insect',
+                    SpecularName = 'url0203_lod1_specteam.dds',
                 },
             },
         },
@@ -428,8 +435,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = true, #from false
-            Water = true, #from false
+            Sub = true,
+            Water = true,
         },
     },
 }
