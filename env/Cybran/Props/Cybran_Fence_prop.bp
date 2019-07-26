@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_fence_Albedo.dds',
                     SpecName = 'cybran_fence_SpecTeam.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'Unit',
                 },
             },

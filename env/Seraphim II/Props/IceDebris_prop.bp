@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'IceDebris_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     NormalsName = 'IceDebris_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                     SpecularName = 'IceDebris_specteam.dds',
