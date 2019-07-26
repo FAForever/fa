@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'LV_LavaBerg02_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     NormalsName = 'LV_LavaBerg03_normalsTS.dds',
                     ShaderName = 'NormalMappedTerrain',
                 },

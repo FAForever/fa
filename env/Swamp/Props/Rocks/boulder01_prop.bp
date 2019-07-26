@@ -11,7 +11,7 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

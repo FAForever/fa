@@ -29,7 +29,7 @@ PropBlueprint {
             LODs = {
                 {
                     -- share other rock's albedo and specteam
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

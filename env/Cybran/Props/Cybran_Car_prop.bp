@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'cybran_car_Albedo.dds',
                     SpecName = 'cybran_car_SpecTeam.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'Unit',
                 },
             },

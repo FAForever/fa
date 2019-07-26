@@ -13,7 +13,7 @@ PropBlueprint {
                 {
                     AlbedoName = 'seraphim_bus_Albedo.dds',
                     SpecName = 'seraphim_bus_SpecTeam.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     ShaderName = 'Seraphim',
                 },

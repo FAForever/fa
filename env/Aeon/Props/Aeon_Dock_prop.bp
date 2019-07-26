@@ -18,7 +18,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Aeon_dock_lod1_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'Aeon',
                     SpecularName = 'Aeon_dock_lod1_specteam.dds',
                 },

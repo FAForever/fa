@@ -12,7 +12,7 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = 'UEF_Building_002_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     NormalsName = 'UEF_Building_002_normalsTS.dds',
                     ShaderName = 'VertexNormal',
                     SpecularName = 'UEF_Building_002_specteam.dds',
