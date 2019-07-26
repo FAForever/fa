@@ -283,7 +283,7 @@ UnitBlueprint {
                     BuffType = 'STUN',
                     Duration = 1.5,
                     Radius = 4,
-                    TargetAllow = '(ALLUNITS - SPECIALLOWPRI)',
+                    TargetAllow = 'ALLUNITS',
                     TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,WALL',
                 },
             },
