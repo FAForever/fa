@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'AttachPoint',
             'URB0201',
             'B07',
             'B08',
