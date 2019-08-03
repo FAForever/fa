@@ -4909,6 +4909,11 @@ lobui_0411="Фракционный цвет шрифта"
 # Lobby changelog panel
 lobui_0412="Что нового в FAF?"
 
+# AI Fill Slots
+lobui_0461="Выберите ИИ для автозаполнения"
+lobui_0462="Заполнить слоты"
+lobui_0463="Очистить слоты"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Сетевая игра"
 main_menu_0002="Вернуться в игру"

@@ -4366,6 +4366,11 @@ lobui_0405="Lobby Background"
 lobui_0411="Faction Font Color"
 lobui_0460="Player color in chat"
 
+# AI Fill Slots
+lobui_0461 = "Choose AI for autofilling"
+lobui_0462 = "Fill Slots"
+lobui_0463 = "Clear Slots"
+
 # Lobby background options
 lobui_0406="Factions"
 lobui_0407="Concept Art"
@@ -7550,4 +7555,3 @@ aireplace_0001="AI Replacement"
 aireplace_0002="Toggle AI Replacement if a player disconnects."
 aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
 aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
-
