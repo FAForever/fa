@@ -191,7 +191,7 @@ UnitBlueprint {
     SizeX = 2.75,
     SizeY = 1,
     SizeZ = 2.75,
-    StrategicIconName = 'icon_structure2_air',
+    StrategicIconName = 'icon_structure1_air',
     StrategicIconSortPriority = 175,
     Transport = {
         Class2AttachSize = 2,
