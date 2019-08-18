@@ -303,6 +303,18 @@ Scenario = {
 
 
 
+        -- Cybran Specific
+        ['OST_NavalAttacks_T2CybranPlatoon1'] = {
+            'OST_NavalAttacks_T2CybranPlatoon1',
+            '',
+            { 'urs0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'urs0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'xrs0204', -1, 1, 'attack', 'AttackFormation' }, -- T2Submarines
+            { 'xrs0205', -1, 1, 'attack', 'AttackFormation' }, -- UtilityBoats
+        },
+
+
+
         -- Seraphim Specific
         ['OST_NavalAttacks_T3SubmarinePlatoon'] = {
             'OST_NavalAttacks_T3SubmarinePlatoon',
@@ -1695,6 +1707,41 @@ Scenario = {
                         ChildrenType = {'MissleShips', 'Cruisers'},
                     },
 
+
+
+                    -- Cybran Specific
+                    ['OSB_Child_NavalAttacks_T2CybranPlatoon1'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T2CybranPlatoon1',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 3, 0 },
+                                {'default_brain', '3', '0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Destroyers', 'Cruisers', 'T2Submarines', 'UtilityBoats'},
+                    },
 
 
                     -- Seraphim Specific
