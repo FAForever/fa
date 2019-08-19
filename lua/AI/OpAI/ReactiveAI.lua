@@ -27,7 +27,6 @@ ReactionTypes:
     Horde
     Combined
     Pinpoint
-    
 
 TriggeringEventType
     ExperimentalLand
@@ -36,19 +35,30 @@ TriggeringEventType
     Nuke
     HLRA
     MassedAir
+--]]
 
-]]--
-
-    
 TrackingCategories = {
-    ExperimentalAir = { categories.EXPERIMENTAL * categories.AIR, },
-    ExperimentalLand = { categories.uel0401, (categories.EXPERIMENTAL * categories.LAND * categories.MOBILE) },
-    ExperimentalNaval = { categories.EXPERIMENTAL * categories.NAVAL, },
-    Nuke = { categories.NUKE, },
-    HLRA = { categories.ueb2401, (categories.STRATEGIC * categories.TECH3) + (categories.EXPERIMENTAL * categories.STRUCTURE), },
-    MassedAir = { categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3 ), },
+    ExperimentalAir = {
+        categories.EXPERIMENTAL * categories.AIR,
+    },
+    ExperimentalLand = {
+        categories.uel0401,
+        (categories.EXPERIMENTAL * categories.LAND * categories.MOBILE),
+    },
+    ExperimentalNaval = {
+        categories.EXPERIMENTAL * categories.NAVAL,
+    },
+    Nuke = {
+        categories.NUKE,
+    },
+    HLRA = {
+        categories.ueb2401,
+        (categories.STRATEGIC * categories.TECH3) + (categories.EXPERIMENTAL * categories.STRUCTURE),
+    },
+    MassedAir = {
+        categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3),
+    },
 }
-
 
 ReactiveAI = Class(OpAI) {
     Create = function(self, brain, location, triggeringEventType, reactionType, name, data)
@@ -56,7 +66,7 @@ ReactiveAI = Class(OpAI) {
         --   the OpAI
 
         -- We figure out what type of builder to add based on our action and response
-        local builderType = self:GetBuilderType( triggeringEventType, reactionType )
+        local builderType = self:GetBuilderType(triggeringEventType, reactionType)
 
         -- At this point we need to combine the passed in data with our own data to create the OpAI
         local builderData = builderType.PlatoonData or {}
@@ -65,130 +75,129 @@ ReactiveAI = Class(OpAI) {
                 builderData[k] = v
             end
         end
-                
+
         -- Create the actual OpAI thing here passing in the rebuilt data
         OpAI.Create(self, brain, location, builderType.OpAI, name .. '_' .. location .. '_ReactiveAI', builderData)
-        
+
         -- add in children count, child locks, etc
         self:SetChildCount(builderType.ChildCount)
-        
+
         -- Activate only the children listed
         self:SetChildActive('All', false)
         for k,v in builderType.Children do 
             self:SetChildActive(v, true) 
         end
         for k,v in builderType.TriggeringBuildConditions do
-            self:AddBuildCondition( unpack(v) )
+            self:AddBuildCondition(unpack(v))
         end        
     end,
-    
+
     ReactionData = {
         -- This uses purely air to respond.  It is the easiest to implement and has the least chance of breaking
         AirRetaliation = {
             ExperimentalAir = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'AirSuperiority', 'FighterBomber', 'Interceptors', },
+                Children = {'AirSuperiority', 'FighterBomber', 'Interceptors'},
                 Priority = 1200,
                 ChildCount = 4,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalAir,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 1, TrackingCategories.ExperimentalAir, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {1, TrackingCategories.ExperimentalAir, '>='}},
                 },
             },
             ExperimentalLand = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'HeavyGunships', 'Gunships', 'Bombers', 'FighterBombers', },
+                Children = {'HeavyGunships', 'Gunships', 'Bombers', 'FighterBombers'},
                 Priority = 1200,
                 ChildCount = 3,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalLand,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 1, TrackingCategories.ExperimentalLand, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {1, TrackingCategories.ExperimentalLand, '>='}},
                 },
             },
             ExperimentalNaval = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'TorpedoBombers', 'HeavyTorpedoBombers', },
+                Children = {'TorpedoBombers', 'HeavyTorpedoBombers'},
                 Priority = 1200,
                 ChildCount = 3,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalNaval,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 1, TrackingCategories.ExperimentalNaval, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {1, TrackingCategories.ExperimentalNaval, '>='}},
                 },
             },
             Nuke = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'StrategicBombers', 'HeavyGunships', 'Gunships', 'Bombers', },
+                Children = {'StrategicBombers', 'HeavyGunships', 'Gunships', 'Bombers'},
                 ChildCount = 1,
                 Priority = 1200,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.Nuke,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 1, TrackingCategories.Nuke, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {1, TrackingCategories.Nuke, '>='}},
                 },
             },
             HLRA = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'StrategicBombers', 'HeavyGunships', 'Gunships', 'Bombers', },
+                Children = {'StrategicBombers', 'HeavyGunships', 'Gunships', 'Bombers'},
                 ChildCount = 1,
                 Priority = 1200,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.HLRA,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 1, TrackingCategories.HLRA, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {1, TrackingCategories.HLRA, '>='}},
                 },
            },
             MassedAir = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'AirSuperiority', 'FighterBomber', 'Interceptors', },
+                Children = {'AirSuperiority', 'FighterBomber', 'Interceptors'},
                 ChildCount = 4,
                 Priority = 1200,
-                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
+                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
                 PlatoonData = {
                     CategoryList = TrackingCategories.MassedAir,
                 },
                 TriggeringBuildConditions = {
-                    { '/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
-                        { 40, TrackingCategories.MassedAir, '>=' } },
+                    {'/lua/editor/OtherArmyUnitCountBuildConditions.lua', 'FocusBrainBeingBuiltOrActiveCategoryCompare',
+                        {40, TrackingCategories.MassedAir, '>='}},
                 },
             },
         },
         -- End of AirRetaliation block
     },
-        
-    GetBuilderData = function( self, builderData, typeData, builderType, triggeringEventType, reactionType )
+
+    GetBuilderData = function(self, builderData, typeData, builderType, triggeringEventType, reactionType)
     end,
-    
-    GetBuilderType = function( self, triggeringEventType, reactionType )
+
+    GetBuilderType = function(self, triggeringEventType, reactionType)
         local retData = self.ReactionData[reactionType][triggeringEventType]
         if not retData then
             if not self.ReactionData[reactionType] then
-                error( '*AI ERROR: Invalid reaction Type for ReactiveAI - ' .. reactionType, 2 )
+                error('*AI ERROR: Invalid reaction Type for ReactiveAI - ' .. reactionType, 2)
             end
-            error( '*AI ERROR: Invalid triggeringEventType for ReactiveAI - ' .. triggeringEventType, 2 )
+            error('*AI ERROR: Invalid triggeringEventType for ReactiveAI - ' .. triggeringEventType, 2)
         end
         return retData
     end,
-    
+
     ReactionDatas = {
-        
     },
 }
 
