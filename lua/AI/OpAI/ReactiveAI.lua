@@ -69,7 +69,10 @@ ReactiveAI = Class(OpAI) {
         local builderType = self:GetBuilderType(triggeringEventType, reactionType)
 
         -- At this point we need to combine the passed in data with our own data to create the OpAI
-        local builderData = builderType.PlatoonData or {}
+        local builderData = {
+            PlatoonData = builderType.PlatoonData,
+            MasterPlatoonFunction = builderType.PlatoonAIFunction,
+        }
         if data then
             for k,v in data do
                 builderData[k] = v
