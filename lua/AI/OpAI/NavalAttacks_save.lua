@@ -1339,8 +1339,8 @@ Scenario = {
                                 {'default_brain','default_master'}
                             },
                             [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                {'default_brain', 2, 3, 4, 0 },
+                                {'default_brain', '2','3','4','0' }
                             },
                         },
                         PlatoonData = {
@@ -1371,8 +1371,8 @@ Scenario = {
                                 {'default_brain','default_master'}
                             },
                             [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                {'default_brain', 2, 3, 4, 0 },
+                                {'default_brain', '2','3','4','0' }
                             },
                         },
                         PlatoonData = {
