@@ -1,3 +1,23 @@
+Patch 3707 (14 July, 2019)
+============================
+- Revert exe change to stable 3704 exe
+
+Patch 3706 (14 July, 2019)
+============================
+- Improved the team kill detection
+- Increased the team kill report wait time
+- Weapon category fixes
+- Mod blacklist update
+- Fixed Sera ACU PhaseShield mesh
+- Pushed the new (fixed) exe after more testing
+
+### Contributors ###
+- speed2
+- PhilipJFry
+- keyser
+- Uveso
+- FAETHER
+
 Patch 3705 (5 July, 2019)
 ============================
 - Fixed various desync Issues for replays

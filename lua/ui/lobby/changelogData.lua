@@ -1,5 +1,31 @@
-last_version = 3705
+last_version = 3707
 gamePatches = {
+	{
+		version = 3707,
+		name = 'Game Version 3707',
+		description = {
+			'- Revert exe change to stable 3704 exe',
+		},
+	},
+	{
+		version = 3706,
+		name = 'Game Version 3706',
+		description = {
+			'- Improved the team kill detection',
+			'- Increased the team kill report wait time',
+			'- Weapon category fixes',
+			'- Mod blacklist update',
+			'- Fixed Sera ACU PhaseShield mesh',
+			'- Pushed the new (fixed) exe after more testing',
+			'',
+			'**Contributors**',
+			'- speed2',
+			'- PhilipJFry',
+			'- keyser',
+			'- Uveso',
+			'- FAETHER',
+		},
+	},
 	{
 		version = 3705,
 		name = 'Game Version 3705',
@@ -31,7 +57,7 @@ gamePatches = {
 			'- JaggedAppliance',
 			'- Strogo',
 			'- Exotic-Retard',
-			'- Keyer',
+			'- keyser',
 			'- speed2',
 			'- svenni_badbwoi',
 		},
