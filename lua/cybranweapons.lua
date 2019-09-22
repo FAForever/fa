@@ -407,10 +407,20 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
-        local army = self.unit:GetArmy()
-        for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit,-2,army,v)
+        for _, v in self.FxDeath do
+            CreateEmitterAtBone(self.unit, -2, self.unit:GetArmy(), v)
         end
+        self:DoOnFireBuffs()
+
         KamikazeWeapon.OnFire(self)
+    end,
+
+    OnGotTarget = function(self)
+        local target = self:GetCurrentTarget()
+        if target then
+            IssueAttack({self.unit}, target)
+        end
+
+        KamikazeWeapon.OnGotTarget(self)
     end,
 }

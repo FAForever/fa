@@ -36,20 +36,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Stun = {   
-            Add = {
-                OnImpact = true,
-                OnDeath = true,
-            },
-            AppliedToTarget = false,
-            BuffType = 'STUN',
-            Duration = 2,
-            Radius = 6,
-            TargetAllow = 'MOBILE', --ALLUNITS
-            TargetDisallow = 'EXPERIMENTAL, WALL, COMMAND',
-        },
-    },
     BuildIconSortPriority = 80,
     Categories = {
         'PRODUCTFA',
@@ -81,6 +67,7 @@ UnitBlueprint {
     Description = '<LOC xrl0302_desc>Mobile Bomb',
     Display = {
         Abilities = {
+            '<LOC ability_cloak>Cloaking',
             '<LOC ability_suicideweapon>Suicide Weapon',
             '<LOC ability_stun>EMP Weapon',
         },
@@ -127,6 +114,7 @@ UnitBlueprint {
         BuildCostEnergy = 1800,
         BuildCostMass = 300,
         BuildTime = 1200,
+        MaintenanceConsumptionPerSecondEnergy = 25,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -159,12 +147,14 @@ UnitBlueprint {
         },
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
+            RULEUTC_CloakToggle = true,
         },
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xrl0302_name>Fire Beetle',
         UnitWeight = 1,
     },
     Intel = {
+        Cloak = true,
         VisionRadius = 24,
     },
     Interface = {
@@ -213,10 +203,45 @@ UnitBlueprint {
     Weapon = {
         {            
             AboveWaterTargetsOnly = true,
+			Buffs = {
+			    {
+                    Add = {
+                        OnFire = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 8,
+                    Radius = 8,
+                    TargetAllow = 'MOBILE',
+                    TargetDisallow = 'TECH2, TECH3, EXPERIMENTAL, WALL, COMMAND',
+                },
+                {
+                    Add = {
+                        OnFire = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 6,
+                    Radius = 8,
+                    TargetAllow = 'MOBILE',
+                    TargetDisallow = 'TECH1, TECH3, EXPERIMENTAL, WALL, COMMAND',
+                },
+                {
+                    Add = {
+                        OnFire = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 4,
+                    Radius = 8,
+                    TargetAllow = 'MOBILE',
+                    TargetDisallow = 'TECH1, TECH2, EXPERIMENTAL, WALL, COMMAND',
+                },
+            },
             CollideFriendly = false,
-            Damage = 1499,
+            Damage = 100,
             DamageFriendly = false,
-            DamageRadius = 6,
+            DamageRadius = 8,
             DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
             FireOnSelfDestruct = true,
@@ -226,7 +251,7 @@ UnitBlueprint {
             },
             FiringTolerance = 180,
             Label = 'Suicide',
-            MaxRadius = 5.8,
+            MaxRadius = 7.8,
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -238,45 +263,6 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Kamikaze',
-        },
-        {
-            AboveWaterTargetsOnly = true,
-            Accurate = true,
-            BallisticArc = 'RULEUBA_None',
-            CollideFriendly = false,
-            Damage = 1,
-            DamageFriendly = false,
-            DamageRadius = 6,
-            DamageType = 'EMP',
-            DisplayName = 'EMP',
-            FireTargetLayerCapsTable = {
-                Air = 'Air|Land|Seabed|Water',
-                Land = 'Air|Land|Seabed|Water',
-                Water = 'Air|Land|Water',
-            },
-            FireOnDeath = true,
-            FiringTolerance = 2,
-            IgnoreIfDisabled = true,
-            Label = 'DeathWeapon',
-            MaxRadius = 6,
-            MuzzleVelocity = 0,
-            ProjectileId = '/projectiles/CIFEMP01/CIFEMP01_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.15,
-            RackBones = {
-                {
-                    MuzzleBones = {
-                        0,
-                    },
-                    RackBone = 0,
-                },
-            },
-            RangeCategory = 'UWRC_InDirectFire',
-            RateOfFire = 0.5,
-            SalvoSize = 1,
-            SlavedToBody = true,
-            TargetCheckInterval = 1,
-            TargetRestrictDisallow = 'UNTARGETABLE, AIR',
-            WeaponCategory = 'Direct Fire',
         },
     },
     Wreckage = {
