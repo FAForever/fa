@@ -2808,6 +2808,10 @@ function CreateUI(maxPlayers)
     GUI.TeamCountSelector.Width:Set(44)
     GUI.TeamCountSelector.Top:Set(GUI.AIClearButton.Top() + 5)
     GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right())
+    local tooltipText = {}
+    tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
+    tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
+    Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0,148)
     local ChangedSlots = {}
     GUI.AIFillButton.OnClick = function()
       local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
