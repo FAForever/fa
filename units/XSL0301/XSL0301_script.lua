@@ -135,6 +135,17 @@ XSL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
+       -- ResourceAllocation
+        elseif enh =='ResourceAllocation' then
+            local bp = self:GetBlueprint().Enhancements[enh]
+            local bpEcon = self:GetBlueprint().Economy
+            if not bp then return end
+            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+        elseif enh == 'ResourceAllocationRemove' then
+            local bpEcon = self:GetBlueprint().Economy
+            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)

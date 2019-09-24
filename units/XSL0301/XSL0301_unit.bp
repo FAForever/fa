@@ -318,9 +318,9 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
         MaxBuildDistance = 10,
-    NaturalProducer = true,
-        ProductionPerSecondEnergy = 200,
-        ProductionPerSecondMass = 2,
+        NaturalProducer = true,
+        ProductionPerSecondEnergy = 20,
+        ProductionPerSecondMass = 1,
         StorageEnergy = 500,
         StorageMass = 275,
         TeleportEnergyMod = 5.42,
@@ -533,6 +533,19 @@ UnitBlueprint {
             },
             Slot = 'Back',
         },
+        ResourceAllocationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'ras',
+            Name = '<LOC enhancements_0025>Remove Resource Allocation System',
+            Prerequisite = 'ResourceAllocation',
+            RemoveEnhancements = {
+                'ResourceAllocation',
+                'ResourceAllocationRemove',
+            },
+            Slot = 'RCH',
+        },
         Slots = {
             Back = {
                 name = '<LOC _Back>',
@@ -652,6 +665,16 @@ UnitBlueprint {
             HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
+        },
+        RAS = {
+            BuildIconSortPriority = 10,
+            Description = '<LOC xsl0301_RAS_desc>SACU (RAS preset)',
+            Enhancements = {
+                'ResourceAllocation',
+            },
+            HelpText = '<LOC xsl0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_RAS_name>SACU (RAS preset)',
         },
     },
     General = {
