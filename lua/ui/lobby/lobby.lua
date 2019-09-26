@@ -2936,6 +2936,15 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
+    
+	-- curated Maps
+	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
+	GUI.curatedmapsButton.OnClick = function()
+		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+	end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3014,7 +3023,7 @@ function CreateUI(maxPlayers)
     end
 
     LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 53)
 
     ---------------------------------------------------------------------------
     -- set up chat display
@@ -3302,8 +3311,8 @@ function CreateUI(maxPlayers)
     local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     GUI.loadButton = loadButton
     UIUtil.setVisible(loadButton, singlePlayer)
-    LayoutHelpers.AtHorizontalCenterIn(loadButton, GUI.gameoptionsButton)
-    LayoutHelpers.Below(loadButton, GUI.gameoptionsButton, 9)
+    LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, launchGameButton, 7)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.loadButton, GUI.optionsPanel)
     loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
@@ -3328,8 +3337,8 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
-    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton)
-    LayoutHelpers.Below(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton, 9)
+    LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsOrPresetsBtn, launchGameButton, 7)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.optionsPanel)
 
     ---------------------------------------------------------------------------
     -- Checkbox Show changed Options
