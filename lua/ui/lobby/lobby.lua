@@ -2819,7 +2819,7 @@ function CreateUI(maxPlayers)
         for i = 1, table.getn(ChangedSlots) do
           HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], ChangedSlots[i])
         end
-        GUI.TeamCountSelector.OnClick()
+        GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
         return
       end
       for Slot = 1, GetNumAvailStartSpots() do
@@ -2828,7 +2828,7 @@ function CreateUI(maxPlayers)
           table.insert(ChangedSlots, Slot)
         end
       end
-      GUI.TeamCountSelector.OnClick()
+      GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
     end
     GUI.AIClearButton.OnClick = function()
       for i = 1, table.getn(ChangedSlots) do
@@ -2836,7 +2836,7 @@ function CreateUI(maxPlayers)
       end
       ChangedSlots = {}
     end
-    GUI.TeamCountSelector.OnClick = function(self, index, text)
+    GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
       local OccupiedSlots = 0
       local AvailStartSpots = GetNumAvailStartSpots()
       for Slot = 1, AvailStartSpots do
@@ -2845,29 +2845,24 @@ function CreateUI(maxPlayers)
         end
       end
       local PlayersPerTeam = 0
-      local TeamIndex = GUI.TeamCountSelector:GetItem()
-      if TeamIndex > 1 then
-        PlayersPerTeam = math.floor(OccupiedSlots / (TeamIndex - 1))
-        if PlayersPerTeam == 0 then
-          PlayersPerTeam = 1
-        end
+      if Index > 1 then
+        PlayersPerTeam = math.floor(OccupiedSlots / (Index - 1))
       end
       local AssignedTeam = 2
       local Counter = 0
       for Slot = 1, AvailStartSpots do
         if gameInfo.PlayerOptions[Slot] then
-          if (TeamIndex <= 1) or (AssignedTeam > table.getn(GUI.TeamCountSelector._array)) then
+          if AssignedTeam > Index then
             SetPlayerOption(Slot, 'Team', 1, true)
-            SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
           else
             SetPlayerOption(Slot, 'Team', AssignedTeam, true)
-            SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
             Counter = Counter + 1
-            if Counter == PlayersPerTeam then
+            if Counter >= PlayersPerTeam then
               AssignedTeam = AssignedTeam + 1
               Counter = 0
             end
           end
+          SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
         end
       end
     end
@@ -2941,15 +2936,6 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
-    
-	-- curated Maps
-	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-	GUI.curatedmapsButton.OnClick = function()
-		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
-	end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3028,7 +3014,7 @@ function CreateUI(maxPlayers)
     end
 
     LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 53)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
 
     ---------------------------------------------------------------------------
     -- set up chat display
@@ -3316,8 +3302,8 @@ function CreateUI(maxPlayers)
     local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     GUI.loadButton = loadButton
     UIUtil.setVisible(loadButton, singlePlayer)
-    LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, launchGameButton, 7)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.loadButton, GUI.optionsPanel)
+    LayoutHelpers.AtHorizontalCenterIn(loadButton, GUI.gameoptionsButton)
+    LayoutHelpers.Below(loadButton, GUI.gameoptionsButton, 9)
     loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
@@ -3342,8 +3328,8 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
-    LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsOrPresetsBtn, launchGameButton, 7)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.optionsPanel)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton)
+    LayoutHelpers.Below(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton, 9)
 
     ---------------------------------------------------------------------------
     -- Checkbox Show changed Options
