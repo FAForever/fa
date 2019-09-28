@@ -68,9 +68,6 @@ url0301_RAS_help="Enhanced during construction with a Resource Allocation System
 url0301_RAS_name="SACU (RAS Preset)"
 
 ##Seraphim
-xsl0301_AdvancedCombat_desc="Support Armoured Command Unit (Advanced Combatant Preset)"
-xsl0301_AdvancedCombat_help="Enhanced during construction with the Enhanced Sensor System, Nano-Repair System and Overcharge."
-xsl0301_AdvancedCombat_name="SACU (Advanced Combatant Preset)"
 xsl0301_Combat_desc="Support Armoured Command Unit (Combatant Preset)"
 xsl0301_Combat_help="Enhanced during construction with the Enhanced Sensor System."
 xsl0301_Combat_name="SACU (Combatant Preset)"
@@ -84,7 +81,7 @@ xsl0301_NanoCombat_desc="Support Armoured Command Unit (Nano Combatant Preset)"
 xsl0301_NanoCombat_help="Enhanced during construction with the Enhanced Sensor System and Nano-Repair System."
 xsl0301_NanoCombat_name="SACU (Nano Combatant Preset)"
 xsl0301_Rambo_desc="Support Armoured Command Unit (Rambo Preset)"
-xsl0301_Rambo_help="Enhanced during construction with the Personal Shield Generator, Nano-Repair System and Overcharge."
+xsl0301_Rambo_help="Enhanced during construction with the Enhanced Sensor System, Nano-Repair System and Overcharge."
 xsl0301_Rambo_name="SACU (Rambo Preset)"
 
 A02_M01_OBJ_010_113="(%s%%/%s%%)"

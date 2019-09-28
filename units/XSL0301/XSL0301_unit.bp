@@ -587,18 +587,6 @@ UnitBlueprint {
         },
     },
     EnhancementPresets = {
-        AdvancedCombat = {
-            BuildIconSortPriority = 30,
-            Description = '<LOC xsl0301_AdvancedCombat_desc>SACU (Advanced Combatant preset)',
-            Enhancements = {
-                'EnhancedSensors',
-                'DamageStabilization',
-                'Overcharge',
-            },
-            HelpText = '<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.',
-            SortCategory = 'SORTOTHER',
-            UnitName = '<LOC xsl0301_AdvancedCombat_name>SACU (Advanced Combatant preset)',
-        },
         Combat = {
             BuildIconSortPriority = 15,
             Description = '<LOC xsl0301_Combat_desc>SACU (Combatant preset)',
@@ -645,11 +633,11 @@ UnitBlueprint {
             BuildIconSortPriority = 35,
             Description = '<LOC xsl0301_Rambo_desc>SACU (Rambo preset)',
             Enhancements = {
-                'Overcharge',
-                'Shield',
+                'EnhancedSensors',
                 'DamageStabilization',
+                'Overcharge',
             },
-            HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.',
+            HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
         },
