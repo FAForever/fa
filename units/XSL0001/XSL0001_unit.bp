@@ -394,11 +394,11 @@ UnitBlueprint {
             RegenFloor = 15,
             RegenCeiling = 200,
             RegenPerSecond = 0.01111111111,
-            Slot = 'RCH',
+            Slot = 'LCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
-                'Right_Upgrade',
-                'Right_Turret_Muzzle',
+                'Left_Upgrade',
+                'Left_Turret_Muzzle',
             },
             UpgradeUnitAmbientBones = {
                 'Body',
@@ -415,7 +415,7 @@ UnitBlueprint {
                 'AdvancedRegenAura',
                 'AdvancedRegenAuraRemove',
             },
-            Slot = 'RCH',
+            Slot = 'LCH',
         },
         BlastAttack = {
             AdditionalDamage = 620,
@@ -609,11 +609,11 @@ UnitBlueprint {
             ShowBones = {
                 'Right_Upgrade',
             },
-            Slot = 'RCH',
+            Slot = 'LCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
-                'Right_Upgrade',
-                'Right_Turret_Muzzle',
+                'Left_Upgrade',
+                'Left_Turret_Muzzle',
             },
             UpgradeUnitAmbientBones = {
                 'Body',
@@ -633,7 +633,7 @@ UnitBlueprint {
                 'RegenAura',
                 'RegenAuraRemove',
             },
-            Slot = 'RCH',
+            Slot = 'LCH',
         },
         ResourceAllocation = {
             BuildCostEnergy = 175000,
@@ -644,9 +644,9 @@ UnitBlueprint {
             ProductionPerSecondEnergy = 2000,
             ProductionPerSecondMass = 16,
             ShowBones = {
-                'Back_Upgrade',
+                'Right_Upgrade',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'Body',
             },
@@ -661,9 +661,9 @@ UnitBlueprint {
             ProductionPerSecondEnergy = 4000,
             ProductionPerSecondMass = 32,
             ShowBones = {
-                'Back_Upgrade',
+                'Right_Upgrade',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'Body',
             },
@@ -673,7 +673,7 @@ UnitBlueprint {
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
-                'Back_Upgrade',
+                'Right_Upgrade',
             },
             Icon = 'eras',
             Name = '<LOC enhancements_0012>Remove Advanced Allocation System',
@@ -683,14 +683,14 @@ UnitBlueprint {
                 'ResourceAllocationAdvanced',
                 'ResourceAllocationAdvancedRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         ResourceAllocationRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
-                'Back_Upgrade',
+                'Right_Upgrade',
             },
             Icon = 'ras',
             Name = '<LOC enhancements_0013>Remove Resource Allocation System',
@@ -699,7 +699,7 @@ UnitBlueprint {
                 'ResourceAllocation',
                 'ResourceAllocationRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         Slots = {
             Back = {
