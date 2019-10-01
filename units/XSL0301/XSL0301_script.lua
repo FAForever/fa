@@ -63,16 +63,6 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
-        -- Shields
-        elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()
-            self:CreateShield(bp)
-        elseif enh == 'ShieldRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
         -- Overcharge
         elseif enh == 'Overcharge' then
             self:AddCommandCap('RULEUCC_Overcharge')

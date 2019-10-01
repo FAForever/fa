@@ -493,49 +493,6 @@ UnitBlueprint {
             },
             Slot = 'RCH',
         },
-        Shield = {
-            BuildCostEnergy = 109400,
-            BuildCostMass = 1200,
-            BuildTime = 6720,
-            Icon = 'sp',
-            ImpactEffects = 'SeraphimShieldHit01',
-            MaintenanceConsumptionPerSecondEnergy = 300,
-            Name = '<LOC enhancements_0028>Personal Shield Generator',
-            OwnerShieldMesh = '/units/xsl0301/xsl0301_personalshield_mesh',
-            PersonalShield = true,
-            RegenAssistMult = 10,
-            ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 20000,
-            ShieldRechargeTime = 160,
-            ShieldRegenRate = 22,
-            ShieldRegenStartTime = 1,
-            ShowBones = {
-                'Back_Upgrade',
-            },
-            Slot = 'Back',
-            UpgradeEffectBones = {
-                'Back_Upgrade',
-            },
-            UpgradeUnitAmbientBones = {
-                'Torso',
-            },
-        },
-        ShieldRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = {
-                'Back_Upgrade',
-            },
-            Icon = 'sp',
-            Name = '<LOC enhancements_0147>Remove Personal Shield Generator',
-            Prerequisite = 'Shield',
-            RemoveEnhancements = {
-                'Shield',
-                'ShieldRemove',
-            },
-            Slot = 'Back',
-        },
         Slots = {
             Back = {
                 name = '<LOC _Back>',
