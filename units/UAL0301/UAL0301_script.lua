@@ -102,29 +102,6 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
-        -- SystemIntegrityCompensator
-        elseif enh == 'SystemIntegrityCompensator' then
-            local name = 'AeonSCURegenRate'
-            if not Buffs[name] then
-                BuffBlueprint {
-                    Name = name,
-                    DisplayName = name,
-                    BuffType = 'SCUREGENRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        Regen = {
-                            Add =  bp.NewRegenRate - self:GetBlueprint().Defense.RegenRate,
-                            Mult = 1,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, name)
-        elseif enh == 'SystemIntegrityCompensatorRemove' then
-            if Buff.HasBuff(self, 'AeonSCURegenRate') then
-                Buff.RemoveBuff(self, 'AeonSCURegenRate')
-            end
         -- Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
