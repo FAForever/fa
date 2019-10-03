@@ -45,6 +45,11 @@ teamOptions =
                 key = 'balanced_reveal',
             },
             {
+                text = "<LOC lobui_0782>Optimal balance mirrored (Revealed)",
+                help = "<LOC lobui_0783>Teams will be optimally balanced with mirrored positions, labeled random start locations",
+                key = 'balanced_reveal_mirrored',
+            },
+            {
                 text = "<LOC lobui_0780>Flexible balance (Revealed)",
                 help = "<LOC lobui_0781>Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable, labeled random start locations",
                 key = 'balanced_flex_reveal',
