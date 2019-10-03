@@ -1413,6 +1413,74 @@ local function AssignRandomStartSpots()
             orgPlayerOptions[k] = p
         end
 
+        local mirrored = string.find(teamSpawn, 'mirrored')
+        if mirrored then
+            local rating_cmp = function(a,b) return a.rating > b.rating end
+            local slot_cmp = function(a,b) return a.slot < b.slot end
+
+            function getMasterOrder(sortedSlots)
+                local masterOrder = {}
+
+                local slot2nr = {}
+                for k, p in sortedSlots.byNr do
+                    slot2nr[p.slot] = k
+                end
+
+                for k, p in sortedSlots.byRating do
+                    table.insert(masterOrder, slot2nr[p.slot])
+                end
+
+                return masterOrder
+            end
+
+            function teamsSameSize(slots)
+                local size
+
+                for t, sorted in slots do
+                    local s = table.getn(sorted.byNr)
+                    if not size then size = s end
+
+                    if size ~= s then return false end
+                end
+
+                return true
+            end
+
+            function reorderSlots(sortedSlots, masterOrder)
+                local newSlots = {}
+                for i, j in masterOrder do
+                    table.insert(newSlots, sortedSlots.byNr[j].slot)
+                end
+
+                for i, s in newSlots do
+                    sortedSlots.byRating[i].slot = s
+                end
+            end
+
+            local slots = {}
+            local masterTeam
+
+            for _, p in data.setup do
+                if not slots[p.team] then slots[p.team] = {} end
+                if not slots[p.team].byNr then slots[p.team].byNr = {} end
+                if not slots[p.team].byRating then slots[p.team].byRating = {} end
+                if not masterTeam then masterTeam = p.team end
+
+                table.binsert(slots[p.team].byNr, p, slot_cmp)
+                table.binsert(slots[p.team].byRating, p, rating_cmp)
+            end
+
+            -- abort mirroring if team sizes differ
+            if not teamsSameSize(slots) then 
+                WARN("Mirroring disabled due to teams not having the same number of players")
+            else 
+                local masterOrder = getMasterOrder(slots[masterTeam])
+                for t, sorted in slots do
+                    reorderSlots(sorted, masterOrder)
+                end
+            end
+        end
+
         -- Rearrange the players in the slots to match the chosen configuration. The result object
         -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
         -- an object (and because swapping is too much like hard work).
