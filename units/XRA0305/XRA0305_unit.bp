@@ -96,7 +96,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'COUNTERINTELLIGENCE',
         'OVERLAYANTIAIR',
-        'OVERLAYCOUNTERINTEL',
         'OVERLAYDIRECTFIRE',
     },
     CollisionOffsetZ = 0,
