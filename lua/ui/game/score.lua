@@ -370,7 +370,7 @@ function _OnBeat()
             for _, line in controls.armyLines do
                 if line.armyID == index then
                     if line.OOG then break end
-                    if not GetFocusArmy() == -1 then
+                    if GetFocusArmy() ~= -1 then
                         if not IsAlly(GetFocusArmy(),line.armyID) then
                             line.mass_in:SetText('')
                             line.energy_in:SetText('')
