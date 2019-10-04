@@ -269,8 +269,8 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25200,
         BuildCostMass = 2100,
-        BuildRate = 56,
-        BuildTime = 14400,
+        BuildRate = 2,
+        BuildTime = 8400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
         },
@@ -417,7 +417,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,
-            BuildTime = 8400,
+            BuildTime = 25000,
             Icon = 'isb',
             Name = '<LOC enhancements_0069>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
@@ -865,20 +865,6 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
-        },
-    },
-    Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-        EnergyMult = 0,
-        HealthMult = 0.9,
-        MassMult = 0.9,
-        ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
         },
     },
 }
