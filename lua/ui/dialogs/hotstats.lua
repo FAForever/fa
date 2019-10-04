@@ -33,10 +33,10 @@ local info_dialog = {
     {name="<LOC SCORE_0085>Total Losses", path={"general","lost","count"},key=7},
     {name="<LOC SCORE_0086>Energy Rate", path={"resources","energyin","rate",fac_mul=10},key=59},
     {name="<LOC SCORE_0087>Total Energy Spent", path={"resources","energyout","total"},key=9},
-    {name="<LOC SCORE_0088>Total Energy Wasted", path={"resources","energyover",false},key=10},
+    {name="<LOC SCORE_0088>Total Energy Wasted", path={"resources","energyover","total"},key=10},
     {name="<LOC SCORE_0089>Mass Rate", path={"resources","massin","rate",fac_mul=10},key=59},
     {name="<LOC SCORE_0090>Total Mass Spent", path={"resources","massout","total"},key=12},
-    {name="<LOC SCORE_0091>Total Mass Wasted", path={"resources","massover",false},key=13},
+    {name="<LOC SCORE_0091>Total Mass Wasted", path={"resources","massover","total"},key=13},
     {name="<LOC SCORE_0092>Air Units Built", path={"units","air","built"},key=14},
     {name="<LOC SCORE_0093>Air Units Killed", path={"units","air","kills"},key=15},
     {name="<LOC SCORE_0094>Air Units Lost", path={"units","air","lost"},key=16},
@@ -91,10 +91,10 @@ local histo={
     main_histo={
         [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="<LOC SCORE_0005>Mass",
             data={{name="mass incombe",icon="",path={"resources","massin","total"},color="green",Tooltip="<LOC SCORE_0072>Mass earned during the game."},
-            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }},
+            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover","total"},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }},
         [2]={name="energy",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/energy.dds"),label1="energy",link="energy_histo",Tooltip="<LOC SCORE_0006>Energy",
             data={{name="energy incombe",icon="",path={"resources","energyin","total"},color="orange",Tooltip="<LOC SCORE_0075>Energy earned during the game."},
-            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }},
+            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover","total"},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }},
         [3]={name="units built",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="<LOC SCORE_0078>Total units/structures built during the game.",
             data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."},
             {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."},
@@ -116,7 +116,7 @@ local histo={
         [2]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0073>Mass used during the game.",link="main_histo",
             data={{name="mass out",icon="",path={"resources","massout","total"},color="5fdc5c",Tooltip="<LOC SCORE_0073>Mass used during the game."} }},
         [3]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0071>Mass wasted during the game.",link="main_histo",
-            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }}
+            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover","total"},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }}
     },
     energy_histo={
         [1]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-in-icon.dds"),label1="in",label2="",Tooltip="<LOC SCORE_0075>Energy earned during the game.",link="main_histo",
@@ -124,7 +124,7 @@ local histo={
         [2]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0076>Energy used during the game.",link="main_histo",
             data={{name="energy out",icon="",path={"resources","energyout","total"},color="dcb05c",Tooltip="<LOC SCORE_0076>Energy used during the game."} }},
         [3]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0074>Energy wasted during the game.",link="main_histo",
-            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }}
+            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover","total"},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }}
     },
     built_histo={
         [1]={name="units built",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="<LOC SCORE_0069>Air units.",link="main_histo",
