@@ -177,16 +177,30 @@ function SetupPlayerLines()
             group.mass.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     if MassEnergyStoredCache[group.armyID].Mass then
-                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass) or '')
+                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass))
                     end
+                elseif event.Type == 'MouseExit' then
+                    if MassEnergyStoredCache[group.armyID].Massover then
+                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Massover))
+                    end                    
                 end
             end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            group.mass_in:DisableHitTest()
             LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1+14)
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
+            group.mass_in.HandleEvent = function(self, event)
+                if event.Type == 'MouseEnter' then
+                    if MassEnergyStoredCache[group.armyID].Mass then
+                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass))
+                    end
+                elseif event.Type == 'MouseExit' then
+                    if MassEnergyStoredCache[group.armyID].Massover then
+                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Massover))
+                    end                    
+                end
+            end
 
             group.energy = Bitmap(group)
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
@@ -197,16 +211,30 @@ function SetupPlayerLines()
             group.energy.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     if MassEnergyStoredCache[group.armyID].Energy then
-                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy) or '')
+                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy))
                     end
+                elseif event.Type == 'MouseExit' then
+                    if MassEnergyStoredCache[group.armyID].Energyover then
+                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energyover))
+                    end 
                 end
             end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            group.energy_in:DisableHitTest()
             LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0+14)
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
+            group.energy_in.HandleEvent = function(self, event)
+                if event.Type == 'MouseEnter' then
+                    if MassEnergyStoredCache[group.armyID].Energy then
+                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy))
+                    end
+                elseif event.Type == 'MouseExit' then
+                    if MassEnergyStoredCache[group.armyID].Energyover then
+                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energyover))
+                    end 
+                end
+            end
         end
 
         group.Height:Set(group.faction.Height)
@@ -384,7 +412,8 @@ function _OnBeat()
             for _, line in controls.armyLines do
                 if line.armyID == index then
                     if line.OOG then break end
-                    MassEnergyStoredCache[line.armyID] = {Mass = scoreData.resources.StoredMass, Energy = scoreData.resources.StoredEnergy}
+                    MassEnergyStoredCache[line.armyID] = {Massover = scoreData.resources.massover.rate, Mass = scoreData.resources.StoredMass,
+                                                          Energyover = scoreData.resources.energyover.rate, Energy = scoreData.resources.StoredEnergy}
                     if GetFocusArmy() ~= -1 then
                         if not IsAlly(GetFocusArmy(),line.armyID) then
                             line.mass_in:SetText('')
@@ -392,11 +421,9 @@ function _OnBeat()
                         end
                     end
                     
-                    if not armiesInfo[index].outOfGame then
-                        if scoreData.resources.massover.rate then
-                            line.mass_in:SetText(fmtnum(scoreData.resources.massover.rate * 10))
-                            line.energy_in:SetText(fmtnum(scoreData.resources.energyover.rate * 10))
-                        end
+                    if scoreData.resources.massover.rate then
+                        line.mass_in:SetText(fmtnum(scoreData.resources.massover.rate))
+                        line.energy_in:SetText(fmtnum(scoreData.resources.energyover.rate))
                     end
                     if scoreData.general.score == -1 then
                         line.score:SetText(LOC("<LOC _Playing>Playing"))

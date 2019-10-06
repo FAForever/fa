@@ -217,14 +217,14 @@ function ScoreDisplayResourcesThread()
             ArmyScore[index].resources.MassReclaimRate = massReclaimRate
             ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
             ArmyScore[index].general.lastReclaimedMass = reclaimedMass
-            ArmyScore[index].resources.massover.rate = ((ArmyScore[index].resources.massin.rate - ArmyScore[index].resources.massout.rate) + ArmyScore[index].resources.MassReclaimRate)
+            ArmyScore[index].resources.massover.rate = ((ArmyScore[index].resources.massin.rate - ArmyScore[index].resources.massout.rate) + ArmyScore[index].resources.MassReclaimRate) * 10
 
             local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
             local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
             ArmyScore[index].resources.EnergyReclaimRate = energyReclaimRate
             ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
             ArmyScore[index].general.lastReclaimedEnergy = reclaimedEnergy
-            ArmyScore[index].resources.energyover.rate = ((ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate) + ArmyScore[index].resources.EnergyReclaimRate)
+            ArmyScore[index].resources.energyover.rate = ((ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate) + ArmyScore[index].resources.EnergyReclaimRate) * 10
         end
         WaitSeconds(0.1)
     end
