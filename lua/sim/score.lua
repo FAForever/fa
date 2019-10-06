@@ -128,6 +128,8 @@ function ScoreThread()
                     total = 0,
                     rate = 0                
                 },
+                StoredMass = 0,
+                StoredEnergy = 0,
                 MassReclaimRate = 0,
                 EnergyReclaimRate = 0
             }
@@ -176,6 +178,9 @@ function ScoreThread()
             ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover.total = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
+            
+            ArmyScore[index].resources.StoredMass = brain:GetEconomyStored('MASS')
+            ArmyScore[index].resources.StoredEnergy = brain:GetEconomyStored('ENERGY')
 
             for unitId, stats in brain.UnitStats do
                 if ArmyScore[index].blueprints[unitId] == nil then

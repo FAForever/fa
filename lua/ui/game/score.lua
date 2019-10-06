@@ -37,6 +37,7 @@ local issuedNoRushWarning = false
 local gameSpeed = 0
 local needExpand = false
 local contractOnCreate = false
+local MassEnergyStoredCache = {}
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
 
@@ -171,9 +172,15 @@ function SetupPlayerLines()
             group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             LayoutHelpers.AtRightIn(group.mass, group, sw * 1)
             LayoutHelpers.AtVerticalCenterIn(group.mass, group)
-            group.mass:DisableHitTest()
             group.mass.Height:Set(14)
             group.mass.Width:Set(14)
+            group.mass.HandleEvent = function(self, event)
+                if event.Type == 'MouseEnter' then
+                    if MassEnergyStoredCache[group.armyID].Mass then
+                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass) or '')
+                    end
+                end
+            end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             group.mass_in:DisableHitTest()
@@ -185,9 +192,15 @@ function SetupPlayerLines()
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
             LayoutHelpers.AtRightIn(group.energy, group, sw * 0)
             LayoutHelpers.AtVerticalCenterIn(group.energy, group)
-            group.energy:DisableHitTest()
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
+            group.energy.HandleEvent = function(self, event)
+                if event.Type == 'MouseEnter' then
+                    if MassEnergyStoredCache[group.armyID].Energy then
+                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy) or '')
+                    end
+                end
+            end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             group.energy_in:DisableHitTest()
@@ -366,10 +379,12 @@ function _OnBeat()
 
     local armiesInfo = GetArmiesTable().armiesTable
     if currentScores then
+        MassEnergyStoredCache = {}
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
                     if line.OOG then break end
+                    MassEnergyStoredCache[line.armyID] = {Mass = scoreData.resources.StoredMass, Energy = scoreData.resources.StoredEnergy}
                     if GetFocusArmy() ~= -1 then
                         if not IsAlly(GetFocusArmy(),line.armyID) then
                             line.mass_in:SetText('')
