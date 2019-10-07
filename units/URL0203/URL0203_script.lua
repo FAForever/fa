@@ -10,8 +10,9 @@ local CybranWeaponsFile = import('/lua/cybranweapons.lua')
 local CDFElectronBolterWeapon = CybranWeaponsFile.CDFElectronBolterWeapon
 local CDFMissileMesonWeapon = CybranWeaponsFile.CDFMissileMesonWeapon
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
+local SlowAmphibious = import('/lua/defaultunits.lua').SlowAmphibiousLandUnit
 
-URL0203 = Class(CLandUnit) {
+URL0203 = Class(CLandUnit, SlowAmphibious) {
 
     Weapons = {
         Bolter = Class(CDFElectronBolterWeapon) {},
@@ -55,6 +56,7 @@ URL0203 = Class(CLandUnit) {
 				self:SetWeaponEnabledByLabel('Torpedo', true)
 			end
 		end
+        SlowAmphibious.OnLayerChange(self, new, old)
 	end,
 }
 TypeClass = URL0203
