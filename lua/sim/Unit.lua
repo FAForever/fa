@@ -2372,19 +2372,21 @@ Unit = Class(moho.unit_methods) {
         local wreckage = {}
         local bpid = unit:GetUnitId()
 
-        for _, p in props do
-            local pos = p.CachePosition
-            if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
-                local progress = p:GetFractionComplete() * 0.5
-                -- Set health according to how much is left of the wreck
-                unit:SetHealth(self, unit:GetMaxHealth() * progress)
+        if EntityCategoryContains(categories.ENGINEER, self) then
+            for _, p in props do
+                local pos = p.CachePosition
+                if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
+                    local progress = p:GetFractionComplete() * 0.5
+                    -- Set health according to how much is left of the wreck
+                    unit:SetHealth(self, unit:GetMaxHealth() * progress)
 
-                -- Clear up wreck after rebuild bonus applied if engine won't
-                if not unit.EngineIsDeletingWreck then
-                    p:Destroy()
+                    -- Clear up wreck after rebuild bonus applied if engine won't
+                    if not unit.EngineIsDeletingWreck then
+                        p:Destroy()
+                    end
+
+                    return
                 end
-
-                return
             end
         end
 
