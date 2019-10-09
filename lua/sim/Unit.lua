@@ -1003,6 +1003,7 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             local targetData
             local baseData
+            local repairRatio = 0.75
 
             if focus then -- Always inherit work status of focus
                 self:InheritWork(focus)
@@ -1035,8 +1036,13 @@ Unit = Class(moho.unit_methods) {
                 end
             end
 
-            energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
-            mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
+            if self:IsUnitState('Repairing') then
+                energy = math.max(1, energy * repairRatio)
+                mass = math.max(1, mass * repairRatio)
+            else
+                energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
+                mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
+            end
             energy_rate = energy / time
             mass_rate = mass / time
         end
