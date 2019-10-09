@@ -87,7 +87,7 @@ function SetWeaponPriorities(data)
         local weaponCount = unit:GetWeaponCount()
         local finalPriorities = editedPrioritiesLimited
         
-        if bp.CategoriesHash.EXPERIMENTAL then
+        if bp.CategoriesHash.SNIPEMODE then
             finalPriorities = editedPriorities
         end    
         

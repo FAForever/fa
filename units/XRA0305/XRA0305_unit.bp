@@ -98,6 +98,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYCOUNTERINTEL',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0,
     Defense = {

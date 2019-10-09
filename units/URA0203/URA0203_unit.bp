@@ -99,6 +99,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = -1,
     Defense = {

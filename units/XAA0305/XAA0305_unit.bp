@@ -99,6 +99,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYANTIAIR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 22,

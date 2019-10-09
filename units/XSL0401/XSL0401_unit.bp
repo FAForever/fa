@@ -71,6 +71,7 @@ UnitBlueprint {
         'DRAGBUILD',
         'SHOWATTACKRETICLE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0.6,

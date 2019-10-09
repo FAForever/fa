@@ -51,6 +51,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'BOT',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,

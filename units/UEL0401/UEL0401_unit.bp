@@ -133,6 +133,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYMISC',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0,
     Defense = {
