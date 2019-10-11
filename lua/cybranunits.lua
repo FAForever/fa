@@ -199,22 +199,28 @@ CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag))
+   
+    StartBuildingEffects = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
     end,
 
     OnPaused = function(self)
-        SeaFactoryUnit.OnPaused(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StopArmsMoving()
         end
+        StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
-        SeaFactoryUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
+            self:PlayUnitAmbientSound('ConstructLoop')
+            self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()
         end
+        StructureUnit.OnUnpaused(self)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)

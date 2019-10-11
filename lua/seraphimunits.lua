@@ -187,6 +187,13 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            end
         end,
     },
+    
+    OnUnpaused = function(self)
+        AirFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
 }
 
 -- AIR UNITS
@@ -359,6 +366,13 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
+    
+    OnUnpaused = function(self)
+        LandFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
 }
 
 -- LAND UNITS
@@ -446,6 +460,13 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
+    
+    OnUnpaused = function(self)
+        SeaFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
 }
 
 -- SEA UNITS

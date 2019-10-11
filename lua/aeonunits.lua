@@ -47,6 +47,13 @@ AAirFactoryUnit = Class(AirFactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
+    
+    OnUnpaused = function(self)
+        AirFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
 }
 
 ---------------------------------------------------------------
@@ -117,6 +124,13 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
+    
+    OnUnpaused = function(self)
+        LandFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
 }
 
 ---------------------------------------------------------------
@@ -156,6 +170,13 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
+    end,
+
+    OnUnpaused = function(self)
+        SeaFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
+        end
     end,
 }
 
