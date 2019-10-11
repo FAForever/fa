@@ -1033,16 +1033,15 @@ Unit = Class(moho.unit_methods) {
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
                 else
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                        energy = energy * repairRatio
+                        mass = mass * repairRatio
+                    end
                 end
             end
 
-            if self:IsUnitState('Repairing') and focus.isFinishedUnit then
-                energy = math.max(1, energy * repairRatio)
-                mass = math.max(1, mass * repairRatio)
-            else
-                energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
-                mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
-            end
+            energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
+            mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
             energy_rate = energy / time
             mass_rate = mass / time
         end
