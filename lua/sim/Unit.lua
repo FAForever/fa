@@ -1036,7 +1036,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
 
-            if self:IsUnitState('Repairing') then
+            if self:IsUnitState('Repairing') and focus.isFinishedUnit then
                 energy = math.max(1, energy * repairRatio)
                 mass = math.max(1, mass * repairRatio)
             else
@@ -2115,6 +2115,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         local bp = self:GetBlueprint()
+        self.isFinishedUnit = true
 
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
         -- Do all this here so we only have to do for things which get completed
