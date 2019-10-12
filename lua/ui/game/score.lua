@@ -20,6 +20,7 @@ local Grid = import('/lua/maui/Grid.lua').Grid
 local Prefs = import('/lua/user/prefs.lua')
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local Tooltip = import('/lua/ui/game/tooltip.lua')
+local FindClients = import('/lua/ui/game/chat.lua').FindClients
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -30,14 +31,17 @@ local observerLine = false
 local sessionInfo = SessionGetScenarioInfo()
 local replayID = -1
 
-
 local lastUnitWarning = false
 local unitWarningUsed = false
 local issuedNoRushWarning = false
 local gameSpeed = 0
 local needExpand = false
 local contractOnCreate = false
-local MassEnergyStoredCache = {}
+local ScoresCache = {}
+local resModeSwitch = {}
+local DisplayResMode = 0
+local DisplayStorage = 0
+
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
 
@@ -123,10 +127,56 @@ function fmtnum(ns)
     end
 end
 
-
 function SetLayout()
     if controls.bg then
         import(UIUtil.GetLayoutFilename('score')).SetLayout()
+    end
+end
+
+function UpdResDisplay(mode)
+    for index, scoreData in ScoresCache do
+        if scoreData.resources.massover.rate then
+            for _, line in controls.armyLines do
+                if line.armyID == index then
+                    DisplayResources(scoreData.resources,line,mode)
+                    break
+                end
+            end
+        end
+    end
+end
+
+function ResourceClickProcessing(self, event, resType)
+    if (event.Type == 'MouseEnter') or (event.Type == 'MouseExit') then
+        if event.Type == 'MouseEnter' then
+            DisplayStorage = DisplayStorage + 1
+            UpdResDisplay(2)
+        else
+            DisplayStorage = DisplayStorage - 1
+            UpdResDisplay(DisplayResMode)
+        end
+    elseif event.Type == 'ButtonPress' then
+        --if not event.Modifiers.Left then return end
+        if SessionIsReplay() then return end
+        if event.Modifiers.Shift then
+            local scoreData = ScoresCache[group.armyID]
+            if not scoreData.resources.massover.rate then return end
+            local EconData = GetEconomyTotals()
+            local ResVolume = EconData.stored[string.upper(resType)]
+            if ResVolume <= 0 then return end
+            local SentValue = scoreData.resources.storage['max'..resType] - scoreData.resources.storage['stored'..resType]
+            if SentValue <= 0 then return end
+            SentValue = math.min(SentValue,ResVolume * 0.25)
+            local Value = {Mass = 0, Energy = 0}
+            Value[resType] = SentValue / ResVolume
+            SimCallback( { Func = "GiveResourcesToPlayer",
+                           Args = { From = GetFocusArmy(), To = group.armyID,
+                           Mass = Value.Mass, Energy = Value.Energy, }} )
+            SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
+                text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[group.armyID].name })
+        elseif event.Modifiers.Ctrl then
+            SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true, text = 'Give me '..resType })
+        end
     end
 end
 
@@ -160,7 +210,7 @@ function SetupPlayerLines()
 
         group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
         group.score:DisableHitTest()
-        LayoutHelpers.AtRightIn(group.score, group, sw * 2)
+        LayoutHelpers.AtRightIn(group.score, group, sw * 2 + 16)
         LayoutHelpers.AtVerticalCenterIn(group.score, group)
         group.score:SetColor('ffffffff')
 
@@ -170,69 +220,55 @@ function SetupPlayerLines()
         if armyIndex ~= 0 then
             group.mass = Bitmap(group)
             group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-            LayoutHelpers.AtRightIn(group.mass, group, sw * 1)
+            LayoutHelpers.AtRightIn(group.mass, group, sw * 2 - 26)
             LayoutHelpers.AtVerticalCenterIn(group.mass, group)
             group.mass.Height:Set(14)
             group.mass.Width:Set(14)
             group.mass.HandleEvent = function(self, event)
-                if event.Type == 'MouseEnter' then
-                    if MassEnergyStoredCache[group.armyID].Mass then
-                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass))
-                    end
-                elseif event.Type == 'MouseExit' then
-                    if MassEnergyStoredCache[group.armyID].Massover then
-                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Massover))
-                    end                    
-                end
+                ResourceClickProcessing(self, event, 'Mass')
             end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1+14)
+            LayoutHelpers.AtRightIn(group.mass_in, group, sw * 2 + 14 - 26)
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
             group.mass_in.HandleEvent = function(self, event)
-                if event.Type == 'MouseEnter' then
-                    if MassEnergyStoredCache[group.armyID].Mass then
-                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Mass))
-                    end
-                elseif event.Type == 'MouseExit' then
-                    if MassEnergyStoredCache[group.armyID].Massover then
-                        group.mass_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Massover))
-                    end                    
-                end
+                ResourceClickProcessing(self, event, 'Mass')
             end
 
             group.energy = Bitmap(group)
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
-            LayoutHelpers.AtRightIn(group.energy, group, sw * 0)
+            LayoutHelpers.AtRightIn(group.energy, group, sw * 1 - 26)
             LayoutHelpers.AtVerticalCenterIn(group.energy, group)
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
             group.energy.HandleEvent = function(self, event)
-                if event.Type == 'MouseEnter' then
-                    if MassEnergyStoredCache[group.armyID].Energy then
-                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy))
-                    end
-                elseif event.Type == 'MouseExit' then
-                    if MassEnergyStoredCache[group.armyID].Energyover then
-                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energyover))
-                    end 
-                end
+                ResourceClickProcessing(self, event, 'Energy')
             end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0+14)
+            LayoutHelpers.AtRightIn(group.energy_in, group, sw * 1 + 14 - 26)
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
             group.energy_in.HandleEvent = function(self, event)
-                if event.Type == 'MouseEnter' then
-                    if MassEnergyStoredCache[group.armyID].Energy then
-                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energy))
-                    end
-                elseif event.Type == 'MouseExit' then
-                    if MassEnergyStoredCache[group.armyID].Energyover then
-                        group.energy_in:SetText(fmtnum(MassEnergyStoredCache[group.armyID].Energyover))
-                    end 
+                ResourceClickProcessing(self, event, 'Energy')
+            end
+
+            group.units = Bitmap(group)
+            group.units:SetTexture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
+            LayoutHelpers.AtRightIn(group.units, group, sw * 0)
+            LayoutHelpers.AtVerticalCenterIn(group.units, group)
+            group.units.Height:Set(14)
+            group.units.Width:Set(14)
+            group.units.HandleEvent = function(self, event)
+                if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (SessionIsReplay()) or (not ScoresCache[group.armyID].name) then return end
+                if event.Modifiers.Shift then
+                    SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
+                    SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                        to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
+                elseif event.Modifiers.Ctrl then
+                    SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                        to = 'allies', Chat = true, text = ScoresCache[group.armyID].name..' give me Engineer' })
                 end
             end
         end
@@ -241,7 +277,7 @@ function SetupPlayerLines()
         group.Width:Set(262)
         group.armyID = armyIndex
 
-        if SessionIsReplay() then
+        if IsObserver() then
             group.bg = Bitmap(group)
             group.bg:SetSolidColor('00000000')
             group.bg.Height:Set(group.faction.Height)
@@ -274,9 +310,14 @@ function SetupPlayerLines()
         index = index + 1
     end
 
-    if SessionIsReplay() then
+    if IsObserver() then
         observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
         observerLine.name.Top:Set(observerLine.Top)
+        observerLine.Height:Set(15)
+        controls.armyLines[index] = observerLine
+        index = index + 1
+    end
+    if SessionIsReplay() then
         observerLine.Height:Set(40)
         observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 14, UIUtil.bodyFont)
         observerLine.speedText:SetColor('ff00dbff')
@@ -287,9 +328,9 @@ function SetupPlayerLines()
             UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options/slider-back_bmp.dds'))
 
-        observerLine.speedSlider.Left:Set(function() return observerLine.Left() + 5 end)
+        observerLine.speedSlider.Left:Set(function() return observerLine.Left() end)
         observerLine.speedSlider.Right:Set(function() return observerLine.Right() - 20 end)
-        observerLine.speedSlider.Bottom:Set(function() return observerLine.Bottom() - 5 end)
+        observerLine.speedSlider.Bottom:Set(function() return observerLine.Bottom() end)
         observerLine.speedSlider._background.Left:Set(observerLine.speedSlider.Left)
         observerLine.speedSlider._background.Right:Set(observerLine.speedSlider.Right)
         observerLine.speedSlider._background.Top:Set(observerLine.speedSlider.Top)
@@ -307,8 +348,6 @@ function SetupPlayerLines()
             ConExecute("WLD_GameSpeed " .. newValue)
         end
         observerLine.speedSlider:SetValue(gameSpeed)
-        controls.armyLines[index] = observerLine
-        index = index + 1
     end
     local function CreateMapNameLine(data, armyIndex)
         local group = Group(controls.bgStretch)
@@ -320,8 +359,8 @@ function SetupPlayerLines()
         end
         group.name = UIUtil.CreateText(group, data.mapname, 10, UIUtil.bodyFont)
         group.name:DisableHitTest()
-        LayoutHelpers.AtLeftIn(group.name, group, mapoffset)
-        LayoutHelpers.AtVerticalCenterIn(group.name, group, 1)
+        LayoutHelpers.AtLeftIn(group.name, group)
+        LayoutHelpers.AtVerticalCenterIn(group.name, group)
         group.name:SetColor('ffffffff')
 
         if sessionInfo.Options.Ranked then
@@ -367,7 +406,7 @@ function SetupPlayerLines()
 
     mapData = {}
     mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
-    if replayID == -1 then -- only do this once
+    if SessionIsReplay() then
         if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") and GetFrontEndData('syncreplayid') ~= nil and GetFrontEndData('syncreplayid') ~= 0 then
             replayID = GetFrontEndData('syncreplayid')
         elseif HasCommandLineArg("/savereplay") then
@@ -377,11 +416,61 @@ function SetupPlayerLines()
         elseif HasCommandLineArg("/replayid") then
             replayID =  GetCommandLineArg("/replayid", 1)[1]
         end
+        mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
+        mapData.mapname = mapData.mapname..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
+        if replayID ~= -1 then
+            mapData.mapname = mapData.mapname..', ID: '..replayID
+        end
     end
 
-    -- Temporarily disabled due to formatting error
-    --if tonumber(replayID) > 0 then mapData.mapname = mapData.mapname .. ', ID: ' .. replayID end
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
+
+    resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⁐', 15, UIUtil.bodyFont)
+    --Tooltip.AddControlTooltip(resModeSwitch.icon, {text = LOC('<LOC ResModeSwitchTooltipTitle>'), body = LOC('<LOC ResModeSwitchTooltipDesc>'),})
+    resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
+    resModeSwitch.text:DisableHitTest()
+    LayoutHelpers.AtCenterIn(resModeSwitch.text, resModeSwitch.icon, 2)
+    resModeSwitch.text:SetColor('ffffffff')
+    resModeSwitch.icon.HandleEvent = function(self, event)
+        if event.Type ~= 'ButtonPress' then return end
+        if DisplayResMode == 2 then
+            DisplayResMode = 0
+        else
+            DisplayResMode = DisplayResMode + 1
+        end
+        if DisplayResMode == 0 then
+            resModeSwitch.text:SetText('I')
+        elseif DisplayResMode == 1 then
+            resModeSwitch.text:SetText('B')
+        elseif DisplayResMode == 2 then
+            resModeSwitch.text:SetText('S')
+        end
+        UpdResDisplay(DisplayResMode)
+    end
+end
+
+function DisplayResources(resources, line, mode)
+    if resources.massover.rate then
+        local Tmp = {}
+        if mode == 0 then
+            Tmp = {Mass = resources.massin.rate, Energy = resources.energyin.rate}
+        elseif mode == 1 then
+            Tmp = {Mass = resources.massover.rate, Energy = resources.energyover.rate}
+        elseif mode == 2 then
+            Tmp = {Mass = resources.storage.storedMass * 0.1, Energy = resources.storage.storedEnergy * 0.1}
+        end
+        line.mass_in:SetText(fmtnum(Tmp.Mass * 10))
+        line.energy_in:SetText(fmtnum(Tmp.Energy * 10))
+        line.mass:Show()
+        line.energy:Show()
+        line.units:Show()
+    else
+        line.mass_in:SetText('')
+        line.energy_in:SetText('')
+        line.mass:Hide()
+        line.energy:Hide()
+        line.units:Hide()
+    end
 end
 
 function _OnBeat()
@@ -407,24 +496,17 @@ function _OnBeat()
 
     local armiesInfo = GetArmiesTable().armiesTable
     if currentScores then
-        MassEnergyStoredCache = {}
+        ScoresCache = currentScores
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
-                    if line.OOG then break end
-                    MassEnergyStoredCache[line.armyID] = {Massover = scoreData.resources.massover.rate, Mass = scoreData.resources.StoredMass,
-                                                          Energyover = scoreData.resources.energyover.rate, Energy = scoreData.resources.StoredEnergy}
-                    if GetFocusArmy() ~= -1 then
-                        if not IsAlly(GetFocusArmy(),line.armyID) then
-                            line.mass_in:SetText('')
-                            line.energy_in:SetText('')
-                        end
+                if line.OOG then break end
+                    if DisplayStorage > 0 then
+                        DisplayResources(scoreData.resources,line,2)
+                    else
+                        DisplayResources(scoreData.resources,line,DisplayResMode)
                     end
-                    
-                    if scoreData.resources.massover.rate then
-                        line.mass_in:SetText(fmtnum(scoreData.resources.massover.rate))
-                        line.energy_in:SetText(fmtnum(scoreData.resources.energyover.rate))
-                    end
+
                     if scoreData.general.score == -1 then
                         line.score:SetText(LOC("<LOC _Playing>Playing"))
                         line.scoreNumber = -1
@@ -475,6 +557,15 @@ function _OnBeat()
             end
         end)
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+        local line = {}
+        for index, data in controls.armyLines do
+            if not(data.armyID > 0) then
+                line = controls.armyLines[index - 1]
+                break
+            end
+        end
+        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -3)
+        LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, line.energy)
         currentScores = false -- dont render score UI until next score update
     end
 
@@ -615,7 +706,7 @@ function NoteGameSpeedChanged(newSpeed)
     if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' and controls.time then
         controls.time:SetText(string.format("%s (%+d)", GetGameTime(), gameSpeed))
     end
-    if observerLine then
+    if observerLine.speedSlider then
         observerLine.speedSlider:SetValue(gameSpeed)
     end
 end

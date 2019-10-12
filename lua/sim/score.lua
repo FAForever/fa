@@ -122,14 +122,18 @@ function ScoreThread()
                 },
                 massover = {
                     total = 0,
-                    rate = 0                
+                    rate = 0
                 },
                 energyover = {
                     total = 0,
-                    rate = 0                
+                    rate = 0
                 },
-                StoredMass = 0,
-                StoredEnergy = 0,
+                storage = {
+                    storedMass = 0,
+                    storedEnergy = 0,
+                    maxMass = 0,
+                    maxEnergy = 0,
+                },
                 MassReclaimRate = 0,
                 EnergyReclaimRate = 0
             }
@@ -178,9 +182,21 @@ function ScoreThread()
             ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover.total = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
-            
-            ArmyScore[index].resources.StoredMass = brain:GetEconomyStored('MASS')
-            ArmyScore[index].resources.StoredEnergy = brain:GetEconomyStored('ENERGY')
+
+            ArmyScore[index].resources.storage.storedMass = brain:GetEconomyStored('MASS')
+            ArmyScore[index].resources.storage.storedEnergy = brain:GetEconomyStored('ENERGY')
+            local MassRatio = brain:GetEconomyStoredRatio('MASS')
+            if MassRatio ~= 0 then
+                ArmyScore[index].resources.storage.maxMass = ArmyScore[index].resources.storage.storedMass / MassRatio
+            else
+                ArmyScore[index].resources.storage.maxMass = 0
+            end
+            local EnergyRatio = brain:GetEconomyStoredRatio('ENERGY')
+            if EnergyRatio ~= 0 then
+                ArmyScore[index].resources.storage.maxEnergy = ArmyScore[index].resources.storage.storedEnergy / EnergyRatio
+            else
+                ArmyScore[index].resources.storage.maxEnergy = 0
+            end
 
             for unitId, stats in brain.UnitStats do
                 if ArmyScore[index].blueprints[unitId] == nil then
@@ -217,14 +233,14 @@ function ScoreDisplayResourcesThread()
             ArmyScore[index].resources.MassReclaimRate = massReclaimRate
             ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
             ArmyScore[index].general.lastReclaimedMass = reclaimedMass
-            ArmyScore[index].resources.massover.rate = ((ArmyScore[index].resources.massin.rate - ArmyScore[index].resources.massout.rate) + ArmyScore[index].resources.MassReclaimRate) * 10
+            ArmyScore[index].resources.massover.rate = ArmyScore[index].resources.massin.rate - ArmyScore[index].resources.massout.rate + ArmyScore[index].resources.MassReclaimRate
 
             local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
             local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
             ArmyScore[index].resources.EnergyReclaimRate = energyReclaimRate
             ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
             ArmyScore[index].general.lastReclaimedEnergy = reclaimedEnergy
-            ArmyScore[index].resources.energyover.rate = ((ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate) + ArmyScore[index].resources.EnergyReclaimRate) * 10
+            ArmyScore[index].resources.energyover.rate = ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate + ArmyScore[index].resources.EnergyReclaimRate
         end
         WaitSeconds(0.1)
     end
