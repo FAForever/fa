@@ -57,6 +57,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
         'COUNTERINTELLIGENCE',
+        'INSIGNIFICANTUNIT',
     },
     Defense = {
         AirThreatLevel = 0,
