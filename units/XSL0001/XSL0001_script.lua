@@ -111,7 +111,10 @@ XSL0001 = Class(ACUUnit) {
                             Add = 0,
                             Mult = bp.RegenPerSecond,
                             Floor = bp.RegenFloor,
-                            Ceil = bp.RegenCeiling,
+                            CeilT1 = bp.RegenCeilingT1,
+                            CeilT2 = bp.RegenCeilingT2,
+                            CeilT3 = bp.RegenCeilingT3,
+                            CeilT4 = bp.RegenCeilingT4,
                         },
                     },
                 }
