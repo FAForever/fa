@@ -22,7 +22,8 @@ Blacklist = {
     ['xxxx-NetLag-Experimental-v3'] = HARMFUL,
 
 -- Broken --
-
+    --Old Nomads version thats not featured, and doesnt show up in the mod list
+    ['50423624-1e83-4fc2-85b3-nomadsv00074'] = BROKEN,
 -- Obselete --
 
     -- XINNONY TRY FIX CORRECT DISCONNECT
