@@ -24,6 +24,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
 local Set = import('/lua/system/setutils.lua')
+local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
@@ -359,134 +360,101 @@ Unit = Class(moho.unit_methods) {
 
     -- Updates build restrictions of any unit passed, used for support factories
     updateBuildRestrictions = function(self)
-        local faction = false
-        local type = false
-        local techlevel = false
+        local categoriesCheckTable = {
+            faction = {},
+            type = { 'LAND', 'AIR', 'NAVAL', },
+        }
+        local catFlags = {
+            faction = false,
+            type = false,
+        }
 
-        -- Defines the unit's faction
-        if EntityCategoryContains(categories.AEON, self) then
-            faction = categories.AEON
-        elseif EntityCategoryContains(categories.UEF, self) then
-            faction = categories.UEF
-        elseif EntityCategoryContains(categories.CYBRAN, self) then
-            faction = categories.CYBRAN
-        elseif EntityCategoryContains(categories.SERAPHIM, self) then
-            faction = categories.SERAPHIM
+        --instead of hardcoding we fill the table dynamically from the faction list. much nicer.
+        for key, factionTable in Factions do
+            table.insert(categoriesCheckTable.faction, factionTable.Category)
         end
 
-        -- Defines the unit's layer type
-        if EntityCategoryContains(categories.LAND, self) then
-            type = categories.LAND
-        elseif EntityCategoryContains(categories.AIR, self) then
-            type = categories.AIR
-        elseif EntityCategoryContains(categories.NAVAL, self) then
-            type = categories.NAVAL
+        --This fills the catFlags with categories from the categoriesCheckTable if it finds them.
+        for key, CatsList in categoriesCheckTable do
+            for _, category in CatsList do
+                if EntityCategoryContains(categories[category], self) then
+                    catFlags[key] = categories[category]
+                    break
+                end
+            end
         end
 
-        -- Defines the unit's tech level
-        if EntityCategoryContains(categories.TECH1, self) then
-            techlevel = categories.TECH1
-        elseif EntityCategoryContains(categories.TECH2, self) then
-            techlevel = categories.TECH2
-        elseif EntityCategoryContains(categories.TECH3, self) then
-            techlevel = categories.TECH3
+        --Sanity check.
+        if not catFlags.faction then
+            return
         end
 
         local aiBrain = self:GetAIBrain()
         local supportfactory = false
 
-        -- Sanity check.
-        if not faction then
-            return
-        end
-
-        -- Add build restrictions
-        if EntityCategoryContains(categories.FACTORY, self) then
-            if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
-                -- Add support factory cannot build higher tech units at all, until there is a HQ factory
-                self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
-                self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
-                self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
-                supportfactory = true
-            else
-                -- A normal factory cannot build a support factory until there is a HQ factory
-                self:AddBuildRestriction(categories.SUPPORTFACTORY)
-                supportfactory = false
-            end
-        elseif EntityCategoryContains(categories.ENGINEER, self) then
-            -- Engineers also cannot build a support factory until there is a HQ factory
+        --Add build restrictions
+        if EntityCategoryContains(categories.FACTORY * categories.SUPPORTFACTORY, self) then
+            --Support factories cannot build higher tech units at all, until there is a HQ factory
+            self:AddBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
+            self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
+            supportfactory = true
+        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, self) then
+            --Engineers and normal factories cannot build a support factory until there is a HQ factory
             self:AddBuildRestriction(categories.SUPPORTFACTORY)
         end
 
-        -- Check for the existence of HQs
+        local HQCategory = categories.RESEARCH * catFlags.faction -- make the categories read a bit easier on the eyes
+        --Check for the existence of HQs
         if supportfactory then
-            if not type then
-                return
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+            --if we find any HQs, we remove build restrictions for the support factory in question (self)
+            if not catFlags.type then return end
+
+            --check if our type of T3 HQ exists, else check for any T3 HQ, and then check for T2 HQ variants
+            if self.FindHQType(aiBrain, HQCategory * categories.TECH3 * catFlags.type) then
+                self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
+                self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
+            else
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH3) then
+                    self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE * categories.CONSTRUCTION)
                 end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
-                    break
-                end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
+
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH2 * catFlags.type) then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-                    break
-                end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
-                    break
+                elseif self.FindHQType(aiBrain, HQCategory * categories.TECH2) then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
                 end
             end
         else
-            for _, researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
-                -- If there is a research station of the appropriate type, enable support factory construction
-                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
-                    if not unit.Dead and not unit:IsBeingBuilt() then
-                        -- Special case for the Commander, since its engineering upgrades are implemented using build restrictions
-                        -- In future, figure out a way to query existing legal builds? For example, check if you can build T2, if you can, enable support factory too
-                        if EntityCategoryContains(categories.COMMAND, self) then
-                            if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            end
-                        else
-                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                        end
-                        break
+            --if we find any HQs, we remove build restrictions for the engineering unit in question (self)
+            for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
+                local supportFacCat = categories.SUPPORTFACTORY * catFlags.faction * researchType
+
+                --If there is a research station of the appropriate type, enable support factory construction
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH3 * researchType) then
+                    --if we are a normal unit, or a T3 acu, remove restrictions, else check for T2 upgrade
+                    if (not EntityCategoryContains(categories.COMMAND, self)) or self:HasEnhancement('T3Engineering') then
+                        self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * supportFacCat)
+                    elseif self:HasEnhancement('AdvancedEngineering') then
+                        self:RemoveBuildRestriction(categories.TECH2 * supportFacCat)
                     end
-                end
-                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
-                    if not unit.Dead and not unit:IsBeingBuilt() then
-
-                        -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
-                        if EntityCategoryContains(categories.COMMAND, self) then
-                            if self:HasEnhancement('AdvancedEngineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            elseif self:HasEnhancement('T3Engineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                                self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
-                            end
-                        else
-                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
-                        end
-
-                        break
+                elseif self.FindHQType(aiBrain, HQCategory * categories.TECH2 * researchType) then
+                    --if we are a normal unit, or an upgraded ACU, remove restrictions
+                    if (not EntityCategoryContains(categories.COMMAND, self)) or (self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering')) then
+                        self:RemoveBuildRestriction(categories.TECH2 * supportFacCat)
                     end
                 end
             end
         end
+    end,
+
+    --self.FindHQType(aiBrain, category)
+    FindHQType = function(aiBrain, category)
+        for id, unit in aiBrain:GetListOfUnits(category, false, true) do
+            if not unit.Dead and not unit:IsBeingBuilt() then
+                return true
+            end
+        end
+        return false
     end,
 
     -------------------------------------------------------------------------------------------
