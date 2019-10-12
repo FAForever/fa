@@ -146,7 +146,7 @@ function UpdResDisplay(mode)
     end
 end
 
-function ResourceClickProcessing(self, event, resType)
+function ResourceClickProcessing(self, event, armyID, resType)
     if (event.Type == 'MouseEnter') or (event.Type == 'MouseExit') then
         if event.Type == 'MouseEnter' then
             DisplayStorage = DisplayStorage + 1
@@ -159,7 +159,7 @@ function ResourceClickProcessing(self, event, resType)
         --if not event.Modifiers.Left then return end
         if SessionIsReplay() then return end
         if event.Modifiers.Shift then
-            local scoreData = ScoresCache[group.armyID]
+            local scoreData = ScoresCache[armyID]
             if not scoreData.resources.massover.rate then return end
             local EconData = GetEconomyTotals()
             local ResVolume = EconData.stored[string.upper(resType)]
@@ -170,10 +170,10 @@ function ResourceClickProcessing(self, event, resType)
             local Value = {Mass = 0, Energy = 0}
             Value[resType] = SentValue / ResVolume
             SimCallback( { Func = "GiveResourcesToPlayer",
-                           Args = { From = GetFocusArmy(), To = group.armyID,
+                           Args = { From = GetFocusArmy(), To = armyID,
                            Mass = Value.Mass, Energy = Value.Energy, }} )
             SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
-                text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[group.armyID].name })
+                text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[armyID].name })
         elseif event.Modifiers.Ctrl then
             SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true, text = 'Give me '..resType })
         end
@@ -225,7 +225,7 @@ function SetupPlayerLines()
             group.mass.Height:Set(14)
             group.mass.Width:Set(14)
             group.mass.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, 'Mass')
+                ResourceClickProcessing(self, event, group.armyID, 'Mass')
             end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
@@ -233,7 +233,7 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
             group.mass_in.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, 'Mass')
+                ResourceClickProcessing(self, event, group.armyID, 'Mass')
             end
 
             group.energy = Bitmap(group)
@@ -243,7 +243,7 @@ function SetupPlayerLines()
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
             group.energy.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, 'Energy')
+                ResourceClickProcessing(self, event, group.armyID, 'Energy')
             end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
@@ -251,7 +251,7 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
             group.energy_in.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, 'Energy')
+                ResourceClickProcessing(self, event, group.armyID, 'Energy')
             end
 
             group.units = Bitmap(group)
@@ -291,7 +291,7 @@ function SetupPlayerLines()
                     group.bg:SetSolidColor('ff777777')
                 elseif event.Type == 'MouseExit' then
                     group.bg:SetSolidColor('00000000')
-                elseif event.Type == 'ButtonPress' then
+                elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) then
                     ConExecute('SetFocusArmy '..tostring(self.armyID-1))
                 end
             end
@@ -319,7 +319,7 @@ function SetupPlayerLines()
     end
     if SessionIsReplay() then
         observerLine.Height:Set(40)
-        observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 14, UIUtil.bodyFont)
+        observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 12, UIUtil.bodyFont)
         observerLine.speedText:SetColor('ff00dbff')
         LayoutHelpers.AtRightIn(observerLine.speedText, observerLine)
         observerLine.speedSlider = IntegerSlider(controls.bgStretch, false, -10, 10, 1,
@@ -426,6 +426,7 @@ function SetupPlayerLines()
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⁐', 15, UIUtil.bodyFont)
+    resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
     --Tooltip.AddControlTooltip(resModeSwitch.icon, {text = LOC('<LOC ResModeSwitchTooltipTitle>'), body = LOC('<LOC ResModeSwitchTooltipDesc>'),})
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
     resModeSwitch.text:DisableHitTest()
@@ -508,7 +509,7 @@ function _OnBeat()
                     end
 
                     if scoreData.general.score == -1 then
-                        line.score:SetText(LOC("<LOC _Playing>Playing"))
+                        --line.score:SetText(LOC("<LOC _Playing>Playing"))
                         line.scoreNumber = -1
                     else
                         line.score:SetText(fmtnum(scoreData.general.score))
