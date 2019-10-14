@@ -1,12 +1,9 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEA0305/UEA0305_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  UEF Heavy Gunship Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+--  File     :  /cdimage/units/UEA0305/UEA0305_script.lua
+--  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--  Summary  :  UEF Heavy Gunship Script
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TWeapons = import('/lua/terranweapons.lua')
