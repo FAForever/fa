@@ -66,6 +66,8 @@ function ScoreThread()
     for index, brain in ArmyBrains do
         ArmyScore[index] = {
             faction = 0,
+            name = '',
+            type = '',
             general = {
                 score = 0,
                 mass = 0,

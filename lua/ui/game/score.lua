@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: In game score dialog
 --*
---* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © :2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- current score will contain the most recent score update from the sync
@@ -111,8 +111,6 @@ function CreateScoreUI(parent)
         self.Right:Set(newRight)
     end
     controls.collapseArrow:SetCheck(true, true)
-
-
 end
 
 function fmtnum(ns)
@@ -157,7 +155,7 @@ function ResourceClickProcessing(self, event, armyID, resType)
         end
     elseif event.Type == 'ButtonPress' then
         --if not event.Modifiers.Left then return end
-        if SessionIsReplay() then return end
+        if IsObserver() or (GetFocusArmy() == armyID) then return end
         if event.Modifiers.Shift then
             local scoreData = ScoresCache[armyID]
             if not scoreData.resources.massover.rate then return end
@@ -220,7 +218,7 @@ function SetupPlayerLines()
         if armyIndex ~= 0 then
             group.mass = Bitmap(group)
             group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-            LayoutHelpers.AtRightIn(group.mass, group, sw * 2 - 26)
+            LayoutHelpers.AtRightIn(group.mass, group, sw * 1 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.mass, group)
             group.mass.Height:Set(14)
             group.mass.Width:Set(14)
@@ -229,7 +227,7 @@ function SetupPlayerLines()
             end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtRightIn(group.mass_in, group, sw * 2 + 14 - 26)
+            LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1 + 14 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
             group.mass_in.HandleEvent = function(self, event)
@@ -238,7 +236,7 @@ function SetupPlayerLines()
 
             group.energy = Bitmap(group)
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
-            LayoutHelpers.AtRightIn(group.energy, group, sw * 1 - 26)
+            LayoutHelpers.AtRightIn(group.energy, group, sw * 0 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.energy, group)
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
@@ -247,7 +245,7 @@ function SetupPlayerLines()
             end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtRightIn(group.energy_in, group, sw * 1 + 14 - 26)
+            LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0 + 14 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
             group.energy_in.HandleEvent = function(self, event)
@@ -261,8 +259,9 @@ function SetupPlayerLines()
             group.units.Height:Set(14)
             group.units.Width:Set(14)
             group.units.HandleEvent = function(self, event)
-                if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (SessionIsReplay()) or (not ScoresCache[group.armyID].name) then return end
+                if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or (GetFocusArmy() == group.armyID) then return end
                 if event.Modifiers.Shift then
+                    if not GetSelectedUnits() then return end
                     SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
                         to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
@@ -312,6 +311,7 @@ function SetupPlayerLines()
 
     if IsObserver() then
         observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
+        observerLine.scoreNumber = -2
         observerLine.name.Top:Set(observerLine.Top)
         observerLine.Height:Set(15)
         controls.armyLines[index] = observerLine
@@ -349,6 +349,7 @@ function SetupPlayerLines()
         end
         observerLine.speedSlider:SetValue(gameSpeed)
     end
+
     local function CreateMapNameLine(data, armyIndex)
         local group = Group(controls.bgStretch)
 
@@ -382,6 +383,7 @@ function SetupPlayerLines()
         group.Height:Set(18)
         group.Width:Set(262)
         group:DisableHitTest()
+        group.scoreNumber = -3
 
         return group
     end
@@ -425,12 +427,14 @@ function SetupPlayerLines()
 
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 
-    resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⁐', 15, UIUtil.bodyFont)
+    resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
     resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
+    LayoutHelpers.AtLeftTopIn(resModeSwitch.icon, controls.armyLines[table.getn(controls.armyLines) - 1], 0, -1)
+    LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, controls.armyLines[1].energy)
     --Tooltip.AddControlTooltip(resModeSwitch.icon, {text = LOC('<LOC ResModeSwitchTooltipTitle>'), body = LOC('<LOC ResModeSwitchTooltipDesc>'),})
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
     resModeSwitch.text:DisableHitTest()
-    LayoutHelpers.AtCenterIn(resModeSwitch.text, resModeSwitch.icon, 2)
+    LayoutHelpers.AtCenterIn(resModeSwitch.text, resModeSwitch.icon, 1)
     resModeSwitch.text:SetColor('ffffffff')
     resModeSwitch.icon.HandleEvent = function(self, event)
         if event.Type ~= 'ButtonPress' then return end
@@ -474,6 +478,8 @@ function DisplayResources(resources, line, mode)
     end
 end
 
+local prevArmy = -2
+
 function _OnBeat()
     local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
     if sessionInfo.Options.Quality then
@@ -495,8 +501,8 @@ function _OnBeat()
         end
     end
 
-    local armiesInfo = GetArmiesTable().armiesTable
     if currentScores then
+        local armiesInfo = GetArmiesTable().armiesTable
         ScoresCache = currentScores
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
@@ -509,31 +515,17 @@ function _OnBeat()
                     end
 
                     if scoreData.general.score == -1 then
-                        --line.score:SetText(LOC("<LOC _Playing>Playing"))
                         line.scoreNumber = -1
                     else
                         line.score:SetText(fmtnum(scoreData.general.score))
                         line.scoreNumber = scoreData.general.score
                     end
                     if GetFocusArmy() == index then
-                        line.name:SetColor('ffff7f00')
-                        line.score:SetColor('ffff7f00')
-                        line.name:SetFont('Arial Bold', 12)
-                        line.score:SetFont('Arial Bold', 12)
                         if scoreData.general.currentcap.count > 0 then
                             SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
                         end
-                    else
-                        line.name:SetColor('ffffffff')
-                        line.score:SetColor('ffffffff')
-                        line.name:SetFont(UIUtil.bodyFont, 12)
-                        line.score:SetFont(UIUtil.bodyFont, 12)
                     end
                     if armiesInfo[index].outOfGame then
-                        if scoreData.general.score == -1 then
-                            line.score:SetText(LOC("<LOC _Defeated>Defeated"))
-                            line.scoreNumber = -1
-                        end
                         line.OOG = true
                         line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
                         line.color:SetSolidColor('ff000000')
@@ -547,15 +539,7 @@ function _OnBeat()
             end
         end
         table.sort(controls.armyLines, function(a,b)
-            if a.armyID == 0 or b.armyID == 0 then
-                return a.armyID >= b.armyID
-            else
-                if tonumber(a.scoreNumber) == tonumber(b.scoreNumber) then
-                    return a.name:GetText() < b.name:GetText()
-                else
-                    return tonumber(a.scoreNumber) > tonumber(b.scoreNumber)
-                end
-            end
+            return a.scoreNumber > b.scoreNumber
         end)
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         local line = {}
@@ -565,19 +549,35 @@ function _OnBeat()
                 break
             end
         end
-        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -3)
-        LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, line.energy)
+        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -1)
         currentScores = false -- dont render score UI until next score update
     end
 
-    if observerLine then
-        if GetFocusArmy() == -1 then
-            observerLine.name:SetColor('ffff7f00')
-            observerLine.name:SetFont('Arial Bold', 14)
-        else
-            observerLine.name:SetColor('ffffffff')
-            observerLine.name:SetFont(UIUtil.bodyFont, 14)
+    local cur = GetFocusArmy()
+    if prevArmy ~= cur then
+        for _, data in controls.armyLines do
+            if data.armyID == prevArmy then
+                data.name:SetColor('ffffffff')
+                data.score:SetColor('ffffffff')
+                data.name:SetFont(UIUtil.bodyFont, 12)
+                data.score:SetFont(UIUtil.bodyFont, 12)
+            elseif data.armyID == cur then
+                data.name:SetColor('ffff7f00')
+                data.score:SetColor('ffff7f00')
+                data.name:SetFont('Arial Bold', 12)
+                data.score:SetFont('Arial Bold', 12)
+            end
         end
+        if observerLine then
+            if cur <= 0 then
+                observerLine.name:SetColor('ffff7f00')
+                observerLine.name:SetFont('Arial Bold', 12)
+            elseif prevArmy <= 0 then
+                observerLine.name:SetColor('ffffffff')
+                observerLine.name:SetFont(UIUtil.bodyFont, 12)
+            end
+        end
+        prevArmy = cur
     end
 end
 
