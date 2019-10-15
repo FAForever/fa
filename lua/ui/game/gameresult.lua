@@ -48,11 +48,6 @@ function DoGameResult(armyIndex, result)
         return
     end
 
-    -- Otherwise, do the end-of-game stuff.
-    if SessionIsObservingAllowed() then
-        SetFocusArmy(-1)
-    end
-
     local victory = result == 'victory'
     if victory then
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
