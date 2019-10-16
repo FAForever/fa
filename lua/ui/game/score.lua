@@ -538,9 +538,11 @@ function _OnBeat()
                 end
             end
         end
-        table.sort(controls.armyLines, function(a,b)
-            return a.scoreNumber > b.scoreNumber
-        end)
+        if sessionInfo.Options.Score == 'yes' then
+            table.sort(controls.armyLines, function(a,b)
+                return a.scoreNumber > b.scoreNumber
+            end)
+        end
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         local line = {}
         for index, data in controls.armyLines do
@@ -555,17 +557,22 @@ function _OnBeat()
 
     local cur = GetFocusArmy()
     if prevArmy ~= cur then
-        for _, data in controls.armyLines do
-            if data.armyID == prevArmy then
-                data.name:SetColor('ffffffff')
-                data.score:SetColor('ffffffff')
-                data.name:SetFont(UIUtil.bodyFont, 12)
-                data.score:SetFont(UIUtil.bodyFont, 12)
-            elseif data.armyID == cur then
-                data.name:SetColor('ffff7f00')
-                data.score:SetColor('ffff7f00')
-                data.name:SetFont('Arial Bold', 12)
-                data.score:SetFont('Arial Bold', 12)
+        for _, line in controls.armyLines do
+            if line.armyID == prevArmy then
+                if line.OOG then
+                    line.name:SetColor('ffa0a0a0')
+                    line.score:SetColor('ffa0a0a0')
+                else
+                    line.name:SetColor('ffffffff')
+                    line.score:SetColor('ffffffff')
+                end
+                line.name:SetFont(UIUtil.bodyFont, 12)
+                line.score:SetFont(UIUtil.bodyFont, 12)
+            elseif line.armyID == cur then
+                line.name:SetColor('ffff7f00')
+                line.score:SetColor('ffff7f00')
+                line.name:SetFont('Arial Bold', 12)
+                line.score:SetFont('Arial Bold', 12)
             end
         end
         if observerLine then
