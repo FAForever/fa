@@ -48,6 +48,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'ABILITYBUTTON',
         'SORTINTEL',
+        'DRAGBUILD',
     },
     CollisionOffsetY = -0.25,
     Defense = {
