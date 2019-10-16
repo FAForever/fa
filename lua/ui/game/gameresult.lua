@@ -35,11 +35,25 @@ function DoGameResult(armyIndex, result)
         result = string.sub(result, 1, condPos - 1)
     end
 
+    local armies = GetArmiesTable().armiesTable
+
+    local alliesOOG = true
+    for index, data in armies do
+        if data.human and IsAlly(GetFocusArmy(), index) and (not data.outOfGame) then
+        WARN(index,data.outOfGame)
+            alliesOOG = false
+            break
+        end
+    end
+    
+    if alliesOOG then
+        SetFocusArmy(-1)
+    end
+
     if result == 'score' or announced[armyIndex] then
         return
     end
 
-    local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
     -- If it's someone else, announce it and stop.
