@@ -1749,7 +1749,7 @@ AirUnit = Class(MobileUnit) {
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
 
-        -- Additional stupidity: An idle transport, both loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
+        -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
             self.CreateUnitAirDestructionEffects(self, 1.0)
@@ -1835,36 +1835,19 @@ BaseTransport = Class() {
     DestroyedOnTransport = function(self)
     end,
 
-    -- Flags cargo that it's been killed while in a transport
-    KillAllCargo = function(self, suicide, kill)
-        if self:BeenDestroyed() or self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+    -- Detaches cargo from a dying unit
+    DetachCargo = function(self)
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
-        if not suicide then -- If the transport is self destructed, let its contents be self destructed separately
-            self:SaveCargoMass()
-        end
-
-        -- Recursively store or kill everything. This difference is generally for Air transports (Kill at crash) vs Carriers (Kill on death)
-        self.cargo = {}
-        local function LoopCargo(carrier, lethal)
-            for _, unit in carrier:GetCargo() or {} do
-                if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                    LoopCargo(unit, true) -- Always kill sub-carried units
-                end
-
-                if not EntityCategoryContains(categories.COMMAND, unit) then
-                    unit.killedInTransport = true
-                    unit:DetachFrom()
-
-                    if lethal then
-                        unit:Kill()
-                    else
-                        table.insert(self.cargo, unit)
-                    end
+        local cargo = self:GetCargo()
+        for _, unit in cargo do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
+                for k, subUnit in unit:GetCargo() do
+                    subUnit:Kill()
                 end
             end
+            unit:DetachFrom()
         end
-
-        LoopCargo(self, kill)
     end,
 
     SaveCargoMass = function(self)
@@ -1894,7 +1877,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
     Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
          -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
         local instigator = arg[1]
-        self:KillAllCargo(not instigator or not IsUnit(instigator), false) -- Flag all cargo, don't kill it yet
+        self:FlagCargo(not instigator or not IsUnit(instigator))
         AirUnit.Kill(self, unpack(arg))
     end,
 
@@ -1913,12 +1896,34 @@ AirTransport = Class(AirUnit, BaseTransport) {
         end
     end,
 
+    -- Flags cargo that it's been killed while in a transport
+    FlagCargo = function(self, suicide)
+        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
+
+        if not suicide then -- If the transport is self destructed, let its contents be self destructed separately
+            self:SaveCargoMass()
+        end
+        self.cargo = {}
+        local cargo = self:GetCargo()
+        for _, unit in cargo or {} do
+            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
+                local unitCargo = unit:GetCargo()
+                for k, subUnit in unitCargo do
+                    subUnit:Kill()
+                end
+            end
+            if not EntityCategoryContains(categories.COMMAND, unit) then
+                unit.killedInTransport = true
+                table.insert(self.cargo, unit)
+            end
+        end
+    end,
+
     KillCrashedCargo = function(self)
         if self:BeenDestroyed() then return end
 
-        -- We've already been through and stored. This time, kill.
         for _, unit in self.cargo or {} do
-            if not unit:BeenDestroyed() or not unit.Dead then
+            if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
                 unit:OnKilled(nil, '', 0)
             end
@@ -2079,6 +2084,7 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self:SaveCargoMass()
         SeaUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
     end,
 }
 
