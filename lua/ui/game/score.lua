@@ -29,6 +29,7 @@ local observerLine = false
 
 ----  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()
+local localArmyID = GetFocusArmy()
 local replayID = -1
 
 local lastUnitWarning = false
@@ -94,6 +95,10 @@ function CreateScoreUI(parent)
     GameMain.AddBeatFunction(_OnBeat, true)
     controls.bg.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(_OnBeat)
+    end
+
+    controls.bg.OnHide = function(self, hidden)
+        return true
     end
 
     if contractOnCreate then
@@ -276,26 +281,22 @@ function SetupPlayerLines()
         group.Width:Set(262)
         group.armyID = armyIndex
 
-        if IsObserver() then
-            group.bg = Bitmap(group)
-            group.bg:SetSolidColor('00000000')
-            group.bg.Height:Set(group.faction.Height)
-            group.bg.Left:Set(group.faction.Right)
-            group.bg.Right:Set(group.Right)
-            group.bg.Top:Set(group.faction.Top)
-            group.bg:DisableHitTest()
-            group.bg.Depth:Set(group.Depth)
-            group.HandleEvent = function(self, event)
-                if event.Type == 'MouseEnter' then
-                    group.bg:SetSolidColor('ff777777')
-                elseif event.Type == 'MouseExit' then
-                    group.bg:SetSolidColor('00000000')
-                elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) then
-                    ConExecute('SetFocusArmy '..tostring(self.armyID-1))
-                end
+        group.bg = Bitmap(group)
+        group.bg:SetSolidColor('00000000')
+        group.bg.Height:Set(group.faction.Height)
+        group.bg.Left:Set(group.faction.Right)
+        group.bg.Right:Set(group.Right)
+        group.bg.Top:Set(group.faction.Top)
+        group.bg:DisableHitTest()
+        group.bg.Depth:Set(group.Depth)
+        group.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then
+                self.bg:SetSolidColor('ff777777')
+            elseif event.Type == 'MouseExit' then
+                self.bg:SetSolidColor('00000000')
+            elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) and (sessionInfo.Options.CheatsEnabled) then
+                ConExecute('SetFocusArmy '..tostring(self.armyID-1))
             end
-        else
-            group:DisableHitTest()
         end
 
         return group
@@ -309,17 +310,17 @@ function SetupPlayerLines()
         index = index + 1
     end
 
-    if IsObserver() then
-        observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
-        observerLine.scoreNumber = -2
-        observerLine.name.Top:Set(observerLine.Top)
-        observerLine.Height:Set(15)
-        controls.armyLines[index] = observerLine
-        index = index + 1
-    end
+    observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
+    observerLine:Hide()
+    observerLine.scoreNumber = -2
+    observerLine.name.Top:Set(observerLine.Top)
+    observerLine.Height:Set(15)
+
     if SessionIsReplay() then
+        sessionInfo.Options.Score = 'yes'
         observerLine.Height:Set(40)
         observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 12, UIUtil.bodyFont)
+        observerLine.speedText:Hide()
         observerLine.speedText:SetColor('ff00dbff')
         LayoutHelpers.AtRightIn(observerLine.speedText, observerLine)
         observerLine.speedSlider = IntegerSlider(controls.bgStretch, false, -10, 10, 1,
@@ -327,10 +328,10 @@ function SetupPlayerLines()
             UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
             UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options/slider-back_bmp.dds'))
-
-        observerLine.speedSlider.Left:Set(function() return observerLine.Left() end)
+        observerLine.speedSlider:Hide()
+        observerLine.speedSlider.Left:Set(observerLine.Left)
         observerLine.speedSlider.Right:Set(function() return observerLine.Right() - 20 end)
-        observerLine.speedSlider.Bottom:Set(function() return observerLine.Bottom() end)
+        observerLine.speedSlider.Bottom:Set(observerLine.Bottom)
         observerLine.speedSlider._background.Left:Set(observerLine.speedSlider.Left)
         observerLine.speedSlider._background.Right:Set(observerLine.speedSlider.Right)
         observerLine.speedSlider._background.Top:Set(observerLine.speedSlider.Top)
@@ -501,25 +502,26 @@ function _OnBeat()
         end
     end
 
+    local armiesInfo = GetArmiesTable().armiesTable
     if currentScores then
-        local armiesInfo = GetArmiesTable().armiesTable
         ScoresCache = currentScores
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
-                if line.OOG then break end
+                    if scoreData.general.score == -1 then
+                        line.score:SetText('')
+                        line.scoreNumber = -1
+                    else
+                        line.score:SetText(fmtnum(scoreData.general.score))
+                        line.scoreNumber = scoreData.general.score
+                    end
+                    if line.OOG then break end
                     if DisplayStorage > 0 then
                         DisplayResources(scoreData.resources,line,2)
                     else
                         DisplayResources(scoreData.resources,line,DisplayResMode)
                     end
 
-                    if scoreData.general.score == -1 then
-                        line.scoreNumber = -1
-                    else
-                        line.score:SetText(fmtnum(scoreData.general.score))
-                        line.scoreNumber = scoreData.general.score
-                    end
                     if GetFocusArmy() == index then
                         if scoreData.general.currentcap.count > 0 then
                             SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
@@ -538,7 +540,7 @@ function _OnBeat()
                 end
             end
         end
-        if sessionInfo.Options.Score == 'yes' then
+        if (sessionInfo.Options.Score == 'yes') or (armiesInfo[localArmyID].outOfGame) then
             table.sort(controls.armyLines, function(a,b)
                 return a.scoreNumber > b.scoreNumber
             end)
@@ -575,13 +577,21 @@ function _OnBeat()
                 line.score:SetFont('Arial Bold', 12)
             end
         end
-        if observerLine then
-            if cur <= 0 then
-                observerLine.name:SetColor('ffff7f00')
-                observerLine.name:SetFont('Arial Bold', 12)
-            elseif prevArmy <= 0 then
-                observerLine.name:SetColor('ffffffff')
-                observerLine.name:SetFont(UIUtil.bodyFont, 12)
+        if cur < 1 then
+            observerLine.name:SetColor('ffff7f00')
+            observerLine.name:SetFont('Arial Bold', 12)
+        elseif prevArmy < 1 then
+            observerLine.name:SetColor('ffffffff')
+            observerLine.name:SetFont(UIUtil.bodyFont, 12)
+        end
+        if observerLine:IsHidden() and ((cur < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
+            table.insert(controls.armyLines, table.getn(controls.armyLines), observerLine)
+            import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+            controls.armyGroup.Height:Set(controls.armyGroup.Height() + observerLine.Height())
+            observerLine:Show()
+            if observerLine.speedText then
+                observerLine.speedText:Show()
+                observerLine.speedSlider:Show()
             end
         end
         prevArmy = cur
