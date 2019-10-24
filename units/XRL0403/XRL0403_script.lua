@@ -63,6 +63,7 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
+        self.Sync.LowPriority = true
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
@@ -72,7 +73,7 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
-
+        self.Sync.LowPriority = false
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
         end
