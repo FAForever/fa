@@ -1214,7 +1214,8 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 then
+        -- apply death animation on half built units apart from ML and mega
+        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 and not EntityCategoryContains(categories.EXPERIMENTAL * categories.BOT * categories.CYBRAN, self) then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
