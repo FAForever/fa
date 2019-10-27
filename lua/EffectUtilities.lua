@@ -557,6 +557,35 @@ function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, BuildEffect
     end
 end
 
+function CreateAeonFactoryBuildingEffectsOnPause(builder, unitBeingBuilt, BuildBone, EffectsBag)
+    local bp = unitBeingBuilt:GetBlueprint()
+    local x, y, z = unpack(builder:GetPosition(BuildBone))
+    local mul = 1
+    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
+    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
+    local sy = bp.Physics.MeshExtentsY or sx + sz
+
+    local slice = nil
+
+    -- Create a pool mercury that slow draws into the build unit
+    local fraction = unitBeingBuilt:GetFractionComplete()
+    local scale
+    scale = 1 - math.pow(fraction, 2)
+    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 1, nil, nil, nil)
+    BuildBaseEffect:SetScale(sx * scale, 1.5 * sy * scale, sz * scale)
+    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
+    unitBeingBuilt.Trash:Add(BuildBaseEffect)
+    EffectsBag:Add(BuildBaseEffect)
+
+
+    local slider = CreateSlider(unitBeingBuilt, 0)
+    unitBeingBuilt.Trash:Add(slider)
+    EffectsBag:Add(slider)
+    slider:SetWorldUnits(true)
+    slider:SetSpeed(0)
+    slider:SetGoal(0, 0.5 * (fraction * sy - sy), 0)
+end
+
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
     local bp = unitBeingBuilt:GetBlueprint()
     local army = builder:GetArmy()
@@ -621,6 +650,96 @@ function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, Buil
             local beamEffect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v)
             BuildEffectsBag:Add(beamEffect)
         end
+    end
+end
+
+function CreateSeraphimFactoryBuildingEffectsOnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
+    local bp = unitBeingBuilt:GetBlueprint()
+    local army = builder:GetArmy()
+    local x, y, z = unpack(builder:GetPosition(BuildBone))
+    local mul = 1
+    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
+    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
+    local sy = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
+
+    local slice = nil
+
+    -- Create a pool mercury that slow draws into the build unit
+    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
+    BuildBaseEffect:SetScale(sx, 1, sz)
+    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
+    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
+    unitBeingBuilt.Trash:Add(BuildBaseEffect)
+    EffectsBag:Add(BuildBaseEffect)
+
+    local slider = CreateSlider(unitBeingBuilt, 0)
+    unitBeingBuilt.Trash:Add(slider)
+    EffectsBag:Add(slider)
+    slider:SetWorldUnits(true)
+    slider:SetGoal(0, sy, 0)
+    slider:SetSpeed(0)
+end
+
+function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
+    local bp = unitBeingBuilt:GetBlueprint()
+    local army = builder:GetArmy()
+    local x, y, z = unpack(builder:GetPosition(BuildBone))
+    local mul = 1
+    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
+    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
+    local sy = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
+
+    local slice = nil
+
+    -- Create a pool mercury that slow draws into the build unit
+    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
+    BuildBaseEffect:SetScale(sx, 1, sz)
+    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
+    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
+    unitBeingBuilt.Trash:Add(BuildBaseEffect)
+    EffectsBag:Add(BuildBaseEffect)
+
+    for _, vBone in BuildEffectBones do
+        EffectsBag:Add(CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp'))
+        for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
+            EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, vBeam))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
+        end
+    end
+
+    local slider = CreateSlider(unitBeingBuilt, 0)
+    unitBeingBuilt.Trash:Add(slider)
+    EffectsBag:Add(slider)
+    slider:SetWorldUnits(true)
+    slider:SetGoal(0, 0, 0)
+    slider:SetSpeed(-1)
+    WaitFor(slider)
+
+    if not slider:BeenDestroyed() then
+        slider:SetGoal(0, -sy, 0)
+        slider:SetSpeed(0.05)
+    end
+
+    -- Wait till we are 80% done building, then snap our slider to
+    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
+        WaitSeconds(0.5)
+    end
+
+    if not unitBeingBuilt.Dead then
+        if not BuildBaseEffect:BeenDestroyed() then
+            BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
+        end
+        if not slider:BeenDestroyed() then
+            slider:SetSpeed(1)
+        end
+        WaitSeconds(0.5)
+    end
+
+    if not BuildBaseEffect:BeenDestroyed() then
+        BuildBaseEffect:Destroy()
     end
 end
 

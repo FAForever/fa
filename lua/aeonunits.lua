@@ -38,19 +38,38 @@ local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
+local CreateAeonFactoryBuildingEffectsOnPause = EffectUtil.CreateAeonFactoryBuildingEffectsOnPause
+
 
 ---------------------------------------------------------------
 --  AIR STRUCTURES
 ---------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
+
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
+
+    StartBaseBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffectsOnPause, unitBeingBuilt, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
     
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBaseBuildFx(self:GetFocusUnit())
+        end
+        StructureUnit.OnPaused(self)
+    end,
+
     OnUnpaused = function(self)
         AirFactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
@@ -120,14 +139,31 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 --  LAND FACTORY STRUCTURES
 ---------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
+
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
+    end,
+
+    StartBaseBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffectsOnPause, unitBeingBuilt, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
+    
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBaseBuildFx(self:GetFocusUnit())
+        end
+        StructureUnit.OnPaused(self)
     end,
     
     OnUnpaused = function(self)
         LandFactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
@@ -172,9 +208,25 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
         unitBeingBuilt.Trash:Add(thread)
     end,
 
+    StartBaseBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffectsOnPause, unitBeingBuilt, 'Attachpoint01', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
+    
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBaseBuildFx(self:GetFocusUnit())
+        end
+        StructureUnit.OnPaused(self)
+    end,
+
     OnUnpaused = function(self)
         SeaFactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
