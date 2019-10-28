@@ -11,7 +11,7 @@ Patch 3708 (19 October, 2019)
 - Updated spelling and punctuation
 - Reduced LOD Cutoff from 1000 to 750
 - Fixed target bones of Cybran T2 Land HQ
-- Added a currated maps button
+- Added a curated maps button
 - Changed air staging icon to T1
 - Added an option to fill all lobby slots with AI
 - Fixed strats scripts
