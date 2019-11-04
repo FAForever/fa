@@ -82,6 +82,14 @@ Wreckage = Class(Prop) {
     end,
 }
 
+LifeToDie = function(self, Delay, HDamage)
+    WaitSeconds(Delay)
+    while true do
+        self:OnDamage(nil, HDamage, nil, nil)
+        WaitSeconds(60 + Random(-5, 5))
+    end
+end
+
 --- Create a wreckage prop.
 function CreateWreckage(bp, position, orientation, mass, energy, time)
     local bpWreck = bp.Wreckage.Blueprint
@@ -106,6 +114,22 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
 
     -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
     prop.AssociatedBP = bp.Wreckage.IdHook or bp.BlueprintId
+
+    local Delay = 300
+    local Mult = 0
+    if mass <= 100 then
+        Mult = 1
+    elseif mass <= 500 then
+        Mult = 0.2
+    elseif mass <= 2000 then
+        Delay = 600
+        Mult = 0.1
+    else
+        return prop
+    end
+
+    local TimeToDie = ForkThread(LifeToDie, prop, Delay, prop:GetHealth()*Mult)
+    prop.Trash:Add(TimeToDie)
 
     return prop
 end
