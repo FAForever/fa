@@ -1214,14 +1214,14 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        -- apply death animation on half built units apart from ML and mega
-        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 and not EntityCategoryContains(categories.EXPERIMENTAL * categories.BOT * categories.CYBRAN, self) then
+        -- apply death animation on half built units (do not apply for ML and mega)
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
 
         self:DoUnitCallbacks('OnKilled')
-
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
             self.UnitBeingTeleported = nil
@@ -1586,7 +1586,9 @@ Unit = Class(moho.unit_methods) {
         if overkillRatio and overkillRatio > 1.0 then
             return
         end
-
+        if self:GetFractionComplete() < 0.5 then
+            return
+        end
         return self:CreateWreckageProp(overkillRatio)
     end,
 
