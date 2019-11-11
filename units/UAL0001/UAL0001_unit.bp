@@ -145,6 +145,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
         'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,

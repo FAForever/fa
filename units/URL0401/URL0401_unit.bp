@@ -73,6 +73,7 @@
         'DRAGBUILD',
         'OVERLAYINDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,

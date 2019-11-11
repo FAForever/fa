@@ -72,6 +72,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OMNI',
         'OVERLAYOMNI',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.65,
     Defense = {
