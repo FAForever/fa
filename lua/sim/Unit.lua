@@ -971,6 +971,7 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             local targetData
             local baseData
+            local repairRatio = 0.75
 
             if focus then -- Always inherit work status of focus
                 self:InheritWork(focus)
@@ -1000,6 +1001,10 @@ Unit = Class(moho.unit_methods) {
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
                 else
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                        energy = energy * repairRatio
+                        mass = mass * repairRatio
+                    end
                 end
             end
 
@@ -2077,6 +2082,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         local bp = self:GetBlueprint()
+        self.isFinishedUnit = true
 
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
         -- Do all this here so we only have to do for things which get completed
