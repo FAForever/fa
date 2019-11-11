@@ -164,14 +164,12 @@ NukeProjectile = Class(NullShell) {
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not instigator:GetBlueprint().CategoriesHash.SATELLITE then
-            local bp = self:GetBlueprint().Defense.MaxHealth
-                if bp then
-                self:DoTakeDamage(instigator, amount, vector, damageType)
-            else
-                self:OnKilled(instigator, damageType)
-            end
-        end
+		local bp = self:GetBlueprint().Defense.MaxHealth
+			if bp then
+			self:DoTakeDamage(instigator, amount, vector, damageType)
+		else
+			self:OnKilled(instigator, damageType)
+		end
     end,
 }
 

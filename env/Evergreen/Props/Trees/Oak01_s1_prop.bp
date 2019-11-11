@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'oak01_s1_LOD2_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     NormalsName = 'oak01_s1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },

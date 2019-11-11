@@ -42,6 +42,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:CreateUnitAmbientEffect(self:GetCurrentLayer())
         if self.AnimationManipulator then
             self:SetUnSelectable(true)
             self.AnimationManipulator:SetRate(1)
@@ -83,6 +84,9 @@ URL0402 = Class(CWalkingLandUnit) {
     },
 
     CreateUnitAmbientEffect = function(self, layer)
+        if self:GetFractionComplete() ~= 1 then
+            return
+        end
         if self.AmbientEffectThread ~= nil then
            self.AmbientEffectThread:Destroy()
         end

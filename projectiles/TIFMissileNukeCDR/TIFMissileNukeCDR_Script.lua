@@ -19,6 +19,14 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         self:LauncherCallbacks()
     end,
 
+    OnImpact = function(self, TargetType, TargetEntity)
+        if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE, TargetEntity) then
+            self:Destroy()
+        else
+            TIFMissileNuke.OnImpact(self, TargetType, TargetEntity)
+        end
+    end,
+
     -- Tactical nuke has different flight path
     MovementThread = function(self)
         local army = self:GetArmy()

@@ -24,6 +24,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
 local Set = import('/lua/system/setutils.lua')
+local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
@@ -359,134 +360,101 @@ Unit = Class(moho.unit_methods) {
 
     -- Updates build restrictions of any unit passed, used for support factories
     updateBuildRestrictions = function(self)
-        local faction = false
-        local type = false
-        local techlevel = false
+        local categoriesCheckTable = {
+            faction = {},
+            type = { 'LAND', 'AIR', 'NAVAL', },
+        }
+        local catFlags = {
+            faction = false,
+            type = false,
+        }
 
-        -- Defines the unit's faction
-        if EntityCategoryContains(categories.AEON, self) then
-            faction = categories.AEON
-        elseif EntityCategoryContains(categories.UEF, self) then
-            faction = categories.UEF
-        elseif EntityCategoryContains(categories.CYBRAN, self) then
-            faction = categories.CYBRAN
-        elseif EntityCategoryContains(categories.SERAPHIM, self) then
-            faction = categories.SERAPHIM
+        --instead of hardcoding we fill the table dynamically from the faction list. much nicer.
+        for key, factionTable in Factions do
+            table.insert(categoriesCheckTable.faction, factionTable.Category)
         end
 
-        -- Defines the unit's layer type
-        if EntityCategoryContains(categories.LAND, self) then
-            type = categories.LAND
-        elseif EntityCategoryContains(categories.AIR, self) then
-            type = categories.AIR
-        elseif EntityCategoryContains(categories.NAVAL, self) then
-            type = categories.NAVAL
+        --This fills the catFlags with categories from the categoriesCheckTable if it finds them.
+        for key, CatsList in categoriesCheckTable do
+            for _, category in CatsList do
+                if EntityCategoryContains(categories[category], self) then
+                    catFlags[key] = categories[category]
+                    break
+                end
+            end
         end
 
-        -- Defines the unit's tech level
-        if EntityCategoryContains(categories.TECH1, self) then
-            techlevel = categories.TECH1
-        elseif EntityCategoryContains(categories.TECH2, self) then
-            techlevel = categories.TECH2
-        elseif EntityCategoryContains(categories.TECH3, self) then
-            techlevel = categories.TECH3
+        --Sanity check.
+        if not catFlags.faction then
+            return
         end
 
         local aiBrain = self:GetAIBrain()
         local supportfactory = false
 
-        -- Sanity check.
-        if not faction then
-            return
-        end
-
-        -- Add build restrictions
-        if EntityCategoryContains(categories.FACTORY, self) then
-            if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
-                -- Add support factory cannot build higher tech units at all, until there is a HQ factory
-                self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
-                self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
-                self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
-                supportfactory = true
-            else
-                -- A normal factory cannot build a support factory until there is a HQ factory
-                self:AddBuildRestriction(categories.SUPPORTFACTORY)
-                supportfactory = false
-            end
-        elseif EntityCategoryContains(categories.ENGINEER, self) then
-            -- Engineers also cannot build a support factory until there is a HQ factory
+        --Add build restrictions
+        if EntityCategoryContains(categories.FACTORY * categories.SUPPORTFACTORY, self) then
+            --Support factories cannot build higher tech units at all, until there is a HQ factory
+            self:AddBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
+            self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
+            supportfactory = true
+        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, self) then
+            --Engineers and normal factories cannot build a support factory until there is a HQ factory
             self:AddBuildRestriction(categories.SUPPORTFACTORY)
         end
 
-        -- Check for the existence of HQs
+        local HQCategory = categories.RESEARCH * catFlags.faction -- make the categories read a bit easier on the eyes
+        --Check for the existence of HQs
         if supportfactory then
-            if not type then
-                return
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+            --if we find any HQs, we remove build restrictions for the support factory in question (self)
+            if not catFlags.type then return end
+
+            --check if our type of T3 HQ exists, else check for any T3 HQ, and then check for T2 HQ variants
+            if self.FindHQType(aiBrain, HQCategory * categories.TECH3 * catFlags.type) then
+                self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
+                self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
+            else
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH3) then
+                    self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE * categories.CONSTRUCTION)
                 end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
-                    break
-                end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
+
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH2 * catFlags.type) then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-                    break
-                end
-            end
-            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
-                if not unit.Dead and not unit:IsBeingBuilt() then
-                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
-                    self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
-                    break
+                elseif self.FindHQType(aiBrain, HQCategory * categories.TECH2) then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
                 end
             end
         else
-            for _, researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
-                -- If there is a research station of the appropriate type, enable support factory construction
-                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
-                    if not unit.Dead and not unit:IsBeingBuilt() then
-                        -- Special case for the Commander, since its engineering upgrades are implemented using build restrictions
-                        -- In future, figure out a way to query existing legal builds? For example, check if you can build T2, if you can, enable support factory too
-                        if EntityCategoryContains(categories.COMMAND, self) then
-                            if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            end
-                        else
-                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                        end
-                        break
+            --if we find any HQs, we remove build restrictions for the engineering unit in question (self)
+            for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
+                local supportFacCat = categories.SUPPORTFACTORY * catFlags.faction * researchType
+
+                --If there is a research station of the appropriate type, enable support factory construction
+                if self.FindHQType(aiBrain, HQCategory * categories.TECH3 * researchType) then
+                    --if we are a normal unit, or a T3 acu, remove restrictions, else check for T2 upgrade
+                    if (not EntityCategoryContains(categories.COMMAND, self)) or self:HasEnhancement('T3Engineering') then
+                        self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * supportFacCat)
+                    elseif self:HasEnhancement('AdvancedEngineering') then
+                        self:RemoveBuildRestriction(categories.TECH2 * supportFacCat)
                     end
-                end
-                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
-                    if not unit.Dead and not unit:IsBeingBuilt() then
-
-                        -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
-                        if EntityCategoryContains(categories.COMMAND, self) then
-                            if self:HasEnhancement('AdvancedEngineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            elseif self:HasEnhancement('T3Engineering') then
-                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                                self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
-                            end
-                        else
-                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-                            self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
-                        end
-
-                        break
+                elseif self.FindHQType(aiBrain, HQCategory * categories.TECH2 * researchType) then
+                    --if we are a normal unit, or an upgraded ACU, remove restrictions
+                    if (not EntityCategoryContains(categories.COMMAND, self)) or (self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering')) then
+                        self:RemoveBuildRestriction(categories.TECH2 * supportFacCat)
                     end
                 end
             end
         end
+    end,
+
+    --self.FindHQType(aiBrain, category)
+    FindHQType = function(aiBrain, category)
+        for id, unit in aiBrain:GetListOfUnits(category, false, true) do
+            if not unit.Dead and not unit:IsBeingBuilt() then
+                return true
+            end
+        end
+        return false
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1003,6 +971,7 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             local targetData
             local baseData
+            local repairRatio = 0.75
 
             if focus then -- Always inherit work status of focus
                 self:InheritWork(focus)
@@ -1032,6 +1001,10 @@ Unit = Class(moho.unit_methods) {
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
                 else
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                        energy = energy * repairRatio
+                        mass = mass * repairRatio
+                    end
                 end
             end
 
@@ -1258,6 +1231,12 @@ Unit = Class(moho.unit_methods) {
             self.UnitBeingTeleported = nil
         end
 
+        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
+
+        if self.DeathWeaponEnabled ~= false then
+            self:DoDeathWeapon()
+        end
+
         -- Notify instigator of kill and spread veterancy
         -- We prevent any vet spreading if the instigator isn't part of the vet system (EG - Self destruct)
         -- This is so that you can bring a damaged Experimental back to base, kill, and rebuild, without granting
@@ -1265,13 +1244,7 @@ Unit = Class(moho.unit_methods) {
         if self.totalDamageTaken > 0 and not self.veterancyDispersed then
             self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
-
-        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
-
-        if self.DeathWeaponEnabled ~= false then
-            self:DoDeathWeapon()
-        end
-
+        
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
@@ -1299,11 +1272,6 @@ Unit = Class(moho.unit_methods) {
         
         massTrue = mass
         
-        -- Non-combat structures only give 50% veterancy
-        if not self.gainsVeterancy and EntityCategoryContains(categories.STRUCTURE, self) then
-            mass = mass * 0.5
-        end
-
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
@@ -1361,19 +1329,27 @@ Unit = Class(moho.unit_methods) {
 
     CalculateVeterancyLevel = function(self, massKilled)
         -- Limit the veterancy gain from one kill to one level worth
-        massKilled = math.min(massKilled, self.Sync.myValue)
+        massKilled = math.min(massKilled, self.Sync.myValue or self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1])
 
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
-
+        
         -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
-        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+        if self.Sync.myValue then
+            local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+            
+            -- Bail if our veterancy hasn't increased
+            if newVetLevel == self.Sync.VeteranLevel then return end
 
-        -- Bail if our veterancy hasn't increased
-        if newVetLevel == self.Sync.VeteranLevel then return end
-
-        -- Update our recorded veterancy level
-        self.Sync.VeteranLevel = newVetLevel
+            -- Update our recorded veterancy level
+            self.Sync.VeteranLevel = newVetLevel
+        else
+            if self.Sync.totalMassKilled - self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1] >= 0 then
+                self.Sync.VeteranLevel = self.Sync.VeteranLevel + 1
+            else
+                return
+            end
+        end    
 
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
@@ -1382,11 +1358,28 @@ Unit = Class(moho.unit_methods) {
         self.Sync.totalMassKilled = math.floor(massKilled)
         self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
         
-        local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
+        if self.Sync.myValue then
+            local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
-        if newVetLevel == self.Sync.VeteranLevel then return end
+            if newVetLevel == self.Sync.VeteranLevel then return end
 
-        self.Sync.VeteranLevel = newVetLevel
+            self.Sync.VeteranLevel = newVetLevel
+        else
+            if self.Sync.totalMassKilled  < self.Sync.manualVeterancy[1] then
+                return
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[2] then
+                self.Sync.VeteranLevel = 1
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[3] then
+                self.Sync.VeteranLevel = 2
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[4] then
+                self.Sync.VeteranLevel = 3
+            elseif self.Sync.totalMassKilled < self.Sync.manualVeterancy[5] then
+                self.Sync.VeteranLevel = 4
+            else
+                self.Sync.VeteranLevel = 5
+            end
+        end
+        
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
@@ -1394,8 +1387,12 @@ Unit = Class(moho.unit_methods) {
     SetVeterancy = function(self, veteranLevel)
         if veteranLevel <= 0 or veteranLevel > 5 then return end
         if not self.gainsVeterancy then return end
-
-        self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+        
+        if self.Sync.myValue then
+            self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+        else
+            self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel])
+        end    
     end,
 
     -- Set the veteran level to the level specified
@@ -1660,7 +1657,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        if (layer ~= 'Air' and self.PlayDeathAnimation) or (layer == "Air" and halfBuilt) then
+        if layer ~= 'Air' or (layer == "Air" and halfBuilt) then
             TryCopyPose(self, prop, true)
         end
 
@@ -2109,6 +2106,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         local bp = self:GetBlueprint()
+        self.isFinishedUnit = true
 
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
         -- Do all this here so we only have to do for things which get completed
@@ -2119,11 +2117,31 @@ Unit = Class(moho.unit_methods) {
             self.Sync.totalMassKilled = 0
             self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
-
-            -- Allow units to require more or less mass to level up. Decimal multipliers mean
-            -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-            local defaultMult = 2
-            self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
+            
+            -- Values can be setting up manually via bp.
+            if bp.VeteranMass then
+                self.Sync.manualVeterancy = {
+                    [1] = bp.VeteranMass[1],
+                    [2] = bp.VeteranMass[1] + bp.VeteranMass[2],
+                    [3] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3],
+                    [4] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4],
+                    [5] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4] + bp.VeteranMass[5],
+                }
+            else
+                -- Allow units to require more or less mass to level up. Decimal multipliers mean
+                -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
+                local techMultipliers = {
+                    TECH1 = 2,
+                    TECH2 = 1.5,
+                    TECH3 = 1.25,
+                    SUBCOMMANDER = 2,
+                    EXPERIMENTAL = 2,
+                    COMMAND = 2,
+                }
+                local defaultMult = techMultipliers[self.techCategory] or 2
+                
+                self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
+            end
         end
 
         self:EnableUnitIntel('NotInitialized', nil)
@@ -2404,19 +2422,21 @@ Unit = Class(moho.unit_methods) {
         local wreckage = {}
         local bpid = unit:GetUnitId()
 
-        for _, p in props do
-            local pos = p.CachePosition
-            if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
-                local progress = p:GetFractionComplete() * 0.5
-                -- Set health according to how much is left of the wreck
-                unit:SetHealth(self, unit:GetMaxHealth() * progress)
+        if EntityCategoryContains(categories.ENGINEER, self) then
+            for _, p in props do
+                local pos = p.CachePosition
+                if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
+                    local progress = p:GetFractionComplete() * 0.5
+                    -- Set health according to how much is left of the wreck
+                    unit:SetHealth(self, unit:GetMaxHealth() * progress)
 
-                -- Clear up wreck after rebuild bonus applied if engine won't
-                if not unit.EngineIsDeletingWreck then
-                    p:Destroy()
+                    -- Clear up wreck after rebuild bonus applied if engine won't
+                    if not unit.EngineIsDeletingWreck then
+                        p:Destroy()
+                    end
+
+                    return
                 end
-
-                return
             end
         end
 

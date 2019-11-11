@@ -54,7 +54,7 @@ The actual loading in `init_faf.lua` is done here:
     mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
     mount_dir(fa_path, '/')[/code]
 
-After adding all maps and mods to the search path, all `.nxt` compressed directories are loaded (as filtered by the whitelist). This currently includes: murderparty, labwars, avanced strategic icons and texturepack. They are loaded in alphabetical order.
+After adding all maps and mods to the search path, all `.nxt` compressed directories are loaded (as filtered by the whitelist). This currently includes: murderparty, labwars, advanced strategic icons and texturepack. They are loaded in alphabetical order.
 
 Followed by `.nxt` files, `.nx2` files are loaded. These comprise compressed directories for each subdirectory of the FA virtual file system: effects, env, loc, lua, modules, schook, projectiles, units, textures and meshes.
 
@@ -114,7 +114,7 @@ We can use a custom init file to ease the development process. The following fil
     -- these are the classic supcom directories. They don't work with accents or other foreign characters in usernames
     mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
     mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the uppder ones.
+    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the upper ones.
     mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
     mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
     mount_dir(dev_path, '/')
@@ -134,14 +134,14 @@ We can use a custom init file to ease the development process. The following fil
         'im',
     }
 
-At the very top there is the line: `dev_path`, which should be set to where ever you have cloned this repository.
+At the very top there is the line: `dev_path`, which should be set to wherever you have cloned this repository.
 
 
-Starting Forged Alliance from the commandline with the following arguments:
+Starting Forged Alliance from the command line with the following arguments:
 
 `ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog`
 
-Will put it into a mode where it will look for updates to files that it has loaded. So when you modify a unit file or a blueprint, the game will re-load the file and put it into the active session.
+Will put it into a mode where it will look for updates to files that it has loaded. So when you modify a unit file or a blueprint, the game will reload the file and put it into the active session.
 
 This way, you don't need to restart the game every time you make a change, you simply need to make a new unit of the type, spawn a new projectile or do whatever it is you're doing.
 
@@ -157,11 +157,11 @@ This goes for both future and past work on the SCFA translation and for all lang
 1) *Compliance with the game's UI*
 - Text should never overflow from anywhere
 - As much as possible, try to keep a few pixels of margin between the text and its parent element boundaries
-- Use obvious abreviations if a shorter translation is impossible, but the abreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abreviated.
+- Use obvious abbreviations if a shorter translation is impossible, but the abbreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abbreviated.
 
 2) *Gender-neutral writing*
 - The translation should never adopt gendered formulations when addressing the player directly, and should respect gender-neutral writing everywhere possible
-- Median point and/or parenthesis, or gendering a word twice, should be avoided to the maximum.
+- Median point and/or parentheses, or gendering a word twice, should be avoided to the maximum.
 
 3) *Consistency of keywords*
 - Game specific keywords, like unit names and building names, should always be translated in the same manner consistently across the whole game.

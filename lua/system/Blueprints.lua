@@ -486,6 +486,27 @@ function PreModBlueprints(all_bps)
             end
         end
 
+        for i, w in bp.Weapon or {} do
+            if w.TargetPriorities then
+
+                local newPriorities = {}
+
+                for g, transcendentPritority in w.TranscendentPriorities or {} do
+                    table.insert(newPriorities, transcendentPritority)
+                end
+
+                table.insert(newPriorities, 'SPECIALHIGHPRI')
+
+                for _, priority in w.TargetPriorities do
+                    table.insert(newPriorities, priority)
+                end
+
+                table.insert(newPriorities, 'SPECIALLOWPRI')
+
+                w.TargetPriorities = newPriorities
+            end
+        end
+
         for _, category in {'LAND', 'AIR', 'NAVAL'} do
             if bp.CategoriesHash[category] then
                 bp.LayerCategory = category

@@ -331,7 +331,6 @@ UnitBlueprint {
             RateOfFire = 0.1,#0.08
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
                 '(STRUCTURE * DEFENSE * ANTIAIR)',
@@ -341,8 +340,7 @@ UnitBlueprint {
                 'NAVAL * TECH3',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

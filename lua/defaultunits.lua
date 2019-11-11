@@ -2100,6 +2100,20 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
     end,
 }
 
+-- AMPHIBIOUS LAND UNITS
+AmphibiousLandUnit = Class(MobileUnit) {}
+
+SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+    OnLayerChange = function(self, new, old)
+        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        if new == 'Seabed'  then
+            self:SetSpeedMult(mult)
+        else
+            self:SetSpeedMult(1)
+        end
+    end,
+}
+
 --- Base class for command units.
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
@@ -2442,23 +2456,6 @@ ACUUnit = Class(CommandUnit) {
         WaitTicks(1)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
-    end,
-
-    OnKilledUnit = function(self, unitKilled, massKilled)
-        -- Adjust mass based on unit killed for ACU
-        if unitKilled.techCategory then
-            local techMultipliers = {
-                TECH1 = 1,
-                TECH2 = 0.5,
-                TECH3 = 0.333334,
-                SUBCOMMANDER = 0.3,
-                EXPERIMENTAL = 0.25,
-                COMMAND = 0.05,
-            }
-            massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
-        end
-
-        CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
     end,
 
     BuildDisable = function(self)

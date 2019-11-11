@@ -68,8 +68,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 1450,
-        MaxHealth = 1450,
+        Health = 1200,
+        MaxHealth = 1200,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4.5,
@@ -78,15 +78,22 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_amphibious>Amphibious', # added this [172]
+            '<LOC ability_amphibious>Amphibious',
         },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    LODCutoff = 100,
+                    Scrolling = true,
+                    ShaderName = 'Insect',
+                },
+                {
+                    AlbedoName = 'url0203_lod1_albedo.dds',
                     LODCutoff = 215,
                     Scrolling = true,
                     ShaderName = 'Insect',
+                    SpecularName = 'url0203_lod1_specteam.dds',
                 },
             },
         },
@@ -187,6 +194,7 @@ UnitBlueprint {
         RotateOnSpotThreshold = 0.1,
         TurnRadius = 0,
         TurnRate = 90,
+        WaterSpeedMultiplier = 0.9,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = 0,
@@ -258,13 +266,11 @@ UnitBlueprint {
             RateOfFire = 0.25,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -329,13 +335,11 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -396,11 +400,9 @@ UnitBlueprint {
             RateOfFire = 0.25,
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,
@@ -428,8 +430,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = true, #from false
-            Water = true, #from false
+            Sub = true,
+            Water = true,
         },
     },
 }
