@@ -2100,6 +2100,20 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
     end,
 }
 
+-- AMPHIBIOUS LAND UNITS
+AmphibiousLandUnit = Class(MobileUnit) {}
+
+SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+    OnLayerChange = function(self, new, old)
+        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        if new == 'Seabed'  then
+            self:SetSpeedMult(mult)
+        else
+            self:SetSpeedMult(1)
+        end
+    end,
+}
+
 --- Base class for command units.
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
