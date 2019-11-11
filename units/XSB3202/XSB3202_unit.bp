@@ -125,7 +125,7 @@ UnitBlueprint {
         BuildCostMass = 400,
         BuildRate = 15,
         BuildTime = 600,
-        MaintenanceConsumptionPerSecondEnergy = 100,
+        MaintenanceConsumptionPerSecondEnergy = 200,
         RebuildBonusIds = {
             'xsb3202',
         },
