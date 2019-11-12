@@ -52,6 +52,54 @@ XEA0002 = Class(TAirUnit) {
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
+        
+        local vx, vy, vz = self:GetVelocity()
+        
+        -- randomize falling animation to prevent cntrl-k on nuke abuse
+        -- use default animation if x or z speed > 0.1
+        if math.abs(vx) < 0.1 and math.abs(vz) < 0.1 then
+            self:AttachBoneTo(0, self.colliderProj, 'anchor')
+            self.colliderProj:SetLocalAngularVelocity(0.5, 0.5, 0.5)
+            local rng = Random(1, 8)
+            local randomSetups = {
+                {x = 1, z = 1},
+                {x = 1, z = 0},
+                {x = 1, z = -1},
+                {x = 0, z = 1},
+                {x = -1, z = -1},
+                {x = -1, z = 0},
+                {x = -1, z = 1},
+                {x = 0, z = -1},    
+            }
+            local x = randomSetups[rng].x
+            local z = randomSetups[rng].z
+            
+            if x > 0 then
+                x = x + Random(0, 8)/10
+            elseif x < 0 then
+                x = x - Random(0, 8)/10
+            else
+                if Random(1,2) == 1 then
+                    x = x + Random(0, 8)/10 
+                else
+                    x = x - Random(0, 8)/10
+                end        
+            end
+
+            if z > 0 then
+                z = z + Random(0, 8)/10
+            elseif z < 0 then
+                z = z - Random(0, 8)/10
+            else
+                if Random(1,2) == 1 then
+                    z = z + Random(0, 8)/10 
+                else
+                    z = z - Random(0, 8)/10
+                end 
+            end    
+
+            self.colliderProj:SetVelocity(x, 0, z)
+        end
     end,
 
     Open = function(self)
@@ -75,13 +123,6 @@ XEA0002 = Class(TAirUnit) {
             self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca')
         end,
     },
-
-    -- Make this unit ignore all but nuclear damage (Kills it when parked above a launcher)
-    OnDamage = function(self, instigator, amount, vector, damageType)
-        if EntityCategoryContains(categories.NUKE, instigator) then
-            self:Destroy()
-        end
-    end,
 }
 
 TypeClass = XEA0002

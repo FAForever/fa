@@ -145,6 +145,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
         'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -366,7 +367,7 @@ UnitBlueprint {
             BuildTime = 1225,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
-            NewHealth = 2000,
+            NewHealth = 3000,
             ShowBones = {
                 'Back_Upgrade',
             },
@@ -862,6 +863,13 @@ UnitBlueprint {
         Level4 = 90,
         Level5 = 120,
     },
+    VeteranMass = {
+        1000,
+        1250,
+        1750,
+        2500,
+        3500,
+    },
     VeteranHealingMult = { -- This table is used to override the vet instant heal multiplier per level
         0.1,
         0.2,
@@ -920,12 +928,10 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -954,7 +960,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
@@ -1004,15 +1010,13 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1043,11 +1047,11 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
-            DisplayName = 'Overcharge Cannon',
+            DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
@@ -1091,15 +1095,13 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1179,7 +1181,7 @@ UnitBlueprint {
             RateOfFire = 10,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretDualManipulators = false,

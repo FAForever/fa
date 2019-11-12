@@ -1,0 +1,46 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    AlbedoName = '/env/Wreckage/props/Walls/Wall01_Albedo.dds',
+                    LODCutoff = 500,
+                    MeshName = '/env/Wreckage/props/Walls/Wall01_lod0.scm',
+                    NormalsName = '/env/Wreckage/props/Walls/Wall01_normalsTS.dds',
+                    ShaderName = 'Unit',
+                    SpecularName = '/env/Wreckage/props/Walls/Wall01_Specteam.dds',
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXB0000',
+        SpawnRandomRotation = true,
+        UniformScale = 0.13,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
+    Interface = {
+        HelpText = 'UEF Wall Wreckage',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'Wreckage',
+    ScriptModule = '/lua/wreckage.lua',
+    SizeX = 1,
+    SizeY = 0.1,
+    SizeZ = 1,
+}

@@ -1,0 +1,40 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'cybran_car2_Albedo.dds',
+                    SpecName = 'cybran_car2_SpecTeam.dds',
+                    LODCutoff = 750,
+                    ShaderName = 'Unit',
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Cybran Car2',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2.5,
+    SizeY = 0.3,
+    SizeZ = 3.5,
+}

@@ -1,0 +1,39 @@
+PropBlueprint {
+    Categories = {
+        'INVULNERABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    -- share other rock's albedo and specteam
+                    LODCutoff = 3000,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
+    Interface = {
+        HelpText = 'Very Large Rock - Theta Bridge',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 12,
+    SizeY = 5.5,
+    SizeZ = 16,
+}

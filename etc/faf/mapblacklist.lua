@@ -369,7 +369,6 @@ MapBlacklist = {
     ['denmark3.v0003'] = true,
     ['depths v6'] = true,
     ['desert arena.v0001'] = true,
-    ['desert arena.v0002'] = true,
     ['desert arena v2.v0002'] = true,
     ['desert conflict.v0001'] = true,
     ['desert fox.v0001'] = true,
@@ -1925,4 +1924,7 @@ MapBlacklist = {
     ['paradisebayv2.v0001'] = true,
     ['paradisebayv2.v0002'] = true,
     ['paradisebayv2.v0003'] = true,
+-- Maps that are hidden in the Vault
+    ['aspro_crater.v0001'] = true,
+    ['aspro_crater_remastered.v0001'] = true,
 }

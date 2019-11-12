@@ -59,7 +59,7 @@ UnitBlueprint {
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 10000,
-            ShieldRechargeTime = 30,
+            ShieldRechargeTime = 25,
             ShieldRegenRate = 112,
             ShieldRegenStartTime = 3,
             ShieldSize = 28,
@@ -112,15 +112,15 @@ UnitBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 17000,
+        BuildCostEnergy =17000,
         BuildCostMass = 1260,
         BuildRate = 29.3,
-        BuildTime = 1680,
+        BuildTime = 2200,
         BuildableCategory = {
             'urb4206',
         },
         DifferentialUpgradeCostCalculation = true,
-        MaintenanceConsumptionPerSecondEnergy = 250,
+        MaintenanceConsumptionPerSecondEnergy = 300,
     },
     Footprint = {
         SizeX = 1,

@@ -17,50 +17,42 @@ Filters = {
         key = 'faction',
         choices = {
             {
-                title = 'Aeon',
-                key = 'aeon',
-                sortFunc = function(unitID)
-                    if string.sub(unitID, 2, 2) == 'a' then
-                        return true
-                    end
-                    return false
-                end,
-            },
-            {
                 title = 'UEF',
                 key = 'uef',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 2, 2) == 'e' then
-                        return true
-                    end
-                    return false
+                    return __blueprints[unitID].CategoriesHash.UEF
+                end,
+            },
+            {
+                title = 'Aeon',
+                key = 'aeon',
+                sortFunc = function(unitID)
+                    return __blueprints[unitID].CategoriesHash.AEON
                 end,
             },
             {
                 title = 'Cybran',
                 key = 'cybran',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 2, 2) == 'r' then
-                        return true
-                    end
-                    return false
+                    return __blueprints[unitID].CategoriesHash.CYBRAN
                 end,
             },
             {
                 title = 'Seraphim',
                 key = 'seraphim',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 2, 2) == 's' then
-                        return true
-                    end
-                    return false
+                    return __blueprints[unitID].CategoriesHash.SERAPHIM
                 end,
             },
             {
-                title = 'Operation',
-                key = 'ops',
+                title = 'other faction',
+                key = '3rdParty',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 1, 1) == 'o' then
+                    if not __blueprints[unitID].CategoriesHash.UEF
+                    and not __blueprints[unitID].CategoriesHash.AEON
+                    and not __blueprints[unitID].CategoriesHash.CYBRAN
+                    and not __blueprints[unitID].CategoriesHash.SERAPHIM
+                    then
                         return true
                     end
                     return false
@@ -73,33 +65,38 @@ Filters = {
         key = 'product',
         choices = {
             {
-                title = 'SC1',
+                title = 'SC',
                 key = 'sc1',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 1, 1) == 'u' then
-                        return true
-                    end
-                    return false
+                    return string.sub(unitID, 1, 1) == 'u'
                 end,
             },
             {
-                title = 'Download',
-                key = 'dl',
-                sortFunc = function(unitID)
-                    if string.sub(unitID, 1, 1) == 'd' then
-                        return true
-                    end
-                    return false
-                end,
-            },
-            {
-                title = 'XPack 1',
+                title = 'SC-FA',
                 key = 'scx1',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 1, 1) == 'x' then
-                        return true
-                    end
-                    return false
+                    return string.sub(unitID, 1, 1) == 'x'
+                end,
+            },
+            {
+                title = 'Mods',
+                key = 'dl',
+                sortFunc = function(unitID)
+                    return __blueprints[unitID].Mod
+                end,
+            },
+            {
+                title = 'Operation',
+                key = 'ops',
+                sortFunc = function(unitID)
+                    return string.sub(unitID, 1, 1) == 'o' or __blueprints[unitID].CategoriesHash.OPERATION
+                end,
+            },
+            {
+                title = 'Civilian',
+                key = 'civ',
+                sortFunc = function(unitID)
+                    return string.sub(unitID, 3, 3) == 'c' or __blueprints[unitID].CategoriesHash.CIVILIAN
                 end,
             },
         },
@@ -112,27 +109,30 @@ Filters = {
                 title = 'Land',
                 key = 'land',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 3, 3) == 'l' then
-                        return true
-                    end
-                    return false
+                    return __blueprints[unitID].CategoriesHash.LAND
                 end,
             },
             {
                 title = 'Air',
                 key = 'air',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 3, 3) == 'a' then
-                        return true
-                    end
-                    return false
+                    return __blueprints[unitID].CategoriesHash.AIR
                 end,
             },
             {
                 title = 'Naval',
                 key = 'naval',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 3, 3) == 's' then
+                    return __blueprints[unitID].CategoriesHash.NAVAL
+                end,
+            },
+            {
+                title = 'Amphibious',
+                key = 'amph',
+                sortFunc = function(unitID)
+                    if __blueprints[unitID].CategoriesHash.AMPHIBIOUS
+                    or __blueprints[unitID].CategoriesHash.HOVER
+                    then
                         return true
                     end
                     return false
@@ -148,16 +148,6 @@ Filters = {
                     return false
                 end,
             },
-            {
-                title = 'Civilian',
-                key = 'civ',
-                sortFunc = function(unitID)
-                    if string.sub(unitID, 3, 3) == 'c' then
-                        return true
-                    end
-                    return false
-                end,
-            },
         },
     },
     {
@@ -165,31 +155,49 @@ Filters = {
         key = 'tech',
         choices = {
             {
-                title = 'T1',
+                title = 'Tech 1',
                 key = 't1',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].CategoriesHash.TECH1
                 end,
             },
             {
-                title = 'T2',
+                title = 'Tech 2',
                 key = 't2',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].CategoriesHash.TECH2
                 end,
             },
             {
-                title = 'T3',
+                title = 'Tech 3',
                 key = 't3',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].CategoriesHash.TECH3
                 end,
             },
             {
-                title = 'Exp.',
+                title = 'Experimental',
                 key = 't4',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].CategoriesHash.EXPERIMENTAL
+                end,
+            },
+            {
+                title = 'ACU+',
+                key = 'acu',
+                sortFunc = function(unitID)
+                    -- Show ACU's
+                    if __blueprints[unitID].CategoriesHash.COMMAND then
+                        return true
+                    end
+                    -- Show SCU's
+                    if string.find(unitID, 'l0301_Engineer') then
+                        return true
+                    end
+                    -- Show Paragon
+                    if string.find(unitID, 'xab1401') then
+                        return true
+                    end
                 end,
             },
         },

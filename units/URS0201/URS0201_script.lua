@@ -112,7 +112,7 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
-        if self:GetCurrentLayer() ~= 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.WaterAnimationDeath
@@ -122,7 +122,7 @@ URS0201 = Class(CSeaUnit) {
     end,
 
      DeathThread = function(self, overkillRatio)
-        if self:GetCurrentLayer() ~= 'Water' then
+        if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
             self:PlayUnitSound('Destroyed')
             local army = self:GetArmy()
             if self.PlayDestructionEffects then

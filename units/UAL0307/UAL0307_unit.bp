@@ -158,9 +158,9 @@ UnitBlueprint {
         UniformScale = 0.5,
     },
     Economy = {
-        BuildCostEnergy = 1800,
-        BuildCostMass = 240,
-        BuildTime = 1320,
+        BuildCostEnergy = 1080,
+        BuildCostMass = 220,
+        BuildTime = 792,
         MaintenanceConsumptionPerSecondEnergy = 35,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -270,7 +270,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

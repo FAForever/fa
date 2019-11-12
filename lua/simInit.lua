@@ -184,7 +184,7 @@ function SetupSession()
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
-    -- Preloads AI telplates from AI mods
+    -- Preloads AI templates from AI mods
     AIModTemplatesPreloader()
     
     ResetSyncTable()
@@ -319,16 +319,15 @@ Prefetcher = CreatePrefetchSet()
 
 function DefaultPrefetchSet()
     local set = { models = {}, anims = {}, d3d_textures = {} }
-
---    for k,file in DiskFindFiles('/units/*.scm') do
+--    for k,file in DiskFindFiles('/units/', '*.scm') do
 --        table.insert(set.models,file)
 --    end
 
---    for k,file in DiskFindFiles('/units/*.sca') do
+--    for k,file in DiskFindFiles('/units/', '*.sca') do
 --        table.insert(set.anims,file)
 --    end
 
---    for k,file in DiskFindFiles('/units/*.dds') do
+--    for k,file in DiskFindFiles('/units/', '*.dds') do
 --        table.insert(set.d3d_textures,file)
 --    end
 
@@ -338,7 +337,7 @@ end
 Prefetcher:Update(DefaultPrefetchSet())
 
 function AIModTemplatesPreloader()
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = __active_mods or {}
     for Index, ModData in simMods do
         ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
         if ModAIFiles[1] then

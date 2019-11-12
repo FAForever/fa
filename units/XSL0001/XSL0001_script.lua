@@ -105,12 +105,16 @@ XSL0001 = Class(ACUUnit) {
                     BuffType = 'COMMANDERAURA_' .. enh,
                     Stacks = 'REPLACE',
                     Duration = 5,
+                    Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
                     Affects = {
                         Regen = {
                             Add = 0,
                             Mult = bp.RegenPerSecond,
                             Floor = bp.RegenFloor,
-                            Ceil = bp.RegenCeiling,
+                            CeilT1 = bp.RegenCeilingT1,
+                            CeilT2 = bp.RegenCeilingT2,
+                            CeilT3 = bp.RegenCeilingT3,
+                            CeilT4 = bp.RegenCeilingT4,
                         },
                     },
                 }

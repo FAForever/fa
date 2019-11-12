@@ -15,19 +15,19 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../Pine06_V1_albedo.dds',
-                    LODCutoff = 30,
+                    LODCutoff = 60,
                     NormalsName = '../Pine06_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },
                 {
                     AlbedoName = '../Pine06_V1_albedo.dds',
-                    LODCutoff = 175,
+                    LODCutoff = 200,
                     NormalsName = '../Pine06_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
                 {
                     AlbedoName = 'Pine06_GroupA_LOD2_albedo.dds',
-                    LODCutoff = 700,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },

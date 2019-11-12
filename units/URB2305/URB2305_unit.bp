@@ -156,7 +156,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 210000,
         BuildCostMass = 15000,
-        BuildRate = 1890,
+        BuildRate = 1500,
         BuildTime = 25000,
         RebuildBonusIds = {
             'urb2305',
@@ -328,7 +328,7 @@ UnitBlueprint {
             Damage = 10000,
             DamageFriendly = true,
             DamageRadius = 6,
-            DamageType = 'Normal',
+            DamageType = 'DeathExplosion',
             DisplayName = 'Death Weapon',
             DummyWeapon = true,
             Label = 'DeathWeapon',

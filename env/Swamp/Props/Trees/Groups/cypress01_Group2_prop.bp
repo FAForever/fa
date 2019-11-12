@@ -2,9 +2,9 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
     },
-    CollisionOffsetX = -1,
+    CollisionOffsetX = 1,
     CollisionOffsetY = 0,
-    CollisionOffsetZ = 0.2,
+    CollisionOffsetZ = -1,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -15,19 +15,19 @@ PropBlueprint {
             LODs = {
                 {
                     AlbedoName = '../cypress01_s1_albedo.dds',
-                    LODCutoff = 30,
+                    LODCutoff = 60,
                     NormalsName = '../cypress01_s1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
                 {
                     AlbedoName = '../cypress01_s1_albedo.dds',
-                    LODCutoff = 175,
+                    LODCutoff = 200,
                     NormalsName = '../cypress01_s1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
                 {
                     AlbedoName = 'cypress01_Group2_LOD2_albedo.dds',
-                    LODCutoff = 700,
+                    LODCutoff = 750,
                     ShaderName = 'VertexNormal',
                 },
             },
@@ -47,7 +47,7 @@ PropBlueprint {
     },
     ScriptClass = 'TreeGroup',
     ScriptModule = '/lua/proptree.lua',
-    SizeX = 6,
+    SizeX = 3,
     SizeY = 1.5,
-    SizeZ = 6.1,
+    SizeZ = 5,
 }

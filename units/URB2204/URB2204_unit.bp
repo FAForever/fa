@@ -119,9 +119,9 @@ UnitBlueprint {
         UniformScale = 0.015,
     },
     Economy = {
-        BuildCostEnergy = 3920,
-        BuildCostMass = 392,
-        BuildTime = 958,
+        BuildCostEnergy = 4000,
+        BuildCostMass = 400,
+        BuildTime = 540,
         RebuildBonusIds = {
             'urb2204',
         },
@@ -259,7 +259,6 @@ UnitBlueprint {
             RateOfFire = 2,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
@@ -267,8 +266,7 @@ UnitBlueprint {
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,

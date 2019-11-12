@@ -1,21 +1,18 @@
 PropBlueprint {
-   Categories = {
+    Categories = {
         'RECLAIMABLE',
     },
     Defense = {
         Health = 50,
         MaxHealth = 50,
     },
-    CollisionOffsetX = 0.1,
-    CollisionOffsetY = 0.1,
-    CollisionOffsetZ = 0.1,
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
                     AlbedoName = 'Floe_Floe_albedo.dds',
-                    LODCutoff = 2000,
+                    LODCutoff = 750,
                     ShaderName = 'NormalMappedAlpha',
                     SpecularName = 'Floe_Floe_specteam.dds',
                 },
@@ -24,17 +21,20 @@ PropBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = 100,
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 200,
         ReclaimTime = 5,
     },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
     Interface = {
-        HelpText = 'UEF Buildings',
+        HelpText = 'Floe',
     },
     Physics = {
-        BlockPath = false,
+        BlockPath = true,
     },
-    SizeX = 8,
-    SizeY = 8,
-    SizeZ = 8,
+    SizeX = 12,
+    SizeY = 1,
+    SizeZ = 12,
 }

@@ -1,0 +1,35 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 500,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 10,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Sphere',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.5,
+    SizeY = 0.25,
+    SizeZ = 0.5,
+}

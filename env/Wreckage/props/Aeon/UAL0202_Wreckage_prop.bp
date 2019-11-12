@@ -1,0 +1,41 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    -- share other rock's albedo and specteam
+                    LODCutoff = 750,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 150,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Obsidian Wreckage',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    ScriptClass = 'Wreckage',
+    ScriptModule = '/lua/wreckage.lua',
+    SizeX = 1,
+    SizeY = 0.25,
+    SizeZ = 1,
+}

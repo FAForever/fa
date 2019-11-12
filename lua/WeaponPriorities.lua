@@ -13,19 +13,22 @@ function HandleInputString(inputString)
         if pcall(loadstring("return "..inputString)) then
             --WARN('would have totally run this string just now: '..inputString)
             inputTable = loadstring("return "..inputString)()
+            inputTableLimited = categoryLimiter(inputString, "categories.COMMAND")
         else
             WARN('Syntax error in target priorities string, was discarded: '..inputString)
         end
     else
         WARN('Target priorities string contained improper content, so was discarded: '..inputString)
     end    
-    return inputTable
+    return inputTable, inputTableLimited
 end
 
 function SetWeaponPriorities(data)
     local selectedUnits = data.SelectedUnits
     local prioritiesTable
+    local prioritiesTableLimited
     local editedPriorities = {}
+    local editedPrioritiesLimited = {}
     local default
     local name
 
@@ -37,12 +40,15 @@ function SetWeaponPriorities(data)
     if not selectedUnits[1] then return end
 
     if data.prioritiesTable then
-        prioritiesTable = HandleInputString(data.prioritiesTable)
+        prioritiesTable, prioritiesTableLimited = HandleInputString(data.prioritiesTable)
 
         --this is needed to prevent crashes when there is a mistake in the middle of input string
         --and priTable has such structure: {[1] = userdata: EntityCategory, [2] = empty!, [3] = userdata: EntityCategory}
         for key,cat in prioritiesTable or {} do 
             table.insert(editedPriorities, cat)
+        end
+        for key,cat in prioritiesTableLimited or {} do 
+            table.insert(editedPrioritiesLimited, cat)
         end
     end
     
@@ -76,8 +82,14 @@ function SetWeaponPriorities(data)
     local preparedPrioTables = {}
 
     for _, unit in units do
-        local blueprintId = unit:GetBlueprint().BlueprintId
+        local bp = unit:GetBlueprint()
+        local blueprintId = bp.BlueprintId
         local weaponCount = unit:GetWeaponCount()
+        local finalPriorities = editedPrioritiesLimited
+        
+        if bp.CategoriesHash.SNIPEMODE then
+            finalPriorities = editedPriorities
+        end    
         
         --checks if unit is already in requested mode
         if weaponCount > 0 and unit.Sync.WepPriority ~= name then
@@ -93,7 +105,7 @@ function SetWeaponPriorities(data)
             elseif data.exclusive then
                 for i = 1, weaponCount do
                     local weapon = unit:GetWeapon(i)
-                    weapon:SetTargetingPriorities(editedPriorities)
+                    weapon:SetTargetingPriorities(finalPriorities)
                     weapon:ResetTarget()
                 end    
             elseif preparedPrioTables[blueprintId] then
@@ -108,7 +120,7 @@ function SetWeaponPriorities(data)
                 for i = 1, weaponCount do
                     local weapon = unit:GetWeapon(i)
                     local defaultPriorities = parsedPriorities[blueprintId][i]
-                    local mergedPriorities = table.copy(editedPriorities) or {}
+                    local mergedPriorities = table.copy(finalPriorities) or {}
                 
                     for k,v in defaultPriorities do
                         table.insert(mergedPriorities, v)
@@ -172,4 +184,35 @@ function parseDefaultPriorities()
         end
     end
     return finalPriorities
+end
+
+function categoryLimiter(inputStr, filterStr)
+    local priorityStrings = {}
+    local initIndex = 1
+    local modifiedString = ""
+
+    while initIndex do
+        local startIndex, endIndex, priority = string.find(inputStr, "([^,{}]+)", initIndex)
+        if endIndex then
+            initIndex = endIndex + 1
+            local categoryStart, categoryEnd = string.find(priority, filterStr)
+
+            -- exclude priority that contains given category if there is no "-" in front of it.
+            if not categoryStart or string.sub(priority, categoryStart - 1, categoryStart - 1) == "-" 
+                                 or string.sub(priority, categoryStart - 2, categoryStart - 2) == "-" then
+                table.insert(priorityStrings, priority)
+            end
+        else
+            initIndex = nil
+        end
+    end
+
+    -- also subtract given category from every priority expression, 
+    -- so it's impossible to trick this limiter using combination of allowed categories
+    for k,cat in priorityStrings do
+        modifiedString = modifiedString .. cat .. " - ".. filterStr .. ","      
+    end
+    modifiedString = "{"..modifiedString.."}"
+
+    return loadstring("return "..modifiedString)()
 end

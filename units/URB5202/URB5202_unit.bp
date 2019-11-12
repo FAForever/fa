@@ -3,8 +3,8 @@ UnitBlueprint {
         GuardScanRadius = 300,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 5,
-        RepairConsumeMass = 0.5,
+        RepairConsumeEnergy = 30,
+        RepairConsumeMass = 0,
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 300,
     },
@@ -29,6 +29,7 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
+        'BUILTBYTIER1ENGINEER',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER2COMMANDER',
@@ -36,7 +37,7 @@ UnitBlueprint {
         'CYBRAN',
         'STRUCTURE',
         'STRATEGIC',
-        'TECH2',
+        'TECH1',
         'AIRSTAGINGPLATFORM',
         'DRAGBUILD',
         'SIZE12',
@@ -100,7 +101,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 2100,
         BuildCostMass = 175,
-        BuildTime = 453,
+        BuildTime = 450,
         RebuildBonusIds = {
             'urb5202',
         },
@@ -167,7 +168,7 @@ UnitBlueprint {
     SizeX = 3,
     SizeY = 1.5,
     SizeZ = 3,
-    StrategicIconName = 'icon_structure2_air',
+    StrategicIconName = 'icon_structure1_air',
     StrategicIconSortPriority = 175,
     Transport = {
         Class2AttachSize = 2,

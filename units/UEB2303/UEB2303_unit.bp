@@ -106,7 +106,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 13500,
         BuildCostMass = 1890,
-        BuildTime = 1200,
+        BuildTime = 1600,
         RebuildBonusIds = {
             'ueb2303',
         },
@@ -243,9 +243,7 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

@@ -7,7 +7,7 @@ UnitBlueprint {
         AutoLandTime = 1,
         BankFactor = 4,
         BankForward = false,
-        BreakOffDistance = 34,
+        BreakOffDistance = 45,
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
@@ -23,7 +23,7 @@ UnitBlueprint {
         MaxAirspeed = 15,
         MinAirspeed = 13,
         StartTurnDistance = 5,
-        TurnSpeed = 0.48,
+        TurnSpeed = 1,
         Winged = true,
     },
     Audio = {
@@ -184,8 +184,8 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
+        BuildCostEnergy = 8000,
+        BuildCostMass = 270,
         BuildTime = 1600,
     },
     Footprint = {
@@ -218,7 +218,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        SonarRadius = 90,
+        SonarRadius = 45,
         VisionRadius = 32,
     },
     Interface = {
@@ -319,11 +319,16 @@ UnitBlueprint {
             RateOfFire = 0.1,#0.08
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
+                'CRUISER',
+                '(NAVAL * TECH2 * SHIELD)',
+                '(STRUCTURE * DEFENSE * ANTIAIR)',
+                '(TECH3 * NAVAL * CARRIER)',
+                'SUBMERSIBLE',
+                'NAVAL * TECH2',
+                'NAVAL * TECH3',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,
