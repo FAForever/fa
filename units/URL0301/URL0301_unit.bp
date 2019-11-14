@@ -671,7 +671,7 @@ UnitBlueprint {
     SizeX = 1.1,
     SizeY = 1.9,
     SizeZ = 1.1,
-    StrategicIconName = 'icon_commander_generic',
+    StrategicIconName = 'icon_subcommander',
     StrategicIconSortPriority = 1,
     Transport = {
         CanFireFromTransport = false,
