@@ -45,6 +45,7 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+local OptimalTeams = import('/lua/fairestTeams.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
 AIKeys = {}
@@ -3377,7 +3378,7 @@ function CreateUI(maxPlayers)
     if not isHost then
         GUI.defaultOptions:Hide()
     end
-    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.observerPanel, 11, -94)
+    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.observerPanel, -29, -94)
 
     Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
     if not isHost then
@@ -3398,10 +3399,23 @@ function CreateUI(maxPlayers)
             )
         end
     end
+    
+    -- GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/balanceteam/')
+    GUI.optimalteamsbutton = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/defaultoption/')
+    LayoutHelpers.RightOf(GUI.optimalteamsbutton, GUI.defaultOptions, -19)
+    Tooltip.AddButtonTooltip(GUI.optimalteamsbutton, 'lob_optimal_teams')
+    if not isHost then
+        GUI.optimalteamsbutton:Disable()
+    else
+        GUI.optimalteamsbutton.OnClick = function()
+            OptimalTeams.f_fairestTeam()
+        end
+    end
+    
 
     -- RANDOM MAP BUTTON --
     GUI.randMap = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/randommap/')
-    LayoutHelpers.RightOf(GUI.randMap, GUI.defaultOptions, -19)
+    LayoutHelpers.RightOf(GUI.randMap, GUI.optimalteamsbutton, -19)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not isHost then
         GUI.randMap:Hide()
@@ -3471,7 +3485,7 @@ function CreateUI(maxPlayers)
     
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
-    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 0, 47)
+    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 39, 47)
     Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
     if not isHost then
         GUI.closeEmptySlots:Hide()

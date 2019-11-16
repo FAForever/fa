@@ -878,6 +878,10 @@ Tooltips = {
         title = "<LOC tooltipui0712>Curated Maps",
         description = "<LOC tooltipui0713>Open a web page in your browser to view curated maps",
     },
+    lob_optimal_teams = {
+        title = "<LOC tooltipui0714>Optimal Balance",
+        description = "<LOC tooltipui0715>Balance the teams",
+    },
     lob_select_map = {
         title = "<LOC tooltipui0332>Game Options",
         description = "<LOC tooltipui0333>Choose a map to play on and adjust game settings",
