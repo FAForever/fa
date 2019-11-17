@@ -91,6 +91,15 @@ function PlayMFDMovie(movie, text)
         controls.subtitles = CreateSubtitles(controls.movieBrackets, text[1])
         
         controls.movieBrackets.movie.OnFinished = function(self)
+            if (not controls.movieBrackets.movie:IsLoaded()) and (self.loadCheck == nil) then
+                ForkThread(
+                function(self, duration, onFinished)
+                    WaitSeconds(duration)
+                    onFinished(self)
+                end, self, GetMovieDuration(movie[1]), controls.movieBrackets.movie.OnFinished)
+                self.loadCheck = true
+                return
+            end
             controls.movieBrackets.panel:SetNeedsFrameUpdate(true)
             controls.movieBrackets.panel.sound = PlaySound(Sound{Bank='Interface', Cue=prefix[movie[4]].cue..'_Out'})
             controls.subtitles:Contract()
