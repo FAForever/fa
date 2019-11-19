@@ -293,6 +293,15 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'amph',
+        OrderOverrides = {
+            RULEUTC_WeaponToggle = {
+                bitmapId = 'amphibious',
+                helpText = 'toggle_amphibious',
+            },
+        },
+        ToggleCaps = {
+            RULEUTC_WeaponToggle = true,
+        },
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC urs0201_name>Salem Class',
         UnitWeight = 1,

@@ -5352,6 +5352,7 @@ tooltipui0687="Prevents UEF commanders from upgrading their ACU to have the 'Bil
 tooltipui0688="No Super-Intel"
 tooltipui0689="Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
 tooltipui0690="Drone Auto-Rebuild"
+tooltipui0697="Amphibious Mode Toggle"
 
 tooltipui0540="Reset Chat Window"
 tooltipui0541="Resets the position and layout of the chat window"
