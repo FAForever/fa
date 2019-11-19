@@ -178,6 +178,10 @@ Tooltips = {
         description = "<LOC tooltipui0506>Pause/unpause current construction order",
         keyID = "pause_unit",
     },
+    toggle_amphibious = {
+        title = "<LOC tooltipui0697>Amphibious Mode Toggle",
+        description = "",
+    },
     toggle_omni = {
         title = "<LOC tooltipui0479>Omni Toggle",
         description = "<LOC tooltipui0480>Turn the selected units omni on/off",
