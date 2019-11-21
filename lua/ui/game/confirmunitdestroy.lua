@@ -9,15 +9,17 @@ local CreateAnnouncement = import('/lua/ui/game/announcement.lua').CreateAnnounc
 local destructingUnits = {}
 local controls = {}
 local countdownThreads = {}
+local scenarioInfo = SessionGetScenarioInfo()
+local selUnits = GetSelectedUnits() or {}
 
 function ConfirmUnitDestruction(instant)
-    if (SessionGetScenarioInfo().Options.CheatsEnabled == 'false') and (table.getn(EntityCategoryFilterDown(categories.COMMAND, GetSelectedUnits() or {})) > 0) then
+    if (scenarioInfo.Options.CheatsEnabled == 'false') and (table.getn(EntityCategoryFilterDown(categories.COMMAND, selUnits)) > 0)
+        and (scenarioInfo.Options.Share == 'TransferToKiller') then
         CreateAnnouncement('<LOC confirm_0001>You cannot self destruct during an operation!')
     else
-        local units = GetSelectedUnits()
-        if units then
+        if selUnits then
             local unitIds = {}
-            for _, unit in units do
+            for _, unit in selUnits do
                 table.insert(unitIds, unit:GetEntityId())
             end
             SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy(), noDelay = instant}})
