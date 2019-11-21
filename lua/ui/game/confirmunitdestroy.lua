@@ -10,9 +10,9 @@ local destructingUnits = {}
 local controls = {}
 local countdownThreads = {}
 local scenarioInfo = SessionGetScenarioInfo()
-local selUnits = GetSelectedUnits() or {}
 
 function ConfirmUnitDestruction(instant)
+    local selUnits = GetSelectedUnits() or {}
     if (scenarioInfo.Options.CheatsEnabled == 'false') and (table.getn(EntityCategoryFilterDown(categories.COMMAND, selUnits)) > 0)
         and (scenarioInfo.Options.Share == 'TransferToKiller') then
         CreateAnnouncement('<LOC confirm_0001>You cannot self destruct during an operation!')
