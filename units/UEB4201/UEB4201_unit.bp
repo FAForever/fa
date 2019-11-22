@@ -125,7 +125,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20,
+        VisionRadius = 31,
     },
     Interface = {
         HelpText = '<LOC ueb4201_help>Tactical Missile Defense',
