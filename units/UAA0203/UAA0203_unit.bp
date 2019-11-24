@@ -148,9 +148,9 @@ UnitBlueprint {
         UniformScale = 0.25,
     },
     Economy = {
-        BuildCostEnergy = 4800,
-        BuildCostMass = 240,
-        BuildTime = 1600,
+        BuildCostEnergy = 5000,
+        BuildCostMass = 250,
+        BuildTime = 1660,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -243,7 +243,8 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 13,
+            Damage = 78,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Oblivion Cannon',
             FireTargetLayerCapsTable = {
@@ -253,9 +254,9 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Turret',
             MaxRadius = 22,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 25,
             ProjectileId = '/projectiles/ADFOblivionCannon03/ADFOblivionCannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 4,
@@ -278,7 +279,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 1.25,
+            RateOfFire = 0.208,
             TargetCheckInterval = 0.4,
             TargetPriorities = {
                 '(ALLUNITS - SPECIALLOWPRI)',
