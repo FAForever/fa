@@ -257,7 +257,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 25,
-            ProjectileId = '/projectiles/ADFOblivionCannon03/ADFOblivionCannon03_proj.bp',
+            ProjectileId = '/projectiles/ADFOblivionCannon05/ADFOblivionCannon05_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 4,
             RackBones = {

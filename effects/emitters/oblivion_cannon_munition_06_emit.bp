@@ -1,5 +1,5 @@
 EmitterBlueprint {
-	BlueprintId = 'oblivion_cannon_munition_05',
+	BlueprintId = 'oblivion_cannon_munition_06',
 	Lifetime = -1.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
