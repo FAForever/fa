@@ -995,9 +995,20 @@ AOblivionCannonHit02 = {
     EmtBpPath .. 'oblivion_cannon_hit_13_emit.bp',
 }
 
+AOblivionCannonHit03 = {
+    EmtBpPath .. 'oblivion_cannon_hit_14_emit.bp',
+    EmtBpPath .. 'oblivion_cannon_hit_15_emit.bp',
+    EmtBpPath .. 'oblivion_cannon_hit_16_emit.bp',
+}
+
 AOblivionCannonFXTrails02 = {
     EmtBpPath .. 'oblivion_cannon_munition_03_emit.bp',
     EmtBpPath .. 'oblivion_cannon_munition_04_emit.bp',
+}
+
+AOblivionCannonFXTrails03 = {
+    EmtBpPath .. 'oblivion_cannon_munition_05_emit.bp',
+    EmtBpPath .. 'oblivion_cannon_munition_06_emit.bp',
 }
 
 AOblivionCannonMuzzleFlash02 = {

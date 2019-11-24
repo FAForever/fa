@@ -235,8 +235,8 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
-                    Bank = 'UAAWeapon',
-                    Cue = 'UAA0203_Laser_Lgt',
+                    Bank = 'UASWeapon',
+                    Cue = 'UAS0201_Cannon_Oblivion',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
@@ -245,7 +245,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 13,
             DamageType = 'Normal',
-            DisplayName = 'Quad Light Laser',
+            DisplayName = 'Oblivion Cannon',
             FireTargetLayerCapsTable = {
                 Air = 'Air|Land|Water|Seabed',
                 Land = 'Air|Land|Water|Seabed',
@@ -256,7 +256,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 40,
-            ProjectileId = '/projectiles/ADFLaserLight01/ADFLaserLight01_proj.bp',
+            ProjectileId = '/projectiles/ADFOblivionCannon03/ADFOblivionCannon03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 4,
             RackBones = {
