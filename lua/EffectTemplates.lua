@@ -998,7 +998,6 @@ AOblivionCannonHit02 = {
 AOblivionCannonHit03 = {
     EmtBpPath .. 'oblivion_cannon_hit_14_emit.bp',
     EmtBpPath .. 'oblivion_cannon_hit_15_emit.bp',
-    EmtBpPath .. 'oblivion_cannon_hit_16_emit.bp',
 }
 
 AOblivionCannonFXTrails02 = {

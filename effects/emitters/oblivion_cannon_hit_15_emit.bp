@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'oblivion_cannon_hit_15',
-	Lifetime = 1.20,
+	Lifetime = 7.00,
 	Repeattime = 7.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/sparkle_blue_add_03.dds]],
-	RampTexture = [[/textures/particles/ramp_disintegrator_02.dds]],
+	Texture = [[/textures/particles/aeon_plasma01.dds]],
+	RampTexture = [[/textures/particles/ramp_blue_25.dds]],
 	XDirectionCurve = {
 		XRange = 7.00,
 		Keys = {
@@ -113,13 +113,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 7.00,
 		Keys = {
-			{ x=3.648,y=4,z=0.030 },
+			{ x=3.648,y=2.000,z=0.100 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 7.00,
 		Keys = {
-			{ x=3.648,y=4,z=0.030 },
+			{ x=3.648,y=2.000,z=0.100 },
 		},
 	},
 	InitialRotationCurve = {

@@ -112,7 +112,7 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.250,y=0.200,z=0.000 },
+			{ x=25.250,y=0.180,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
