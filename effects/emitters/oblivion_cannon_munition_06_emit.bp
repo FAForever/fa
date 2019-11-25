@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/beam_disruptor.dds]],
-	RampTexture = [[/textures/particles/ramp_disintegrator_02.dds]],
+	RampTexture = [[/textures/particles/ramp_blue_06.dds]],
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
