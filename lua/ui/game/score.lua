@@ -294,8 +294,8 @@ function SetupPlayerLines()
                 self.bg:SetSolidColor('ff777777')
             elseif event.Type == 'MouseExit' then
                 self.bg:SetSolidColor('00000000')
-            elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) and (sessionInfo.Options.CheatsEnabled) then
-                ConExecute('SetFocusArmy '..tostring(self.armyID-1))
+            elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) then
+                ConExecute('SetFocusArmy '..tostring(self.armyID - 1))
             end
         end
 
