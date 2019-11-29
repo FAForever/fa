@@ -253,7 +253,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Turret',
-            MaxRadius = 22,
+            MaxRadius = 20,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 25,
