@@ -66,7 +66,7 @@ function SetLayout()
         for _, line in controls.armyLines do
             totHeight = totHeight + line.Height()
         end
-        return math.max(totHeight, 50)
+        return totHeight
     end)
 
     LayoutHelpers.AtLeftTopIn(controls.timeIcon, controls.bgTop, 10, 6)
@@ -81,10 +81,8 @@ function SetLayout()
     controls.timeIcon.Width:Set(function() return controls.timeIcon.BitmapWidth() * .8 end)
     controls.unitIcon.Height:Set(function() return controls.unitIcon.BitmapHeight() * .9 end)
     controls.unitIcon.Width:Set(function() return controls.unitIcon.BitmapWidth() * .9 end)
-    if not SessionIsReplay() then
-        local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
-        avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
-    end
+    local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
+    avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
 
     LayoutArmyLines()
 end
@@ -101,4 +99,3 @@ function LayoutArmyLines()
         end
     end
 end
-    
