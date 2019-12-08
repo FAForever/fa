@@ -117,10 +117,10 @@ UnitBlueprint {
     Buffs = {
         Regen = {
             Level1 = 4,
-            Level2 = 8,
-            Level3 = 12,
-            Level4 = 16,
-            Level5 = 20,
+            Level2 = 12,
+            Level3 = 28,
+            Level4 = 48,
+            Level5 = 80,
         },
     },
     Categories = {
@@ -767,10 +767,10 @@ UnitBlueprint {
     },
     VeteranMass = {
         1000,
-        1250,
-        1750,
-        2500,
+        2000,
         3500,
+        5500,
+        8000,
     },
     VeteranHealingMult = { -- This table is used to override the vet instant heal multiplier per level
         0.1,
