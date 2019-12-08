@@ -113,13 +113,14 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
+    -- overwritten by the function CreateVeterancyBuffs in lua\sim\Unit.lua ; but this one is displayed in unitdatabase
     Buffs = {
         Regen = {
-            Level1 = 3,
-            Level2 = 9,
-            Level3 = 21,
-            Level4 = 36,
-            Level5 = 60,
+            Level1 = 6,
+            Level2 = 18,
+            Level3 = 42,
+            Level4 = 72,
+            Level5 = 120,
         },
     },
     Categories = {
