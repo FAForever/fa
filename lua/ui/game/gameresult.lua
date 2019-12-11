@@ -39,8 +39,6 @@ function DoGameResult(armyIndex, result)
         return
     end
 
-    SimCallback({ Func = 'SetLocalCommandSource', Args = false })
-
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
