@@ -44,30 +44,6 @@ local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
 
-Callbacks.SetLocalCommandSource = function(data)
-    if (not ScenarioInfo.Options.AllowObservers) or SessionIsReplay() then return end
-    local humans = {}
-    local humanIndex = 0
-    for _, data in ScenarioInfo.ArmySetup do
-        if data.Human then
-            if IsAlly(GetFocusArmy(), data.ArmyIndex) then
-                if not ArmyIsOutOfGame(data.ArmyIndex) then
-                    return
-                end
-                table.insert(humans, humanIndex)
-            end
-            humanIndex = humanIndex + 1
-        end
-    end
-    
-    for _, index in humans do
-        for _, data in ScenarioInfo.ArmySetup do
-            ArmyGetHandicap(data.ArmyIndex - 1, index, false)
-        end
-    end
-    SetFocusArmy(-1)
-end
-
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
         if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) and u.SetAutoOvercharge then
