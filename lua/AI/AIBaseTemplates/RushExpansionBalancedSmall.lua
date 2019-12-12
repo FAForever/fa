@@ -110,6 +110,6 @@ BaseBuilderTemplate {
             return 25
         end
 
-        return 0
+        return 1
     end,
 }

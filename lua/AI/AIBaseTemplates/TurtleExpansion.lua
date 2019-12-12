@@ -144,10 +144,6 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Start Location' then
-            return 0
-        end
-
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not(personality == 'adaptive' or personality == 'turtle') then
             return 0
@@ -165,6 +161,6 @@ BaseBuilderTemplate {
             return 10
         end
 
-        return 0
+        return 1
     end,
 }
