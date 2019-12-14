@@ -232,6 +232,7 @@ UnitBlueprint {
             MuzzleVelocity = 14,
             MuzzleVelocityReduceDistance = 28,
             ProjectileId = '/projectiles/TIFFragmentationSensorShell01/TIFFragmentationSensorShell01_proj.bp',
+            ProjectilesPerOnFire = 5,
             RackBones = {
                 {
                     MuzzleBones = {
