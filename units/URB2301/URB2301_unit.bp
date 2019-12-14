@@ -199,11 +199,11 @@ UnitBlueprint {
             Label = 'MainGun',
             MaxRadius = 50,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 2,
+            MuzzleSalvoSize = 3,
             MuzzleVelocity = 100,
             ProjectileId = '/projectiles/CDFLaserHeavy02/CDFLaserHeavy02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
