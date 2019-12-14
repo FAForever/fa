@@ -337,7 +337,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/CANTorpedoNanite01/CANTorpedoNanite01_proj.bp',
             ProjectileLifetime = 7,
-            ProjectilesPerOnFire = 3,
+            ProjectilesPerOnFire = 6,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -396,10 +396,11 @@ UnitBlueprint {
             Label = 'AntiTorpedo01',
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/CIMAntiTorpedo01/CIMAntiTorpedo01_proj.bp',
             ProjectileLifetime = 6,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
