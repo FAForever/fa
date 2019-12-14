@@ -397,6 +397,7 @@ UnitBlueprint {
             NotExclusive = true,
             ProjectileId = '/projectiles/ADFOblivionCannon04/ADFOblivionCannon04_proj.bp',
             ProjectileLifetime = 10,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -465,6 +466,7 @@ UnitBlueprint {
             MuzzleVelocity = 20,
             ProjectileId = '/projectiles/AANDepthCharge02/AANDepthCharge02_proj.bp',
             ProjectileLifetime = 10,
+            ProjectilesPerOnFire = 6,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -524,10 +526,11 @@ UnitBlueprint {
             MaxRadius = 45,
             MinRadius = 15,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 80,
             ProjectileId = '/projectiles/AIMAntiTorpedo02/AIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 1.5,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
