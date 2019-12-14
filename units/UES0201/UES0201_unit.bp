@@ -287,7 +287,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/TDFGauss01/TDFGauss01_proj.bp',
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -372,7 +372,7 @@ UnitBlueprint {
             MuzzleVelocity = 30,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TDFGauss01/TDFGauss01_proj.bp',
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -448,7 +448,7 @@ UnitBlueprint {
             MuzzleVelocity = 60,
             ProjectileId = '/projectiles/TAARailgun01/TAARailgun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -523,7 +523,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_proj.bp',
             ProjectileLifetime = 7,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -616,10 +616,11 @@ UnitBlueprint {
             MaxRadius = 30,
             MinRadius = 15,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TIMAntiTorpedo01/TIMAntiTorpedo01_proj.bp',
             ProjectileLifetime = 3,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
