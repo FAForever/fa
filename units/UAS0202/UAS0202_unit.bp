@@ -254,6 +254,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 40,
             ProjectileId = '/projectiles/ADFQuantumCannon01/ADFQuantumCannon01_proj.bp',
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
