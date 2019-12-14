@@ -240,7 +240,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TANAnglerTorpedo02/TANAnglerTorpedo02_proj.bp',
             ProjectileLifetime = 12,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 4,
             RackBones = {
                 {
                     MuzzleBones = {
