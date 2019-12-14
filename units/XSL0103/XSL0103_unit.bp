@@ -304,6 +304,7 @@ UnitBlueprint {
             MuzzleVelocity = 14,
             MuzzleVelocityReduceDistance = 28,
             ProjectileId = '/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_proj.bp',
+            ProjectilesPerOnFire = 5,
             RackBones = {
                 {
                     MuzzleBones = {
