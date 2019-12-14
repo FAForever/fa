@@ -356,10 +356,11 @@ UnitBlueprint {
             MaxRadius = 64,
             MinRadius = 4,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
             ProjectileLifetime = 0.9,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -443,11 +444,12 @@ UnitBlueprint {
             MaxRadius = 64,
             MinRadius = 4,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
             ProjectileLifetime = 0.9,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -515,11 +517,11 @@ UnitBlueprint {
             Label = 'Torpedo01',
             MaxRadius = 64,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 4,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/CANTorpedoNanite01/CANTorpedoNanite01_proj.bp',
             ProjectileLifetime = 7,
-            ProjectilesPerOnFire = 3,
+            ProjectilesPerOnFire = 4,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -592,10 +594,11 @@ UnitBlueprint {
             Label = 'AntiTorpedo',
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 6,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/CIMAntiTorpedo02/CIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 3,
+            ProjectilesPerOnFire = 6,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -669,7 +672,7 @@ UnitBlueprint {
             MuzzleVelocity = 20,
             ProjectileId = '/projectiles/CAABurstCloud01/CAABurstCloud01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 2,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -745,7 +748,7 @@ UnitBlueprint {
             MuzzleVelocity = 14,
             MuzzleVelocityReduceDistance = 28,
             ProjectileId = '/projectiles/CIFBrackmanHackPegs01/CIFBrackmanHackPegs01_proj.bp',
-            ProjectilesPerOnFire = 5,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
