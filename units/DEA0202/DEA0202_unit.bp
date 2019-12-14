@@ -470,6 +470,7 @@ UnitBlueprint {
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
             ProjectileId = '/projectiles/TIFNapalmCarpetBomb02/TIFNapalmCarpetBomb02_proj.bp',
+            ProjectilesPerOnFire = 20,
             RackBones = {
                 {
                     MuzzleBones = {
