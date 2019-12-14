@@ -386,6 +386,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/AANTorpedo01/AANTorpedo01_proj.bp',
             ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -434,6 +435,7 @@ UnitBlueprint {
             MuzzleVelocity = 80,
             ProjectileId = '/projectiles/AIMAntiTorpedo01/AIMAntiTorpedo01_proj.bp',
             ProjectileLifetime = 4,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
