@@ -240,7 +240,7 @@ UnitBlueprint {
             NoPause = true,
             ProjectileId = '/projectiles/TDFPlasma02/TDFPlasma02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 15,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -252,13 +252,13 @@ UnitBlueprint {
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 0,
-            RackSalvoChargeTime = 2,
+            RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = false,
-            RackSalvoReloadTime = 1,
+            RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 1,
+            RateOfFire = 0.17,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
@@ -315,7 +315,7 @@ UnitBlueprint {
             MuzzleVelocityRandomness = 0.5,
             ProjectileId = '/projectiles/TDFFragmentationGrenade01/TDFFragmentationGrenade01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.3,
-            ProjectilesPerOnFire = 3,
+            ProjectilesPerOnFire = 4,
             RackBones = {
                 {
                     MuzzleBones = {
