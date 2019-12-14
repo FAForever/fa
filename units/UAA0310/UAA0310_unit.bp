@@ -737,10 +737,11 @@ UnitBlueprint {
             Label = 'AAFizz01',
             MaxRadius = 44,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 20,
             ProjectileId = '/projectiles/AAAFizz01/AAAFizz01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -813,11 +814,12 @@ UnitBlueprint {
             Label = 'AAFizz02',
             MaxRadius = 44,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 20,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AAAFizz01/AAAFizz01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
