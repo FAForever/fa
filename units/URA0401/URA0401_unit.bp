@@ -593,11 +593,11 @@ UnitBlueprint {
             LeadTarget = true,
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CDFBolter03/CDFBolter03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -663,12 +663,12 @@ UnitBlueprint {
             LeadTarget = true,
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 30,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFBolter03/CDFBolter03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
