@@ -244,7 +244,7 @@ UnitBlueprint {
             MuzzleVelocity = 3,
             ProjectileId = '/projectiles/TIFMissileCruise03/TIFMissileCruise03_proj.bp',
             ProjectileLifetime = 20,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     HideMuzzle = true,
