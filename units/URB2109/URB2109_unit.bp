@@ -210,7 +210,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/CANTorpedoNanite01/CANTorpedoNanite01_proj.bp',
             ProjectileLifetime = 7,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
