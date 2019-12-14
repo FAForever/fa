@@ -303,6 +303,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             NeedPrep = true,
+            ProjectilesPerOnFire = 9,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -388,6 +389,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             NeedPrep = true,
             PrefersPrimaryWeaponTarget = true,
+            ProjectilesPerOnFire = 9,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -456,6 +458,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/SANAnaitTorpedo01/SANAnaitTorpedo01_proj.bp',
             ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -514,6 +517,7 @@ UnitBlueprint {
             MuzzleVelocity = 80,
             ProjectileId = '/projectiles/SANAjelluAntiTorpedo01/SANAjelluAntiTorpedo01_proj.bp',
             ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
