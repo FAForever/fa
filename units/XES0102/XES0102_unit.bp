@@ -241,6 +241,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TANAnglerTorpedo02/TANAnglerTorpedo02_proj.bp',
             ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 4,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -304,10 +305,11 @@ UnitBlueprint {
             MaxRadius = 25,
             MinRadius = 10,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TIMAntiTorpedo01/TIMAntiTorpedo01_proj.bp',
             ProjectileLifetime = 2.5,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
