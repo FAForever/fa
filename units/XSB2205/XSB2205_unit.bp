@@ -251,7 +251,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/SANHeavyCavitationTorpedo02/SANHeavyCavitationTorpedo02_proj.bp',
             ProjectileLifetime = 12,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -321,6 +321,7 @@ UnitBlueprint {
             MuzzleVelocity = 80,
             ProjectileId = '/projectiles/SANAjelluAntiTorpedo01/SANAjelluAntiTorpedo01_proj.bp',
             ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
