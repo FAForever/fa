@@ -265,6 +265,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/SDFShieeihAutoCannon01/SDFShieeihAutoCannon01_proj.bp',
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -335,6 +336,7 @@ UnitBlueprint {
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun05/SAAShleoAAGatlingGun05_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
