@@ -317,11 +317,11 @@ UnitBlueprint {
             Label = 'AALeft',
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 60,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun04/SAAShleoAAGatlingGun04_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -391,12 +391,12 @@ UnitBlueprint {
             Label = 'AARight',
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 60,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun04/SAAShleoAAGatlingGun04_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
