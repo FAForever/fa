@@ -280,8 +280,9 @@ UnitBlueprint {
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             NeedPrep = true,
+            ProjectilesPerOnFire = 18,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -355,8 +356,9 @@ UnitBlueprint {
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             NeedPrep = true,
+            ProjectilesPerOnFire = 18,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -425,7 +427,7 @@ UnitBlueprint {
             MuzzleVelocity = 8,
             ProjectileId = '/projectiles/TANAnglerTorpedo02/TANAnglerTorpedo02_proj.bp',
             ProjectileLifetime = 7,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 4,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -491,6 +493,7 @@ UnitBlueprint {
             MuzzleVelocity = 100,
             ProjectileId = '/projectiles/TDPhalanx01/TDPhalanx01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -551,10 +554,11 @@ UnitBlueprint {
             MaxRadius = 30,
             MinRadius = 10,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TIMAntiTorpedo01/TIMAntiTorpedo01_proj.bp',
             ProjectileLifetime = 6,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
