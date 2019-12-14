@@ -302,6 +302,7 @@ UnitBlueprint {
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
             ProjectileId = '/projectiles/CIFNeutronClusterBomb01/CIFNeutronClusterBomb01_proj.bp',
+            ProjectilesPerOnFire = 6,
             RackBones = {
                 {
                     MuzzleBones = {
