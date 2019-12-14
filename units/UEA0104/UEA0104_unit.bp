@@ -449,7 +449,7 @@ UnitBlueprint {
             MuzzleVelocity = 35,
             ProjectileId = '/projectiles/TAARailgun01/TAARailgun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -523,7 +523,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun01/TAARailgun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
