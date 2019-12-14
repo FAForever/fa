@@ -265,6 +265,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/AIFMissileSerpentine03/AIFMissileSerpentine03_proj.bp',
             ProjectileLifetime = 25,
+            ProjectilesPerOnFire = 5,
             RackBones = {
                 {
                     HideMuzzle = true,
@@ -344,6 +345,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AIFMissileSerpentine03/AIFMissileSerpentine03_proj.bp',
             ProjectileLifetime = 25,
+            ProjectilesPerOnFire = 5,
             RackBones = {
                 {
                     HideMuzzle = true,
@@ -414,6 +416,7 @@ UnitBlueprint {
             MuzzleVelocity = 80,
             ProjectileId = '/projectiles/AIMAntiTorpedo02/AIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 4,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -474,6 +477,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AIMAntiTorpedo02/AIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 4,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -534,6 +538,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AIMAntiTorpedo02/AIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 4,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -594,6 +599,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AIMAntiTorpedo02/AIMAntiTorpedo02_proj.bp',
             ProjectileLifetime = 4,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
