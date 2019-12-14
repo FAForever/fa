@@ -529,6 +529,7 @@ UnitBlueprint {
             MuzzleVelocity = 25,
             ProjectileId = '/projectiles/SIMAntiMissile02/SIMAntiMissile02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -591,6 +592,7 @@ UnitBlueprint {
             MuzzleVelocity = 25,
             ProjectileId = '/projectiles/SIMAntiMissile02/SIMAntiMissile02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -652,10 +654,11 @@ UnitBlueprint {
             Label = 'AntiAirLeft',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 20,
             ProjectileId = '/projectiles/SAAOlarisAAArtillery05/SAAOlarisAAArtillery05_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -726,11 +729,12 @@ UnitBlueprint {
             Label = 'AntiAirRight',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 20,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SAAOlarisAAArtillery05/SAAOlarisAAArtillery05_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
