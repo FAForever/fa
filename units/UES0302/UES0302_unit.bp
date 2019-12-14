@@ -594,11 +594,11 @@ UnitBlueprint {
             Label = 'RightAAGun01',
             MaxRadius = 60,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
             ProjectileId = '/projectiles/TAARailgun02/TAARailgun02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -669,12 +669,12 @@ UnitBlueprint {
             Label = 'RightAAGun01',
             MaxRadius = 60,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun02/TAARailgun02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -745,12 +745,12 @@ UnitBlueprint {
             Label = 'RightAAGun01',
             MaxRadius = 60,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun02/TAARailgun02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -821,12 +821,12 @@ UnitBlueprint {
             Label = 'RightAAGun01',
             MaxRadius = 60,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun02/TAARailgun02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -898,6 +898,7 @@ UnitBlueprint {
             MuzzleVelocity = 100,
             ProjectileId = '/projectiles/TDPhalanx01/TDPhalanx01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -962,6 +963,7 @@ UnitBlueprint {
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TDPhalanx01/TDPhalanx01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
