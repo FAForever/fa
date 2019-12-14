@@ -164,7 +164,9 @@ end
 
 function WrapAndPlaceText(air, physics, weapons, abilities, text, control)
     local ppf = 1
+	local idd = 0
     local dotpulses = 1
+	local radi = 0
     local lines = {}
     -- Used to set the line colour correctly.
     local physics_line = -1
@@ -189,46 +191,68 @@ function WrapAndPlaceText(air, physics, weapons, abilities, text, control)
             if table.getn(weapons) > 0 then
                 table.insert(lines, "")
             end
-            local lastWeapon = {}
 
-            -- Used to count up duplicate weapons.
-            local mflag = 0
-            for i, weapon in weapons do
-                if weapon.WeaponCategory and weapon.WeaponCategory ~= 'Death' then
-                    if weapon.DisplayName == lastWeapon.DisplayName then
-                        mflag = mflag + 1
-                    else
-                        if mflag ~= 0 then
-                            table.insert(lines, string.format("%s (%s) x%d",
-                                weapon.DisplayName,
-                                weapon.WeaponCategory,
-                                mflag + 1))
-                        else
+            for i, weapon in weapons do  --Fix weapon category for dummy weapons so they don't show in the tooltips.
+                if weapon.WeaponCategory and weapon.WeaponCategory ~= 'Death' and weapon.WeaponCategory ~= 'Fix' then
                             table.insert(lines, string.format("%s (%s)", weapon.DisplayName, weapon.WeaponCategory)
                             )
-                        end
-
+								
                         if weapon.ProjectilesPerOnFire then
                             ppf = weapon.ProjectilesPerOnFire
                         else
                             ppf = 1
                         end
 
+                        if weapon.InitialDamage then  --Added to cover for napalm bombs of UEF Bombers.
+                            idd = weapon.InitialDamage
+                        else
+                            idd = 0
+                        end
+						
                         if weapon.DoTPulses then
                             dotpulses = weapon.DoTPulses
                         else
                             dotpulses = 1
                         end
 
-                        table.insert(lines, LOCF("<LOC gameui_0001>Damage: %d, Rate: %0.2f (DPS: %d)  Range: %d",
+                        if weapon.DamageRadius then  --Added damage radius to the tooltip.
+                            radi = weapon.DamageRadius
+                        else
+                            radi = 0
+                        end
+
+                        table.insert(lines, LOCF("<LOC gameui_0001>Damage: %d, Rate: %d (DPS: %d), Range: %d, Radius: %d",
                             weapon.Damage * ppf * dotpulses,
                             1.0 / weapon.RateOfFire,
-                            math.floor(weapon.Damage * ppf * dotpulses * weapon.RateOfFire),
-                            weapon.MaxRadius))
-                        mflag = 0
-                    end
+                            math.floor(( idd + weapon.Damage * dotpulses) * ppf * weapon.RateOfFire),
+                            weapon.MaxRadius, radi))
+                end
+            end
+			
+            for i, weapon in weapons do  -- Added death weapons to the tooltip.
+                if weapon.WeaponCategory and weapon.WeaponCategory == 'Death' then
+                            table.insert(lines, string.format("%s (%s)", weapon.DisplayName, weapon.WeaponCategory)
+                            )
 
-                    lastWeapon = weapon
+                        if weapon.DamageRadius then
+                            radi = weapon.DamageRadius
+                        else
+                            radi = 0
+                        end
+
+						if weapon.NukeInnerRingRadius then
+                            ppf = weapon.NukeInnerRingRadius
+                        else
+                            ppf = 0
+                        end
+						
+						if weapon.NukeInnerRingDamage then
+							idd = weapon.NukeInnerRingDamage
+						else
+							idd = 0
+						end
+
+                        table.insert(lines, LOCF("<LOC gameui_death_weapon>Damage: %d, Radius: %d", math.floor(weapon.Damage + idd), math.max(radi, ppf)))
                 end
             end
         end
