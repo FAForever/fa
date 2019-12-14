@@ -276,7 +276,7 @@ UnitBlueprint {
             NoPause = true,
             ProjectileId = '/projectiles/AAPhalanx01/AAPhalanx01_proj.bp',
             ProjectileLifetime = 2,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 12,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -289,13 +289,13 @@ UnitBlueprint {
             RackFireTogether = true,
             RackRecoilDistance = 0,
             RackReloadTimeout = 0,
-            RackSalvoChargeTime = 1,
+            RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = false,
-            RackSalvoReloadTime = 4.5,
+            RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.15,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'AIR MOBILE HIGHPRIAIR',
