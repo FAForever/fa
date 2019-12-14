@@ -235,6 +235,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectilesPerOnFire = 9,
             RackBones = {
                 {
                     MuzzleBones = {
