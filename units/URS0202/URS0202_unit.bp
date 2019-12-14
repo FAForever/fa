@@ -303,10 +303,11 @@ UnitBlueprint {
             Label = 'ParticleGun',
             MaxRadius = 80,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CDFProtonCannon02/CDFProtonCannon02_proj.bp',
             ProjectileLifetime = 2.6,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -369,6 +370,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             PreferPrimaryWeaponTarget = true,
             ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -512,6 +514,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             NeedPrep = true,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -575,6 +578,7 @@ UnitBlueprint {
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CAANanoDart02/CAANanoDart02_proj.bp',
             ProjectileLifetime = 5.5,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
