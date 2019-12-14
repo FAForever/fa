@@ -249,6 +249,7 @@ UnitBlueprint {
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/SIFLaanseTacticalMissile02/SIFLaanseTacticalMissile02_proj.bp',
             ProjectileLifetime = 60,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -309,11 +310,11 @@ UnitBlueprint {
             Label = 'LeftAAGun',
             MaxRadius = 65,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 20,
             ProjectileId = '/projectiles/SAAOlarisAAArtillery04/SAAOlarisAAArtillery04_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1,
+            ProjectilesPerOnFire = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -454,6 +455,7 @@ UnitBlueprint {
             MuzzleVelocity = 25,
             ProjectileId = '/projectiles/SIMAntiMissile02/SIMAntiMissile02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
