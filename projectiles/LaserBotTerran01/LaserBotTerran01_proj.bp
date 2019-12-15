@@ -1,7 +1,30 @@
 ProjectileBlueprint {
-   Merge = true,
-   Source = '/projectiles/LaserBotTerran01/LaserBotTerran01_proj.bp',
---[BF4] All of the following code was completely missing from the original.
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Display = {
+        StrategicIconSize = 2,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 17,
+        Lifetime = 2.5,
+        UseGravity = true,
+    },
    Categories = {
       'UEF',
       'PROJECTILE',
