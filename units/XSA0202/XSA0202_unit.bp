@@ -481,7 +481,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
+            RateOfFire = 0.2,
             SkipReadyState = true,
             StopOnPrimaryWeaponBusy = true,
             TargetCheckInterval = 1,
