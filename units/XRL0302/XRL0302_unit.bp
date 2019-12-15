@@ -203,7 +203,7 @@ UnitBlueprint {
     SelectionThickness = 0.83,
     SizeX = 0.5,
     SizeY = 0.4,
-    SizeZ = 0.9,
+    SizeZ = 1,
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
