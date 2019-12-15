@@ -232,7 +232,7 @@ UnitBlueprint {
     SelectionThickness = 1.2,
     SizeX = 0.6,
     SizeY = 0.7,
-    SizeZ = 0.6,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_bot1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
