@@ -178,5 +178,16 @@ Blacklist = {
 
     -- old versions of Experimental Wars
     ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = UPGRADE,
+    
+    -- mod pack that was hidden in the vault -> blacklisting to prevent it from being used on faf
+    ['fff6f6c8-248a-11de-8c30-362b9e155667'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100002'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100003'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100004'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100005'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100006'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100007'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100008'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
 
 }
