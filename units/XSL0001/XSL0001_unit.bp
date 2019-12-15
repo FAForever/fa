@@ -393,16 +393,13 @@ UnitBlueprint {
             Radius = 35,
             MaxHealthFactor = 1.2,
             RegenFloor = 15,
-            RegenCeilingT1 = 20,
-            RegenCeilingT2 = 50,
-            RegenCeilingT3 = 120,
-            RegenCeilingT4 = 240,
+            RegenCeiling = 200,
             RegenPerSecond = 0.01111111111,
-            Slot = 'LCH',
+            Slot = 'RCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
-                'Left_Upgrade',
-                'Left_Turret_Muzzle',
+                'Right_Upgrade',
+                'Right_Turret_Muzzle',
             },
             UpgradeUnitAmbientBones = {
                 'Body',
@@ -419,7 +416,7 @@ UnitBlueprint {
                 'AdvancedRegenAura',
                 'AdvancedRegenAuraRemove',
             },
-            Slot = 'LCH',
+            Slot = 'RCH',
         },
         BlastAttack = {
             AdditionalDamage = 620,
@@ -608,19 +605,16 @@ UnitBlueprint {
             Radius = 30,
             MaxHealthFactor = 1.1,
             RegenFloor = 3,
-            RegenCeilingT1 = 10,
-            RegenCeilingT2 = 15,
-            RegenCeilingT3 = 25,
-            RegenCeilingT4 = 40,
+            RegenCeiling = 15,
             RegenPerSecond = 0.02,
             ShowBones = {
-                'Left_Upgrade',
+                'Right_Upgrade',
             },
-            Slot = 'LCH',
+            Slot = 'RCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
-                'Left_Upgrade',
-                'Left_Turret_Muzzle',
+                'Right_Upgrade',
+                'Right_Turret_Muzzle',
             },
             UpgradeUnitAmbientBones = {
                 'Body',
@@ -631,7 +625,7 @@ UnitBlueprint {
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
-                'Left_Upgrade',
+                'Right_Upgrade',
             },
             Icon = 'nrf',
             Name = '<LOC enhancements_0126>Remove Restoration Field',
@@ -640,7 +634,7 @@ UnitBlueprint {
                 'RegenAura',
                 'RegenAuraRemove',
             },
-            Slot = 'LCH',
+            Slot = 'RCH',
         },
         ResourceAllocation = {
             BuildCostEnergy = 175000,
@@ -651,13 +645,9 @@ UnitBlueprint {
             ProductionPerSecondEnergy = 2000,
             ProductionPerSecondMass = 16,
             ShowBones = {
-                'Right_Upgrade',
+                'Back_Upgrade',
             },
-            Slot = 'RCH',
-            UpgradeEffectBones = {
-                'Right_Upgrade',
-                'Right_Turret_Muzzle',
-            },
+            Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'Body',
             },
@@ -672,13 +662,9 @@ UnitBlueprint {
             ProductionPerSecondEnergy = 4000,
             ProductionPerSecondMass = 32,
             ShowBones = {
-                'Right_Upgrade',
+                'Back_Upgrade',
             },
-            Slot = 'RCH',
-            UpgradeEffectBones = {
-                'Right_Upgrade',
-                'Right_Turret_Muzzle',
-            },
+            Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'Body',
             },
@@ -688,7 +674,7 @@ UnitBlueprint {
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
-                'Right_Upgrade',
+                'Back_Upgrade',
             },
             Icon = 'eras',
             Name = '<LOC enhancements_0012>Remove Advanced Allocation System',
@@ -698,14 +684,14 @@ UnitBlueprint {
                 'ResourceAllocationAdvanced',
                 'ResourceAllocationAdvancedRemove',
             },
-            Slot = 'RCH',
+            Slot = 'Back',
         },
         ResourceAllocationRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
-                'Right_Upgrade',
+                'Back_Upgrade',
             },
             Icon = 'ras',
             Name = '<LOC enhancements_0013>Remove Resource Allocation System',
@@ -714,7 +700,7 @@ UnitBlueprint {
                 'ResourceAllocation',
                 'ResourceAllocationRemove',
             },
-            Slot = 'RCH',
+            Slot = 'Back',
         },
         Slots = {
             Back = {
