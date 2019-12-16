@@ -99,6 +99,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'OVERLAYDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = 2.1,
     CollisionOffsetZ = -0.6,

@@ -119,6 +119,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'DRAGBUILD',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1.5,
     Defense = {
