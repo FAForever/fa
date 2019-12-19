@@ -187,18 +187,9 @@ function ScoreThread()
 
             ArmyScore[index].resources.storage.storedMass = brain:GetEconomyStored('MASS')
             ArmyScore[index].resources.storage.storedEnergy = brain:GetEconomyStored('ENERGY')
-            local MassRatio = brain:GetEconomyStoredRatio('MASS')
-            if MassRatio ~= 0 then
-                ArmyScore[index].resources.storage.maxMass = ArmyScore[index].resources.storage.storedMass / MassRatio
-            else
-                ArmyScore[index].resources.storage.maxMass = 0
-            end
-            local EnergyRatio = brain:GetEconomyStoredRatio('ENERGY')
-            if EnergyRatio ~= 0 then
-                ArmyScore[index].resources.storage.maxEnergy = ArmyScore[index].resources.storage.storedEnergy / EnergyRatio
-            else
-                ArmyScore[index].resources.storage.maxEnergy = 0
-            end
+
+            ArmyScore[index].resources.storage.maxMass = brain:GetArmyStat("Economy_MaxStorage_Mass", 0.0).Value
+            ArmyScore[index].resources.storage.maxEnergy = brain:GetArmyStat("Economy_MaxStorage_Energy", 0.0).Value
 
             for unitId, stats in brain.UnitStats do
                 if ArmyScore[index].blueprints[unitId] == nil then
