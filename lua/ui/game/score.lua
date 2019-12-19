@@ -149,7 +149,7 @@ function UpdResDisplay(mode)
     end
 end
 
-function ResourceClickProcessing(self, event, armyID, resType)
+function ResourceClickProcessing(self, event, uiGroup, resType)
     if (event.Type == 'MouseEnter') or (event.Type == 'MouseExit') then
         if event.Type == 'MouseEnter' then
             DisplayStorage = DisplayStorage + 1
@@ -160,6 +160,7 @@ function ResourceClickProcessing(self, event, armyID, resType)
         end
     elseif event.Type == 'ButtonPress' then
         --if not event.Modifiers.Left then return end
+        local armyID = uiGroup.armyID
         if IsObserver() or (GetFocusArmy() == armyID) then return end
         if event.Modifiers.Shift then
             local scoreData = ScoresCache[armyID]
@@ -175,6 +176,8 @@ function ResourceClickProcessing(self, event, armyID, resType)
             SimCallback( { Func = "GiveResourcesToPlayer",
                            Args = { From = GetFocusArmy(), To = armyID,
                            Mass = Value.Mass, Energy = Value.Energy, }} )
+            scoreData.resources.storage['stored'..resType] = scoreData.resources.storage['stored'..resType] + SentValue
+            uiGroup[string.lower(resType)..'_in']:SetText(fmtnum(scoreData.resources.storage['stored'..resType]))
             SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
                 text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[armyID].name })
         elseif event.Modifiers.Ctrl then
@@ -228,7 +231,7 @@ function SetupPlayerLines()
             group.mass.Height:Set(14)
             group.mass.Width:Set(14)
             group.mass.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, group.armyID, 'Mass')
+                ResourceClickProcessing(self, event, group, 'Mass')
             end
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
@@ -236,7 +239,7 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
             group.mass_in.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, group.armyID, 'Mass')
+                ResourceClickProcessing(self, event, group, 'Mass')
             end
 
             group.energy = Bitmap(group)
@@ -246,7 +249,7 @@ function SetupPlayerLines()
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
             group.energy.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, group.armyID, 'Energy')
+                ResourceClickProcessing(self, event, group, 'Energy')
             end
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
@@ -254,7 +257,7 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
             group.energy_in.HandleEvent = function(self, event)
-                ResourceClickProcessing(self, event, group.armyID, 'Energy')
+                ResourceClickProcessing(self, event, group, 'Energy')
             end
 
             group.units = Bitmap(group)
@@ -266,7 +269,8 @@ function SetupPlayerLines()
             group.units.HandleEvent = function(self, event)
                 if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or (GetFocusArmy() == group.armyID) then return end
                 if event.Modifiers.Shift then
-                    if not GetSelectedUnits() then return end
+                    local SelUnits = GetSelectedUnits()
+                    if (not SelUnits) or ((table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1])) then return end
                     SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
                         to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
@@ -502,8 +506,8 @@ function _OnBeat()
         end
     end
 
-    local armiesInfo = GetArmiesTable().armiesTable
     if currentScores then
+        local armiesInfo = GetArmiesTable().armiesTable
         ScoresCache = currentScores
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
@@ -531,8 +535,10 @@ function _OnBeat()
                         line.OOG = true
                         line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
                         line.color:SetSolidColor('ff000000')
-                        line.name:SetColor('ffa0a0a0')
-                        line.score:SetColor('ffa0a0a0')
+                        if GetFocusArmy() ~= index then
+                            line.name:SetColor('ffa0a0a0')
+                            line.score:SetColor('ffa0a0a0')
+                        end
                         line.mass_in:SetColor('ffa0a0a0')
                         line.energy_in:SetColor('ffa0a0a0')
                     end
