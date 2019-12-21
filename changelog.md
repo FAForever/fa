@@ -1,62 +1,62 @@
 Patch 3709 (16 December, 2019)
 ============================
 - Land
-- Mongoose
-    - Speed: 3.5 → 3.2
-    - Gatling gun damage: 16 → 15
-    - Gatling gun muzzle velocity: 30 → 28
-    - Hitbox: 0.4 → 1
-- Asylum
-    - Shield HP: 3800 → 3500
-- Parashield
-    - Shield HP: 3500 → 3000
-- Wagner
-    - Health: 1450 → 1200
-    - Underwater speed: 3.7 → 3
-- Blaze
-    - Mass cost: 220 → 180
-    - Energy cost: 1320 → 1080
-    - Buildtime: 1050 → 900
-- Fire Beetle
-    - Mass cost: 300 → 250
-    - Energy cost: 1800 → 1500
-    - Buildtime: 1200 → 1000
-    - Hitbox: 0.9 → 1
-- Selen
-    - Hitbox: 0.6 → 0.7
+    - Mongoose
+        - Speed: 3.5 → 3.2
+        - Gatling gun damage: 16 → 15
+        - Gatling gun muzzle velocity: 30 → 28
+        - Hitbox: 0.4 → 1
+    - Asylum
+        - Shield HP: 3800 → 3500
+    - Parashield
+        - Shield HP: 3500 → 3000
+    - Wagner
+        - Health: 1450 → 1200
+        - Underwater speed: 3.7 → 3
+    - Blaze
+        - Mass cost: 220 → 180
+        - Energy cost: 1320 → 1080
+        - Buildtime: 1050 → 900
+    - Fire Beetle
+        - Mass cost: 300 → 250
+        - Energy cost: 1800 → 1500
+        - Buildtime: 1200 → 1000
+        - Hitbox: 0.9 → 1
+    - Selen
+        - Hitbox: 0.6 → 0.7
 
 - Air
-- Air scouts
-    - Turn rate: 0.8 → 0.6
-    - Hitbox: 1.6 → 2
-- Spy planes
-    - Turn rate: 0.8 → 0.6
-- Wailer and Broadsword
-    - Mass cost: 1260 → 1500
-    - Energy cost: 42000 → 60000
-- Notha 
-    - Rate of Fire: 0.1 → 0.2
+    - Air scouts
+        - Turn rate: 0.8 → 0.6
+        - Hitbox: 1.6 → 2
+    - Spy planes
+        - Turn rate: 0.8 → 0.6
+    - Wailer and Broadsword
+        - Mass cost: 1260 → 1500
+        - Energy cost: 42000 → 60000
+    - Notha 
+        - Rate of Fire: 0.1 → 0.2
     
 - Navy
-- Frigates
-    - Sonar range: 82 → 18
+    - Frigates
+        - Sonar range: 82 → 18
     
 - Structures
-- Seraphim T2 sonar
-    - Can now move and submerge
-    - Speed: 0 → 1
-    - Submerged speed: 0 → 0.5
-    - Mass cost: 180 → 400
-    - Energy cost: 5400 → 6000
-    - Buildtime: 1171 → 600
-    - Health: 2000 → 1000
-    - Energy maintenance: 100 → 200
+    - Seraphim T2 sonar
+        - Can now move and submerge
+        - Speed: 0 → 1
+        - Submerged speed: 0 → 0.5
+        - Mass cost: 180 → 400
+        - Energy cost: 5400 → 6000
+        - Buildtime: 1171 → 600
+        - Health: 2000 → 1000
+        - Energy maintenance: 100 → 200
     
 - Game Mechanics
-- Overcharge
-    - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
-- Target priorities
-    - ACUs cannot be prioritised by units other than experimentals, labs, gunships and fighter/bombers
+    - Overcharge
+        - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
+    - Target priorities
+        - ACUs cannot be prioritised by units other than experimentals, labs, gunships and fighter/bombers
     
 ### Contributors
 - Strogo
@@ -97,6 +97,7 @@ Patch 3708 (19 October, 2019)
 - Removed dummy harms from unit database
 - Allow to build several Eye of Rhianne with a drag build order
 - Removed energy from stone reclaim
+- Fixed satellite permanently blocking mavor shell against a specific spot
 
 ### Contributors ###
 - speed2
@@ -166,230 +167,243 @@ Patch 3705 (5 July, 2019)
 Patch 3704 (18 June, 2019)
 ============================
 - Land
-- Mongoose
-    - MaxSpeed: 3.6 → 3.5
-    - MuzzleVelocity: 25 → 30
-    - Muzzle Charge Time: 3 → 2
-    - Gatling Gun Firing Randomness: 0.4 → 0.1
-    - Gatling Gun Damage: 15 → 16                    
-- Asylum
-    - Mass cost: 144 → 220
-    - Energy maintenance: 75 → 30
-    - Overspill modifier: 0.15 → 0.3
-- Parashield
-    - Mass cost: 120 → 220
-    - Energy maintenance: 110 → 60
-    - Overspill modifier: 0.15 → 0.3
-- Athanah              
-    - Mass cost: 540 → 720
-    - Energy cost: 4800 → 6400
-    - Buildtime: 3200 → 3600
-    - Shield Recharge Time: 45 → 40
-    - Energy maintenance: 300 → 175
-    - Overspill modifier: 0.15 → 0.3
-- Deceiver
-    - Mass cost: 80 → 160
-    - Energy cost: 800 → 1600
-    - Buildtime: 400 → 800
-    - Energy maintenance: 75 → 40
-- Wagner
-    - Torpedo Damage: 6 → 15
-- Brick
-    - Torpedo Damage: 4 → 8
-- Othuum
-    - Torpedo Damage: 10 → 30
-- Harbinger
-    - The Harbinger can once again shoot while reclaiming.
-- T1 Mobile Anti-Air
-    - All Factions:
-    - Mass cost: 50 → 55
-    - Seraphim and UEF:
-    - Health: 360 → 310
-- T3 Mobile Anti-Air
-    - Aeon:                    
-    - Speed: 2.8 → 3.5
-    - Range: 54 → 64
-    - Cybran:                          
-    - Speed: 2.9 → 3.6
-    - Range: 52 → 62
-    - UEF:
-    - Speed: 2.6 → 3.3
-    - Range: 50 → 60
-    - Damage Radius: 1 → 1.5
-    - Seraphim:
-    - Speed: 2.7 → 3.4
-    - Range: 48 → 58
-- T2 Engineer
-    - Speed: 1.7 → 1.9
-- T3 Engineer
-    - Speed: 1.5 → 1.9
-- Scathis
-    - Mass cost: 110000 → 220000
-    - Energy cost: 2000000 → 4000000
-    - Buildtime: 80000 → 240000
-    - Health: 17500 → 9000
-    - Damage: 3000 → 1600
-    - Damage Radius: 7 → 12
-    - Fire Rate: 0.53 → 0.05
-    - Muzzle Salvo Size: 1 → 20
-    - Maximum Firing Range: 300 → 2000
-    - Minimum Firing Range: 50 → 150
-- Selen
-    - The Selen gets some fixes to its stealth/cloak toggle.
+    - Mongoose
+        - MaxSpeed: 3.6 → 3.5
+        - MuzzleVelocity: 25 → 30
+        - Muzzle Charge Time: 3 → 2
+        - Gatling Gun Firing Randomness: 0.4 → 0.1
+        - Gatling Gun Damage: 15 → 16                    
+    - Asylum
+        - Mass cost: 144 → 220
+        - Energy maintenance: 75 → 30
+        - Overspill modifier: 0.15 → 0.3
+    - Parashield
+        - Mass cost: 120 → 220
+        - Energy maintenance: 110 → 60
+        - Overspill modifier: 0.15 → 0.3
+    - Athanah              
+        - Mass cost: 540 → 720
+        - Energy cost: 4800 → 6400
+        - Buildtime: 3200 → 3600
+        - Shield Recharge Time: 45 → 40
+        - Energy maintenance: 300 → 175
+        - Overspill modifier: 0.15 → 0.3
+    - Deceiver
+        - Mass cost: 80 → 160
+        - Energy cost: 800 → 1600
+        - Buildtime: 400 → 800
+        - Energy maintenance: 75 → 40
+    - Wagner
+        - Torpedo Damage: 6 → 15
+    - Brick
+        - Torpedo Damage: 4 → 8
+    - Othuum
+        - Torpedo Damage: 10 → 30
+    - Harbinger
+        - The Harbinger can once again shoot while reclaiming.
+    - T1 Mobile Anti-Air
+        - All Factions:
+        - Mass cost: 50 → 55
+        - Seraphim and UEF:
+        - Health: 360 → 310
+    - T3 Mobile Anti-Air
+        - Aeon:                    
+        - Speed: 2.8 → 3.5
+        - Range: 54 → 64
+        - Cybran:                          
+        - Speed: 2.9 → 3.6
+        - Range: 52 → 62
+        - UEF:
+        - Speed: 2.6 → 3.3
+        - Range: 50 → 60
+        - Damage Radius: 1 → 1.5
+        - Seraphim:
+        - Speed: 2.7 → 3.4
+        - Range: 48 → 58
+    - T2 Engineer
+        - Speed: 1.7 → 1.9
+    - T3 Engineer
+        - Speed: 1.5 → 1.9
+    - Scathis
+        - Mass cost: 110000 → 220000
+        - Energy cost: 2000000 → 4000000
+        - Buildtime: 80000 → 240000
+        - Health: 17500 → 9000
+        - Damage: 3000 → 1600
+        - Damage Radius: 7 → 12
+        - Fire Rate: 0.53 → 0.05
+        - Muzzle Salvo Size: 1 → 20
+        - Maximum Firing Range: 300 → 2000
+        - Minimum Firing Range: 50 → 150
+    - Selen
+        - The Selen gets some fixes to its stealth/cloak toggle.
+
 - Air
-- Renegade
-    - Mass cost: 240 → 270
-    - Energy cost: 4800 → 5400
-    - Buildtime: 1600 → 1800
-- Notha
-    - Bomb Damage: 1175 → 1250
-- Torpedo Bombers
-    - Mass cost: 240 → 270
-    - Energy cost: 4800 → 8000
-    - BreakOffDistance: 34 → 45
-    - TurnSpeed: 0.48 → 1
-    - Sonar Radius: 90 → 45
-- Restorer
-    - Speed: 8 → 10
-    - Damage: 24 → 28
-- Wailer and Broadsword
-    - Will no longer chase air units which fly past            
-- Novax
-    - Mass cost: 28000 → 36000
-    - Energy cost: 400000 → 512000
-    - Buildtime: 30000 → 44800
-    - Damage: 50 → 60
-    - Radar radius: 150 → 200
-    - Omni radius: 50 → 60
-    - Vision radius: 40 → 60
+    - Renegade
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 5400
+        - Buildtime: 1600 → 1800
+    - Notha
+        - Bomb Damage: 1175 → 1250
+    - Torpedo Bombers
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 8000
+        - BreakOffDistance: 34 → 45
+        - TurnSpeed: 0.48 → 1
+        - Sonar Radius: 90 → 45
+    - Restorer
+        - Speed: 8 → 10
+        - Damage: 24 → 28
+    - Wailer and Broadsword
+        - Will no longer chase air units which fly past            
+    - Novax
+        - Mass cost: 28000 → 36000
+        - Energy cost: 400000 → 512000
+        - Buildtime: 30000 → 44800
+        - Damage: 50 → 60
+        - Radar radius: 150 → 200
+        - Omni radius: 50 → 60
+        - Vision radius: 40 → 60
+
 - Navy
-- Bulwark
-    - Speed: 7 → 5
-    - Turn Rate: 60 → 45
-    - Overspill Damage Modifier: 0.25 → 0.35
-    - UniformScale: 0.09 → 0.135
-- Beacon
-    - The torpedo defense of the aeon frigate works more effectively
-- Siren
-    - The cybran cruiser now shoots its anti-air missiles in a faster and more effective way.
-- Exodus
-    - AoE: 1 → 1.4
-- Battleships:
-    - Galaxy
-    - Health: 47000 → 44500
-    - Summit
-    - Mass cost: 10500 → 10000
-    - Buildtime: 33000 → 31600
-    - Omen
-    - Range: 104/114 → 110
-    - Tempest
-    - Mass cost: 24000 → 22000
-- Yathsou
-    - WaterVisionRadius: 45 → 55
+    - Bulwark
+        - Speed: 7 → 5
+        - Turn Rate: 60 → 45
+        - Overspill Damage Modifier: 0.25 → 0.35
+        - UniformScale: 0.09 → 0.135
+    - Beacon
+        - The torpedo defense of the aeon frigate works more effectively
+    - Siren
+        - The cybran cruiser now shoots its anti-air missiles in a faster and more effective way.
+    - Exodus
+        - AoE: 1 → 1.4
+    - Battleships:
+        - Galaxy
+            - Health: 47000 → 44500
+        - Summit
+            - Mass cost: 10500 → 10000
+            - Buildtime: 33000 → 31600
+        - Omen
+            - Range: 104/114 → 110
+        - Tempest
+            - Mass cost: 24000 → 22000
+    - Yathsou (T3 submarine)
+        - WaterVisionRadius: 45 → 55
 
 - Structures
-- Tactical Missile Defense
-    - Buildtime: 600 → 400
-- T2 Land HQ
-    - Buildtime: 2600 → 2300
-- T2 Artillery
-    - Buildtime: 1200 → 1600
-    - Minimum Range: 5 → 50
-- Eye of Rhianne
-    - Energy Storage: 0 → 10000
-- T2 Static Flak
-    - Mass cost: 392 → 400
-    - Energy cost: 3920 → 4000
-    - Buildtime: 958 → 540
-- T2 Radar
-    - Energy Maintenance: 200 → 150
-- Airstaging
-    - Tech level: 2 → 1
-    - Repair Mass cost: 0.5 → 0
-    - Repair Energy cost: 5 → 30
-    - Buildtime: 534 → 450
+    - Tactical Missile Defense
+        - Buildtime: 600 → 400
+    - T2 Land HQ
+        - Buildtime: 2600 → 2300
+    - T2 Artillery
+        - Buildtime: 1200 → 1600
+        - Minimum Range: 5 → 50
+    - Eye of Rhianne
+        - Energy Storage: 0 → 10000
+    - T2 Static Flak
+        - Mass cost: 392 → 400
+        - Energy cost: 3920 → 4000
+        - Buildtime: 958 → 540
+    - T2 Radar
+        - Energy Maintenance: 200 → 150
+    - Airstaging
+        - Tech level: 2 → 1
+        - Repair Mass cost: 0.5 → 0
+        - Repair Energy cost: 5 → 30
+        - Buildtime: 534 → 450
+    - Nuke Launchers
+        - BuildPower: 1080 → 1500
+        - Missile Buildtime: 324000 → 450000
+    - T2 static shields
+        - Aeon
+            - Recharge Time: 16 → 24
+            - Buildtime: 701 → 950
+        - UEF
+            - Recharge Time: 15 → 23
+            - Buildtime: 845 → 1150
+        - Seraphim
+            - Recharge Time: 17 → 25
+            - Buildtime: 958 → 1250
+        - Cybran
+            - ED1
+                - Recharge Time: 18 → 20
+                - Buildtime: 600 → 700
+                - Buildpower: 15.53 → 19.2
+            - ED2
+                - Recharge Time: 16 → 22
+                - Buildtime: 466 → 775
+                - Buildpower: 13.34 → 21
+            - ED3
+                - Recharge Time: 18 → 25
+                - Buildtime: 1067 → 2200
+                - Buildpower: 30.575 → 29.3
 
-- Nuke Launchers
-    - BuildPower: 1080 → 1500
-    - Missile Buildtime: 324000 → 450000
-- T2 static shields
-    - Aeon
-    - Recharge Time: 16 → 24
-    - Buildtime: 701 → 950
-- UEF
-    - Recharge Time: 15 → 23
-    - Buildtime: 845 → 1150
-- Seraphim
-    - Recharge Time: 17 → 25
-    - Buildtime: 958 → 1250
-- Cybran
-- ED1
-    - Recharge Time: 18 → 20
-    - Buildtime: 600 → 700
-    - Buildpower: 15.53 → 19.2
-- ED2
-    - Recharge Time: 16 → 22
-    - Buildtime: 466 → 775
-    - Buildpower: 13.34 → 21
-- ED3
-    - Recharge Time: 18 → 25
-    - Buildtime: 1067 → 2200
-    - Buildpower: 30.575 → 29.3
-- ED4
-    - Recharge Time: 20 → 25
-    - Buildtime: 3667 → 3515
-    - Buildpower: 11.81 → 50.7
-- HSD Pulse
-- Shield Health: 15000 → 17000
-    - Mass cost: 3000 → 3300
-    - Energy cost: 50000 → 55000
-- ED5
-    - Shield Health: 15000 → 16500
-    - Buildtime: 1654 → 7100
-- T3 Static Artillery
-    - Emissary (Aeon): 30764 → 120000
-    - Hovatham (Seraphim): 29792 → 110000
-    - Duke (UEF): 30278 → 115000
-    - Disruptor (Cybran): 29308 → 105000
-- Game Enders
-    - Mavor: 99900 → 300000
-    - Paragon: 125100 → 325000
-    - Salvation: 90000 → 100000
-    - Yolona Oss: 125100 → 250000
+    - T3 static shields
+        - Cybran
+            - ED4
+                - Recharge Time: 20 → 25
+                - Buildtime: 3667 → 3515
+                - Buildpower: 11.81 → 50.7
+            - ED5
+                - Shield Health: 15000 → 16500
+                - Buildtime: 1654 → 7100
+        - UEF
+            - HSD Pulse
+                - Shield Health: 15000 → 17000
+                - Mass cost: 3000 → 3300
+                - Energy cost: 50000 → 55000
+    - T3 Static Artillery
+        - Emissary (Aeon)
+            - Buildtime: 30764 → 120000 
+        - Hovatham (Seraphim)
+            - Buildtime: 29792 → 110000
+        - Duke (UEF)
+            - Buildtime: 30278 → 115000
+        - Disruptor (Cybran)
+            - Buildtime: 29308 → 105000
+    - Game Enders
+        - Mavor
+            - Buildtime: 99900 → 300000
+        - Paragon
+            - Buildtime: 125100 → 325000
+        - Salvation
+            - Buildtime: 90000 → 100000
+        - Yolona Oss
+            - Buildtime: 125100 → 250000
 
 - ACUs
-- Regen Aura
-    - Mass cost: 600 → 700
-    - Energy cost: 4500 → 18000
-    - BuildTime: 600 → 700
-    - Added ACU HP: 1000 → 500
-    - Range: 22 → 30
-    - Max Health Multiplier: 1 → 1.1
-    - Min Regen: 0 → 3
+    - Regen Aura
+        - Mass cost: 600 → 700
+        - Energy cost: 4500 → 18000
+        - BuildTime: 600 → 700
+        - Added ACU HP: 1000 → 500
+        - Range: 22 → 30
+        - Max Health Multiplier: 1 → 1.1
+        - Min Regen: 0 → 3
 
-- Advanced Regen Aura
-    - Mass cost: 1500 → 1800
-    - Energy cost: 31250 → 42000
-    - BuildTime: 1250 → 1500
-    - Added ACU HP: 2500 → 1500
-    - Range: 30 → 35
-    - Max Health Multiplier: 1.1 → 1.2
-    - Min Regen: 0 → 15
-    
-- Aeon Personal Shield
-    - Shield Recharge time: 90 → 75
+    - Advanced Regen Aura
+        - Mass cost: 1500 → 1800
+        - Energy cost: 31250 → 42000
+        - BuildTime: 1250 → 1500
+        - Added ACU HP: 2500 → 1500
+        - Range: 30 → 35
+        - Max Health Multiplier: 1.1 → 1.2
+        - Min Regen: 0 → 15
+        
+    - Aeon Personal Shield
+        - Shield Recharge time: 90 → 75
 
-- Chrono Dampener
-    - Additional Health: 0 → 3000
-    - Stun Time: 3.5s → 2.5s
+    - Chrono Dampener
+        - Additional Health: 0 → 3000
+        - Stun Time: 3.5s → 2.5s
 
 - Projectiles
-- Tactical missile
-    - Mass cost: 180 → 250
+    - Tactical missile
+        - Mass cost: 180 → 250
 
-- ACU Tactical Missile
-    - Mass cost: 180 → 250
-    - Buildtime: 300 → 450
+    - ACU Tactical Missile
+        - Mass cost: 180 → 250
+        - Buildtime: 300 → 450
 
 ### Contributors
 - Strogo
@@ -451,7 +465,7 @@ Patch 3702 (28 December, 2018)
 - speed2
 - Exotic_Retard
 - PhilipJFry
-- shalkya
+- keyser
 
 
 Hotfix Patch 3701 (28 October 2018)
@@ -505,7 +519,7 @@ Patch 3699 (20 October, 2018)
 
 ### Contributors
 - Hussar
-- shalkya
+- keyser
 - Strogo
 - Uveso
 - Rackover
@@ -584,7 +598,7 @@ Patch 3697 (17 August, 2018)
 - CookieNoob
 - PhilipJFry
 - IceDreamer
-- shalkya
+- keyser
 - Uveso
 - FAETHER
 - TheAdDad
@@ -597,236 +611,242 @@ Patch 3696 (26 May, 2018)
 ============================
 ### Gameplay
 - Aeon 
-- Personal Shield Generator:
-    - BuildCostMass: 1000 → 1300
-    - BuildTime: 1000 → 1300
+    - Personal Shield Generator:
+        - BuildCostMass: 1000 → 1300
+        - BuildTime: 1000 → 1300
     - Heavy Personal Shield Generator:
-    - BuildCostEnergy: 93750 → 123750
-    - BuildCostMass: 1500 → 2300
-    - BuildTime: 1750 → 2450
-    - ShieldMaxHealth: 29000 → 25000
-    - ShieldRegenRate: 37 → 32
+        - BuildCostEnergy: 93750 → 123750
+        - BuildCostMass: 1500 → 2300
+        - BuildTime: 1750 → 2450
+        - ShieldMaxHealth: 29000 → 25000
+        - ShieldRegenRate: 37 → 32
 - UEF
-- Nano-Repair System:
-    - NewHealth: 2000 → 1500
-- Personal Shield Generator:
-    - BuildCostMass: 1500 → 2300
-    - ShieldMaxHealth: 24000 → 19000
-    - ShieldRegenRate: 35 → 30
+    - Nano-Repair System:
+        - NewHealth: 2000 → 1500
+    - Personal Shield Generator:
+        - BuildCostMass: 1500 → 2300
+        - ShieldMaxHealth: 24000 → 19000
+        - ShieldRegenRate: 35 → 30
     - Shield Generator Field:
-    - BuildCostMass: 3000 → 3600
-    - BuildTime: 2800 → 3400
+        - BuildCostMass: 3000 → 3600
+        - BuildTime: 2800 → 3400
 - Seraphim
-- Refracting Chronotron Amplifier:
-    - AdditionalDamage: 750 → 620
-    - BuildCostMass: 4800 → 5400
-    - BuildTime: 4200 → 4600
-- Nano-Repair System:
-    - BuildCostEnergy: 42000 → 56000
-    - BuildCostMass: 1200 → 1800
-    - BuildTime: 1200 → 1800
-    - NewHealth: 3000 → 2000
-- Enhanced Nano-Repair System:
-    - BuildCostMass: 4500 → 5800
-    - BuildTime: 4200 → 4600
+    - Refracting Chronotron Amplifier:
+        - AdditionalDamage: 750 → 620
+        - BuildCostMass: 4800 → 5400
+        - BuildTime: 4200 → 4600
+    - Nano-Repair System:
+        - BuildCostEnergy: 42000 → 56000
+        - BuildCostMass: 1200 → 1800
+        - BuildTime: 1200 → 1800
+        - NewHealth: 3000 → 2000
+    - Enhanced Nano-Repair System:
+        - BuildCostMass: 4500 → 5800
+        - BuildTime: 4200 → 4600
 
 - T3 Land Combat
-- Harbinger:
-    - Health: 4600 → 3050
-    - Shield Health: 1300 → 1000
-    - Shield Regen Rate: 9 → 30
-    - Shield Recharge Time: 63 → 40
-    - ShieldRegenStartTime: 3 → 2
-    - Power Drain: 25 → 30
-    - BuildTime: 4500 → 3600
-    - Speed: 3 → 2.85
-    - Acceleration: 3 → 3.2
-    - Turn Rate: 120 → 130
-    - Damage: 300 → 320
-    - Rate of Fire: 1.25 → 1
-    - Range: 28 → 26
-    - Muzzle Velocity: 30 → 40
-- Othuum:
-    - Health: 6700 → 5000
-    - Acceleration: 2.6 → 3.5
-    - SizeY: 0.45 → 0.65
-    - SizeZ: 2.0 → 2.3
-    - First 2 Guns:
-    - Damage: 75 → 39
-    - Muzzle Velocity: 35 → 40
-    - Turret Yaw Speed: 90 → 120
-    - 3rd Gun:
-    - Damage: 400 → 525
-    - Range: 32 → 28
-    - Muzzle Velocity: 30 → 40
-    - Torpedo Weapon:
-    - Range: 32 → 28
-    - Target Priorities:
-    - Othuum now prioritises T3 over T2 over T1 instead of the reverse.
-- Percival:            
-    - Health: 9300 → 7200
-    - BuildTime: 6000 → 4800
-    - Speed: 2 → 2.1
-    - Acceleration: → 2.1
-    - TurnRate: 60 → 70
-    - Damage: 1600 → 1670
-    - Rate of Fire: 0.25 → 0.2
-    - Range: 35 → 34
-    - Muzzle Velocity: 35 → 38
-    - Turret Yaw Speed: 60 → 90
-- Titan:
-    - Health: 2200 → 2550
-    - Shield: 1200 → 600
-    - Recharge Time: 60 → 15
-    - Regen Rate: 9 → 20
-    - Speed: 4 → 3.8
-    - Acceleration: 4 → 4.2
-    - Range: 20 → 22
-    - Muzzle Velocity: 30 → 35
-    - Turn rate: 150 → 120
-    - Target Priorities:
-    - Titan now prioritises T3 over T2 over T1 instead of the reverse.
-- Brick:
-    - Health: 9000 → 7500
-    - BuildTime: 6000 → 4800
-    - Speed: 2 → 2.3
-    - Acceleration: 2 → 2.3
-    - TurnRate: 60 → 65
-    - Main Weapon:
-    - Damage: 150 → 125
-    - Range: 35 → 32
-    - MuzzleVelocity: 35 → 42
-    - Turret Yaw Speed: 60 → 90
-- Loyalist:
-    - Health: 3100 → 3000
-    - Speed: 4 → 3.8
-    - Acceleration: 4 → 4.2
-    - EMP explosion on death:
-    - Duration: 2s → 1.4s
-    - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
-    - 1st Weapon (Disintegrator Pulse Laser):
-    - Damage: 175 → 150
-    - Range: 25 → 20
-    - 2nd Weapon (Heavy Electron Bolter):
-    - Damage: 12 → 14
-    - Range: 25 → 20
-    - Muzzle Velocity: 40 → 35
-    - TurretYawSpeed: 90 → 120
-- T3 Ranged Units
-    - Sprite Striker:
-    - Mass Cost: 640 → 720
-    - Build Time: 3600 → 4000
-    - Health: 450 → 500
-    - Speed: 3 → 2.85
-    - Sizex: 0.8 → 0.95
-    - SizeY: 1.15 → 1.35
-    - SizeZ: 0.6 → 0.8
-    - Firing Randomness while moving: 0.5 → 0.3
-    - Rate of Fire: 0.142 → 0.15
-    - MuzzleVelocity: 120 → 90
-    - TurretYawSpeed: 90 → 110
-- Usha-Ah:
-    - Mass Cost: 640 → 800
-    - Energy Cost: 8000 → 8800
-    - Build Time: 3600 → 4300
-    - Health: 500 → 700
-    - Speed: 3 → 2.5
-    - Acceleration: 3 → 2.5
-    - UniformScale: 0.08 → 0.095
-    - SizeX: 0.35 → 0.45
-    - SizeY: 1.2 → 1.55
-    - SizeZ: 0.7 → 0.9
-    - Default Fire Mode:
-    - Firing Randomness while moving: 0.25 → 0.4
-    - Rate of Fire: 0.2 → 0.25
-    - Firing Tolerance: 0.5 → 3
-    - Muzzle Velocity: 120 → 80
-    - TurretYawSpeed: 90 → 70
-    - Ranged Fire Mode:
-    - Firing Randomness while moving: 0.5 → 0.2
-    - Rate of Fire: 0.07 → 0.066
-    - TurretYawSpeed: 90 → 50
-- T3 Mobile Artillery:
-    - Build time is reduced for T3 mobile artillery.
-    - Build Time: 4800 → 4300
+    - Harbinger:
+        - Health: 4600 → 3050
+        - Shield Health: 1300 → 1000
+        - Shield Regen Rate: 9 → 30
+        - Shield Recharge Time: 63 → 40
+        - ShieldRegenStartTime: 3 → 2
+        - Power Drain: 25 → 30
+        - BuildTime: 4500 → 3600
+        - Speed: 3 → 2.85
+        - Acceleration: 3 → 3.2
+        - Turn Rate: 120 → 130
+        - Damage: 300 → 320
+        - Rate of Fire: 1.25 → 1
+        - Range: 28 → 26
+        - Muzzle Velocity: 30 → 40
+    - Othuum:
+        - Health: 6700 → 5000
+        - Acceleration: 2.6 → 3.5
+        - SizeY: 0.45 → 0.65
+        - SizeZ: 2.0 → 2.3
+        - First 2 Guns:
+        - Damage: 75 → 39
+        - Muzzle Velocity: 35 → 40
+        - Turret Yaw Speed: 90 → 120
+        - 3rd Gun:
+        - Damage: 400 → 525
+        - Range: 32 → 28
+        - Muzzle Velocity: 30 → 40
+        - Torpedo Weapon:
+        - Range: 32 → 28
+        - Target Priorities: Othuum now prioritises T3 over T2 over T1 instead of the reverse.
+    - Percival:            
+        - Health: 9300 → 7200
+        - BuildTime: 6000 → 4800
+        - Speed: 2 → 2.1
+        - Acceleration: → 2.1
+        - TurnRate: 60 → 70
+        - Damage: 1600 → 1670
+        - Rate of Fire: 0.25 → 0.2
+        - Range: 35 → 34
+        - Muzzle Velocity: 35 → 38
+        - Turret Yaw Speed: 60 → 90
+    - Titan:
+        - Health: 2200 → 2550
+        - Shield: 1200 → 600
+        - Recharge Time: 60 → 15
+        - Regen Rate: 9 → 20
+        - Speed: 4 → 3.8
+        - Acceleration: 4 → 4.2
+        - Range: 20 → 22
+        - Muzzle Velocity: 30 → 35
+        - Turn rate: 150 → 120
+        - Target Priorities: Titan now prioritises T3 over T2 over T1 instead of the reverse.
+    - Brick:
+        - Health: 9000 → 7500
+        - BuildTime: 6000 → 4800
+        - Speed: 2 → 2.3
+        - Acceleration: 2 → 2.3
+        - TurnRate: 60 → 65
+        - Main Weapon:
+        - Damage: 150 → 125
+        - Range: 35 → 32
+        - MuzzleVelocity: 35 → 42
+        - Turret Yaw Speed: 60 → 90
+    - Loyalist:
+        - Health: 3100 → 3000
+        - Speed: 4 → 3.8
+        - Acceleration: 4 → 4.2
+        - EMP explosion on death:
+        - Duration: 2s → 1.4s
+        - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
+        - 1st Weapon (Disintegrator Pulse Laser):
+            - Damage: 175 → 150
+            - Range: 25 → 20
+        - 2nd Weapon (Heavy Electron Bolter):
+            - Damage: 12 → 14
+            - Range: 25 → 20
+            - Muzzle Velocity: 40 → 35
+            - TurretYawSpeed: 90 → 120
+    - T3 Ranged Units
+        - Sprite Striker:
+            - Mass Cost: 640 → 720
+            - Build Time: 3600 → 4000
+            - Health: 450 → 500
+            - Speed: 3 → 2.85
+            - Sizex: 0.8 → 0.95
+            - SizeY: 1.15 → 1.35
+            - SizeZ: 0.6 → 0.8
+            - Firing Randomness while moving: 0.5 → 0.3
+            - Rate of Fire: 0.142 → 0.15
+            - MuzzleVelocity: 120 → 90
+            - TurretYawSpeed: 90 → 110
+        - Usha-Ah:
+            - Mass Cost: 640 → 800
+            - Energy Cost: 8000 → 8800
+            - Build Time: 3600 → 4300
+            - Health: 500 → 700
+            - Speed: 3 → 2.5
+            - Acceleration: 3 → 2.5
+            - UniformScale: 0.08 → 0.095
+            - SizeX: 0.35 → 0.45
+            - SizeY: 1.2 → 1.55
+            - SizeZ: 0.7 → 0.9
+            - Default Fire Mode:
+                - Firing Randomness while moving: 0.25 → 0.4
+                - Rate of Fire: 0.2 → 0.25
+                - Firing Tolerance: 0.5 → 3
+                - Muzzle Velocity: 120 → 80
+                - TurretYawSpeed: 90 → 70
+            - Ranged Fire Mode:
+                - Firing Randomness while moving: 0.5 → 0.2
+                - Rate of Fire: 0.07 → 0.066
+                - TurretYawSpeed: 90 → 50
+    - T3 Mobile Artillery:
+        - Build time is reduced for T3 mobile artillery.
+        - Build Time: 4800 → 4300
 
 - Experimental Units
-- Cybran:
-    - Monkeylord:
-    - Build Time: 15750 → 27500
-    - Mass Cost: 19000 → 20000
-    - Megalith Build Time: 18750 → 60 625
-    - Soul Ripper Build Time: 20000 → 56250
-    - Scathis Build Time: 50000 → 80000
-- UEF:
-    - Fatboy:
-    - Build Time: 21 000 → 47 500
-    - Shield Recharge Time: 160 → 120
-    - Shield Regen Rate: 64 → 100
-    - Power Upkeep cost: 500 → 600
-    - Atlantis Build Time: 14 400 → 20 500
-    - Novax Center Build Time: 25 000 → 30 000
-- Aeon:
-    - Galactic Colossus:
-    - Power Cost: 343 750 → 330 000
-    - Build Time: 20 625 → 51500
-    - Claws:
-    - Fixed a bug with the claws, credit to EQ.
-    - Rate of Fire: 1 → 0.15
-    - Czar Build Time: 33 750 → 50 625
-    - Tempest Build Time: 14 400 → 28 000
-    - Tempest Muzzle Velocity: 28 → 35
-- Seraphim:
-    - Ythotha:
-    - Build Time: 18750 → 46 875
-    - Mass Cost: 25 000 → 26 500
-    - Power Cost: 312 500 → 330 000
-    - Phason Beam Generator Damage: 8000 → 6000
-    - Gatling Plasma Cannon Damage: 550 → 610
-    - Heavy Sinn Unthe Cannon Damage: 1200 → 1850
-    - Flak Damage: 39 → 46
-    - Flak Range: 25 → 21
-    - Ahwassa Build Time: 36000 → 67500
+    - Cybran:
+        - Monkeylord:
+            - Build Time: 15750 → 27500
+            - Mass Cost: 19000 → 20000
+        - Megalith:
+            - Build Time: 18750 → 60 625
+        - Soul Ripper:
+            - Build Time: 20000 → 56250
+        - Scathis;
+            - Build Time: 50000 → 80000
+    - UEF:
+        - Fatboy:
+            - Build Time: 21 000 → 47 500
+            - Shield Recharge Time: 160 → 120
+            - Shield Regen Rate: 64 → 100
+            - Power Upkeep cost: 500 → 600
+        - Atlantis:
+            - Build Time: 14 400 → 20 500
+        - Novax Center:
+            - Build Time: 25 000 → 30 000
+    - Aeon:
+        - Galactic Colossus:
+            - Power Cost: 343 750 → 330 000
+            - Build Time: 20 625 → 51500
+            - Claws:
+                - Fixed a bug with the claws, credit to EQ.
+                - Rate of Fire: 1 → 0.15
+        - Czar:
+            - Build Time: 33 750 → 50 625
+        - Tempest:
+            - Build Time: 14 400 → 28 000
+            - Muzzle Velocity: 28 → 35
+    - Seraphim:
+        - Ythotha:
+            - Build Time: 18750 → 46 875
+            - Mass Cost: 25 000 → 26 500
+            - Power Cost: 312 500 → 330 000
+            - Phason Beam Generator Damage: 8000 → 6000
+            - Gatling Plasma Cannon Damage: 550 → 610
+            - Heavy Sinn Unthe Cannon Damage: 1200 → 1850
+            - Flak Damage: 39 → 46
+            - Flak Range: 25 → 21
+        - Ahwassa:
+            - Build Time: 36000 → 67500
 
 - Navy
-- Battleships:
-- Seraphim:
-    - FiringRandomness: 0.3 → 0.25
-    - MuzzleVelocity: 30 → 40
-- Aeon:
-    - TurnRate: 35 → 40
-    - MaxSpeed: 3.6 → 3.7
-    - Range: 100 → 105
-- Cybran Carrier:
-    - Fixed the aim on the Anti Air weapon of the carrier.
-- Bulwark:
-    - Damage Overspill: 15% → 25%
-    - Recharge time: 35 → 40
-- Shard:
-    - Health: 750 → 800
+    - Battleships:
+        - Seraphim:
+            - FiringRandomness: 0.3 → 0.25
+            - MuzzleVelocity: 30 → 40
+        - Aeon:
+            - TurnRate: 35 → 40
+            - MaxSpeed: 3.6 → 3.7
+            - Range: 100 → 105
+    - Cybran Carrier:
+        - Fixed the aim on the Anti Air weapon of the carrier.
+    - Bulwark:
+        - Damage Overspill: 15% → 25%
+        - Recharge time: 35 → 40
+    - Shard:
+        - Health: 750 → 800
 
 - Structures
-- T3 Land HQs:
-    - Mass Cost: 4 920 → 5 220
-    - Power Cost: 43 900 → 47 400
-    - Build Time: 11 000 → 12 100
-- Ravager:
-    - Health: 7500 → 6500
-    - Mass Cost: 1 800 → 2 000
-    - Power Cost: 16 000 → 17 600
-    - Build Time: 1 500 → 2000
-- T3 Static Artillery:
-    - UEF/Cybran/Seraphim/Aeon Range: 750/700/825/900 → 825 
-- Cybran:
-    - Damage: 4600 → 3700
-    - Rate of Fire: 0.1 → 0.13
-- T3 Mass Fabricator:
-    - Adjacency from storage: 4.1667% → 3%
-    - Adjacency for SML: 20% → 12.5%
-- Civilian Structures
-    - Adjusted Civilian Building Mass values to make them more consistent. Civilian buildings will give 50-150 mass.
-- Cybran Shield
-    - Added the ED4 Shield to the list of buildable structures and to the hotbuild keygroup for shields.
+    - T3 Land HQs:
+        - Mass Cost: 4 920 → 5 220
+        - Power Cost: 43 900 → 47 400
+        - Build Time: 11 000 → 12 100
+    - Ravager:
+        - Health: 7500 → 6500
+        - Mass Cost: 1 800 → 2 000
+        - Power Cost: 16 000 → 17 600
+        - Build Time: 1 500 → 2000
+    - T3 Static Artillery:
+        - UEF/Cybran/Seraphim/Aeon Range: 750/700/825/900 → 825 
+    - Cybran:
+        - Damage: 4600 → 3700
+        - Rate of Fire: 0.1 → 0.13
+    - T3 Mass Fabricator:
+        - Adjacency from storage: 4.1667% → 3%
+        - Adjacency for SML: 20% → 12.5%
+    - Civilian Structures:
+        - Adjusted Civilian Building Mass values to make them more consistent. Civilian buildings will give 50-150 mass.
+    - Cybran Shield:
+        - Added the ED4 Shield to the list of buildable structures and to the hotbuild keygroup for shields.
 
 - Overcharge
     - The damage dealt by overcharge now scales with the amount of energy drained from storage.
@@ -848,44 +868,45 @@ Patch 3696 (26 May, 2018)
 - Teleport
     - Teleporting takes 5 seconds longer. The animation at the teleport destination is unchanged.
 
-- T1 Mobile Anti Air
-    - Aeon:
-    - Mass Cost: 55 → 50
-    - Damage: 10 → 8
-    - UEF:
-    - Mass Cost: 55 → 50
-    - Damage: 16 → 14
-    - Seraphim:
-    - Mass Cost: 55 → 50
-    - Damage: 8 → 14
-    - Cybran:
-    - Mass Cost: 55 → 50
-    - Damage: 10 → 9
-- Fire Beetle:
-    - Damage: 3500 → 1500
-    - AoE: 4.5 → 6
-    - Transport class: 2 → 1
-    - Stun ability added. Duration → 2s. Stuns all units except Experimentals
-    - Friendly Fire → Disabled
-    - Health: 300 → 500
-- T2 Transports:
-    - Mass Cost: 300 → 330
-    - Power Cost: 12000 → 13200
-    - Speed: 15 → 14.3
-- Aurora:
-    - FiringRandomnessWhileMoving: 0.3 → 0.1
-    - MuzzleVelocity: 30 → 25
-- Ahwassa:
-    - BombDropThreshold: 4 → 20
-- T1 Bombers:
-    - RandomBreakOffDistanceMult: 1 → 1.5
-- Selen:
-    - Removed the Power drain from the stealth/cloak ability while not moving.
+- Miscellaneous
+    - T1 Mobile Anti Air
+        - Aeon:
+            - Mass Cost: 55 → 50
+            - Damage: 10 → 8
+        - UEF:
+            - Mass Cost: 55 → 50
+            - Damage: 16 → 14
+        - Seraphim:
+            - Mass Cost: 55 → 50
+            - Damage: 8 → 14
+        - Cybran:
+            - Mass Cost: 55 → 50
+            - Damage: 10 → 9
+    - Fire Beetle:
+        - Damage: 3500 → 1500
+        - AoE: 4.5 → 6
+        - Transport class: 2 → 1
+        - Stun ability added. Duration → 2s. Stuns all units except Experimentals
+        - Friendly Fire → Disabled
+        - Health: 300 → 500
+    - T2 Transports:
+        - Mass Cost: 300 → 330
+        - Power Cost: 12000 → 13200
+        - Speed: 15 → 14.3
+    - Aurora:
+        - FiringRandomnessWhileMoving: 0.3 → 0.1
+        - MuzzleVelocity: 30 → 25
+    - Ahwassa:
+        - BombDropThreshold: 4 → 20
+    - T1 Bombers:
+        - RandomBreakOffDistanceMult: 1 → 1.5
+    - Selen:
+        - Removed the Power drain from the stealth/cloak ability while not moving.
 ### Fixes
-    - Nuke trajectory is now corrected so it travels parallel to the ground.
-    - Selens will no longer lose their radar when there is a power stall.
-    - Units with personal shields that are unloading from transports will now take damage on their health when hit.
-    - The seraphim T2 torp defence wreck is no longer invisible.
+- Nuke trajectory is now corrected so it travels parallel to the ground.
+- Selens will no longer lose their radar when there is a power stall.
+- Units with personal shields that are unloading from transports will now take damage on their health when hit.
+- The seraphim T2 torp defence wreck is no longer invisible.
     
 ### Contributors
 - CookieNoob
@@ -2407,7 +2428,7 @@ Patch 3658 (August 29th, 2016)
 - JaggedAppliance
 - JJ173
 - Justify87
-- shalkya
+- keyser
 - Sheeo
 - Speed2
 - Uveso
@@ -2947,7 +2968,7 @@ Patch 3641 (July 12, 2015)
 - bamboofats
 - ckitching
 - quark036
-- shalkya
+- keyser
 - pip
 - zock
 
