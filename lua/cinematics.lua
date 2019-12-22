@@ -146,8 +146,8 @@ function CameraTrackEntities(units, zoom, seconds)
 end
 
 -- Similar to CameraTrackEntity, but this gives more control with the pitchAdjust parameter.
-function CameraThirdPerson(entity, pitchAdjust, zoom, seconds)
-    ScenarioInfo.Camera:NoseCam(entity, pitchAdjust, zoom, seconds)
+function CameraThirdPerson(entity, pitchAdjust, zoom, seconds, transition)
+    ScenarioInfo.Camera:NoseCam(entity, pitchAdjust, zoom, seconds, transition)
 
     if seconds and seconds ~= 0 then
         -- Wait for it to be done
