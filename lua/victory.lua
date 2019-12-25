@@ -37,11 +37,6 @@ function ObserverAfterDeath(armyIndex)
             ArmyGetHandicap(i - 1, index, false)
         end
     end
-
-    if not SessionIsReplay() then
-        WaitTicks(10)
-        SimConExecute('SetFocusArmy -1')
-    end
 end
 
 function CheckVictory(scenarioInfo)
