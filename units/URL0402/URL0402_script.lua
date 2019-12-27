@@ -235,6 +235,16 @@ URL0402 = Class(CWalkingLandUnit) {
 
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
+
+        local bp = self:GetBlueprint()
+        local position = self:GetPosition()
+        for i, numWeapons in bp.Weapon do
+            if bp.Weapon[i].Label == 'SpiderDeath' then
+                position[3] = position[3]+3
+                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                break
+            end
+        end
         DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Center_Turret', 2)

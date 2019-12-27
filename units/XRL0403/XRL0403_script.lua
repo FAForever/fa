@@ -177,8 +177,19 @@ XRL0403 = Class(CWalkingLandUnit) {
 
         WaitSeconds(1)
         self:CreateFirePlumes(army, {'Right_Leg01_B01','Right_Leg02_B01','Left_Leg02_B01',}, 0.5)
-        WaitSeconds(0.3)
+        WaitSeconds(0.4)
         self:CreateDeathExplosionDustRing()
+        
+        local bp = self:GetBlueprint()
+        local position = self:GetPosition()
+        for i, numWeapons in bp.Weapon do
+            position[3] = position[3]+0.4
+            if(bp.Weapon[i].Label == 'MegalithDeath') then
+                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                break
+            end
+        end
+        
         WaitSeconds(0.4)
 
 
@@ -199,14 +210,6 @@ XRL0403 = Class(CWalkingLandUnit) {
 
         -- Finish up force ring to push trees
         DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
-
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'MegalithDeath') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
 
         -- Explosion on and damage fire on various bones
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)

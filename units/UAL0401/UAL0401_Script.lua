@@ -59,9 +59,11 @@ UAL0401 = Class(AWalkingLandUnit) {
         end
 
         local bp = self:GetBlueprint()
+        local position = self:GetPosition()
         for i, numWeapons in bp.Weapon do
             if bp.Weapon[i].Label == 'CollossusDeath' then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                position[3] = position[3]+5
+                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                 break
             end
         end
