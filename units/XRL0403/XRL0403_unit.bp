@@ -787,9 +787,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 7500,
+            Damage = 8000,
             DamageFriendly = true,
-            DamageRadius = 4,
+            DamageRadius = 9,
             DamageType = 'DeathExplosion',
             DisplayName = 'Megalith Death',
             DummyWeapon = true,
