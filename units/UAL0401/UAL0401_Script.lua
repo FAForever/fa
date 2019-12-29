@@ -60,9 +60,13 @@ UAL0401 = Class(AWalkingLandUnit) {
 
         local bp = self:GetBlueprint()
         local position = self:GetPosition()
+        local qx, qy, qz, qw = unpack(self:GetOrientation())
+        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+        local current_yaw = math.floor(a * (180 / math.pi) + 0.5)
         for i, numWeapons in bp.Weapon do
             if bp.Weapon[i].Label == 'CollossusDeath' then
-                position[3] = position[3]+5
+                position[3] = position[3]+5*math.cos(math.rad(current_yaw))
+                position[1] = position[1]+5*math.sin(math.rad(current_yaw))
                 DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                 break
             end
