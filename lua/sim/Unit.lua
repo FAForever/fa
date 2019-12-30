@@ -1452,14 +1452,14 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        -- Find a weapon which is not a DeathWeapon
+        -- Find a weapon which is not a DeathWeapon / Suicide / DeathImpact / AntiMissile (AEON/SERA TMD) / Turret01 (UEF/CYBRAN TMD) / MissileRack (CYBRAN/SERA/AEON SMD) / AntiNuke (UEF SMD) / AntiTorpedo / AntiTorpedo01 (stealth boat)
         for index, wep in weps do
-            if wep.Label ~= 'DeathWeapon' then
+            if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'Suicide' and wep.Label ~= 'DeathImpact' and wep.Label ~= 'AntiMissile' and wep.Label ~= 'Turret01' and wep.Label ~= 'MissileRack' and wep.Label ~= 'AntiNuke' and wep.Damage ~= 0 and wep.Label ~= 'AntiTorpedo' and wep.Label ~= 'AntiTorpedo01' then
                 return true
             end
         end
 
-        -- We only have a DeathWeapon. Bail.
+        -- We only have weapon labels from above. Bail.
         return false
     end,
 
