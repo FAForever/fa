@@ -44,13 +44,13 @@ Patch 3709 (16 December, 2019)
 - Structures
     - Seraphim T2 sonar
         - Can now move and submerge
-        - Speed: 0 → 1
-        - Submerged speed: 0 → 0.5
+            - Speed: 0 → 1
+            - Submerged speed: 0 → 0.5
         - Mass cost: 180 → 400
         - Energy cost: 5400 → 6000
+        - Energy maintenance: 100 → 200
         - Buildtime: 1171 → 600
         - Health: 2000 → 1000
-        - Energy maintenance: 100 → 200
     
 - Game Mechanics
     - Overcharge
@@ -202,24 +202,24 @@ Patch 3704 (18 June, 2019)
     - Harbinger
         - The Harbinger can once again shoot while reclaiming.
     - T1 Mobile Anti-Air
-        - All Factions:
-        - Mass cost: 50 → 55
-        - Seraphim and UEF:
-        - Health: 360 → 310
+        - All Factions
+            - Mass cost: 50 → 55
+        - Seraphim and UEF
+            - Health: 360 → 310
     - T3 Mobile Anti-Air
-        - Aeon:                    
-        - Speed: 2.8 → 3.5
-        - Range: 54 → 64
-        - Cybran:                          
-        - Speed: 2.9 → 3.6
-        - Range: 52 → 62
-        - UEF:
-        - Speed: 2.6 → 3.3
-        - Range: 50 → 60
-        - Damage Radius: 1 → 1.5
-        - Seraphim:
-        - Speed: 2.7 → 3.4
-        - Range: 48 → 58
+        - Aeon
+            - Speed: 2.8 → 3.5
+            - Range: 54 → 64
+        - Cybran
+            - Speed: 2.9 → 3.6
+            - Range: 52 → 62
+        - UEF
+            - Speed: 2.6 → 3.3
+            - Range: 50 → 60
+            - Damage Radius: 1 → 1.5
+        - Seraphim
+            - Speed: 2.7 → 3.4
+            - Range: 48 → 58
     - T2 Engineer
         - Speed: 1.7 → 1.9
     - T3 Engineer
@@ -277,7 +277,7 @@ Patch 3704 (18 June, 2019)
         - The cybran cruiser now shoots its anti-air missiles in a faster and more effective way.
     - Exodus
         - AoE: 1 → 1.4
-    - Battleships:
+    - Battleships
         - Galaxy
             - Health: 47000 → 44500
         - Summit
@@ -611,41 +611,41 @@ Patch 3696 (26 May, 2018)
 ============================
 ### Gameplay
 - Aeon 
-    - Personal Shield Generator:
+    - Personal Shield Generator
         - BuildCostMass: 1000 → 1300
         - BuildTime: 1000 → 1300
-    - Heavy Personal Shield Generator:
+    - Heavy Personal Shield Generator
         - BuildCostEnergy: 93750 → 123750
         - BuildCostMass: 1500 → 2300
         - BuildTime: 1750 → 2450
         - ShieldMaxHealth: 29000 → 25000
         - ShieldRegenRate: 37 → 32
 - UEF
-    - Nano-Repair System:
+    - Nano-Repair System
         - NewHealth: 2000 → 1500
-    - Personal Shield Generator:
+    - Personal Shield Generator
         - BuildCostMass: 1500 → 2300
         - ShieldMaxHealth: 24000 → 19000
         - ShieldRegenRate: 35 → 30
-    - Shield Generator Field:
+    - Shield Generator Field
         - BuildCostMass: 3000 → 3600
         - BuildTime: 2800 → 3400
 - Seraphim
-    - Refracting Chronotron Amplifier:
+    - Refracting Chronotron Amplifier
         - AdditionalDamage: 750 → 620
         - BuildCostMass: 4800 → 5400
         - BuildTime: 4200 → 4600
-    - Nano-Repair System:
+    - Nano-Repair System
         - BuildCostEnergy: 42000 → 56000
         - BuildCostMass: 1200 → 1800
         - BuildTime: 1200 → 1800
         - NewHealth: 3000 → 2000
-    - Enhanced Nano-Repair System:
+    - Enhanced Nano-Repair System
         - BuildCostMass: 4500 → 5800
         - BuildTime: 4200 → 4600
 
 - T3 Land Combat
-    - Harbinger:
+    - Harbinger
         - Health: 4600 → 3050
         - Shield Health: 1300 → 1000
         - Shield Regen Rate: 9 → 30
@@ -660,23 +660,26 @@ Patch 3696 (26 May, 2018)
         - Rate of Fire: 1.25 → 1
         - Range: 28 → 26
         - Muzzle Velocity: 30 → 40
-    - Othuum:
+        - DPS: 375 → 320
+    - Othuum
         - Health: 6700 → 5000
         - Acceleration: 2.6 → 3.5
         - SizeY: 0.45 → 0.65
         - SizeZ: 2.0 → 2.3
         - First 2 Guns:
-        - Damage: 75 → 39
-        - Muzzle Velocity: 35 → 40
-        - Turret Yaw Speed: 90 → 120
+            - Damage: 75 → 39
+            - Muzzle Velocity: 35 → 40
+            - Turret Yaw Speed: 90 → 120
+            - Combined DPS: 300 → 156
         - 3rd Gun:
-        - Damage: 400 → 525
-        - Range: 32 → 28
-        - Muzzle Velocity: 30 → 40
+            - Damage: 400 → 525
+            - Range: 32 → 28
+            - Muzzle Velocity: 30 → 40
+            - DPS: 100 → 131
         - Torpedo Weapon:
-        - Range: 32 → 28
+            - Range: 32 → 28
         - Target Priorities: Othuum now prioritises T3 over T2 over T1 instead of the reverse.
-    - Percival:            
+    - Percival
         - Health: 9300 → 7200
         - BuildTime: 6000 → 4800
         - Speed: 2 → 2.1
@@ -687,7 +690,8 @@ Patch 3696 (26 May, 2018)
         - Range: 35 → 34
         - Muzzle Velocity: 35 → 38
         - Turret Yaw Speed: 60 → 90
-    - Titan:
+        - DPS: 400 → 334
+    - Titan
         - Health: 2200 → 2550
         - Shield: 1200 → 600
         - Recharge Time: 60 → 15
@@ -698,34 +702,37 @@ Patch 3696 (26 May, 2018)
         - Muzzle Velocity: 30 → 35
         - Turn rate: 150 → 120
         - Target Priorities: Titan now prioritises T3 over T2 over T1 instead of the reverse.
-    - Brick:
+    - Brick
         - Health: 9000 → 7500
         - BuildTime: 6000 → 4800
         - Speed: 2 → 2.3
         - Acceleration: 2 → 2.3
         - TurnRate: 60 → 65
         - Main Weapon:
-        - Damage: 150 → 125
-        - Range: 35 → 32
-        - MuzzleVelocity: 35 → 42
-        - Turret Yaw Speed: 60 → 90
-    - Loyalist:
+            - Damage: 150 → 125
+            - Range: 35 → 32
+            - MuzzleVelocity: 35 → 42
+            - Turret Yaw Speed: 60 → 90
+            - DPS: 375 → 312.5
+    - Loyalist
         - Health: 3100 → 3000
         - Speed: 4 → 3.8
         - Acceleration: 4 → 4.2
         - EMP explosion on death:
-        - Duration: 2s → 1.4s
-        - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
+            - Duration: 2s → 1.4s
+            - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
         - 1st Weapon (Disintegrator Pulse Laser):
             - Damage: 175 → 150
             - Range: 25 → 20
+            - DPS: 175 → 150
         - 2nd Weapon (Heavy Electron Bolter):
             - Damage: 12 → 14
             - Range: 25 → 20
             - Muzzle Velocity: 40 → 35
             - TurretYawSpeed: 90 → 120
+            - DPS: 30 → 35
     - T3 Ranged Units
-        - Sprite Striker:
+        - Sprite Striker
             - Mass Cost: 640 → 720
             - Build Time: 3600 → 4000
             - Health: 450 → 500
@@ -737,7 +744,7 @@ Patch 3696 (26 May, 2018)
             - Rate of Fire: 0.142 → 0.15
             - MuzzleVelocity: 120 → 90
             - TurretYawSpeed: 90 → 110
-        - Usha-Ah:
+        - Usha-Ah
             - Mass Cost: 640 → 800
             - Energy Cost: 8000 → 8800
             - Build Time: 3600 → 4300
@@ -758,45 +765,45 @@ Patch 3696 (26 May, 2018)
                 - Firing Randomness while moving: 0.5 → 0.2
                 - Rate of Fire: 0.07 → 0.066
                 - TurretYawSpeed: 90 → 50
-    - T3 Mobile Artillery:
+    - T3 Mobile Artillery
         - Build time is reduced for T3 mobile artillery.
         - Build Time: 4800 → 4300
 
 - Experimental Units
-    - Cybran:
-        - Monkeylord:
+    - Cybran
+        - Monkeylord
             - Build Time: 15750 → 27500
             - Mass Cost: 19000 → 20000
-        - Megalith:
+        - Megalith
             - Build Time: 18750 → 60 625
-        - Soul Ripper:
+        - Soul Ripper
             - Build Time: 20000 → 56250
-        - Scathis;
+        - Scathis
             - Build Time: 50000 → 80000
-    - UEF:
-        - Fatboy:
+    - UEF
+        - Fatboy
             - Build Time: 21 000 → 47 500
             - Shield Recharge Time: 160 → 120
             - Shield Regen Rate: 64 → 100
             - Power Upkeep cost: 500 → 600
-        - Atlantis:
+        - Atlantis
             - Build Time: 14 400 → 20 500
-        - Novax Center:
+        - Novax Center
             - Build Time: 25 000 → 30 000
-    - Aeon:
-        - Galactic Colossus:
+    - Aeon
+        - Galactic Colossus
             - Power Cost: 343 750 → 330 000
             - Build Time: 20 625 → 51500
             - Claws:
                 - Fixed a bug with the claws, credit to EQ.
                 - Rate of Fire: 1 → 0.15
-        - Czar:
+        - Czar
             - Build Time: 33 750 → 50 625
-        - Tempest:
+        - Tempest
             - Build Time: 14 400 → 28 000
             - Muzzle Velocity: 28 → 35
-    - Seraphim:
-        - Ythotha:
+    - Seraphim
+        - Ythotha
             - Build Time: 18750 → 46 875
             - Mass Cost: 25 000 → 26 500
             - Power Cost: 312 500 → 330 000
@@ -805,47 +812,47 @@ Patch 3696 (26 May, 2018)
             - Heavy Sinn Unthe Cannon Damage: 1200 → 1850
             - Flak Damage: 39 → 46
             - Flak Range: 25 → 21
-        - Ahwassa:
+        - Ahwassa
             - Build Time: 36000 → 67500
 
 - Navy
-    - Battleships:
-        - Seraphim:
+    - Battleships
+        - Seraphim
             - FiringRandomness: 0.3 → 0.25
             - MuzzleVelocity: 30 → 40
-        - Aeon:
+        - Aeon
             - TurnRate: 35 → 40
             - MaxSpeed: 3.6 → 3.7
             - Range: 100 → 105
-    - Cybran Carrier:
+    - Cybran Carrier
         - Fixed the aim on the Anti Air weapon of the carrier.
-    - Bulwark:
+    - Bulwark
         - Damage Overspill: 15% → 25%
         - Recharge time: 35 → 40
-    - Shard:
+    - Shard
         - Health: 750 → 800
 
 - Structures
-    - T3 Land HQs:
+    - T3 Land HQs
         - Mass Cost: 4 920 → 5 220
         - Power Cost: 43 900 → 47 400
         - Build Time: 11 000 → 12 100
-    - Ravager:
+    - Ravager
         - Health: 7500 → 6500
         - Mass Cost: 1 800 → 2 000
         - Power Cost: 16 000 → 17 600
         - Build Time: 1 500 → 2000
-    - T3 Static Artillery:
+    - T3 Static Artillery
         - UEF/Cybran/Seraphim/Aeon Range: 750/700/825/900 → 825 
-    - Cybran:
+    - Cybran
         - Damage: 4600 → 3700
         - Rate of Fire: 0.1 → 0.13
-    - T3 Mass Fabricator:
+    - T3 Mass Fabricator
         - Adjacency from storage: 4.1667% → 3%
         - Adjacency for SML: 20% → 12.5%
-    - Civilian Structures:
+    - Civilian Structures
         - Adjusted Civilian Building Mass values to make them more consistent. Civilian buildings will give 50-150 mass.
-    - Cybran Shield:
+    - Cybran Shield
         - Added the ED4 Shield to the list of buildable structures and to the hotbuild keygroup for shields.
 
 - Overcharge
@@ -870,37 +877,37 @@ Patch 3696 (26 May, 2018)
 
 - Miscellaneous
     - T1 Mobile Anti Air
-        - Aeon:
+        - Aeon
             - Mass Cost: 55 → 50
             - Damage: 10 → 8
-        - UEF:
+        - UEF
             - Mass Cost: 55 → 50
             - Damage: 16 → 14
-        - Seraphim:
+        - Seraphim
             - Mass Cost: 55 → 50
             - Damage: 8 → 14
-        - Cybran:
+        - Cybran
             - Mass Cost: 55 → 50
             - Damage: 10 → 9
-    - Fire Beetle:
+    - Fire Beetle
         - Damage: 3500 → 1500
         - AoE: 4.5 → 6
         - Transport class: 2 → 1
         - Stun ability added. Duration → 2s. Stuns all units except Experimentals
         - Friendly Fire → Disabled
         - Health: 300 → 500
-    - T2 Transports:
+    - T2 Transports
         - Mass Cost: 300 → 330
         - Power Cost: 12000 → 13200
         - Speed: 15 → 14.3
-    - Aurora:
+    - Aurora
         - FiringRandomnessWhileMoving: 0.3 → 0.1
         - MuzzleVelocity: 30 → 25
-    - Ahwassa:
+    - Ahwassa
         - BombDropThreshold: 4 → 20
-    - T1 Bombers:
+    - T1 Bombers
         - RandomBreakOffDistanceMult: 1 → 1.5
-    - Selen:
+    - Selen
         - Removed the Power drain from the stealth/cloak ability while not moving.
 ### Fixes
 - Nuke trajectory is now corrected so it travels parallel to the ground.
@@ -1253,8 +1260,7 @@ Patch 3684 (27th May 2017)
     - Seraphim Health increased 3500 → 4000
 - T2 Land/Air HQ + T3 Land/Air Support
     - Aeon Health increased 6200 → 6400
-    - Cybran
-        - Health increased 5000 → 5500
+    - Cybran Health increased 5000 → 5500
 - T2 Naval Support
     - Aeon Health increased 5000 → 6400
     - UEF Health increased 6500 → 8000
@@ -1271,8 +1277,7 @@ Patch 3684 (27th May 2017)
     - Seraphim Health increased 11000 → 14000
 - T3 Land/Air HQ
     - Aeon Health increased 12400 → 12800
-    - Cybran
-        - Health increased 10000 → 11000
+    - Cybran Health increased 10000 → 11000
 - T3 Naval Support
     - Aeon Health decreased 13000 → 12800
     - UEF Health decreased 17000 → 16000
