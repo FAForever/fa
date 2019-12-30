@@ -16,6 +16,8 @@ See guidelines for contributing [here](CONTRIBUTING.md).
 
 See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
 
+Actual exe patches are [here](https://github.com/FAETHER/FA-Binary-Patches)
+
 Running the game with your changes
 ----------------------------------
 
@@ -89,7 +91,7 @@ Setting up a development init file
 ----------------------------------
 
 
-ForgedAlliance.exe takes several useful command-line arguments, and it's even possible to make your own. An article on this can be found [here](http://supcom.wikia.com/wiki/Command_line_switches).
+[ForgedAlliance.exe takes several useful command-line arguments](http://supcom.wikia.com/wiki/Command_line_switches), and it's even possible to make your own.
 
 We can use a custom init file to ease the development process. The following file init file can be used:
 
@@ -146,6 +148,12 @@ Will put it into a mode where it will look for updates to files that it has load
 This way, you don't need to restart the game every time you make a change, you simply need to make a new unit of the type, spawn a new projectile or do whatever it is you're doing.
 
 It's not perfect; some changes will require a full game restart, and certain changes can cause crashes. But it's a lot better than reloading the game for every change, every time.
+
+To start several processes of the game you need to add a line
+
+`debug = { enable_debug_facilities = true }`
+
+to `%userprofile%\AppData\Local\Gas Powered Games\Supreme Commander Forged Alliance\Game.prefs`
 
 Translation guidelines
 ----------------------------------
