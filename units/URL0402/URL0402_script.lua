@@ -240,11 +240,10 @@ URL0402 = Class(CWalkingLandUnit) {
         local position = self:GetPosition()
         local qx, qy, qz, qw = unpack(self:GetOrientation())
         local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        local current_yaw = math.floor(a * (180 / math.pi) + 0.5)
         for i, numWeapons in bp.Weapon do
             if bp.Weapon[i].Label == 'SpiderDeath' then
-                position[3] = position[3]+3*math.cos(math.rad(current_yaw))
-                position[1] = position[1]+3*math.sin(math.rad(current_yaw))
+                position[3] = position[3]+3*math.cos(a)
+                position[1] = position[1]+3*math.sin(a)
                 DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                 break
             end
