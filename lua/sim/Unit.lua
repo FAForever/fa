@@ -1453,8 +1453,19 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Find a weapon which is not a DeathWeapon / Suicide / DeathImpact / AntiMissile (AEON/SERA TMD) / Turret01 (UEF/CYBRAN TMD) / MissileRack (CYBRAN/SERA/AEON SMD) / AntiNuke (UEF SMD) / AntiTorpedo / AntiTorpedo01 (stealth boat)
+        local No_vet_label = {
+        ['DeathWeapon'] = true, 
+        ['Suicide'] = true, 
+        ['DeathImpact'] = true, 
+        ['AntiMissile'] = true, 
+        ['Turret01'] = true, 
+        ['MissileRack'] = true, 
+        ['AntiNuke'] = true, 
+        ['AntiTorpedo'] = true, 
+        ['AntiTorpedo01'] = true
+        }
         for index, wep in weps do
-            if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'Suicide' and wep.Label ~= 'DeathImpact' and wep.Label ~= 'AntiMissile' and wep.Label ~= 'Turret01' and wep.Label ~= 'MissileRack' and wep.Label ~= 'AntiNuke' and wep.Damage ~= 0 and wep.Label ~= 'AntiTorpedo' and wep.Label ~= 'AntiTorpedo01' then
+            if No_vet_label[wep.Label] ~= true and wep.Damage ~= 0 then
                 return true
             end
         end
