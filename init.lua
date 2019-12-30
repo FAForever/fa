@@ -171,6 +171,28 @@ end
 mount_mod_sounds(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
 mount_mod_sounds(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
 
+-- This code mounts ui textures from mods as root, so things like strategic icons can be modified directly from the mod folders.
+-- Workaround for dropping an .scd into gamedata folder, so mod installation can be fully automatic.
+local function mount_strategic_icons(MODFOLDER)
+    for _,mod in io.dir( MODFOLDER..'\\*.*') do
+        if mod != '.' and mod != '..' then
+            for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\*.*') do
+                if folder == 'textures' then
+                    for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\textures\\*.*') do
+                        if folder == 'ui' then
+                          LOG('Found mod icons in: '..mod)
+                          mount_dir(MODFOLDER..'\\'..mod..'\\textures\\ui', '/textures/ui')
+                          break
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+mount_strategic_icons(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
+mount_strategic_icons(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
+
 -- These are the classic supcom directories. They don't work with accents or other foreign characters in usernames
 mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
 mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
