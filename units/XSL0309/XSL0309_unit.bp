@@ -225,6 +225,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
+        MaxBuildDistance = 7,
         NeedToFaceTargetToBuild = false,
         StorageEnergy = 0,
         StorageMass = 40,

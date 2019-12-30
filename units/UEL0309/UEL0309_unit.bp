@@ -202,6 +202,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
         },
+        MaxBuildDistance = 7,
         StorageEnergy = 0,
         StorageMass = 40,
         TeleportEnergyMod = 0.15,
