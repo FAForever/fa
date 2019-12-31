@@ -1447,25 +1447,23 @@ Unit = Class(moho.unit_methods) {
     ShouldUseVetSystem = function(self)
         local bp = self:GetBlueprint()
 
-        -- Bail if we don't have any weapons
-        if not bp.Weapon[1] then
+        -- Bail if we don't have any weapons or have the ExcludeFromVeterancy flag (TMD, SMD, stealth boat, mobile stealth, mobile shields, aeon T3 sonar, mercy, beetle)
+        if not bp.Weapon[1] or bp.General.ExcludeFromVeterancy then
             return false
         end
 
-        -- Find a weapon which is not a DeathWeapon / DeathImpact and doesn't have the ExcludeFromVeterancy flag (TMD, SMD, stealth boat, mobile stealth, mobile shields, aeon T3 sonar, mercy, beetle)
+        -- Find a weapon which is not a DeathWeapon / DeathImpact
         local No_vet_label = {
         ['DeathWeapon'] = true,
         ['DeathImpact'] = true,
         }
-        if not bp.General.ExcludeFromVeterancy then
-            for index, wep in bp.Weapon do
-                if not No_vet_label[wep.Label] then
-                    return true
-                end
+        for index, wep in bp.Weapon do
+            if not No_vet_label[wep.Label] then
+                return true
             end
         end
 
-        -- We only have weapon labels or a flagged weapon from above. Bail.
+        -- We only have DeathWeapon / DeathImpact labels. Bail.
         return false
     end,
 
