@@ -212,6 +212,7 @@ UnitBlueprint {
     },
     Weapon = {
         {            
+            ExcludeFromVeterancy = true,
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
             Damage = 1499,

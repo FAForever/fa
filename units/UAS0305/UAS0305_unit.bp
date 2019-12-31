@@ -194,6 +194,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 235,
     Weapon = {
         {
+            ExcludeFromVeterancy = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1,

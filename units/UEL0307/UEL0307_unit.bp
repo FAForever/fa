@@ -236,6 +236,7 @@ UnitBlueprint {
     },
     Weapon = {
         { -- special dummy weapon to make the unit stop a certain distance away
+            ExcludeFromVeterancy = true,
             Damage = 0,
             DamageFriendly = false,
             FireTargetLayerCapsTable = { --what the unit will stop for

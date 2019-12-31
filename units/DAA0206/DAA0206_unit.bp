@@ -233,6 +233,7 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            ExcludeFromVeterancy = true,
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {

@@ -164,6 +164,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 200,
     Weapon = {
         {
+            ExcludeFromVeterancy = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',

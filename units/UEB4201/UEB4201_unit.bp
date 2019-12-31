@@ -167,6 +167,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 200,
     Weapon = {
         {
+            ExcludeFromVeterancy = true,
             AimsStraightOnDisable = true,
             Audio = {
                 Fire = Sound {

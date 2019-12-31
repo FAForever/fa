@@ -223,6 +223,7 @@ UnitBlueprint {
     StrategicIconSortPriority = 165,
     Weapon = {
         {
+            ExcludeFromVeterancy = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XRS_Weapon',

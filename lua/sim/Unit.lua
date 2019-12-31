@@ -1452,25 +1452,18 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        -- Find a weapon which is not a DeathWeapon / Suicide / DeathImpact / AntiMissile (AEON/SERA TMD) / Turret01 (UEF/CYBRAN TMD) / MissileRack (CYBRAN/SERA/AEON SMD) / AntiNuke (UEF SMD) / AntiTorpedo / AntiTorpedo01 (stealth boat)
+        -- Find a weapon which is not a DeathWeapon / DeathImpact and doesn't have the ExcludeFromVeterancy flag (TMD, SMD, stealth boat, mobile stealth, mobile shields, aeon T3 sonar, mercy, beetle)
         local No_vet_label = {
-        ['DeathWeapon'] = true, 
-        ['Suicide'] = true, 
-        ['DeathImpact'] = true, 
-        ['AntiMissile'] = true, 
-        ['Turret01'] = true, 
-        ['MissileRack'] = true, 
-        ['AntiNuke'] = true, 
-        ['AntiTorpedo'] = true, 
-        ['AntiTorpedo01'] = true
+        ['DeathWeapon'] = true,
+        ['DeathImpact'] = true,
         }
         for index, wep in weps do
-            if No_vet_label[wep.Label] ~= true and wep.Damage ~= 0 then
+            if not No_vet_label[wep.Label] and not wep.ExcludeFromVeterancy then
                 return true
             end
         end
 
-        -- We only have weapon labels from above. Bail.
+        -- We only have weapon labels or a flagged weapon from above. Bail.
         return false
     end,
 
