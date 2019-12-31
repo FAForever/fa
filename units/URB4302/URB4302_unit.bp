@@ -167,6 +167,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC urb4302_name>Guardian',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -209,7 +210,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 195,
     Weapon = {
         {
-            ExcludeFromVeterancy = true,
             AlwaysRecheckTarget = false,
             Audio = {
                 Fire = Sound {

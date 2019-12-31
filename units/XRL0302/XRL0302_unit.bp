@@ -163,6 +163,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xrl0302_name>Fire Beetle',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 24,
@@ -212,7 +213,6 @@ UnitBlueprint {
     },
     Weapon = {
         {            
-            ExcludeFromVeterancy = true,
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
             Damage = 1499,

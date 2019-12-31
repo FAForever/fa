@@ -194,6 +194,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xes0205_name>Bulwark',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 32,
@@ -241,7 +242,6 @@ UnitBlueprint {
     Weapon = {
         {   -- Adds a dummy weapon that does nothing except adds another range circle to show
             -- where the shield ends on the water's surface. Purely visual fix.
-            ExcludeFromVeterancy = true,
             Damage = 0,
             MaxRadius = 34,
             RangeCategory = 'UWRC_DirectFire',

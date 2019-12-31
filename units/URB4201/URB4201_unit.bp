@@ -123,6 +123,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC urb4201_name>Zapper',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -164,7 +165,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 200,
     Weapon = {
         {
-            ExcludeFromVeterancy = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',

@@ -145,6 +145,7 @@ UnitBlueprint {
         },
         UnitWeight = 1,
         UpgradesFrom = 'uab3202',
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         ShowIntelOnSelect = true,
@@ -194,7 +195,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 235,
     Weapon = {
         {
-            ExcludeFromVeterancy = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1,

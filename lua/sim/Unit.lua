@@ -1446,6 +1446,7 @@ Unit = Class(moho.unit_methods) {
     -- Returns true if a unit can gain veterancy (Has a weapon)
     ShouldUseVetSystem = function(self)
         local weps = self:GetBlueprint().Weapon
+        local gen = self:GetBlueprint().General
 
         -- Bail if we don't have any weapons
         if not weps[1] then
@@ -1457,9 +1458,11 @@ Unit = Class(moho.unit_methods) {
         ['DeathWeapon'] = true,
         ['DeathImpact'] = true,
         }
-        for index, wep in weps do
-            if not No_vet_label[wep.Label] and not wep.ExcludeFromVeterancy then
-                return true
+        if not gen.ExcludeFromVeterancy then
+            for index, wep in weps do
+                if not No_vet_label[wep.Label] then
+                    return true
+                end
             end
         end
 

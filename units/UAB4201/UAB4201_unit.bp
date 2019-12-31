@@ -136,6 +136,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC uab4201_name>Volcano',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -180,7 +181,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 200,
     Weapon = {
         {
-            ExcludeFromVeterancy = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UALWeapon',
@@ -242,7 +242,6 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         { -- Dummy weapon used manipulate the game to show correct range circle [129]
-            ExcludeFromVeterancy = true,
             MaxRadius = 12.5,
             RangeCategory = 'UWRC_Countermeasure',
         },

@@ -237,6 +237,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xsl0307_name>Athanah',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -291,7 +292,6 @@ UnitBlueprint {
     },
     Weapon = {
         { -- special dummy weapon to make the unit stop a certain distance away
-            ExcludeFromVeterancy = true,
             Damage = 0,
             DamageFriendly = false,
             FireTargetLayerCapsTable = { --what the unit will stop for

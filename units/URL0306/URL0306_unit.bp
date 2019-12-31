@@ -149,6 +149,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC url0306_name>Deceiver',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         RadarStealth = true,
@@ -201,7 +202,6 @@ UnitBlueprint {
     },
     Weapon = {
         { -- special dummy weapon to make the unit stop a certain distance away
-            ExcludeFromVeterancy = true,
             Damage = 0,
             DamageFriendly = false,
             FireTargetLayerCapsTable = { --what the unit will stop for
