@@ -645,7 +645,7 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             Damage = 10000,
             DamageFriendly = true,
-            DamageRadius = 8,
+            DamageRadius = 10,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,
