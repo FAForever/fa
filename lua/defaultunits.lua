@@ -1789,6 +1789,52 @@ AirUnit = Class(MobileUnit) {
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
+    
+    
+    -- Well, unit's OnCollisionCheck is called before projectile's OnCollisionCheck. That's why this check is here and not in NukeProjectile
+    -- Doing it for every projectile that hits air unit is so dumb, but what's other option? :(
+    OnCollisionCheck = function(self, other, firingWeapon)
+        -- Nuke doesn't explode on collide with air units
+        if other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
+            if not IsAlly(self:GetArmy(), other:GetArmy()) then
+                self:Kill()
+                return false
+            end    
+        end
+        
+        -------- default part from unit.lua---------
+        --------------------------------------------
+        
+        if self.DisallowCollisions then
+            return false
+        end
+
+        if EntityCategoryContains(categories.PROJECTILE, other) then
+            if IsAlly(self:GetArmy(), other:GetArmy()) then
+                return other.CollideFriendly
+            end
+        end
+
+        -- Check for specific non-collisions
+        local bp = other:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        bp = self:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), other) then
+                    return false
+                end
+            end
+        end
+        return true
+    end,
 }
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.

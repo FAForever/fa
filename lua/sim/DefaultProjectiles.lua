@@ -66,6 +66,7 @@ NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
         local army = self:GetArmy()
         local launcher = self:GetLauncher()
+        self.Nuke = true
         self.CreateEffects(self, self.InitialEffects, army, 1)
         self:TrackTarget(false)
         WaitSeconds(2.5) -- Height
