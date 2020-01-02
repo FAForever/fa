@@ -324,7 +324,7 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Buil
         end
     end
 
-    CreateEmitterOnEntity(BeamEndEntity, builder:GetArmy(), '/effects/emitters/sparks_08_emit.bp')
+    CreateEmitterOnEntity(BeamEndEntity, army, '/effects/emitters/sparks_08_emit.bp')
     local waitTime = util.GetRandomFloat(0.3, 1.5)
 
     while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
@@ -341,6 +341,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
+    local army = builder:GetArmy()
 
     local slice = nil
     WaitSeconds(0.1)
@@ -353,11 +354,11 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
 
-    CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(), '/effects/emitters/aeon_being_built_ambient_01_emit.bp')
+    CreateEmitterOnEntity(BuildBaseEffect, army, '/effects/emitters/aeon_being_built_ambient_01_emit.bp')
     :SetEmitterCurveParam('X_POSITION_CURVE', 0, sx * 1.5)
     :SetEmitterCurveParam('Z_POSITION_CURVE', 0, sz * 1.5)
 
-    CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(), '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    CreateEmitterOnEntity(BuildBaseEffect, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
     :ScaleEmitter((sx + sz) * 0.3)
 
     local slider = CreateSlider(unitBeingBuilt, 0)
@@ -572,8 +573,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 1, nil, nil, nil)
     if builder:IsPaused() then
         local fraction = unitBeingBuilt:GetFractionComplete()
-        local scale
-        scale = 1 - math.pow(fraction, 2)
+        local scale = 1 - math.pow(fraction, 2)
         BuildBaseEffect:SetScale(sx * scale, 1.5 * sy * scale, sz * scale)
     else
         BuildBaseEffect:SetScale(sx, 1.5 * sy, sz)
@@ -583,11 +583,11 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     EffectsBag:Add(BuildBaseEffect)
 
     if not builder:IsPaused() then
-        CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(), '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        CreateEmitterOnEntity(BuildBaseEffect, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         :SetEmitterCurveParam('X_POSITION_CURVE', 0, sx * 1.5)
         :SetEmitterCurveParam('Z_POSITION_CURVE', 0, sz * 1.5)
 
-        CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(), '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+        CreateEmitterOnEntity(BuildBaseEffect, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
         :ScaleEmitter((sx + sz) * 0.3)
 
         for _, vBone in BuildEffectBones do
@@ -649,7 +649,7 @@ function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, Bu
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
-    
+
     local slice = nil
 
     -- Create a pool mercury that slow draws into the build unit
@@ -664,10 +664,10 @@ function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, Bu
         EffectsBag:Add(CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp'))
         for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
             EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, vBeam))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
         end
     end
 
@@ -715,7 +715,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffe
     local sy_pause = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
 
     local slice = nil
-    
+
     -- Create a pool mercury that slow draws into the build unit
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
     BuildBaseEffect:SetScale(sx, 1, sz)
@@ -723,20 +723,20 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffe
     Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
-    
+
     for _, vBone in BuildEffectBones do
         EffectsBag:Add(CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp'))
         for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
             if not builder:IsPaused() then
                 EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, vBeam))
             end
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
         end
     end
-    
+
     local slider = CreateSlider(unitBeingBuilt, 0)
     unitBeingBuilt.Trash:Add(slider)
     EffectsBag:Add(slider)
@@ -786,6 +786,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
+    local army = builder:GetArmy()
 
     local slice = nil
     WaitSeconds(0.1)
@@ -811,13 +812,13 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
     local AdjustedEmitters = {}
     local effect = nil
     for _, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder:GetArmy(), vEffect):ScaleEmitter(scaleFactor)
+        effect = CreateAttachedEmitter(unitBeingBuilt, -1, army, vEffect):ScaleEmitter(scaleFactor)
         table.insert(AdjustedEmitters, effect)
         EffectsBag:Add(effect)
     end
 
     for _, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter(BuildBaseEffect, -1, builder:GetArmy(), vEffect):ScaleEmitter(scaleFactor)
+        effect = CreateAttachedEmitter(BuildBaseEffect, -1, army, vEffect):ScaleEmitter(scaleFactor)
         table.insert(AdjustedEmitters, effect)
         EffectsBag:Add(effect)
     end
@@ -838,11 +839,11 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
     local unitsArmy = unitBeingBuilt:GetArmy()
     local focusArmy = GetFocusArmy()
     if focusArmy == -1 or IsAlly(unitsArmy, focusArmy) then
-        CreateLightParticle(unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
+        CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
     elseif IsEnemy(unitsArmy, focusArmy) then
         local blip = unitBeingBuilt:GetBlip(focusArmy)
         if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle(unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
+            CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
         end
     end
 

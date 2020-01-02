@@ -38,7 +38,6 @@ local CreateSeraphimFactoryBuildingEffectsUnPause = EffectUtil.CreateSeraphimFac
 
 -- FACTORIES
 SFactoryUnit = Class(FactoryUnit) {
-
     StartBuildFx = function(self, unitBeingBuilt)
         local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
         local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
@@ -69,10 +68,8 @@ SFactoryUnit = Class(FactoryUnit) {
     end,
 }
 
-
 -- AIR STRUCTURES
 SAirFactoryUnit = Class(AirFactoryUnit) {
-
     StartBuildFx = function(self, unitBeingBuilt)
         SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
