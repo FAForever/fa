@@ -164,14 +164,12 @@ NukeProjectile = Class(NullShell) {
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not instigator:GetBlueprint().CategoriesHash.SATELLITE then
-            local bp = self:GetBlueprint().Defense.MaxHealth
-                if bp then
-                self:DoTakeDamage(instigator, amount, vector, damageType)
-            else
-                self:OnKilled(instigator, damageType)
-            end
-        end
+		local bp = self:GetBlueprint().Defense.MaxHealth
+			if bp then
+			self:DoTakeDamage(instigator, amount, vector, damageType)
+		else
+			self:OnKilled(instigator, damageType)
+		end
     end,
 }
 
@@ -374,7 +372,8 @@ OverchargeProjectile = Class() {
 
             
                 -- Get max energy available to drain according to how much we have
-                local energyLimit = launcher:GetAIBrain():GetEconomyStored('ENERGY') * data.energyMult
+                local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
+                local energyLimit = energyAvailable * data.energyMult
                 
                 if OCProjectiles[army] > 1 then
                     energyLimit = energyLimit / OCProjectiles[army]
@@ -409,6 +408,11 @@ OverchargeProjectile = Class() {
 
                 damage = math.min(damage, idealDamage)
                 damage = math.max(data.minDamage, damage)
+                
+                -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
+                if energyAvailable < 5000 then
+                    damage = energyLimitDamage
+                end
             
         end
 
@@ -430,14 +434,14 @@ OverchargeProjectile = Class() {
         end
     end,
 
-    -- y = 3000e^(0.000095(x+15500))-9700
+    -- y = 3000e^(0.000095(x+15500))-10090
     -- https://www.desmos.com/calculator/yyetmwyf0d
     DamageAsEnergy = function(self, damage)
-        return (3000 * math.exp(0.000095 * (damage + 15500))) - 9700
+        return (3000 * math.exp(0.000095 * (damage + 15500))) - 10090
     end,
 
     EnergyAsDamage = function(self, energy)
-        return (math.log((energy + 9700) / 3000) / 0.000095) - 15500
+        return (math.log((energy + 10090) / 3000) / 0.000095) - 15500
     end,
     
     UnitsDetection = function(self, targetType, targetEntity)

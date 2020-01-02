@@ -124,6 +124,9 @@ UnitBlueprint {
         },
         DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 400,
+        RebuildBonusIds = {
+            'urb4206',
+        },
     },
     Footprint = {
         SizeX = 1,
@@ -156,7 +159,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_ShieldToggle = true,
         },

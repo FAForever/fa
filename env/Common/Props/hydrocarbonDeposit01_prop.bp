@@ -1,0 +1,32 @@
+PropBlueprint {
+    Categories = {
+        'INVULNERABLE',
+        'UNTARGETABLE',
+    },
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'hydrocarbonDeposit01_albedo.dds',
+                    LODCutoff = 50,
+                    NormalsName = 'hydrocarbonDeposit01_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+            },
+        },
+        UniformScale = 0.4,
+    },
+    Interface = {
+        HelpText = 'hydrocarbonDeposit',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.1,
+    SizeY = 0.1,
+    SizeZ = 0.1,
+}

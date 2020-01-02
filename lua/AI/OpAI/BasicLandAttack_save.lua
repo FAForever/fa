@@ -334,13 +334,27 @@ Scenario = {
         ['OST_BasicLandAttack_T2HoverAttack2'] = {
             'OST_BasicLandAttack_T2HoverAttack2', '',
             { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
-            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0307', -1, 1, 'attack', 'AttackFormation' },
         },
         ['OST_BasicLandAttack_T2HoverAttack3'] = {
             'OST_BasicLandAttack_T2HoverAttack3', '',
             { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
-            { 'ual0307', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0307', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2RangeBots'] = {
+            'OST_BasicLandAttack_T2RangeBots', '',
+            { 'del0204', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2RangeBotsShields'] = {
+            'OST_BasicLandAttack_T2RangeBotsShields', '',
+            { 'del0204', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0307', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T2RangeBotsArtillery'] = {
+            'OST_BasicLandAttack_T2RangeBotsArtillery', '',
+            { 'del0204', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0103', -1, 1, 'attack', 'AttackFormation' },
         },
 
     --[[------[ CYBRAN SPECIFIC ]------]]--
@@ -1775,6 +1789,102 @@ Scenario = {
                             }},
                         },
                         ChildrenType = {'AmphibiousTanks', 'MobileFlak', 'MobileShields'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T2RangeBots'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2RangeBots',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 3, 0},
+                                {'default_brain','1','3','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'RangeBots'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T2RangeBotsSheilds'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2RangeBotsShields',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 3, 0},
+                                {'default_brain','1','3','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'RangeBots', 'MobileShields'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T2RangeBotsArtillery'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2RangeBotsArtillery',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 3, 0},
+                                {'default_brain','1','3','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'RangeBots', 'LightArtillery'},
                     },
                     -- Cybran Stuff --
                     ['OSB_Child_BasicLandAttack_T2MobileBombsStealth'] =  {

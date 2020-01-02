@@ -727,12 +727,20 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
+        elseif unitBeingBuilt:GetBlueprint().CategoriesHash.RESEARCH then
+            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory 
+            self:RemoveCommandCap('RULEUCC_Guard')
+            self.DisabledAssist = true
         end
         self.FactoryBuildFailed = false
     end,
 
     --- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order)
+        if self.DisabledAssist then
+            self:AddCommandCap('RULEUCC_Guard')
+            self.DisabledAssist = nil
+        end
         local bp = self:GetBlueprint()
         if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
             self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
@@ -1343,7 +1351,9 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     DestroyIdleEffects = function(self)
-        self.TimedSonarEffectsThread:Destroy()
+        if self.TimedSonarEffectsThread then
+            self.TimedSonarEffectsThread:Destroy()
+        end
         StructureUnit.DestroyIdleEffects(self)
     end,
 
@@ -2090,6 +2100,20 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
     end,
 }
 
+-- AMPHIBIOUS LAND UNITS
+AmphibiousLandUnit = Class(MobileUnit) {}
+
+SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+    OnLayerChange = function(self, new, old)
+        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        if new == 'Seabed'  then
+            self:SetSpeedMult(mult)
+        else
+            self:SetSpeedMult(1)
+        end
+    end,
+}
+
 --- Base class for command units.
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
@@ -2344,7 +2368,11 @@ ACUUnit = Class(CommandUnit) {
         if not legalWork then return end
 
         self:SendNotifyMessage('started', work)
-        self:SetImmobile(true)
+
+        -- No need to do it for AI
+        if self:GetAIBrain().BrainType == 'Human' then
+            self:SetImmobile(true)
+        end
 
         return true
     end,
@@ -2390,8 +2418,12 @@ ACUUnit = Class(CommandUnit) {
             Sync.EnforceRating = true
             WARN('ACU kill detected. Rating for ranked games is now enforced.')
 
-            -- If we are teamkilled
-            if IsAlly(self:GetArmy(), instigator:GetArmy()) then
+            -- If we are teamkilled, filter out death explostions of allied units that were not coused by player's self destruct order
+            -- Damage types:
+            --     'DeathExplosion' - when normal unit is killed
+            --     'Nuke' - when Paragon is killed
+            --     'Deathnuke' - when ACU is killed
+            if IsAlly(self:GetArmy(), instigator:GetArmy()) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy()}
             else

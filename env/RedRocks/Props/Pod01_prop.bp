@@ -1,0 +1,39 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    -- share other rock's albedo and specteam
+                    LODCutoff = 750,
+                    ShaderName = 'BloatingNormalMappedAlpha',
+                },
+            },
+        },
+        UniformScale = 0.02,
+    },
+    Economy = {
+        ReclaimEnergyMax = 10,
+        ReclaimMassMax = 1,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
+    Interface = {
+        HelpText = 'Medium Pod',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.5,
+    SizeY = 0.5,
+    SizeZ = 0.5,
+}

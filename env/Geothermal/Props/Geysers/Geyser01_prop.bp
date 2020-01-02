@@ -1,0 +1,38 @@
+PropBlueprint {
+    Categories = {
+        'INVULNERABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 3000,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 1,
+        ReclaimMassMax = 1,
+        ReclaimTime = 1,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Geyser',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 3.5,
+    SizeY = 0.5,
+    SizeZ = 3.5,
+}

@@ -328,7 +328,7 @@ UnitBlueprint {
             Damage = 10000,
             DamageFriendly = true,
             DamageRadius = 6,
-            DamageType = 'Normal',
+            DamageType = 'DeathExplosion',
             DisplayName = 'Death Weapon',
             DummyWeapon = true,
             Label = 'DeathWeapon',

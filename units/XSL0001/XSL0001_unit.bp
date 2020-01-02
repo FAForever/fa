@@ -164,7 +164,8 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
         'VERIFYMISSILEUI',
-        'SHOWATTACKRETICLE'
+        'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0.2,
     Defense = {
@@ -939,12 +940,10 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -973,11 +972,11 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
-            DisplayName = 'Chronotron Overcharge Cannon',
+            DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
@@ -1024,15 +1023,13 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1063,11 +1060,11 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000, -- Display only, use the Overcharge section to make changes
+            Damage = 15000, -- Display only, use the Overcharge section to make changes
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
-            DisplayName = 'Chronotron Overcharge Cannon',
+            DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
@@ -1112,15 +1109,13 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1234,10 +1229,8 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,

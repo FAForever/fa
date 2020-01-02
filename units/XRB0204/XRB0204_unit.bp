@@ -163,6 +163,8 @@ UnitBlueprint {
             BuildEffectBones = {
                 'Attachpoint01',
                 'Attachpoint02',
+                'Attachpoint01',
+                'Attachpoint02',
             },
         },
 
@@ -194,7 +196,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },

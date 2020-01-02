@@ -1,4 +1,169 @@
-Patch 3704 (28 December, 2018)
+Patch 3709 (16 December, 2019)
+============================
+- Land
+- Mongoose
+    - Speed: 3.5 → 3.2
+    - Gatling gun damage: 16 → 15
+    - Gatling gun muzzle velocity: 30 → 28
+    - Hitbox: 0.4 → 1
+- Asylum
+    - Shield HP: 3800 → 3500
+- Parashield
+    - Shield HP: 3500 → 3000
+- Wagner
+    - Health: 1450 → 1200
+    - Underwater speed: 3.7 → 3
+- Blaze
+    - Mass cost: 220 → 180
+    - Energy cost: 1320 → 1080
+    - Buildtime: 1050 → 900
+- Fire Beetle
+    - Mass cost: 300 → 250
+    - Energy cost: 1800 → 1500
+    - Buildtime: 1200 → 1000
+    - Hitbox: 0.9 → 1
+- Selen
+    - Hitbox: 0.6 → 0.7
+
+- Air
+- Air scouts
+    - Turn rate: 0.8 → 0.6
+    - Hitbox: 1.6 → 2
+- Spy planes
+    - Turn rate: 0.8 → 0.6
+- Wailer and Broadsword
+    - Mass cost: 1260 → 1500
+    - Energy cost: 42000 → 60000
+- Notha 
+    - Rate of Fire: 0.1 → 0.2
+    
+- Navy
+- Frigates
+    - Sonar range: 82 → 18
+    
+- Structures
+- Seraphim T2 sonar
+    - Can now move and submerge
+    - Speed: 0 → 1
+    - Submerged speed: 0 → 0.5
+    - Mass cost: 180 → 400
+    - Energy cost: 5400 → 6000
+    - Buildtime: 1171 → 600
+    - Health: 2000 → 1000
+    - Energy maintenance: 100 → 200
+    
+- Game Mechanics
+- Overcharge
+    - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
+- Target priorities
+    - ACUs cannot be prioritised by units other than experimentals, labs, gunships and fighter/bombers
+    
+### Contributors
+- Strogo
+- JaggedAppliance
+- keyser
+- Petricpwnz
+- PhilipJFry
+- TurinTurambar
+- eforgacs
+
+Patch 3708 (19 October, 2019)
+============================
+- Added new icons for E storages
+- Added missing categories for SACUs
+- Made Aeon tmd destroy Billy
+- Fixed Salem floating when killed during landing
+- Fixed Hives build effects
+- Allow to rebuild ED4 and Aeon air support factory
+- Fixed ML exhaust effects playing during construction
+- Updated seraphim shader to be more realistic
+- Updated spelling and punctuation
+- Reduced LOD Cutoff from 1000 to 750
+- Fixed target bones of Cybran T2 Land HQ
+- Added a curated maps button
+- Changed air staging icon to T1
+- Added an option to fill all lobby slots with AI
+- Fixed strats scripts
+- Cleaned up UEF units file
+- Allow to use existing low detail models
+- Fixed wrecks facing wrong direction
+- Blacklisted old nomads mod version
+- Improved code and mod support
+- Fixed a bug preventing broadsword from draining 25e when built
+- Allow to display the broadsword jammer ring
+- Made mass storage targeted after everything else
+- Allow to give order to T3 sonars while they are being built
+- Fixed a bug allowing air factories to rebuild units on wreck
+- Removed dummy harms from unit database
+- Allow to build several Eye of Rhianne with a drag build order
+- Removed energy from stone reclaim
+
+### Contributors ###
+- speed2
+- eforgacs
+- BlackYps
+- badbwoi
+- PhilipJFry
+- KionX
+- keyser
+- Exotic-Retard
+- IceDreamer
+- Strogo
+
+Patch 3707 (14 July, 2019)
+============================
+- Revert exe change to stable 3704 exe
+
+Patch 3706 (14 July, 2019)
+============================
+- Improved the team kill detection
+- Increased the team kill report wait time
+- Weapon category fixes
+- Mod blacklist update
+- Fixed Sera ACU PhaseShield mesh
+- Pushed the new (fixed) exe after more testing
+
+### Contributors ###
+- speed2
+- PhilipJFry
+- keyser
+- Uveso
+- FAETHER
+
+Patch 3705 (5 July, 2019)
+============================
+- Fixed various desync Issues for replays
+- Improved In Game Cheat Menu [ALT]+[F2] to support 16 players
+- Various AI Improvements
+- Changed Novax Background Icon to AIR
+- Fixed Seraphim Arty Shells not disappearing
+- Removed controversial dots from the french translation
+- Added a 3 second timer to the teamkill report feature
+- Restricted ACU immobilization feature to human players to avoid breaking the AI
+- Fixed a bug that gave you free resources by pausing a factory
+- Fixed loading AI mod templates being loaded without mods being enabled
+- Fixed unfinished unit transfer in fullshare games
+- Remove "Assist" command from factory during upgrade
+- Fixed free shield assist bug
+- Enable transport rates to be set vs blueprint
+- Added Exit button to the endscreen
+- Optimized unitcount for VictoryConditions
+- Check for dead status before killing beams
+- Improved targeting of torpedo bomber and subs
+- Integration of the Supreme Props mod
+
+### Contributors ###
+- Uveso
+- Rackover
+- FAETHER
+- JaggedAppliance
+- Strogo
+- Exotic-Retard
+- keyser
+- speed2
+- svenni_badbwoi
+
+Patch 3704 (18 June, 2019)
 ============================
 - Land
 - Mongoose

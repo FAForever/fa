@@ -213,14 +213,14 @@ UnitBlueprint {
     SizeX = 0.85,
     SizeY = 1,
     SizeZ = 0.7,
-    StrategicIconName = 'icon_structure_energy', #Removed tech level 1
+    StrategicIconName = 'icon_structure_energy_storage',
     StrategicIconSortPriority = 250,
     Weapon = {
         {
             Damage = 1000,
             DamageFriendly = true,
             DamageRadius = 5,
-            DamageType = 'Normal',
+            DamageType = 'DeathExplosion',
             DisplayName = 'Death Weapon',
             DummyWeapon = true,
             Label = 'DeathWeapon',

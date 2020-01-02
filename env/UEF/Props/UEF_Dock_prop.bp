@@ -1,0 +1,46 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'UEF_dock_Albedo.dds',
+                    SpecName = 'UEF_dock_SpecTeam.dds',
+                    LODCutoff = 225,
+                    ShaderName = 'Unit',
+                },
+                {
+                    AlbedoName = 'UEF_dock_lod1_albedo.dds',
+                    LODCutoff = 750,
+                    ShaderName = 'Unit',
+                    SpecularName = 'UEF_dock_lod1_specteam.dds',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 300,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'UEF Dock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 8.5,
+    SizeY = 0.1,
+    SizeZ = 6,
+}

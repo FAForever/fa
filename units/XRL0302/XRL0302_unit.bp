@@ -124,9 +124,9 @@ UnitBlueprint {
         UniformScale = 0.054,
     },
     Economy = {
-        BuildCostEnergy = 1800,
-        BuildCostMass = 300,
-        BuildTime = 1200,
+        BuildCostEnergy = 1500,
+        BuildCostMass = 250,
+        BuildTime = 1000,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -160,7 +160,7 @@ UnitBlueprint {
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xrl0302_name>Fire Beetle',
         UnitWeight = 1,
     },
@@ -203,7 +203,7 @@ UnitBlueprint {
     SelectionThickness = 0.83,
     SizeX = 0.5,
     SizeY = 0.4,
-    SizeZ = 0.9,
+    SizeZ = 1,
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -229,11 +229,9 @@ UnitBlueprint {
             MaxRadius = 5.8,
             TargetCheckInterval = 999999,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,

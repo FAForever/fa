@@ -18,6 +18,7 @@ function ToggleSelfDestruct(data)
                     if unit:BeenDestroyed() or unit.Dead then return end
 
                     FireSelfdestructWeapons(unit)
+                    unit.SelfDestructed = true
                     unit:Kill()
                 end
             else
@@ -42,6 +43,7 @@ function ToggleSelfDestruct(data)
                         local bp = unit:GetBlueprint()
                         if bp.General.InstantDeathOnSelfDestruct then
                             FireSelfdestructWeapons(unit)
+                            unit.SelfDestructed = true
                             unit:Kill()
                         else
                             -- Regular self destruct cycle
@@ -51,6 +53,7 @@ function ToggleSelfDestruct(data)
                                 WaitSeconds(5)
                                 if unit:BeenDestroyed() then return end
                                 FireSelfdestructWeapons(unit)
+                                unit.SelfDestructed = true
                                 unit:Kill()
                             end)
                         end

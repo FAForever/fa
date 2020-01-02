@@ -137,7 +137,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC ueb5202_name>Refuel & Repair',
         UnitWeight = 1,
     },
@@ -177,7 +177,7 @@ UnitBlueprint {
     SizeX = 3,
     SizeY = 1.6,
     SizeZ = 3,
-    StrategicIconName = 'icon_structure2_air',
+    StrategicIconName = 'icon_structure1_air',
     StrategicIconSortPriority = 175,
     Transport = {
         Class2AttachSize = 2,
