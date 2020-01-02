@@ -168,6 +168,7 @@ function mount_mod_content(MODFOLDER)
                         if folder == 'ui' then
                           LOG('Found mod icons in: '..mod)
                           mount_dir(MODFOLDER..'\\'..mod..'\\textures\\ui', '/textures/ui')
+                          break
                         end
                     end
                 end
