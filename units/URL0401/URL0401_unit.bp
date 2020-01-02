@@ -74,6 +74,7 @@
         'OVERLAYINDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     Defense = {
         AirThreatLevel = 0,
