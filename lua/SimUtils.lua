@@ -344,8 +344,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     for _, unit in EntityCategoryFilterDown(categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, units) do
         --This transfer is pretty complex, so we do it only for really important units (EXPs and t3 arty). 
         if unit:IsBeingBuilt() then
-            local entityID = unit:GetEntityId()
-            unfinishedUnits[entityID] = unit
+            unfinishedUnits[unit.EntityId] = unit
             noUnits = nil --have to store units using entityID and not table.insert
         end
     end

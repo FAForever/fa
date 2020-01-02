@@ -530,13 +530,10 @@ Weapon = Class(moho.weapon_methods) {
         end
         local bp = self:GetBlueprint().EnabledByEnhancement
         if bp then
-            local id = self.unit:GetEntityId()
-            if SimUnitEnhancements[id] then
-                for k, v in SimUnitEnhancements[id] do
-                    if v == bp then
-                        self:SetEnabled(enable)
-                        return
-                    end
+            for k, v in SimUnitEnhancements[self.unit.EntityId] or {} do
+                if v == bp then
+                    self:SetEnabled(enable)
+                    return
                 end
             end
             -- Enhancement needed but doesn't have it, don't allow weapon to be enabled.
