@@ -54,6 +54,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {

@@ -72,6 +72,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0.6,
