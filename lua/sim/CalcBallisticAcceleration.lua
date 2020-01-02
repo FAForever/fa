@@ -11,7 +11,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local acc = 4.75
     local launcher = projectile:GetLauncher()
     if not launcher then return acc end
-    local id = launcher:GetEntityId()
+    local id = launcher.EntityId
 
     -- Get projectile position and velocity
     -- velocity needs to multiplied by 10 due to being returned /tick instead of /s

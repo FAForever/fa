@@ -28,8 +28,7 @@ function ToggleSelfDestruct(data)
                         togglingOff = true
                         KillThread(unit.SelfDestructThread)
                         unit.SelfDestructThread = false
-                        local entityId = unit:GetEntityId()
-                        CancelCountdown(entityId)
+                        CancelCountdown(unit.EntityId)
                     end
                 end
 
@@ -47,8 +46,7 @@ function ToggleSelfDestruct(data)
                             unit:Kill()
                         else
                             -- Regular self destruct cycle
-                            local entityId = unit:GetEntityId()
-                            StartCountdown(entityId)
+                            StartCountdown(unit.EntityId)
                             unit.SelfDestructThread = ForkThread(function()
                                 WaitSeconds(5)
                                 if unit:BeenDestroyed() then return end

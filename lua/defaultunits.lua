@@ -436,7 +436,7 @@ StructureUnit = Class(Unit) {
         if scus[1] then
             for _, u in scus do
                 u:SetFocusEntity(self)
-                self.Repairers[u:GetEntityId()] = u
+                self.Repairers[u.EntityId] = u
             end
         end
 
@@ -568,7 +568,7 @@ StructureUnit = Class(Unit) {
         end
 
         for k, v in self.AdjacencyBeamsBag do
-            if v.Unit:GetEntityId() == adjacentUnit:GetEntityId() then
+            if v.Unit.EntityId == adjacentUnit.EntityId then
                 return
             end
         end
