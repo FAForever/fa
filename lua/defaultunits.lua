@@ -1791,20 +1791,10 @@ AirUnit = Class(MobileUnit) {
     end,
     
     
-    -- Well, unit's OnCollisionCheck is called before projectile's OnCollisionCheck. That's why this check is here and not in NukeProjectile
-    -- Doing it for every projectile that hits air unit is so dumb, but what's other option? :(
+    -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
+    -- the only difference is the `elseif other.Nuke...` condition
+    -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
     OnCollisionCheck = function(self, other, firingWeapon)
-        -- Nuke doesn't explode on collide with air units
-        if other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
-            if not IsAlly(self:GetArmy(), other:GetArmy()) then
-                self:Kill()
-                return false
-            end    
-        end
-        
-        -------- default part from unit.lua---------
-        --------------------------------------------
-        
         if self.DisallowCollisions then
             return false
         end
@@ -1812,6 +1802,9 @@ AirUnit = Class(MobileUnit) {
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if IsAlly(self:GetArmy(), other:GetArmy()) then
                 return other.CollideFriendly
+            elseif other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
+                self:Kill()
+                return false
             end
         end
 
