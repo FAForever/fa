@@ -160,6 +160,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC xsb4302_name>Ythisioz',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,

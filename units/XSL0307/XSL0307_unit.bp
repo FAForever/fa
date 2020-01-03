@@ -237,6 +237,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xsl0307_name>Athanah',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,

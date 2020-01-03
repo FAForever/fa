@@ -145,6 +145,7 @@ UnitBlueprint {
         },
         UnitWeight = 1,
         UpgradesFrom = 'uab3202',
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         ShowIntelOnSelect = true,

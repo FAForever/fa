@@ -198,6 +198,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC ual0307_name>Asylum',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,

@@ -187,6 +187,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC daa0206_name>Mercy',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 15,

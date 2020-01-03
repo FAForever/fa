@@ -123,6 +123,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC urb4201_name>Zapper',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
