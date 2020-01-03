@@ -45,7 +45,6 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 --  FACTORIES
 ---------------------------------------------------------------
 AFactoryUnit = Class(FactoryUnit) {
-
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
@@ -74,7 +73,6 @@ AFactoryUnit = Class(FactoryUnit) {
 --  AIR STRUCTURES
 ---------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
-  
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
@@ -152,7 +150,6 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 --  LAND FACTORY STRUCTURES
 ---------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
-  
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,

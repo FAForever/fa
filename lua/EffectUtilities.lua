@@ -560,13 +560,13 @@ end
 
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
     local bp = unitBeingBuilt:GetBlueprint()
-    local army = builder:GetArmy()
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-
+    local army = builder:GetArmy()
+    
     local slice = nil
 
     -- Create a pool mercury that slow draws into the build unit
