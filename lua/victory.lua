@@ -16,6 +16,29 @@ function AllUnitsInCategoryDead(brain,categoryCheck)
     return true
 end
 
+function ObserverAfterDeath(armyIndex)
+    if not ScenarioInfo.Options.AllowObservers then return end
+    local humans = {}
+    local humanIndex = 0
+    for i, data in ArmyBrains do
+        if data.BrainType == 'Human' then
+            if IsAlly(armyIndex, i) then
+                if not ArmyIsOutOfGame(i) then
+                    return
+                end
+                table.insert(humans, humanIndex)
+            end
+            humanIndex = humanIndex + 1
+        end
+    end
+
+    for _, index in humans do
+        for i in ArmyBrains do
+            ArmyGetHandicap(i - 1, index, false)
+        end
+    end
+end
+
 function CheckVictory(scenarioInfo)
     local categoryCheck = victoryCategories[scenarioInfo.Options.Victory]
     if not categoryCheck then return end
@@ -31,6 +54,7 @@ function CheckVictory(scenarioInfo)
             if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
                 if AllUnitsInCategoryDead(brain,categoryCheck) then
                     brain:OnDefeat()
+                    ObserverAfterDeath(brain:GetArmyIndex())
                 else
                     table.insert(stillAlive, brain)
                 end

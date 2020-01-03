@@ -42,15 +42,14 @@ function DoGameResult(armyIndex, result)
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
+    if not SessionIsReplay() then
+        SetFocusArmy(-1)
+    end
+
     -- If it's someone else, announce it and stop.
     if armyIndex ~= GetFocusArmy() then
         import('/lua/ui/game/score.lua').ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
         return
-    end
-
-    -- Otherwise, do the end-of-game stuff.
-    if SessionIsObservingAllowed() then
-        SetFocusArmy(-1)
     end
 
     local victory = result == 'victory'
