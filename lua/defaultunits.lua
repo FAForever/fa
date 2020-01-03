@@ -637,13 +637,17 @@ FactoryUnit = Class(StructureUnit) {
 
     OnPaused = function(self)
         -- When factory is paused take some action
-        self:StopUnitAmbientSound('ConstructLoop')
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
-        if self.BuildingUnit then
+        if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
+            StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         StructureUnit.OnUnpaused(self)
     end,

@@ -11,6 +11,7 @@
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
 local DefaultUnitsFile = import('defaultunits.lua')
+local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -39,13 +40,49 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 
+
+---------------------------------------------------------------
+--  FACTORIES
+---------------------------------------------------------------
+AFactoryUnit = Class(FactoryUnit) {
+    StartBuildFx = function(self, unitBeingBuilt)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
+   
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+        StructureUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        FactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+    end,
+}
+
 ---------------------------------------------------------------
 --  AIR STRUCTURES
 ---------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+  
+    OnPaused = function(self)
+        AFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        AFactoryUnit.OnUnpaused(self)
     end,
 }
 
@@ -114,8 +151,15 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 ---------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+   
+    OnPaused = function(self)
+        AFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        AFactoryUnit.OnUnpaused(self)
     end,
 }
 
@@ -156,6 +200,14 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
+    end,
+     
+    OnPaused = function(self)
+        AFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        AFactoryUnit.OnUnpaused(self)
     end,
 }
 
