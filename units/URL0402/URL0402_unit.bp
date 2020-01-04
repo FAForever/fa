@@ -266,6 +266,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC url0402_name>Monkeylord',
         UnitWeight = 1,
+        FractionThreshold = 0.99,
     },
     Intel = {
         ActiveIntel = {

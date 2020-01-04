@@ -259,6 +259,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC xrl0403_name>Megalith',
         UnitWeight = 1,
+        FractionThreshold = 0.99,
     },
     Intel = {
         SonarRadius = 76,
