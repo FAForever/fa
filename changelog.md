@@ -1,3 +1,119 @@
+Patch 3710 (10 January, 2019)
+============================
+- Land
+    - Sniper Bot
+        - Sprite Striker (aeon)
+            - Mass cost: 720 → 800
+            - Energy cost: 8000 → 8900
+            - Buildtime: 4000 → 4500
+            - Speed: 2.85 → 2.6
+        - Usha-Ah (seraphim)
+            - Mass cost: 800 → 880
+            - Energy cost: 8800 → 9700
+            - Buildtime: 4300 → 4900
+            - Speed: 2.5 → 2.4
+    - Experimentals
+        - Galactic Colossus
+            - Death weapon damage: 7500 → 8000
+            - Death weapon aoe: 4 → 7
+        - Ythotha
+            - Death weapon damage: 10000 → 7000
+            - Death weapon aoe: 8 → 6
+        - Monkeylord
+            - Death weapon aoe: 7 → 6
+        - Megalith
+            - Death weapon damage: 7500 → 8000
+            - Death weapon aoe: 4 → 9
+
+- Air
+    - Air scouts
+        - Turn rate: 0.6 → 0.8
+        - Max speed: 20 → 19
+    - Spy planes
+        - Turn rate: 0.6 → 0.8
+        - Max speed: 30 → 27
+    - swiftwind
+        - Mass cost: 200 → 235
+        - Energy cost: 6000 → 6750
+        - Buildtime: 1600 → 1800
+    - ASF
+        - Max speed: 25 → 22
+        - Build time: 3000 → 4000
+    - Specter (aeon gunship)
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 5400
+        - Buildtime: 1600 → 1800
+        - Damage: 13 → 78
+        - Range: 22 → 20
+        - Aoe: 0 → 2
+        - Rate of fire: 1.25 → 0.208
+        - Bullet speed: 40 → 25
+        - Dps : 65 → 65
+    - Experimentals
+        - CZAR
+            - Max speed: 8 → 10
+            - Health: 58 000 → 40 000
+            - Personal shield: 0 → 30 000
+            - Shield recharge time: 120
+            - Shield regen rate: 180
+            - Energy consumption: 0 → 500
+            - SAM (anti-air):
+                - Range: 64 → 120
+                - Aoe: 0 → 2
+                - Bullet speed: 50 → 100
+        - Ahwassa
+            - Crash Aoe: 8 → 10
+        - Soul ripper
+            - Crash Damage: 5000 → 7000
+            - Crash Aoe: 4 → 8
+
+- Seraphim ACU
+    - regen field
+        - regen ceiling:
+            - T1: 10 hp/s
+            - T2: 15 hp/s
+            - T3: 25 hp/s
+            - T4: 40 hp/s
+        - Moved from RCH (right arm) to LCH (left arm)
+    - advanced regen field
+        - regen ceiling:
+            - T1: 20 hp/s
+            - T2: 50 hp/s
+            - T3: 120 hp/s
+            - T4: 240 hp/s
+        - Moved from RCH (right arm) to LCH (left arm)
+    - RAS
+        - Moved from back to RCH (right arm)
+
+- Misc
+    - Broken tree ressource modifier: 1.25 → 2
+    - Nuke missile kills non-experimental air units without explosion
+    - Veterancy rework:
+        - ACU veterancy from units:
+            - from T2: 50% → 100%
+            - from T3: 33% → 100%
+            - from T4: 25% → 100%
+            - from SACU: 30% → 100%
+            - from ACU: 5% → 100%
+        - Units veterancy from economy building: 50% → 100%
+        - ACU veterancy total mass killed requirements:
+            - 2nd level: 2000 → 2250
+            - 3rd level: 3000 → 4000
+            - 4th level: 4000 → 6500
+            - 5th level: 5000 → 10000
+        - units mass killed multiplier:
+            - multiply the unit mass cost by the multiplier to obtain the mass killed requirement per vet.
+            - T1/SACU/Exp: 2
+            - T2: 1.5
+            - T3: 1.25
+    - ACU won't survive an ACU explosion under 2500 hp by vetting anymore (veterancy is gained right after ACU explosion)
+        
+### Contributors
+- Strogo
+- keyser
+- TurinTurambar
+- Petricpwnz
+
 Patch 3709 (16 December, 2019)
 ============================
 - Land
@@ -34,7 +150,7 @@ Patch 3709 (16 December, 2019)
 - Wailer and Broadsword
     - Mass cost: 1260 → 1500
     - Energy cost: 42000 → 60000
-- Notha 
+- Notha
     - Rate of Fire: 0.1 → 0.2
     
 - Navy
@@ -2307,7 +2423,7 @@ Patch 3658 (August 29th, 2016)
         - Decreased StartTurnDistance 5 → 1.4
         - Increased TurnSpeed 0.75 → 1.5
         - Decreased RandomBreakOffDistanceMult 1.5 → 1
-- Ahwasssa
+- Ahwassa
     - Decreased StartTurnDistance 15 → 1
     - Increased TurnSpeed 0.65 → 0.9
 - Cybran T1 Frigate
