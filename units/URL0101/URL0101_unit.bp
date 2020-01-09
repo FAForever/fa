@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 27, --MaxRadius of the dummy gun instead of 
+        -- the radar range because no point to aggro on units outside the
+        -- shooting range as the gun isn't real
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -179,6 +184,31 @@ UnitBlueprint {
     SizeZ = 1, # #from 0.5
     StrategicIconName = 'icon_land1_intel',
     StrategicIconSortPriority = 135,
+    Weapon = {
+        { -- dummy weapon to stop at a certain point when attack moved
+            AutoInitiateAttackCommand = false,
+            CannotAttackGround = false,
+            Damage = 0,
+            DamageFriendly = false,
+            DamageType = 'Normal',
+            DisplayName = 'Target Tracker',
+            FireTargetLayerCapsTable = {
+                Land = 'Land|Water',
+                Water = 'Land|Water',
+            },
+            MaxRadius = 27, -- Tweaked so it stops a bit behind mantis using GuardScanRadius
+            RateOfFire = 0.1,
+            ReTargetOnMiss = false,
+            TargetCheckInterval = 0.1,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            Turreted = false,
+            SlavedToBody = false,
+            WeaponCategory = 'Missile',
+        },
+    },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
