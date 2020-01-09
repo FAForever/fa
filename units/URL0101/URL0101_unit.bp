@@ -196,7 +196,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 27, -- Tweaked so it stops a bit behind mantis using GuardScanRadius
+            MaxRadius = 25, -- Tweaked so it stops a bit behind mantis using GuardScanRadius
             RateOfFire = 0.1,
             ReTargetOnMiss = false,
             TargetCheckInterval = 0.1,
