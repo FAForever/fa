@@ -183,7 +183,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20,
+        VisionRadius = 27,
     },
     Interface = {
         HelpText = '<LOC xsl0202_help>Assault Bot',
