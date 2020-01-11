@@ -34,7 +34,7 @@ function ObserverAfterDeath(armyIndex)
 
     for _, index in humans do
         for i in ArmyBrains do
-            ArmyGetHandicap(i - 1, index, false)
+            SetCommandSource(i - 1, index, false)
         end
     end
 end
