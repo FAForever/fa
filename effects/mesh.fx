@@ -2848,8 +2848,8 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     // Calculate lookup texture into falloff ramp
-    float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
-    float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x));
+	float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
+	float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
 
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
@@ -2859,22 +2859,25 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     // Calculate specular highlights of the sun
     float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * 0.7;
+    float3 phongAdditive = pow( specularAmount, 20) * specular.g * light;
 
     // Calculate environment map reflection
     float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
     environment *= reflectivity * fallOff.a * light;
-    
     // Makes reflection more intense depending on the diffuse color.
-    environment *= (diffuse.g + 0.5) * 2.0;
+    environment *= (diffuse.g + 0.75) * 0.8;
     
-    float3 teamColor = fallOff.g * vertex.color.rgb * 2;
+	// This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
+	// because it produces consistent results with different player colors
+	NdotV = 2.6 * pow(NdotV, 6) - 2.6 * NdotV + 2;
+    float3 teamColor = NdotV * vertex.color.rgb;
+	
     // There are also white highlights in the diffuse texture in some models
     float3 whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4));
     
     // Combine all previous computations
     float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.4;
-    color += float3(0.5,0.6,0.7) * (phongAdditive + environment);
+    color += phongAdditive + environment;
     color += (teamColor * diffuse.a) + whiteness;
     
     // Substitute all the computations on pure glowing parts with the pure brightness texture
