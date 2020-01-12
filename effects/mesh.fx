@@ -2854,22 +2854,24 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    light = light + ( 1 - light ) * shadowFill;
-    
+    // Corrects the light values from 1 to 2 range to 1.6 to 1.8 for consistent results
+    float correction = (sunDiffuse.g + sunAmbient.g + 0.3) / 2; 
+    light = light / correction + ( 1 - light ) * shadowFill;
+
     // Calculate specular highlights of the sun
     float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( specularAmount, 20) * specular.g * light;
+    float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * sunDiffuse * 0.7;
 
     // Calculate environment map reflection
     float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
     environment *= reflectivity * fallOff.a * light;
     // Makes reflection more intense depending on the diffuse color.
-    environment *= (diffuse.g + 0.75) * 0.8;
+    environment *= (diffuse.g + 1) * 0.6;
     
     // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
     // because it produces consistent results with different player colors
-    NdotV = 2.6 * pow(NdotV, 6) - 2.6 * NdotV + 2;
+    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
     float3 teamColor = NdotV * vertex.color.rgb;
 	
     // There are also white highlights in the diffuse texture in some models
