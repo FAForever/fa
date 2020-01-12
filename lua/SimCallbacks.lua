@@ -119,6 +119,20 @@ Callbacks.CapMex = function(data, units)
     IssueGuard(units, builder)
 end
 
+Callbacks.SpawnAndSetVeterancyUnit = function(data)
+    if not CheatsEnabled() then return end
+    for bpId in data.bpId do
+        for i = 1, data.count do
+            local unit = CreateUnitHPR(bpId, data.army, data.pos[1], data.pos[2], data.pos[3], 0, 0, 0)
+            if data.veterancy > 0 then
+                for vetLvl = 1, data.veterancy do
+                    unit:SetVeterancy(vetLvl)
+                end
+            end
+        end
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
