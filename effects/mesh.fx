@@ -2847,9 +2847,9 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    // Calculate lookup texture into falloff ramp
-	float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
-	float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
+    // Calculate lookup texture for falloff ramp
+    float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
+    float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
 
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
@@ -2867,9 +2867,9 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     // Makes reflection more intense depending on the diffuse color.
     environment *= (diffuse.g + 0.75) * 0.8;
     
-	// This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
-	// because it produces consistent results with different player colors
-	NdotV = 2.6 * pow(NdotV, 6) - 2.6 * NdotV + 2;
+    // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
+    // because it produces consistent results with different player colors
+    NdotV = 2.6 * pow(NdotV, 6) - 2.6 * NdotV + 2;
     float3 teamColor = NdotV * vertex.color.rgb;
 	
     // There are also white highlights in the diffuse texture in some models
