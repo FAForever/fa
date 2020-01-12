@@ -213,36 +213,70 @@ function CreateDialog(x, y)
     count:SetHighlightForegroundColor(UIUtil.highlightColor)
     count:SetHighlightBackgroundColor("880085EF")
     count.Height:Set(15)
-    count.Width:Set(50)
+    count.Width:Set(30)
     count:SetFont(UIUtil.bodyFont, 12)
     count:SetMaxChars(4)
     count:SetText('1')
     LayoutHelpers.RightOf(count, countLabel, 5)
+    count.OnCharPressed = function(self, charcode)
+        if (charcode < 48) or (charcode > 57) then -- between 0 and 9
+            return true
+        end
+    end
+    count.OnNonTextKeyPressed = function(self, keycode, modifiers)
+    end
+    count.OnKeyboardFocusChange = function(self)
+        if self:GetText() == '' then
+            self:SetText('1')
+        end
+    end
+
+    local veterancyLabel = UIUtil.CreateText(count, 'Veterancy:', 12, UIUtil.bodyFont)
+    LayoutHelpers.RightOf(veterancyLabel, count, 5)
+
+    local veterancyLevel = Edit(dialog)
+    veterancyLevel:SetForegroundColor(UIUtil.fontColor)
+    veterancyLevel:SetBackgroundColor('ff333333')
+    veterancyLevel:SetHighlightForegroundColor(UIUtil.highlightColor)
+    veterancyLevel:SetHighlightBackgroundColor("880085EF")
+    veterancyLevel.Height:Set(15)
+    veterancyLevel.Width:Set(30)
+    veterancyLevel:SetFont(UIUtil.bodyFont, 12)
+    veterancyLevel:SetMaxChars(1)
+    veterancyLevel:SetText('0')
+    LayoutHelpers.RightOf(veterancyLevel, veterancyLabel, 5)
+    veterancyLevel.OnCharPressed = function(self, charcode)
+        if (charcode < 48) or (charcode > 53) then -- between 0 and 5
+            return true
+        end
+        self:ClearText()
+    end
+    veterancyLevel.OnNonTextKeyPressed = function(self, keycode, modifiers)
+    end
+    veterancyLevel.OnKeyboardFocusChange = function(self)
+        if self:GetText() == '' then
+            self:SetText('0')
+        end
+    end
 
     local function spawnUnits(creationList, targetArmy)
-        local numUnits = 1
-        if type(tonumber(count:GetText())) == 'number' then
-            numUnits = count:GetText()
-        end
+        local numUnits = tonumber(count:GetText())
+        local vetLvl = tonumber(veterancyLevel:GetText())
         WaitSeconds(0.1)
         while not IsKeyDown(1) do -- Left mouse button
             if IsKeyDown('ESCAPE') then return end
             WaitSeconds(0.05)
         end
-        local cursorPos = GetMouseScreenPos()
-        for unitID in creationList do
-            for i = 1, numUnits do
-                local cmd = 'CreateUnit ' .. unitID .. ' ' .. targetArmy .. ' ' .. cursorPos[1] .. ' ' .. cursorPos[2]
-                ConExecuteSave(cmd)
-            end
-        end
+        SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+                       Args = { bpId = creationList, count = numUnits,
+                       army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
     end
 
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
     createBtn.OnClick = function(button)
-        ForkThread(spawnUnits, CreationList, currentArmy - 1)
+        ForkThread(spawnUnits, CreationList, currentArmy)
         dialog:Destroy()
         dialog = false
     end
@@ -543,7 +577,7 @@ function CreateDialog(x, y)
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy - 1)
+                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)
