@@ -2854,20 +2854,19 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    // Corrects the light values from 1 to 2 range to 1.6 to 1.8 for consistent results
-    float correction = (sunDiffuse.g + sunAmbient.g + 0.3) / 2; 
-    light = light / correction + ( 1 - light ) * shadowFill;
+    // Normalizes the light to 1 for consistent results across different maps
+    float correction = sunDiffuse.g + sunAmbient.g; 
+    light = light / correction + ( 1 - light / correction ) * shadowFill * 0.5;
 
     // Calculate specular highlights of the sun
     float3 reflection = reflect( sunDirection, normal);
     float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
     float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * sunDiffuse * 0.7;
+    phongAdditive *= (diffuse.g + 1);
 
     // Calculate environment map reflection
     float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
     environment *= reflectivity * fallOff.a * light;
-    // Makes reflection more intense depending on the diffuse color.
-    environment *= (diffuse.g + 1) * 0.6;
     
     // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
     // because it produces consistent results with different player colors
@@ -2878,7 +2877,7 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float3 whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4));
     
     // Combine all previous computations
-    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.4;
+    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.65;
     color += phongAdditive + environment;
     color += (teamColor * diffuse.a) + whiteness;
     
@@ -3125,8 +3124,8 @@ float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) :
     // Calculate lighting and shadows
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    float correction = (sunDiffuse.g + sunAmbient.g + 0.3) / 2; 
-    light = light / correction + ( 1 - light ) * shadowFill;
+    float correction = sunDiffuse.g + sunAmbient.g; 
+    light = light / correction + ( 1 - light / correction ) * shadowFill * 0.5;
 
     float4 diffuse = tex2D( albedoSampler, texcoord2);
     float4 specular = tex2D( specularSampler, texcoord2);
@@ -3139,8 +3138,8 @@ float4 SeraphimBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) :
     float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * sunDiffuse * 0.7;
 
     // Determine our final output color
-    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.4;
-    color += environment * 0.6 + phongAdditive + (NdotV * vertex.color.rgb * diffuse.a);
+    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.65;
+    color += environment + phongAdditive + (NdotV * vertex.color.rgb * diffuse.a);
 
     return float4( color, max(vertex.material.y, 0.25) );
 }
