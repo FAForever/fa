@@ -141,7 +141,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 24,
+        VisionRadius = 22,
     },
     Interface = {
         HelpText = '<LOC url0202_help>Heavy Tank',
