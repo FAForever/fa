@@ -172,7 +172,9 @@ Patch 3709 (16 December, 2019)
 - Overcharge
     - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
 - Target priorities
-    - ACUs cannot be prioritised by units other than experimentals, labs, gunships and fighter/bombers
+    - ACUs cannot be prioritised by units other than experimentals, labs, gunships, fighter/bombers and ACUs
+- Repair
+    - Repair get 25% cost reduction
     
 ### Contributors
 - Strogo
