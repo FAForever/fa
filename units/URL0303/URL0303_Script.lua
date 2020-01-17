@@ -62,7 +62,7 @@ URL0303 = Class(CWalkingLandUnit) {
         self.Trash:Add(bufffx1)
         self.Trash:Add(bufffx2)
         self.Trash:Add(bufffx3)
-        WaitSeconds(5)
+        WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
         self:Kill()
     end,
 
