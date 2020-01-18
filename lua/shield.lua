@@ -141,7 +141,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if not (IsEnemy(self:GetArmy(), firingWeapon.unit:GetArmy())) then
+            if not (IsEnemy(self:GetArmy(), firingWeapon.unit.Army)) then
                 return false
             end
         end
@@ -850,7 +850,7 @@ AntiArtilleryShield = Class(Shield) {
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then
-            if self:GetArmy() == firingWeapon.unit:GetArmy() then
+            if self:GetArmy() == firingWeapon.unit.Army then
                 return false
             end
         end

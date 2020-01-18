@@ -123,10 +123,9 @@ AEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        local army =  self:GetArmy()
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, army, v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,

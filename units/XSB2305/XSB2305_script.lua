@@ -19,7 +19,7 @@ XSB2305 = Class(SStructureUnit) {
                 self.unit:PlayUnitAmbientSound('NukeCharge')
 
                 for k, v in FxLaunch do
-                    CreateEmitterAtEntity(self.unit, self.unit:GetArmy(), v)
+                    CreateEmitterAtEntity(self.unit, self.unit.Army, v)
                 end
 
                 WaitSeconds(9.5)

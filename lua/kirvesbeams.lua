@@ -79,7 +79,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

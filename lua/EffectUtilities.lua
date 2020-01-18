@@ -151,13 +151,13 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
 end
 
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
     local buildAttachBone = builder:GetBlueprint().Display.BuildAttachBone
     BuildEffectsBag:Add(CreateAttachedEmitter(builder, buildAttachBone, army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
 end
 
 function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local buildbp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
@@ -227,7 +227,7 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, Bui
 end
 
 function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local buildbp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
@@ -308,7 +308,7 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Buil
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local ox, oy, oz = unpack(unitBeingBuilt:GetPosition())
     local BeamEndEntity = Entity()
-    local army = builder:GetArmy()
+    local army = builder.Army
     BuildEffectsBag:Add(BeamEndEntity)
     Warp(BeamEndEntity, Vector(ox, oy, oz))
 
@@ -341,7 +341,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    local army = builder:GetArmy()
+    local army = builder.Army
 
     local slice = nil
     WaitSeconds(0.1)
@@ -381,7 +381,7 @@ end
 
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
     WaitSeconds(0.2)
-    local army = builder:GetArmy()
+    local army = builder.Army
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local BeamEndEntities = {}
     local ox, oy, oz = unpack(unitBeingBuilt:GetPosition())
@@ -420,8 +420,8 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
         builder.buildBots = {}
     end
 
-    local builderArmy = builder:GetArmy()
-    local unitBeingBuiltArmy = unitBeingBuilt:GetArmy() or nil
+    local builderArmy = builder.Army
+    local unitBeingBuiltArmy = unitBeingBuilt.Army or nil
 
     -- If is new, won't spawn build bots if they might accidentally capture the unit
     if unitBeingBuiltArmy and ( builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) ) then
@@ -471,7 +471,7 @@ end
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
-        local army = builder:GetArmy()
+        local army = builder.Army
         for _, vBone in BuildBones do
             for _, vEffect in  EffectTemplate.CybranBuildUnitBlink01 do
                 BuildEffectsBag:Add(CreateAttachedEmitter(builder, vBone, army, vEffect))
@@ -504,7 +504,7 @@ function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, Bu
         '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
         '/effects/emitters/build_sparks_blue_02_emit.bp',
     }
-    local army = builder:GetArmy()
+    local army = builder.Army
 
     CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
 
@@ -528,7 +528,7 @@ function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, Bu
 end
 
 function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
     BuildEffectsBag:Add(CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp'))
 
     local beamEnd = Entity()
@@ -543,7 +543,7 @@ function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, Buil
 end
 
 function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
     local beamEnd = Entity()
     BuildEffectsBag:Add(beamEnd)
     Warp(beamEnd, unitBeingBuilt:GetPosition())
@@ -565,7 +565,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    local army = builder:GetArmy()
+    local army = builder.Army
     
     local slice = nil
 
@@ -629,7 +629,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
 end
 
 function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local army = builder:GetArmy()
+    local army = builder.Army
 
     for _, vBone in BuildEffectBones do
         BuildEffectsBag:Add(CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp'))
@@ -643,7 +643,7 @@ end
 
 function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
     local bp = unitBeingBuilt:GetBlueprint()
-    local army = builder:GetArmy()
+    local army = builder.Army
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -706,7 +706,7 @@ end
 
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
     local bp = unitBeingBuilt:GetBlueprint()
-    local army = builder:GetArmy()
+    local army = builder.Army
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -786,7 +786,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    local army = builder:GetArmy()
+    local army = builder.Army
 
     local slice = nil
     WaitSeconds(0.1)
@@ -836,7 +836,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
 
     -- The flash can now be seen only by the player owning the building, his allies or enemies who
     -- have a visual of the building.
-    local unitsArmy = unitBeingBuilt:GetArmy()
+    local unitsArmy = unitBeingBuilt.Army
     local focusArmy = GetFocusArmy()
     if focusArmy == -1 or IsAlly(unitsArmy, focusArmy) then
         CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
@@ -869,7 +869,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
 
     local uBp = unit:GetBlueprint()
     local aBp = adjacentUnit:GetBlueprint()
-    local army = unit:GetArmy()
+    local army = unit.Army
     local faction = uBp.General.FactionName
 
     -- Determine which effects we will be using
@@ -1217,7 +1217,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
 end
 
 function PlaySacrificingEffects(unit, target_unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
@@ -1229,7 +1229,7 @@ function PlaySacrificingEffects(unit, target_unit)
 end
 
 function PlaySacrificeEffects(unit, target_unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
@@ -1241,7 +1241,7 @@ function PlaySacrificeEffects(unit, target_unit)
 end
 
 function PlayReclaimEffects(reclaimer, reclaimed, BuildEffectBones, EffectsBag)
-    local army = reclaimer:GetArmy()
+    local army = reclaimer.Army
     local pos = reclaimed:GetPosition()
     pos[2] = GetTerrainHeight(pos[1], pos[3])
 
@@ -1264,7 +1264,7 @@ end
 function PlayReclaimEndEffects(reclaimer, reclaimed)
     local army = -1
     if reclaimer then
-        army = reclaimer:GetArmy()
+        army = reclaimer.Army
     end
     for _, v in EffectTemplate.ReclaimObjectEnd do
         CreateEmitterAtEntity(reclaimed, army, v)
@@ -1274,7 +1274,7 @@ function PlayReclaimEndEffects(reclaimer, reclaimed)
 end
 
 function PlayCaptureEffects(capturer, captive, BuildEffectBones, EffectsBag)
-    local army = capturer:GetArmy()
+    local army = capturer.Army
 
     for _, vBone in BuildEffectBones do
         for _, vEmit in EffectTemplate.CaptureBeams do
@@ -1288,7 +1288,7 @@ function CreateCybranQuantumGateEffect(unit, bone1, bone2, TrashBag, startwaitSe
     -- Adding a quick wait here so that unit bone positions are correct
     WaitSeconds(startwaitSeed)
 
-    local army = unit:GetArmy()
+    local army = unit.Army
     local BeamEmtBp = '/effects/emitters/cybran_gate_beam_01_emit.bp'
     local pos1 = unit:GetPosition(bone1)
     local pos2 = unit:GetPosition(bone2)
@@ -1330,14 +1330,14 @@ function CreateCybranQuantumGateEffect(unit, bone1, bone2, TrashBag, startwaitSe
 end
 
 function CreateEnhancementEffectAtBone(unit, bone, TrashBag)
-    local army = unit:GetArmy()
+    local army = unit.Army
     for _, vEffect in EffectTemplate.UpgradeBoneAmbient do
         TrashBag:Add(CreateAttachedEmitter(unit, bone, army, vEffect))
     end
 end
 
 function CreateEnhancementUnitAmbient(unit, bone, TrashBag)
-    local army = unit:GetArmy()
+    local army = unit.Army
     for _, vEffect in EffectTemplate.UpgradeUnitAmbient do
         TrashBag:Add(CreateAttachedEmitter(unit, bone, army, vEffect))
     end
@@ -1351,7 +1351,7 @@ function CleanupEffectBag(self, EffectBag)
 end
 
 function SeraphimRiftIn(unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     unit:HideBone(0, true)
 
     for _, v in EffectTemplate.SerRiftIn_Small do
@@ -1371,7 +1371,7 @@ function SeraphimRiftIn(unit)
 end
 
 function SeraphimRiftInLarge(unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     unit:HideBone(0, true)
 
     for _, v in EffectTemplate.SerRiftIn_Large do
@@ -1391,14 +1391,14 @@ function SeraphimRiftInLarge(unit)
 end
 
 function CybranBuildingInfection(unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     for _, v in EffectTemplate.CCivilianBuildingInfectionAmbient do
         CreateAttachedEmitter (unit, -1, army, v)
     end
 end
 
 function CybranQaiShutdown(unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     for _, v in EffectTemplate.CQaiShutdown do
         CreateAttachedEmitter (unit, -1, army, v)
     end
@@ -1406,14 +1406,14 @@ end
 
 function AeonHackACU(unit)
     for _, v in EffectTemplate.AeonOpHackACU do
-        CreateAttachedEmitter (unit, -1, unit:GetArmy(), v)
+        CreateAttachedEmitter (unit, -1, unit.Army, v)
     end
 end
 
 -- New function for insta capture fix
 IsHumanUnit = function(self)
     local ArmyTable = ScenarioInfo.ArmySetup
-    local ArmyIndex = self:GetArmy()
+    local ArmyIndex = self.Army
 
     for ArmyName, Army in ArmyTable do
         if Army.ArmyIndex == ArmyIndex then
@@ -1433,7 +1433,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
         return
     end
 
-    local army = unit:GetArmy()
+    local army = unit.Army
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
     local Yoffset = TeleportGetUnitYOffset(unit)
@@ -1581,7 +1581,7 @@ end
 function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     -- Creates charge up effects at the unit
     local bp = unit:GetBlueprint()
-    local army = unit:GetArmy()
+    local army = unit.Army
     local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {Bone = 0, Offset = {0, 0.25, 0}, }
     local bone, ox, oy, oz
     local emitters = {}
@@ -1672,7 +1672,7 @@ function PlayTeleportOutEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just before the unit is taken from its original location
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
-    local army = unit:GetArmy()
+    local army = unit.Army
     local Yoffset = TeleportGetUnitYOffset(unit)
 
     if bp.Display.TeleportEffects.PlayTeleportOutFx ~= false then
@@ -1731,7 +1731,7 @@ function DoTeleportInDamage(unit)
         end
         if dmg > 0 and dmgRadius > 0 then
             local faction = bp.General.FactionName
-            local army = unit:GetArmy()
+            local army = unit.Army
             local templ
             if unit.TeleportInWeaponFxOverride then
                 templ = unit.TeleportInWeaponFxOverride
@@ -1756,7 +1756,7 @@ function DoTeleportInDamage(unit)
 end
 
 function CreateTeleSteamFX(unit)
-    local army = unit:GetArmy()
+    local army = unit.Army
     local totalBones = unit:GetBoneCount() - 1
     for _, v in EffectTemplate.UnitTeleportSteam01 do
         for bone = 1, totalBones do
@@ -1769,7 +1769,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just after the unit is taken from its original location
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
-    local army = unit:GetArmy()
+    local army = unit.Army
     local Yoffset = TeleportGetUnitYOffset(unit)
     local decalOrient = RandomFloat(0, 2 * math.pi)
 

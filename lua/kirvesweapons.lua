@@ -28,8 +28,8 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
-            CreateAttachedEmitter(self.unit, 'Shells_Left', self.unit:GetArmy(), v)
-            CreateAttachedEmitter(self.unit, 'Shells_Right', self.unit:GetArmy(), v)
+            CreateAttachedEmitter(self.unit, 'Shells_Left', self.unit.Army, v)
+            CreateAttachedEmitter(self.unit, 'Shells_Right', self.unit.Army, v)
         end
     end,
 }

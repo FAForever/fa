@@ -91,7 +91,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -110,7 +110,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -143,7 +143,7 @@ UEL0001 = Class(ACUUnit) {
         if not bp then return end
         if enh == 'LeftPod' then
             local location = self:GetPosition('AttachSpecial02')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'LeftPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -151,7 +151,7 @@ UEL0001 = Class(ACUUnit) {
             self.LeftPod = pod
         elseif enh == 'RightPod' then
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'RightPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)

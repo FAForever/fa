@@ -13,7 +13,7 @@ DamageArea = function(instigator, location, radius, damage, type, damageAllies, 
                 -- need this ugliness due to Damage() refuse to damage when instigator == u
                 instigator:OnDamage(instigator, damage, vector, type)
             end
-        elseif damageAllies or not IsAlly(army, u:GetArmy()) then
+        elseif damageAllies or not IsAlly(army, u.Army) then
             Damage(instigator, location, u, damage, type)
         end
     end

@@ -17,7 +17,7 @@ UEA0304 = Class(TAirUnit) {
     },
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator:GetArmy() == self:GetArmy() then
+        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
         

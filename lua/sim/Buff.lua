@@ -284,7 +284,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'RadarRadius' then
             local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
             if not unit:IsIntelEnabled('Radar') then
-                unit:InitIntel(unit:GetArmy(),'Radar', val)
+                unit:InitIntel(unit.Army,'Radar', val)
                 unit:EnableIntel('Radar')
             else
                 unit:SetIntelRadius('Radar', val)
@@ -297,7 +297,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'OmniRadius' then
             local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
             if not unit:IsIntelEnabled('Omni') then
-                unit:InitIntel(unit:GetArmy(),'Omni', val)
+                unit:InitIntel(unit.Army,'Omni', val)
                 unit:EnableIntel('Omni')
             else
                 unit:SetIntelRadius('Omni', val)
@@ -480,7 +480,7 @@ function PlayBuffEffect(unit, buffName, trsh)
     end
 
     for k, fx in def.Effects do
-        local bufffx = CreateAttachedEmitter(unit, 0, unit:GetArmy(), fx)
+        local bufffx = CreateAttachedEmitter(unit, 0, unit.Army, fx)
         if def.EffectsScale then
             bufffx:ScaleEmitter(def.EffectsScale)
         end

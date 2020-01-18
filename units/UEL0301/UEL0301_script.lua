@@ -65,7 +65,7 @@ UEL0301 = Class(CommandUnit) {
             RemoveEconomyEvent(self, self.RebuildingPod)
             self.RebuildingPod = nil
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -89,7 +89,7 @@ UEL0301 = Class(CommandUnit) {
         if not bp then return end
         if enh == 'Pod' then
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
