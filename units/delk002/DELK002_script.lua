@@ -25,8 +25,8 @@ DELK002 = Class(TLandUnit) {
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit:GetArmy(), Effects.WeaponSteam01)
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit:GetArmy(), Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -57,8 +57,8 @@ DELK002 = Class(TLandUnit) {
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit:GetArmy(), Effects.WeaponSteam01)
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit:GetArmy(), Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },

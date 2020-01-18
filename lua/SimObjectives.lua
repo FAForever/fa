@@ -127,7 +127,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
                 local cnt = 0
                 if units then
                     for _, unit in units do
-                        if not requirement.ArmyIndex or (requirement.ArmyIndex == unit:GetArmy()) then
+                        if not requirement.ArmyIndex or (requirement.ArmyIndex == unit.Army) then
                             if EntityCategoryContains(requirement.Category, unit) then
                                 if not unit.Marked and objective.MarkUnits then
                                     unit.Marked = true
@@ -821,7 +821,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
                 if units then
                     for _, unit in units do
                         if not unit.Dead and not unit:IsBeingBuilt() then
-                            if not (requirement.ArmyIndex or requirement.Armies) or (requirement.ArmyIndex == unit:GetArmy()) or ArmiesList[unit:GetArmy()] then
+                            if not (requirement.ArmyIndex or requirement.Armies) or (requirement.ArmyIndex == unit.Army) or ArmiesList[unit.Army] then
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
@@ -1728,7 +1728,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
     objective.AddUnitTarget = function(self, unit)
         self.NextTargetTag = self.NextTargetTag + 1
-        if unit:GetArmy() == GetPlayerArmy() then
+        if unit.Army == GetPlayerArmy() then
             SetupFocusNotify(self, unit, self.NextTargetTag)
         else
             SetupNotify(self, unit, self.NextTargetTag)

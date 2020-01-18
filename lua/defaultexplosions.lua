@@ -108,7 +108,7 @@ end
 
 function MakeExplosionEntitySpec(unit, overKillRatio)
     return {
-        Army = unit:GetArmy(),
+        Army = unit.Army,
         Dimensions = {GetUnitSizes(unit)},
         BoundingXZRadius = GetAverageBoundingXZRadius(unit),
         BoundingXYZRadius = GetAverageBoundingXYZRadius(unit),
@@ -272,7 +272,7 @@ ScorchDecalTextures = {
 ----------------------
 function CreateWreckageEffects(obj, prop)
     if IsUnit(obj) then
-        local army = obj:GetArmy()
+        local army = obj.Army
         local scale = GetAverageBoundingXYZRadius(obj)
         local emitters = {}
         local layer = obj:GetCurrentLayer()
@@ -332,7 +332,7 @@ function CreateDefaultExplosion(unit, scale, overKillRatio)
         Volume = GetUnitVolume(unit),
     }
     local Explosion = unit --Entity(spec)
-    local army = unit:GetArmy()
+    local army = unit.Army
 
     CreateConcussionRing(Explosion, scale)
     --CreateDestructionFire(Explosion, scale)
@@ -399,7 +399,7 @@ function CreateUnitDebrisEffects(object, bone)
     local Effects = {'/effects/emitters/destruction_explosion_smoke_09_emit.bp'}
 
     for k, v in Effects do
-        CreateAttachedEmitter(object,bone,object:GetArmy(),v)
+        CreateAttachedEmitter(object,bone,object.Army,v)
     end
 end
 

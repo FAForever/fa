@@ -93,7 +93,7 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
@@ -241,7 +241,7 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
-            CreateAttachedEmitter(self.unit, self:GetBlueprint().TurretBonePitch, self.unit:GetArmy(), v)
+            CreateAttachedEmitter(self.unit, self:GetBlueprint().TurretBonePitch, self.unit.Army, v)
         end
     end,
 }
@@ -252,7 +252,7 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         local bp = self:GetBlueprint()
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do

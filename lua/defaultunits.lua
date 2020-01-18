@@ -59,7 +59,7 @@ StructureUnit = Class(Unit) {
 
     RotateTowardsEnemy = function(self)
         local bp = self:GetBlueprint()
-        local army = self:GetArmy()
+        local army = self.Army
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
         local x, y = GetMapSize()
@@ -152,7 +152,7 @@ StructureUnit = Class(Unit) {
             tarmac = specTarmac
         end
 
-        local army = self:GetArmy()
+        local army = self.Army
         local w = tarmac.Width
         local l = tarmac.Length
         local fadeout = tarmac.FadeOut
@@ -251,7 +251,7 @@ StructureUnit = Class(Unit) {
             local fxbp = bpEmitters[color]
             for _, v in bp do
                 if type(v) == 'table' then
-                    local fx = CreateAttachedEmitter(self, v.BLBone, self:GetArmy(), fxbp)
+                    local fx = CreateAttachedEmitter(self, v.BLBone, self.Army, fxbp)
                     fx:OffsetEmitter(v.BLOffsetX or 0, v.BLOffsetY or 0, v.BLOffsetZ or 0)
                     fx:ScaleEmitter(v.BLScale or 1)
                     table.insert(self.FxBlinkingLightsBag, fx)
@@ -653,7 +653,7 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         aiBrain:ESRegisterUnitEnergyStorage(self)
         local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
@@ -689,7 +689,7 @@ FactoryUnit = Class(StructureUnit) {
                 self:CreateBlinkingLights('Green')
                 self.BlinkingLightsState = state
             elseif bls == 'Red' then
-                local aiBrain = GetArmyBrain(self:GetArmy())
+                local aiBrain = GetArmyBrain(self.Army)
                 local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
                 local curMass = aiBrain:GetEconomyStoredRatio('MASS')
                 if curEnergy > 0.11 and curMass > 0.11 then
@@ -972,7 +972,7 @@ EnergyStorageUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitEnergyStorage(self)
         local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
         if curEnergy > 0.11 then
@@ -1221,7 +1221,7 @@ MassStorageUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         local curMass = aiBrain:GetEconomyStoredRatio('MASS')
         if curMass > 0.11 then
@@ -1331,7 +1331,7 @@ SonarUnit = Class(StructureUnit) {
 
     TimedIdleSonarEffects = function(self)
         local layer = self:GetCurrentLayer()
-        local army = self:GetArmy()
+        local army = self.Army
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
@@ -1641,7 +1641,7 @@ AirUnit = Class(MobileUnit) {
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
-        local army = self:GetArmy()
+        local army = self.Army
         if new == 'Down' then
             -- Turn off the ambient hover sound
             self:StopUnitAmbientSound('ActiveLoop')
@@ -1709,7 +1709,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
             self.colliderProj = nil
@@ -1736,7 +1736,7 @@ AirUnit = Class(MobileUnit) {
     end,
 
     CreateUnitAirDestructionEffects = function(self, scale)
-        local army = self:GetArmy()
+        local army = self.Army
         local scale = explosion.GetAverageBoundingXZRadius(self)
         explosion.CreateDefaultHitExplosion(self, scale)
 
@@ -2266,7 +2266,7 @@ CommandUnit = Class(WalkingLandUnit) {
         end
 
         local totalBones = self:GetBoneCount() - 1
-        local army = self:GetArmy()
+        local army = self.Army
         for k, v in EffectTemplate.UnitTeleportSteam01 do
             for bone = 1, totalBones do
                 CreateAttachedEmitter(self, bone, army, v)
@@ -2390,7 +2390,7 @@ ACUUnit = Class(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        ArmyBrains[self.Army]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
     
@@ -2407,8 +2407,8 @@ ACUUnit = Class(CommandUnit) {
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
 
-        if self:GetHealth() < ArmyBrains[self:GetArmy()]:GetUnitStat(self:GetUnitId(), "lowest_health") then
-            ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self:GetUnitId(), "lowest_health") then
+            ArmyBrains[self.Army]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         end
     end,
 
@@ -2416,8 +2416,8 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.OnKilled(self, instigator, type, overkillRatio)
 
         -- If there is a killer, and it's not me
-        if instigator and instigator:GetArmy() ~= self:GetArmy() then
-            local instigatorBrain = ArmyBrains[instigator:GetArmy()]
+        if instigator and instigator.Army ~= self.Army then
+            local instigatorBrain = ArmyBrains[instigator.Army]
 
             Sync.EnforceRating = true
             WARN('ACU kill detected. Rating for ranked games is now enforced.')
@@ -2427,16 +2427,16 @@ ACUUnit = Class(CommandUnit) {
             --     'DeathExplosion' - when normal unit is killed
             --     'Nuke' - when Paragon is killed
             --     'Deathnuke' - when ACU is killed
-            if IsAlly(self:GetArmy(), instigator:GetArmy()) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
+            if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
-                Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy()}
+                Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             else
                 ForkThread(function()
                     instigatorBrain:ReportScore()
                 end)
             end
         end
-        ArmyBrains[self:GetArmy()].CommanderKilledBy = (instigator or self):GetArmy()
+        ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,
 
     ResetRightArm = function(self)

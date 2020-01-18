@@ -153,7 +153,7 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     DeathThread = function(self)
         self:PlayUnitSound('Destroyed')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)

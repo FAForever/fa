@@ -54,7 +54,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         local bp = self:GetBlueprint()
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
@@ -106,7 +106,7 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
@@ -364,7 +364,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
         self.SphereEffectEntity:SetVizToNeutrals('Intel')
         self.SphereEffectEntity:SetVizToEnemies('Intel')
 
-        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit:GetArmy(), self.SphereEffectBp)
+        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
 
         self.unit.Trash:Add(self.SphereEffectEntity)
         self.unit.Trash:Add(emit)
@@ -407,7 +407,7 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
         end

@@ -269,7 +269,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self:GetArmy() == firingWeapon.unit:GetArmy() then
+        if not firingWeapon.CollideFriendly and self:GetArmy() == firingWeapon.unit.Army then
             return false
         end
 

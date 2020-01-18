@@ -24,8 +24,8 @@ UAL0205 = Class(AHoverLandUnit, SlowHover) {
 
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         },
     },

@@ -19,7 +19,7 @@ XSA0101 = Class(SAirUnit) {
             Z = pos[3],
             Radius = self:GetBlueprint().Intel.VisionRadiusOnDeath,
             LifeTime = self:GetBlueprint().Intel.IntelDurationOnDeath,
-            Army = self:GetArmy(),
+            Army = self.Army,
             Omni = false,
             WaterVision = false,
         }

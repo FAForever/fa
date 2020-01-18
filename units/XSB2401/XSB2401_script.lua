@@ -66,7 +66,7 @@ XSB2401 = Class(SStructureUnit) {
                 if not self.MissileEffect[bidx] then
                     self.MissileEffect[bidx] = {}
                 end
-                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self,bone, self:GetArmy(), v)
+                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self,bone, self.Army, v)
             end
         end
         self:PlayUnitSound('Construct')

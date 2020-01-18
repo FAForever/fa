@@ -128,7 +128,7 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, self:GetArmy(), v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,

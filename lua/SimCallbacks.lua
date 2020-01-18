@@ -30,7 +30,7 @@ function SecureUnits(units)
             u = GetEntityById(u)
         end
 
-        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) then
+        if IsEntity(u) and OkayToMessWithArmy(u.Army) then
             table.insert(secure, u)
         end
     end
@@ -46,7 +46,7 @@ local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Sera
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
-        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) and u.SetAutoOvercharge then
+        if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
             u:SetAutoOvercharge(data.auto == true)
         end
     end
@@ -57,7 +57,7 @@ Callbacks.PersistFerry = function(data, units)
     if table.getsize(transports) == 0 then return end
     local start = data.route[1]
 
-    local helper = CreateUnit('hel0001', units[1]:GetArmy(), start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
+    local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
     table.insert(units, helper)
     IssueClearCommands(units)
     for _, r in data.route do
@@ -226,7 +226,7 @@ Callbacks.ValidateAssist = function(data, units)
     local target = GetEntityById(data.target)
     if units and target then
         for k, u in units do
-            if IsEntity(u) and u:GetArmy() == target:GetArmy() and IsInvalidAssist(u, target) then
+            if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
                 IssueClearCommands({target})
                 return
             end

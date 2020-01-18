@@ -215,7 +215,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit:GetArmy(), v):ScaleEmitter(self.FxMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
         end
     end,
 
@@ -223,7 +223,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayFxMuzzleChargeSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxChargeMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit:GetArmy(), v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
         end
     end,
 
@@ -233,7 +233,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         local bp = self:GetBlueprint()
         for k, v in self.FxRackChargeMuzzleFlash do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, self.unit:GetArmy(), v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
+                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
             end
         end
         if bp.Audio.ChargeStart then
@@ -688,7 +688,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                             self.unit:NukeCreatedAtUnit()
 
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
+                            local launchData = { army = self.unit.Army-1, location = self:GetCurrentTargetPos()}
                             if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
                             table.insert(Sync.NukeLaunchData, launchData)
                             self.unit:RemoveNukeSiloAmmo(1)
@@ -1131,7 +1131,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     PlayFxBeamStart = function(self, muzzle)
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         local bp = self:GetBlueprint()
         local beam
         local beamTable
@@ -1317,7 +1317,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 
         local launcher = self.unit
         local pos = proj:GetPosition()
-        local army = launcher:GetArmy()
+        local army = launcher.Army
         local brain = launcher:GetAIBrain()
         local damageType = bp.DamageType
         proj.InnerRing:DoNukeDamage(launcher, pos, brain, army, damageType)

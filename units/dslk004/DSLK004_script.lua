@@ -230,13 +230,12 @@ DSLK004 = Class(SLandUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 
-        local army =  self:GetArmy()
         local EfctTempl = {
             '/units/DSLK004/effects/orbeffect_01.bp',
             '/units/DSLK004/effects/orbeffect_02.bp',
         }
         for k, v in EfctTempl do
-            CreateAttachedEmitter(self, 'Orb', army, v)
+            CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
 }

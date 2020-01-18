@@ -60,7 +60,7 @@ Tree = Class(Prop) {
 		local pos = self:GetCachePosition()
 		local army = -1
         if instigator then
-            army = instigator:GetArmy()
+            army = instigator.Army
         end		
 		local TerrainType = GetTerrainType( pos.x,pos.z )
 		

@@ -99,7 +99,7 @@ URL0402 = Class(CWalkingLandUnit) {
         if layer == 'Land' then
             self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
         elseif layer == 'Seabed' then
-            local army = self:GetArmy()
+            local army = self.Army
             for kE, vE in self.AmbientSeabedExhaustEffects do
                 for kB, vB in self.AmbientExhaustBones do
                     table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
@@ -110,7 +110,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     UnitLandAmbientEffectThread = function(self)
         while not self.Dead do
-            local army = self:GetArmy()
+            local army = self.Army
 
             for kE, vE in self.AmbientLandExhaustEffects do
                 for kB, vB in self.AmbientExhaustBones do
@@ -191,7 +191,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     DeathThread = function(self)
         self:PlayUnitSound('Destroyed')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)

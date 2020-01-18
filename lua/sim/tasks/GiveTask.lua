@@ -10,7 +10,7 @@ GiveTask = Class(ScriptTask) {
         ScriptTask.OnCreate(self, commandData)
 
         local unit = self:GetUnit()
-        local from = unit:GetArmy()
+        local from = unit.Army
         local to = commandData.To
 
         self.Army = from
@@ -32,7 +32,7 @@ GiveTask = Class(ScriptTask) {
         for to, array in transferList[self.Army] or {} do
             local units = {}
             for _, unit in array do
-                if not unit.Dead and unit:GetArmy() == self.Army then
+                if not unit.Dead and unit.Army == self.Army then
                     table.insert(units, unit)
                 end
             end

@@ -24,7 +24,7 @@ XSL0401 = Class(SWalkingLandUnit) {
     },
 
     SpawnElectroStorm = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local position = self:GetPosition()
         local spawnEffects = self.SpawnEffects
         

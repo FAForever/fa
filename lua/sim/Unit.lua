@@ -99,11 +99,12 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
         self.EntityId = self:GetEntityId()
+        self.Army = self:GetArmy()
 
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self.EntityId
-        self.Sync.army = self:GetArmy()
+        self.Sync.army = self.Army
         setmetatable(self.Sync, SyncMeta)
 
         if not self.Trash then
@@ -825,7 +826,7 @@ Unit = Class(moho.unit_methods) {
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
 
-            local captorArmyIndex = captor:GetArmy()
+            local captorArmyIndex = captor.Army
             local captorBrain = false
 
             -- Ignore army cap during unit transfer in Campaign
@@ -1168,7 +1169,7 @@ Unit = Class(moho.unit_methods) {
         local totalBones = self:GetBoneCount()
         local bone = Random(1, totalBones) - 1
         local bpDE = self:GetBlueprint().Display.DamageEffects
-        local army = self:GetArmy()
+        local army = self.Army
         for _, v in effects do
             local fx
             if bpDE then
@@ -1240,7 +1241,7 @@ Unit = Class(moho.unit_methods) {
             self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
 
-        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
+        ArmyBrains[self.Army].LastUnitKilledBy = (instigator or self).Army
 
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
@@ -1250,7 +1251,7 @@ Unit = Class(moho.unit_methods) {
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self:GetUnitId(), "lost", 1)
     end,
 
     -- Argument val is true or false. False = cannot be killed
@@ -1326,11 +1327,11 @@ Unit = Class(moho.unit_methods) {
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
-        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then return end -- No XP for friendly fire...
+        if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
 
         self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+        ArmyBrains[self.Army]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
     end,
 
     CalculateVeterancyLevel = function(self, massKilled)
@@ -1494,7 +1495,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if EntityCategoryContains(categories.PROJECTILE, other) then
-            if IsAlly(self:GetArmy(), other:GetArmy()) then
+            if IsAlly(self.Army, other:GetArmy()) then
                 return other.CollideFriendly
             end
         end
@@ -1529,7 +1530,7 @@ Unit = Class(moho.unit_methods) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if IsAlly(self:GetArmy(), firingWeapon.unit:GetArmy()) then
+            if IsAlly(self.Army, firingWeapon.unit.Army) then
                 return false
             end
         end
@@ -1707,7 +1708,7 @@ Unit = Class(moho.unit_methods) {
         local Util = utilities
         local sx, sy, sz = self:GetUnitSizes()
         local vol = sx * sy * sz
-        local army = self:GetArmy()
+        local army = self.Army
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
@@ -2187,11 +2188,11 @@ Unit = Class(moho.unit_methods) {
             self.MovementEffectsExist = false
         end
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "built", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self:GetUnitId(), "built", 1)
 
         -- Prevent UI mods from violating game/scenario restrictions
         local id = self:GetUnitId()
-        local index = self:GetArmy()
+        local index = self.Army
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))
             if self ~= nil then self:Destroy() end
@@ -2466,7 +2467,7 @@ Unit = Class(moho.unit_methods) {
         local id = built:GetUnitId()
         local bp = built:GetBlueprint()
         local bpSelf = self:GetBlueprint()
-        local index = self:GetArmy()
+        local index = self.Army
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
@@ -3181,7 +3182,7 @@ Unit = Class(moho.unit_methods) {
             local effects = {}
             local scale = 1
             local offset
-            local army = self:GetArmy()
+            local army = self.Army
             local boneTable
 
             if bpTable.Damage then
@@ -3310,7 +3311,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectBag, TerrainType)
-        local army = self:GetArmy()
+        local army = self.Army
         local pos = self:GetPosition()
         local effects = {}
         local emit
@@ -3464,7 +3465,7 @@ Unit = Class(moho.unit_methods) {
             WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
-        local army = self:GetArmy()
+        local army = self.Army
         for kb, vb in effectBones do
             table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP))
         end
@@ -3480,7 +3481,7 @@ Unit = Class(moho.unit_methods) {
             WARN('*WARNING: No contrail effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
-        local army = self:GetArmy()
+        local army = self.Army
         local ZOffset = tableData.ZOffset or 0.0
         for ke, ve in self.ContrailEffects do
             for kb, vb in effectBones do
@@ -3526,7 +3527,7 @@ Unit = Class(moho.unit_methods) {
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
         local duration = treads.TreadLifeTime or 10
-        local army = self:GetArmy()
+        local army = self.Army
 
         while true do
             -- Syntactic reference
@@ -3977,7 +3978,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        local army =  self:GetArmy()
+        local army =  self.Army
         table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
         table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
         table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, army, EffectTemplate.TTransportGlow01))
@@ -4279,7 +4280,7 @@ Unit = Class(moho.unit_methods) {
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
         local focusArmy = GetFocusArmy()
-        local army = self:GetArmy()
+        local army = self.Army
         if focusArmy == -1 or focusArmy == army then
             local id
             local unitType

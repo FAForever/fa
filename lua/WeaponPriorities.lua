@@ -63,7 +63,7 @@ function SetWeaponPriorities(data)
         name = data.name 
     end 
 
-    if GetEntityById(selectedUnits[1]):GetArmy() == GetFocusArmy() and not data.hideMsg then
+    if GetEntityById(selectedUnits[1]).Army == GetFocusArmy() and not data.hideMsg then
         --send the message to the owner of the army
         print('Target Priority:', name)
     end
@@ -74,7 +74,7 @@ function SetWeaponPriorities(data)
     for _, unitId in selectedUnits do
         local unit = GetEntityById(unitId)
         
-        if unit and OkayToMessWithArmy(unit:GetArmy()) then 
+        if unit and OkayToMessWithArmy(unit.Army) then 
             table.insert(units, unit)
         end
     end   

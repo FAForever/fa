@@ -53,7 +53,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
@@ -187,7 +187,7 @@ TLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
@@ -243,7 +243,7 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self:GetBlueprint().General.BuildBones.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self:GetArmy(), '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
             self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
@@ -404,7 +404,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
                 -- store off the pod name so we can give to new unit
                 local podName = k
-                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy(v.PodHandle, captor:GetArmy())
+                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy(v.PodHandle, captor.Army)
                 newPod.PodName = podName
 
                 -- create a callback for when the unit is flipped.  set creator for the new pod to the new tower
@@ -489,7 +489,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     CreatePod = function(self, podName)
         local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
-        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
     end,

@@ -65,7 +65,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
 
         -- Create vacuum suck up from ground effects on the unit targetted.
         for _, v in EffectTemplate.ACollossusTractorBeamVacuum01 do
-            CreateEmitterAtEntity(target, target:GetArmy(), v):ScaleEmitter(0.25 * target:GetFootPrintSize()/0.5)
+            CreateEmitterAtEntity(target, target.Army, v):ScaleEmitter(0.25 * target:GetFootPrintSize()/0.5)
         end
 
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
@@ -145,7 +145,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             target.DestructionExplosionWaitDelayMax = 0
 
             for kEffect, vEffect in EffectTemplate.ACollossusTractorBeamCrush01 do
-                CreateEmitterAtBone(self.unit, muzzle, self.unit:GetArmy(), vEffect)
+                CreateEmitterAtBone(self.unit, muzzle, self.unit.Army, vEffect)
             end
 
             target:Kill(self.unit, 'Damage', 100)
@@ -310,7 +310,7 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
         local damageTable = self:GetDamageTable()
         local blueprint = self:GetBlueprint()
         local data = {
-            Army = self.unit:GetArmy(),
+            Army = self.unit.Army,
             Instigator = self.unit,
             StartRadius = blueprint.DOTStartRadius,
             EndRadius = blueprint.DOTEndRadius,
@@ -338,7 +338,7 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
         local damageTable = self:GetDamageTable()
         local blueprint = self:GetBlueprint()
         local data = {
-            Army = self.unit:GetArmy(),
+            Army = self.unit.Army,
             Instigator = self.unit,
             StartRadius = blueprint.DOTStartRadius,
             EndRadius = blueprint.DOTEndRadius,
@@ -400,7 +400,7 @@ AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
 
     PlayFxRackSalvoChargeSequence = function(self)
         DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence(self)
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         for _, v in self.ChargeEffectMuzzles do
             for i, j in self.FxChargeEffects do
                 CreateAttachedEmitter(self.unit, v, army, j)
@@ -445,7 +445,7 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local army = self.unit:GetArmy()
+        local army = self.unit.Army
         local bp = self:GetBlueprint()
         for _, v in self.FxUpackingChargeEffects do
             for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
@@ -473,7 +473,7 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for _, v in self.FxUpackingChargeEffects do
                 for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do

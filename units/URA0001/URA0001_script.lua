@@ -22,8 +22,8 @@ URA0001 = Class(CAirUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
         CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
     end,
 
@@ -44,7 +44,7 @@ URA0001 = Class(CAirUnit) {
     OnImpact = function(self, with)
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)

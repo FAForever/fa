@@ -45,7 +45,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
             end
             for keys,values in effects do
                 for keysbones,valuesbones in bones do
-                    table.insert(self.EffectsBag, CreateAttachedEmitter(self,valuesbones,self:GetArmy(), values):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    table.insert(self.EffectsBag, CreateAttachedEmitter(self,valuesbones,self.Army, values):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
                 end
             end
         end,

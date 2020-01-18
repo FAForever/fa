@@ -96,7 +96,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     CreateRollOffEffects = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local unitB = self.UnitBeingBuilt
         if not self.ReleaseEffectsBag then self.ReleaseEffectsBag = {} end
         for _, v in self.RollOffBones do
@@ -318,7 +318,7 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        local army =  self:GetArmy()
+        local army =  self.Army
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
                 CreateAttachedEmitter(self, 0, army, v)
