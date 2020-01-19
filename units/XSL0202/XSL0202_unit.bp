@@ -183,7 +183,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20,
+        VisionRadius = 24,
     },
     Interface = {
         HelpText = '<LOC xsl0202_help>Assault Bot',
@@ -255,7 +255,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 1,
+            FiringTolerance = 3,
             Label = 'MainGun',
             MaxRadius = 26,
             MuzzleChargeDelay = 0,
@@ -309,7 +309,7 @@ UnitBlueprint {
             TurretPitchSpeed = 60,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 70,
+            TurretYawSpeed = 85,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
