@@ -970,10 +970,9 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
         unit:SetBusy(false)
 
         local totalBones = unit:GetBoneCount() - 1
-        local army = unit.Army
         for _, v in import('/lua/EffectTemplates.lua').UnitTeleportSteam01 do
             for bone = 1, totalBones do
-                CreateAttachedEmitter(unit, bone, army, v)
+                CreateAttachedEmitter(unit, bone, unit.Army, v)
             end
         end
 
@@ -2104,18 +2103,14 @@ function AntiOffMapMainThread()
     end
 end
 
-IsHumanUnit = function(self)
-    local ArmyTable = ScenarioInfo.ArmySetup
-    local ArmyIndex = self.Army
-
-    for ArmyName, Army in ArmyTable do
-        if Army.ArmyIndex == ArmyIndex then
+function IsHumanUnit(self)
+    for _, Army in ScenarioInfo.ArmySetup do
+        if Army.ArmyIndex == self.Army then
             if Army.Human == true then
                 return true
             else
                 return false
             end
-
         end
     end
 end

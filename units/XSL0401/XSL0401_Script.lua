@@ -24,15 +24,14 @@ XSL0401 = Class(SWalkingLandUnit) {
     },
 
     SpawnElectroStorm = function(self)
-        local army = self.Army
         local position = self:GetPosition()
         local spawnEffects = self.SpawnEffects
         
         -- Spawn the Energy Being
-        local spiritUnit = CreateUnitHPR('XSL0402', army, position[1], position[2], position[3], 0, 0, 0)
+        local spiritUnit = CreateUnitHPR('XSL0402', self.Army, position[1], position[2], position[3], 0, 0, 0)
         -- Create effects for spawning of energy being
         for k, v in spawnEffects do
-            CreateAttachedEmitter(spiritUnit, -1, army, v)
+            CreateAttachedEmitter(spiritUnit, -1, self.Army, v)
         end
     end,
 

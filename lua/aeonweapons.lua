@@ -400,10 +400,9 @@ AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
 
     PlayFxRackSalvoChargeSequence = function(self)
         DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence(self)
-        local army = self.unit.Army
         for _, v in self.ChargeEffectMuzzles do
             for i, j in self.FxChargeEffects do
-                CreateAttachedEmitter(self.unit, v, army, j)
+                CreateAttachedEmitter(self.unit, v, self.unit.Army, j)
             end
         end
     end,
@@ -445,11 +444,10 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local army = self.unit.Army
         local bp = self:GetBlueprint()
         for _, v in self.FxUpackingChargeEffects do
             for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, j, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+                CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
             end
         end
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
@@ -473,11 +471,10 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for _, v in self.FxUpackingChargeEffects do
                 for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, j, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+                    CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
                 end
             end
             DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)

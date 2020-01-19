@@ -1131,7 +1131,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     PlayFxBeamStart = function(self, muzzle)
-        local army = self.unit.Army
         local bp = self:GetBlueprint()
         local beam
         local beamTable
@@ -1317,11 +1316,10 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 
         local launcher = self.unit
         local pos = proj:GetPosition()
-        local army = launcher.Army
         local brain = launcher:GetAIBrain()
         local damageType = bp.DamageType
-        proj.InnerRing:DoNukeDamage(launcher, pos, brain, army, damageType)
-        proj.OuterRing:DoNukeDamage(launcher, pos, brain, army, damageType)
+        proj.InnerRing:DoNukeDamage(launcher, pos, brain, launcher.Army, damageType)
+        proj.OuterRing:DoNukeDamage(launcher, pos, brain, launcher.Army, damageType)
 
         -- Stop it calling DoDamage any time in the future.
         proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
