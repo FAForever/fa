@@ -1,5 +1,8 @@
 UnitBlueprint {
     ResolvePath = true,
+    AI = {
+        GuardScanRadius = 40, --RadarRadius
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
