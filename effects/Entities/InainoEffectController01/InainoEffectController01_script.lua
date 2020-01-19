@@ -15,12 +15,11 @@ local SIFInainoStrategicMissileEffect04 = '/effects/Entities/SIFInainoStrategicM
 
 InainoEffectController01 = Class(NullShell) {
     EffectThread = function(self, Data)
-        local army = self:GetArmy()
-        self:ForkThread(self.CreateInitialHit, army)
-        self:ForkThread(self.CreateInitialBuildup, army)
+        self:ForkThread(self.CreateInitialHit, self.Army)
+        self:ForkThread(self.CreateInitialBuildup, self.Army)
         self:ForkThread(self.CreateGroundFingers)
         self:ForkThread(self.CreateInitialFingers)
-        self:ForkThread(self.MainBlast, army)
+        self:ForkThread(self.MainBlast, self.Army)
     end,
 
     CreateInitialHit = function(self, army)
@@ -40,10 +39,10 @@ InainoEffectController01 = Class(NullShell) {
         WaitSeconds(5.00)
 
         -- Create a light for this thing's flash.
-        CreateLightParticle(self, -1, self:GetArmy(), 160, 14, 'flare_lens_add_03', 'ramp_white_07')
+        CreateLightParticle(self, -1, self.Army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
 
         -- Create our decals
-        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())
+        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self.Army)
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do

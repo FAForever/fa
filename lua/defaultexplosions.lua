@@ -73,9 +73,8 @@ end
 
 function CreateDefaultHitExplosion(obj, scale)
     if obj and not obj:BeenDestroyed() then
-        local army = obj:GetArmy()
-        CreateFlash(obj, -1, scale * 0.5, army)
-        CreateEffects(obj, army, EffectTemplate.FireCloudMed01)
+        CreateFlash(obj, -1, scale * 0.5, obj.Army)
+        CreateEffects(obj, obj.Army, EffectTemplate.FireCloudMed01)
     end
 end
 
@@ -84,14 +83,12 @@ function CreateDefaultHitExplosionOffset(obj, scale, xOffset, yOffset, zOffset)
         return
     end
 
-    local army = obj:GetArmy()
-    CreateBoneEffectsOffset(obj, -1, army, EffectTemplate.DefaultHitExplosion01, xOffset, yOffset, zOffset)
+    CreateBoneEffectsOffset(obj, -1, obj.Army, EffectTemplate.DefaultHitExplosion01, xOffset, yOffset, zOffset)
 end
 
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
-    local army = obj:GetArmy()
-    CreateFlash(obj, boneName, scale * 0.5, army)
-    CreateBoneEffects(obj, boneName, army, EffectTemplate.FireCloudMed01)
+    CreateFlash(obj, boneName, scale * 0.5, obj.Army)
+    CreateBoneEffects(obj, boneName, obj.Army, EffectTemplate.FireCloudMed01)
 end
 
 function CreateTimedStuctureUnitExplosion(obj)
@@ -337,7 +334,7 @@ end
 function CreateDestructionFire(object, scale)
     local proj = object:CreateProjectile('/effects/entities/DestructionFire01/DestructionFire01_proj.bp', 0, 0, 0, nil, nil, nil)
     proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
-    CreateEmitterOnEntity(proj, proj:GetArmy(), '/effects/emitters/destruction_explosion_fire_01_emit.bp'):ScaleEmitter(scale)
+    CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_fire_01_emit.bp'):ScaleEmitter(scale)
 end
 
 function CreateDestructionSparks(object, scale)
@@ -345,7 +342,7 @@ function CreateDestructionSparks(object, scale)
     for i = 1, GetRandomInt(5, 10) do
         proj = object:CreateProjectile('/effects/entities/DestructionSpark01/DestructionSpark01_proj.bp', 0, 0, 0, nil, nil, nil)
         proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
-        CreateEmitterOnEntity(proj, proj:GetArmy(), '/effects/emitters/destruction_explosion_sparks_02_emit.bp'):ScaleEmitter(scale)
+        CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_sparks_02_emit.bp'):ScaleEmitter(scale)
     end
 end
 
@@ -354,7 +351,7 @@ function CreateFirePlume(object, scale)
     for i = 1, GetRandomInt(4, 8) do
         proj = object:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', 0, 0, 0, nil, nil, nil)
         proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
-        local emitter = CreateEmitterOnEntity(proj, proj:GetArmy(), '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
+        local emitter = CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
         local lifetime = GetRandomFloat(12, 22)
         emitter:SetEmitterParam('REPEATTIME', lifetime)
@@ -371,7 +368,7 @@ function CreateExplosionProjectile(object, projectile, minnumber, maxnumber, eff
     ypos = ypos / 2
     for j = 1, number do
         proj = object:CreateProjectile(projectile, xpos, ypos, zpos, nil, nil, nil):SetBallisticAcceleration(yaccel):SetCollision(false)
-        emitter = CreateEmitterOnEntity(proj, proj:GetArmy(), effect):ScaleEmitter(fxscale)
+        emitter = CreateEmitterOnEntity(proj, proj.Army, effect):ScaleEmitter(fxscale)
         if emitterparam then
             emitter:SetEmitterParam('REPEATTIME', math.floor(12 * fxscale + 0.5))
             emitter:SetEmitterParam('LIFETIME', math.floor(12 * fxscale + 0.5))
@@ -400,7 +397,7 @@ function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVeloc
     orient[1], orient[2], orient[3], orient[4] = QuatFromRotation(orientRot, orientX, orientY, orientZ)
     proj:SetOrientation(orient, true)
 
-    CreateEmitterAtEntity(proj, proj:GetArmy(), '/effects/emitters/destruction_explosion_smoke_10_emit.bp')
+    CreateEmitterAtEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_smoke_10_emit.bp')
     return proj
 end
 
@@ -427,16 +424,16 @@ function CreateSmoke(object, scale)
                           '/effects/emitters/destruction_explosion_smoke_07_emit.bp'}
 
     for k, v in SmokeEffects do
-        CreateEmitterAtEntity(object, object:GetArmy(), v):ScaleEmitter(scale)
+        CreateEmitterAtEntity(object, object.Army, v):ScaleEmitter(scale)
     end
 end
 
 function CreateConcussionRing(object, scale)
-    CreateEmitterAtEntity(object, object:GetArmy(), '/effects/emitters/destruction_explosion_concussion_ring_01_emit.bp'):ScaleEmitter(scale)
+    CreateEmitterAtEntity(object, object.Army, '/effects/emitters/destruction_explosion_concussion_ring_01_emit.bp'):ScaleEmitter(scale)
 end
 
 function CreateFireShadow(object, scale)
-    CreateEmitterAtEntity(object ,object:GetArmy(), '/effects/emitters/destruction_explosion_fire_shadow_01_emit.bp'):ScaleEmitter(scale)
+    CreateEmitterAtEntity(object ,object.Army, '/effects/emitters/destruction_explosion_fire_shadow_01_emit.bp'):ScaleEmitter(scale)
 end
 
 
@@ -444,6 +441,6 @@ function OldCreateWreckageEffects(object)
     local Effects = {'/effects/emitters/destruction_explosion_smoke_08_emit.bp'}
 
     for k, v in Effects do
-        CreateEmitterAtEntity(object, object:GetArmy(), v):SetEmitterParam('LIFETIME', GetRandomFloat(100, 1000))
+        CreateEmitterAtEntity(object, object.Army, v):SetEmitterParam('LIFETIME', GetRandomFloat(100, 1000))
     end
 end

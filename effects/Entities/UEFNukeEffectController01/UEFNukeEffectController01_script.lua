@@ -11,13 +11,12 @@ local RandomFloat = Util.GetRandomFloat
 
 UEFNukeEffectController01 = Class(NullShell) {
     EffectThread = function(self)
-        local army = self:GetArmy()
         local position = self:GetPosition()
 
         -- Create full-screen glow flash
-        CreateLightParticle(self, -1, army, 35, 4, 'glow_02', 'ramp_red_02')
+        CreateLightParticle(self, -1, self.Army, 35, 4, 'glow_02', 'ramp_red_02')
         WaitSeconds(0.25)
-        CreateLightParticle(self, -1, army, 80, 20, 'glow_03', 'ramp_fire_06')
+        CreateLightParticle(self, -1, self.Army, 80, 20, 'glow_03', 'ramp_fire_06')
 
         -- Create initial fireball dome effect
         local FireballDomeYOffset = -5
@@ -28,7 +27,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         self:CreateProjectile('/effects/entities/UEFNukeEffect02/UEFNukeEffect02_proj.bp',0,PlumeEffectYOffset,0,0,0,1)
 
         for k, v in EffectTemplate.TNukeRings01 do
-            CreateEmitterAtEntity(self, army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
 
         self:CreateInitialFireballSmokeRing()
@@ -38,16 +37,16 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         WaitSeconds(0.55)
 
-        CreateLightParticle(self, -1, army, 300, 250, 'glow_03', 'ramp_nuke_04')
+        CreateLightParticle(self, -1, self.Army, 300, 250, 'glow_03', 'ramp_nuke_04')
 
         -- Create ground decals
         local orientation = RandomFloat(0,2*math.pi)
-        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 60, 60, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, self.Army)
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, self.Army)
+        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 60, 60, 1200, 0, self.Army)
 
         WaitSeconds(8.9)
-        self:CreateGroundPlumeConvectionEffects(army)
+        self:CreateGroundPlumeConvectionEffects(self.Army)
     end,
 
     CreateInitialFireballSmokeRing = function(self)

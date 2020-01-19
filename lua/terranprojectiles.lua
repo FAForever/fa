@@ -90,10 +90,9 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self:GetArmy()
         if targetType == 'Terrain' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, self.Army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, self.Army)
             self:ShakeCamera(20, 1, 0, 1)
         end
         local pos = self:GetPosition()
@@ -112,11 +111,10 @@ TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
     FxImpactLand = EffectTemplate.TAntiMatterShellHit02,
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self:GetArmy()
-        #CreateLightParticle(self, -1, army, 16, 6, 'glow_03', 'ramp_antimatter_02')
+        #CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         if targetType == 'Terrain' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, self.Army)
+            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, self.Army)
             self:ShakeCamera(20, 1, 0, 1)
         end
         local pos = self:GetPosition()
@@ -189,10 +187,9 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        local army = self:GetArmy()
 
         for k, v in self.FxEnterWater do #splash
-            CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
 
         self:TrackTarget(false)
@@ -279,10 +276,9 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, TargetType, TargetEntity)
-        local army = self:GetArmy()
-        CreateLightParticle(self, -1, army, 2.75, 4, 'sparkle_03', 'ramp_fire_03')
+        CreateLightParticle(self, -1, self.Army, 2.75, 4, 'sparkle_03', 'ramp_fire_03')
         if TargetType == 'Terrain' then
-            CreateSplat(self:GetPosition(), 0, 'scorch_008_albedo', 6, 6, 250, 200, army)
+            CreateSplat(self:GetPosition(), 0, 'scorch_008_albedo', 6, 6, 250, 200, self.Army)
 
             #local blanketSides = 12
             #local blanketAngle = (2*math.pi) / blanketSides
@@ -395,7 +391,6 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self:GetArmy()
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
@@ -423,7 +418,6 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self:GetArmy()
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
@@ -431,7 +425,7 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end
@@ -457,9 +451,8 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
 
     OnExitWater = function(self)
         EmitterProjectile.OnExitWater(self)
-        local army = self:GetArmy()
         for k, v in self.FxExitWaterEmitter do
-            CreateEmitterAtBone(self,-2,army,v)
+            CreateEmitterAtBone(self, -2, self.Army, v)
         end
     end,
 
@@ -614,10 +607,9 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        local army = self:GetArmy()
 
         for k, v in self.FxEnterWater do #splash
-            CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
         self:TrackTarget(true)
         self:StayUnderwater(true)

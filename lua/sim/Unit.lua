@@ -98,13 +98,10 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
-        self.EntityId = self:GetEntityId()
-        self.Army = self:GetArmy()
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
-        self.Sync.id = self.EntityId
-        self.Sync.army = self.Army
+        self.Sync.id = self:GetEntityId()
+        self.Sync.army = self:GetArmy()
         setmetatable(self.Sync, SyncMeta)
 
         if not self.Trash then
