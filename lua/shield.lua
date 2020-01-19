@@ -44,6 +44,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
+        self.Army = self:GetArmy()
         self._IsUp = false
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
@@ -133,7 +134,7 @@ Shield = Class(moho.shield_methods, Entity) {
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
+        amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         return math.min(self:GetHealth(), amount)
     end,
 
@@ -141,7 +142,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if not (IsEnemy(self:GetArmy(), firingWeapon.unit.Army)) then
+            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
                 return false
             end
         end
@@ -161,7 +162,7 @@ Shield = Class(moho.shield_methods, Entity) {
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
+        amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         local finalVal =  amount - self:GetHealth()
         if finalVal < 0 then
             finalVal = 0
@@ -297,7 +298,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
         if not self or self.Owner.Dead then return end
-        local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
         Warp(ImpactMesh, self:GetPosition())
@@ -309,7 +309,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         for _, v in self.ImpactEffects do
-            CreateEmitterAtBone(ImpactMesh, -1, army, v):OffsetEmitter(0, 0, OffsetLength)
+            CreateEmitterAtBone(ImpactMesh, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
         end
 
         WaitSeconds(5)
@@ -328,7 +328,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- Return true to process this collision, false to ignore it.
     OnCollisionCheck = function(self, other)
-        if other:GetArmy() == -1 then
+        if other.Army == -1 then
             return false
         end
 
@@ -353,7 +353,7 @@ Shield = Class(moho.shield_methods, Entity) {
             return true
         end
 
-        return IsEnemy(self:GetArmy(), other:GetArmy())
+        return IsEnemy(self.Army, other.Army)
     end,
 
     TurnOn = function(self)
@@ -805,7 +805,6 @@ PersonalShield = Class(Shield){
     end,
 
     CreateImpactEffect = function(self, vector)
-        local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactEnt = Entity {Owner = self.Owner}
 
@@ -813,7 +812,7 @@ PersonalShield = Class(Shield){
         ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
 
         for k, v in self.ImpactEffects do
-            CreateEmitterAtBone(ImpactEnt, -1, army, v):OffsetEmitter(0, 0, OffsetLength)
+            CreateEmitterAtBone(ImpactEnt, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
         end
         WaitSeconds(1)
 
@@ -833,7 +832,7 @@ PersonalShield = Class(Shield){
     end,
 
     OnDestroy = function(self)
-        if not self.Owner.MyShield or self.Owner.MyShield:GetEntityId() == self:GetEntityId() then
+        if not self.Owner.MyShield or self.Owner.MyShield.EntityId == self.EntityId then
             self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
         end
         self:UpdateShieldRatio(0)
@@ -850,7 +849,7 @@ AntiArtilleryShield = Class(Shield) {
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then
-            if self:GetArmy() == firingWeapon.unit.Army then
+            if self.Army == firingWeapon.unit.Army then
                 return false
             end
         end
@@ -870,7 +869,7 @@ AntiArtilleryShield = Class(Shield) {
 
     -- Return true to process this collision, false to ignore it.
     OnCollisionCheck = function(self, other)
-        if other:GetArmy() == -1 then
+        if other.Army == -1 then
             return false
         end
 
@@ -878,7 +877,7 @@ AntiArtilleryShield = Class(Shield) {
             return true
         end
 
-        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self:GetArmy(), other:GetArmy()) then
+        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self.Army, other.Army) then
             return true
         end
 

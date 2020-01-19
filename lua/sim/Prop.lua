@@ -149,7 +149,7 @@ Prop = Class(moho.prop_methods, Entity) {
             self.hasLabel = false
         end
 
-        Sync.Reclaim[self:GetEntityId()] = data
+        Sync.Reclaim[self.EntityId] = data
     end,
 
     OnDestroy = function(self)

@@ -29,15 +29,14 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
 
     -- Tactical nuke has different flight path
     MovementThread = function(self)
-        local army = self:GetArmy()
         local target = self:GetTrackingTarget()
         local launcher = self:GetLauncher()
-        self.CreateEffects(self, self.InitialEffects, army, 1)
+        self.CreateEffects(self, self.InitialEffects, self.Army, 1)
         self.WaitTime = 0.1
         self:SetTurnRate(8)
         WaitSeconds(0.3)
-        self.CreateEffects(self, self.LaunchEffects, army, 1)
-        self.CreateEffects(self, self.ThrustEffects, army, 1)
+        self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
+        self.CreateEffects(self, self.ThrustEffects, self.Army, 1)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitSeconds(self.WaitTime)

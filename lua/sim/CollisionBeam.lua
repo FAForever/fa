@@ -42,6 +42,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self.LastTerrainType = nil
         self.BeamEffectsBag = {}
         self.TerrainEffectsBag = {}
+        self.Army = self:GetArmy()
         self.Trash = TrashBag()
     end,
 
@@ -124,20 +125,19 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     CreateBeamEffects = function(self)
-        local army = self:GetArmy()
         for k, y in self.FxBeamStartPoint do
-            local fx = CreateAttachedEmitter(self, 0, army, y):ScaleEmitter(self.FxBeamStartPointScale)
+            local fx = CreateAttachedEmitter(self, 0, self.Army, y):ScaleEmitter(self.FxBeamStartPointScale)
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         for k, y in self.FxBeamEndPoint do
-            local fx = CreateAttachedEmitter(self, 1, army, y):ScaleEmitter(self.FxBeamEndPointScale)
+            local fx = CreateAttachedEmitter(self, 1, self.Army, y):ScaleEmitter(self.FxBeamEndPointScale)
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         if table.getn(self.FxBeam) ~= 0 then
-            local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], army)
-            AttachBeamToEntity(fxBeam, self, 0, army)
+            local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], self.Army)
+            AttachBeamToEntity(fxBeam, self, 0, self.Army)
 
             -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
@@ -202,21 +202,19 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
         if TerrainEffects and (self.LastTerrainType ~= TerrainType) then
             self:DestroyTerrainEffects()
-            self:CreateTerrainEffects(self:GetArmy(), TerrainEffects, self.TerrainImpactScale)
+            self:CreateTerrainEffects(self.Army, TerrainEffects, self.TerrainImpactScale)
             self.LastTerrainType = TerrainType
         end
     end,
 
     --- Show the origin of this beam weapon to the target army for the duration of the firing.
     ShowBeamSource = function(self, target)
-        local targetArmy = target:GetArmy()
-
-        self.unit.ignoreDetectionFrom[targetArmy] = true
-        self.needIntelClear = not self.unit.reallyDetectedBy[targetArmy]
+        self.unit.ignoreDetectionFrom[target.Army] = true
+        self.needIntelClear = not self.unit.reallyDetectedBy[target.Army]
 
         self.exposingShooter = true
 
-        self:InitIntel(targetArmy, 'Vision', 2)
+        self:InitIntel(target.Army, 'Vision', 2)
         self:EnableIntel('Vision')
     end,
 
@@ -281,7 +279,6 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
         local ImpactEffects = {}
         local ImpactEffectScale = 1
-        local army = self:GetArmy()
 
         if impactType == 'Water' then
             ImpactEffects = self.FxImpactWater
@@ -311,7 +308,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             LOG('*ERROR: CollisionBeam:OnImpact(): UNKNOWN TARGET TYPE ', repr(impactType))
         end
 
-        self:CreateImpactEffects(army, ImpactEffects, ImpactEffectScale)
+        self:CreateImpactEffects(self.Army, ImpactEffects, ImpactEffectScale)
         self:UpdateTerrainCollisionEffects(impactType)
     end,
 

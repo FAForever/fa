@@ -71,7 +71,7 @@ function SyncUnitEnhancements()
     for id, slots in SimUnitEnhancements do
         local unit = GetEntityById(id)
         local me = GetFocusArmy()
-        if unit and (me == -1 or IsAlly(me, unit:GetArmy())) then
+        if unit and (me == -1 or IsAlly(me, unit.Army)) then
             sync[id] = slots
         end
     end
@@ -130,7 +130,7 @@ function FloatingEntityText(entityId, text)
         WARN('Trying to float entity text with no entityId or no text.')
         return false
     else
-        if GetEntityById(entityId):GetArmy() == GetFocusArmy() then
+        if GetEntityById(entityId).Army == GetFocusArmy() then
             if not Sync.FloatingEntityText then Sync.FloatingEntityText = {} end
             table.insert(Sync.FloatingEntityText, {entity = entityId, text = text})
         end
@@ -142,7 +142,7 @@ function StartCountdown(entityId)
         WARN('Trying to start countdown text with no entityId.')
         return false
     else
-        if GetEntityById(entityId):GetArmy() == GetFocusArmy() then
+        if GetEntityById(entityId).Army == GetFocusArmy() then
             if not Sync.StartCountdown then Sync.StartCountdown = {} end
             table.insert(Sync.StartCountdown, {entity = entityId})
         end
@@ -154,7 +154,7 @@ function CancelCountdown(entityId)
         WARN('Trying to Cancel Countdown text with no entityId.')
         return false
     else
-        if GetEntityById(entityId):GetArmy() == GetFocusArmy() then
+        if GetEntityById(entityId).Army == GetFocusArmy() then
             if not Sync.CancelCountdown then Sync.CancelCountdown = {} end
             table.insert(Sync.CancelCountdown, {entity = entityId})
         end

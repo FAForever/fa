@@ -31,7 +31,7 @@ BuffField = Class(Entity) {
             if not Owner.BuffFieldEffectsBag then
                 Owner.BuffFieldEffectsBag = {}
             end
-            self.Emitter = CreateAttachedEmitter(Owner, 0, Owner:GetArmy(), self.FieldVisualEmitter)
+            self.Emitter = CreateAttachedEmitter(Owner, 0, Owner.Army, self.FieldVisualEmitter)
             table.insert(Owner.BuffFieldEffectsBag, self.Emitter)
         end
     end,

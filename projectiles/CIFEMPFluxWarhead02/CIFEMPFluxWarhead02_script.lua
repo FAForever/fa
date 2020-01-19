@@ -23,7 +23,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
 
     EffectThread = function(self)
         -- Light and Camera Shake
-        CreateLightParticle(self, -1, self:GetArmy(), 200, 200, 'beam_white_01', 'ramp_red_09')
+        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_red_09')
         self:ShakeCamera(75, 3, 0, 20)
 
         -- Mesh effects
@@ -39,22 +39,19 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         self:ForkThread(self.PlumeThread, self.Plumeproj3, self.Plumeproj3:GetBlueprint().Display.UniformScale)
         self:ForkThread(self.PlumeVelocityThread, self.Plumeproj3)
 
-        local army = self:GetArmy()
-        CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, army)
+        CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, self.Army)
 
         -- Emitter Effects
         self:ForkThread(self.EmitterEffectsThread, self.Plumeproj)
     end,
 
     EmitterEffectsThread = function(self, plume)
-        local army = self:GetArmy()
-
         for k, v in self.PlumeEffects do
-            CreateAttachedEmitter(plume, -1, army, v)
+            CreateAttachedEmitter(plume, -1, self.Army, v)
         end
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
 
         self:StarCloudDispersal()

@@ -13,15 +13,14 @@ AIFQuantumWarhead02 = Class(NullShell) {
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
     EffectThread = function(self)
-        local army = self:GetArmy()
-        CreateLightParticle(self, -1, army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
-        self:ForkThread(self.ShakeAndBurnMe, army)
-        self:ForkThread(self.InnerCloudFlares, army)
+        self:ForkThread(self.ShakeAndBurnMe, self.Army)
+        self:ForkThread(self.InnerCloudFlares, self.Army)
         self:ForkThread(self.DistortionField)
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
     end,
 

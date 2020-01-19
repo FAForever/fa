@@ -22,8 +22,8 @@ SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
 		if TargetType != 'Shield' and TargetType != 'Water' and TargetType != 'UnitAir' then
 			local rotation = RandomFloat(0,2*math.pi)
 	        
-			CreateDecal(self:GetPosition(), rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, self:GetArmy())
-			CreateDecal(self:GetPosition(), rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, self:GetArmy())
+			CreateDecal(self:GetPosition(), rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, self.Army)
+			CreateDecal(self:GetPosition(), rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, self.Army)
 		end
 	end,
 }
