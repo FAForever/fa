@@ -49,19 +49,23 @@ URL0303 = Class(CWalkingLandUnit) {
 
     InitiateCharge = function(self)
         if self.Charging then return end
-        local blueprint = self:GetBlueprint()
+
         self.Charging = true
+        local blueprint = self:GetBlueprint()
+        local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
+        self.Trash:Add(bufffx3)
+        WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
+
         self:SetWeaponEnabledByLabel('Disintigrator', false)
         self:SetWeaponEnabledByLabel('HeavyBolter', false)
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
         -- EMP duration mult added in DoDeathWeapon 
+
         local bufffx1 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
         local bufffx2 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
-        local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
         self.Trash:Add(bufffx1)
         self.Trash:Add(bufffx2)
-        self.Trash:Add(bufffx3)
         WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
         self:Kill()
     end,

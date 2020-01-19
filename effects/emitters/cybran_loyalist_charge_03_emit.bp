@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'cybran_loyalist_charge_03',
-	Lifetime = 15.00,
+	Lifetime = 35.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
