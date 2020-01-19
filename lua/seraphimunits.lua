@@ -96,17 +96,16 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     CreateRollOffEffects = function(self)
-        local army = self.Army
         local unitB = self.UnitBeingBuilt
         if not self.ReleaseEffectsBag then self.ReleaseEffectsBag = {} end
         for _, v in self.RollOffBones do
-            local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
+            local fx = AttachBeamEntityToEntity(self, v, unitB, -1, self.Army, EffectTemplate.TTransportBeam01)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
-            fx = AttachBeamEntityToEntity(unitB, -1, self, v, army, EffectTemplate.TTransportBeam02)
+            fx = AttachBeamEntityToEntity(unitB, -1, self, v, self.Army, EffectTemplate.TTransportBeam02)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
-            fx = CreateEmitterAtBone(self, v, army, EffectTemplate.TTransportGlow01)
+            fx = CreateEmitterAtBone(self, v, self.Army, EffectTemplate.TTransportGlow01)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
         end
@@ -318,10 +317,9 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        local army =  self.Army
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, army, v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,

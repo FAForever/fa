@@ -59,7 +59,6 @@ StructureUnit = Class(Unit) {
 
     RotateTowardsEnemy = function(self)
         local bp = self:GetBlueprint()
-        local army = self.Army
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
         local x, y = GetMapSize()
@@ -67,10 +66,10 @@ StructureUnit = Class(Unit) {
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE + categories.LAND + categories.NAVAL)
         local units = brain:GetUnitsAroundPoint(cats, pos, 2 * (bp.AI.GuardScanRadius or 100), 'Enemy')
         for _, u in units do
-            local blip = u:GetBlip(army)
+            local blip = u:GetBlip(self.Army)
             if blip then
-                local on_radar = blip:IsOnRadar(army)
-                local seen = blip:IsSeenEver(army)
+                local on_radar = blip:IsOnRadar(self.Army)
+                local seen = blip:IsSeenEver(self.Army)
 
                 if on_radar or seen then
                     local epos = u:GetPosition()
@@ -152,7 +151,6 @@ StructureUnit = Class(Unit) {
             tarmac = specTarmac
         end
 
-        local army = self.Army
         local w = tarmac.Width
         local l = tarmac.Length
         local fadeout = tarmac.FadeOut
@@ -195,7 +193,7 @@ StructureUnit = Class(Unit) {
                 albedo2 = albedo2 .. GetTarmac(faction, terrain)
             end
 
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, self.Army, 0)
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
                 self.Trash:Add(tarmacHndl)
@@ -203,7 +201,7 @@ StructureUnit = Class(Unit) {
         end
 
         if normal and tarmac.Normal then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
@@ -212,7 +210,7 @@ StructureUnit = Class(Unit) {
         end
 
         if glow and tarmac.Glow then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
@@ -1331,7 +1329,6 @@ SonarUnit = Class(StructureUnit) {
 
     TimedIdleSonarEffects = function(self)
         local layer = self:GetCurrentLayer()
-        local army = self.Army
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
@@ -1341,7 +1338,7 @@ SonarUnit = Class(StructureUnit) {
 
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            local emit = CreateAttachedEmitter(self, vBone, army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            local emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
                                 emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
@@ -1641,7 +1638,6 @@ AirUnit = Class(MobileUnit) {
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
-        local army = self.Army
         if new == 'Down' then
             -- Turn off the ambient hover sound
             self:StopUnitAmbientSound('ActiveLoop')
@@ -1736,7 +1732,6 @@ AirUnit = Class(MobileUnit) {
     end,
 
     CreateUnitAirDestructionEffects = function(self, scale)
-        local army = self.Army
         local scale = explosion.GetAverageBoundingXZRadius(self)
         explosion.CreateDefaultHitExplosion(self, scale)
 
@@ -2266,10 +2261,9 @@ CommandUnit = Class(WalkingLandUnit) {
         end
 
         local totalBones = self:GetBoneCount() - 1
-        local army = self.Army
         for k, v in EffectTemplate.UnitTeleportSteam01 do
             for bone = 1, totalBones do
-                CreateAttachedEmitter(self, bone, army, v)
+                CreateAttachedEmitter(self, bone, self.Army, v)
             end
         end
 

@@ -826,22 +826,21 @@ Unit = Class(moho.unit_methods) {
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
 
-            local captorArmyIndex = captor.Army
             local captorBrain = false
 
             -- Ignore army cap during unit transfer in Campaign
             if ScenarioInfo.CampaignMode then
                 captorBrain = captor:GetAIBrain()
-                SetIgnoreArmyUnitCap(captorArmyIndex, true)
+                SetIgnoreArmyUnitCap(captor.Army, true)
             end
 
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(captorArmyIndex, false)
+                SetIgnoreArmyUnitCap(captor.Army, false)
             end
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex, true) or {}
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captor.Army, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1169,15 +1168,14 @@ Unit = Class(moho.unit_methods) {
         local totalBones = self:GetBoneCount()
         local bone = Random(1, totalBones) - 1
         local bpDE = self:GetBlueprint().Display.DamageEffects
-        local army = self.Army
         for _, v in effects do
             local fx
             if bpDE then
                 local num = Random(1, table.getsize(bpDE))
                 local bpFx = bpDE[num]
-                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
+                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
             else
-                fx = CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(self.FxDamageScale)
+                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(self.FxDamageScale)
             end
             table.insert(fxBag, fx)
         end
@@ -1705,46 +1703,44 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SinkDestructionEffects = function(self)
-        local Util = utilities
         local sx, sy, sz = self:GetUnitSizes()
         local vol = sx * sy * sz
-        local army = self.Army
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
         local i = 0
 
         while i < 1 do
-            local randBone = Util.GetRandomInt(0, numBones)
+            local randBone = utilities.GetRandomInt(0, numBones)
             local boneHeight = self:GetPosition(randBone)[2]
             local toSurface = surfaceHeight - boneHeight
             local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
             local rs = math.max(math.min(2.5, vol / 20), 0.5)
-            local scale = Util.GetRandomFloat(rs/2, rs)
+            local scale = utilities.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
             if toSurface < 1 then
-                CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
-                CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
+                CreateAttachedEmitter(self, randBone, self.Army, '/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
+                CreateAttachedEmitter(self, randBone, self.Army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
             end
 
             if toSurface < 0 then
                 explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
-                local lifetime = Util.GetRandomInt(50, 200)
+                local lifetime = utilities.GetRandomInt(50, 200)
 
                 if toSurface > 1 then
-                    CreateEmitterAtBone(self, randBone, army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
+                    CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
                         :ScaleEmitter(scale)
                         :SetEmitterParam('LIFETIME', lifetime)
 
-                    CreateAttachedEmitter(self, -1, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                    CreateAttachedEmitter(self, -1, self.Army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
                 end
-                CreateEmitterAtBone(self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
-                CreateEmitterAtBone(self, randBone, army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
             end
-            local rd = Util.GetRandomFloat(0.4, 1.0)
+            local rd = utilities.GetRandomFloat(0.4, 1.0)
             WaitSeconds(i + rd)
             i = i + 0.3
         end
@@ -2467,9 +2463,8 @@ Unit = Class(moho.unit_methods) {
         local id = built:GetUnitId()
         local bp = built:GetBlueprint()
         local bpSelf = self:GetBlueprint()
-        local index = self.Army
-        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
-            WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
+        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, self.Army) then
+            WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
             IssueClearCommands({self})
@@ -3182,7 +3177,6 @@ Unit = Class(moho.unit_methods) {
             local effects = {}
             local scale = 1
             local offset
-            local army = self.Army
             local boneTable
 
             if bpTable.Damage then
@@ -3210,7 +3204,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
-                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army)
+                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, self.Army)
                 local treadOffsetX = boneTable.Tread.TreadOffset[1]
                 if x and x > 0 then
                     if layer ~= 'Seabed' then
@@ -3228,7 +3222,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             for k, v in effects do
-                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0, offset.y or 0, offset.z or 0)
+                CreateEmitterAtBone(self, bone, self.Army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0, offset.y or 0, offset.z or 0)
             end
         end
 
@@ -3311,7 +3305,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectBag, TerrainType)
-        local army = self.Army
         local pos = self:GetPosition()
         local effects = {}
         local emit
@@ -3328,7 +3321,7 @@ Unit = Class(moho.unit_methods) {
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
-                        emit = CreateAttachedEmitter(self, vBone, army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                        emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                         if vTypeGroup.Offset then
                             emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                         end
@@ -3465,9 +3458,8 @@ Unit = Class(moho.unit_methods) {
             WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
-        local army = self.Army
         for kb, vb in effectBones do
-            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP))
+            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
         end
     end,
 
@@ -3481,11 +3473,10 @@ Unit = Class(moho.unit_methods) {
             WARN('*WARNING: No contrail effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
-        local army = self.Army
         local ZOffset = tableData.ZOffset or 0.0
         for ke, ve in self.ContrailEffects do
             for kb, vb in effectBones do
-                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, army, ve):SetEmitterParam('POSITION_Z', ZOffset))
+                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
             end
         end
     end,
@@ -3527,12 +3518,11 @@ Unit = Class(moho.unit_methods) {
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
         local duration = treads.TreadLifeTime or 10
-        local army = self.Army
 
         while true do
             -- Syntactic reference
             -- CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
-            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, army)
+            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, self.Army)
             WaitSeconds(interval)
         end
     end,
@@ -3978,10 +3968,9 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        local army =  self.Army
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
-        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, army, EffectTemplate.TTransportGlow01))
+        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
+        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
+        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
         self:TransportAnimation()
     end,
 
@@ -4280,8 +4269,7 @@ Unit = Class(moho.unit_methods) {
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
         local focusArmy = GetFocusArmy()
-        local army = self.Army
-        if focusArmy == -1 or focusArmy == army then
+        if focusArmy == -1 or focusArmy == self.Army then
             local id
             local unitType
             local category
@@ -4318,7 +4306,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = army}
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = self.Army}
                 table.insert(Sync.EnhanceMessage, message)
             end
         end

@@ -99,11 +99,10 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     end
 
     local RadEntities = {}
-    local unitArmy = unit.Army
     for _, v in UnitsinRec do
         local dist = VDist3(position, v:GetPosition())
         local vArmy = v.Army
-        if unitArmy ~= vArmy and not IsAlly(unitArmy, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
+        if unit.Army ~= vArmy and not IsAlly(unit.Army, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
             table.insert(RadEntities, v)
         end
     end
