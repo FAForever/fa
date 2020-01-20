@@ -162,29 +162,27 @@ URS0201 = Class(CSeaUnit) {
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
 
         if self:GetAIBrain().BrainType == 'Human' and self:GetCurrentLayer() ~= 'Land' then
-            self:GetStat("h1_SetSalemAmph", 0)
-        else
             self:SetScriptBit('RULEUTC_WeaponToggle', true)
         end
     end,
     
-    -- Enable amphibious mode
+    -- Disable amphibious mode
     OnScriptBitSet = function(self, bit)
         CSeaUnit.OnScriptBitSet(self, bit)
-        if bit == 1 then
-            self:GetStat("h1_SetSalemAmph", 1)
-        end    
-    end,
-
-    -- Disable amphibious mode
-    OnScriptBitClear = function(self, bit)
-        CSeaUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
             if self:GetCurrentLayer() ~= 'Land' then
                 self:GetStat("h1_SetSalemAmph", 0)
             else
-                self:SetScriptBit('RULEUTC_WeaponToggle', true)
-            end  
+                self:SetScriptBit('RULEUTC_WeaponToggle', false)
+            end 
+        end    
+    end,
+
+    -- Enable amphibious mode
+    OnScriptBitClear = function(self, bit)
+        CSeaUnit.OnScriptBitClear(self, bit)
+        if bit == 1 then
+            self:GetStat("h1_SetSalemAmph", 1)
         end
     end,
 }
