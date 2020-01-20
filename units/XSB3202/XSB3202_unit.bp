@@ -109,7 +109,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'XSB3202',
+                            'XSB3102',
                         },
                         Scale = 0.9,
                         Type = 'BackWake',
