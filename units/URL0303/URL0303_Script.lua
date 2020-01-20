@@ -44,18 +44,20 @@ URL0303 = Class(CWalkingLandUnit) {
             RedirectRateOfFire = bp.RedirectRateOfFire
         }
         self.Trash:Add(antiMissile)
-        self.Charging = false
+        self.ChargingInitiated = false
+        self.ChargingInProgress = false
     end,
 
     InitiateCharge = function(self)
-        if self.Charging then return end
+        if self.ChargingInitiated then return end
 
-        self.Charging = true
+        self.ChargingInitiated = true
         local blueprint = self:GetBlueprint()
         local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
         self.Trash:Add(bufffx3)
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
+        self.ChargingInProgress = true
         self:SetWeaponEnabledByLabel('Disintigrator', false)
         self:SetWeaponEnabledByLabel('HeavyBolter', false)
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
@@ -87,7 +89,7 @@ URL0303 = Class(CWalkingLandUnit) {
             if v.Add.OnDeath then
                 bp = v
             end
-            if self.Charging then
+            if self.ChargingInProgress then
                 bp.Duration = bp.DurationWhenCharging
             end
         end
