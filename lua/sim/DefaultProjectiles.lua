@@ -420,7 +420,7 @@ OverchargeProjectile = Class() {
             launcher:ForkThread(function()
                 WaitFor(launcher.EconDrain)
                 RemoveEconomyEvent(launcher, launcher.EconDrain)
-                OCProjectiles[army] = OCProjectiles[army] - 1
+                OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
             end)
         end
@@ -475,6 +475,8 @@ OverchargeProjectile = Class() {
     end,
     
     OnCreate = function(self)
+        self.Army = self:GetArmy()
+
         if not OCProjectiles[self.Army] then
             OCProjectiles[self.Army] = 0
         end
