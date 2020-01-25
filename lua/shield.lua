@@ -45,6 +45,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
         self.Army = self:GetArmy()
+        self.EntityId = self:GetEntityId()
         self._IsUp = false
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
