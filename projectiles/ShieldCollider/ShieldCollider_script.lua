@@ -89,7 +89,7 @@ ShieldCollider = Class(Projectile) {
                     end
 
                     if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
-                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - ' .. self:GetUnitId())
+                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - ' .. self.UnitId)
                         return
                     end
 

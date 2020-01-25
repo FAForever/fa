@@ -167,7 +167,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
@@ -348,7 +348,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
@@ -445,7 +445,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then

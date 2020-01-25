@@ -219,7 +219,7 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 TMobileFactoryUnit = Class(LandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom  ~= builder:GetUnitId() then
+        if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
             self:HideBone(0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
@@ -436,7 +436,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
             ChangeState(self, self.UpgradingState)
         end

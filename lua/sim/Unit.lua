@@ -210,6 +210,7 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
 
         -- Save common lookup info
+        self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
         self.layerCategory = bp.LayerCategory
         self.factionCategory = bp.FactionCategory
@@ -1246,7 +1247,7 @@ Unit = Class(moho.unit_methods) {
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
-        ArmyBrains[self.Army]:AddUnitStat(self:GetUnitId(), "lost", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
     end,
 
     -- Argument val is true or false. False = cannot be killed
@@ -1326,7 +1327,7 @@ Unit = Class(moho.unit_methods) {
 
         self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
 
-        ArmyBrains[self.Army]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+        ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
     end,
 
     CalculateVeterancyLevel = function(self, massKilled)
@@ -1394,7 +1395,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateVeterancyBuffs = function(self, level)
         local healthBuffName = 'VeterancyMaxHealth' .. level -- Currently there is no difference between units, therefore no need for unique buffs
-        local regenBuffName = self:GetUnitId() .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
+        local regenBuffName = self.UnitId .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
 
         if not Buffs[regenBuffName] then
             -- Maps self.techCategory to a number so we can do math on it for naval units
@@ -1938,7 +1939,7 @@ Unit = Class(moho.unit_methods) {
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
             else
-                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self:GetUnitId()), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
             end
         end
     end,
@@ -2181,10 +2182,10 @@ Unit = Class(moho.unit_methods) {
             self.MovementEffectsExist = false
         end
 
-        ArmyBrains[self.Army]:AddUnitStat(self:GetUnitId(), "built", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "built", 1)
 
         -- Prevent UI mods from violating game/scenario restrictions
-        local id = self:GetUnitId()
+        local id = self.UnitId
         local index = self.Army
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))
@@ -2377,7 +2378,7 @@ Unit = Class(moho.unit_methods) {
         local upos = unit:GetPosition()
         local props = GetReclaimablesInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         local wreckage = {}
-        local bpid = unit:GetUnitId()
+        local bpid = unit.UnitId
 
         if EntityCategoryContains(categories.ENGINEER, self) then
             for _, p in props do
@@ -2457,7 +2458,7 @@ Unit = Class(moho.unit_methods) {
 
     OnStartBuild = function(self, built, order)
         -- Prevent UI mods from violating game/scenario restrictions
-        local id = built:GetUnitId()
+        local id = built.UnitId
         local bp = built:GetBlueprint()
         local bpSelf = self:GetBlueprint()
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, self.Army) then
@@ -2499,7 +2500,7 @@ Unit = Class(moho.unit_methods) {
         self:DoOnStartBuildCallbacks(built)
 
         
-        if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
+        if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
@@ -3314,7 +3315,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self:GetUnitId()), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
@@ -3355,7 +3356,7 @@ Unit = Class(moho.unit_methods) {
 
             if not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0)) then
                 if not self.Footfalls and bpTable.Footfall then
-                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self:GetUnitId()), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
+                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
                 end
                 return false
             end
@@ -3452,7 +3453,7 @@ Unit = Class(moho.unit_methods) {
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
         if not effectBones or (effectBones and table.getn(effectBones) == 0) then
-            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
+            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
         for kb, vb in effectBones do
@@ -3467,7 +3468,7 @@ Unit = Class(moho.unit_methods) {
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
         if not effectBones or (effectBones and table.getn(effectBones) == 0) then
-            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
+            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
         local ZOffset = tableData.ZOffset or 0.0
@@ -3526,7 +3527,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateFootFallManipulators = function(self, footfall)
         if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
-            WARN('*WARNING: No footfall bones defined for unit ', repr(self:GetUnitId()), ', ', 'these must be defined to animation collision detector and foot plant controller')
+            WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end
 
@@ -3602,7 +3603,7 @@ Unit = Class(moho.unit_methods) {
         if self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self:GetUnitId() .. ' and it does not exist in the model.', 2)
+        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.', 2)
 
         return false
     end,

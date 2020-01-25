@@ -186,7 +186,7 @@ StructureUnit = Class(Unit) {
 
         -- Players and AI can build buildings outside of their faction. Get the *building's* faction to determine the correct tarrain-specific tarmac
         local factionTable = {e = 1, a = 2, r = 3, s = 4}
-        local faction  = factionTable[string.sub(self:GetUnitId(), 2, 2)]
+        local faction  = factionTable[string.sub(self.UnitId, 2, 2)]
         if albedo and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
@@ -374,15 +374,15 @@ StructureUnit = Class(Unit) {
         if FactionName == 'UEF' then
             self:HideBone(0, true)
             self.BeingBuiltShowBoneTriggered = false
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)
             end
         elseif FactionName == 'Aeon' then
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateAeonBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
             end
         elseif FactionName == 'Seraphim' then
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateSeraphimBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
             end
         end
@@ -1697,7 +1697,7 @@ AirUnit = Class(MobileUnit) {
 
         -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
         if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuff is missing
-            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint? ' .. self:GetUnitId())
+            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint? ' .. self.UnitId)
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
@@ -1985,7 +1985,7 @@ ConstructionUnit = Class(MobileUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-        if unitBeingBuilt:GetUnitId() == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
             self.Upgrading = true
             self.BuildingUnit = false
         end
@@ -2384,7 +2384,7 @@ ACUUnit = Class(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        ArmyBrains[self.Army]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
     
@@ -2401,8 +2401,8 @@ ACUUnit = Class(CommandUnit) {
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
 
-        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self:GetUnitId(), "lowest_health") then
-            ArmyBrains[self.Army]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self.UnitId, "lowest_health") then
+            ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         end
     end,
 
