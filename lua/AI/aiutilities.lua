@@ -1351,7 +1351,7 @@ function GetTransports(platoon, units)
         if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION - categories.uea0203, unit) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.getn(unit:GetCargo()) < 1 and unit:GetFractionComplete() == 1 then
             local unitPos = unit:GetPosition()
             local curr = {Unit = unit, Distance = VDist2(unitPos[1], unitPos[3], location[1], location[3]),
-                           Id = unit:GetUnitId()}
+                           Id = unit.UnitId}
             table.insert(transports, curr)
         end
     end
@@ -1446,7 +1446,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     end
 
     for num, unit in transports do
-        local id = unit:GetUnitId()
+        local id = unit.UnitId
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end
@@ -2758,7 +2758,7 @@ function UseTransportsGhetto(units, transports)
     end
 
     for num, unit in transports do
-        local id = unit:GetUnitId()
+        local id = unit.UnitId
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end

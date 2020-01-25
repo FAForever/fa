@@ -90,7 +90,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         local unit = v
         local bp = unit:GetBlueprint()
-        local unitId = unit:GetUnitId()
+        local unitId = unit.UnitId
 
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount()  -- looks like one of these 2 works for SMDs also

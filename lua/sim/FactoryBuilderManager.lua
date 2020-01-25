@@ -412,7 +412,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         elseif EntityCategoryContains(categories.STRUCTURE, unitBeingBuilt) then
             self:AddConsumption(factory, 'Upgrades', unitBeingBuilt)
         else
-            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt:GetUnitId())
+            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt.UnitId)
         end
     end,
 

@@ -1036,7 +1036,7 @@ BaseManager = Class {
         local aiBrain = unit:GetAIBrain()
         local factionIndex = aiBrain:GetFactionIndex()
         local armyIndex = aiBrain:GetArmyIndex()
-        local upgradeID = aiBrain:FindUpgradeBP(unit:GetUnitId(), StructureUpgradeTemplates[factionIndex])
+        local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
         if upgradeID then
             IssueClearCommands({unit})
             IssueUpgrade({unit}, upgradeID)

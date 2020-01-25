@@ -36,17 +36,17 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Make certain the weapon has essential aspects defined
         if not bp.RackBones then
-           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
         if not bp.MuzzleSalvoSize then
-           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
         if not bp.MuzzleSalvoDelay then
-           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
@@ -73,12 +73,12 @@ DefaultProjectileWeapon = Class(Weapon) {
         self.NumMuzzles = self.NumMuzzles / table.getn(bp.RackBones)
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * bp.MuzzleSalvoDelay
         if totalMuzzleFiringTime > (1 / rof) then
-            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return false
         end
         if bp.RackRecoilDistance ~= 0 and bp.MuzzleSalvoDelay ~= 0 then
-            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return false
         end
@@ -444,7 +444,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             local bp = self:GetBlueprint()
             if not bp.RackBones then
-                error('Error on rackbones ' .. self.unit:GetUnitId())
+                error('Error on rackbones ' .. self.unit.UnitId)
             end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
@@ -1079,12 +1079,12 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self:GetBlueprint()
         if not bp.BeamCollisionDelay then
-            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end
         if not bp.BeamLifetime then
-            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end

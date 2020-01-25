@@ -1813,7 +1813,7 @@ function GetLoadTransports(platoon)
     local scoutUnits = platoon:GetSquadUnits('scout') or {}
 
     for num, unit in scoutUnits do
-        local id = unit:GetUnitId()
+        local id = unit.UnitId
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end
@@ -2158,7 +2158,7 @@ function GetTransportsThread(platoon)
             for _, v in platoon:GetPlatoonUnits() do
                 if not v.Dead then
                     if EntityCategoryContains(categories.TRANSPORTATION, v) then
-                        local id = v:GetUnitId()
+                        local id = v.UnitId
                         if not transSlotTable[id] then
                             transSlotTable[id] = GetNumTransportSlots(v)
                         end
@@ -2195,7 +2195,7 @@ function GetTransportsThread(platoon)
                     if EntityCategoryContains(categories.TRANSPORTATION, unit) and not unit:IsUnitState('Busy') then
                         local unitPos = unit:GetPosition()
                         local curr = {Unit=unit, Distance=VDist2(unitPos[1], unitPos[3], location[1], location[3]),
-                                       Id = unit:GetUnitId()}
+                                       Id = unit.UnitId}
                         table.insert(transports, curr)
                     end
                 end
