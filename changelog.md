@@ -1,4 +1,4 @@
-Patch 3710 (26 January, 2019)
+Patch 3710 (26 January, 2020)
 ============================
 - Reworked the score board to request/send resources/unit to allies and view allie's ressources income, storage and drain
 - Removed vet bar for unvettable units
