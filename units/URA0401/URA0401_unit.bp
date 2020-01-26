@@ -112,6 +112,7 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = 0.9,
     Defense = {

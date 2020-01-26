@@ -80,6 +80,6 @@ BaseBuilderTemplate {
             return 100
         end
 
-        return 0
+        return 1
     end,
 }

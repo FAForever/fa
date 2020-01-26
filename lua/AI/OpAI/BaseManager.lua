@@ -435,9 +435,8 @@ BaseManager = Class {
     end,
 
     RemoveConstructionEngineer = function(self, unit)
-        local entId = unit:GetEntityId()
         for k, v in self.ConstructionEngineers do
-            if v:GetEntityId() == entId then
+            if v.EntityId == unit.EntityId then
                 table.remove(self.ConstructionEngineers, k)
                 break
             end
@@ -476,9 +475,8 @@ BaseManager = Class {
             return false
         end
 
-        local entId = unit:GetEntityId()
         for k, v in self.ConstructionEngineers do
-            if v:GetEntityId() == entId then
+            if v.EntityId == unit.EntityId then
                 return true
             end
         end

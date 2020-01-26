@@ -456,7 +456,9 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         for templateName, baseData in BaseBuilderTemplates do
             local baseValue = baseData.ExpansionFunction(aiBrain, position, constructionData.NearMarkerType)
             table.insert(baseValues, { Base = templateName, Value = baseValue })
+            --SPEW('*AI DEBUG: AINewExpansionBase(): Scann next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
             if not highPri or baseValue > highPri then
+                --SPEW('*AI DEBUG: AINewExpansionBase(): Possible next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
                 highPri = baseValue
             end
         end
@@ -468,6 +470,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
                 table.insert(validNames, v.Base)
             end
         end
+        --SPEW('*AI DEBUG: AINewExpansionBase(): validNames for Expansions ' .. repr(validNames))
         local pick = validNames[ Random(1, table.getn(validNames)) ]
 
         # Error if no pick
@@ -476,7 +479,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         end
 
         # Setup base
-        #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
+        --SPEW('*AI DEBUG: AINewExpansionBase(): ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
         import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick)
 
         # If air base switch to building an air factory rather than land

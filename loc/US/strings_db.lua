@@ -5352,6 +5352,7 @@ tooltipui0687="Prevents UEF commanders from upgrading their ACU to have the 'Bil
 tooltipui0688="No Super-Intel"
 tooltipui0689="Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
 tooltipui0690="Drone Auto-Rebuild"
+tooltipui0697="Amphibious Mode Toggle"
 
 tooltipui0540="Reset Chat Window"
 tooltipui0541="Resets the position and layout of the chat window"
@@ -7177,6 +7178,8 @@ lobui_0778="Optimal balance (Revealed)"
 lobui_0779="Teams will be optimally balanced, labeled random start locations"
 lobui_0780="Flexible balance (Revealed)"
 lobui_0781="Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable, labeled random start locations"
+lobui_0782="Optimal balance (Mirrored)"
+lobui_0783="Teams will be optimally balanced, mirrored start locations"
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."

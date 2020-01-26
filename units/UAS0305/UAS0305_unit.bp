@@ -32,6 +32,7 @@ UnitBlueprint {
         'SORTINTEL',
         'NAVAL', #added for shipwreck mod
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -145,6 +146,7 @@ UnitBlueprint {
         },
         UnitWeight = 1,
         UpgradesFrom = 'uab3202',
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         ShowIntelOnSelect = true,

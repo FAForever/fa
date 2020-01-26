@@ -1749,7 +1749,7 @@ AIBrain = Class(moho.aibrain_methods) {
         for _, v in factories do
             if not v.Dead and not (v:IsUnitState('Building') or v:IsUnitState('Upgrading')) then
                 local guarded = v:GetGuardedUnit()
-                if not guarded or guarded:GetEntityId() ~= primary:GetEntityId() then
+                if not guarded or guarded.EntityId ~= primary.EntityId then
                     IssueClearCommands({v})
                     IssueFactoryAssist({v}, primary)
                 end

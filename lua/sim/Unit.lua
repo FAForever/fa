@@ -1219,13 +1219,14 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 then
+        -- apply death animation on half built units (do not apply for ML and mega)
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
 
         self:DoUnitCallbacks('OnKilled')
-
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
             self.UnitBeingTeleported = nil
@@ -1469,21 +1470,25 @@ Unit = Class(moho.unit_methods) {
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
     ShouldUseVetSystem = function(self)
-        local weps = self:GetBlueprint().Weapon
+        local bp = self:GetBlueprint()
 
-        -- Bail if we don't have any weapons
-        if not weps[1] then
+        -- Bail if we don't have any weapons or have the ExcludeFromVeterancy flag (TMD, SMD, stealth boat, mobile stealth, mobile shields, aeon T3 sonar, mercy, beetle)
+        if not bp.Weapon[1] or bp.General.ExcludeFromVeterancy then
             return false
         end
 
-        -- Find a weapon which is not a DeathWeapon
-        for index, wep in weps do
-            if wep.Label ~= 'DeathWeapon' then
+        -- Find a weapon which is not a DeathWeapon / DeathImpact
+        local No_vet_label = {
+        ['DeathWeapon'] = true,
+        ['DeathImpact'] = true,
+        }
+        for index, wep in bp.Weapon do
+            if not No_vet_label[wep.Label] then
                 return true
             end
         end
 
-        -- We only have a DeathWeapon. Bail.
+        -- We only have DeathWeapon / DeathImpact labels. Bail.
         return false
     end,
 
@@ -1614,7 +1619,9 @@ Unit = Class(moho.unit_methods) {
         if overkillRatio and overkillRatio > 1.0 then
             return
         end
-
+        if self:GetFractionComplete() < 0.5 then
+            return
+        end
         return self:CreateWreckageProp(overkillRatio)
     end,
 

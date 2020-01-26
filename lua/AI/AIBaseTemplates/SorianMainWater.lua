@@ -220,11 +220,11 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        return 0
+        return -1
     end,
     FirstBaseFunction = function(aiBrain)
         if not aiBrain.Sorian then
-            return 0
+            return -1
         end
         local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not per then

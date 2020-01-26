@@ -78,7 +78,7 @@ function DoOverspill(source, instigator, amount, dmgType, dmgMod)
         return
     end
     if source:IsUp() then
-        local instigatorId = instigator:GetEntityId()
+        local instigatorId = instigator.EntityId
         RegisterDamage(source:GetEntityId(), instigatorId, amount)
         local doDamage = function()
             WaitTicks(1)

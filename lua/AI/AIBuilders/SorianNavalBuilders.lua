@@ -34,6 +34,7 @@ BuilderGroup {
         Priority = 985,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3'}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
@@ -71,6 +72,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
@@ -108,6 +110,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
@@ -144,6 +147,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
@@ -186,6 +190,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -221,6 +226,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -256,6 +262,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -295,6 +302,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilderSorian',
         Priority = 905,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH2, ENGINEER TECH3' } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
@@ -317,6 +325,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilderSorian',
         Priority = 905,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH3' } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
@@ -339,6 +348,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 905,
         BuilderConditions = {
+            { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },

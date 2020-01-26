@@ -127,6 +127,7 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
 		    'SHIELD',
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -1.5,
     Defense = {

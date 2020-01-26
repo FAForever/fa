@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 
 local DefaultUnitsFile = import('defaultunits.lua')
+local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -32,13 +33,49 @@ local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
+local CreateSeraphimFactoryBuildingEffectsUnPause = EffectUtil.CreateSeraphimFactoryBuildingEffectsUnPause
+
+-- FACTORIES
+SFactoryUnit = Class(FactoryUnit) {
+    StartBuildFx = function(self, unitBeingBuilt)
+        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffectsUnPause, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        unitBeingBuilt.Trash:Add(thread)
+    end,
+    
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StartBuildFx(self:GetFocusUnit())
+        end
+        StructureUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        FactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFxUnpause(self:GetFocusUnit())
+        end
+    end,
+}
 
 -- AIR STRUCTURES
 SAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
@@ -187,6 +224,14 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            end
         end,
     },
+
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- AIR UNITS
@@ -295,9 +340,11 @@ SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 -- LAND FACTORY STRUCTURES
 SLandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -359,6 +406,14 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
+    
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- LAND UNITS
@@ -382,9 +437,11 @@ SSonarUnit = Class(SonarUnit) {}
 -- SEA FACTORY STRUCTURES
 SSeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -446,6 +503,14 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
+    
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- SEA UNITS

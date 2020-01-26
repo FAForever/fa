@@ -54,6 +54,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -108,7 +109,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'XSB3202',
+                            'XSB3102',
                         },
                         Scale = 0.9,
                         Type = 'BackWake',
@@ -123,7 +124,6 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 6000,
         BuildCostMass = 400,
-        BuildRate = 15,
         BuildTime = 600,
         MaintenanceConsumptionPerSecondEnergy = 200,
         RebuildBonusIds = {
@@ -160,7 +160,6 @@ UnitBlueprint {
                 helpText = 'toggle_sonar',
             },
         },
-        SelectionPriority = 5,
         TarmacDecal = 'Tarmacs/tarmac_seraphim_2x_albedo',
         TarmacGlowDecal = 'Tarmacs/tarmac_seraphim_2x_glow',
         TechLevel = 'RULEUTL_Advanced',

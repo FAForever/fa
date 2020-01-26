@@ -436,7 +436,7 @@ StructureUnit = Class(Unit) {
         if scus[1] then
             for _, u in scus do
                 u:SetFocusEntity(self)
-                self.Repairers[u:GetEntityId()] = u
+                self.Repairers[u.EntityId] = u
             end
         end
 
@@ -568,7 +568,7 @@ StructureUnit = Class(Unit) {
         end
 
         for k, v in self.AdjacencyBeamsBag do
-            if v.Unit:GetEntityId() == adjacentUnit:GetEntityId() then
+            if v.Unit.EntityId == adjacentUnit.EntityId then
                 return
             end
         end
@@ -637,13 +637,17 @@ FactoryUnit = Class(StructureUnit) {
 
     OnPaused = function(self)
         -- When factory is paused take some action
-        self:StopUnitAmbientSound('ConstructLoop')
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
-        if self.BuildingUnit then
+        if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
+            StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         StructureUnit.OnUnpaused(self)
     end,

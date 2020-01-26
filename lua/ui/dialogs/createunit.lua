@@ -186,6 +186,15 @@ function CreateDialog(x, y)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
+    ForkThread(function()
+                   while not IsKeyDown('ESCAPE') do
+                       if not dialog then return end
+                       WaitSeconds(0.05)
+                   end
+                   dialog:Destroy()
+                   dialog = false
+               end)
+
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
     LayoutHelpers.AtBottomIn(cancelBtn, dialog)
     LayoutHelpers.AtRightIn(cancelBtn, dialog)
@@ -210,20 +219,30 @@ function CreateDialog(x, y)
     count:SetText('1')
     LayoutHelpers.RightOf(count, countLabel, 5)
 
+    local function spawnUnits(creationList, targetArmy)
+        local numUnits = 1
+        if type(tonumber(count:GetText())) == 'number' then
+            numUnits = count:GetText()
+        end
+        WaitSeconds(0.1)
+        while not IsKeyDown(1) do -- Left mouse button
+            if IsKeyDown('ESCAPE') then return end
+            WaitSeconds(0.05)
+        end
+        local cursorPos = GetMouseScreenPos()
+        for unitID in creationList do
+            for i = 1, numUnits do
+                local cmd = 'CreateUnit ' .. unitID .. ' ' .. targetArmy .. ' ' .. cursorPos[1] .. ' ' .. cursorPos[2]
+                ConExecuteSave(cmd)
+            end
+        end
+    end
+
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
     createBtn.OnClick = function(button)
-        for unitID, _ in CreationList do
-            local numUnits = 1
-            if type(tonumber(count:GetText())) == 'number' then
-                numUnits = count:GetText()
-            end
-            for i = 1, numUnits do
-                local cmd = 'CreateUnit ' .. unitID .. ' ' .. (currentArmy-1) .. ' ' .. x .. ' ' .. y
-                ConExecuteSave(cmd)
-            end
-        end
+        ForkThread(spawnUnits, CreationList, currentArmy - 1)
         dialog:Destroy()
         dialog = false
     end
@@ -322,7 +341,7 @@ function CreateDialog(x, y)
     local lowestControl = false
     local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
     for i, val in GetArmiesTable().armiesTable do
-                       
+
         armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
         -- set the layout to left at the first army
         if i == 1 then
@@ -524,14 +543,7 @@ function CreateDialog(x, y)
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    local numUnits = 1
-                    if type(tonumber(count:GetText())) == 'number' then
-                        numUnits = count:GetText()
-                    end
-                    for i = 1, numUnits do
-                        local cmd = 'CreateUnit ' .. self.unitID .. ' ' .. (currentArmy-1) .. ' ' .. x .. ' ' .. y
-                        ConExecuteSave(cmd)
-                    end
+                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy - 1)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)

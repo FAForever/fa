@@ -129,14 +129,8 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 250,
-                    ShaderName = 'Unit',
-                },
-                {
-                    AlbedoName = 'ues0302_lod1_albedo.dds',
                     LODCutoff = 600,
                     ShaderName = 'Unit',
-                    SpecularName = 'ues0302_lod1_specteam.dds',
                 },
             },
         },

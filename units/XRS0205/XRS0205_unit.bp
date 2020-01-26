@@ -173,6 +173,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xrs0205_name>CI:18 Mermaid',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         RadarRadius = 60,
