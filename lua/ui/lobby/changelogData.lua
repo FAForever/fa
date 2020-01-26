@@ -1,5 +1,39 @@
-last_version = 3709
+last_version = 3710
 gamePatches = {
+	{
+		version = 3710,
+		name = 'Game Version 3710',
+		description = {
+            '- Reworked the score board to request/send resources/unit to allies and view allie\'s ressources income, storage and drain',
+            '- Removed vet bar for unvettable units',
+            '- Allowed mod to change UI textures',
+            '- Improved spawing menu',
+            '- Allowed transition for 3rd person camera',
+            '- Improved AI pathfinding and expansion base template',
+            '- Allowed SCU to have their own strategic icons',
+            '- Fixed "select land unit on screen" selecting factories',
+            '- Allowed dead players to see the whole map only after the team lost',
+            '- Fixed factorie\'s construction beam still working when they are paused',
+            '- Added an option in lobby for optimal mirrored balance',
+            '- Fixed megalith/monkeylord wreck going under the ground when killed while being built',
+            '- Fixed ACU\'s gun fire fx',
+            '- Added an amphibious toggle for the salem',
+            '- Fixed exp and mobile sonar that are under construction being selected over engies',
+            '- Allowed T2 sera sonar to be selected over engies',
+            '- Update map blacklist',
+            '',
+            '**Contributors**',
+            '- KionX',
+            '- wodzu93',
+            '- keyser',
+            '- speed2',
+            '- Uveso',
+            '- Strogo',
+            '- Crotalus',
+            '- Nojoke',
+            '- PhilipJFry',
+		},
+	},
 	{
 		version = 3709,
 		name = 'Game Version 3709',
@@ -70,7 +104,6 @@ gamePatches = {
             '- PhilipJFry',
             '- TurinTurambar',
             '- eforgacs',
-
 		},
 	},
 	{
