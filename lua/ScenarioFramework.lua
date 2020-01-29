@@ -17,7 +17,7 @@ local SimUIVars = import('/lua/sim/SimUIState.lua')
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
 
-local OperationNISCameraActive = false
+local PauseUnitDeathActive = false
 
 -- Cause the game to exit immediately
 function ExitGame()
@@ -166,7 +166,7 @@ end
 
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
-    while OperationNISCameraActive do
+    while PauseUnitDeathActive do
         WaitSeconds(1)
     end
     self:SetCanBeKilled(true)
@@ -1794,7 +1794,7 @@ end
 
 -- CDR Death (pass hold only if it's a mid-operation death)
 function CDRDeathNISCamera(unit, hold)
-    OperationNISCameraActive = true
+    PauseUnitDeathActive = true
     local camInfo = {
         blendTime = 1,
         holdTime = hold,
@@ -1921,7 +1921,7 @@ function OperationNISCameraThread(unitInfo, camInfo)
         end
 
     end
-    OperationNISCameraActive = false
+    PauseUnitDeathActive = false
 end
 
 function OnPostLoad()
