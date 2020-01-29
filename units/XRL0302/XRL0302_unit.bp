@@ -72,8 +72,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'FireBeetle',
         EconomyThreatLevel = 0,
-        Health = 500,
-        MaxHealth = 500,
+        Health = 350,
+        MaxHealth = 350,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
@@ -81,6 +81,7 @@ UnitBlueprint {
     Description = '<LOC xrl0302_desc>Mobile Bomb',
     Display = {
         Abilities = {
+            '<LOC ability_cloak>Cloaking',
             '<LOC ability_suicideweapon>Suicide Weapon',
             '<LOC ability_stun>EMP Weapon',
         },
@@ -124,9 +125,9 @@ UnitBlueprint {
         UniformScale = 0.054,
     },
     Economy = {
-        BuildCostEnergy = 1500,
-        BuildCostMass = 250,
-        BuildTime = 1000,
+        BuildCostEnergy = 1300,
+        BuildCostMass = 190,
+        BuildTime = 700,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -165,6 +166,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        Cloak = true,
         VisionRadius = 24,
     },
     Interface = {
@@ -214,7 +216,7 @@ UnitBlueprint {
         {            
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1499,
+            Damage = 1100,
             DamageFriendly = false,
             DamageRadius = 6,
             DamageType = 'FireBeetleExplosion',
