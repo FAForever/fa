@@ -97,10 +97,6 @@ function CreateScoreUI(parent)
         GameMain.RemoveBeatFunction(_OnBeat)
     end
 
-    controls.bg.OnHide = function(self, hidden)
-        return true
-    end
-
     if contractOnCreate then
         Contract()
     end
@@ -116,6 +112,10 @@ function CreateScoreUI(parent)
         self.Right:Set(newRight)
     end
     controls.collapseArrow:SetCheck(true, true)
+end
+
+function newOnHide(self, hidden)
+    return true
 end
 
 function fmtnum(ns)
@@ -471,6 +471,9 @@ function DisplayResources(resources, line, mode)
         end
         line.mass_in:SetText(fmtnum(Tmp.Mass * 10))
         line.energy_in:SetText(fmtnum(Tmp.Energy * 10))
+        line.mass.OnHide = nil
+        line.energy.OnHide = nil
+        line.units.OnHide = nil
         line.mass:Show()
         line.energy:Show()
         line.units:Show()
@@ -480,6 +483,9 @@ function DisplayResources(resources, line, mode)
         line.mass:Hide()
         line.energy:Hide()
         line.units:Hide()
+        line.mass.OnHide = newOnHide
+        line.energy.OnHide = newOnHide
+        line.units.OnHide = newOnHide
     end
 end
 
