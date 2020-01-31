@@ -2851,102 +2851,101 @@ function CreateUI(maxPlayers)
     GUI.chatPanel.Height:Set(245)
 
     if isHost then
-    GUI.AIFillPanel = Combo.Combo(GUI.panel, 14, 12, false, nil)
-    GUI.AIFillPanel.Width:Set(278)
-    GUI.AIFillPanel.Left:Set(GUI.observerPanel.Left())
-    GUI.AIFillPanel.Top:Set(GUI.chatPanel.Top())
-    if (AIKeys[1] or AIStrings[1] or AITooltips[1]) == nil then
-      for _, aidata in aitypes do
-        table.insert(AIKeys, aidata.key)
-        table.insert(AIStrings, aidata.name)
-        table.insert(AITooltips, 'aitype_'..aidata.key)
-      end
-    end
-    GUI.AIFillPanel:AddItems(AIStrings)
-    GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
-    GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillPanel, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
-    GUI.AIFillButton.Width:Set(129)
-    GUI.AIFillButton.Height:Set(30)
-    LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillPanel, -10, 25)
-    GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
-    GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width())
-    GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height())
-    LayoutHelpers.RightOf(GUI.AIClearButton, GUI.AIFillButton, -19)
-    GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-    GUI.TeamCountSelector.Width:Set(44)
-    GUI.TeamCountSelector.Top:Set(GUI.AIClearButton.Top() + 5)
-    GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right())
-    local tooltipText = {}
-    tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
-    tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
-    Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0,148)
-    local ChangedSlots = {}
-    GUI.AIFillButton.OnClick = function()
-      local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
-      if ChangedSlots[1] ~= nil then
-        for i = 1, table.getn(ChangedSlots) do
-          HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], ChangedSlots[i])
+        GUI.AIFillPanel = Combo.Combo(GUI.panel, 14, 12, false, nil)
+        GUI.AIFillPanel.Width:Set(278)
+        GUI.AIFillPanel.Left:Set(GUI.observerPanel.Left)
+        GUI.AIFillPanel.Top:Set(GUI.chatPanel.Top)
+        if (AIKeys[1] or AIStrings[1] or AITooltips[1]) == nil then
+          for _, aidata in aitypes do
+            table.insert(AIKeys, aidata.key)
+            table.insert(AIStrings, aidata.name)
+            table.insert(AITooltips, 'aitype_'..aidata.key)
+          end
         end
-        GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
-        return
-      end
-      for Slot = 1, GetNumAvailStartSpots() do
-        if not (gameInfo.PlayerOptions[Slot] or gameInfo.ClosedSlots[Slot]) then
-          HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], Slot)
-          table.insert(ChangedSlots, Slot)
-        end
-      end
-      GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
-    end
-    GUI.AIClearButton.OnClick = function()
-      for i = 1, table.getn(ChangedSlots) do
-        HostUtils.RemoveAI(ChangedSlots[i])
-      end
-      ChangedSlots = {}
-    end
-    GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
-      local OccupiedSlots = 0
-      local AvailStartSpots = GetNumAvailStartSpots()
-      for Slot = 1, AvailStartSpots do
-        if gameInfo.PlayerOptions[Slot] ~= nil then
-          OccupiedSlots = OccupiedSlots + 1
-        end
-      end
-      local PlayersPerTeam = 0
-      if Index > 1 then
-        PlayersPerTeam = math.floor(OccupiedSlots / (Index - 1))
-      end
-      local AssignedTeam = 2
-      local Counter = 0
-      for Slot = 1, AvailStartSpots do
-        if gameInfo.PlayerOptions[Slot] then
-          if AssignedTeam > Index then
-            SetPlayerOption(Slot, 'Team', 1, true)
-          else
-            SetPlayerOption(Slot, 'Team', AssignedTeam, true)
-            Counter = Counter + 1
-            if Counter >= PlayersPerTeam then
-              AssignedTeam = AssignedTeam + 1
-              Counter = 0
+        GUI.AIFillPanel:AddItems(AIStrings)
+        GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
+        GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillPanel, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
+        GUI.AIFillButton.Width:Set(129)
+        GUI.AIFillButton.Height:Set(30)
+        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillPanel, -10, 25)
+        GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
+        GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width)
+        GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height)
+        LayoutHelpers.RightOf(GUI.AIClearButton, GUI.AIFillButton, -19)
+        GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        GUI.TeamCountSelector.Width:Set(44)
+        LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
+        GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right)
+        local tooltipText = {}
+        tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
+        tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
+        Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0,148)
+        local ChangedSlots = {}
+        GUI.AIFillButton.OnClick = function()
+          local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
+          if ChangedSlots[1] ~= nil then
+            for i = 1, table.getn(ChangedSlots) do
+              HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], ChangedSlots[i])
+            end
+            GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
+            return
+          end
+          for Slot = 1, GetNumAvailStartSpots() do
+            if not (gameInfo.PlayerOptions[Slot] or gameInfo.ClosedSlots[Slot]) then
+              HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], Slot)
+              table.insert(ChangedSlots, Slot)
             end
           end
-          SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
+          GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
         end
-      end
-    end
-    local texturePath = '/scx_menu/lan-game-lobby/frame/'
-    GUI.AIFillPanelBorder = Border(GUI.panel,
-      UIUtil.SkinnableFile(texturePath .. 'topLeft.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'topRight.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'bottomLeft.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'bottomRight.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'left.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'right.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'top.dds'),
-      UIUtil.SkinnableFile(texturePath .. 'bottom.dds')
-)
-    GUI.AIFillPanelBorder:Surround(GUI.AIFillPanel, 62, 62)
-    GUI.AIFillPanelBorder.Bottom:Set(GUI.AIFillPanelBorder.Bottom() + 43)
+        GUI.AIClearButton.OnClick = function()
+          for i = 1, table.getn(ChangedSlots) do
+            HostUtils.RemoveAI(ChangedSlots[i])
+          end
+          ChangedSlots = {}
+        end
+        GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
+          local OccupiedSlots = 0
+          local AvailStartSpots = GetNumAvailStartSpots()
+          for Slot = 1, AvailStartSpots do
+            if gameInfo.PlayerOptions[Slot] ~= nil then
+              OccupiedSlots = OccupiedSlots + 1
+            end
+          end
+          local PlayersPerTeam = 0
+          if Index > 1 then
+            PlayersPerTeam = math.floor(OccupiedSlots / (Index - 1))
+          end
+          local AssignedTeam = 2
+          local Counter = 0
+          for Slot = 1, AvailStartSpots do
+            if gameInfo.PlayerOptions[Slot] then
+              if AssignedTeam > Index then
+                SetPlayerOption(Slot, 'Team', 1, true)
+              else
+                SetPlayerOption(Slot, 'Team', AssignedTeam, true)
+                Counter = Counter + 1
+                if Counter >= PlayersPerTeam then
+                  AssignedTeam = AssignedTeam + 1
+                  Counter = 0
+                end
+              end
+              SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
+            end
+          end
+        end
+        local texturePath = '/scx_menu/lan-game-lobby/frame/'
+        GUI.AIFillPanelBorder = Border(GUI.panel,
+          UIUtil.SkinnableFile(texturePath .. 'topLeft.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'topRight.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'bottomLeft.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'bottomRight.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'left.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'right.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'top.dds'),
+          UIUtil.SkinnableFile(texturePath .. 'bottom.dds'))
+        GUI.AIFillPanelBorder:Surround(GUI.AIFillPanel, 62, 62)
+        LayoutHelpers.AtBottomIn(GUI.AIFillPanelBorder, GUI.AIFillPanel, 20)
     end
  
 
