@@ -1050,3 +1050,27 @@ end
 function moho.entity_methods()
 end
 
+------
+-- New functions from engine patch:
+------
+
+-- Returns list of deposits
+-- Type: 0 - All, 1 - Mass, 2 - Energy
+-- Result: {{X1,X2,Z1,Z2,Type,Dist},...}
+function GetDepositsAroundPoint(X, Z, Radius, Type)
+end
+
+-- Returns true if the active session is a replay
+-- Same as user SessionIsReplay.
+function SessionIsReplay()
+end
+
+-- Allows set the rights to the army
+-- Nothing returns
+function SetCommandSource(targetArmyIndex, sourceHumanIndex, Set or Unset)
+end
+
+-- Sets the focus without checking rights
+-- Nothing returns
+function SetFocusArmy(armyIndex or -1)
+end
