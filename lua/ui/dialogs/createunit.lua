@@ -169,8 +169,7 @@ end
 
 function CreateDialog(x, y)
     if dialog then
-        dialog:Destroy()
-        dialog = false
+        dialog.cancelBtn.OnClick()
         return
     end
 
@@ -186,15 +185,6 @@ function CreateDialog(x, y)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
-    ForkThread(function()
-                   while not IsKeyDown('ESCAPE') do
-                       if not dialog then return end
-                       WaitSeconds(0.05)
-                   end
-                   dialog:Destroy()
-                   dialog = false
-               end)
-
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
     LayoutHelpers.AtBottomIn(cancelBtn, dialog)
     LayoutHelpers.AtRightIn(cancelBtn, dialog)
@@ -202,6 +192,16 @@ function CreateDialog(x, y)
         dialog:Destroy()
         dialog = false
     end
+
+    ForkThread(function()
+                   while dialog do
+                       if IsKeyDown('ESCAPE') then
+						   cancelBtn.OnClick()
+						   return
+					   end
+                       WaitSeconds(0.05)
+                   end
+               end)
 
     local countLabel = UIUtil.CreateText(dialog, 'Count:', 12, UIUtil.bodyFont)
     LayoutHelpers.AtBottomIn(countLabel, dialog,10)
@@ -259,26 +259,36 @@ function CreateDialog(x, y)
         end
     end
 
-    local function spawnUnits(creationList, targetArmy)
+    local function spawnUnits(creationList, targetArmy, fast)
+		if table.getsize(creationList) <= 0 then return end
         local numUnits = tonumber(count:GetText())
         local vetLvl = tonumber(veterancyLevel:GetText())
-        WaitSeconds(0.1)
-        while not IsKeyDown(1) do -- Left mouse button
-            if IsKeyDown('ESCAPE') then return end
-            WaitSeconds(0.05)
-        end
-        SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
-                       Args = { bpId = creationList, count = numUnits,
-                       army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+		if fast then
+			SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+				Args = { bpId = creationList, count = numUnits,
+				army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+		else
+			WaitSeconds(0.1)
+			while not dialog do
+				if IsKeyDown('ESCAPE') then return end
+				if IsKeyDown(1) then -- Left mouse button
+					SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+						Args = { bpId = creationList, count = numUnits,
+						army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+					return
+				end
+				WaitSeconds(0.05)
+			end
+		end
     end
 
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
-    createBtn.OnClick = function(button)
-        ForkThread(spawnUnits, CreationList, currentArmy)
-        dialog:Destroy()
-        dialog = false
+    createBtn.HandleEvent = function(self, event)
+		if event.Type ~= 'ButtonPress' then return end
+        ForkThread(spawnUnits, CreationList, currentArmy, event.Modifiers.Right)
+        cancelBtn.OnClick()
     end
 
     local function SetFilters(filterTable)
@@ -576,8 +586,12 @@ function CreateDialog(x, y)
                         CreationList[self.unitID] = true
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
+                elseif event.Type == 'ButtonPress' and event.Modifiers.Right then
+					CreationList[self.unitID] = true
+                    ForkThread(spawnUnits, CreationList, currentArmy, true)
+                    cancelBtn:OnClick()
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy)
+                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy, false)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)
