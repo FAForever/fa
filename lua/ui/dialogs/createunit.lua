@@ -196,9 +196,9 @@ function CreateDialog(x, y)
     ForkThread(function()
                    while dialog do
                        if IsKeyDown('ESCAPE') then
-						   cancelBtn.OnClick()
-						   return
-					   end
+                           cancelBtn.OnClick()
+                           return
+                       end
                        WaitSeconds(0.05)
                    end
                end)
@@ -260,33 +260,33 @@ function CreateDialog(x, y)
     end
 
     local function spawnUnits(creationList, targetArmy, fast)
-		if table.getsize(creationList) <= 0 then return end
+        if table.getsize(creationList) <= 0 then return end
         local numUnits = tonumber(count:GetText())
         local vetLvl = tonumber(veterancyLevel:GetText())
-		if fast then
-			SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
-				Args = { bpId = creationList, count = numUnits,
-				army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-		else
-			WaitSeconds(0.1)
-			while not dialog do
-				if IsKeyDown('ESCAPE') then return end
-				if IsKeyDown(1) then -- Left mouse button
-					SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
-						Args = { bpId = creationList, count = numUnits,
-						army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-					return
-				end
-				WaitSeconds(0.05)
-			end
-		end
+        if fast then
+            SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+                Args = { bpId = creationList, count = numUnits,
+                army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+        else
+            WaitSeconds(0.1)
+            while not dialog do
+                if IsKeyDown('ESCAPE') then return end
+                if IsKeyDown(1) then -- Left mouse button
+                    SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+                        Args = { bpId = creationList, count = numUnits,
+                        army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+                    return
+                end
+                WaitSeconds(0.05)
+            end
+        end
     end
 
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
     createBtn.HandleEvent = function(self, event)
-		if event.Type ~= 'ButtonPress' then return end
+        if event.Type ~= 'ButtonPress' then return end
         ForkThread(spawnUnits, CreationList, currentArmy, event.Modifiers.Right)
         cancelBtn.OnClick()
     end
@@ -587,7 +587,7 @@ function CreateDialog(x, y)
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
                 elseif event.Type == 'ButtonPress' and event.Modifiers.Right then
-					CreationList[self.unitID] = true
+                    CreationList[self.unitID] = true
                     ForkThread(spawnUnits, CreationList, currentArmy, true)
                     cancelBtn:OnClick()
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
