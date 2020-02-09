@@ -213,8 +213,8 @@ UnitBlueprint {
         HelpText = '<LOC ues0202_help>Cruiser',
     },
     LifeBarHeight = 0.075,
-    LifeBarOffset = 3.45,
-    LifeBarSize = 1.75,
+    LifeBarOffset = 2.45,
+    LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
         BankingSlope = 0,
