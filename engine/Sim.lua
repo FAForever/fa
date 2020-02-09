@@ -1066,11 +1066,13 @@ function SessionIsReplay()
 end
 
 -- Allows set the rights to the army
+-- targetArmyIndex, sourceHumanIndex is 0 based index
 -- Nothing returns
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, Set or Unset)
 end
 
 -- Sets the focus without checking rights
+-- armyIndex is 0 based index
 -- Nothing returns
 function SetFocusArmy(armyIndex or -1)
 end
