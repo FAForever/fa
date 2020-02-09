@@ -41,7 +41,7 @@ UEB4301 = Class(TShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
         for k, v in self.ShieldEffects do
-            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 0, self:GetArmy(), v))
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 0, self.Army, v))
         end
     end,
 

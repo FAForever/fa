@@ -36,7 +36,7 @@ URB4202 = Class(CShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter(self, 'Shaft', self:GetArmy(), v))
+            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter(self, 'Shaft', self.Army, v))
         end
     end,
 

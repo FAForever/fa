@@ -17,7 +17,7 @@ UAA0203 = Class(AAirUnit) {
             
             PlayFxMuzzleSequence = function(self, muzzle)
                 local bp = self:GetBlueprint()
-                local army = self.unit:GetArmy()
+                local army = self.unit.Army
                 for k, v in self.FxMuzzleFlash do
                     CreateAttachedEmitter(self.unit, muzzle, army, v)
                 end

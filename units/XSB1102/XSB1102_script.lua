@@ -34,7 +34,7 @@ XSB1102 = Class(SEnergyCreationUnit) {
 
         for keys, values in effects do
             for keysbones, valuesbones in bones do
-                self.Trash:Add(CreateAttachedEmitter(self, valuesbones, self:GetArmy(), values):ScaleEmitter(scale):OffsetEmitter(0, -0.2, 1))
+                self.Trash:Add(CreateAttachedEmitter(self, valuesbones, self.Army, values):ScaleEmitter(scale):OffsetEmitter(0, -0.2, 1))
             end
         end
 

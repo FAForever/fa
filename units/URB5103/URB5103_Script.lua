@@ -16,7 +16,7 @@ URB5103 = Class(CStructureUnit) {
     OnCreate = function(self)
         CStructureUnit.OnCreate(self)
         for k, v in self.FxTransportBeacon do
-            self.Trash:Add(CreateAttachedEmitter(self, 0,self:GetArmy(), v):ScaleEmitter(self.FxTransportBeaconScale))
+            self.Trash:Add(CreateAttachedEmitter(self, 0, self.Army, v):ScaleEmitter(self.FxTransportBeaconScale))
         end
     end,
 }

@@ -22,7 +22,7 @@ URB2302 = Class(CStructureUnit) {
             FxCoolDownEffect = EffectTemplate.CDisruptorCoolDownEffect,
 
             PlayFxMuzzleSequence = function(self, muzzle)
-                local army = self.unit:GetArmy()
+                local army = self.unit.Army
                 DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
                 for k, v in self.FxGroundEffect do
                     CreateAttachedEmitter(self.unit, 'URB2302', army, v)

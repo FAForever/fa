@@ -40,7 +40,6 @@ URA0401 = Class(CAirUnit) {
         CAirUnit.OnStopBeingBuilt(self,builder,layer)
         self.AnimManip = CreateAnimator(self)
         self.Trash:Add(self.AnimManip)
-        --self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
     end,
 
     OnMotionHorzEventChange = function(self, new, old )
@@ -63,18 +62,17 @@ URA0401 = Class(CAirUnit) {
     end,
 
     MovementAmbientExhaustThread = function(self)
-        while not self:IsDead() do
+        while not self.Dead do
             local ExhaustEffects = {
                 '/effects/emitters/dirty_exhaust_smoke_01_emit.bp',
                 '/effects/emitters/dirty_exhaust_sparks_01_emit.bp',            
             }
-            local ExhaustBeam = '/effects/emitters/missile_exhaust_fire_beam_03_emit.bp'
-            local army = self:GetArmy()         
+            local ExhaustBeam = '/effects/emitters/missile_exhaust_fire_beam_03_emit.bp'        
 
             for kE, vE in ExhaustEffects do
                 for kB, vB in self.MovementAmbientExhaustBones do
-                    table.insert(self.MovementAmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
-                    table.insert(self.MovementAmbientExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vB, army, ExhaustBeam))
+                    table.insert(self.MovementAmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, self.Army, vE))
+                    table.insert(self.MovementAmbientExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vB, self.Army, ExhaustBeam))
                 end
             end
 

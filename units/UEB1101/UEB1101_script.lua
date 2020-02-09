@@ -49,8 +49,9 @@ UEB1101 = Class(TEnergyCreationUnit) {
 
     OpeningState = State {
         Main = function(self)
-            if self:GetBlueprint().Audio.Activate then
-                self:PlaySound(self:GetBlueprint().Audio.Activate)
+            local bp = self:GetBlueprint()
+            if bp.Audio.Activate then
+                self:PlaySound(bp.Audio.Activate)
             end
             self.Sliders.Slider1:SetGoal(0, 0, -3)
             self.Sliders.Slider1:SetSpeed(5)
@@ -75,7 +76,7 @@ UEB1101 = Class(TEnergyCreationUnit) {
 
     IdleOpenState = State {
         Main = function(self)
-            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self:GetArmy(), '/effects/emitters/economy_electricity_01_emit.bp')
+            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self.Army, '/effects/emitters/economy_electricity_01_emit.bp')
             self.Trash:Add(self.Effecct1)
         end,
     },

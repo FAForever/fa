@@ -17,7 +17,7 @@ URL0101 = Class(CWalkingLandUnit) {
         local bp = self:GetBlueprint()
         self.RadarEnt = Entity {}
         self.Trash:Add(self.RadarEnt)
-        self.RadarEnt:InitIntel(self:GetArmy(), 'Radar', bp.Intel.RadarRadius)
+        self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius)
         self.RadarEnt:EnableIntel('Radar')
         self.RadarEnt:AttachBoneTo(-1, self, 0)
         --antena spinner

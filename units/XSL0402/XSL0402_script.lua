@@ -20,7 +20,7 @@ XSL0402 = Class(SEnergyBallUnit) {
         SEnergyBallUnit.OnCreate(self)
         for k, v in EffectTemplate.OthuyAmbientEmanation do
             -- XSL0402
-            CreateAttachedEmitter(self,'Outer_Tentaclebase', self:GetArmy(), v)
+            CreateAttachedEmitter(self,'Outer_Tentaclebase', self.Army, v)
         end
         self:HideBone(0,true)
     end,

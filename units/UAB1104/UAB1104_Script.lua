@@ -48,10 +48,10 @@ UAB1104 = Class(AMassFabricationUnit) {
             self.Goal = Random(120, 300)
 
             -- Ambient effects
-            self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
+            self.AmbientEffects = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
             self.Trash:Add(self.AmbientEffects)
 
-            while not self:IsDead() do
+            while not self.Dead do
                 -- spin clockwise
                 if not self.Clockwise then
                     self.Rotator:SetTargetSpeed(self.Goal)

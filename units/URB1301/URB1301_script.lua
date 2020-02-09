@@ -21,7 +21,7 @@ URB1301 = Class(CEnergyCreationUnit) {
             else
                 fxname = 'BlinkyLight' .. i
             end
-            local fx = CreateAttachedEmitter(self, fxname, self:GetArmy(), '/effects/emitters/light_yellow_02_emit.bp'):OffsetEmitter(0, 0, 0.01):ScaleEmitter(1)
+            local fx = CreateAttachedEmitter(self, fxname, self.Army, '/effects/emitters/light_yellow_02_emit.bp'):OffsetEmitter(0, 0, 0.01):ScaleEmitter(1)
             self.Trash:Add(fx)
         end
     end
