@@ -1067,6 +1067,7 @@ end
 
 -- Allows set the rights to the army
 -- targetArmyIndex, sourceHumanIndex is 0 based index
+-- 'Set or Unset' is boolean
 -- Nothing returns
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, Set or Unset)
 end
