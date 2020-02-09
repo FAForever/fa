@@ -190,4 +190,7 @@ Blacklist = {
     ['fff6f6c8-248a-11de-8c30-362b9e100008'] = HARMFUL,
     ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
 
+    -- cheat mod
+    ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
+    ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
 }
