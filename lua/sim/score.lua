@@ -1,4 +1,7 @@
-scoreInterval = 10
+historyInterval = 10
+scoreInterval = 1
+resourcesInterval = 0.1
+alliesScore = true
 
 local scoreData = {current={}, historical={}}
 local scoreOption = ScenarioInfo.Options.Score or "no"
@@ -57,7 +60,7 @@ end
 
 function ScoreHistoryThread()
     while true do
-        WaitSeconds(scoreInterval)
+        WaitSeconds(historyInterval)
         table.insert(scoreData.historical, table.deepcopy(scoreData.current))
     end
 end
@@ -153,6 +156,7 @@ function ScoreThread()
     ForkThread(ScoreDisplayResourcesThread)
 
     while true do
+        local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
             ArmyScore[index].faction = brain:GetFactionIndex()
             ArmyScore[index].name = brain.Nickname
@@ -207,12 +211,11 @@ function ScoreThread()
                 ArmyScore[index].units[categoryName]['lost'] = brain:GetBlueprintStat("Units_Killed", category)
             end
 
-            WaitSeconds(0.1)
+            WaitSeconds(updInterval)
         end
 
         UpdateScoreData(ArmyScore)
         SyncScores()
-        WaitSeconds(3)
     end
 end
 
@@ -235,14 +238,14 @@ function ScoreDisplayResourcesThread()
             ArmyScore[index].general.lastReclaimedEnergy = reclaimedEnergy
             ArmyScore[index].resources.energyover.rate = ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate + ArmyScore[index].resources.EnergyReclaimRate
         end
-        WaitSeconds(0.1)
+        WaitSeconds(resourcesInterval)
     end
 end
 
 local observer = false
 function SyncScores()
-    local my_army_index = GetFocusArmy()
-    observer = my_army_index == -1
+    local myArmyIndex = GetFocusArmy()
+    observer = myArmyIndex == -1
 
     local victory = import('/lua/victory.lua')
     if observer or victory.gameOver then
@@ -261,7 +264,7 @@ function SyncScores()
                 brain.StatsSent = true
             end
 
-            if IsAlly(my_army_index,brain:GetArmyIndex()) then
+            if (myArmyIndex == index) or (alliesScore and IsAlly(myArmyIndex, index)) then
                 Sync.Score[index] = ArmyScore[index]
             else
                 Sync.Score[index] = {}
