@@ -17,10 +17,12 @@ function SetLayout()
 
     LayoutHelpers.AtRightTopIn(controls.bg, mapGroup, 18, 7)
     controls.bg.Width:Set(controls.bgTop.Width)
+    controls.bgStretch.Width:Set(controls.bgTop.Width)
+    controls.bgBottom.Width:Set(controls.bgTop.Width)
 
     LayoutHelpers.AtRightTopIn(controls.bgTop, controls.bg, 3)
     LayoutHelpers.AtLeftTopIn(controls.armyGroup, controls.bgTop, 10, 25)
-    controls.armyGroup.Width:Set(controls.armyLines[1].Width)
+    controls.armyGroup.Width:Set(function() return controls.bgTop.Width() - 20 end)
 
     controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
     controls.leftBracketMin.Top:Set(function() return controls.bg.Top() - 1 end)
@@ -61,13 +63,6 @@ function SetLayout()
     controls.bgStretch.Right:Set(function() return controls.bgTop.Right() - 0 end)
 
     controls.bg.Height:Set(function() return controls.bgBottom.Bottom() - controls.bgTop.Top() end)
-    controls.armyGroup.Height:Set(function()
-        local totHeight = 0
-        for _, line in controls.armyLines do
-            totHeight = totHeight + line.Height()
-        end
-        return totHeight
-    end)
 
     LayoutHelpers.AtLeftTopIn(controls.timeIcon, controls.bgTop, 10, 6)
     controls.timeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
@@ -83,8 +78,6 @@ function SetLayout()
     controls.unitIcon.Width:Set(function() return controls.unitIcon.BitmapWidth() * .9 end)
     local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
     avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
-
-    LayoutArmyLines()
 end
 
 function LayoutArmyLines()

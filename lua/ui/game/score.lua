@@ -43,6 +43,14 @@ local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
 
+function armyGroupHeight()
+    local height = 0
+    for _, line in controls.armyLines do
+        height = height + line.Height()
+    end
+    return height
+end
+
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
 
@@ -77,7 +85,7 @@ function CreateScoreUI(parent)
 
     controls.bg:DisableHitTest(true)
 
-    SetupPlayerLines()
+    controls.bgTop.Width:Set(320)
 
     controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.time:SetColor('ff00dbff')
@@ -91,10 +99,12 @@ function CreateScoreUI(parent)
     Tooltip.AddControlTooltip(controls.units, 'score_units')
 
     SetLayout()
+    SetupPlayerLines()
+    controls.armyGroup.Height:Set(armyGroupHeight())
 
-    GameMain.AddBeatFunction(_OnBeat, true)
+    GameMain.AddBeatFunction(OnBeat, true)
     controls.bg.OnDestroy = function(self)
-        GameMain.RemoveBeatFunction(_OnBeat)
+        GameMain.RemoveBeatFunction(OnBeat)
     end
 
     if contractOnCreate then
@@ -114,7 +124,7 @@ function CreateScoreUI(parent)
     controls.collapseArrow:SetCheck(true, true)
 end
 
-function newOnHide(self, hidden)
+function blockOnHide(self, hidden)
     return true
 end
 
@@ -220,7 +230,7 @@ function SetupPlayerLines()
         LayoutHelpers.AtVerticalCenterIn(group.score, group)
         group.score:SetColor('ffffffff')
 
-        group.name.Right:Set(group.score.Left)
+        group.name.Right:Set(function() return group.score.Left() - 5 end)
         group.name:SetClipToWidth(true)
 
         if armyIndex ~= 0 then
@@ -282,7 +292,7 @@ function SetupPlayerLines()
         end
 
         group.Height:Set(group.faction.Height)
-        group.Width:Set(262)
+        group.Width:Set(controls.armyGroup.Width)
         group.armyID = armyIndex
 
         group.bg = Bitmap(group)
@@ -316,6 +326,7 @@ function SetupPlayerLines()
 
     observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
     observerLine:Hide()
+    observerLine.OnHide = blockOnHide
     observerLine.scoreNumber = -2
     observerLine.name.Top:Set(observerLine.Top)
     observerLine.Height:Set(15)
@@ -323,11 +334,11 @@ function SetupPlayerLines()
     if SessionIsReplay() then
         sessionInfo.Options.Score = 'yes'
         observerLine.Height:Set(40)
-        observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 12, UIUtil.bodyFont)
+        observerLine.speedText = UIUtil.CreateText(observerLine, '', 12, UIUtil.bodyFont)
         observerLine.speedText:Hide()
         observerLine.speedText:SetColor('ff00dbff')
         LayoutHelpers.AtRightIn(observerLine.speedText, observerLine)
-        observerLine.speedSlider = IntegerSlider(controls.bgStretch, false, -10, 10, 1,
+        observerLine.speedSlider = IntegerSlider(observerLine, false, -10, 10, 1,
             UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
             UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
             UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
@@ -355,14 +366,9 @@ function SetupPlayerLines()
         observerLine.speedSlider:SetValue(gameSpeed)
     end
 
-    local function CreateMapNameLine(data, armyIndex)
+    local function CreateMapNameLine(data)
         local group = Group(controls.bgStretch)
 
-        local mapnamesize = string.len(data.mapname)
-        local mapoffset = 131 - (mapnamesize * 2.7)
-        if sessionInfo.Options.Ranked then
-            mapoffset = mapoffset + 10
-        end
         group.name = UIUtil.CreateText(group, data.mapname, 10, UIUtil.bodyFont)
         group.name:DisableHitTest()
         LayoutHelpers.AtLeftIn(group.name, group)
@@ -370,23 +376,18 @@ function SetupPlayerLines()
         group.name:SetColor('ffffffff')
 
         if sessionInfo.Options.Ranked then
-            group.faction = Bitmap(group)
-            group.faction:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
-            group.faction.Height:Set(14)
-            group.faction.Width:Set(14)
-            group.faction:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(group.faction, group.name, -15)
+            group.ranked = Bitmap(group)
+            group.ranked:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
+            group.ranked.Height:Set(16)
+            group.ranked.Width:Set(16)
+            group.ranked:DisableHitTest()
+            LayoutHelpers.AtLeftTopIn(group.ranked, group, 0)
         end
 
-        group.score = UIUtil.CreateText(group, '', 10, UIUtil.bodyFont)
-        group.score:DisableHitTest()
-        LayoutHelpers.AtRightIn(group.score, group)
-        LayoutHelpers.AtVerticalCenterIn(group.score, group)
-        group.score:SetColor('ffffffff')
-        group.name.Right:Set(group.score.Left)
+        group.name.Right:Set(group.Right)
         group.name:SetClipToWidth(true)
         group.Height:Set(18)
-        group.Width:Set(262)
+        group.Width:Set(controls.armyGroup.Width)
         group:DisableHitTest()
         group.scoreNumber = -3
 
@@ -430,7 +431,7 @@ function SetupPlayerLines()
         end
     end
 
-    controls.armyLines[index] = CreateMapNameLine(mapData, 0)
+    controls.armyLines[index] = CreateMapNameLine(mapData)
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
     resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
@@ -469,8 +470,8 @@ function DisplayResources(resources, line, mode)
         elseif mode == 2 then
             Tmp = {Mass = resources.storage.storedMass * 0.1, Energy = resources.storage.storedEnergy * 0.1}
         end
-        line.mass_in:SetText(fmtnum(Tmp.Mass * 10))
-        line.energy_in:SetText(fmtnum(Tmp.Energy * 10))
+        line.mass_in:SetText('  '..fmtnum(Tmp.Mass * 10))
+        line.energy_in:SetText('  '..fmtnum(Tmp.Energy * 10))
         line.mass.OnHide = nil
         line.energy.OnHide = nil
         line.units.OnHide = nil
@@ -483,15 +484,15 @@ function DisplayResources(resources, line, mode)
         line.mass:Hide()
         line.energy:Hide()
         line.units:Hide()
-        line.mass.OnHide = newOnHide
-        line.energy.OnHide = newOnHide
-        line.units.OnHide = newOnHide
+        line.mass.OnHide = blockOnHide
+        line.energy.OnHide = blockOnHide
+        line.units.OnHide = blockOnHide
     end
 end
 
 local prevArmy = -2
 
-function _OnBeat()
+function OnBeat()
     local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
     if sessionInfo.Options.Quality then
         s = string.format("%s Q:%.2f%%", s, sessionInfo.Options.Quality)
@@ -525,7 +526,7 @@ function _OnBeat()
                         line.score:SetText(fmtnum(scoreData.general.score))
                         line.scoreNumber = scoreData.general.score
                     end
-                    if line.OOG then break end
+
                     if DisplayStorage > 0 then
                         DisplayResources(scoreData.resources,line,2)
                     else
@@ -537,7 +538,8 @@ function _OnBeat()
                             SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
                         end
                     end
-                    if armiesInfo[index].outOfGame then
+
+                    if (not line.OOG) and (armiesInfo[index].outOfGame) then
                         line.OOG = true
                         line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
                         line.color:SetSolidColor('ff000000')
@@ -552,11 +554,11 @@ function _OnBeat()
                 end
             end
         end
-        if (sessionInfo.Options.Score == 'yes') or (armiesInfo[localArmyID].outOfGame) then
+        --[[if (sessionInfo.Options.Score == 'yes') or (armiesInfo[localArmyID].outOfGame) then
             table.sort(controls.armyLines, function(a,b)
                 return a.scoreNumber > b.scoreNumber
             end)
-        end
+        end]]
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         local line = {}
         for index, data in controls.armyLines do
@@ -597,14 +599,25 @@ function _OnBeat()
             observerLine.name:SetFont(UIUtil.bodyFont, 12)
         end
         if observerLine:IsHidden() and ((cur < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
-            table.insert(controls.armyLines, table.getn(controls.armyLines), observerLine)
+            table.insert(controls.armyLines, table.getsize(controls.armyLines), observerLine)
             import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
-            controls.armyGroup.Height:Set(controls.armyGroup.Height() + observerLine.Height())
+            controls.armyGroup.Height:Set(armyGroupHeight())
+            observerLine.OnHide = nil
             observerLine:Show()
             if observerLine.speedText then
                 observerLine.speedText:Show()
                 observerLine.speedSlider:Show()
             end
+        end
+        if cur >= 0 then
+            table.sort(controls.armyLines, function(a, b)
+                if (a.armyID > 0) and (b.armyID > 0) then
+                    if not IsAlly(a.armyID, b.armyID) then
+                        return IsAlly(a.armyID, cur)
+                    end
+                end
+                return a.armyID > b.armyID
+            end)
         end
         prevArmy = cur
     end
