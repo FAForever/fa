@@ -107,7 +107,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     Warp(BuildBaseEffect, Vector(xPos, yPos - y, zPos))
     BuildBaseEffect:SetScale(x, y, z)
     BuildBaseEffect:SetVelocity(0, 1.4 * y, 0)
-    WaitSeconds(0.8)
+    WaitSeconds(0.7)
 
     if unitBeingBuilt.Dead then
         return
@@ -122,7 +122,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
 
     local lComplete = unitBeingBuilt:GetFractionComplete()
-    WaitSeconds(0.3)
+    WaitSeconds(0.2)
 
     if unitBeingBuilt.Dead then
         return
@@ -130,7 +130,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
 
     -- Create glow slice cuts and resize base cube
     local slice = nil
-    local SlicePeriod = 1.2
+    local SlicePeriod = 1.1
     local cComplete = unitBeingBuilt:GetFractionComplete()
     while not unitBeingBuilt.Dead and  cComplete < 1.0 do
         if lComplete < cComplete and not BuildBaseEffect:BeenDestroyed() then
@@ -204,7 +204,7 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, Bui
 
     if unitBeingBuilt:GetFractionComplete() == 0 then
         Warp(BeamEndEntity, Vector((cx1 + cx2) * 0.5, ((cy1 + cy2) * 0.5) - oy, (cz1 + cz2) * 0.5))
-        WaitSeconds(0.8)
+        WaitSeconds(0.7)
     end
 
     local flipDirection = true
@@ -220,7 +220,7 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, Bui
             BeamEndEntity:SetVelocity(-velX, -velY, -velZ)
             flipDirection = true
         end
-        WaitSeconds(0.6)
+        WaitSeconds(0.5)
     end
 end
 
@@ -277,7 +277,7 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectB
     if unitBeingBuilt:GetFractionComplete() == 0 then
         Warp(BeamEndEntity, Vector(cx1, cy1 - oy, cz1))
         Warp(BeamEndEntity2, Vector(cx2, cy2 - oy, cz2))
-        WaitSeconds(0.8)
+        WaitSeconds(0.7)
     end
 
     local flipDirection = true
@@ -297,7 +297,7 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectB
             BeamEndEntity2:SetVelocity(velX, velY, velZ)
             flipDirection = true
         end
-        WaitSeconds(0.6)
+        WaitSeconds(0.5)
     end
 end
 
