@@ -203,7 +203,7 @@ UnitBlueprint {
         HelpText = '<LOC xes0205_help>Shield Boat',
     },
     LifeBarHeight = 0.075,
-    LifeBarOffset = 1.1,
+    LifeBarOffset = 1.7,
     LifeBarSize = 1.1,
     Physics = {
         BackUpDistance = 5,
