@@ -83,14 +83,20 @@ UnitBlueprint {
         AnimationDeath = {
             {
                 Animation = '/units/uas0103/uas0103_adeath01.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
             {
                 Animation = '/units/uas0103/uas0103_adeath02.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
             {
-                Animation = '/units/uas0103/uas0103_adeath02.sca',  #from                 Animation = '/units/uas0103/uas0103_adeath03.sca',
+                Animation = '/units/uas0103/uas0103_adeath03.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
         },
