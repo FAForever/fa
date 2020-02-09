@@ -17,8 +17,8 @@ UAB2204 = Class(AStructureUnit) {
 
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter(self.unit, 'Turret_Right_Muzzle', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter(self.unit, 'Turret_Left_Muzzle', self.unit:GetArmy(), '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Turret_Right_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                CreateAttachedEmitter(self.unit, 'Turret_Left_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         },
     },

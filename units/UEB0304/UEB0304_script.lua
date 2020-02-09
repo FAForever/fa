@@ -24,8 +24,8 @@ UEB0304 = Class(TQuantumGateUnit) {
         self.GateEffectEntity:SetVizToEnemies('Intel')          
         self.Trash:Add(self.GateEffectEntity)
 
-        CreateAttachedEmitter(self, 'Left_Gate_FX', self:GetArmy(), '/effects/emitters/terran_gate_01_emit.bp')
-        CreateAttachedEmitter(self, 'Right_Gate_FX', self:GetArmy(), '/effects/emitters/terran_gate_01_emit.bp')
+        CreateAttachedEmitter(self, 'Left_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
+        CreateAttachedEmitter(self, 'Right_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
       
         TQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
     end,

@@ -14,7 +14,7 @@ UAB0304 = Class(AQuantumGateUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         for k, v in AQuantumGateAmbient do
-            CreateAttachedEmitter(self, 'UAB0304', self:GetArmy(), v)
+            CreateAttachedEmitter(self, 'UAB0304', self.Army, v)
         end
 
         AQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)

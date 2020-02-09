@@ -44,7 +44,7 @@ URB1102 = Class(CEnergyCreationUnit) {
 
             for keffects, veffects in effects do
                 for kbones, vbones in bones do
-                    table.insert(self.EffectsBag, CreateAttachedEmitter(self, vbones, self:GetArmy(), veffects):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    table.insert(self.EffectsBag, CreateAttachedEmitter(self, vbones, self.Army, veffects):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
                 end
             end
         end,

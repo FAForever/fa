@@ -43,11 +43,10 @@ URB0304 = Class(CQuantumGateUnit) {
         self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2], self.Trash, 2.7)
         self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2], self.Trash, 3.1)
 
-        local army = self:GetArmy()
         for kBonesSet,vBoneSet in self.GateBones do
             for kBone, vBone in vBoneSet do
                 for kEffect, vEffect in self.GateEffects do
-                    self.Trash:Add(CreateAttachedEmitter(self, vBone, army, vEffect))
+                    self.Trash:Add(CreateAttachedEmitter(self, vBone, self.Army, vEffect))
                 end
             end
         end

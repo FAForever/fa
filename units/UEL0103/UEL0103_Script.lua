@@ -15,10 +15,11 @@ UEL0103 = Class(TLandUnit) {
         MainGun = Class(TIFHighBallisticMortarWeapon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = TIFHighBallisticMortarWeapon.CreateProjectileAtMuzzle(self, muzzle)
+                local bp = self:GetBlueprint()
                 local data = {
-                    Radius = self:GetBlueprint().CameraVisionRadius or 5,
-                    Lifetime = self:GetBlueprint().CameraLifetime or 5,
-                    Army = self.unit:GetArmy(),
+                    Radius = bp.CameraVisionRadius or 5,
+                    Lifetime = bp.CameraLifetime or 5,
+                    Army = self.unit.Army,
                 }
                 if proj and not proj:BeenDestroyed() then
                     proj:PassData(data)
