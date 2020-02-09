@@ -16,7 +16,6 @@ UAA0203 = Class(AAirUnit) {
             FxChassisMuzzleFlash = {'/effects/emitters/aeon_gunship_body_illumination_01_emit.bp',},
             
             PlayFxMuzzleSequence = function(self, muzzle)
-                local bp = self:GetBlueprint()
                 local army = self.unit.Army
                 for k, v in self.FxMuzzleFlash do
                     CreateAttachedEmitter(self.unit, muzzle, army, v)
@@ -24,12 +23,6 @@ UAA0203 = Class(AAirUnit) {
 
                 for k, v in self.FxChassisMuzzleFlash do
                     CreateAttachedEmitter(self.unit, -1, army, v)
-                end
-
-                if self.unit:GetCurrentLayer() == 'Water' and bp.Audio.FireUnderWater then
-                    self:PlaySound(bp.Audio.FireUnderWater)
-                elseif bp.Audio.Fire then
-                    self:PlaySound(bp.Audio.Fire)
                 end
             end,        
         },
