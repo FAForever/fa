@@ -1,26 +1,25 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB4301/UAB4301_script.lua
-#**  Author(s):  David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Heavy Shield Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/UAB4301/UAB4301_script.lua
+--#**  Author(s):  David Tomandl, Jessica St. Croix
+--#**
+--#**  Summary  :  Aeon Heavy Shield Generator Script
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 
 UAB4301 = Class(AShieldStructureUnit) {
-    
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_02_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_03_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_04_emit.bp',
     },
-    
+
     OnStopBeingBuilt = function(self,builder,layer)
-        AShieldStructureUnit.OnStopBeingBuilt(self,builder,layer)
-		self.ShieldEffectsBag = {}
+        AShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
+        self.ShieldEffectsBag = {}
     end,
 
     OnShieldEnabled = function(self)
@@ -39,10 +38,10 @@ UAB4301 = Class(AShieldStructureUnit) {
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self:GetArmy(), v ) )
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 0, self:GetArmy(), v))
         end
     end,
 
@@ -60,8 +59,8 @@ UAB4301 = Class(AShieldStructureUnit) {
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
     end,
     
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -76,4 +75,5 @@ UAB4301 = Class(AShieldStructureUnit) {
         end
     end,
 }
+
 TypeClass = UAB4301

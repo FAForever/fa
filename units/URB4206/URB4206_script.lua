@@ -1,29 +1,26 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB4206/URB4206_script.lua
-#**  Author(s):  David Tomandl, Greg Kohne
-#**
-#**  Summary  :  Cybran Shield Generator lvl 4 Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/URB4206/URB4206_script.lua
+--#**  Author(s):  David Tomandl, Greg Kohne
+--#**
+--#**  Summary  :  Cybran Shield Generator lvl 4 Script
+--#**
+--#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
-local Shield = import('/lua/shield.lua').Shield
 
 URB4206 = Class(CShieldStructureUnit) {
-    
     ShieldEffects = { 
-                    '/effects/emitters/cybran_shield_04_generator_01_emit.bp',
-                    '/effects/emitters/cybran_shield_04_generator_02_emit.bp',
-                    '/effects/emitters/cybran_shield_04_generator_03_emit.bp',
-                    },
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        CShieldStructureUnit.OnStopBeingBuilt(self,builder,layer)
+        '/effects/emitters/cybran_shield_04_generator_01_emit.bp',
+        '/effects/emitters/cybran_shield_04_generator_02_emit.bp',
+        '/effects/emitters/cybran_shield_04_generator_03_emit.bp',
+    },
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self.Rotator1 = CreateRotator(self, 'Shaft', 'z', nil, 30, 5, 30)
         self.Trash:Add(self.Rotator1)
-		self.ShieldEffectsBag = {}
+        self.ShieldEffectsBag = {}
     end,
 
     OnShieldEnabled = function(self)
@@ -31,15 +28,16 @@ URB4206 = Class(CShieldStructureUnit) {
         if self.Rotator1 then
             self.Rotator1:SetTargetSpeed(10)
         end
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
+
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'Shaft', self:GetArmy(), v ) )
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'Shaft', self:GetArmy(), v))
         end
     end,
 
@@ -51,8 +49,8 @@ URB4206 = Class(CShieldStructureUnit) {
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
             end
-		    self.ShieldEffectsBag = {}
-		end
+            self.ShieldEffectsBag = {}
+        end
     end,
 }
 

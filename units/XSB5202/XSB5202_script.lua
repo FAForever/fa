@@ -1,13 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB5202/UAB5202_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Aeon Air Staging Platform
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/UAB5202/UAB5202_script.lua
+--#**  Author(s):  John Comes, David Tomandl
+--#**
+--#**  Summary  :  Aeon Air Staging Platform
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local SAirStagingPlatformUnit = import('/lua/seraphimunits.lua').SAirStagingPlatformUnit
 local SeraphimAirStagePlat02 = import('/lua/EffectTemplates.lua').SeraphimAirStagePlat02
 local SeraphimAirStagePlat01 = import('/lua/EffectTemplates.lua').SeraphimAirStagePlat01
@@ -17,7 +16,7 @@ XSB5202 = Class(SAirStagingPlatformUnit) {
         for k, v in SeraphimAirStagePlat02 do
             CreateAttachedEmitter(self, 'XSB5202', self:GetArmy(), v)
         end
-        
+
         for k, v in SeraphimAirStagePlat01 do
             CreateAttachedEmitter(self, 'Pod01', self:GetArmy(), v)
             CreateAttachedEmitter(self, 'Pod02', self:GetArmy(), v)
@@ -25,7 +24,7 @@ XSB5202 = Class(SAirStagingPlatformUnit) {
             CreateAttachedEmitter(self, 'Pod04', self:GetArmy(), v)
             CreateAttachedEmitter(self, 'Pod05', self:GetArmy(), v)
             CreateAttachedEmitter(self, 'Pod06', self:GetArmy(), v)
-        end        
+        end
 
         SAirStagingPlatformUnit.OnStopBeingBuilt(self, builder, layer)
     end,
