@@ -1,19 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1301/URB1301_script.lua
-#**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Power Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/URB1301/URB1301_script.lua
+--#**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+--#**
+--#**  Summary  :  Cybran Power Generator Script
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
 URB1301 = Class(CEnergyCreationUnit) {
-    
     AmbientEffects = 'CT3PowerAmbient',
-    
+
     OnStopBeingBuilt = function(self, builder, layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         for i = 1, 36 do

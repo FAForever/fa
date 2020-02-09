@@ -1,18 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB1101/UEB1101_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Terran Power Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/UEB1101/UEB1101_script.lua
+--#**  Author(s):  John Comes, David Tomandl
+--#**
+--#**  Summary  :  Terran Power Generator Script
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
 UEB1101 = Class(TEnergyCreationUnit) {
-
-
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)
         self.Sliders = {
@@ -33,9 +30,9 @@ UEB1101 = Class(TEnergyCreationUnit) {
         end
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        TEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
-        
+    OnStopBeingBuilt = function(self, builder, layer)
+        TEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
+
         ChangeState(self, self.OpeningState)
     end,
 
@@ -55,13 +52,13 @@ UEB1101 = Class(TEnergyCreationUnit) {
             if self:GetBlueprint().Audio.Activate then
                 self:PlaySound(self:GetBlueprint().Audio.Activate)
             end
-            self.Sliders.Slider1:SetGoal(0,0,-3)
+            self.Sliders.Slider1:SetGoal(0, 0, -3)
             self.Sliders.Slider1:SetSpeed(5)
-            self.Sliders.Slider2:SetGoal(-3,0,0)
+            self.Sliders.Slider2:SetGoal(-3, 0, 0)
             self.Sliders.Slider2:SetSpeed(5)
-            self.Sliders.Slider3:SetGoal(0,0,3)
+            self.Sliders.Slider3:SetGoal(0, 0, 3)
             self.Sliders.Slider3:SetSpeed(5)
-            self.Sliders.Slider4:SetGoal(3,0,0)
+            self.Sliders.Slider4:SetGoal(3, 0, 0)
             self.Sliders.Slider4:SetSpeed(5)
             for k, v in self.Sliders do
                 WaitFor(v)
@@ -78,11 +75,10 @@ UEB1101 = Class(TEnergyCreationUnit) {
 
     IdleOpenState = State {
         Main = function(self)
-            self.Effect1 = CreateAttachedEmitter(self,'Exhaust01',self:GetArmy(), '/effects/emitters/economy_electricity_01_emit.bp')
+            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self:GetArmy(), '/effects/emitters/economy_electricity_01_emit.bp')
             self.Trash:Add(self.Effecct1)
         end,
     },
-
 
     ClosingState = State {
         Main = function(self)
@@ -97,7 +93,7 @@ UEB1101 = Class(TEnergyCreationUnit) {
                 WaitFor(v)
             end
             for k, v in self.Sliders do
-                v:SetGoal(0,0,0)
+                v:SetGoal(0, 0, 0)
                 v:SetSpeed(20)
             end
             for k,v in self.Sliders do
@@ -105,7 +101,6 @@ UEB1101 = Class(TEnergyCreationUnit) {
             end
             ChangeState(self, self.ClosedIdleState)
         end,
-
     },
 
     ClosedIdleState = State {
