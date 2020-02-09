@@ -110,7 +110,7 @@ UnitBlueprint {
                         Bones = {
                             'XES0205',
                         },
-                        Scale = 0.35,
+                        Scale = 1,
                         Type = 'SeaIdle01',
                     },
                 },
