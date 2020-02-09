@@ -233,7 +233,7 @@ UnitBlueprint {
     },
     SelectionSizeX = 0.9,
     SelectionSizeZ = 2.7,   
-    SelectionThickness = 0.55,
+    SelectionThickness = 0.2,
     SizeX = 1.575,
     SizeY = 1.2,
     SizeZ = 4.125,
