@@ -248,7 +248,7 @@ function SyncScores()
     observer = myArmyIndex == -1
 
     local victory = import('/lua/victory.lua')
-    if observer or victory.gameOver then
+    if observer or victory.gameOver or SessionIsReplay() then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
