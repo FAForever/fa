@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Ring',
+        },
+    },
     Adjacency = 'T1MassFabricatorAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
