@@ -243,11 +243,10 @@ StructureUnit = Class(Unit) {
 
     CreateBlinkingLights = function(self, color)
         self:DestroyBlinkingLights()
-        local bp = self:GetBlueprint().Display.BlinkingLights
-        local bpEmitters = self:GetBlueprint().Display.BlinkingLightsFx
-        if bp then
-            local fxbp = bpEmitters[color]
-            for _, v in bp do
+        local bp = self:GetBlueprint()
+        if bp.Display.BlinkingLights then
+            local fxbp = bp.Display.BlinkingLightsFx[color]
+            for _, v in bp.Display.BlinkingLights do
                 if type(v) == 'table' then
                     local fx = CreateAttachedEmitter(self, v.BLBone, self.Army, fxbp)
                     fx:OffsetEmitter(v.BLOffsetX or 0, v.BLOffsetY or 0, v.BLOffsetZ or 0)
@@ -1742,8 +1741,6 @@ AirUnit = Class(MobileUnit) {
 
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
-        local bp = self:GetBlueprint()
-
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
@@ -1938,13 +1935,15 @@ ConstructionUnit = Class(MobileUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
 
+        local bp = self:GetBlueprint()
+
         self.EffectsBag = {}
-        if self:GetBlueprint().General.BuildBones then
+        if bp.General.BuildBones then
             self:SetupBuildBones()
         end
 
-        if self:GetBlueprint().Display.AnimationBuild then
-            self.BuildingOpenAnim = self:GetBlueprint().Display.AnimationBuild
+        if bp.Display.AnimationBuild then
+            self.BuildingOpenAnim = bp.Display.AnimationBuild
         end
 
         if self.BuildingOpenAnim then
@@ -2291,7 +2290,7 @@ CommandUnit = Class(WalkingLandUnit) {
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
 
-        local teleDelay = self:GetBlueprint().General.TeleportDelay
+        local teleDelay = bp.General.TeleportDelay
 
         if teleDelay then
             energyCostMod = (time + teleDelay) / time
@@ -2452,8 +2451,10 @@ ACUUnit = Class(CommandUnit) {
 
     GiveInitialResources = function(self)
         WaitTicks(1)
-        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
-        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+        local bp = self:GetBlueprint()
+        local aiBrain = self:GetAIBrain()
+        aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
+        aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
     end,
 
     OnKilledUnit = function(self, unitKilled, massKilled)
