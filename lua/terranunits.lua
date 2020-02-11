@@ -10,9 +10,6 @@
 ---------------------------------------------------------------------------
 -- TERRAN DEFAULT UNITS
 ---------------------------------------------------------------------------
-local Entity = import('/lua/sim/Entity.lua').Entity
-local util = import('utilities.lua')
-
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
