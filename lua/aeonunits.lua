@@ -46,7 +46,7 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 ---------------------------------------------------------------
 AFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
    
@@ -197,7 +197,7 @@ ASonarUnit = Class(SonarUnit) {}
 ---------------------------------------------------------------
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
      

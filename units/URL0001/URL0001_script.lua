@@ -97,7 +97,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Build/Upgrade
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)

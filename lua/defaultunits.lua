@@ -596,6 +596,11 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnCreate(self)
+
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+
+
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
     end,
@@ -1512,7 +1517,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
+        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
@@ -1520,7 +1525,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.CaptureEffectsBag)
+        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     -- Units with layer change effects (amphibious units like Megalith) need
@@ -1931,6 +1936,9 @@ ConstructionUnit = Class(MobileUnit) {
 
         local bp = self:GetBlueprint()
 
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
+
         self.EffectsBag = {}
         if bp.General.BuildBones then
             self:SetupBuildBones()
@@ -2112,6 +2120,13 @@ CommandUnit = Class(WalkingLandUnit) {
 
     __init = function(self, rightGunName)
         self.rightGunLabel = rightGunName
+    end,
+
+    OnCreate = function(self)
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+
+        WalkingLandUnit.OnCreate(self)
     end,
 
     ResetRightArm = function(self)

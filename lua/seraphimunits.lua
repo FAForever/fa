@@ -39,13 +39,13 @@ local CreateSeraphimFactoryBuildingEffectsUnPause = EffectUtil.CreateSeraphimFac
 -- FACTORIES
 SFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local BuildBones = self.BuildEffectBones
         local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
     StartBuildFxUnpause = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local BuildBones = self.BuildEffectBones
         local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffectsUnPause, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
@@ -258,7 +258,7 @@ SConstructionUnit = Class(ConstructionUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     SetupBuildBones = function(self)

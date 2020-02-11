@@ -52,7 +52,7 @@ URL0301 = Class(CCommandUnit) {
     -- Engineering effects
     CreateBuildEffects = function(self, unitBeingBuilt, order)
        EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-       EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+       EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
