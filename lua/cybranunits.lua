@@ -118,7 +118,7 @@ CConstructionUnit = Class(ConstructionUnit){
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 }
 
@@ -201,7 +201,7 @@ CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
    
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
@@ -379,11 +379,11 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self:GetBlueprint().General.BuildBones.BuildEffectBones), self.BuildEffectsBag)
+        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self.BuildEffectBones), self.BuildEffectsBag)
         if buildbots then
-            EffectUtil.CreateCybranEngineerBuildEffects(self, self:GetBlueprint().General.BuildBones.BuildEffectBones, buildbots, self.BuildEffectsBag)
+            EffectUtil.CreateCybranEngineerBuildEffects(self, self.BuildEffectBones, buildbots, self.BuildEffectsBag)
         else
-            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -468,7 +468,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
+        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
@@ -476,7 +476,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.CaptureEffectsBag)
+        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 }
 
