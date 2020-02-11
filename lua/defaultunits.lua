@@ -4,22 +4,16 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local Unit = import('/lua/sim/Unit.lua').Unit
-local Shield = import('shield.lua').Shield
 local explosion = import('defaultexplosions.lua')
-local Util = import('utilities.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
-local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
 local teleportTime = {}
 
 local CreateScaledBoom = function(unit, overkill, bone)
