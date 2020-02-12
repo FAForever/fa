@@ -134,7 +134,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local bp = self:GetBlueprint()
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
-        local snd = self:GetBlueprint().Audio.ExistLoop
+        local snd = bp.Audio.ExistLoop
         if snd then
             self:SetAmbientSound(snd, nil)
         end
@@ -195,7 +195,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if not self or self:BeenDestroyed() then
             return
         end
-        local health = self:GetHealth()
+
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
         if health <= 0 then
@@ -369,9 +369,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
-        local TerrainEffects = self:GetTerrainEffects(targetType, self:GetBlueprint().Display.ImpactEffects.Type)
+        local TerrainEffects = self:GetTerrainEffects(targetType, bp.Display.ImpactEffects.Type)
         self:CreateImpactEffects(self.Army, ImpactEffects, ImpactEffectScale)
-        self:CreateTerrainEffects(self.Army, TerrainEffects, self:GetBlueprint().Display.ImpactEffects.Scale or 1)
+        self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
 
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
