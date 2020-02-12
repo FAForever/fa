@@ -339,39 +339,41 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         -- Structure stuff
         CStructureUnit.OnCreate(self)
 
+        local bp = self:GetBlueprint()
+
         -- Construction stuff
         self.EffectsBag = {}
-        if self:GetBlueprint().General.BuildBones then
+        if bp.General.BuildBones then
             self:SetupBuildBones()
         end
 
-        if self:GetBlueprint().Display.AnimationBuild then
-            self.BuildingOpenAnim = self:GetBlueprint().Display.AnimationBuild
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
+
+        -- Set up building animation
+        if bp.Display.AnimationOpen then
+            self.BuildingOpenAnim = bp.Display.AnimationOpen
         end
 
-        if self.BuildingOpenAnim then
-            self.BuildingOpenAnimManip = CreateAnimator(self)
-            self.BuildingOpenAnimManip:SetPrecedence(1)
-            self.BuildingOpenAnimManip:PlayAnim(self.BuildingOpenAnim, false):SetRate(0)
-            if self.BuildArmManipulator then
-                self.BuildArmManipulator:Disable()
-            end
-        end
+        self.AnimationManipulator = CreateAnimator(self)
+        self.Trash:Add(self.AnimationManipulator)
+
         self.BuildingUnit = false
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        local unitid = self:GetBlueprint().General.UpgradesTo
-
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
+
+        self.AnimationManipulator:PlayAnim(self.BuildingOpenAnim, false):SetRate(1)
 
         CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
+
         -- If created with F2 on land, then play the transform anim.
         if self:GetCurrentLayer() == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
@@ -393,14 +395,9 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
-
-        if self.BuildingOpenAnimManip and self.BuildArmManipulator then
-            self.StoppedBuilding = true
-        elseif self.BuildingOpenAnimManip then
-            self.BuildingOpenAnimManip:SetRate(-1)
-        end
-
         self.BuildingUnit = false
+
+        self.AnimationManipulator:SetRate(-1)
     end,
 
     OnPaused = function(self)
@@ -426,27 +423,6 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
     StopBuildingEffects = function(self, unitBeingBuilt)
         CStructureUnit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
-    WaitForBuildAnimation = function(self, enable)
-        if self.BuildArmManipulator then
-            WaitFor(self.BuildingOpenAnimManip)
-            if (enable) then
-                self.BuildArmManipulator:Enable()
-            end
-        end
-    end,
-
-    OnPrepareArmToBuild = function(self)
-        CStructureUnit.OnPrepareArmToBuild(self)
-
-        if self.BuildingOpenAnimManip then
-            self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
-            if self.BuildArmManipulator then
-                self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
-            end
-        end
     end,
 
     OnStopBuilderTracking = function(self)
