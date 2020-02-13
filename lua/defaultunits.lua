@@ -2184,16 +2184,8 @@ CommandUnit = Class(WalkingLandUnit) {
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
 
-        local bp = self:GetBlueprint()
-        local isUpgrade = order == 'Upgrade'
-        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
-
-        if not isUpgrade then
+        if order ~= 'Upgrade' then
             self.BuildingUnit = true
-        end
-
-        if showEffects then
-            self:StartBuildingEffects(unitBeingBuilt, order)
         end
 
         -- Check if we're about to try and build something we shouldn't. This can only happen due to
