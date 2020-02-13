@@ -559,12 +559,28 @@ function OnBeat()
                 return a.scoreNumber > b.scoreNumber
             end)
         end]]
-        import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+        if not SessionIsReplay() then
+            table.sort(controls.armyLines, function(a, b)
+                if (a.armyID > 0) and (b.armyID > 0) then
+                    return a.armyID <= b.armyID
+                end
+                return false
+            end)
+            local cur = GetFocusArmy()
+            table.sort(controls.armyLines, function(a, b)
+                if (a.armyID > 0) and (b.armyID > 0) then
+                    if not IsAlly(a.armyID, b.armyID) then
+                        return IsAlly(a.armyID, cur)
+                    end
+                end
+                return a.armyID > b.armyID
+            end)
+            import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+        end
         local line = {}
-        for index, data in controls.armyLines do
-            if not(data.armyID > 0) then
-                line = controls.armyLines[index - 1]
-                break
+        for _, data in controls.armyLines do
+            if data.armyID > 0 then
+                line = data
             end
         end
         LayoutHelpers.Below(resModeSwitch.icon, line.energy, -1)
@@ -608,16 +624,6 @@ function OnBeat()
                 observerLine.speedText:Show()
                 observerLine.speedSlider:Show()
             end
-        end
-        if cur >= 0 then
-            table.sort(controls.armyLines, function(a, b)
-                if (a.armyID > 0) and (b.armyID > 0) then
-                    if not IsAlly(a.armyID, b.armyID) then
-                        return IsAlly(a.armyID, cur)
-                    end
-                end
-                return a.armyID > b.armyID
-            end)
         end
         prevArmy = cur
     end
