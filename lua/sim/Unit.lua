@@ -937,7 +937,7 @@ Unit = Class(moho.unit_methods) {
         local units = {}
         -- We need to check all the units assisting.
         for _, v in self:GetGuards() do
-            if not v.Dead then
+            if not v.Dead and (v:IsUnitState('Building') or v:IsUnitState('Repairing')) then
                 table.insert(units, v)
             end
         end
