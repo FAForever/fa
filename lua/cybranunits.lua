@@ -417,6 +417,20 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         CStructureUnit.OnUnpaused(self)
     end,
 
+    OnProductionPaused = function(self)
+        if self:IsUnitState('Building') then
+            self:SetMaintenanceConsumptionInactive()
+        end
+        self:SetProductionActive(false)
+    end,
+
+    OnProductionUnpaused = function(self)
+        if self:IsUnitState('Building') then
+            self:SetMaintenanceConsumptionActive()
+        end
+        self:SetProductionActive(true)
+    end,
+
     StartBuildingEffects = function(self, unitBeingBuilt, order)
         CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, order)
     end,
