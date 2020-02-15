@@ -169,7 +169,8 @@ end
 
 function CreateDialog(x, y)
     if dialog then
-        dialog.cancelBtn.OnClick()
+        dialog:Destroy()
+        dialog = false
         return
     end
 
