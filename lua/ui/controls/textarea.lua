@@ -1,6 +1,7 @@
 local Text = import('/lua/maui/text.lua')
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local UIUtil = import('/lua/ui/uiutil.lua')
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
 --- A multi-line textfield
 --
@@ -18,15 +19,15 @@ TextArea = Class(ItemList) {
         ItemList.__init(self, parent)
 
         -- Initial width and height are necessary to dodge partial-initialisation-reflow weirdness.
-        self.Width:Set(width)
-        self.Height:Set(height)
+        self.Width:Set(ScaleNumber(width))
+        self.Height:Set(ScaleNumber(height))
 
         self.text = ""
 
         -- By default, inherit colour and font from UIUtil (this will update with the skin, too,
         -- because LazyVars are magical.
         self:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
-        self:SetFont(UIUtil.bodyFont, 14)
+        self:SetFont(UIUtil.bodyFont, ScaleNumber(14))
 
         -- The advance function for Text.WrapText. Delegates to the ItemList.GetStringAdvance.
         self.advanceFunction = function(text) return self:GetStringAdvance(text) end
