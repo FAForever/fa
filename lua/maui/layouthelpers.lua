@@ -423,23 +423,31 @@ end
 --* set the dimensions
 function SetDimensions(control, width, height)
     if width then
-        control.Width:Set(width)
+        control.Width:Set(function()
+            return math.floor(width * pixelScaleFactor)
+        end)
     end
     
     if height then
-        control.Height:Set(height)
+        control.Height:Set(function()
+            return math.floor(height * pixelScaleFactor)
+        end)
     end
 end
 
 function SetWidth(control, width)
     if width then
-        control.Width:Set(width)
+        control.Width:Set(function()
+            return math.floor(width * pixelScaleFactor)
+        end)
     end
 end
 
 function SetHeight(control, height)
     if height then
-        control.Height:Set(height)
+        control.Height:Set(function()
+            return math.floor(height * pixelScaleFactor)
+        end)
     end
 end
 
@@ -452,4 +460,13 @@ end
 function DepthUnderParent(control, parent, depth)
     depth = depth or 1
     control.Depth:Set(function() return parent.Depth() - depth end)
+end
+
+-- Scale according to the globally set ratio 
+function Scale(control)
+    SetDimensions(control, control.Width(), control.Height())
+end
+
+function ScaleNumber(number)
+    return math.floor(number * pixelScaleFactor)
 end
