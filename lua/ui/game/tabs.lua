@@ -592,8 +592,7 @@ function BuildContent(contentID)
         contentGroup = Group(controls.parent)
 
         local function BuildButton(button)
-            local btn = UIUtil.CreateButtonStd(contentGroup, '/game/medium-btn/medium', button.label, UIUtil.menuFontSize)
-            btn.label:SetFont(UIUtil.factionFont, UIUtil.menuFontSize)
+            local btn = UIUtil.CreateButtonStd(contentGroup, '/game/medium-btn/medium', button.label, 18)
             if button.action and actions[button.action] then
                 btn.OnClick = function() CollapseWindow(actions[button.action]) end
             end
