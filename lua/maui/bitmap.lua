@@ -28,6 +28,7 @@
 
 
 local Control = import('control.lua').Control
+local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
 Bitmap = Class(moho.bitmap_methods, Control) {
 
@@ -66,8 +67,8 @@ Bitmap = Class(moho.bitmap_methods, Control) {
     
     ResetLayout = function(self)
         Control.ResetLayout(self)
-        self.Width:SetFunction(function() return self.BitmapWidth() end)
-        self.Height:SetFunction(function() return self.BitmapHeight() end)
+        self.Width:SetFunction(function() return ScaleNumber(self.BitmapWidth()) end)
+        self.Height:SetFunction(function() return ScaleNumber(self.BitmapHeight()) end)
     end,
 
     OnInit = function(self)
