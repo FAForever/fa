@@ -130,10 +130,10 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
     mods.availableToAll = availableMods
 
-    dialogHeight = GetFrame(0).Height() - 80
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
 
     dialogContent = Group(parent)
-    dialogContent.Width:Set(dialogWidth)
+    LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
 
     modsDialog = Popup(parent, dialogContent)
@@ -334,7 +334,7 @@ function CreateModsFilter(parent, tag)
     filterToggle.tag = tag
     filterToggle.checked = true
     filterToggle.Height:Set(height)
-    filterToggle.Width:Set(width)
+    LayoutHelpers.SetWidth(filterToggle, width)
     filterToggle.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             if not self.checked then
@@ -831,10 +831,10 @@ function CreateListElement(parent, mod, Pos)
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     group.bg.Height:Set(modIconSize + 10)
-    group.bg.Width:Set(dialogWidth - 15)
+    LayoutHelpers.SetWidth(group.bg, dialogWidth - 15)
 
     group.Height:Set(modInfoHeight)
-    group.Width:Set(dialogWidth - 25)
+    LayoutHelpers.SetWidth(group, dialogWidth - 25)
     LayoutHelpers.AtLeftTopIn(group, parent, 4, group.Height()*(Pos-1))
     LayoutHelpers.FillParent(group.bg, group)
 
@@ -843,8 +843,7 @@ function CreateListElement(parent, mod, Pos)
     end
 
     group.icon = Bitmap(group, mod.icon)
-    group.icon.Height:Set(modIconSize)
-    group.icon.Width:Set(modIconSize)
+    LayoutHelpers.SetDimensions(group.icon, modIconSize, modIconSize)
     group.icon:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 7)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
