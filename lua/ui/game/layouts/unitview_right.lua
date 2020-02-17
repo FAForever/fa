@@ -49,8 +49,7 @@ function SetLayout()
     controls.name:SetDropShadow(true)
 
     LayoutHelpers.AtLeftTopIn(controls.icon, controls.bg, 12, 34)
-    controls.icon.Height:Set(48)
-    controls.icon.Width:Set(48)
+    LayoutHelpers.SetDimensions(controls.icon, 48, 48)
     LayoutHelpers.AtLeftTopIn(controls.stratIcon, controls.icon)
     LayoutHelpers.Below(controls.vetIcons[1], controls.icon, 5)
     LayoutHelpers.AtLeftIn(controls.vetIcons[1], controls.icon, -5)
@@ -59,25 +58,21 @@ function SetLayout()
         LayoutHelpers.RightOf(controls.vetIcons[i], controls.vetIcons[i-1], -3)
     end
     LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 35)
-    controls.healthBar.Width:Set(188)
-    controls.healthBar.Height:Set(16)
+    LayoutHelpers.SetDimensions(controls.healthBar, 188, 16)
     controls.healthBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
     LayoutHelpers.AtBottomIn(controls.shieldBar, controls.healthBar)
     LayoutHelpers.AtLeftIn(controls.shieldBar, controls.healthBar)
-    controls.shieldBar.Width:Set(188)
-    controls.shieldBar.Height:Set(2)
+    LayoutHelpers.SetDimensions(controls.shieldBar, 188, 2)
     controls.shieldBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.shieldBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/shieldbar.dds'))
     LayoutHelpers.Below(controls.fuelBar, controls.shieldBar)
-    controls.fuelBar.Width:Set(188)
-    controls.fuelBar.Height:Set(2)
+    LayoutHelpers.SetDimensions(controls.fuelBar, 188, 2)
     controls.fuelBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.fuelBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
 
     LayoutHelpers.AtLeftTopIn(controls.vetBar, controls.bg, 192, 68)
-    controls.vetBar.Width:Set(56)
-    controls.vetBar.Height:Set(3)
+    LayoutHelpers.SetDimensions(controls.vetBar, 56, 3)
     controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
 
@@ -102,24 +97,22 @@ function SetLayout()
         controls.statGroups[i].value:SetDropShadow(true)
     end
     LayoutHelpers.AtLeftTopIn(controls.actionIcon, controls.bg, 261, 34)
-    controls.actionIcon.Height:Set(48)
-    controls.actionIcon.Width:Set(48)
+    LayoutHelpers.SetDimensions(controls.actionIcon, 48, 48)
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
 
     controls.abilities.Left:Set(function() return controls.bg.Right() + 20 end)
     controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
-    controls.abilities.Height:Set(50)
-    controls.abilities.Width:Set(200)
+    LayoutHelpers.SetDimensions(controls.abilities, 200, 50)
 
     SetBG(controls)
 
-    if options.gui_detailed_unitview != 0 then
+    if options.gui_detailed_unitview ~= 0 then
         LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 25)
         LayoutHelpers.Below(controls.shieldBar, controls.healthBar)
-        controls.shieldBar.Height:Set(14)
+        LayoutHelpers.SetHeight(controls.shieldBar, 14)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
-        controls.shieldBar.Height:Set(2)
+        LayoutHelpers.SetHeight(controls.shieldBar, 2)
     else
         LayoutHelpers.AtLeftTopIn(controls.statGroups[1].icon, controls.bg, 70, 60)
         LayoutHelpers.AtLeftTopIn(controls.statGroups[2].icon, controls.bg, 70, 80)
@@ -157,10 +150,10 @@ function PositionWindow()
 end
 
 function UpdateStatusBars(controls)
-    if options.gui_detailed_unitview != 0 and controls.store == 1 then
+    if options.gui_detailed_unitview ~= 0 and controls.store == 1 then
         LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
-    elseif options.gui_detailed_unitview != 0 then
+    elseif options.gui_detailed_unitview ~= 0 then
         LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,0)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
     end
