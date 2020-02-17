@@ -366,8 +366,7 @@ function Show(bp, buildingUnit, bpID)
 
     local iconName = GameCommon.GetCachedUnitIconFileNames(bp)
     View.UnitImg:SetTexture(iconName)
-    View.UnitImg.Height:Set(46)
-    View.UnitImg.Width:Set(48)
+    LayoutHelpers.SetDimensions(View.UnitImg, 46, 46)
 
     ShowView(showUpKeep, false, showecon, showShield)
 end
