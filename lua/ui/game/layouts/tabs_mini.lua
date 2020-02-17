@@ -71,7 +71,7 @@ function SetLayout()
     controls.parent.Height:Set(function() return controls.bgTop.Height() + controls.bgBottom.Height() end)
     LayoutHelpers.AtHorizontalCenterIn(controls.parent, GetFrame(0))
     LayoutHelpers.AtTopIn(controls.parent, GetFrame(0))
-    controls.bgTop.defWidth = 180
+    controls.bgTop.defWidth = LayoutHelpers.ScaleNumber(180)
     controls.bgTop.Width:Set(controls.bgTop.defWidth)
 end
 
