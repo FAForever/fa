@@ -5127,8 +5127,7 @@ function CreateBigPreview(parent)
     local MASS_ICON_SIZE = 10
 
     local dialogContent = Group(parent)
-    dialogContent.Width:Set(MAP_PREVIEW_SIZE + 10)
-    dialogContent.Height:Set(MAP_PREVIEW_SIZE + 10)
+    LayoutHelpers.SetDimensions(dialogContent, MAP_PREVIEW_SIZE + 10, MAP_PREVIEW_SIZE + 10)
 
     LrgMap = Popup(parent, dialogContent)
 
