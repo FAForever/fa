@@ -5650,8 +5650,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(420)
-    dialogContent.Height:Set(260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
