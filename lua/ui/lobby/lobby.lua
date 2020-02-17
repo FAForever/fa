@@ -2414,8 +2414,7 @@ function CreateSlotsUI(makeLabel)
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
     GUI.labelGroup = labelGroup
-    labelGroup.Width:Set(791)
-    labelGroup.Height:Set(21)
+    LayoutHelpers.SetDimensions(labelGroup, 791, 21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
     local slotLabel = makeLabel("#", 14)
@@ -2486,7 +2485,7 @@ function CreateSlotsUI(makeLabel)
 
         -- Slot number
         local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
-        slotNumber.Width:Set(COLUMN_WIDTHS[1])
+        LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
         newSlot:AddChild(slotNumber)
         newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
@@ -2495,7 +2494,7 @@ function CreateSlotsUI(makeLabel)
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
         newSlot.KinderCountry = flag
-        flag.Width:Set(COLUMN_WIDTHS[2])
+        LayoutHelpers.SetWidth(flag, COLUMN_WIDTHS[2])
         newSlot:AddChild(flag)
 
         -- TODO: Factorise this boilerplate.
@@ -2519,7 +2518,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
         newSlot:AddChild(nameLabel)
-        nameLabel.Width:Set(COLUMN_WIDTHS[5])
+        LayoutHelpers.SetWidth(nameLabel, COLUMN_WIDTHS[5])
         -- left deal with name clicks
         nameLabel.OnEvent = defaultHandler
         nameLabel.OnClick = function(self, index, text)
@@ -2539,7 +2538,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.color = colorSelector
 
         newSlot:AddChild(colorSelector)
-        colorSelector.Width:Set(COLUMN_WIDTHS[6])
+        LayoutHelpers.SetWidth(colorSelector, COLUMN_WIDTHS[6])
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
                 lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index })
@@ -2577,7 +2576,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.faction = factionSelector
         newSlot.AvailableFactions = factionList
         newSlot:AddChild(factionSelector)
-        factionSelector.Width:Set(COLUMN_WIDTHS[7])
+        LayoutHelpers.SetWidth(factionSelector, COLUMN_WIDTHS[7])
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
@@ -2600,7 +2599,7 @@ function CreateSlotsUI(makeLabel)
         local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
-        teamSelector.Width:Set(COLUMN_WIDTHS[8])
+        LayoutHelpers.SetWidth(teamSelector, COLUMN_WIDTHS[8])
         teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
             SetPlayerOption(curRow, 'Team', index)
@@ -2615,7 +2614,7 @@ function CreateSlotsUI(makeLabel)
         local barMin = 0
         local CPUGroup = Group(newSlot)
         newSlot.CPUGroup = CPUGroup
-        CPUGroup.Width:Set(COLUMN_WIDTHS[9])
+        LayoutHelpers.SetWidth(CPUGroup, COLUMN_WIDTHS[9])
         CPUGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(CPUGroup)
         local CPUSpeedBar = StatusBar(CPUGroup, barMin, barMax, false, false,
@@ -2635,7 +2634,7 @@ function CreateSlotsUI(makeLabel)
         barMin = 0
         local pingGroup = Group(newSlot)
         newSlot.pingGroup = pingGroup
-        pingGroup.Width:Set(COLUMN_WIDTHS[10])
+        LayoutHelpers.SetWidth(pingGroup, COLUMN_WIDTHS[10])
         pingGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(pingGroup)
         local pingStatus = StatusBar(pingGroup, barMin, barMax, false, false,
