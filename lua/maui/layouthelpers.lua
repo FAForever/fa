@@ -18,8 +18,8 @@
 --* Note that if you add a new layout helper function that uses offsets, you need
 --* to scale the offset with this factor or your layout may get funky when the
 --* art is changed
-
-local pixelScaleFactor = 1.0
+local Prefs = import('/lua/user/prefs.lua')
+local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
 
 function SetPixelScaleFactor(newFactor)
     pixelScaleFactor = newFactor
@@ -412,11 +412,11 @@ function DimensionsRelativeTo(control, fileName, controlName)
     end
     control.Width:Set(function()
         local layoutTable = import(fileName()).layout
-        return layoutTable[controlName].width
+        return math.floor(layoutTable[controlName].width * pixelScaleFactor)
     end)
     control.Height:Set(function()
         local layoutTable = import(fileName()).layout
-        return layoutTable[controlName].height
+        return math.floor(layoutTable[controlName].height * pixelScaleFactor)
     end)
 end
 

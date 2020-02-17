@@ -9,6 +9,7 @@
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Prefs = import('/lua/user/prefs.lua')
 
 --* Percentage versus offset
 --* Percentages are specified as a float, with 0.00 to 1.00 the normal ranges
@@ -23,7 +24,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 --* to scale the offset with this factor or your layout may get funky when the
 --* art is changed
 
-local pixelScaleFactor = 1.0
+local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
 local effectGroup = false
 local gameView = UIUtil.CreateScreenGroup(GetFrame(0), "Effect Helper ScreenGroup")
 
@@ -471,7 +472,7 @@ function Pulse(control, time, alphaBtm, alphaTop)
     control.OnFrame = function(self, frameTime)
         elapsedTime = elapsedTime + frameTime
         if elapsedTime >= duration then
-            direction = direction * -1 # reverse direction
+            direction = direction * -1 -- reverse direction
             elapsedTime = 0
         end
         local timeSlice = frameTime / duration
