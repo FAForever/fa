@@ -17,7 +17,7 @@
 
 local Control = import('control.lua').Control
 local Dragger = import('dragger.lua').Dragger
-
+local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
 ItemList = Class(moho.item_list_methods, Control) {
 
@@ -72,7 +72,7 @@ ItemList = Class(moho.item_list_methods, Control) {
     SetFont = function(self, family, pointsize)
         if self._font then
             self._lockFontChanges = true
-            self._font._pointsize:Set(pointsize)
+            self._font._pointsize:Set(ScaleNumber(pointsize))
             self._font._family:Set(family)
             self._lockFontChanges = false
             self:_internalSetFont()
