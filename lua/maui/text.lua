@@ -9,6 +9,7 @@
 -- SetCenteredHorizontally(bool)
 
 local Control = import('control.lua').Control
+local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
 Text = Class(moho.text_methods, Control) {
 
@@ -53,7 +54,7 @@ Text = Class(moho.text_methods, Control) {
     SetFont = function(self, family, pointsize)
         if self._font then
             self._lockFontChanges = true
-            self._font._pointsize:Set(pointsize)
+            self._font._pointsize:Set(ScaleNumber(pointsize))
             self._font._family:Set(family)
             self._lockFontChanges = false
             self:_internalSetFont()
