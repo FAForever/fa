@@ -34,11 +34,11 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
-local round = import('/lua/ui/lobby/trueskill.lua').round
-local Player = import('/lua/ui/lobby/trueskill.lua').Player
-local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
+local round = Trueskill.round
+local Player = Trueskill.Player
+local Rating = Trueskill.Rating
 local ModBlacklist = import('/etc/faf/blacklist.lua').Blacklist
-local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
+local Teams = Trueskill.Teams
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 local SetUtils = import('/lua/system/setutils.lua')
@@ -2822,8 +2822,7 @@ function CreateUI(maxPlayers)
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 6, 70)
-    GUI.playerPanel.Width:Set(706)
-    GUI.playerPanel.Height:Set(307)
+    LayoutHelpers.SetDimensions(GUI.playerPanel, 706, 307)
 
     -- Observer section
     GUI.observerPanel = Group(GUI.panel, "observerPanel")
@@ -2847,12 +2846,12 @@ function CreateUI(maxPlayers)
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
     UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 11, 459)
-    GUI.chatPanel.Width:Set(478)
-    GUI.chatPanel.Height:Set(245)
+    LayoutHelpers.SetWidth(GUI.chatPanel, 478)
+    LayoutHelpers.SetHeight(GUI.chatPanel, 245)
 
     if isHost then
         GUI.AIFillPanel = Combo.Combo(GUI.panel, 14, 12, false, nil)
-        GUI.AIFillPanel.Width:Set(278)
+        LayoutHelpers.SetWidth(GUI.AIFillPanel, 278)
         GUI.AIFillPanel.Left:Set(GUI.observerPanel.Left)
         GUI.AIFillPanel.Top:Set(GUI.chatPanel.Top)
         if (AIKeys[1] or AIStrings[1] or AITooltips[1]) == nil then
@@ -2865,15 +2864,15 @@ function CreateUI(maxPlayers)
         GUI.AIFillPanel:AddItems(AIStrings)
         GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillPanel, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
-        GUI.AIFillButton.Width:Set(129)
-        GUI.AIFillButton.Height:Set(30)
+        LayoutHelpers.SetWidth(GUI.AIFillButton, 129)
+        LayoutHelpers.SetHeight(GUI.AIFillButton, 30)
         LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillPanel, -10, 25)
         GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
         GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width)
         GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height)
         LayoutHelpers.RightOf(GUI.AIClearButton, GUI.AIFillButton, -19)
         GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        GUI.TeamCountSelector.Width:Set(44)
+        LayoutHelpers.SetWidth(GUI.TeamCountSelector, 44)
         LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
         GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right)
         local tooltipText = {}
@@ -2954,8 +2953,7 @@ function CreateUI(maxPlayers)
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
     UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 813, 88)
-    GUI.mapPanel.Width:Set(198)
-    GUI.mapPanel.Height:Set(198)
+    LayoutHelpers.SetDimensions(GUI.mapPanel, 198, 198)
     LayoutHelpers.DepthOverParent(GUI.mapPanel, GUI.panel, 2)
 
     -- Map Preview Info Labels
@@ -2972,8 +2970,7 @@ function CreateUI(maxPlayers)
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
-    GUI.optionsPanel.Width:Set(198)
-    GUI.optionsPanel.Height:Set(337)
+    LayoutHelpers.SetDimensions(GUI.optionsPanel, 198, 337)
     LayoutHelpers.DepthOverParent(GUI.optionsPanel, GUI.panel, 2)
 
     ---------------------------------------------------------------------------
@@ -3191,8 +3188,8 @@ function CreateUI(maxPlayers)
     chatBG:SetSolidColor('FF212123')
     LayoutHelpers.Below(chatBG, GUI.chatDisplay, 1)
     LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
-    chatBG.Width:Set(GUI.chatPanel.Width() - 16)
-    chatBG.Height:Set(24)
+    chatBG.Width:Set(GUI.chatPanel.Width() - LayoutHelpers.ScaleNumber(16))
+    LayoutHelpers.SetHeight(chatBG, 24)
 
     -- Set up the chat edit buttons and functions
     setupChatEdit(GUI.chatPanel)
@@ -3204,7 +3201,7 @@ function CreateUI(maxPlayers)
     GUI.OptionContainer.Bottom:Set(function() return GUI.optionsPanel.Bottom() end)
 
     -- Leave space for the scrollbar.
-    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 18 end)
+    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - LayoutHelpers.ScaleNumber(18) end)
     GUI.OptionContainer.top = 0
     LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 1, 1)
     LayoutHelpers.DepthOverParent(GUI.OptionContainer, GUI.optionsPanel, -1)
@@ -3229,7 +3226,7 @@ function CreateUI(maxPlayers)
             element.bg2.Bottom:Set(function() return element.bg.Bottom() - 1 end)
             element.bg2.Top:Set(function() return element.value.Top() + 0 end)
 
-            element.Height:Set(36)
+            LayoutHelpers.SetHeight(element, 36)
             element.Width:Set(GUI.OptionContainer.Width)
             element:DisableHitTest()
 
@@ -3364,7 +3361,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Launch Button
-    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', LOC("<LOC tooltipui0173>Launch Game"))
+    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/', LOC("<LOC tooltipui0173>Launch Game")) -- TODO: large button crashing when scalled
     GUI.launchGameButton = launchGameButton
     LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
     LayoutHelpers.AtBottomIn(launchGameButton, GUI.panel, -8)
@@ -3695,8 +3692,8 @@ end
 function setupChatEdit(chatPanel)
     GUI.chatEdit = Edit(chatPanel)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
-    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - 9)
-    GUI.chatEdit.Height:Set(22)
+    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - LayoutHelpers.ScaleNumber(9))
+    LayoutHelpers.SetHeight(GUI.chatEdit, 22)
     GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
     GUI.chatEdit:ShowBackground(false)
