@@ -17,16 +17,15 @@ ResourceMapPreview = Class(Group) {
         Group.__init(self, parent)
         self.size = size
         self.buttonsDisabled = buttonsDisabled or false
-        self.massIconSize = massIconSize or DEFAULT_MASS_ICON_SIZE
-        self.hydroIconSize = hydroIconSize or DEFAULT_HYDROCARBON_ICON_SIZE
+        self.massIconSize = LayoutHelpers.ScaleNumber(massIconSize or DEFAULT_MASS_ICON_SIZE)
+        self.hydroIconSize = LayoutHelpers.ScaleNumber(hydroIconSize or DEFAULT_HYDROCARBON_ICON_SIZE)
 
         -- Bitmap pools for icons.
         self.massIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"), self, massIconSize, massIconSize)
         self.hydroIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"), self, hydroIconSize, hydroIconSize)
         self.wreckageIconPool = TexturePool(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/mappreview/wreckage.dds"), self, 6, 6)
 
-        self.Width:Set(size)
-        self.Height:Set(size)
+        LayoutHelpers.SetDimensions(self, self.size, self.size)
 
         self.massmarkers = {}
         self.hydromarkers = {}
@@ -35,8 +34,7 @@ ResourceMapPreview = Class(Group) {
         self.ratingLabel = {}
 
         self.mapPreview = MapPreview(self)
-        self.mapPreview.Width:Set(size)
-        self.mapPreview.Height:Set(size)
+        LayoutHelpers.SetDimensions(self.mapPreview, self.size, self.size)
         LayoutHelpers.AtLeftTopIn(self.mapPreview, self)
     end,
 
