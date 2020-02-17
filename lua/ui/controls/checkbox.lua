@@ -33,7 +33,7 @@ Checkbox = Class(Group) {
 
         -- Center the text inside the textfield (which we expand to be the whole height of the control)
         textfield:SetCenteredVertically(true)
-        LayoutHelpers.SetDimensions(self, function() return checkBmp.Width() + textfield.Width() end, checkBmp.Height)
+        LayoutHelpers.SetDimensions(self, checkBmp.Width() + textfield.Width(), checkBmp.Height())
         if labelRight then
             LayoutHelpers.AtLeftTopIn(checkBmp, self)
             LayoutHelpers.RightOf(textfield, checkBmp)
