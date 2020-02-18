@@ -136,8 +136,7 @@ function CreateAvatar(unit)
     else
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
     end
-    bg.icon.Height:Set(44)
-    bg.icon.Width:Set(44)
+    LayoutHelpers.SetDimensions(bg.icon, 44, 44)
     bg.icon:DisableHitTest()
 
     bg.healthbar = StatusBar(bg, 0, 1, false, false,
@@ -246,8 +245,7 @@ function CreateIdleTab(unitData, id, expandFunc)
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 7, 8)
     bg.icon:SetSolidColor('00000000')
-    bg.icon.Height:Set(34)
-    bg.icon.Width:Set(34)
+    LayoutHelpers.SetDimensions(bg.icon, 34, 34)
     bg.icon:DisableHitTest()
 
     bg.count = UIUtil.CreateText(bg.icon, '', 18, UIUtil.bodyFont)
@@ -263,7 +261,7 @@ function CreateIdleTab(unitData, id, expandFunc)
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-close_btn_over.dds'),
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-open_btn_dis.dds'),
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-close_btn_dis.dds'))
-    bg.expandCheck.Right:Set(function() return bg.Left() + 4 end)
+    LayoutHelpers.AnchorToLeft(bg.expandCheck, bg, -4)
     LayoutHelpers.AtVerticalCenterIn(bg.expandCheck, bg)
     bg.expandCheck.OnCheck = function(self, checked)
         if checked then
@@ -508,6 +506,7 @@ function CreateIdleEngineerList(parent, units)
     local bgBottom = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_b.dds'))
     local bgStretch = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_m.dds'))
 
+    --LayoutHelpers.SetDimensions(group, bgTop.Width, 1)
     group.Width:Set(bgTop.Width)
     group.Height:Set(1)
 
@@ -521,7 +520,7 @@ function CreateIdleEngineerList(parent, units)
     LayoutHelpers.AtHorizontalCenterIn(bgStretch, group)
 
     group.connector = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/bracket_bmp.dds'))
-    group.connector.Right:Set(function() return parent.Left() + 8 end)
+    LayoutHelpers.AnchorToLeft(group.connector, parent, -8)
     LayoutHelpers.AtVerticalCenterIn(group.connector, parent)
 
     LayoutHelpers.LeftOf(group, parent, 10)
@@ -542,14 +541,13 @@ function CreateIdleEngineerList(parent, units)
             else
                 entry.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
-            entry.icon.Height:Set(34)
-            entry.icon.Width:Set(34)
+            LayoutHelpers.SetDimensions(entry.icon, 34, 34)
             LayoutHelpers.AtRightIn(entry.icon, entry, 22)
             LayoutHelpers.AtVerticalCenterIn(entry.icon, entry)
 
             entry.iconBG = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
             LayoutHelpers.AtCenterIn(entry.iconBG, entry.icon)
-            entry.iconBG.Depth:Set(function() return entry.icon.Depth() - 1 end)
+            LayoutHelpers.DepthUnderParent(entry.iconBG, entry.icon)
 
             entry.techIcon = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-engineers-panel/tech-'..techLevel..'_bmp.dds'))
             LayoutHelpers.AtLeftIn(entry.techIcon, entry)
@@ -568,8 +566,8 @@ function CreateIdleEngineerList(parent, units)
             entry.countBG.Right:Set(function() return entry.count.Right() + 1 end)
             entry.countBG.Bottom:Set(function() return entry.count.Bottom() + 1 end)
 
-            entry.countBG.Depth:Set(function() return entry.Depth() + 1 end)
-            entry.count.Depth:Set(function() return entry.countBG.Depth() + 1 end)
+            LayoutHelpers.DepthOverParent(entry.countBG, entry)
+            LayoutHelpers.DepthOverParent(entry.count, entry.countBG)
 
             entry.Height:Set(function() return entry.iconBG.Height() end)
             entry.Width:Set(self.Width)
@@ -668,8 +666,7 @@ function CreateIdleFactoryList(parent, units)
             else
                 icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
-            icon.Height:Set(40)
-            icon.Width:Set(40)
+            LayoutHelpers.SetDimensions(icon, 40, 40)
 
             icon.count = UIUtil.CreateText(icon, '', 20, UIUtil.bodyFont)
             icon.count:SetColor('ffffffff')

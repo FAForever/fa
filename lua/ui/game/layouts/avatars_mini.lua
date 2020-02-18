@@ -5,8 +5,7 @@ function SetLayout()
     local controls = import('/lua/ui/game/avatars.lua').controls
     
     LayoutHelpers.AtRightTopIn(controls.avatarGroup, controls.parent, 0, 200)
-    controls.avatarGroup.Height:Set(0)
-    controls.avatarGroup.Width:Set(200)
+    LayoutHelpers.SetDimensions(controls.avatarGroup, 200, 0)
     
     controls.bgTop:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'))
     controls.bgStretch:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'))
@@ -18,13 +17,13 @@ function SetLayout()
     LayoutHelpers.AtRightIn(controls.bgTop, controls.avatarGroup)
     LayoutHelpers.AtRightIn(controls.bgBottom, controls.avatarGroup)
     
-    controls.bgTop.Bottom:Set(function() return controls.avatarGroup.Top() + 70 end)
+    LayoutHelpers.AnchorToTop(controls.bgTop, controls.avatarGroup, -70)
     controls.bgBottom.Top:Set(function() return math.max(controls.bgTop.Bottom(), controls.avatarGroup.Bottom() + 0) end)
-    controls.bgStretch.Top:Set(controls.bgTop.Bottom)
-    controls.bgStretch.Bottom:Set(controls.bgBottom.Top)
-    controls.bgStretch.Right:Set(function() return controls.bgTop.Right() - 7 end)
+    LayoutHelpers.AnchorToBottom(controls.bgStretch, controls.bgTop)
+    LayoutHelpers.AnchorToTop(controls.bgStretch, controls.bgBottom)
+    LayoutHelpers.AtRightIn(controls.bgStretch, controls.bgTop, 7)
     
-    controls.collapseArrow.Depth:Set(function() return controls.bgTop.Depth() + 1 end)
+    LayoutHelpers.DepthOverParent(controls.collapseArrow, controls.bgTop)
     controls.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-r-btn/tab-close_btn_up.dds'))
     controls.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-r-btn/tab-close_btn_up.dds'),
         UIUtil.UIFile('/game/tab-r-btn/tab-open_btn_up.dds'),
@@ -45,7 +44,8 @@ function LayoutAvatars()
     local height = 0
     for _, control in controls.avatars do
         if prevControl then
-            control.Top:Set(function() return prevControl.Bottom() + space end)
+            LayoutHelpers.AnchorToBottom(control, prevControl, space)
+            --control.Top:Set(function() return prevControl.Bottom() + space end)
             LayoutHelpers.AtRightIn(control, prevControl)
             height = height + (control.Bottom() - prevControl.Bottom())
         else
@@ -57,7 +57,7 @@ function LayoutAvatars()
     if controls.idleEngineers then
         if prevControl then
             controls.idleEngineers.prevControl = prevControl
-            controls.idleEngineers.Top:Set(function() return controls.idleEngineers.prevControl.Bottom() + space end)
+            LayoutHelpers.AnchorToBottom(controls.idleEngineers, controls.idleEngineers.prevControl, space)
             LayoutHelpers.AtRightIn(controls.idleEngineers, controls.idleEngineers.prevControl)
             height = height + (controls.idleEngineers.Bottom() - controls.idleEngineers.prevControl.Bottom())
         else
@@ -69,7 +69,7 @@ function LayoutAvatars()
     if controls.idleFactories then
         if prevControl then
             controls.idleFactories.prevControl = prevControl
-            controls.idleFactories.Top:Set(function() return controls.idleFactories.prevControl.Bottom() + space end)
+            LayoutHelpers.AnchorToBottom(controls.idleFactories, controls.idleFactories.prevControl, space)
             LayoutHelpers.AtRightIn(controls.idleFactories, controls.idleFactories.prevControl)
             height = height + (controls.idleFactories.Bottom() - controls.idleFactories.prevControl.Bottom())
         else
@@ -78,6 +78,6 @@ function LayoutAvatars()
         end
     end
     
-    controls.avatarGroup.Height:Set(function() return height - 5 end)
+    controls.avatarGroup.Height:Set(function() return height - LayoutHelpers.ScaleNumber(5) end)
 end
     
