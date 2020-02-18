@@ -1,5 +1,6 @@
 local Control = import('control.lua').Control
 local Group = import('group.lua').Group
+local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 local LazyVar = import('/lua/lazyvar.lua')
 
 Grid = Class(Group) {
@@ -8,8 +9,8 @@ Grid = Class(Group) {
     -- the left top is placed, the whole grid is not resized
     __init = function(self, parent, itemWidth, itemHeight)
         Group.__init(self, parent, "Grid")
-        self._itemWidth = itemWidth
-        self._itemHeight = itemHeight
+        self._itemWidth = ScaleNumber(itemWidth)
+        self._itemHeight = ScaleNumber(itemHeight)
         self._items = {}
         self._top = {}
         self._top["Horz"] = 1
