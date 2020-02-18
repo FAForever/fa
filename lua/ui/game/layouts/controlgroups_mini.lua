@@ -18,8 +18,7 @@ function SetLayout()
     controls.bgStretch.Bottom:Set(controls.bgBottom.Top)
     controls.bgStretch.Right:Set(function() return controls.bgTop.Right() - 7 end)
     
-    controls.container.Height:Set(20)
-    controls.container.Width:Set(60)
+    LayoutHelpers.SetDimensions(controls.container, 60, 20)
     LayoutHelpers.AtTopIn(controls.container, controls.parent, 368)
     LayoutHelpers.AtRightIn(controls.container, controls.parent)
     
