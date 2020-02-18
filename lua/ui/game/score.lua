@@ -381,7 +381,7 @@ function SetupPlayerLines()
             group.ranked.Height:Set(16)
             group.ranked.Width:Set(16)
             group.ranked:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(group.ranked, group, 0)
+            LayoutHelpers.AtRightTopIn(group.ranked, group, -1)
         end
 
         group.name.Right:Set(group.Right)
@@ -554,27 +554,28 @@ function OnBeat()
                 end
             end
         end
-        --[[if (sessionInfo.Options.Score == 'yes') or (armiesInfo[localArmyID].outOfGame) then
-            table.sort(controls.armyLines, function(a,b)
-                return a.scoreNumber > b.scoreNumber
-            end)
-        end]]
-        if not SessionIsReplay() then
-            table.sort(controls.armyLines, function(a, b)
-                if (a.armyID > 0) and (b.armyID > 0) then
-                    return a.armyID <= b.armyID
-                end
-                return false
-            end)
-            local cur = GetFocusArmy()
-            table.sort(controls.armyLines, function(a, b)
-                if (a.armyID > 0) and (b.armyID > 0) then
-                    if not IsAlly(a.armyID, b.armyID) then
-                        return IsAlly(a.armyID, cur)
+        local curFA = GetFocusArmy()
+        if (curFA > 0) and (not SessionIsReplay()) then
+            local di = 1
+            for si, data in controls.armyLines do
+                if data.armyID > 0 then
+                    if data.armyID < controls.armyLines[di].armyID then
+                        table.remove(controls.armyLines, si)
+                        table.insert(controls.armyLines, di, data)
+                        di = di + 1
                     end
                 end
-                return a.armyID > b.armyID
-            end)
+            end
+            local di = 1
+            for si, data in controls.armyLines do
+                if data.armyID > 0 then
+                    if IsAlly(data.armyID, curFA) then
+                        table.remove(controls.armyLines, si)
+                        table.insert(controls.armyLines, di, data)
+                        di = di + 1
+                    end
+                end
+            end
             import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
         end
         local line = {}
@@ -587,8 +588,8 @@ function OnBeat()
         currentScores = false -- dont render score UI until next score update
     end
 
-    local cur = GetFocusArmy()
-    if prevArmy ~= cur then
+    local curFA = GetFocusArmy()
+    if prevArmy ~= curFA then
         for _, line in controls.armyLines do
             if line.armyID == prevArmy then
                 if line.OOG then
@@ -600,21 +601,21 @@ function OnBeat()
                 end
                 line.name:SetFont(UIUtil.bodyFont, 12)
                 line.score:SetFont(UIUtil.bodyFont, 12)
-            elseif line.armyID == cur then
+            elseif line.armyID == curFA then
                 line.name:SetColor('ffff7f00')
                 line.score:SetColor('ffff7f00')
                 line.name:SetFont('Arial Bold', 12)
                 line.score:SetFont('Arial Bold', 12)
             end
         end
-        if cur < 1 then
+        if curFA < 1 then
             observerLine.name:SetColor('ffff7f00')
             observerLine.name:SetFont('Arial Bold', 12)
         elseif prevArmy < 1 then
             observerLine.name:SetColor('ffffffff')
             observerLine.name:SetFont(UIUtil.bodyFont, 12)
         end
-        if observerLine:IsHidden() and ((cur < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
+        if observerLine:IsHidden() and ((curFA < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
             table.insert(controls.armyLines, table.getsize(controls.armyLines), observerLine)
             import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
             controls.armyGroup.Height:Set(armyGroupHeight())
@@ -625,7 +626,7 @@ function OnBeat()
                 observerLine.speedSlider:Show()
             end
         end
-        prevArmy = cur
+        prevArmy = curFA
     end
 end
 
