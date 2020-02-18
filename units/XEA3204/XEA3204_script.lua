@@ -11,7 +11,6 @@ XEA3204 = Class(TConstructionUnit) {
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         self.docked = true
-        self.returning = false
     end,
 
     SetParent = function(self, parent, podName)
@@ -30,34 +29,14 @@ XEA3204 = Class(TConstructionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.returning = false
     end,
 
     OnStopBuild = function(self, unitBuilding)
         TConstructionUnit.OnStopBuild(self, unitBuilding)
-        self.returning = true
     end,
 
     OnFailedToBuild = function(self)
         TConstructionUnit.OnFailedToBuild(self)
-        self.returning = true
-    end,
-
-    OnMotionHorzEventChange = function(self, new, old)
-        if self and not self.Dead then
-            if self.Parent and not self.Parent.Dead then
-                local myPosition = self:GetPosition()
-                local parentPosition = self.Parent:GetPosition(self.Parent.PodData[self.PodName].PodAttachpoint)
-                local distSq = VDist2Sq(myPosition[1], myPosition[3], parentPosition[1], parentPosition[3])
-                if self.docked and distSq > 0 and not self.returning then
-                    self.docked = false
-                    self.Parent:ForkThread(self.Parent.NotifyOfPodStartBuild)
-                elseif not self.docked and distSq < 1 and self.returning then
-                    self.docked = true
-                    self.Parent:ForkThread(self.Parent.NotifyOfPodStopBuild)
-                end
-            end
-        end
     end,
 
     -- Don't make wreckage

@@ -385,8 +385,13 @@ TPodTowerUnit = Class(TStructureUnit) {
             if not self.PodData then
                 self.PodData = {}
             end
-            self.PodData[pod.PodName] = table.deepcopy(podData)
+            self.PodData[pod.PodName] = {}
             self.PodData[pod.PodName].PodHandle = pod
+            self.PodData[pod.PodName].PodUnitID = podData.PodUnitID
+            self.PodData[pod.PodName].PodName = podData.PodName
+            self.PodData[pod.PodName].Active = podData.Active
+            self.PodData[pod.PodName].PodAttachpoint = podData.PodAttachpoint
+            self.PodData[pod.PodName].CreateWithUnit = podData.CreateWithUnit
             pod:SetParent(self, pod.PodName)
         end
     end,
@@ -443,33 +448,6 @@ TPodTowerUnit = Class(TStructureUnit) {
         self.PodData[podName].Active = false
     end,
 
-    NotifyOfPodStartBuild = function(self)
-        if not self.OpeningAnimationStarted then
-            self.OpeningAnimationStarted = true
-            local bp = self:GetBlueprint()
-            if not bp.Display.AnimationOpen then return end
-            if not self.OpenAnim then
-                self.OpenAnim = CreateAnimator(self)
-                self.Trash:Add(self.OpenAnim)
-            end
-            self.OpenAnim:PlayAnim(bp.Display.AnimationOpen, false):SetRate(2.0)
-            WaitSeconds(0.5)
-            if not self.NowUpgrading then
-                self.OpenAnim:SetRate(0)
-            end
-        end
-    end,
-
-    NotifyOfPodStopBuild = function(self)
-        if self.OpeningAnimationStarted then
-            local bp = self:GetBlueprint()
-            if not bp.Display.AnimationOpen then return end
-            if not self.OpenAnim then return end
-            self.OpenAnim:SetRate(1.5)
-            self.OpeningAnimationStarted = false
-        end
-    end,
-
     SetPodConsumptionRebuildRate = function(self, podData)
         local bp = self:GetBlueprint()
         -- Get build rate of tower
@@ -493,16 +471,50 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
+        self:PlayUnitSound('Load')
+        self:RequestRefreshUI()
+        local PodPresent = 0
+        for _, v in self.PodData or {} do
+            if v.Active then
+                PodPresent = PodPresent + 1
+            end
+        end
+        local PodAttached = 0
+        for _, v in self:GetCargo() do
+            PodAttached = PodAttached + 1
+        end
+        if PodAttached == PodPresent and self.OpeningAnimationStarted then
+            local bp = self:GetBlueprint()
+            if not self.OpenAnim then return end
+            self.OpenAnim:SetRate(1.5)
+            self.OpeningAnimationStarted = false
+        end
     end,
 
     OnTransportDetach = function(self, bone, attachee)
         attachee:SetDoNotTarget(false)
+        self:PlayUnitSound('Unload')
+        self:RequestRefreshUI()
+        if not self.OpeningAnimationStarted then
+            self.OpeningAnimationStarted = true
+            local bp = self:GetBlueprint()
+            if not self.OpenAnim then
+                self.OpenAnim = CreateAnimator(self)
+                self.Trash:Add(self.OpenAnim)
+            end
+            self.OpenAnim:PlayAnim(bp.Display.AnimationOpen, false):SetRate(2.0)
+            -- wait 5 ticks and stop the animation so that the doors stay open
+            ForkThread(function ()
+                coroutine.yield(5)
+                self.OpenAnim:SetRate(0)
+            end)
+        end
     end,
 
     FinishedBeingBuilt = State {
         Main = function(self)
             -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
-            WaitSeconds(0.1)
+            coroutine.yield(1)
 
             -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
             -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
@@ -514,7 +526,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                     if not self.PodData then
                         self.PodData = {}
                     end
-                    self.PodData[v.PodName] = table.deepcopy(v)
+                    self.PodData[v.PodName] = table.copy(v)
                     self:CreatePod(v.PodName)
                 end
             end
@@ -554,7 +566,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                         ChangeState(self, self.RebuildingPodState)
                     end
                 end
-                WaitSeconds(1)
+                coroutine.yield(1)
             end
         end,
 
