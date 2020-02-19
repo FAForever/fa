@@ -437,7 +437,6 @@ function SetupPlayerLines()
     resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
     LayoutHelpers.AtLeftTopIn(resModeSwitch.icon, controls.armyLines[table.getn(controls.armyLines) - 1], 0, -1)
     LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, controls.armyLines[1].energy)
-    --Tooltip.AddControlTooltip(resModeSwitch.icon, {text = LOC('<LOC ResModeSwitchTooltipTitle>'), body = LOC('<LOC ResModeSwitchTooltipDesc>'),})
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
     resModeSwitch.text:DisableHitTest()
     LayoutHelpers.AtCenterIn(resModeSwitch.text, resModeSwitch.icon, 1)
@@ -458,6 +457,8 @@ function SetupPlayerLines()
         end
         UpdResDisplay(DisplayResMode)
     end
+    local bodyText = 'I - '..LOC('<LOC tooltipui0714>')..'\n B - '..LOC('<LOC tooltipui0715>')..'\n S - '..LOC('<LOC uvd_0006>')
+    Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1, 70)
 end
 
 function DisplayResources(resources, line, mode)
