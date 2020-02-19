@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
 local EMPDeathWeapon = Class(Weapon) {
@@ -23,16 +24,61 @@ local EMPDeathWeapon = Class(Weapon) {
 
 XRL0302 = Class(CWalkingLandUnit) {
 
+    IntelEffects = {
+        Cloak = {
+            {
+                Bones = {
+                    'XRL0302',
+                },
+                Scale = 3.0,
+                Type = 'Cloak01',
+            },
+        },
+    },
+
     Weapons = {
         Suicide = Class(CMobileKamikazeBombWeapon) {},
         DeathWeapon = Class(EMPDeathWeapon) {},
     },
+
+    AmbientExhaustBones = {
+        'XRL0302',
+    },
+
+    AmbientLandExhaustEffects = {
+        '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
+    },
+
+    OnCreate = function(self)
+        CWalkingLandUnit.OnCreate(self)
+
+        self.EffectsBag = {}
+        self.AmbientExhaustEffectsBag = {}
+        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.EffectsBag)
+        self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
+    end,
 
     -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
     
+    EmitPeriodicEffects = function(self)
+        while not self.Dead do
+            local army = self:GetArmy()
+
+            for kE, vE in self.AmbientLandExhaustEffects do
+                for kB, vB in self.AmbientExhaustBones do
+                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+                end
+            end
+
+            WaitSeconds(3)
+            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
+
+        end
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         if instigator then
@@ -43,6 +89,16 @@ XRL0302 = Class(CWalkingLandUnit) {
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
 
+        if self.EffectsBag then
+            EffectUtil.CleanupEffectBag(self, 'EffectsBag')
+            self.EffectsBag = nil
+        end
+        if self.AmbientExhaustEffectsBag then
+            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
+            self.AmbientExhaustEffectsBag = nil
+        end
+        self.PeriodicFXThread:Destroy()
+        self.PeriodicFXThread = nil
         CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
         -- Now handle our special buff
