@@ -9,8 +9,6 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
-local Prefs = import('/lua/user/prefs.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local FilePicker = import('/lua/ui/controls/filepicker.lua').FilePicker
 
