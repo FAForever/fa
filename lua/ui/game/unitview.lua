@@ -598,8 +598,7 @@ function UpdateEnhancementIcons(info)
 
         enhancement:Show()
         enhancement:SetTexture(UIUtil.UIFile(texture, true))
-        enhancement.Width:Set(30)
-        enhancement.Height:Set(30)
+        LayoutHelpers.SetDimensions(enhancement, 30, 30)
     end
 end
 
