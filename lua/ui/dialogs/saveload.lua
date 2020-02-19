@@ -104,8 +104,7 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
         end)
     end)
     LayoutHelpers.AtLeftTopIn(filePicker, panel, 43, 118)
-    filePicker.Width:Set(595)
-    filePicker.Height:Set(362)
+    LayoutHelpers.SetDimensions(filePicker, 595, 362)
     
     local lastStr = Prefs.GetFromCurrentProfile(fileType)
     if lastStr then
@@ -200,8 +199,8 @@ function CreateLoadDialog(parent, exitBehavior, fileType)
         local worked, error, detail = LoadSavedGame(fileInfo.fspec)
         if not worked then
             UIUtil.ShowInfoDialog(lparent,
-                                  # note - the 'Unknown error...' string below is intentionally not localized because
-                                  # it should never show up.  If it does, add the error string to SaveErrors.
+                                  -- note - the 'Unknown error...' string below is intentionally not localized because
+                                  -- it should never show up.  If it does, add the error string to SaveErrors.
                                   LOCF(SaveErrors[error] or ('Unknown error ' .. repr(error) .. 'loading savegame %s: %s'),
                                        Basename(fileInfo.fspec, true),
                                        InternalErrors[detail] or detail),
