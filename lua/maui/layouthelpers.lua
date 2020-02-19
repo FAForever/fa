@@ -97,6 +97,20 @@ function AtRightTopIn(control, parent, rightOffset, topOffset)
     control.Top:Set(function() return math.floor(parent.Top() + (topOffset * pixelScaleFactor)) end)
 end
 
+function AtLeftBottomIn(control, parent, leftOffset, bottomOffset)
+    leftOffset = leftOffset or 0
+    bottomOffset = bottomOffset or 0
+    control.Left:Set(function() return math.floor(parent.Left() + (leftOffset * pixelScaleFactor)) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottomOffset * pixelScaleFactor)) end)
+end
+
+function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
+    rightOffset = rightOffset or 0
+    bottomOffset = bottomOffset or 0
+    control.Right:Set(function() return math.floor(parent.Right() - (rightOffset * pixelScaleFactor)) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottomOffset * pixelScaleFactor)) end)
+end
+
 --* these functions use percentages to place the item rather than offsets so they will
 --* stay proportially spaced when the parent resizes
 function FromLeftIn(control, parent, percent)
