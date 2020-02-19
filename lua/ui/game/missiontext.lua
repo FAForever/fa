@@ -10,13 +10,9 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/Bitmap.lua').Bitmap
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
 local WrapText = import('/lua/maui/text.lua').WrapText
 local Movie = import('/lua/maui/movie.lua').Movie
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local econ = import('/lua/ui/game/economy.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local MISSION_TEXT_TIMEOUT = 10
@@ -244,7 +240,7 @@ function CreateSubtitles(parent, text)
     bg.mr.Top:Set(bg.Top)
     bg.mr.Bottom:Set(bg.Bottom)
     
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), 300, 
+    local wrapped = WrapText(LOC(text), 300, 
         function(curText) return bg.text[1]:GetStringAdvance(curText) end)
         
     for index, line in wrapped do
