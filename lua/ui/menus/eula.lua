@@ -9,11 +9,9 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
 local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
+local WrapText = import('/lua/maui/text.lua').WrapText
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 
 function CreateEULA(inParent, callback)
     local parent = Group(inParent)
@@ -55,7 +53,7 @@ function CreateEULA(inParent, callback)
     local eulaText = import('/lua/ui/help/eula.lua').EULA
     local textBoxWidth = eulaBody.Width()
 
-    local tempTable = import('/lua/maui/text.lua').WrapText(LOC(eulaText), textBoxWidth,
+    local tempTable = WrapText(LOC(eulaText), textBoxWidth,
     function(text)
         return eulaBody:GetStringAdvance(text)
     end)
