@@ -92,8 +92,7 @@ function CreateDialog(over, isLoad, exitBehavior)
         end
     end)
     LayoutHelpers.AtLeftTopIn(filePicker, panel, 43, 118)
-    filePicker.Width:Set(595)
-    filePicker.Height:Set(362)
+    LayoutHelpers.SetDimensions(filePicker, 595, 362)
 
     local cancelBtn = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Cancel>", 14, 0, nil, "UI_Menu_Cancel_02")
     cancelBtn.OnClick = function(self, modifiers)
