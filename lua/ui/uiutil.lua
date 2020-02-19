@@ -1055,17 +1055,10 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     LayoutHelpers.AtCenterIn(ret.bottomleftglow, ret.bottomleft)
     LayoutHelpers.AtCenterIn(ret.bottomrightglow, ret.bottomright)
 
-    ret.topleft.Left:Set(function() return parent.Left() - leftOffset end)
-    ret.topleft.Top:Set(function() return parent.Top() - topOffset end)
-
-    ret.topright.Right:Set(function() return parent.Right() + rightOffset end)
-    ret.topright.Top:Set(function() return parent.Top() - topOffset end)
-
-    ret.bottomleft.Left:Set(function() return parent.Left() - leftOffset end)
-    ret.bottomleft.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
-
-    ret.bottomright.Right:Set(function() return parent.Right() + rightOffset end)
-    ret.bottomright.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
+    LayoutHelpers.AtLeftTopIn(ret.topleft, parent, -leftOffset, -topOffset)
+    LayoutHelpers.AtRightTopIn(ret.topright, parent, -rightOffset, -topOffset)
+    LayoutHelpers.AtLeftBottomIn(ret.bottomleft, parent, -leftOffset, -bottomOffset)
+    LayoutHelpers.AtRightBottomIn(ret.bottomright, parent, -rightOffset, -bottomOffset)
 
     ret:DisableHitTest(true)
     LayoutHelpers.FillParent(ret, parent)
