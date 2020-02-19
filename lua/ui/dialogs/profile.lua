@@ -11,7 +11,6 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
 local Edit = import('/lua/maui/edit.lua').Edit
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Tooltip = import('/lua/ui/game/tooltip.lua')
