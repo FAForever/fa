@@ -13,8 +13,6 @@ NinePatch = Class(Group) {
             self.center.Left:Set(self.Left)
             self.center.Bottom:Set(self.Bottom)
             self.center.Right:Set(self.Right)
-
-            self.center:SetTiled(true)
         end
 
         self.tl = Bitmap(self, topLeft)
