@@ -20,8 +20,7 @@ function CreateDialog(teamkill)
     end
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(360)
-    dialogContent.Height:Set(180)
+    LayoutHelpers.SetDimensions(dialogContent, 360, 180)
 
     dialog = Popup(GetFrame(0), dialogContent)
     
