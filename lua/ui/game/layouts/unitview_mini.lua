@@ -101,8 +101,8 @@ function SetLayout()
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
 
-    controls.abilities.Left:Set(function() return controls.bg.Right() + 19 end)
-    controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 50 end)
+    LayoutHelpers.AnchorToRight(controls.abilities, controls.bg, 19)
+    LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 50)
     LayoutHelpers.SetDimensions(controls.abilities, 200, 50)
 
     SetBG(controls)
@@ -142,19 +142,19 @@ function PositionWindow()
     local consControl = import('/lua/ui/game/construction.lua').controls.constructionGroup
     if consControl:IsHidden() then
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-        controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
+        LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 24)
     else
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 120)
-        controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 42 end)
+        LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 42)
     end
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 17)
 end
 
 function UpdateStatusBars(controls)
-    if options.gui_detailed_unitview != 0 and controls.store == 1 then
+    if options.gui_detailed_unitview ~= 0 and controls.store == 1 then
         LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
-    elseif options.gui_detailed_unitview != 0 then
+    elseif options.gui_detailed_unitview ~= 0 then
         LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,0)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.shieldBar,0)
     end

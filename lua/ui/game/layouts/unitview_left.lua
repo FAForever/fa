@@ -108,8 +108,8 @@ function SetLayout()
     LayoutHelpers.Below(controls.actionText, controls.actionIcon)
     LayoutHelpers.AtHorizontalCenterIn(controls.actionText, controls.actionIcon)
 
-    controls.abilities.Left:Set(function() return controls.bg.Right() + 20 end)
-    controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
+    LayoutHelpers.AnchorToRight(controls.abilities, controls.bg, 20)
+    LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 24)
     LayoutHelpers.SetDimensions(controls.abilities, 200, 50)
 
     SetBG(controls)
@@ -138,7 +138,7 @@ function SetBG(controls)
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds')
-)
+    )
 
     controls.abilityBG:Surround(controls.abilities, 3, 5)
     LayoutHelpers.DepthUnderParent(controls.abilityBG, controls.abilities)
