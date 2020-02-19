@@ -529,7 +529,7 @@ FilePicker = Class(Group) {
                     self._tabs[i].arrow:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort-arrow-up_bmp.dds'))
                 end
             end
-            self._tabs[i].Width:Set(tabData.width)
+            LayoutHelpers.SetWidth(self._tabs[i], tabData.width)
             self._tabs[i].Uncheck = function(control)
                 control._checked = false
                 control:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_m.dds'))
