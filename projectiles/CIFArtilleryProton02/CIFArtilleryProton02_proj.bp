@@ -30,6 +30,8 @@ ProjectileBlueprint {
         Mesh = {
             LODs = {
                 {
+                    AlbedoName = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_albedo.dds',
+                    MeshName = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_lod0.scm',
                     LODCutoff = 150,
                     ShaderName = 'TMeshAlpha',
                 },
