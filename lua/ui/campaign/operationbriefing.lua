@@ -19,11 +19,8 @@ local Button = import('/lua/maui/button.lua').Button
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local Combo = import('/lua/ui/controls/combo.lua').Combo
 local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 
 local mapErrorDialog = false
 local activePopupButton = false
@@ -77,9 +74,6 @@ function CreateUI(operationID, briefingData)
 
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() backBtn.OnClick() end)
     
-    #LOG(repr(briefingData))
-    #LOG(operationID)
-    
     local launchBtn = UIUtil.CreateButtonStd(briefingGroup, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC opbrief_0003>Launch", 20, 2)
     LayoutHelpers.AtRightIn(launchBtn, backgrounds.bottom, 20)
     LayoutHelpers.AtBottomIn(launchBtn, backgrounds.bottom, 2)
@@ -89,7 +83,6 @@ function CreateUI(operationID, briefingData)
         if scenario then
             local function TryLaunch()
                 local factionToIndex = import('/lua/factions.lua').FactionIndexMap
-                LOG('FACTION: ', faction)
                 LaunchSinglePlayerSession(import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(scenario, difficulty, factionToIndex[faction], 
                     {opKey = operationID, campaignID = faction, difficulty = difficulty}, false))
                 parent:Destroy()
@@ -358,7 +351,6 @@ function CreateUI(operationID, briefingData)
         
     playpauseBtn.OnClick = function(self)
         if fmv_playing then
-            LOG('pausing')
             Tooltip.SetTooltipText(self, LOC('<LOC tooltipui0098>'))
             Tooltip.AddButtonTooltip(self, 'options_Play')
             self:SetTexture(UIUtil.UIFile('/dialogs/movie-control/nav-play_btn_up.dds'))
@@ -371,7 +363,6 @@ function CreateUI(operationID, briefingData)
             PauseVoice('VO', true)
             statusBar:SetNeedsFrameUpdate(false)
         else
-            LOG('resuming')
             Tooltip.SetTooltipText(self, LOC('<LOC tooltipui0066>'))
             Tooltip.AddButtonTooltip(self, 'options_Pause')
             self:SetTexture(UIUtil.UIFile('/dialogs/movie-control/nav-pause_btn_up.dds'))
