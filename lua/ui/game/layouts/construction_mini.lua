@@ -61,8 +61,6 @@ function SetLayout()
     LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 67)
     LayoutHelpers.ResetRight(controls.minBG)
     LayoutHelpers.ResetTop(controls.minBG)
-    WARN(controls.scrollMin.BitmapHeight())
-    WARN(controls.scrollMin.Height())
     LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO: This is now set value instead of a function to get Bitmap dimension. When when the texture changes, it wont properly resize anymore
     --controls.minBG.Width:Set(controls.minBG.BitmapWidth)
     --controls.minBG.Height:Set(controls.minBG.BitmapHeight)
