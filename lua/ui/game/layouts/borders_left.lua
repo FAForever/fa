@@ -31,15 +31,15 @@ function SetLayout(gameParent)
     
     controls.controlClusterGroup.Left:Set(gameParent.Left)
     controls.controlClusterGroup.Bottom:Set(gameParent.Bottom)
-    controls.controlClusterGroup.Top:Set(function() return controls.statusClusterGroup.Bottom() end)
-    controls.controlClusterGroup.Right:Set(function() return gameParent.Left() + 150 end)
+    LayoutHelpers.AnchorToBottom(controls.controlClusterGroup, controls.statusClusterGroup)
+    LayoutHelpers.AnchorToLeft(controls.controlClusterGroup, gameParent, -150)
     controls.controlClusterGroup:SetRenderPass(UIUtil.UIRP_PostGlow)    
     controls.controlClusterGroup:DisableHitTest()
     
     controls.statusClusterGroup.Left:Set(gameParent.Left)
     controls.statusClusterGroup.Top:Set(gameParent.Top)
     controls.statusClusterGroup.Right:Set(gameParent.Right)
-    controls.statusClusterGroup.Height:Set(function() return controls.statusClusterGroup.Top() + 150 end)
+    LayoutHelpers.SetHeight(controls.statusClusterGroup, controls.statusClusterGroup.Top() + 150)
     controls.statusClusterGroup:DisableHitTest()
     controls.statusClusterGroup:DisableHitTest()
     
