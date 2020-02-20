@@ -1,18 +1,12 @@
-
 local UIUtil = import('/lua/ui/uiutil.lua')
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Movie = import('/lua/maui/movie.lua').Movie
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local Movie = import('/lua/maui/movie.lua').Movie
 local WrapText = import('/lua/maui/text.lua').WrapText
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
 local Prefs = import('/lua/user/prefs.lua')
-local MapUtil = import('/lua/ui/maputil.lua')
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local PlayCampaignMovie = import('campaignmovies.lua').PlayCampaignMovie
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
@@ -151,7 +145,7 @@ function CreateUI()
             self.checked = checked
             if checked then
                 for i, control in GUI.OpSelectionGroup.Items do
-                    if control != self and control.checked then
+                    if control ~= self and control.checked then
                         control:SetCheck(false)
                     end
                 end
@@ -288,7 +282,7 @@ function CreateUI()
         item.boxIconRight.Depth:Set(function() return item.Depth() - 1 end)
         
         item:DisableHitTest(true)
-        if data.enabled != nil then
+        if data.enabled ~= nil then
             if data.enabled then
                 item:EnableHitTest()
             else
@@ -615,7 +609,7 @@ end
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
         function()
-            # Display subtitles
+            -- Display subtitles
             local lastOff = 0
             for k,v in captions do
                 WaitSeconds(v.offset - lastOff)
