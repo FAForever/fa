@@ -126,12 +126,12 @@ function CreateUI(operationID, briefingData)
     local briefBG = Bitmap(briefingGroup, UIUtil.UIFile('/scx_menu/operation-briefing/text-panel_bmp.dds'))
     
     local briefGlow = Bitmap(briefBG, UIUtil.UIFile('/scx_menu/operation-briefing/emiter-bar_bmp.dds'))
-    briefGlow.Bottom:Set(function() return backgrounds.bottom.Top() + 5 end)
+    LayoutHelpers.AnchorToTop(briefGlow, backgrounds.bottom, -5)
     LayoutHelpers.AtHorizontalCenterIn(briefGlow, backgrounds.bottom)
     briefGlow.Depth:Set(function() return briefingGroup.Depth() + 1 end)
     
     briefBG.Depth:Set(function() return briefGlow.Depth() + 1 end)
-    briefBG.Bottom:Set(function() return briefGlow.Top() + 50 end)
+    LayoutHelpers.AnchorToTop(briefBG, briefGlow, -50)
     LayoutHelpers.AtHorizontalCenterIn(briefBG, briefGlow)
     
     local title = UIUtil.CreateText(briefingGroup, LOC(briefingData.long_name), 24)
@@ -225,9 +225,9 @@ function CreateUI(operationID, briefingData)
     local statusBar = StatusBar(parent, 0, 100, false, false, 
         UIUtil.UIFile('/scx_menu/operation-briefing/status-bar-back_bmp.dds'), 
         UIUtil.UIFile('/scx_menu/operation-briefing/status-bar_bmp.dds'), false)
-    statusBar.Left:Set(function() return backgrounds.bottom.Left() + 260 end)
-    statusBar.Right:Set(function() return statusBar.Left() + 200 end)
-    statusBar.Bottom:Set(function() return backgrounds.bottom.Bottom() - 37 end)
+    LayoutHelpers.AtLeftIn(statusBar, backgrounds.bottom, 260)
+    LayoutHelpers.AnchorToLeft(statusBar, statusBar, -200)
+    LayoutHelpers.AtBottomIn(statusBar, backgrounds.bottom, 37)
     statusBar.OnFrame = function(self, delta)
         fmv_time = fmv_time + delta
         local perc = MATH_Lerp(fmv_time, 0, briefMovie:GetLength(), 0, 100)
@@ -479,8 +479,8 @@ function CreateOptionGroup(parent, label, optionData, default, disabled)
                     activePopupButton.popup = nil
                 end
                 self.popup = CreatePopup(self, self.data)
-                self.popup.Bottom:Set(function() return backgrounds.bottom.Top() - 2 end)
-                self.popup.Left:Set(function() return backgrounds.bottom.Left() + 556 end)
+                LayoutHelpers.AnchorToTop(self.popup, backgrounds.bottom, 2)
+                LayoutHelpers.AtLeftIn(self.popup, backgrounds.bottom, 556)
                 activePopupButton = self
             end
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_01'}))
@@ -500,8 +500,7 @@ function CreateOptionGroup(parent, label, optionData, default, disabled)
     LayoutHelpers.AtRightIn(group.button, group)
     LayoutHelpers.AtVerticalCenterIn(group.button, group)
     
-    group.Height:Set(30)
-    group.Width:Set(150)
+    LayoutHelpers.SetDimensions(group, 150, 30)
     
     return group
 end
@@ -544,17 +543,16 @@ function CreatePopup(parent, data)
             end
             item.icon = Bitmap(item, UIUtil.UIFile(texture))
             item.icon:DisableHitTest()
-            item.icon.Height:Set(function() return item.icon.BitmapHeight() * .5 end)
-            item.icon.Width:Set(function() return item.icon.BitmapWidth() * .5 end)
+            LayoutHelpers.SetDimensions(item.icon, item.icon.BitmapWidth() * .5, item.icon.BitmapHeight() * .5)
             LayoutHelpers.AtLeftTopIn(item.icon, item)
             LayoutHelpers.AtLeftIn(item.text, item, 40)
             LayoutHelpers.AtVerticalCenterIn(item.text, item)
             item.Height:Set(item.icon.Height)
         else
             LayoutHelpers.AtCenterIn(item.text, item)
-            item.Height:Set(20)
+            LayoutHelpers.SetHeight(item, 20)
         end
-        item.Width:Set(100)
+        LayoutHelpers.SetWidth(item, 100)
         if i == 1 then
             LayoutHelpers.AtLeftTopIn(item, bg)
         else
@@ -569,7 +567,7 @@ function CreatePopup(parent, data)
         end
         return height
     end)
-    bg.Width:Set(100)
+    LayoutHelpers.SetWidth(bg, 100)
     return bg
 end
 
