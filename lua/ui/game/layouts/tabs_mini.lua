@@ -90,7 +90,7 @@ function LayoutStretchBG()
     
     controls.bgLeftStretch:SetTexture(UIUtil.UIFile('/game/options-panel/options_brd_vert_l.dds'))
     controls.bgLeftStretch.Bottom:Set(controls.bgBottomLeftGlow.Top)
-    controls.bgLeftStretch.Left:Set(function() return controls.bgTopLeftGlow.Left() + 4 end)
+    LayoutHelpers.AtLeftIn(controls.bgLeftStretch, controls.bgTopLeftGlow, 4)
     controls.bgLeftStretch.Top:Set(controls.bgTopLeftGlow.Bottom)
     
     controls.bgBottomRightGlow:SetTexture(UIUtil.UIFile('/game/options-panel/options_brd_vert_lr.dds'))
@@ -105,7 +105,7 @@ function LayoutStretchBG()
     
     controls.bgRightStretch:SetTexture(UIUtil.UIFile('/game/options-panel/options_brd_vert_r.dds'))
     controls.bgRightStretch.Bottom:Set(controls.bgBottomRightGlow.Top)
-    controls.bgRightStretch.Right:Set(function() return controls.bgTopRightGlow.Right() - 4 end)
+    LayoutHelpers.AtRightIn(controls.bgRightStretch, controls.bgTopRightGlow, 4)
     controls.bgRightStretch.Top:Set(controls.bgTopRightGlow.Bottom)
     
     controls.bgMidStretch:SetTexture(UIUtil.UIFile('/game/options-panel/options_brd_m.dds'))

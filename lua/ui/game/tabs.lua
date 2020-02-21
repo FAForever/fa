@@ -639,7 +639,8 @@ function BuildContent(contentID)
 
     animationLock = true
 
-    contentGroup.Top:Set(function() return controls.bgTop.Bottom() + 20 end)
+    LayoutHelpers.AnchorToBottom(contentGroup, controls.bgTop, 20)
+    --contentGroup.Top:Set(function() return controls.bgTop.Bottom() + 20 end)
     LayoutHelpers.AtHorizontalCenterIn(contentGroup, controls.bgTop)
     contentGroup:SetAlpha(0, true)
     contentGroup.OnFrame = function(self, delta)
@@ -846,44 +847,37 @@ function ToggleGameInfo()
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
 
     local dialog = Group(GetFrame(0))
-        LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
-        dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
+    LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
+    dialog.Depth:Set(999)
     local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-withoutBG.dds'))
-        dialog.Width:Set(background.Width)
-        dialog.Height:Set(background.Height)
-        LayoutHelpers.FillParent(background, dialog)
+    LayoutHelpers.SetDimensions(dialog, background.Width(), background.Height())
+    LayoutHelpers.FillParent(background, dialog)
     local dialog2 = Group(dialog)
-        dialog2.Width:Set(background.Width)
-        dialog2.Height:Set(background.Height)
-        LayoutHelpers.AtCenterIn(dialog2, dialog)
-    -----------
+    LayoutHelpers.SetDimensions(dialog2, background.Width(), background.Height())
+    LayoutHelpers.AtCenterIn(dialog2, dialog)
+
     -- Title --
     local text0 = UIUtil.CreateText(dialog2, 'Game Info :', 17, 'Arial')
-        text0:SetColor('B9BFB9') -- 808080
-        text0:SetDropShadow(true)
-        LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-        LayoutHelpers.AtTopIn(text0, dialog2, 10)
-    --------------------
+    text0:SetColor('B9BFB9')
+    text0:SetDropShadow(true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
+    LayoutHelpers.AtTopIn(text0, dialog2, 10)
+
     -- OK button --
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
-        LayoutHelpers.AtHorizontalCenterIn(OkButton, dialog2, 0)
-        LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
-        OkButton.OnClick = function(self)
-            dialog:Destroy()
-            --infoBtn:Enable()
-        end
+    LayoutHelpers.AtHorizontalCenterIn(OkButton, dialog2, 0)
+    LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
+    OkButton.OnClick = function(self)
+        dialog:Destroy()
+    end
     ------------------
     -- Preset List --
     PresetList = ItemList(dialog2)
-        PresetList:SetFont(UIUtil.bodyFont, 11)
-        PresetList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
-        --PresetList:ShowMouseoverItem(true)
-        PresetList.Width:Set(537-20-19)--232)--210)
-        PresetList.Height:Set(310)
-        --LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
-        LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
-        LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-        UIUtil.CreateLobbyVertScrollbar(PresetList)
+    PresetList:SetFont(UIUtil.bodyFont, 11)
+    PresetList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
+    LayoutHelpers.SetDimensions(PresetList, background.Width() - 30, background.Height() - 90)
+    LayoutHelpers.AtLeftTopIn(PresetList, dialog2, 10, 38)
+    UIUtil.CreateLobbyVertScrollbar(PresetList)
     ------------
     -- Script --
 
