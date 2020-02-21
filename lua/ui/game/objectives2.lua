@@ -20,11 +20,8 @@ local GameMain = import('/lua/ui/game/gamemain.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Button = import('/lua/maui/button.lua').Button
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Movie = import('/lua/maui/movie.lua').Movie
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
 local cmdMode = import('/lua/ui/game/commandmode.lua')
 local UIPing = import('/lua/ui/game/ping.lua')
@@ -91,7 +88,7 @@ function CreateUI(inParent)
             local position = GetMouseWorldPos()
             for _, v in position do
                 local var = v
-                if var != v then
+                if var ~= v then
                     return
                 end
             end
@@ -200,7 +197,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
                 needsLayoutUpdate = true
             end
             objectives[update.tag][update.updateField] = update.updateData
-        elseif update.updateField == 'target' and update.updateField != 'timer' then
+        elseif update.updateField == 'target' and update.updateField ~= 'timer' then
             if controls.objItems[update.tag] then
                 if update.updateData.TargetTag == 1 then
                     if not controls.objItems[update.tag].ImageLocked and update.updateData.BlueprintId and DiskGetFileInfo('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds') then
@@ -558,7 +555,7 @@ function CreateTooltip(parentControl, objData, container)
 
         controls.tooltip.text.title:SetText(LOC(objData.title) or LOC(objData.Name))
         local progressStr = ''
-        if objData.progress and objData.progress != '' then
+        if objData.progress and objData.progress ~= '' then
             progressStr = LOC(objData.progress)
         elseif objData.targets.Type == 'Timer' and objData.targets.Time > 0 then
             progressStr = string.format("%02d:%02d", math.floor(objData.targets.Time/60), math.floor(math.mod(objData.targets.Time, 60)))
@@ -593,11 +590,11 @@ function CreateTooltip(parentControl, objData, container)
             for id, control in controls.tooltip.text do
                 if id == 'desc' then
                     for _, line in control do
-                        if line:GetText() != '' then
+                        if line:GetText() ~= '' then
                             totHeight = totHeight + line.Height()
                         end
                     end
-                elseif control:GetText() != '' then
+                elseif control:GetText() ~= '' then
                     totHeight = control.Height() + totHeight
                 end
             end
