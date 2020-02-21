@@ -9,18 +9,15 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Movie = import('/lua/maui/movie.lua').Movie
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local WinMgr = import('/lua/ui/game/windowmanager.lua')
 local WIN_ID = 'Transmission_Log'
 
-# Possible LOC tag for the future
-# "<LOC _Technology>Technology"
-# <LOC trans_log_0000>Transmission Log
-# <LOC trans_log_0001>No entries
-# <LOC trans_log_0002>%d - %d of %d entries
+-- Possible LOC tag for the future
+-- "<LOC _Technology>Technology"
+-- <LOC trans_log_0000>Transmission Log
+-- <LOC trans_log_0001>No entries
+-- <LOC trans_log_0002>%d - %d of %d entries
 local controls = {
     bg = false,
     logContainer = false,
@@ -122,7 +119,7 @@ function CreateTransmissionLog()
     
     
     local function DataSize()
-        if prevtabsize != table.getn(LogData) then
+        if prevtabsize ~= table.getn(LogData) then
             local size = 1
             for i, v in LogData do
                 size = size + table.getn(v.text)
@@ -254,7 +251,7 @@ function AddEntry(entryData)
     local tempData = {}
     local nameStart = string.find(tempText, ']')
 
-    if nameStart != nil then
+    if nameStart ~= nil then
         tempData.name = LOC("<LOC "..string.sub(tempText, 2, nameStart-1)..">")
         tempData.text = WrapText(string.sub(tempText, nameStart+2))
     else
