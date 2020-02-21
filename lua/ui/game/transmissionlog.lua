@@ -37,8 +37,7 @@ function CreateTransmissionLog()
     LayoutHelpers.AtCenterIn(controls.bg, GetFrame(0))
     
     controls.closeBtn = UIUtil.CreateButtonStd(controls.bg, "/widgets02/small", "<LOC _Close>", 16)
-    controls.closeBtn.Right:Set(function() return controls.bg.Right() - 70 end)
-    controls.closeBtn.Bottom:Set(function() return controls.bg.Bottom() - 28 end)
+    LayoutHelpers.AtRightBottomIn(controls.closeBtn, controls.bg, 70, 28)
     controls.closeBtn.OnClick = function(self, modifiers)
         ToggleTransmissionLog()
     end
@@ -53,8 +52,7 @@ function CreateTransmissionLog()
     end
     
     controls.logContainer = Group(controls.bg)
-    controls.logContainer.Height:Set(330)
-    controls.logContainer.Width:Set(752)
+    LayoutHelpers.SetDimensions(controls.logContainer, 752, 330)
     controls.logContainer.top = 1
     
     controls.title = UIUtil.CreateText(controls.bg, LOC('<LOC trans_log_0000>Transmission Log'), 20)
@@ -68,16 +66,16 @@ function CreateTransmissionLog()
     
     controls.logEntries[1].time = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtLeftTopIn(controls.logEntries[1].time, controls.logContainer)
-    controls.logEntries[1].time.Width:Set(60)
+    LayoutHelpers.SetWidth(controls.logEntries[1].time, 60)
     
     controls.logEntries[1].name = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
     
     controls.logEntries[1].text = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtRightTopIn(controls.logEntries[1].text, controls.logContainer)
-    controls.logEntries[1].text.Width:Set(function() return controls.logContainer.Width() - 170 end)
+    controls.logEntries[1].text.Width:Set(function() return controls.logContainer.Width() - LayoutHelpers.ScaleNumber(170) end)
     
     controls.logEntries[1].bg.Top:Set(controls.logEntries[1].time.Top)
-    controls.logEntries[1].bg.Left:Set(function() return controls.logContainer.Left() - 10 end)
+    LayoutHelpers.AtLeftIn(controls.logEntries[1].bg, controls.logContainer, -10)
     controls.logEntries[1].bg.Right:Set(controls.logContainer.Right)
     controls.logEntries[1].bg.Bottom:Set(controls.logEntries[1].time.Bottom)
     controls.logEntries[1].bg:SetSolidColor('00000000')
@@ -93,7 +91,7 @@ function CreateTransmissionLog()
         
         controls.logEntries[index].time = UIUtil.CreateText(controls.logEntries[index].bg, '', 14, "Arial")
         LayoutHelpers.Below(controls.logEntries[index].time, controls.logEntries[index-1].time)
-        controls.logEntries[index].time.Width:Set(60)
+        LayoutHelpers.SetWidth(controls.logEntries[index].time, 60)
         
         controls.logEntries[index].name = UIUtil.CreateText(controls.logEntries[index].bg, '', 14, "Arial")
         
@@ -106,7 +104,7 @@ function CreateTransmissionLog()
         controls.logEntries[index].name:SetClipToWidth(true)
         
         controls.logEntries[index].bg.Top:Set(controls.logEntries[index].time.Top)
-        controls.logEntries[index].bg.Left:Set(function() return controls.logContainer.Left() - 5 end)
+        LayoutHelpers.AtLeftIn(controls.logEntries[index].bg, controls.logContainer, -5)
         controls.logEntries[index].bg.Right:Set(controls.logContainer.Right)
         controls.logEntries[index].bg.Bottom:Set(controls.logEntries[index].time.Bottom)
         controls.logEntries[index].bg:SetSolidColor('00000000')
