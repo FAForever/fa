@@ -191,9 +191,9 @@ function CreateUI()
 
     local scrollingBG = Bitmap(botBorderLeft)
     scrollingBG:SetSolidColor('ff000000')
-    scrollingBG.Left:Set(function() return botBorderLeft.Right() - 30 end)
-    scrollingBG.Right:Set(function() return botBorderRight.Left() + 30 end)
-    scrollingBG.Height:Set(20)
+    LayoutHelpers.AnchorToRight(scrollingBG, botBorderLeft, -30)
+    LayoutHelpers.AnchorToLeft(scrollingBG, botBorderRight, -30)
+    LayoutHelpers.SetHeight(scrollingBG, 30)
     LayoutHelpers.AtBottomIn(scrollingBG, border)
 
     -- legal text
@@ -392,15 +392,15 @@ function CreateUI()
         end
 
         mainMenu.profile.leftBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_left.dds'))
-        mainMenu.profile.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
+        LayoutHelpers.AtRightIn(mainMenu.profile.leftBracket, menuBracketLeft, 15)
         LayoutHelpers.AtTopIn(mainMenu.profile.leftBracket, mainMenu.profile, -52)
-        mainMenu.profile.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
+        LayoutHelpers.DepthUnderParent(mainMenu.profile.leftBracket, menuBracketLeft)
         mainMenu.profile.leftBracket:SetAlpha(0)
 
         mainMenu.profile.rightBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_right.dds'))
-        mainMenu.profile.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
+        LayoutHelpers.AtLeftIn(mainMenu.profile.rightBracket, menuBracketRight, 15)
         LayoutHelpers.AtTopIn(mainMenu.profile.rightBracket, mainMenu.profile, -52)
-        mainMenu.profile.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
+        LayoutHelpers.DepthUnderParent(mainMenu.profile.rightBracket, menuBracketRight)
         mainMenu.profile.rightBracket:SetAlpha(0)
 
         mainMenu.profile.SetItemAlpha = function(self, alpha)
@@ -554,14 +554,14 @@ function CreateUI()
                 end
 
                 mainMenu[k].btn.leftBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_left.dds'))
-                mainMenu[k].btn.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
+                LayoutHelpers.AtRightIn(mainMenu[k].btn.leftBracket, menuBracketLeft, 15)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.leftBracket, mainMenu[k].btn, -6)
-                mainMenu[k].btn.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
+                LayoutHelpers.DepthUnderParent(mainMenu[k].btn.leftBracket, menuBracketLeft)
 
                 mainMenu[k].btn.rightBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_right.dds'))
-                mainMenu[k].btn.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
+                LayoutHelpers.AtLeftIn(mainMenu[k].btn.rightBracket, menuBracketRight, 15)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.rightBracket, mainMenu[k].btn, -6)
-                mainMenu[k].btn.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
+                LayoutHelpers.DepthUnderParent(mainMenu[k].btn.rightBracket, menuBracketRight)
 
                 mainMenu[k].btn:Disable()
                 mainMenu[k].btn:SetAlpha(0, true)
