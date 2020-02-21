@@ -46,10 +46,8 @@ function SetLayout()
     LayoutHelpers.RightOf(controls.time, controls.timeIcon, 2)
     LayoutHelpers.LeftOf(controls.units, controls.unitIcon)
     
-    controls.timeIcon.Height:Set(function() return controls.timeIcon.BitmapHeight() * .9 end)
-    controls.timeIcon.Width:Set(function() return controls.timeIcon.BitmapWidth() * .9 end)
-    controls.unitIcon.Height:Set(function() return controls.unitIcon.BitmapHeight() * .9 end)
-    controls.unitIcon.Width:Set(function() return controls.unitIcon.BitmapWidth() * .9 end)
+    LayoutHelpers.SetDimensions(controls.timeIcon, controls.timeIcon.BitmapWidth() * .9, controls.timeIcon.BitmapHeight() * .9)
+    LayoutHelpers.SetDimensions(controls.unitIcon, controls.unitIcon.BitmapWidth() * .9, controls.unitIcon.BitmapHeight() * .9)
     
     LayoutContainerBG(controls.objectiveContainer, textures.objective)
     LayoutContainerBG(controls.squadContainer, textures.squad)
@@ -64,7 +62,7 @@ function SetLayout()
     LayoutHelpers.AtRightIn(controls.bg.bracketBottom, controls.bg)
     
     controls.bg.bracketStretch.Top:Set(controls.bg.bracketTop.Bottom)
-    controls.bg.bracketStretch.Right:Set(function() return controls.bg.bracketTop.Right() - 7 end)
+    LayoutHelpers.AtRightIn(controls.bg.bracketStretch, controls.bg.bracketTop, 7)
     controls.bg.bracketStretch.Bottom:Set(controls.bg.bracketBottom.Top)
     
     LayoutHelpers.AtTopIn(controls.collapseArrow, controls.bg, 22)
@@ -89,12 +87,12 @@ function SetLayout()
         if not controls.squadContainer:IsHidden() then
             height = height + controls.squadContainer.Height()
         end
-        return height + 20
+        return height + LayoutHelpers.ScaleNumber(20)
     end)
     controls.bg.Width:Set(function() return math.max(math.max(controls.infoContainer.Width(), controls.objectiveContainer.Width()), controls.squadContainer.Width()) end)
     
     local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
-    avatarGroup.Top:Set(controls.bg.bracketBottom.Bottom()+60)
+    LayoutHelpers.AnchorToBottom(avatarGroup, controls.bg.bracketBottom, 60)
 end
 
 function LayoutContainerBG(container, textures)
@@ -109,7 +107,7 @@ function LayoutContainerBG(container, textures)
     LayoutHelpers.AtRightTopIn(container.RightBG, container)
     
     container.LeftBG.Right:Set(function() return math.min(container.RightBG.Left(), container.Left() + container.LeftBG.Width()) end)
-    container.LeftBG.Top:Set(function() return container.RightBG.Top() - 2 end)
+    LayoutHelpers.AtTopIn(container.LeftBG, container.RightBG, -2)
     
     container.StretchBG.Top:Set(container.RightBG.Top)
     container.StretchBG.Left:Set(container.LeftBG.Right)

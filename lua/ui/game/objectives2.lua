@@ -282,8 +282,7 @@ function UpdateObjectiveItems(skipAnnounce)
             group.icon = Bitmap(group.bg, UIUtil.UIFile('/dialogs/objective-unit/help-lg-graphics_bmp.dds'))
         end
         LayoutHelpers.AtCenterIn(group.icon, group.bg, -6, -1)
-        group.icon.Height:Set(40)
-        group.icon.Width:Set(40)
+        LayoutHelpers.SetDimensions(group.icon, 40, 40)
         group.icon:DisableHitTest()
 
         group.icon.flash = Bitmap(group.icon, UIUtil.UIFile('/game/units_bmp/glow.dds'))
@@ -464,7 +463,7 @@ function LayoutObjectiveItems()
             objectiveWidth = objectiveWidth + item.Width()
             prevControl = item
         end
-        controls.objectiveContainer.Width:Set(objectiveWidth+20)
+        controls.objectiveContainer.Width:Set(objectiveWidth + LayoutHelpers.ScaleNumber(20))
         controls.objectiveContainer:Show()
     else
         controls.objectiveContainer:Hide()
@@ -561,7 +560,7 @@ function CreateTooltip(parentControl, objData, container)
             progressStr = string.format("%02d:%02d", math.floor(objData.targets.Time/60), math.floor(math.mod(objData.targets.Time, 60)))
         end
         controls.tooltip.text.progress:SetText(progressStr)
-        controls.tooltip.Width:Set(function() return math.max(180, controls.tooltip.text.title.Width()) end)
+        controls.tooltip.Width:Set(function() return math.max(LayoutHelpers.ScaleNumber(180), controls.tooltip.text.title.Width()) end)
 
         local curLine = 1
         local wrapped = import('/lua/maui/text.lua').WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
@@ -606,9 +605,9 @@ function CreateTooltip(parentControl, objData, container)
 
     controls.tooltip:DisableHitTest(true)
     LayoutHelpers.AtVerticalCenterIn(controls.tooltip.connector, container)
-    controls.tooltip.connector.Right:Set(function() return container.Left() + 7 end)
+    LayoutHelpers.AnchorToLeft(controls.tooltip.connector, container, -7)
     LayoutHelpers.LeftOf(controls.tooltip, container, 32)
-    controls.tooltip.Top:Set(function() return container.Top() + 16 end)
+    LayoutHelpers.AtTopIn(controls.tooltip, container, 16)
 end
 
 function DestroyTooltip()
@@ -642,8 +641,8 @@ function AddPingGroups(groupData, onload)
         controls.squads[id] = Bitmap(controls.bg, UIUtil.UIFile('/game/ping-icons/panel-icon_bmp.dds'))
         controls.squads[id].btn = Button(controls.squads[id], icon, icon, icon, icon)
         LayoutHelpers.AtCenterIn(controls.squads[id].btn, controls.squads[id])
-        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - 16 end)
-        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - 16 end)
+        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - LayoutHelpers.ScaleNumber(16) end)
+        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - LayoutHelpers.ScaleNumber(16) end)
         controls.squads[id].btn.Data = pingGroup
         controls.squads[id].btn.OnClick = function(self, modifiers)
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
