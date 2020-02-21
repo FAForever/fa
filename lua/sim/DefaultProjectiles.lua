@@ -358,7 +358,6 @@ OverchargeProjectile = Class() {
         -- Energy drained is calculated by the relationship equations
         local damage = data.minDamage
         local army = self:GetArmy()
-        local killShieldGenOnImpact = false
 
         if targetEntity then
             -- Handle hitting shields. We want the unit underneath, not the shield itself
@@ -404,10 +403,6 @@ OverchargeProjectile = Class() {
                     --good against group of mobile shields
                 end
 
-                if targetCats.DIESTOOCDEPLETINGSHIELD then
-                    killShieldGenOnImpact = true
-                end
-
                       ------ ACU -------
                 if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
                     idealDamage = data.minDamage		
@@ -438,7 +433,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[army] = OCProjectiles[army] - 1
                 launcher.EconDrain = nil
                 -- if oc depleets a mobile shield it kills the generator, vet counted, no wreck left
-                if killShieldGenOnImpact and not targetEntity.MyShield:IsUp() then
+                if targetCats.DIESTOOCDEPLETINGSHIELD and not targetEntity.MyShield:IsUp() then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
