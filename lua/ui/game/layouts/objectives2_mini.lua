@@ -27,17 +27,17 @@ function SetLayout()
     
     LayoutHelpers.AtRightTopIn(controls.infoContainer, controls.bg, 13, 10)
     controls.infoContainer.Height:Set(controls.infoContainer.LeftBG.Height)
-    controls.infoContainer.Width:Set(function() return controls.time.Width() + controls.units.Width() + 120 end)
+    controls.infoContainer.Width:Set(function() return controls.time.Width() + controls.units.Width() + LayoutHelpers.ScaleNumber(120) end)
     
     controls.objectiveContainer.Top:Set(function() return controls.infoContainer.Bottom() end)
     LayoutHelpers.AtRightIn(controls.objectiveContainer, controls.bg, 15)
     controls.objectiveContainer.Height:Set(controls.objectiveContainer.LeftBG.Height)
-    controls.objectiveContainer.Width:Set(1)
+    LayoutHelpers.SetWidth(controls.objectiveContainer, 1)
     
     controls.squadContainer.Top:Set(function() return controls.objectiveContainer.Bottom() end)
     LayoutHelpers.AtRightIn(controls.squadContainer, controls.bg, 15)
     controls.squadContainer.Height:Set(controls.squadContainer.LeftBG.Height)
-    controls.squadContainer.Width:Set(1)
+    LayoutHelpers.SetWidth(controls.squadContainer, 1)
     
     controls.timeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
     controls.unitIcon:SetTexture(UIUtil.UIFile('/dialogs/score-overlay/tank_bmp.dds'))
