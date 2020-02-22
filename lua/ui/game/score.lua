@@ -85,7 +85,7 @@ function CreateScoreUI(parent)
 
     controls.bg:DisableHitTest(true)
 
-    controls.bgTop.Width:Set(320)
+    LayoutHelpers.SetWidth(controls.bgTop, 320)
 
     controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.time:SetColor('ff00dbff')
@@ -207,8 +207,7 @@ function SetupPlayerLines()
         else
             group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
         end
-        group.faction.Height:Set(14)
-        group.faction.Width:Set(14)
+        LayoutHelpers.SetDimensions(group.faction, 14, 14)
         group.faction:DisableHitTest()
         LayoutHelpers.AtLeftTopIn(group.faction, group, -4)
 
@@ -230,7 +229,7 @@ function SetupPlayerLines()
         LayoutHelpers.AtVerticalCenterIn(group.score, group)
         group.score:SetColor('ffffffff')
 
-        group.name.Right:Set(function() return group.score.Left() - 5 end)
+        LayoutHelpers.AnchorToLeft(group.name, group.score, 5)
         group.name:SetClipToWidth(true)
 
         if armyIndex ~= 0 then
@@ -238,8 +237,7 @@ function SetupPlayerLines()
             group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             LayoutHelpers.AtRightIn(group.mass, group, sw * 1 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.mass, group)
-            group.mass.Height:Set(14)
-            group.mass.Width:Set(14)
+            LayoutHelpers.SetDimensions(group.mass, 14, 14)
             group.mass.HandleEvent = function(self, event)
                 ResourceClickProcessing(self, event, group, 'Mass')
             end
@@ -256,8 +254,7 @@ function SetupPlayerLines()
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
             LayoutHelpers.AtRightIn(group.energy, group, sw * 0 + 16)
             LayoutHelpers.AtVerticalCenterIn(group.energy, group)
-            group.energy.Height:Set(14)
-            group.energy.Width:Set(14)
+            LayoutHelpers.SetDimensions(group.energy, 14, 14)
             group.energy.HandleEvent = function(self, event)
                 ResourceClickProcessing(self, event, group, 'Energy')
             end
@@ -274,8 +271,7 @@ function SetupPlayerLines()
             group.units:SetTexture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
             LayoutHelpers.AtRightIn(group.units, group, sw * 0)
             LayoutHelpers.AtVerticalCenterIn(group.units, group)
-            group.units.Height:Set(14)
-            group.units.Width:Set(14)
+            LayoutHelpers.SetDimensions(group.units, 14, 14)
             group.units.HandleEvent = function(self, event)
                 if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or (GetFocusArmy() == group.armyID) then return end
                 if event.Modifiers.Shift then
@@ -328,11 +324,11 @@ function SetupPlayerLines()
     observerLine:Hide()
     observerLine.OnHide = blockOnHide
     observerLine.name.Top:Set(observerLine.Top)
-    observerLine.Height:Set(15)
+    LayoutHelpers.SetHeight(observerLine, 15)
 
     if SessionIsReplay() then
         sessionInfo.Options.Score = 'yes'
-        observerLine.Height:Set(40)
+        LayoutHelpers.SetHeight(observerLine, 40)
         observerLine.speedText = UIUtil.CreateText(observerLine, '', 12, UIUtil.bodyFont)
         observerLine.speedText:Hide()
         observerLine.speedText:SetColor('ff00dbff')
@@ -344,7 +340,7 @@ function SetupPlayerLines()
             UIUtil.SkinnableFile('/dialogs/options/slider-back_bmp.dds'))
         observerLine.speedSlider:Hide()
         observerLine.speedSlider.Left:Set(observerLine.Left)
-        observerLine.speedSlider.Right:Set(function() return observerLine.Right() - 20 end)
+        LayoutHelpers.AtRightIn(observerLine.speedSlider, observerLine, 20)
         observerLine.speedSlider.Bottom:Set(observerLine.Bottom)
         observerLine.speedSlider._background.Left:Set(observerLine.speedSlider.Left)
         observerLine.speedSlider._background.Right:Set(observerLine.speedSlider.Right)
@@ -377,15 +373,14 @@ function SetupPlayerLines()
         if sessionInfo.Options.Ranked then
             group.ranked = Bitmap(group)
             group.ranked:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
-            group.ranked.Height:Set(16)
-            group.ranked.Width:Set(16)
+            LayoutHelpers.SetDimensions(group.ranked, 16, 16)
             group.ranked:DisableHitTest()
             LayoutHelpers.AtRightTopIn(group.ranked, group, -1)
         end
 
         group.name.Right:Set(group.Right)
         group.name:SetClipToWidth(true)
-        group.Height:Set(18)
+        LayoutHelpers.SetHeight(group, 19)
         group.Width:Set(controls.armyGroup.Width)
         group:DisableHitTest()
 
