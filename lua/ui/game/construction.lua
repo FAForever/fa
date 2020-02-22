@@ -313,7 +313,7 @@ function CreateUI()
         Checkbox.OnEnable(self)
     end
 
-    controls.extraBtn1:UseAlphaHitTest(true)
+    --controls.extraBtn1:UseAlphaHitTest(true)
     controls.extraBtn2 = Checkbox(controls.minBG)
     controls.extraBtn2.icon = Bitmap(controls.extraBtn2)
     controls.extraBtn2.icon.OnTexture = UIUtil.SkinnableFile('/game/construct-sm_btn/pause_on.dds')
@@ -334,7 +334,7 @@ function CreateUI()
         Checkbox.OnEnable(self)
     end
 
-    controls.extraBtn2:UseAlphaHitTest(true)
+    --controls.extraBtn2:UseAlphaHitTest(true)
     controls.secondaryProgress = StatusBar(controls.secondaryChoices, 0, 1, false, false,
         UIUtil.UIFile('/game/unit-over/health-bars-back-1_bmp.dds'),
         UIUtil.UIFile('/game/unit-over/bar01_bmp.dds'),
