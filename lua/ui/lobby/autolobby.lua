@@ -202,8 +202,7 @@ local function CreateUI()
     ---------------------------------------------------------------------------
     local controlGroup = Group(parent, "controlGroup")
     LayoutHelpers.AtCenterIn(controlGroup, parent)
-    controlGroup.Width:Set(970)
-    controlGroup.Height:Set(670)
+    LayoutHelpers.SetDimensions(controlGroup, 970, 670)
 
     UIUtil.ShowInfoDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 end
