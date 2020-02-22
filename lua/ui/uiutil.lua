@@ -554,7 +554,7 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     end
 
     local button = Button(parent, up, down, over, disabled, clickCue, rolloverCue)
-    button:UseAlphaHitTest(true)
+    button:UseAlphaHitTest(false)
 
     if label and pointSize then
         button.label = CreateText(button, label, pointSize, buttonFont, dropshadow)

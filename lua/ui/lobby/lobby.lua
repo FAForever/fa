@@ -3360,7 +3360,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Launch Button
-    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/', LOC("<LOC tooltipui0173>Launch Game")) -- TODO: large button crashing when scalled
+    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', LOC("<LOC tooltipui0173>Launch Game"))
     GUI.launchGameButton = launchGameButton
     LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
     LayoutHelpers.AtBottomIn(launchGameButton, GUI.panel, -8)
