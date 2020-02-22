@@ -834,8 +834,8 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     LayoutHelpers.AtTopIn(textLine[1], dialog, 15)
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
 
-    dialog.Width:Set(428)
-    local textBoxWidth = (dialog.Width() - 80)
+    LayoutHelpers.SetWidth(dialog, 428)
+    local textBoxWidth = (dialog.Width() - LayoutHelpers.ScaleNumber(80))
     local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
     function(text)
         return textLine[1]:GetStringAdvance(text)
@@ -859,7 +859,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         textHeight = textHeight + textLine[i]:Height()
     end
 
-    dialog.Height:Set(textHeight + 85)
+    dialog.Height:Set(textHeight + LayoutHelpers.ScaleNumber(85))
 
     local popup = Popup(parent, dialog)
     -- Don't close when the shadow is clicked.
