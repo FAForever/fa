@@ -588,8 +588,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local gridGroup = Group(currentPage, "scoreGridGroup")
             -- no layout info for these sub pages, so position manually
             LayoutHelpers.AtLeftTopIn(gridGroup, currentPage, 43, 102)
-            gridGroup.Width:Set(743)
-            gridGroup.Height:Set(257)
+            LayoutHelpers.SetDimensions(gridGroup, 743, 257)
 
             local gridBG = Bitmap(gridGroup, UIUtil.SkinnableFile('/scx_menu/score-victory-defeat/totals-back_bmp.dds'))
             LayoutHelpers.AtLeftTopIn(gridBG, bg, 34, 114)
@@ -609,8 +608,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             }
 
             local playerText = MultiLineText(gridBG, UIUtil.bodyFont, 16, UIUtil.fontColor)
-            playerText.Width:Set(250)
-            playerText.Height:Set(35)
+            LayoutHelpers.SetDimensions(playerText, 250, 35)
             LayoutHelpers.AtLeftTopIn(playerText, gridBG, labelXPos.icon + 5, 12)   -- note this is at icon as there is none in the label
             playerText:SetText(LOC("<LOC _Player>"))
 
@@ -704,8 +702,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     curGrid[index] = {}
 
                     curGrid[index].color = Bitmap(armyBg)
-                    curGrid[index].color.Width:Set(21)
-                    curGrid[index].color.Height:Set(20)
+                    LayoutHelpers.SetDimensions(curGrid[index].color, 21, 20)
                     LayoutHelpers.AtLeftTopIn(curGrid[index].color, armyBg, labelXPos.icon, 6)
 
                     curGrid[index].factionIcon = Bitmap(curGrid[index].color)
@@ -714,7 +711,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     local INDEX = index
                     curGrid[index].playerName = UIUtil.CreateText(armyBg, "", 16, UIUtil.bodyFont)
                     LayoutHelpers.AtLeftTopIn(curGrid[index].playerName, armyBg, labelXPos.player, 6)
-                    curGrid[index].playerName.Right:Set(function() return curGrid[INDEX].playerName.Left() + 220 end)
+                    LayoutHelpers.AnchorToLeft(curGrid[index].playerName, curGrid[INDEX].playerName, -220)
                     curGrid[index].playerName:SetClipToWidth(true)
 
                     --curGrid[index].teamName = UIUtil.CreateText(armyBg, "", 16, UIUtil.bodyFont)
@@ -773,7 +770,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 typeButtons[index].checkbox._dataType = dataType.scoreKey
             end
             typeGroup.Width:Set(width)
-            typeGroup.Height:Set(1)
+            LayoutHelpers.SetHeight(typeGroup, 1)
             LayoutHelpers.AtTopIn(typeGroup, gridGroup, 316)
             LayoutHelpers.AtHorizontalCenterIn(typeGroup, bg)
 
@@ -805,8 +802,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)
-            movieGroup.Height:Set(290)
-            movieGroup.Width:Set(330)
+            LayoutHelpers.SetDimensions(movieGroup, 330, 290)
 
             -- Set debriefing dialogue if it exists
             local debriefData = {text = '<NO DATA AVAILABLE>', faction = 'NONE'}
@@ -819,8 +815,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local opDebriefMovie = Movie(movieGroup)
             LayoutHelpers.AtTopIn(opDebriefMovie, movieGroup, 2)
             LayoutHelpers.AtHorizontalCenterIn(opDebriefMovie, movieGroup)
-            opDebriefMovie.Height:Set(192)
-            opDebriefMovie.Width:Set(192)
+            LayoutHelpers.SetDimensions(opDebriefMovie, 192, 192)
 
             local hasVideo = false
             if debriefData.vid and GetMovieDuration('/movies/' .. debriefData.vid) ~= 0 then
@@ -866,15 +861,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local debriefText = UIUtil.CreateTextBox(movieGroup)
             LayoutHelpers.AtBottomIn(debriefText, movieGroup)
             LayoutHelpers.AtHorizontalCenterIn(debriefText, movieGroup, -15)
-            debriefText.Width:Set(function() return movieGroup.Width() - 30 end)
-            debriefText.Height:Set(90)
+            debriefText.Width:Set(function() return movieGroup.Width() - LayoutHelpers.ScaleNumber(30) end)
+            LayoutHelpers.SetHeight(debriefText, 90)
 
             UIUtil.SetTextBoxText(debriefText, debriefData.text)
 
             local scoreGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtTopIn(scoreGroup, currentPage, 120)
-            scoreGroup.Height:Set(50)
-            scoreGroup.Width:Set(150)
+            LayoutHelpers.SetDimensions(scoreGroup, 150, 50)
 
             local opScoreLabel = UIUtil.CreateText(scoreGroup, LOC("<LOC SCORE_0043>Operation Score"), 14, UIUtil.bodyFont)
             LayoutHelpers.AtTopIn(opScoreLabel, scoreGroup, 5)
@@ -886,8 +880,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
             local objGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(objGroup, currentPage, 395, 190)
-            objGroup.Height:Set(220)
-            objGroup.Width:Set(535)
+            LayoutHelpers.SetDimensions(objGroup, 535, 220)
 
             LayoutHelpers.AtHorizontalCenterIn(scoreGroup, objGroup)
 
@@ -960,7 +953,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
             objContainer = Group(objGroup)
             objContainer.Height:Set(function() return objGroup.Height() + 0 end)
-            objContainer.Width:Set(function() return objGroup.Width() - 30 end)
+            objContainer.Width:Set(function() return objGroup.Width() - LayoutHelpers.ScaleNumber(30) end)
             objContainer.top = 0
 
             LayoutHelpers.AtLeftTopIn(objContainer, objGroup)
@@ -980,7 +973,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 objEntries[index].result = UIUtil.CreateText(objEntries[1].bg, '', 16, UIUtil.bodyFont)
                 objEntries[index].result:DisableHitTest()
 
-                objEntries[index].bg.Height:Set(function() return objEntries[index].title.Height() + 4 end)
+                objEntries[index].bg.Height:Set(function() return objEntries[index].title.Height() + LayoutHelpers.ScaleNumber(4) end)
 
                 LayoutHelpers.AtVerticalCenterIn(objEntries[index].title, objEntries[index].bg)
                 LayoutHelpers.AtVerticalCenterIn(objEntries[index].result, objEntries[index].bg)
@@ -1124,8 +1117,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             #LayoutHelpers.RelativeTo(curButton, bg,
             #    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
             #    'l_general_btn', 'panel_bmp', -10)
-            curButton.Left:Set(function() return bg.Left() + 17 end)
-            curButton.Top:Set(function() return bg.Top() + 57 end)
+            LayoutHelpers.AtLeftTopIn(curButton, bg, 17, 57)
             defaultTab = curButton
         end
         prev = curButton
