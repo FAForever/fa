@@ -207,12 +207,7 @@ function Create(parent)
     local function CreateOverlayBtn(buttonData)
         local btn = false
         if buttonData.button then
-            btn = Button(controls.bg,
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_down.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_over.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'),
-                'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            btn = UIUtil.CreateButtonStd(controls.bg, '/game/mfd_btn/'..buttonData.bitmap, nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
             Tooltip.AddButtonTooltip(btn, buttonData.tooltip)
         else
             btn = Checkbox(controls.bg,
@@ -226,7 +221,7 @@ function Create(parent)
             Tooltip.AddCheckboxTooltip(btn, buttonData.tooltip)
         end
         btn.ID = buttonData.id
-        btn:UseAlphaHitTest(true)
+        --btn:UseAlphaHitTest(true)
 
         if buttonData.dropout then
             btn.dropout = Checkbox(btn,
@@ -244,14 +239,9 @@ function Create(parent)
     end
 
     local function CreatePingBtn(buttonData)
-        local btn = Button(controls.bg,
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_down.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_over.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'),
-            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+        local btn = UIUtil.CreateButtonStd(controls.bg, '/game/mfd_btn/'..buttonData.bitmap, nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
         Tooltip.AddButtonTooltip(btn, buttonData.tooltip)
-        btn:UseAlphaHitTest(true)
+        --btn:UseAlphaHitTest(true)
         btn.ID = buttonData.pingType
         btn.cursor = buttonData.cursor
         if SessionIsReplay() or GetFocusArmy() == -1 then
