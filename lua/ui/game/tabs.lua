@@ -410,7 +410,7 @@ function CreateStretchBar(parent, topPiece)
 
     if topPiece then
         group.centerLeft = Bitmap(group)
-        group.centerLeft.Top:Set(function() return group.center.Top() + 8 end)
+        LayoutHelpers.AtTopIn(group.centerLeft, group.center, 8)
         group.centerLeft.Left:Set(group.left.Right)
         group.centerLeft.Right:Set(group.center.Left)
 
