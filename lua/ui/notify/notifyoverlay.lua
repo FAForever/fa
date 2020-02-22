@@ -100,8 +100,7 @@ end
 function createEnhancementOverlay(args)
     local overlay = Bitmap(GetFrame(0))
 
-    overlay.Width:Set(100)
-    overlay.Height:Set(50)
+    LayoutHelpers.SetDimensions(overlay, 100, 50)
     overlay.customName = args.text
     overlay.category = args.category
     overlay.source = args.source
@@ -128,7 +127,7 @@ function createEnhancementOverlay(args)
         local worldView = import('/lua/ui/game/worldview.lua').viewLeft
         local pos = worldView:Project(overlay.pos)
 
-        LayoutHelpers.AtLeftTopIn(overlay, worldView, pos.x - overlay.Width() / 2, pos.y - overlay.Height() / 2 + 1)
+        LayoutHelpers.AtLeftTopIn(overlay, worldView, (pos.x - overlay.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - overlay.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
 
         local timeRemaining = math.ceil(overlay.eta - seconds)
         if timeRemaining ~= overlay.lastTimeRemaining then
