@@ -505,9 +505,8 @@ function CreateIdleEngineerList(parent, units)
     local bgBottom = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_b.dds'))
     local bgStretch = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_m.dds'))
 
-    --LayoutHelpers.SetDimensions(group, bgTop.Width, 1)
     group.Width:Set(bgTop.Width)
-    group.Height:Set(1)
+    LayoutHelpers.SetHeight(group, 1)
 
     bgTop.Bottom:Set(group.Top)
     bgBottom.Top:Set(group.Bottom)
@@ -560,10 +559,8 @@ function CreateIdleEngineerList(parent, units)
 
             entry.countBG = Bitmap(entry)
             entry.countBG:SetSolidColor('77000000')
-            entry.countBG.Top:Set(function() return entry.count.Top() - 1 end)
-            entry.countBG.Left:Set(function() return entry.count.Left() - 1 end)
-            entry.countBG.Right:Set(function() return entry.count.Right() + 1 end)
-            entry.countBG.Bottom:Set(function() return entry.count.Bottom() + 1 end)
+            LayoutHelpers.AtLeftTopIn(entry.countBG, entry.count, -1, -1)
+            LayoutHelpers.AtRightBottomIn(entry.countBG, entry.count, -1, -1)
 
             LayoutHelpers.DepthOverParent(entry.countBG, entry)
             LayoutHelpers.DepthOverParent(entry.count, entry.countBG)
@@ -640,12 +637,12 @@ end
 function CreateIdleFactoryList(parent, units)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/game/avatar-factory-panel/factory-panel_bmp.dds'))
 
-    bg.Right:Set(function() return parent.Left() - 9 end)
+    LayoutHelpers.AnchorToLeft(bg, parent, 9)
     bg.Top:Set(function() return math.max(controls.avatarGroup.Top()+10, (parent.Top() + (parent.Height() / 2)) - (bg.Height() / 2)) end)
 
     local connector = Bitmap(bg, UIUtil.SkinnableFile('/game/avatar-factory-panel/bracket_bmp.dds'))
     LayoutHelpers.AtVerticalCenterIn(connector, parent)
-    connector.Right:Set(function() return parent.Left() + 7 end)
+    LayoutHelpers.AnchorToLeft(connector, parent, -7)
 
     bg:DisableHitTest(true)
 
@@ -674,10 +671,8 @@ function CreateIdleFactoryList(parent, units)
 
             icon.countBG = Bitmap(icon)
             icon.countBG:SetSolidColor('77000000')
-            icon.countBG.Top:Set(function() return icon.count.Top() - 1 end)
-            icon.countBG.Left:Set(function() return icon.count.Left() - 1 end)
-            icon.countBG.Right:Set(function() return icon.count.Right() + 1 end)
-            icon.countBG.Bottom:Set(function() return icon.count.Bottom() + 1 end)
+            LayoutHelpers.AtLeftTopIn(icon.countBG, icon.count, -1, -1)
+            LayoutHelpers.AtRightBottomIn(icon.countBG, icon.count, -1, -1)
 
             icon.countBG.Depth:Set(function() return icon.Depth() + 1 end)
             icon.count.Depth:Set(function() return icon.countBG.Depth() + 1 end)
