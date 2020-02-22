@@ -25,11 +25,10 @@ function SetLayout()
     controls.armyGroup.Width:Set(function() return controls.bgTop.Width() - 20 end)
 
     controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
-    controls.leftBracketMin.Top:Set(function() return controls.bg.Top() - 1 end)
-    controls.leftBracketMin.Left:Set(function() return controls.bg.Left() - 10 end)
+    LayoutHelpers.AtLeftTopIn(controls.leftBracketMin, controls.bg, -10, -1)
 
     controls.leftBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
-    controls.leftBracketMax.Bottom:Set(function() return controls.bg.Bottom() + 1 end)
+    LayoutHelpers.AtBottomIn(controls.leftBracketMax, controls.bg, -1)
     controls.leftBracketMax.Left:Set(controls.leftBracketMin.Left)
 
     controls.leftBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
@@ -38,8 +37,7 @@ function SetLayout()
     controls.leftBracketMid.Left:Set(function() return controls.leftBracketMin.Left() end)
 
     controls.rightBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'))
-    controls.rightBracketMin.Top:Set(function() return controls.bg.Top() - 5 end)
-    controls.rightBracketMin.Right:Set(function() return controls.bg.Right() + 18 end)
+    LayoutHelpers.AtRightTopIn(controls.rightBracketMin, controls.bg, -18, -5)
 
     controls.rightBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'))
     controls.rightBracketMax.Bottom:Set(function()
@@ -50,7 +48,7 @@ function SetLayout()
     controls.rightBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'))
     controls.rightBracketMid.Top:Set(controls.rightBracketMin.Bottom)
     controls.rightBracketMid.Bottom:Set(controls.rightBracketMax.Top)
-    controls.rightBracketMid.Right:Set(function() return controls.rightBracketMin.Right() - 7 end)
+    LayoutHelpers.AtRightIn(controls.rightBracketMid, controls.rightBracketMin, 7)
 
     controls.bgTop:SetTexture(UIUtil.UIFile('/game/score-panel/panel-score_bmp_t.dds'))
     controls.bgBottom:SetTexture(UIUtil.UIFile('/game/score-panel/panel-score_bmp_b.dds'))
@@ -72,10 +70,8 @@ function SetLayout()
     controls.unitIcon:SetTexture(UIUtil.UIFile('/dialogs/score-overlay/tank_bmp.dds'))
     LayoutHelpers.LeftOf(controls.units, controls.unitIcon)
 
-    controls.timeIcon.Height:Set(function() return controls.timeIcon.BitmapHeight() * .8 end)
-    controls.timeIcon.Width:Set(function() return controls.timeIcon.BitmapWidth() * .8 end)
-    controls.unitIcon.Height:Set(function() return controls.unitIcon.BitmapHeight() * .9 end)
-    controls.unitIcon.Width:Set(function() return controls.unitIcon.BitmapWidth() * .9 end)
+    LayoutHelpers.SetDimensions(controls.timeIcon, controls.timeIcon.BitmapWidth() * .8, controls.timeIcon.BitmapHeight() * .8)
+    LayoutHelpers.SetDimensions(controls.unitIcon, controls.unitIcon.BitmapWidth() * .9, controls.unitIcon.BitmapHeight() * .9)
     local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
     avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
 end
