@@ -204,8 +204,7 @@ function SetLayout()
 
     -- Unit Image
     LayoutHelpers.AtLeftTopIn(control.UnitImg, control.BG, 12, 36)
-    control.UnitImg.Height:Set(46)
-    control.UnitImg.Width:Set(48)
+    LayoutHelpers.SetDimensions(control.UnitImg, 48, 46)
     
     -- Tech Level Text
     LayoutHelpers.CenteredBelow(control.TechLevel, control.UnitImg)
@@ -213,7 +212,7 @@ function SetLayout()
     -- Unit Description
     LayoutHelpers.AtLeftTopIn(control.UnitShortDesc, control.BG, 20, 13)
     control.UnitShortDesc:SetClipToWidth(true)
-    control.UnitShortDesc.Right:Set(function() return control.BG.Right() - 15 end)
+    LayoutHelpers.AtRightIn(control.UnitShortDesc, control.BG, 15)
 
     -- Time stat
     LayoutHelpers.Below(control.TimeStat, control.UnitImg, 4)
@@ -223,13 +222,13 @@ function SetLayout()
     
     -- Build Resource Group
     LayoutHelpers.AtLeftTopIn(control.BuildCostGroup, control.BG, 70, 34)
-    control.BuildCostGroup.Width:Set(115)
+    LayoutHelpers.SetWidth(control.BuildCostGroup, 115)
     LayoutResourceGroup(control.BuildCostGroup)
-    control.BuildCostGroup.Bottom:Set(function() return control.BuildCostGroup.MassValue.Bottom() + 1 end)
+    LayoutHelpers.AtBottomIn(control.BuildCostGroup, control.BuildCostGroup.MassValue, -1)
 
     -- Upkeep Resource Group
     LayoutHelpers.RightOf(control.UpkeepGroup, control.BuildCostGroup)
-    control.UpkeepGroup.Width:Set(55)
+    LayoutHelpers.SetWidth(control.UpkeepGroup, 55)
     control.UpkeepGroup.Bottom:Set(control.BuildCostGroup.Bottom)
     LayoutResourceGroup(control.UpkeepGroup)
     
@@ -247,28 +246,26 @@ function SetLayout()
     
     if control.Description then
         -- Description
-        control.Description.Left:Set(function() return control.BG.Right() - 2 end)
-        control.Description.Bottom:Set(function() return control.BG.Bottom() - 2 end)
-        control.Description.Width:Set(400)
-        control.Description.Height:Set(20)
+        LayoutHelpers.AnchorToRight(control.Description, control.BG, -2)
+        LayoutHelpers.AtBottomIn(control.Description, control.BG, 2)
+        LayoutHelpers.SetDimensions(control.Description, 400, 20)
         LayoutTextbox(control.Description)
     end
 end
 
 function LayoutResourceGroup(group)
-    
     LayoutHelpers.AtTopIn(group.Label, group)
     LayoutHelpers.AtLeftIn(group.Label, group)
 
     LayoutHelpers.Below(group.MassIcon, group.Label, 5)
-    group.EnergyIcon.Left:Set(function() return group.Label.Left() - 4 end)
+    LayoutHelpers.AtLeftIn(group.EnergyIcon, group.Label, -4)
 
     LayoutHelpers.RightOf(group.EnergyValue, group.EnergyIcon, 1)
-    group.EnergyValue.Top:Set(function() return group.EnergyIcon.Top() + 1 end)
+    LayoutHelpers.AtTopIn(group.EnergyValue, group.EnergyIcon, 1)
 
     LayoutHelpers.RightOf(group.MassValue, group.MassIcon, 1)
     group.MassValue.Right:Set(function() return group.Label.Right() end)
-    group.MassValue.Top:Set(function() return group.MassIcon.Top() + 1 end)
+    LayoutHelpers.AtTopIn(group.MassValue, group.MassIcon, 1)
 
     LayoutHelpers.Below(group.EnergyIcon, group.MassIcon, 5)
 end
@@ -277,7 +274,7 @@ function LayoutStatGroup(group)
     group.Width:Set(function() return group.Label.Width() + group.Value.Width() end)
     group.Label.Left:Set(group.Left)
     group.Label.Top:Set(group.Top)
-    group.Value.Left:Set(function() return group.Label.Right() + 4 end)
+    LayoutHelpers.AnchorToRight(group.Value, group.Label, 4)
     LayoutHelpers.AtVerticalCenterIn(group.Value, group.Label)
 end  
 
@@ -294,11 +291,11 @@ function LayoutTextbox(group)
     group.BR.Bottom:Set(group.Bottom)
     group.BR.Right:Set(group.Right)
     
-    group.TM.Top:Set(function() return group.Top() + 4 end)
+    LayoutHelpers.AtTopIn(group.TM, group, 4)
     group.TM.Left:Set(group.TL.Right)
     group.TM.Right:Set(group.TR.Left)
     
-    group.BM.Bottom:Set(function() return group.Bottom() - 4 end)
+    LayoutHelpers.AtBottomIn(group.BM, group, 4)
     group.BM.Left:Set(group.BL.Right)
     group.BM.Right:Set(group.BR.Left)
     
@@ -326,7 +323,7 @@ function LayoutTextbox(group)
     group.BR.Depth:Set(group.TL.Depth)
     
     LayoutHelpers.AtLeftTopIn(group.Value[1], group, 24, 14)
-    group.Value[1].Right:Set(function() return group.Right() - 15 end)
+    LayoutHelpers.AtRightIn(group.Value[1], group, 15)
     group.Value[1].Width:Set(function() return group.Right() - group.Left() - 14 end)
     group.Value[1]:SetClipToWidth(true)
 end
