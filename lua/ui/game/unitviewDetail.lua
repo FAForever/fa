@@ -273,7 +273,7 @@ function WrapAndPlaceText(air, physics, weapons, abilities, text, control)
         else
             control.Value[index]:SetColor(UIUtil.fontColor)
         end
-        control.Height:Set(function() return (math.max(table.getsize(lines), 4) * control.Value[1].Height()) + 30 end)
+        control.Height:Set(function() return (math.max(table.getsize(lines), 4) * control.Value[1].Height()) + LayoutHelpers.ScaleNumber(30) end)
     end
     for i, v in control.Value do
         local index = i
