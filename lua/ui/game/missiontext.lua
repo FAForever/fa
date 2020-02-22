@@ -240,7 +240,8 @@ function CreateSubtitles(parent, text)
     bg.mr.Top:Set(bg.Top)
     bg.mr.Bottom:Set(bg.Bottom)
     
-    local wrapped = WrapText(LOC(text), 300, 
+    local textWidth = LayoutHelpers.ScaleNumber(300)
+    local wrapped = WrapText(LOC(text), textWidth, 
         function(curText) return bg.text[1]:GetStringAdvance(curText) end)
         
     for index, line in wrapped do
@@ -269,8 +270,8 @@ function CreateSubtitles(parent, text)
             end
             local newWidth = self.Width() + (delta * 800)
             local finishedWidth = false
-            if newWidth > 300 then
-                newWidth = 300
+            if newWidth > textWidth then
+                newWidth = textWidth
                 finishedWidth = true
             end
             if finishedWidth then
