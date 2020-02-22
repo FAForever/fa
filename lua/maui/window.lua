@@ -468,10 +468,10 @@ Window = Class(Group) {
                 self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
             end
         elseif defaultPosition then
-            self.Left:Set(defaultPosition.Left)
-            self.Top:Set(defaultPosition.Top)
-            self.Bottom:Set(defaultPosition.Bottom)
-            self.Right:Set(defaultPosition.Right)
+            self.Left:Set(LayoutHelpers.ScaleNumber(defaultPosition.Left))
+            self.Top:Set(LayoutHelpers.ScaleNumber(defaultPosition.Top))
+            self.Bottom:Set(LayoutHelpers.ScaleNumber(defaultPosition.Bottom))
+            self.Right:Set(LayoutHelpers.ScaleNumber(defaultPosition.Right))
         end
     end,
     
@@ -506,8 +506,8 @@ Window = Class(Group) {
     end,
     
     SetMinimumResize = function(control, xDimension, yDimension)
-        control._xMin = xDimension or 0
-        control._yMin = yDimension or 0
+        control._xMin = LayoutHelpers.ScaleNumber(xDimension) or 0
+        control._yMin = LayoutHelpers.ScaleNumber(yDimension) or 0
     end,
     
     SetWindowAlpha = function(control, alpha)
