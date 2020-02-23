@@ -81,8 +81,7 @@ end
 
 local function EditActionKey(parent, action, currentKey)
     local dialogContent = Group(parent)
-    dialogContent.Height:Set(170)
-    dialogContent.Width:Set(400)
+    LayoutHelpers.SetDimensions(dialogContent, 400, 170)
 
     local keyPopup = Popup(popup, dialogContent)
 
@@ -325,7 +324,7 @@ function CreateLine()
     local line = Bitmap(keyContainer)
     line.Left:Set(keyContainer.Left)
     line.Right:Set(keyContainer.Right)
-    line.Height:Set(20)
+    LayoutHelpers.SetHeight(line, 20)
 
     line.key = UIUtil.CreateText(line, '', 16, "Arial")
     line.key:DisableHitTest()
@@ -353,7 +352,7 @@ function CreateLine()
 
     LayoutHelpers.AtLeftIn(line.description, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.description, line)
-    LayoutHelpers.AtRightIn(line.key, line, line.Width() - keyBindingWidth + 30)
+    LayoutHelpers.LeftOf(line.key, line.description, 30)
     LayoutHelpers.AtVerticalCenterIn(line.key, line)
     LayoutHelpers.AtRightIn(line.statistics, line, 10)
     LayoutHelpers.AtVerticalCenterIn(line.statistics, line)
@@ -518,8 +517,7 @@ function CreateUI()
     keyTable = FormatData()
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(980)
-    dialogContent.Height:Set(730)
+    LayoutHelpers.SetDimensions(dialogContent, 980, 730)
 
     popup = Popup(GetFrame(0), dialogContent)
     popup.OnShadowClicked = CloseUI
@@ -535,7 +533,7 @@ function CreateUI()
     local offset = dialogContent.Width() / 5
 
     local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
-    closeButton.Width:Set(200)
+    LayoutHelpers.SetWidth(closeButton, 200)
     LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
     LayoutHelpers.AtRightIn(closeButton, dialogContent, offset - (closeButton.Width() / 2))
     Tooltip.AddControlTooltip(closeButton,
@@ -552,7 +550,7 @@ function CreateUI()
     end
 
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Default Preset"))
-    defaultButton.Width:Set(200)
+    LayoutHelpers.SetWidth(defaultButton, 200)
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
     LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() / 2))
     defaultButton.OnClick = function(self, modifiers)
@@ -568,7 +566,7 @@ function CreateUI()
     })
 
     local hotbuildButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0009>Hotbuild Preset"))
-    hotbuildButton.Width:Set(200)
+    LayoutHelpers.SetWidth(hotbuildButton, 200)
     LayoutHelpers.AtBottomIn(hotbuildButton, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(hotbuildButton, dialogContent)
     hotbuildButton.OnClick = function(self, modifiers)
@@ -592,11 +590,11 @@ function CreateUI()
     end
 
     keyFilter = Bitmap(dialogContent)
-    keyFilter:SetSolidColor('FF282828')-- #FF282828
-    keyFilter.Left:Set(function() return dialogContent.Left() + 63 end)
-    keyFilter.Right:Set(function() return dialogContent.Right() - 6 end)
-    keyFilter.Top:Set(function() return title.Bottom() + 10 end)
-    keyFilter.Bottom:Set(function() return title.Bottom() + 40 end)
+    keyFilter:SetSolidColor('FF282828')
+    LayoutHelpers.AtLeftIn(keyFilter, dialogContent, 63)
+    LayoutHelpers.AtRightIn(keyFilter, dialogContent, 6)
+    LayoutHelpers.AnchorToBottom(keyFilter, title, 10)
+    LayoutHelpers.AtBottomIn(keyFilter, title, -40)
     keyFilter.Width:Set(function() return keyFilter.Right() - keyFilter.Left() end)
     keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
 
@@ -630,9 +628,9 @@ function CreateUI()
     keyFilter.text:SetBackgroundColor('04E1B44A') -- #04E1B44A
     keyFilter.text:SetHighlightForegroundColor(UIUtil.highlightColor)
     keyFilter.text:SetHighlightBackgroundColor("880085EF") --#880085EF
-    keyFilter.text.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() - 10 end)
-    keyFilter.text.Left:Set(function() return keyFilter.Left() + 5 end)
-    keyFilter.text.Right:Set(function() return keyFilter.Right() end)
+    keyFilter.text.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() - LayoutHelpers.ScaleNumber(10) end)
+    LayoutHelpers.AtLeftIn(keyFilter.text, keyFilter, 5)
+    LayoutHelpers.AtRightIn(keyFilter.text, keyFilter)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.text, keyFilter)
     keyFilter.text:AcquireFocus()
     keyFilter.text:SetText('')
@@ -679,11 +677,11 @@ function CreateUI()
     })
 
     keyContainer = Group(dialogContent)
-    keyContainer.Left:Set(function() return dialogContent.Left() + 10 end)
-    keyContainer.Right:Set(function() return dialogContent.Right() - 20 end)
-    keyContainer.Top:Set(function() return keyFilter.Bottom() + 10 end)
-    keyContainer.Bottom:Set(function() return defaultButton.Top() - 10 end)
-    keyContainer.Height:Set(function() return keyContainer.Bottom() - keyContainer.Top() - 10 end)
+    LayoutHelpers.AtLeftIn(keyContainer, dialogContent, 10)
+    LayoutHelpers.AtRightIn(keyContainer, dialogContent, 20)
+    LayoutHelpers.AnchorToBottom(keyContainer, keyFilter, 10)
+    LayoutHelpers.AnchorToTop(keyContainer, defaultButton, 10)
+    keyContainer.Height:Set(function() return keyContainer.Bottom() - keyContainer.Top() - LayoutHelpers.ScaleNumber(10) end)
     keyContainer.top = 0
     UIUtil.CreateLobbyVertScrollbar(keyContainer)
 
