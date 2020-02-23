@@ -735,6 +735,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
     },
+    options_ui_scale = {
+        title = "<LOC OPTIONS_0283>UI Scale",
+        description = "<LOC OPTIONS_0284>Changes the size of all UI elements. (requires game restart)",
+    },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
         description = "<LOC OPTIONS_0152>Toggles the display of subtitles during movies",
