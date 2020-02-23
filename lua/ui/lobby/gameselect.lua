@@ -152,8 +152,7 @@ function CreateEditField(parent, width, maxChars)
     control:SetForegroundColor(UIUtil.fontColor)
     control:SetHighlightForegroundColor(UIUtil.highlightColor)
     control:SetHighlightBackgroundColor("880085EF")
-    control.Height:Set(19)
-    control.Width:Set(width)
+    LayoutHelpers.SetDimensions(control, width, 19)
     control:SetFont(UIUtil.bodyFont, 16)
     if maxChars then control:SetMaxChars(maxChars) end
     return control
@@ -210,8 +209,7 @@ function CreateUI(over, exitBehavior)
     
     gameList = Group(panel)
     LayoutHelpers.AtLeftTopIn(gameList, panel, 30, 152)
-    gameList.Width:Set(function() return panel.Width() - 90 end)
-    gameList.Height:Set(432)
+    LayoutHelpers.SetDimensions(gameList, panel.Width() - 90, 432)
     gameList.top = 0
     
     local gamesTitle = UIUtil.CreateText(panel, '<LOC GAMESEL_0002>Server List', 18, UIUtil.bodyFont)
@@ -348,7 +346,7 @@ function CreateUI(over, exitBehavior)
         
         if data.options then
             btn.combo = Combo(btn, 14, 20, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-            btn.combo.Width:Set(260)
+            LayoutHelpers.SetWidth(btn.combo, 260)
             LayoutHelpers.AtLeftIn(btn.combo, btn, 38)
             LayoutHelpers.AtVerticalCenterIn(btn.combo, btn, -1)
             btn.combo.Depth:Set(function() return btn.Depth() + 20 end)
@@ -379,7 +377,7 @@ function CreateUI(over, exitBehavior)
         LayoutHelpers.AtVerticalCenterIn(btn.arrow, btn.lcap)
         btn.arrow:Hide()
         
-        btn.Width:Set(data.width)
+        LayoutHelpers.SetWidth(btn, data.width)
         
         btn._checked = false
         
@@ -460,8 +458,7 @@ function CreateUI(over, exitBehavior)
         
         if parent.data.ScenarioMap then
             bg.preview:SetTextureFromMap(parent.data.ScenarioMap)
-            bg.preview.Width:Set(240)
-            bg.preview.Height:Set(240)
+            LayoutHelpers.SetDimensions(bg.preview, 240, 240)
         else
             bg.preview.Width:Set(0)
             bg.preview.Height:Set(0)
@@ -492,8 +489,7 @@ function CreateUI(over, exitBehavior)
         bg.RefreshData = function(self, data) 
             if data.ScenarioMap then
                 self.preview:SetTextureFromMap(data.ScenarioMap)
-                self.preview.Width:Set(240)
-                self.preview.Height:Set(240)
+                LayoutHelpers.SetDimensions(self.preview, 240, 240)
             else
                 self.preview.Width:Set(0)
                 self.preview.Height:Set(0)
@@ -590,17 +586,14 @@ function CreateUI(over, exitBehavior)
         end
         
         gameListObjects[index].preview = MapPreview(gameListObjects[index])
-        gameListObjects[index].preview.Width:Set(58)
-        gameListObjects[index].preview.Height:Set(58)
+        LayoutHelpers.SetDimensions(gameListObjects[index].preview, 58, 58)
         LayoutHelpers.AtHorizontalCenterIn(gameListObjects[index].preview, gameList._tabs[1])
         LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].preview, gameListObjects[index])
         gameListObjects[index].preview:DisableHitTest()
         
         gameListObjects[index].mapglow = Bitmap(gameListObjects[index].preview, UIUtil.UIFile('/scx_menu/gameselect/map-panel-glow_bmp.dds'))
-        gameListObjects[index].mapglow.Top:Set(function() return gameListObjects[index].preview.Top() - 3 end)
-        gameListObjects[index].mapglow.Left:Set(function() return gameListObjects[index].preview.Left() - 3 end)
-        gameListObjects[index].mapglow.Right:Set(function() return gameListObjects[index].preview.Right() + 3 end)
-        gameListObjects[index].mapglow.Bottom:Set(function() return gameListObjects[index].preview.Bottom() + 3 end)
+
+        LayoutHelpers.FillParentFixedBorder(gameListObjects[index].mapglow, gameListObjects[index].preview, -3)
         gameListObjects[index].mapglow:DisableHitTest()
         
         gameListObjects[index].nopreview = UIUtil.CreateText(gameListObjects[index], '?', 60, UIUtil.bodyFont)
@@ -628,10 +621,7 @@ function CreateUI(over, exitBehavior)
         gameListObjects[index].custom:DisableHitTest()
         
         gameListObjects[index].roGroup = Group(gameListObjects[index])
-        gameListObjects[index].roGroup.Left:Set(gameListObjects[index].mapbg.Left)
-        gameListObjects[index].roGroup.Right:Set(gameListObjects[index].mapbg.Right)
-        gameListObjects[index].roGroup.Top:Set(gameListObjects[index].mapbg.Top)
-        gameListObjects[index].roGroup.Bottom:Set(gameListObjects[index].mapbg.Bottom)
+        LayoutHelpers.FillParent(gameListObjects[index].roGroup, gameListObjects[index].mapbg)
         gameListObjects[index].roGroup.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 if not gameListObjects[index].rollover then
