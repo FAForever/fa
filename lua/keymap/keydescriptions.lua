@@ -244,7 +244,6 @@ keyDescriptions = {
     ['select_next_air_factory'] = '<LOC key_desc_0208>Select next air factory',
     ['select_next_naval_factory'] = '<LOC key_desc_0209>Select next naval factory',
     ['toggle_selectedinfo'] = '<LOC key_desc_0210>Toggle single unit selected info',
-    ['toggle_selectedrings'] = '<LOC key_desc_0211>Toggle single unit selected rings',
     ['toggle_cloakjammingstealth'] = '<LOC key_desc_0212>Toggle all counter-intelligence abilities',
     ['toggle_intelshield'] = '<LOC key_desc_0213>Toggle intel and shield',
     ['toggle_mdf_panel'] = '<LOC key_desc_0214>Toggle MFD panel',
