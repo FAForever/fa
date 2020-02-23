@@ -27,7 +27,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH3',
         'OMNI',
-        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',
