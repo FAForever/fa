@@ -327,7 +327,7 @@ function CreateFilter(parent, filterData)
 
     group.combo = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.AtVerticalCenterIn(group.combo, group.title)
-    group.combo.Right:Set(function() return group.Right() - 10 end)
+    LayoutHelpers.AtRightIn(group.combo, group, 10)
     LayoutHelpers.SetWidth(group.combo, 80)
 
     local comboBg = Bitmap(group)
@@ -376,8 +376,8 @@ function CreateFilter(parent, filterData)
     if not filterData.NoDelimiter then
         group.comboFilter = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         LayoutHelpers.AtVerticalCenterIn(group.comboFilter, group.title)
-        group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
-        group.comboFilter.Width:Set(60)
+        LayoutHelpers.AnchorToLeft(group.comboFilter, group.combo, 5)
+        LayoutHelpers.SetWidth(group.comboFilter, 60)
 
         group.comboFilter:AddItems({"=", ">=", "<="}, filterFactory.SelectedComparator)
 
@@ -616,8 +616,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     nameFilter = filterName
 
     -- Expand the group to encompass all the filter controls
-    filterGroup.Bottom:Set(function() return filterName.Bottom() + 3 end)
-    filterGroup.Right:Set(function() return filters[table.getn(filters)].Right() + 1 end)
+    LayoutHelpers.AtBottomIn(filterGroup, filterName, -3)
+    LayoutHelpers.AtRightIn(filterGroup, filters[table.getn(filters)], -1)
 
     local mapSelectGroup = Group(dialogContent)
     dialogContent.mapSelectGroup = mapSelectGroup
@@ -636,7 +636,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     --TODO what is this getting under when it's in over state?
     mapList.Depth:Set(function() return dialogContent.Depth() + 10 end)
     -- Allocating space for the scrollbar.
-    mapList.Width:Set(function() return mapSelectGroup.Width() - 21 end)
+    mapList.Width:Set(function() return mapSelectGroup.Width() - LayoutHelpers.ScaleNumber(21) end)
     mapList.Bottom:Set(mapInfoGroup.Bottom)
     LayoutHelpers.Below(mapList, mapListTitle)
     mapList:AcquireKeyboardFocus(true)
@@ -1076,8 +1076,7 @@ end
 function GUI_OldMap(over)
     local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(1000)
-    dialogContent.Height:Set(100)
+    LayoutHelpers.SetDimensions(dialogContent, 1000, 100)
 
     local ChangelogData = import('/lua/ui/lobby/changelogData.lua')
     local OldMapPopup = Popup(GUI, dialogContent)
