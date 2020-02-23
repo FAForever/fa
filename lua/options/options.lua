@@ -285,17 +285,17 @@ options = {
                 },
             },
             {
-                title = "UI Scale",
+                title = "<LOC OPTIONS_0283>UI Scale",
                 key = 'ui_scale',
                 restart = true,
                 type = 'toggle',
-                default = 1,
+                default = 1.0,
                 custom = {
                     states = {
                         {text = "100%", key = 1.0,},
                         {text = "125%", key = 1.25,},
                         {text = "150%", key = 1.5,},
-                        {text = "178%", key = 1.75,},
+                        {text = "175%", key = 1.75,},
                         {text = "200%", key = 2.0,},
                     },
                 },
