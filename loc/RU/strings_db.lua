@@ -7996,6 +7996,8 @@ OPTIONS_0279="Использовать фракционный цвет шриф�
 OPTIONS_0280="Когда включено, цвет шрифта в интерфейсе поменяется в зависимости от вашей фракции"
 OPTIONS_0281="Hotkey Labels"
 OPTIONS_0282="Displays associated keybindings on the buttons for commands and building units or structures"
+OPTIONS_0283="UI Scale"
+OPTIONS_0284="Changes the size of all UI elements. (requires game restart)"
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы ТУ3 недоступны"
