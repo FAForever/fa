@@ -750,15 +750,15 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
                                     , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
                                     , "UI_Arrow_Click")
 
-    scrollbar.Left:Set(function() return attachto.Right() + offset_right end)
+    LayoutHelpers.AnchorToRight(scrollbar, attachto, offset_right)
     scrollbar.Top:Set(scrollUpButton.Bottom)
     scrollbar.Bottom:Set(scrollDownButton.Top)
 
     scrollUpButton.Left:Set(scrollbar.Left)
-    scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
+    LayoutHelpers.AtTopIn(scrollUpButton, attachto, offset_top)
 
     scrollDownButton.Left:Set(scrollbar.Left)
-    scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
+    LayoutHelpers.AtBottomIn(scrollDownButton, attachto, offset_bottom)
 
     scrollbar.Right:Set(scrollUpButton.Right)
 
