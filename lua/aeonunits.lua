@@ -52,7 +52,7 @@ AFactoryUnit = Class(FactoryUnit) {
    
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') then
+        if self:IsUnitState('Building') and self.unitBeingBuilt ~= nil then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
@@ -62,7 +62,7 @@ AFactoryUnit = Class(FactoryUnit) {
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
+        if self:IsUnitState('Building') and self.unitBeingBuilt ~= nil then
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
