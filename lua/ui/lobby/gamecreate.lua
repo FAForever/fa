@@ -8,10 +8,8 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Edit = import('/lua/maui/edit.lua').Edit
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local unselectedCheckboxFile = UIUtil.SkinnableFile('/widgets/rad_un.dds')
@@ -34,7 +32,7 @@ end
 function CreateUI(playerName, over, exitBehavior)
     playerName = playerName or Prefs.GetFromCurrentProfile('NetName') or Prefs.GetFromCurrentProfile('Name')
 
--- control layout
+    -- control layout
 	local parent = over
 
     local panel = Bitmap(parent, UIUtil.SkinnableFile('/scx_menu/gamecreate/panel-brackets_bmp.dds'))
@@ -122,7 +120,7 @@ function CreateUI(playerName, over, exitBehavior)
 	LayoutHelpers.AtLeftIn(continueButton, panel, 38)
 	LayoutHelpers.AtBottomIn(continueButton, panel, 34)
 
---  control behvaior
+    --  control behvaior
     exitButton.OnClick = function(self)
    		panel:Destroy()
     	import('/lua/ui/lobby/gameselect.lua').CreateUI(over, exitBehavior)
@@ -152,14 +150,14 @@ function CreateUI(playerName, over, exitBehavior)
         local port = tonumber(portEdit:GetText()) or 0  -- default of port 0 will cause engine to choose
 
         if not autoPort:IsChecked() then
-            if not port or math.floor(port) != port or port < 1 or port > 65535 then
+            if not port or math.floor(port) ~= port or port < 1 or port > 65535 then
                 if errorDialog then errorDialog:Destroy() end
                 errorDialog = UIUtil.ShowInfoDialog(parent, LOCF('<LOC DIRCON_0003>Invalid port number: %s.  Must be an integer between 1 and 65535', portEdit:GetText()), "<LOC _OK>")
                 return
             end        
         end
 
-        if port != 0 then
+        if port ~= 0 then
             Prefs.SetToCurrentProfile('LastPort', port)
         end
 
@@ -189,7 +187,7 @@ function CanQuickHost()
     local playerName = Prefs.GetFromCurrentProfile('NetName') or Prefs.GetFromCurrentProfile('Name')
     local lastGameName = Prefs.GetFromCurrentProfile('last_game_name')
 
-    return lastScenario != nil and lastPort != nil and playerName != nil and lastGameName != nil
+    return lastScenario ~= nil and lastPort ~= nil and playerName ~= nil and lastGameName ~= nil
 end
 
 function QuickHost()
