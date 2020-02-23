@@ -566,19 +566,6 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0235>Single Unit Selected Rings",
-                key = 'gui_enhanced_unitrings',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
                 title = "<LOC OPTIONS_0236>Zoom Pop Distance",
                 key = 'gui_zoom_pop_distance',
                 type = 'slider',

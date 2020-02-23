@@ -553,12 +553,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if newSelection then
         local n = table.getn(newSelection)
 
-        if n == 1 and import("/lua/keymap/selectedinfo.lua").SelectedOverlayOn then
-            import("/lua/keymap/selectedinfo.lua").ActivateSingleRangeOverlay()
-        else
-            import("/lua/keymap/selectedinfo.lua").DeactivateSingleRangeOverlay()
-        end
-
         -- if something died in selection, restore command mode
         if n > 0 and table.getsize(removed) > 0 and table.getsize(added) == 0 then
             local CM = import('/lua/ui/game/commandmode.lua')
