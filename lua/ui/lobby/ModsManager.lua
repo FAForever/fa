@@ -157,7 +157,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
-    SaveButton:UseAlphaHitTest(true)
+    --SaveButton:UseAlphaHitTest(true)
     LayoutHelpers.AtHorizontalCenterIn(SaveButton, dialogContent)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
 
@@ -167,13 +167,13 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     -- so that it is faster to find and activate mods
     scrollGroup = Group(dialogContent)
 
-    LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2)
-    scrollGroup.Top:Set(function() return subtitle.Bottom() + 10 end)
-    scrollGroup.Bottom:Set(function() return SaveButton.Top() - 70 end)
+    LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, -2)
+    LayoutHelpers.AnchorToBottom(scrollGroup, subtitle, 10)
+    LayoutHelpers.AnchorToTop(scrollGroup, SaveButton, 70)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
     scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
 
-    modsPerPage = math.floor((scrollGroup.Height() - 10) / modInfoHeight)
+    modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
 
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
     scrollGroup.top = 1
@@ -357,7 +357,7 @@ function CreateModsFilter(parent, tag)
             return true
         end
     end
-    filterToggle:UseAlphaHitTest(true)
+    --filterToggle:UseAlphaHitTest(true)
     Tooltip.AddControlTooltip(filterToggle, { text = modsTags[tag].text, body = modsTags[tag].body })
 
     return filterToggle
@@ -830,10 +830,10 @@ function CreateListElement(parent, mod, Pos)
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    group.bg.Height:Set(modIconSize + 10)
+    LayoutHelpers.SetHeight(group.bg, modIconSize + 10)
     LayoutHelpers.SetWidth(group.bg, dialogWidth - 15)
 
-    group.Height:Set(modInfoHeight)
+    LayoutHelpers.SetHeight(group, modInfoHeight)
     LayoutHelpers.SetWidth(group, dialogWidth - 25)
     LayoutHelpers.AtLeftTopIn(group, parent, 4, group.Height()*(Pos-1))
     LayoutHelpers.FillParent(group.bg, group)
