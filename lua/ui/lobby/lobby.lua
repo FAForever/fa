@@ -5804,8 +5804,7 @@ end
 -- Show the lobby preset UI.
 function ShowPresetDialog()
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(600)
-    dialogContent.Height:Set(530)
+    LayoutHelpers.SetDimensions(dialogContent, 600, 530)
 
     local presetDialog = Popup(GUI, dialogContent)
     presetDialog.OnClosed = presetDialog.Destroy
@@ -5820,8 +5819,7 @@ function ShowPresetDialog()
     local PresetList = ItemList(dialogContent)
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
-    PresetList.Width:Set(265)
-    PresetList.Height:Set(430)
+    LayoutHelpers.SetDimensions(PresetList, 265, 430)
     LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
     LayoutHelpers.AtLeftIn(PresetList, dialogContent, 14)
     LayoutHelpers.AtTopIn(PresetList, dialogContent, 38)
@@ -5832,8 +5830,7 @@ function ShowPresetDialog()
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
-    InfoList.Width:Set(281)
-    InfoList.Height:Set(430)
+    LayoutHelpers.SetDimensions(InfoList, 281, 430)
     LayoutHelpers.RightOf(InfoList, PresetList, 26)
 
     -- Quit button
@@ -5981,8 +5978,7 @@ end
 
 function CreateHelpWindow()
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(420)
-    dialogContent.Height:Set(225)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 225)
 
     local helpWindow = Popup(GUI, dialogContent)
 
