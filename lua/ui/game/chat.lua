@@ -418,15 +418,14 @@ function SetupChatScroll()
                     line.chatID = chatHistory[curEntry].armyID
                     if chatHistory[curEntry].camera and not line.camIcon then
                         line.camIcon = Bitmap(line.text, UIUtil.UIFile('/game/camera-btn/pinned_btn_up.dds'))
-                        line.camIcon.Height:Set(16)
-                        line.camIcon.Width:Set(20)
+                        LayoutHelpers.ScaleDimensions(line.camIcon, 20, 16)
                         LayoutHelpers.AtVerticalCenterIn(line.camIcon, line.teamColor)
-                        line.camIcon.Left:Set(function() return line.name.Right() + 4 end)
-                        line.text.Left:Set(function() return line.camIcon.Right() + 4 end)
+                        LayoutHelpers.AnchorToRightline(line.camIcon, line.name, 4)
+                        LayoutHelpers.AnchorToRightline(line.text, line.camIcon, 4)
                     elseif not chatHistory[curEntry].camera and line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        line.text.Left:Set(function() return line.name.Right() + 2 end)
+                        LayoutHelpers.AnchorToRightline(line.text, line.name, 2)
                     end
                 else
                     line.name:Disable()
@@ -438,7 +437,7 @@ function SetupChatScroll()
                     if line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        line.text.Left:Set(function() return line.name.Right() + 2 end)
+                        LayoutHelpers.AnchorToRightline(line.text, line.name, 2)
                     end
                 end
                 if chatHistory[curEntry].camera then
