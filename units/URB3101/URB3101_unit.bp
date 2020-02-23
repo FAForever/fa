@@ -29,7 +29,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH1',
         'RADAR',
-        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',

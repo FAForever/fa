@@ -33,7 +33,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH3',
         'OPTICS',
-        'DRAGBUILD',
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
