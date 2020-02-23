@@ -226,8 +226,8 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     restrictions.Initial = initial
 
     -- Scaling dialog size based on window size
-    dialogWidth = GetFrame(0).Width() - 40
-    dialogHeight = GetFrame(0).Height() - 40
+    dialogWidth = GetFrame(0).Width() - LayoutHelpers.ScaleNumber(40)
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(40)
 
     GUI.bg = Group(parent)
     GUI.bg.Width:Set(dialogWidth)
@@ -254,7 +254,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
 
     GUI.content = Group(GUI.bg)
     LayoutHelpers.AtLeftIn(GUI.content, GUI.bg, 6)
-    GUI.content.Top:Set(function() return GUI.title.Bottom() - 2 end)
+    LayoutHelpers.AnchorToBottom(GUI.content, GUI.title, -2)
     GUI.content.Bottom:Set(GUI.resetBtn.Top)
     GUI.content.Width:Set(function() return GUI.bg.Width() - 12 end)
     GUI.content:DisableHitTest()
@@ -263,9 +263,9 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0
     GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     GUI.progressBar:SetValue(0)
-    GUI.progressBar.Height:Set(5)
-    GUI.progressBar.Left:Set(function() return GUI.bg.Left() + 30 end)
-    GUI.progressBar.Right:Set(function() return GUI.bg.Right() - 30 end)
+    LayoutHelpers.SetHeight(GUI.progressBar, 5)
+    LayoutHelpers.AtLeftIn(GUI.progressBar, GUI.bg, 30)
+    LayoutHelpers.AtRightIn(GUI.progressBar, GUI.bg, 30)
     LayoutHelpers.AtVerticalCenterIn(GUI.progressBar, GUI.bg)
 
     GUI.progressTxt = UIUtil.CreateText(GUI.bg, "Blueprints Loading ... ", 16, UIUtil.titleFont)
@@ -336,7 +336,7 @@ function OnBlueprintsLoaded()
         timer:Stop('UnitsManager...UnitsGroupping',true)
 
         -- scale cell size by dialog size and make space for scroll bar
-        cellSpace = dialogWidth - dialogScrollWidth - 20
+        cellSpace = dialogWidth / LayoutHelpers.GetPixelScaleFactor() - dialogScrollWidth - 20
         cellSize = math.floor(cellSpace / cellMax)
         cellSize = math.min(cellSize, 55)
         -- calculate grid size and margin to ensure grids are centered
@@ -369,9 +369,8 @@ end
 function CreatePresetsGrid()
     local rowMax = 4
     GUI.presetsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, rowMax)
-    GUI.presetsGrid.Top:Set(function() return GUI.content.Top() + 6 end)
-    GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
-    GUI.presetsGrid.Height:Set(function() return cellSize * rowMax end)
+    LayoutHelpers.AtLeftTopIn(GUI.presetsGrid, GUI.content, gridMargin, 6)
+    LayoutHelpers.SetHeight(GUI.presetsGrid, cellSize * rowMax)
     GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     local index = 0
@@ -400,9 +399,9 @@ end
 -- Creates a grid with buttons representing all original units and modded units (if game mods are enabled)
 function CreateUnitsGrid()
     GUI.unitsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 25)
-    GUI.unitsGrid.Top:Set(function() return GUI.presetsGrid.Bottom() + 6 end)
-    GUI.unitsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
-    GUI.unitsGrid.Bottom:Set(function() return GUI.content.Bottom() - 2 end)
+    LayoutHelpers.AnchorToBottom(GUI.unitsGrid, GUI.presetsGrid, 6)
+    LayoutHelpers.AtLeftIn(GUI.unitsGrid, GUI.content, gridMargin)
+    LayoutHelpers.AtBottomIn(GUI.unitsGrid, GUI.content, 2)
     GUI.unitsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     GUI.unitsGrid.HandleEvent = function(self, event)
@@ -457,11 +456,11 @@ function CreateControls(OnOk, OnCancel, isHost)
     LayoutHelpers.AtHorizontalCenterIn(GUI.cancelBtn, GUI.bg)
 
     GUI.okBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Ok>")
-    GUI.okBtn.Left:Set(function() return GUI.cancelBtn.Left() - 120 end)
+    LayoutHelpers.AtLeftIn(GUI.okBtn, GUI.cancelBtn, -120)
     LayoutHelpers.AtBottomIn(GUI.okBtn, GUI.bg, 5)
 
     GUI.resetBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Reset>")
-    GUI.resetBtn.Left:Set(function() return GUI.cancelBtn.Left() + 120 end)
+    LayoutHelpers.AtLeftIn(GUI.resetBtn, GUI.cancelBtn, 120)
     LayoutHelpers.AtBottomIn(GUI.resetBtn, GUI.bg, 5)
     Tooltip.AddButtonTooltip(GUI.resetBtn, 'options_reset_all')
 
@@ -595,23 +594,20 @@ function CreateUnitIcon(parent, bp, faction)
 
     local control = Bitmap(parent)
     control.bp = bp -- Save blueprint reference for later
-    control.Height:Set(cellSize)
-    control.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(control, cellSize, cellSize)
     control:SetSolidColor('FF000000')
 
     local imagePath = UnitsAnalyzer.GetImagePath(bp, faction)
     bp.ImagePath = imagePath
 
     local fill = Bitmap(control)
-    fill.Height:Set(cellSize-1)
-    fill.Width:Set(cellSize-1)
+    LayoutHelpers.SetDimensions(fill, cellSize - 1, cellSize - 1)
     fill:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(fill, control)
     LayoutHelpers.AtHorizontalCenterIn(fill, control)
 
     local hover = Bitmap(control)
-    hover.Height:Set(cellSize)
-    hover.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(hover, cellSize, cellSize)
     hover:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(hover, control)
     LayoutHelpers.AtHorizontalCenterIn(hover, control)
@@ -624,8 +620,7 @@ function CreateUnitIcon(parent, bp, faction)
           imagePath, -- dis.dds'),
           imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    checkbox.Height:Set(cellSize - 6)
-    checkbox.Width:Set(cellSize - 6)
+    LayoutHelpers.SetDimensions(checkbox, cellSize - 6, cellSize - 6)
     checkbox:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(checkbox, control, 5, 5)
 
@@ -635,8 +630,7 @@ function CreateUnitIcon(parent, bp, faction)
         imagePath = '/textures/ui/icons_strategic/commander_generic.dds'
         local position = cellSize - unitFontSize - 2
         local typeIcon = Bitmap(control)
-        typeIcon.Height:Set(unitFontSize)
-        typeIcon.Width:Set(unitFontSize)
+        LayoutHelpers.SetDimensions(typeIcon, unitFontSize, unitFontSize)
         typeIcon:SetTexture(imagePath)
         typeIcon:DisableHitTest()
         LayoutHelpers.AtLeftTopIn(typeIcon, control, position, 3)
@@ -648,8 +642,7 @@ function CreateUnitIcon(parent, bp, faction)
 
     local modPosition = cellSize - unitFontSize
     local modFill = Bitmap(control)
-    modFill.Height:Set(unitFontSize + 1)
-    modFill.Width:Set(unitFontSize + 1)
+    LayoutHelpers.SetDimensions(modFill, unitFontSize + 1, unitFontSize + 1)
     modFill:SetSolidColor('00ffffff')
     modFill:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(modFill, control, modPosition - 2, modPosition - 2)
@@ -666,8 +659,7 @@ function CreateUnitIcon(parent, bp, faction)
     end
 
     local overlay = Bitmap(control)
-    overlay.Height:Set(cellSize)
-    overlay.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(overlay, cellSize, cellSize)
     overlay:SetSolidColor('00ffffff')
     overlay:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(overlay, control)
@@ -681,8 +673,7 @@ function CreateUnitIcon(parent, bp, faction)
         colors.FillUncheck = '003e3d3d'  -- #003e3d3d'
 
         checkbox.selector = overlay
-        checkbox.Height:Set(cellSize)
-        checkbox.Width:Set(cellSize)
+        LayoutHelpers.SetDimensions(checkbox, cellSize, cellSize)
         LayoutHelpers.AtVerticalCenterIn(checkbox, control)
         LayoutHelpers.AtHorizontalCenterIn(checkbox, control)
 
@@ -791,23 +782,20 @@ function CreatePresetIcon(parent, presetName)
     local control = Bitmap(parent)
     control.preset = preset
     control.presetName = presetName
-    control.Height:Set(cellSize)
-    control.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(control, cellSize, cellSize)
     control:SetSolidColor(colors.FillUncheck)
 
     local imagePath = UnitsAnalyzer.GetImagePath(preset, '')
 
     local fill = Bitmap(control)
-    fill.Height:Set(cellSize-1)
-    fill.Width:Set(cellSize-1)
+    LayoutHelpers.SetDimensions(fill, cellSize - 1, cellSize - 1)
     fill:SetSolidColor(colors.FillUncheck)
     fill:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(fill, control)
     LayoutHelpers.AtHorizontalCenterIn(fill, control)
 
     local hover = Bitmap(control)
-    hover.Height:Set(cellSize)
-    hover.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(hover, cellSize, cellSize)
     hover:SetSolidColor('00ffffff')
     hover:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(hover, control)
@@ -821,8 +809,7 @@ function CreatePresetIcon(parent, presetName)
           imagePath, -- dis.dds'),
           imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    checkbox.Height:Set(cellSize-2)
-    checkbox.Width:Set(cellSize-2)
+    LayoutHelpers.SetDimensions(checkbox, cellSize - 2, cellSize - 2)
     checkbox:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(checkbox, control)
     LayoutHelpers.AtHorizontalCenterIn(checkbox, control)
