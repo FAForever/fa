@@ -162,7 +162,7 @@ end
 function CreateUI(over, exitBehavior)
     local discovery = import('/lua/ui/lobby/lobbyComm.lua').CreateDiscoveryService()
 	local parent = over
-	# panel and title
+	-- panel and title
     local panel = Bitmap(parent, UIUtil.SkinnableFile('/scx_menu/gameselect/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(panel, parent)
 
@@ -217,7 +217,7 @@ function CreateUI(over, exitBehavior)
     local gamesTitle = UIUtil.CreateText(panel, '<LOC GAMESEL_0002>Server List', 18, UIUtil.bodyFont)
     LayoutHelpers.Above(gamesTitle, gameList, 6)
     
-	# name edit field
+	-- name edit field
     local nameEdit = CreateEditField(panel, 375, 20)
     LayoutHelpers.AtLeftIn(nameEdit, panel, 30)
     LayoutHelpers.AtTopIn(nameEdit, panel, 92)
@@ -262,7 +262,7 @@ function CreateUI(over, exitBehavior)
         end
     end
     
-	# ip address and port edit
+	-- ip address and port edit
 	local ipaddressEdit = CreateEditField(panel, 290)
     LayoutHelpers.AtLeftTopIn(ipaddressEdit, panel, 28, 615)
     ipaddressEdit:SetText(Prefs.GetFromCurrentProfile('last_dc_ipaddress') or "")
@@ -302,7 +302,7 @@ function CreateUI(over, exitBehavior)
         local portstr = portEdit:GetText()
         local port = tonumber(portstr)
     
-        if not port or math.floor(port) != port or port < 1 or port > 65535 then
+        if not port or math.floor(port) ~= port or port < 1 or port > 65535 then
             UIUtil.ShowInfoDialog(parent,
                                   LOCF('<LOC DIRCON_0003>Invalid port number: %s.  Must be an integer between 1 and 65535', portstr),
                                   "<LOC _OK>")
@@ -314,7 +314,7 @@ function CreateUI(over, exitBehavior)
                 return
             end
 
-            local valid = ipaddress != '' and ValidateIPAddress(ipaddress .. ':' .. port)
+            local valid = ipaddress ~= '' and ValidateIPAddress(ipaddress .. ':' .. port)
             if valid then
                 Prefs.SetToCurrentProfile('last_dc_ipaddress', ipaddress)
                 Prefs.SetToCurrentProfile('last_dc_port', tostring(port))
@@ -409,7 +409,7 @@ function CreateUI(over, exitBehavior)
                 gameList._sortby.ascending = not gameList._sortby.ascending 
             end
             for index, tab in gameList._tabs do
-                if index != i then
+                if index ~= i then
                     tab:Uncheck()
                 end
             end
@@ -783,7 +783,7 @@ function CreateUI(over, exitBehavior)
     function formatData()
         formattedData = {}
         for i, gameData in games do
-            if gameData.ProductCode == nil or gameData.ProductCode != import('/lua/productcode.lua').productCode then continue end
+            if gameData.ProductCode == nil or gameData.ProductCode ~= import('/lua/productcode.lua').productCode then continue end
             gameData.wrappedName = import('/lua/maui/text.lua').WrapText(gameData.GameName, 
                 gameList._tabs[2].Right() - gameList._tabs[2].Left(), 
                 function(curText) return gameListObjects[1].name1:GetStringAdvance(curText) end)
