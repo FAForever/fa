@@ -24,7 +24,7 @@ function CreateEditField(parent)
     control:SetHighlightForegroundColor(UIUtil.highlightColor)
     control:SetHighlightBackgroundColor("880085EF")
     control.Height:Set(function() return control:GetFontHeight() end)
-    control.Width:Set(250)
+    LayoutHelpers.SetWidth(control, 250)
     control:SetFont(UIUtil.bodyFont, 16)
     return control
 end
@@ -46,11 +46,11 @@ function CreateUI(playerName, over, exitBehavior)
     
     local panelTitle = UIUtil.CreateText(panel, "<LOC _Create_LAN_Game>", 22)
     LayoutHelpers.AtHorizontalCenterIn(panelTitle, panel)
-    panelTitle.Top:Set(function() return panel.Top() + 50 end)
+    LayoutHelpers.AtTopIn(panelTitle, panel, 50)
 
     local gameNameEdit = CreateEditField(panel)
     gameNameEdit:SetText(Prefs.GetFromCurrentProfile('last_game_name') or "")
-    gameNameEdit.Width:Set(340)
+    LayoutHelpers.SetWidth(gameNameEdit, 340)
     LayoutHelpers.AtHorizontalCenterIn(gameNameEdit, panel)
     LayoutHelpers.AtTopIn(gameNameEdit, panel, 120)
     gameNameEdit:SetMaxChars(32)
@@ -70,7 +70,7 @@ function CreateUI(playerName, over, exitBehavior)
 
     local autoPort = UIUtil.CreateCheckboxStd(panel, '/dialogs/check-box_btn/radio')
     autoPort.Right:Set(portEdit.Right)
-    autoPort.Bottom:Set(function() return portEdit.Top() - 5 end)
+    LayoutHelpers.AnchorToTop(autoPort, portEdit, 5)
     autoPort.OnCheck = function(self, checked)
         if checked then
             portEdit:Disable()
