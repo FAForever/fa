@@ -102,9 +102,9 @@ function CreateScoreUI(parent)
     SetupPlayerLines()
     controls.armyGroup.Height:Set(armyGroupHeight())
 
-    GameMain.AddBeatFunction(OnBeat, true)
+    GameMain.AddBeatFunction(_OnBeat, true)
     controls.bg.OnDestroy = function(self)
-        GameMain.RemoveBeatFunction(OnBeat)
+        GameMain.RemoveBeatFunction(_OnBeat)
     end
 
     if contractOnCreate then
@@ -327,7 +327,6 @@ function SetupPlayerLines()
     observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
     observerLine:Hide()
     observerLine.OnHide = blockOnHide
-    observerLine.scoreNumber = -2
     observerLine.name.Top:Set(observerLine.Top)
     observerLine.Height:Set(15)
 
@@ -389,7 +388,6 @@ function SetupPlayerLines()
         group.Height:Set(18)
         group.Width:Set(controls.armyGroup.Width)
         group:DisableHitTest()
-        group.scoreNumber = -3
 
         return group
     end
@@ -493,7 +491,7 @@ end
 
 local prevArmy = -2
 
-function OnBeat()
+function _OnBeat()
     local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
     if sessionInfo.Options.Quality then
         s = string.format("%s Q:%.2f%%", s, sessionInfo.Options.Quality)
@@ -522,7 +520,6 @@ function OnBeat()
                 if line.armyID == index then
                     if scoreData.general.score == -1 then
                         line.score:SetText('')
-                        line.scoreNumber = -1
                     else
                         line.score:SetText(fmtnum(scoreData.general.score))
                         line.scoreNumber = scoreData.general.score
