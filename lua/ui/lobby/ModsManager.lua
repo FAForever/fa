@@ -77,7 +77,7 @@ local modDependencyMap = {}
 -- Maps uids to sets of uids of mods that depend on the first uid
 local modBackwardDependencyMap = {}
 
-function UpdateClientModStatus(mod_selec)
+function UpdateClientModStatus()
     if GUIOpen then
         modsDialog:Close()
         GUIOpen = false
@@ -238,6 +238,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
         return mods.activated
     end
+    UIUtil.MakeInputModal(dialogContent, function() SaveButton.OnClick(SaveButton) end, function() SaveButton.OnClick(SaveButton) end)
 
     RefreshModsList()
 
