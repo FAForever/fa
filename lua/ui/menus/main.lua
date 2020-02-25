@@ -124,9 +124,10 @@ function CreateUI()
             color = menuFontColorAlt,
         },
         {
-            name = '<LOC tooltipui0355>Extras',
-            tooltip = 'mainmenu_extras',
-            action = function() ButtonExtras() end,
+            name = '<LOC _Mod_Manager>',
+            tooltip = 'mainmenu_mod',
+            action = function() ButtonMod() end,
+            color = menuFontColorAlt,
         },
         {
             name = '<LOC _Options>',
@@ -282,7 +283,7 @@ function CreateUI()
         control:SetNeedsFrameUpdate(true)
         if animIn then
             control.mod = 1
-            PlaySound(Sound({Bank = 'Interface', Cue = 'X_Main_Menu_On_Start'}))
+            --PlaySound(Sound({Bank = 'Interface', Cue = 'X_Main_Menu_On_Start'}))
         else
             control.mod = -1
         end
