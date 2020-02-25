@@ -692,17 +692,12 @@ end
 -- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
--- @param visited The set of mods visited during this recursive set of calls (used to break cycles)
-function ActivateMod(uid, isRecursing, visited)
+function ActivateMod(uid, isRecursing)
     if mods.activated[uid] then
         return
     end
 
-    visited = visited or {}
-    if visited[uid] then
-        return
-    end
-    visited[uid] = true
+    mods.activated[uid] = true
 
     -- Dependency checking time!
     local deps = modDependencyMap[uid]
@@ -724,7 +719,7 @@ function ActivateMod(uid, isRecursing, visited)
             local doEnable = function()
                 for k, uid in activatedConflictingMods do
                     DeactivateMod(uid)
-                    ActivateMod(thisUID, true, visited)
+                    ActivateMod(thisUID, true)
                     LOG("ModsManager activated: ".. GetModNameType(thisUID))
                 end
             end
@@ -746,12 +741,11 @@ function ActivateMod(uid, isRecursing, visited)
         -- Activate any dependencies. We guaranteed that these all exist earlier on.
         if deps.requires then
             for uid, _ in deps.requires do
-                ActivateMod(uid, true, visited)
+                ActivateMod(uid, true)
                 LOG("ModsManager activated dependency: ".. GetModNameType(uid))
             end
         end
     end
-    mods.activated[uid] = true
     controlMap[uid].bg:SetCheck(true, true)
 
     if mods.selectable[uid].ui_only then
@@ -763,27 +757,22 @@ function ActivateMod(uid, isRecursing, visited)
     UpdateModsCounters()
 end
 
-function DeactivateMod(uid, visited)
+function DeactivateMod(uid)
     if not mods.activated[uid] then
         return
     end
 
-    visited = visited or {}
-    if visited[uid] then
-        return
-    end
-    visited[uid] = true
+    mods.activated[uid] = nil
 
     -- Check for backward dependencies: do other mods require this one? If so, we should disable
     -- those mods, as well.
     local victims = modBackwardDependencyMap[uid]
     if victims then
         for k, v in victims do
-            DeactivateMod(k, true, visited)
+            DeactivateMod(k, true)
         end
     end
 
-    mods.activated[uid] = nil
     controlMap[uid].bg:SetCheck(false, true)
 
     if mods.selectable[uid].ui_only then
