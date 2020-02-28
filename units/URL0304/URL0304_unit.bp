@@ -276,7 +276,7 @@ UnitBlueprint {
             TurretPitchSpeed = 20,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 3, --maybe 2 is needed, with 3 they can hit patrolling percies, kinda
+            TurretYawSpeed = 30,
             Turreted = true,
             WeaponCategory = 'Artillery',
             WeaponRepackTimeout = 0,
