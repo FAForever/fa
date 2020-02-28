@@ -315,7 +315,8 @@ Weapon = Class(moho.weapon_methods) {
 
     end,
 
-    GetDamageTable = function(self)
+
+    GetDamageTableInternal = function(self)
         local weaponBlueprint = self:GetBlueprint()
         local damageTable = {}
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
@@ -346,6 +347,12 @@ Weapon = Class(moho.weapon_methods) {
         return damageTable
     end,
 
+    damageTableCache = false,
+    GetDamageTable = function(self)
+        if not self.damageTableCache then self.damageTableCache = self:GetDamageTableInternal() end
+        return self.damageTableCache
+    end,
+    
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -461,10 +468,12 @@ Weapon = Class(moho.weapon_methods) {
 
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
+        self.damageTableCache = false
     end,
 
     AddDamageRadiusMod = function(self, dmgRadMod)
         self.DamageRadiusMod = self.DamageRadiusMod + (dmgRadMod or 0)
+        self.damageTableCache = false
     end,
 
     DoOnFireBuffs = function(self)
@@ -485,6 +494,7 @@ Weapon = Class(moho.weapon_methods) {
             -- Error
             error('ERROR: DisableBuff in weapon.lua does not have a buffname')
         end
+        self.damageTableCache = false
     end,
 
     ReEnableBuff = function(self, buffname)
@@ -494,6 +504,7 @@ Weapon = Class(moho.weapon_methods) {
             -- Error
             error('ERROR: ReEnableBuff in weapon.lua does not have a buffname')
         end
+        self.damageTableCache = false
     end,
 
     -- Method to mark weapon when parent unit gets loaded on to a transport unit
