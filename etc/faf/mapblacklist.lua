@@ -368,7 +368,6 @@ MapBlacklist = {
     ['denmark3.v0002'] = true,
     ['denmark3.v0003'] = true,
     ['depths v6'] = true,
-    ['desert arena.v0001'] = true,
     ['desert arena v2.v0002'] = true,
     ['desert conflict.v0001'] = true,
     ['desert fox.v0001'] = true,
