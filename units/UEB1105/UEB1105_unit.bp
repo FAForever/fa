@@ -35,6 +35,7 @@ UnitBlueprint {
         'ECONOMIC',
         'TECH1',
         'ENERGYSTORAGE',
+        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',
