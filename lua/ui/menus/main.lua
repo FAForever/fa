@@ -339,7 +339,7 @@ function CreateUI()
         -- title
         mainMenu.titleBack = Bitmap(mainMenuGroup, UIUtil.UIFile('/menus/main03/panel-top_bmp.dds'))
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
-        LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 10)
+        LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 0)
 
         mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, GetPreference("profile.current"), 26)
         LayoutHelpers.AtCenterIn(mainMenu.titleTxt, mainMenu.titleBack, 3)
@@ -518,10 +518,10 @@ function CreateUI()
                     mainMenu[k].btn.label:SetColor(v.color)
                 end
                 if k == 1 then
-                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu.profile)
+                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu.profile, -5)
                 else
                     local lastBtn = k - 1
-                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu[lastBtn].btn, -5)
+                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu[lastBtn].btn, -6)
                 end
                 if v.action then
                     mainMenu[k].btn.glow = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/large-btn/large_btn_glow.dds'))
