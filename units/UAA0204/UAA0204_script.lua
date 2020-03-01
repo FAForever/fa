@@ -20,6 +20,7 @@ UAA0204 = Class(AAirUnit) {
                         self:ChangeMaxRadius(100)
                         WaitTicks(1)
                         self:ChangeMaxRadius(self:GetBlueprint().MaxRadius)
+                        self:ResetTarget()
                     end)
                 end
                 AANDepthChargeBombWeapon.OnLostTarget(self)

@@ -21,6 +21,7 @@ XSA0204 = Class(SAirUnit) {
                         self:ChangeMaxRadius(100)
                         WaitTicks(1)
                         self:ChangeMaxRadius(self:GetBlueprint().MaxRadius)
+                        self:ResetTarget()
                     end)
                 end
                 SANHeavyCavitationTorpedo.OnLostTarget(self)

@@ -27,6 +27,7 @@ XAA0306 = Class(AAirUnit) {
                     self:ChangeMaxRadius(100)
                     WaitTicks(1)
                     self:ChangeMaxRadius(self:GetBlueprint().MaxRadius)
+                    self:ResetTarget()
                 end)
             end,
         },
