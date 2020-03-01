@@ -66,12 +66,6 @@ function CreateUI()
     local menuExtras = {
         title = '<LOC tooltipui0355>Extras',
         {
-            name = '<LOC _Mod_Manager>',
-            tooltip = 'mainmenu_mod',
-            action = function() ButtonMod() end,
-            color = menuFontColorAlt,
-        },
-        {
             name = '<LOC OPTIONS_0073>Credits',
             tooltip = 'options_credits',
             action = function() ButtonCredits() end,
@@ -85,6 +79,14 @@ function CreateUI()
         {
             name = '<LOC _Back>',
             action = function() ButtonBack() end,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
             color = menuFontColorAlt,
         },
         {
@@ -130,6 +132,11 @@ function CreateUI()
             color = menuFontColorAlt,
         },
         {
+            name = '<LOC tooltipui0355>Extras',
+            tooltip = 'mainmenu_extras',
+            action = function() ButtonExtras() end,
+        },
+        {
             name = '<LOC _Options>',
             tooltip = 'mainmenu_options',
             action = function() ButtonOptions() end,
@@ -141,9 +148,6 @@ function CreateUI()
             action = function() ButtonExit() end,
         }
     }
-
-    local largestMenu = menuTop
-    local mainMenuSize = table.getn(largestMenu)
 
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
@@ -258,16 +262,20 @@ function CreateUI()
     LayoutHelpers.AtCenterIn(menuBracketBar, menuBracketMiddle, 60)
 
     local menuBracketLeft = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketLeft, menuBracketMiddle, 200, -190)
+    LayoutHelpers.AtLeftTopIn(menuBracketLeft, menuBracketMiddle, -178)
+    menuBracketLeft.Height:Set(mainMenuGroup.Height)
 
     local menuBracketLeftGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left-energy_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketLeftGlow, menuBracketLeft, 0, 22)
+    LayoutHelpers.AtRightTopIn(menuBracketLeftGlow, menuBracketLeft, -10, 20)
+    LayoutHelpers.AtBottomIn(menuBracketLeftGlow, menuBracketLeft, 10)
 
     local menuBracketRight = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketRight, menuBracketMiddle, 200, 190)
+    LayoutHelpers.AtRightTopIn(menuBracketRight, menuBracketMiddle, -178)
+    menuBracketRight.Height:Set(mainMenuGroup.Height)
 
     local menuBracketRightGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right-energy_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketRightGlow, menuBracketRight, 0, -22)
+    LayoutHelpers.AtLeftTopIn(menuBracketRightGlow, menuBracketRight, -10, 20)
+    LayoutHelpers.AtBottomIn(menuBracketRightGlow, menuBracketRight, 10)
 
     menuBracketMiddle.Top:Set(function() return topBorder.Bottom() - menuBracketLeft.Height() end)
     LayoutHelpers.AtHorizontalCenterIn(menuBracketMiddle, border)
@@ -677,7 +685,7 @@ function CreateUI()
         end
 
         -- set final dimensions/placement of mainMenuGroup
-        mainMenuGroup.Height:Set(function() return (mainMenuSize * buttonHeight) + mainMenu.titleBack.Height() end)
+        mainMenuGroup.Height:Set(function() return (table.getn(menuTable) * buttonHeight) + mainMenu.titleBack.Height() end)
         mainMenuGroup.Width:Set(mainMenu.titleBack.Width)
         LayoutHelpers.AtHorizontalCenterIn(mainMenuGroup, border)
 
