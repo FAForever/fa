@@ -346,7 +346,10 @@ Description = {
     ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
     ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
-
+    ['ual0301-cd'] = "<LOC Unit_Description_0157>Creates a Quantum Stasis Field around the SCU. Immobilizes enemy units within its radius. High Energy Consumption.",
+    ['ual0301-ran'] = "<LOC Unit_Description_0465>Increases the range of the gun of the SCU.",
+    ['ual0301-rof'] = "<LOC Unit_Description_0466>Equips the standard SACU's Reacton cannon with area-of-effect damage.",
+    ['ual0301-aoe'] = "<LOC Unit_Description_0467>Increases the standard SACU's Reacton cannon projectile damage.",
     -- AEON -- Support Commander Presets
     ['ual0301_Engineer']     = "<LOC ual0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with rapid fabrication enhancement.",
     ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
