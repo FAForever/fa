@@ -14,7 +14,18 @@ local SANHeavyCavitationTorpedo = SeraphimWeapons.SANHeavyCavitationTorpedo
 
 XSA0204 = Class(SAirUnit) {
     Weapons = {
-        Bomb = Class(SANHeavyCavitationTorpedo) {},
+        Bomb = Class(SANHeavyCavitationTorpedo) {
+            OnLostTarget = function(self)
+                if self.unit:GetTargetEntity().Dead then
+                    self:ForkThread(function()
+                        self:ChangeMaxRadius(100)
+                        WaitTicks(1)
+                        self:ChangeMaxRadius(self:GetBlueprint().MaxRadius)
+                    end)
+                end
+                SANHeavyCavitationTorpedo.OnLostTarget(self)
+            end,
+        },
     },
 }
 TypeClass = XSA0204

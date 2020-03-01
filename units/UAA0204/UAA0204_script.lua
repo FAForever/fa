@@ -13,7 +13,18 @@ local AANDepthChargeBombWeapon = import('/lua/aeonweapons.lua').AANDepthChargeBo
 
 UAA0204 = Class(AAirUnit) {
     Weapons = {
-        Bomb = Class(AANDepthChargeBombWeapon) {},
+        Bomb = Class(AANDepthChargeBombWeapon) {
+            OnLostTarget = function(self)
+                if self.unit:GetTargetEntity().Dead then
+                    self:ForkThread(function()
+                        self:ChangeMaxRadius(100)
+                        WaitTicks(1)
+                        self:ChangeMaxRadius(self:GetBlueprint().MaxRadius)
+                    end)
+                end
+                AANDepthChargeBombWeapon.OnLostTarget(self)
+            end,
+        },
     },
 }
 
