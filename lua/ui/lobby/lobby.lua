@@ -51,6 +51,10 @@ AIKeys = {}
 AIStrings = {}
 AITooltips = {}
 
+--This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
+-- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
+PreGameData = {}
+
 local IsSyncReplayServer = false
 
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
@@ -2039,7 +2043,9 @@ local function TryLaunch(skipNoObserversCheck)
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
-
+        
+        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+        SetPreference('PreGameData',PreGameData)
         lobbyComm:LaunchGame(gameInfo)
     end
 

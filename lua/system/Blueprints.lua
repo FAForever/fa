@@ -627,6 +627,7 @@ end
 --- Sim -> LoadBlueprints() - no arguments, no changes!
 --- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua
 --- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua
+
 function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
 
     local task = 'Blueprints Loading... '
@@ -668,6 +669,25 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
+    
+    --load game preferences file
+    PreGameData = false --this stops us from tripping the games global variable uninitialised detector, which is very finicky in this file.
+    LoadCustomPreferences()
+    
+    -- load blueprints from active map directory
+    if PreGameData and PreGameData.CurrentMapDir then
+        task = 'Blueprints Loading: Blueprints from current map'
+        files = DiskFindFiles(PreGameData.CurrentMapDir, pattern)
+        for k,file in files do
+            BlueprintLoaderUpdateProgress()
+            -- update UnitManager UI via taskNotifier only if it exists
+            if taskNotifier then
+               taskNotifier:Update(task, total, k)
+            end
+            
+            safecall(task .. ': ' .. file, doscript, file)
+        end
+    end
 
     for i,mod in mods or {} do
         current_mod = mod -- used in UnitBlueprint()
@@ -687,6 +707,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     end
     stats.UnitsMod = table.getsize(original_blueprints.Unit) - stats.UnitsOrg
     stats.ProjsMod = table.getsize(original_blueprints.Projectile) - stats.ProjsOrg
+
 
     if not skipExtraction then
         BlueprintLoaderUpdateProgress()
@@ -733,4 +754,12 @@ function ReloadBlueprint(file)
     ModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
+end
+
+-- Load the game.prefs file and save it
+function LoadCustomPreferences()
+    local PrefFile = DiskFindFiles("/preferences", "Game.prefs")
+    task = 'Blueprints Loading: loading game preferences file'
+    if not PrefFile[1] then WARN('Blueprints.lua - Preferences file not found. Skipping custom content. Is the file mounted correctly in the init?') return end
+    safecall(task .. ': ' .. PrefFile[1], doscript, PrefFile[1])
 end

@@ -193,6 +193,8 @@ mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx5', '/')
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
 mount_dir(fa_path, '/')
 
+--load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
+mount_dir(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games\\Supreme Commander Forged Alliance', '/preferences')
 
 hook = {
     '/schook'
