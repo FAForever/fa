@@ -21,7 +21,8 @@ Checkbox = Class(Group) {
 
         -- Escape early if the layout is the extremely trivial case...
         if not label then
-            LayoutHelpers.SetDimensions(self, checkBmp.Width(), checkBmp.Height())
+            self.Width:Set(checkBmp.Width)
+            self.Height:Set(checkBmp.Height)
             LayoutHelpers.AtCenterIn(checkBmp, self)
             return
         end
