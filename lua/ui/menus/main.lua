@@ -595,8 +595,8 @@ function CreateUI()
                             self.first = false
                         end
                         local change = (delta * 200)
-                        local rightGoal = function() return self.Left() + 40 end
-                        local leftGoal = function() return self.Right() - 38 end
+                        local rightGoal = function() return self.Left() + LayoutHelpers.ScaleNumber(40) end
+                        local leftGoal = function() return self.Right() - LayoutHelpers.ScaleNumber(38) end
                         if self.leftBracket.Right() < rightGoal() then
                             local newRight = self.leftBracket.Right() + change
                             if newRight > rightGoal() then
@@ -631,8 +631,8 @@ function CreateUI()
                     control.OnRolloverEvent = function() end
                     control.OnClick = function() end
                     control.OnFrame = function(self, delta)
-                        local rightGoal = function() return menuBracketLeft.Right() - 15 end
-                        local leftGoal = function() return menuBracketRight.Left() + 15 end
+                        local rightGoal = function() return menuBracketLeft.Right() - LayoutHelpers.ScaleNumber(15) end
+                        local leftGoal = function() return menuBracketRight.Left() + LayoutHelpers.ScaleNumber(15) end
 
                         local change = (delta * 200)
                         if self.leftBracket.Right() > rightGoal() then
