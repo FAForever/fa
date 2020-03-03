@@ -36,7 +36,7 @@ end
 
 local function CreateNameFilter(data)
     local group = Group(dialog)
-    LayoutHelpers.SetWidth(group, dialog.Width())
+    group.Width:Set(dialog.Width)
     LayoutHelpers.SetHeight(group, 30)
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
