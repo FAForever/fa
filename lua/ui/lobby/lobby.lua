@@ -2838,8 +2838,7 @@ function CreateUI(maxPlayers)
         obsOffset = 503
     end
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 512, obsOffset)
-    GUI.observerPanel.Width:Set(278)
-    GUI.observerPanel.Height:Set(obsHeight)
+    LayoutHelpers.SetDimensions(GUI.observerPanel, 278, obsHeight)
 
     -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
@@ -3605,10 +3604,8 @@ function CreateUI(maxPlayers)
     GUI.observerList = ItemList(GUI.observerPanel)
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
     GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
-    GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 4 end)
-    GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() end)
-    GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 2 end)
-    GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 15 end)
+    LayoutHelpers.AtLeftTopIn(GUI.observerList, GUI.observerPanel, 4, 2)
+    LayoutHelpers.AtRightBottomIn(GUI.observerList, GUI.observerPanel, 15)
     GUI.observerList.OnClick = function(self, row, event)
         if isHost and event.Modifiers.Right then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
