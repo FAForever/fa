@@ -36,7 +36,7 @@ local optionKeyToControlMap = false
 local controlTypeCreate = {
     toggle = function(parent, optionItemData)
         local combo = Combo(parent, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-        combo.Width:Set(250)
+        LayoutHelpers.SetWidth(combo, 250)
 
         combo.SetCustomData = function(newCustomData, newDefault)
             local itemArray = {}
@@ -218,8 +218,7 @@ local function CreateOption(parent, optionItemData)
     --TODO get this data from layout!
     local controlGroup = Group(bg)
     LayoutHelpers.AtLeftTopIn(controlGroup, bg, 338, 5)
-    controlGroup.Width:Set(252)
-    controlGroup.Height:Set(24)
+    LayoutHelpers.SetDimensions(controlGroup, 252, 24)
 
     if controlTypeCreate[optionItemData.type] then
         bg._control = controlTypeCreate[optionItemData.type](controlGroup, optionItemData)
@@ -386,6 +385,7 @@ function CreateDialog(over, exitBehavior)
     local elementWidth, elementHeight = GetTextureDimensions(UIUtil.UIFile('/dialogs/options-02/content-box_bmp.dds'))
     local optionGrid = Grid(dialog, elementWidth, elementHeight)
     LayoutHelpers.RelativeTo(optionGrid, dialog, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp', 'panel_bmp')
+    LayoutHelpers.AtRightBottomIn(optionGrid, dialog, 43, 100)
     LayoutHelpers.DimensionsRelativeTo(optionGrid, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp')
     local scrollbar = UIUtil.CreateVertScrollbarFor(optionGrid, -4)
 

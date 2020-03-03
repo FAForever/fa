@@ -353,12 +353,12 @@ function RelativeTo(control, parent, fileName, controlName, parentName, topOffse
     end
     control.Left:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left + ((leftOffset or 0) * pixelScaleFactor)))
+        return math.floor(parent.Left() + ((layoutTable[controlName].left - layoutTable[parentName].left) * pixelScaleFactor + ((leftOffset or 0) * pixelScaleFactor)))
     end)
 
     control.Top:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top + ((topOffset or 0) * pixelScaleFactor)))
+        return math.floor(parent.Top() + ((layoutTable[controlName].top - layoutTable[parentName].top) * pixelScaleFactor + ((topOffset or 0) * pixelScaleFactor)))
     end)
 end
 
@@ -426,11 +426,11 @@ function DimensionsRelativeTo(control, fileName, controlName)
     end
     control.Width:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(layoutTable[controlName].width * pixelScaleFactor)
+        return math.floor(layoutTable[controlName].width)-- * pixelScaleFactor)
     end)
     control.Height:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(layoutTable[controlName].height * pixelScaleFactor)
+        return math.floor(layoutTable[controlName].height)-- * pixelScaleFactor)
     end)
 end
 
