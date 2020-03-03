@@ -45,7 +45,7 @@ function Toggle(section)
     local sb = UIUtil.CreateVertScrollbarFor(statList)
     sb.Left:Set(statusCluster.Left)
 
-    # Hide/Show children on doubleclick
+    -- Hide/Show children on doubleclick
     function statList.OnDoubleClick(self,row)
         local item i = self:GetItem(row)
         i = string.gsub(i,"^%s*%[[+-]%]","")
@@ -80,7 +80,7 @@ function AddStats(parentCtrl, children, indent, add)
         local name = string.gsub(v.Name,"Moho::","")
 
         local value = ""
-        if v.Value != nil then
+        if v.Value ~= nil then
             if v.Type == "Float" then
                 value = ": " .. string.format("%.4f",v.Value)
             elseif v.Type == "Integer" then
@@ -90,8 +90,8 @@ function AddStats(parentCtrl, children, indent, add)
             end
         end
 
-        # If we're adding an item we've never seen before default
-        # to collapsed mode (unless it's specifically our filter item)
+        -- If we're adding an item we've never seen before default
+        -- to collapsed mode (unless it's specifically our filter item)
         if hideItems[name] == nil then
             if isFilter then
                 hideItems[name] = false
@@ -105,7 +105,7 @@ function AddStats(parentCtrl, children, indent, add)
 
         if addChildren then
             local treeMode = ""
-            if v.Children != nil then
+            if v.Children ~= nil then
                 if hidden then
                     treeMode = "[+]"
                 else
@@ -114,7 +114,7 @@ function AddStats(parentCtrl, children, indent, add)
             end
             parentCtrl:AddItem(tostring(indent) .. treeMode .. name .. value)
         end
-        if v.Children != nil and not hidden then
+        if v.Children ~= nil and not hidden then
             AddStats(parentCtrl,v.Children,indent..'  ',addChildren)
         end
     end

@@ -80,7 +80,7 @@ function AddStats(parentCtrl, children, indent, add)
         local addChildren = add or string.lower(v.Name) == filter
 
         local value = ""
-        if v.Value != nil then
+        if v.Value ~= nil then
             if v.Type == "Float" then
                 value = ": " .. string.format("%.4f",v.Value)
             elseif v.Type == "Integer" then
@@ -92,13 +92,13 @@ function AddStats(parentCtrl, children, indent, add)
         if addChildren then
             parentCtrl:AddItem(indent .. v.Name .. value)
 
-            if v.Blueprints != nil then
+            if v.Blueprints ~= nil then
                 for bp,val in v.Blueprints do
                     parentCtrl:AddItem(indent..' '..bp..': '..val)
                 end
             end
         end
-        if v.Children != nil then
+        if v.Children ~= nil then
             AddStats(parentCtrl,v.Children,indent..'  ',addChildren)
         end
     end
