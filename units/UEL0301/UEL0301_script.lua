@@ -10,6 +10,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
+local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
 UEL0301 = Class(CommandUnit) {
@@ -26,7 +27,8 @@ UEL0301 = Class(CommandUnit) {
     Weapons = {
         RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
-    },
+		Grenade = Class(TIFFragLauncherWeapon) {}
+	},
 
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
@@ -87,7 +89,8 @@ UEL0301 = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        if enh == 'Pod' then
+        --Drone
+		if enh == 'Pod' then
             local location = self:GetPosition('AttachSpecial01')
             local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
@@ -108,7 +111,8 @@ UEL0301 = Class(CommandUnit) {
                 end
             end
             KillThread(self.RebuildThread)
-        elseif enh == 'Shield' then
+        --Shield
+		elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -118,7 +122,8 @@ UEL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh == 'ShieldGeneratorField' then
+        --Bubble shield
+		elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
             ForkThread(function()
                 WaitTicks(1)
@@ -130,7 +135,8 @@ UEL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh =='ResourceAllocation' then
+        --RAS
+		elseif enh =='ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
@@ -140,38 +146,37 @@ UEL0301 = Class(CommandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh == 'SensorRangeEnhancer' then
+        --Sensor + Jammer
+		elseif enh == 'SensorRangeEnhancer' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
-        elseif enh == 'SensorRangeEnhancerRemove' then
+			self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
+            self.RadarJammerEnh = true
+            self:EnableUnitIntel('Enhancement', 'Jammer')
+            --self:AddToggleCap('RULEUTC_JammingToggle')
+		elseif enh == 'SensorRangeEnhancerRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-        elseif enh == 'RadarJammer' then
-            self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
-            self.RadarJammerEnh = true
-            self:EnableUnitIntel('Enhancement', 'Jammer')
-            self:AddToggleCap('RULEUTC_JammingToggle')
-        elseif enh == 'RadarJammerRemove' then
-            local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Jammer', 0)
             self:DisableUnitIntel('Enhancement', 'Jammer')
             self.RadarJammerEnh = false
-            self:RemoveToggleCap('RULEUTC_JammingToggle')
-        elseif enh =='AdvancedCoolingUpgrade' then
+            --self:RemoveToggleCap('RULEUTC_JammingToggle')
+        --Gun Dps
+		elseif enh =='AdvancedCoolingUpgrade' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(bp.NewRateOfFire)
         elseif enh =='AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-        elseif enh =='HighExplosiveOrdnance' then
-            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
-            wep:AddDamageRadiusMod(bp.NewDamageRadius)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        elseif enh =='HighExplosiveOrdnanceRemove' then
-            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
-            wep:AddDamageRadiusMod(bp.NewDamageRadius)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
+        --elseif enh =='HighExplosiveOrdnance' then
+        --    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+        --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
+        --    wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+        --elseif enh =='HighExplosiveOrdnanceRemove' then
+        --    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+        --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
+        --    wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
     end,
 
