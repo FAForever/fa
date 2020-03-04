@@ -641,7 +641,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 									
 									-- This formula was obtained empirically and somehow it works :)
 									local randomness = bp.FixedSpreadRadius / (distance^2 / 12)
-
+									
 									self:SetFiringRandomness(randomness) 
 				end
 				

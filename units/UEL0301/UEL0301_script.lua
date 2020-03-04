@@ -25,9 +25,14 @@ UEL0301 = Class(CommandUnit) {
     },
 
     Weapons = {
-        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
+        Grenade = Class(TIFFragLauncherWeapon) {
+            OnCreate = function(self)
+                TIFFragLauncherWeapon.OnCreate(self)
+                self:SetWeaponEnabled(false)
+            end,
+        },
+		RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
-		Grenade = Class(TIFFragLauncherWeapon) {}
 	},
 
     OnCreate = function(self)
@@ -35,7 +40,8 @@ UEL0301 = Class(CommandUnit) {
         self:SetCapturable(false)
         self:HideBone('Jetpack', true)
         self:HideBone('SAM', true)
-        self:SetupBuildBones()
+        self:GetWeaponByLabel('Grenade').NeedsUpgrade = true
+		self:SetupBuildBones()
     end,
 
     __init = function(self)
@@ -124,13 +130,17 @@ UEL0301 = Class(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         --Bubble shield
 		elseif enh == 'ShieldGeneratorField' then
-            self:DestroyShield()
-            ForkThread(function()
-                WaitTicks(1)
-                self:CreateShield(bp)
-                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-                self:SetMaintenanceConsumptionActive()
-            end)
+            self:AddToggleCap('RULEUTC_ShieldToggle')
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+            self:CreateShield(bp)
+			--self:DestroyShield()
+            --ForkThread(function()
+            --    WaitTicks(1)
+            --    self:CreateShield(bp)
+            --    self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            --    self:SetMaintenanceConsumptionActive()
+            --end)
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
@@ -166,15 +176,20 @@ UEL0301 = Class(CommandUnit) {
 		elseif enh =='AdvancedCoolingUpgrade' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(bp.NewRateOfFire)
+			--wep:ChangeMuzzleVelocity(bp.NewMuzzleVelocity)
         elseif enh =='AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-        --elseif enh =='HighExplosiveOrdnance' then
-        --    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+			--wep:ChangeMuzzleVelocity(self:GetBlueprint().Weapon[1].MuzzleVelocity or 25)
+        --Granade Launcher
+		elseif enh =='HighExplosiveOrdnance' then
+			self:SetWeaponEnabledByLabel('Grenade', true)
+		--    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
         --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
         --    wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        --elseif enh =='HighExplosiveOrdnanceRemove' then
-        --    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+        elseif enh =='HighExplosiveOrdnanceRemove' then
+			self:SetWeaponEnabledByLabel('Grenade', false)
+		--    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
         --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
         --    wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end

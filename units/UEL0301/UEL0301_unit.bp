@@ -287,12 +287,13 @@ UnitBlueprint {
     },
     Enhancements = {
         AdvancedCoolingUpgrade = {
-            BuildCostEnergy = 44700,
+            BuildCostEnergy = 25000,
             BuildCostMass = 1000,
             BuildTime = 5040,
             Icon = 'acu',
             Name = '<LOC enhancements_0061>Energy Accelerator',
-            NewRateOfFire = 2.5,
+            --NewMuzzleVelocity = 35,
+			NewRateOfFire = 2.5,
             Slot = 'LCH',
             UpgradeUnitAmbientBones = {
                 'UEL0301',
@@ -314,51 +315,40 @@ UnitBlueprint {
             },
             Slot = 'LCH',
         },
-        --HighExplosiveOrdnance = {
-        --    BuildCostEnergy = 30000,
-        --    BuildCostMass = 800,
-        --    BuildTime = 3360,
-        --    Icon = 'heo',
-        --    Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
-        --    NewDamageRadius = 2,
-        --    NewMaxRadius = 35,
-        --    ShowBones = {
-        --        'SAM',
-        --    },
-        --    Slot = 'RCH',
-        --    UpgradeEffectBones = {
-        --        'SAM',
-        --        'Cannon_Muzzle',
-        --    },
-        --    UpgradeUnitAmbientBones = {
-        --        'UEL0301',
-        --    },
-        --},
-        --HighExplosiveOrdnanceRemove = {
-        --    BuildCostEnergy = 1,
-        --    BuildCostMass = 1,
-        --    BuildTime = 0.1,
-        --    HideBones = {
-        --        'SAM',
-        --    },
-        --    Icon = 'heo',
-        --    Name = '<LOC enhancements_0064>Remove Heavy Plasma Refractor',
-        --    NewDamageRadius = -2,
-        --    NewMaxRadius = 25,
-        --    Prerequisite = 'HighExplosiveOrdnance',
-        --    RemoveEnhancements = {
-        --        'HighExplosiveOrdnance',
-        --        'HighExplosiveOrdnanceRemove',
-        --    },
-        --    Slot = 'RCH',
-        --},
+        HighExplosiveOrdnance = {
+            BuildCostEnergy = 60000,
+            BuildCostMass = 1500,
+            BuildTime = 6000,
+            Icon = 'heo',
+            Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
+            ShowBones = {
+                'SAM',
+            },
+            Slot = 'RCH',
+        },
+        HighExplosiveOrdnanceRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = {
+                'SAM',
+            },
+            Icon = 'heo',
+            Name = '<LOC enhancements_0064>Remove Heavy Plasma Refractor',
+            Prerequisite = 'HighExplosiveOrdnance',
+            RemoveEnhancements = {
+                'HighExplosiveOrdnance',
+                'HighExplosiveOrdnanceRemove',
+            },
+            Slot = 'RCH',
+        },
         Pod = {
             BuildCostEnergy = 8700,
             BuildCostMass = 380,
             BuildTime = 2500,
             Icon = 'ed',
             Name = '<LOC enhancements_0065>C-D2 Engineering Drone',
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeEffectBones = {
                 'AttachSpecial01',
             },
@@ -377,7 +367,7 @@ UnitBlueprint {
                 'Pod',
                 'PodRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
@@ -390,7 +380,7 @@ UnitBlueprint {
             ShowBones = {
                 'SAM',
             },
-            Slot = 'RCH',
+            Slot = 'Back',
             UpgradeEffectBones = {
                 'SAM',
             },
@@ -412,7 +402,7 @@ UnitBlueprint {
                 'ResourceAllocation',
                 'ResourceAllocationRemove',
             },
-            Slot = 'RCH',
+            Slot = 'Back',
         },
         SensorRangeEnhancer = {
             BuildCostEnergy = 20000,
@@ -452,7 +442,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 100200,
+            BuildCostEnergy = 80000,
             BuildCostMass = 2000,
             BuildTime = 7200,
             Icon = 'psg',
@@ -483,7 +473,7 @@ UnitBlueprint {
             },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 360800,
+            BuildCostEnergy = 150000,
             BuildCostMass = 3500,
             BuildTime = 10800,
             Icon = 'sgf',
@@ -496,13 +486,13 @@ UnitBlueprint {
             Mesh = '/effects/entities/Shield01/Shield01_mesh',
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             Name = '<LOC enhancements_0074>Shield Generator Field',
-            Prerequisite = 'Shield',
+            --Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 52000,
+            ShieldMaxHealth = 25000,
             ShieldRechargeTime = 215,
             ShieldRegenRate = 150,
             ShieldRegenStartTime = 1,
-            ShieldSize = 20,
+            ShieldSize = 24,
             ShieldSpillOverDamageMod = 0.20,
             ShieldVerticalOffset = -3,
             Slot = 'Back',
@@ -521,7 +511,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0075>Remove Shields',
             Prerequisite = 'ShieldGeneratorField',
             RemoveEnhancements = {
-                'Shield',
+                --'Shield',
                 'ShieldGeneratorField',
                 'ShieldGeneratorFieldRemove',
             },
@@ -578,7 +568,6 @@ UnitBlueprint {
             Description = '<LOC uel0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'AdvancedCoolingUpgrade',
-                'HighExplosiveOrdnance',
             },
             HelpText = '<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.',
             SortCategory = 'SORTOTHER',
@@ -594,12 +583,13 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC uel0301_Engineer_name>SACU (Engineer preset)',
         },
-        IntelJammer = {
+        SupportPreset = {
             BuildIconSortPriority = 35,
             Description = '<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)',
             Enhancements = {
-                'RadarJammer',
+				'Pod',
                 'SensorRangeEnhancer',
+				'ShieldGeneratorField',
             },
             HelpText = '<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.',
             SortCategory = 'SORTOTHER',
@@ -731,7 +721,7 @@ UnitBlueprint {
         Level5 = 125,
     },
     Weapon = {
-        {
+		{
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -820,20 +810,21 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Heavy Fragmentation Grenade Launcher',
 			DoTPulses = 8,
-			DoTTime = 4,
+			DoTTime = 6,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0,
+            FiringRandomness = 9.0,
+			--FiringRandomness = 0,
             FiringTolerance = 0,
-			FixedSpreadRadius = 12,
+			--FixedSpreadRadius = 12,
             Label = 'Grenade',
-            MaxRadius = 25,
-			MinRadius = 15,
+            MaxRadius = 30,
+			MinRadius = 20,
             MuzzleSalvoDelay = 0.05,
             MuzzleSalvoSize = 12,
-            MuzzleVelocity = 12.8,
+            MuzzleVelocity = 14.8,
             MuzzleVelocityRandomness = 0.5,
             ProjectileId = '/projectiles/TDFFragmentationGrenade02/TDFFragmentationGrenade02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.5,
@@ -841,9 +832,11 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Arm_Right_B03',
+                        'Arm_Right_Build',
+						--'Arm_Left_Muzzle',
                     },
-                    RackBone = 'Arm_Right_B01',
+                    RackBone = 'Arm_Right_B03',
+					--RackBone = 'Arm_Left_Barrel02',
                 },
             },
             RackRecoilDistance = 0,
@@ -864,12 +857,14 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
-            TurretBoneMuzzle = 'Arm_Right_B03',
-            TurretBonePitch = 'Arm_Right_B01',
+			--TurretBoneMuzzle = 'Arm_Left_Muzzle',
+            --TurretBonePitch = 'Arm_Left_Barrel01',
+            TurretBoneMuzzle = 'Arm_Right_Build',
+            TurretBonePitch = 'Arm_Right_B03',
             TurretBoneYaw = 'Torso',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 55,
+            TurretPitchRange = 90,
             TurretPitchSpeed = 45,
             TurretYaw = 0,
             TurretYawRange = 20,
@@ -910,6 +905,7 @@ UnitBlueprint {
             WeaponCategory = 'Death',
         },
     },
+	
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
