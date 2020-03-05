@@ -22,7 +22,7 @@ function SetLayout()
 
     LayoutHelpers.AtRightTopIn(controls.bgTop, controls.bg, 3)
     LayoutHelpers.AtLeftTopIn(controls.armyGroup, controls.bgTop, 10, 25)
-    controls.armyGroup.Width:Set(function() return controls.bgTop.Width() - 20 end)
+    controls.armyGroup.Width:Set(function() return controls.bgTop.Width() - LayoutHelpers.ScaleNumber(20) end)
 
     controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
     LayoutHelpers.AtLeftTopIn(controls.leftBracketMin, controls.bg, -10, -1)
