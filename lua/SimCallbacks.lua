@@ -258,11 +258,23 @@ function IsInvalidAssist(unit, target)
     end
 end
 
+-- This one is used for attack move button which was added in FAF.
+-- I think 90% of players use alt+RMB instead? So for now we exclude engies,
+-- but if some auto abuse will appear again, then better remove it completely.
 Callbacks.AttackMove = function(data, units)
-    if data.Clear then
-        IssueClearCommands(units)
+    units = SecureUnits(units)
+    local validatedUnits = {}
+
+    for k, unit in units do
+        if not unit:GetBlueprint().CategoriesHash.ENGINEER then
+            table.insert(validatedUnits, unit)
+        end
     end
-    IssueAggressiveMove(units, data.Target)
+
+    if data.Clear then
+        IssueClearCommands(validatedUnits)
+    end
+    IssueAggressiveMove(validatedUnits, data.Target)
 end
 
 --tells a unit to toggle its pointer

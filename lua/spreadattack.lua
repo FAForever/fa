@@ -397,6 +397,7 @@ end -- Function SpreadAttack()
 ----------------------------
 
 local IssueOrderFunctions = nil
+local Delays = {MoveTick = {}, MessageTick = {}}
 
 -- This function re-issues all shadow orders to the selected units.
 -- Since the orders herein are Sim-side commands, this function needs to be called through a SimCallback.
@@ -425,24 +426,43 @@ function GiveOrders(Data)
             return
         end
         
-        if unit:GetBlueprint().CategoriesHash.BOMBER then
-            for key, order in Data.unit_orders or {} do
-                if order.CommandType == "Move" then
-                    local bomberPosition = unit:GetPosition()
-                    
-                    --reject all move orders that are closer than 20
-                    if VDist2(bomberPosition[1], bomberPosition[3], order.Position[1], order.Position[3]) < 20 then
-                        table.remove (Data.unit_orders, key)
+        if not Delays.MoveTick[Data.From] then
+            Delays.MoveTick[Data.From] = 0
+            Delays.MessageTick[Data.From] = 0
+        end
+
+        local validatedOrders = {}
+        local moveTick = Delays.MoveTick[Data.From]
+
+        for key, order in Data.unit_orders or {} do
+            if order.CommandType == "Move" then
+                local currentTick = GetGameTick()
+
+                if currentTick ~= moveTick and currentTick - moveTick < 100 then --10 sec delay between shift-g moves
+                    if GetFocusArmy() == Data.From and Delays.MessageTick[Data.From] ~= currentTick then
+                        local seconds = math.floor((100 - (currentTick - moveTick)) / 10)
+                        print("Shift-g command rejected. Try again in ".. seconds .." seconds.")
+                        
+                        Delays.MessageTick[Data.From] = currentTick
                     end
+                else
+                    table.insert(validatedOrders, order)
+                    Delays.MoveTick[Data.From] = currentTick
                 end
+            else
+                table.insert(validatedOrders, order)
             end
+        end
+
+        if not validatedOrders[1] then
+            return
         end
 
         -- All orders will be re-issued, so all existing orders have to be cleared first.
         IssueClearCommands({ unit })
 
         -- Re-issue all orders.
-        for _,order in ipairs(Data.unit_orders) do
+        for _,order in ipairs(validatedOrders) do
             local Function = IssueOrderFunctions[order.CommandType]
             if not Function then
                 continue
