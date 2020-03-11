@@ -86,7 +86,7 @@ URL0301 = Class(CCommandUnit) {
 
     SpeedBuffThread = function(self, type)
         local bp = self:GetBlueprint().Enhancements[type]
-        local buff = 'CybranSCU' .. type
+        local buff = 'CybranSACU' .. type
 
         while not self.Dead do
             local units = self:GetUnitsToBuff(bp)
@@ -113,7 +113,7 @@ URL0301 = Class(CCommandUnit) {
                 local buff_bp = {
                     Name = buff,
                     DisplayName = buff,
-                    BuffType = 'SUPPORTCOMMANDERAURA_' .. enh,
+                    BuffType = 'COMMANDERAURA_' .. enh,
                     Stacks = 'REPLACE',
                     Duration = 5,
                     --Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
@@ -121,7 +121,7 @@ URL0301 = Class(CCommandUnit) {
 					--	Mult = bp.MoveMult,
 					--},
 					Affects = {
-						MoveMult = {
+						MoveMult2 = {
 							Mult = bp.MoveMult,						
 						},
                     },
@@ -129,31 +129,13 @@ URL0301 = Class(CCommandUnit) {
                 BuffBlueprint(buff_bp)
             end
 
-            buff2 = buff .. 'SelfBuff'
-
-            if not Buffs[buff2] then   -- AURA SELF BUFF
-                BuffBlueprint {
-                    Name = buff2,
-                    DisplayName = buff2,
-                    BuffType = 'COMMANDERAURAFORSELF',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-						MoveMult = {
-							Mult = bp.MoveMult,						
-						},
-                    },
-                }
-            end
-
-            Buff.ApplyBuff(self, buff2)
             --table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
-            if self.RegenThreadHandle then
-                KillThread(self.RegenThreadHandle)
-                self.RegenThreadHandle = nil
+            if self.SpeedThreadHandle then
+                KillThread(self.SpeedThreadHandle)
+                self.SpeedThreadHandle = nil
             end
 
-            self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, enh)
+            self.SpeedThreadHandle = self:ForkThread(self.SpeedBuffThread, enh)
         elseif enh == 'AccelerationFieldRemove' then
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
@@ -162,62 +144,62 @@ URL0301 = Class(CCommandUnit) {
                 self.ShieldEffectsBag = {}
             end
 
-            KillThread(self.RegenThreadHandle)
-            self.RegenThreadHandle = nil
+            KillThread(self.SpeedThreadHandle)
+            self.SpeedThreadHandle = nil
             for _, b in {'SeraphimACURegenAura', 'SeraphimACUAdvancedRegenAura'} do
                 if Buff.HasBuff(self, b .. 'SelfBuff') then
                     Buff.RemoveBuff(self, b .. 'SelfBuff')
                 end
             end		
 		--Personal Cloak
-		elseif enh == 'CloakingGenerator' then
-            self.StealthEnh = false
-            self.CloakEnh = true
-            self:EnableUnitIntel('Enhancement', 'Cloak')
-            if not Buffs['CybranSCUCloakBonus'] then
-               BuffBlueprint {
-                    Name = 'CybranSCUCloakBonus',
-                    DisplayName = 'CybranSCUCloakBonus',
-                    BuffType = 'SCUCLOAKBONUS',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
-                Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
-            end
-            Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
-        elseif enh == 'CloakingGeneratorRemove' then
-            self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.StealthEnh = false
-            self.CloakEnh = false
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
-                Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
-            end
+		--elseif enh == 'CloakingGenerator' then
+        --    self.StealthEnh = false
+        --    self.CloakEnh = true
+        --    self:EnableUnitIntel('Enhancement', 'Cloak')
+         --   if not Buffs['CybranSCUCloakBonus'] then
+        --       BuffBlueprint {
+        --            Name = 'CybranSCUCloakBonus',
+        --            DisplayName = 'CybranSCUCloakBonus',
+        --            BuffType = 'SCUCLOAKBONUS',
+        --            Stacks = 'ALWAYS',
+        --            Duration = -1,
+        --            Affects = {
+        --                MaxHealth = {
+        --                    Add = bp.NewHealth,
+        --                    Mult = 1.0,
+        --                },
+        --            },
+        --        }
+        --    end
+        --    if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
+        --        Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
+        --    end
+        --    Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
+        --elseif enh == 'CloakingGeneratorRemove' then
+        --    self:DisableUnitIntel('Enhancement', 'Cloak')
+        --    self.StealthEnh = false
+        --    self.CloakEnh = false
+        --    self:RemoveToggleCap('RULEUTC_CloakToggle')
+        --    if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
+        --        Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
+        --    end
 		--Personal Stealth
-        elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
-            if self.IntelEffectsBag then
-                EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
-                self.IntelEffectsBag = nil
-            end
-            self.CloakEnh = false
-            self.StealthEnh = true
-            self:EnableUnitIntel('Enhancement', 'RadarStealth')
-            self:EnableUnitIntel('Enhancement', 'SonarStealth')
-        elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = false
-            self.CloakEnh = false
+        --elseif enh == 'StealthGenerator' then
+        --    self:AddToggleCap('RULEUTC_CloakToggle')
+        --    if self.IntelEffectsBag then
+        --        EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+        --        self.IntelEffectsBag = nil
+        --    end
+        --    self.CloakEnh = false
+        --    self.StealthEnh = true
+        --    self:EnableUnitIntel('Enhancement', 'RadarStealth')
+        --    self:EnableUnitIntel('Enhancement', 'SonarStealth')
+        --elseif enh == 'StealthGeneratorRemove' then
+        --    self:RemoveToggleCap('RULEUTC_CloakToggle')
+        --    self:DisableUnitIntel('Enhancement', 'RadarStealth')
+         --   self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        --    self.StealthEnh = false
+        --    self.CloakEnh = false
 		--Stealth Field
 		elseif enh == 'StealthField' then
             self:AddToggleCap('RULEUTC_CloakToggle')
