@@ -111,6 +111,9 @@ UnitBlueprint {
             Level5 = 25,
         },
     },
+	BuffFields = {
+		AccelerationField = 'CybSCUSpeedBuff',	
+	},
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTSC1',
@@ -288,6 +291,31 @@ UnitBlueprint {
         TeleportTimeMod = 0.0001,
     },
     Enhancements = {
+		AccelerationField = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 10,
+			MoveMult = 2.5,
+			--AccMult	= 0.5,
+			--SpeedMult = 0.5,
+            Icon = 'sfs',
+            MaintenanceConsumptionPerSecondEnergy = 100,
+            Name = '<LOC enhancements_0101>Personal Stealth Generator',
+            Slot = 'Back',
+        },
+        AccelerationFieldRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'sfs',
+            Name = '<LOC enhancements_0102>Remove Personal Stealth Generator',
+            Prerequisite = 'AccelerationField',
+            RemoveEnhancements = {
+                'AccelerationField',
+                'AccelerationFieldRemove',
+            },
+            Slot = 'Back',
+        },
         CloakingGenerator = {
             BuildCostEnergy = 382200,
             BuildCostMass = 5000,
@@ -372,7 +400,7 @@ UnitBlueprint {
             BuildTime = 3000,
             Icon = 'nms',
             Name = '<LOC enhancements_0095>Nanite Missile System',
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'URL0301',
             },
@@ -388,7 +416,7 @@ UnitBlueprint {
                 'NaniteMissileSystem',
                 'NaniteMissileSystemRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
@@ -457,6 +485,31 @@ UnitBlueprint {
                 x = -10,
                 y = 10,
             },
+        },
+		StealthField = {
+            BuildCostEnergy = 500,
+            BuildCostMass = 5,
+            BuildTime = 10,
+            Icon = 'sfs',
+            MaintenanceConsumptionPerSecondEnergy = 250,
+            Name = '<LOC enhancements_0101>Personal Stealth Generator',
+            Slot = 'Back',
+            UpgradeUnitAmbientBones = {
+                'URL0301',
+            },
+        },
+        StealthFieldRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'sfs',
+            Name = '<LOC enhancements_0102>Remove Personal Stealth Generator',
+            Prerequisite = 'StealthField',
+			RemoveEnhancements = {
+                'StealthField',
+                'StealthFieldRemove',
+            },
+            Slot = 'Back',
         },
         StealthGenerator = {
             BuildCostEnergy = 7400,
@@ -628,8 +681,11 @@ UnitBlueprint {
         FreeIntel = false,
         OmniRadius = 16,
         RadarStealth = true,
+		RadarStealthField = true,
+		RadarStealthFieldRadius = 55,
         ReactivateTime = 2,
         SonarStealth = true,
+		SonarStealthFieldRadius = 55,
         VisionRadius = 26,
         WaterVisionRadius = 26,
     },

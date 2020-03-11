@@ -61,18 +61,116 @@ URL0301 = Class(CCommandUnit) {
         self:SetMaintenanceConsumptionInactive()
         -- Disable enhancement-based Intels until enhancements are built
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
+		self:DisableUnitIntel('Enhancement', 'RadarStealthField')
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
+		self:DisableUnitIntel('Enhancement', 'SonarStealthField')
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
     end,
 
+	GetUnitsToBuff = function(self, bp)
+        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+        local brain = self:GetAIBrain()
+        local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
+        local units = {}
+
+        for _, u in all do
+            if not u.Dead and not u:IsBeingBuilt() then
+                table.insert(units, u)
+            end
+        end
+
+        return units
+    end,
+
+    SpeedBuffThread = function(self, type)
+        local bp = self:GetBlueprint().Enhancements[type]
+        local buff = 'CybranSCU' .. type
+
+        while not self.Dead do
+            local units = self:GetUnitsToBuff(bp)
+            for _,unit in units do
+                Buff.ApplyBuff(unit, buff)
+                unit:RequestRefreshUI()
+            end
+            WaitSeconds(5)
+        end
+    end,
     -- Enhancements
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        if enh == 'CloakingGenerator' then
+        --Acceleration Field
+		if enh == 'AccelerationField' then
+            local buff
+            local type
+
+            buff = 'CybranSACU' .. enh
+
+            if not Buffs[buff] then
+                local buff_bp = {
+                    Name = buff,
+                    DisplayName = buff,
+                    BuffType = 'SUPPORTCOMMANDERAURA_' .. enh,
+                    Stacks = 'REPLACE',
+                    Duration = 5,
+                    --Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
+                    --buff_bp.Affects.MoveMult = {
+					--	Mult = bp.MoveMult,
+					--},
+					Affects = {
+						MoveMult = {
+							Mult = bp.MoveMult,						
+						},
+                    },
+                }
+                BuffBlueprint(buff_bp)
+            end
+
+            buff2 = buff .. 'SelfBuff'
+
+            if not Buffs[buff2] then   -- AURA SELF BUFF
+                BuffBlueprint {
+                    Name = buff2,
+                    DisplayName = buff2,
+                    BuffType = 'COMMANDERAURAFORSELF',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+						MoveMult = {
+							Mult = bp.MoveMult,						
+						},
+                    },
+                }
+            end
+
+            Buff.ApplyBuff(self, buff2)
+            --table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
+            if self.RegenThreadHandle then
+                KillThread(self.RegenThreadHandle)
+                self.RegenThreadHandle = nil
+            end
+
+            self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, enh)
+        elseif enh == 'AccelerationFieldRemove' then
+            if self.ShieldEffectsBag then
+                for k, v in self.ShieldEffectsBag do
+                    v:Destroy()
+                end
+                self.ShieldEffectsBag = {}
+            end
+
+            KillThread(self.RegenThreadHandle)
+            self.RegenThreadHandle = nil
+            for _, b in {'SeraphimACURegenAura', 'SeraphimACUAdvancedRegenAura'} do
+                if Buff.HasBuff(self, b .. 'SelfBuff') then
+                    Buff.RemoveBuff(self, b .. 'SelfBuff')
+                end
+            end		
+		--Personal Cloak
+		elseif enh == 'CloakingGenerator' then
             self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
@@ -103,6 +201,7 @@ URL0301 = Class(CCommandUnit) {
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
             end
+		--Personal Stealth
         elseif enh == 'StealthGenerator' then
             self:AddToggleCap('RULEUTC_CloakToggle')
             if self.IntelEffectsBag then
@@ -119,13 +218,42 @@ URL0301 = Class(CCommandUnit) {
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
             self.CloakEnh = false
-        elseif enh == 'NaniteMissileSystem' then
+		--Stealth Field
+		elseif enh == 'StealthField' then
+            self:AddToggleCap('RULEUTC_CloakToggle')
+            if self.IntelEffectsBag then
+                EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+                self.IntelEffectsBag = nil
+            end
+            self.CloakEnh = false
+            self.StealthEnh = false
+			self.StealthFieldEnh = true
+			self:EnableUnitIntel('Enhancement', 'RadarStealth')
+            self:EnableUnitIntel('Enhancement', 'SonarStealth')
+			--self:ChangeRadarStealthFieldRadius(self:GetBlueprint().Enhancements['StealthField'].NewRadarStealthFieldRadius)
+			--self:ChangeSonarStealthFieldRadius(self:GetBlueprint().Enhancements['StealthField'].NewSonarStealthFieldRadius)
+            self:EnableUnitIntel('Enhancement', 'RadarStealthField')
+            self:EnableUnitIntel('Enhancement', 'SonarStealthField')
+        elseif enh == 'StealthFieldRemove' then
+            self:RemoveToggleCap('RULEUTC_CloakToggle')
+			self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
+            --self:ChangeRadarStealthFielRadius(0)
+			--self:ChangeSonarStealthFielRadius(0)
+			self:DisableUnitIntel('Enhancement', 'RadarStealthFieldRadius')
+            self:DisableUnitIntel('Enhancement', 'SonarStealthFieldRadius')
+            self.StealthFieldEnh = false
+			self.StealthEnh = false
+            self.CloakEnh = false
+        --SAM Weapon
+		elseif enh == 'NaniteMissileSystem' then
             self:ShowBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)
         elseif enh == 'NaniteMissileSystemRemove' then
             self:HideBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', false)
-        elseif enh == 'SelfRepairSystem' then
+        --Nano Repair System
+		elseif enh == 'SelfRepairSystem' then
             CCommandUnit.CreateEnhancement(self, enh)
             local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate or 0
             if not Buffs['CybranSCURegenerateBonus'] then
@@ -152,7 +280,8 @@ URL0301 = Class(CCommandUnit) {
             if Buff.HasBuff(self, 'CybranSCURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranSCURegenerateBonus')
             end
-        elseif enh =='ResourceAllocation' then
+        --RAS
+		elseif enh =='ResourceAllocation' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
@@ -160,7 +289,8 @@ URL0301 = Class(CCommandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh =='Switchback' then
+        --Engineering
+		elseif enh =='Switchback' then
             if not Buffs['CybranSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'CybranSCUBuildRate',
@@ -181,7 +311,8 @@ URL0301 = Class(CCommandUnit) {
             if Buff.HasBuff(self, 'CybranSCUBuildRate') then
                 Buff.RemoveBuff(self, 'CybranSCUBuildRate')
             end
-        elseif enh == 'FocusConvertor' then
+        --Gun Range
+		elseif enh == 'FocusConvertor' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:AddDamageMod(bp.NewDamageMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
@@ -189,7 +320,8 @@ URL0301 = Class(CCommandUnit) {
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:AddDamageMod(-self:GetBlueprint().Enhancements['FocusConvertor'].NewDamageMod)
             wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
-        elseif enh == 'EMPCharge' then
+        --Emp
+		elseif enh == 'EMPCharge' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:ReEnableBuff('STUN')
         elseif enh == 'EMPChargeRemove' then
