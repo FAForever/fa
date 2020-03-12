@@ -184,14 +184,15 @@ UEL0301 = Class(CommandUnit) {
         --Granade Launcher
 		elseif enh =='HighExplosiveOrdnance' then
 			self:SetWeaponEnabledByLabel('Grenade', true)
+			local wep = self:GetWeaponByLabel('Grenade')
+			wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
 		--    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
         --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
         --    wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh =='HighExplosiveOrdnanceRemove' then
+			local wep = self:GetWeaponByLabel('Grenade')
+            wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
 			self:SetWeaponEnabledByLabel('Grenade', false)
-		--    local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
-        --    wep:AddDamageRadiusMod(bp.NewDamageRadius)
-        --    wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
     end,
 
