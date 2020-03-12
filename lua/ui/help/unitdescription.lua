@@ -355,9 +355,10 @@ Description = {
     ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
     ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a heavy personal shield and the reacton refractor enhancements.",
     ['ual0301_RAS'] = "<LOC ual0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
-    ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
-    ['ual0301_SimpleCombat'] = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
-
+    ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. cheap rambo, Enhanced during construction with a personal shield and the reacton refractor enhancements.",
+    ['ual0301_HeavyCombat'] = "<LOC ual0301_HeavyCombat_help>Support Armored Command Unit. heavy preset.",
+	['ual0301_AoECombat'] = "<LOC ual0301_AOECombat_help>Support Armored Command Unit. AoE preset.",
+	['ual0301_Supp'] = "<LOC ual0301_Support_help>Support Armored Command Unit. Support preset.",
     -- AEON -- Land Units
     ['ual0101'] = "<LOC Unit_Description_0223> Fast, lightly armored reconnaissance vehicle. Armed with a laser and a state-of-the-art sensor suite.",
     ['ual0106'] = "<LOC Unit_Description_0224> Fast, lightly armored assault bot. Fires a short-range sonic weapon.",
