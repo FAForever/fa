@@ -9,12 +9,6 @@ local selectionOverlay = {
         Tooltip = "overlay_selection",
 }
 
-SelectedInfoOn = true
-
-if options.gui_enhanced_unitview == 0 then
-   SelectedInfoOn = false
-end
-
 function GetUnitRolloverInfo(unit)
     local info = {}
 
@@ -57,13 +51,5 @@ function GetUnitRolloverInfo(unit)
     info.armyIndex = unit:GetArmy() - 1
 
     return info
-end
-
-function ToggleOn()
-   if SelectedInfoOn then
-      SelectedInfoOn = false
-   else
-      SelectedInfoOn = true
-   end
 end
 
