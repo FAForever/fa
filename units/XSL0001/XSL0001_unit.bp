@@ -397,6 +397,7 @@ UnitBlueprint {
             RegenCeilingT2 = 50,
             RegenCeilingT3 = 120,
             RegenCeilingT4 = 240,
+            RegenCeilingSCU = 140,
             RegenPerSecond = 0.01111111111,
             Slot = 'LCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
@@ -612,6 +613,7 @@ UnitBlueprint {
             RegenCeilingT2 = 15,
             RegenCeilingT3 = 25,
             RegenCeilingT4 = 40,
+            RegenCeilingSCU = 30, 
             RegenPerSecond = 0.02,
             ShowBones = {
                 'Left_Upgrade',
