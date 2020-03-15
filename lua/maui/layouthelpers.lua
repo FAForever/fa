@@ -426,11 +426,11 @@ function DimensionsRelativeTo(control, fileName, controlName)
     end
     control.Width:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(layoutTable[controlName].width)-- * pixelScaleFactor)
+        return math.floor(layoutTable[controlName].width * pixelScaleFactor)
     end)
     control.Height:Set(function()
         local layoutTable = import(fileName()).layout
-        return math.floor(layoutTable[controlName].height)-- * pixelScaleFactor)
+        return math.floor(layoutTable[controlName].height * pixelScaleFactor)
     end)
 end
 
