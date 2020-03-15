@@ -24,8 +24,8 @@ Grid = Class(Group) {
         self._visible["Horz"] = LazyVar.Create()
         self._visible["Vert"] = LazyVar.Create()
         
-        self._visible["Horz"]:Set(function() return math.floor(self.Width() / itemWidth) end)
-        self._visible["Vert"]:Set(function() return math.floor(self.Height() / itemHeight) end)
+        self._visible["Horz"]:Set(function() return math.floor(self.Width() / self._itemWidth) end)
+        self._visible["Vert"]:Set(function() return math.floor(self.Height() / self._itemHeight) end)
     
         -- get frame update to check visibility
         self:SetNeedsFrameUpdate(true)
