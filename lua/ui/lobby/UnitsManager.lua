@@ -338,7 +338,7 @@ function OnBlueprintsLoaded()
         -- scale cell size by dialog size and make space for scroll bar
         cellSpace = dialogWidth / LayoutHelpers.GetPixelScaleFactor() - dialogScrollWidth - 20
         cellSize = math.floor(cellSpace / cellMax)
-        cellSize = math.min(cellSize, 55)
+        cellSize = math.min(cellSize, LayoutHelpers.ScaleNumber(55))
         -- calculate grid size and margin to ensure grids are centered
         gridWidth = cellSize * cellMax
         gridMargin = (cellSpace - gridWidth) / 2
