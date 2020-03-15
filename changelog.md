@@ -1,6 +1,13 @@
-Patch 3710 (26 January, 2019)
+Patch 3711 (15 March, 2020)
 ============================
-- Reworked the score board to request/send resources/unit to allies and view allie's ressources income, storage and drain
+- Fix a bug allowing to generate resources for free
+
+### Contributors ###
+- speed2
+
+Patch 3710 (26 January, 2020)
+============================
+- Reworked the score board to request/send resources/unit to allies and view allie's resources income, storage and drain
 - Removed vet bar for unvettable units
 - Allowed mod to change UI textures
 - Improved spawing menu

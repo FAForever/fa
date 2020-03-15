@@ -1,10 +1,20 @@
-last_version = 3710
+last_version = 3711
 gamePatches = {
+    {
+		version = 3711,
+		name = 'Game Version 3711',
+		description = {
+            '- Fix a bug allowing to generate resources for free',
+            '',
+            '**Contributors**',
+            '- speed2',
+		},
+	},
 	{
 		version = 3710,
 		name = 'Game Version 3710',
 		description = {
-            '- Reworked the score board to request/send resources/unit to allies and view allie\'s ressources income, storage and drain',
+            '- Reworked the score board to request/send resources/unit to allies and view allie\'s resources income, storage and drain',
             '- Removed vet bar for unvettable units',
             '- Allowed mod to change UI textures',
             '- Improved spawing menu',
