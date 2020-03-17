@@ -105,6 +105,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
+        'ASF',
     },
     CollisionOffsetZ = 0,
     Defense = {
