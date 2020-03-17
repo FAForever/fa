@@ -200,6 +200,7 @@ function SetDialogueText(updatedDialogueText)
     for _, info in updatedDialogueText do
         if dialogues[info.ID] then
             dialogues[info.ID].text:SetText(info.text)
+            dialogues[info.ID].text:SetColor(UIUtil.fontColor)
             if dialogues[info.ID].btns[1] then
                 if dialogues[info.ID].text._text[1] then
                     LayoutHelpers.Below(dialogues[info.ID].btns[1], dialogues[info.ID].text._text[table.getsize(dialogues[info.ID].text._text)], 5)
