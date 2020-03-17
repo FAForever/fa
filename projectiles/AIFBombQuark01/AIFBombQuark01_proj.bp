@@ -31,6 +31,9 @@ ProjectileBlueprint {
         # MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
         UniformScale = 0.3,
     },
+    DoNotCollideList = {
+        'ASF',
+    },
     General = {
         Category = 'Bomb',
         EntityCategory = {

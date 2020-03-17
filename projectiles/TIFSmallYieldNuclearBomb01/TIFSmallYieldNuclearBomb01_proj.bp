@@ -38,6 +38,9 @@ ProjectileBlueprint {
         StrategicIconSize = 2,
         UniformScale = 0.125,
     },
+    DoNotCollideList = {
+        'ASF',
+    },
     General = {
         Category = 'Bomb',
         EntityCategory = {

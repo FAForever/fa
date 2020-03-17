@@ -29,6 +29,9 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 2,
     },
+    DoNotCollideList = {
+        'ASF',
+    },
     General = {
         Category = 'Bomb',
         Faction = 'Seraphim',
