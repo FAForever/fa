@@ -443,7 +443,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 35000,
+            BuildCostEnergy = 40000,
             BuildCostMass = 2000,
             BuildTime = 8000,
             Icon = 'psg',
