@@ -119,15 +119,12 @@ local function HostAddPlayer(senderId, playerInfo)
         while gameInfo.PlayerOptions[slot] do
             slot = slot + 1
         end
+        playerInfo.StartSpot = slot
     end
 
-    # figure out a reasonable default color
-    for colorIndex,colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            playerInfo.PlayerColor = colorIndex
-            break
-        end
-    end
+    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
+    -- TODO: Should colors be based on teams?
+    playerInfo.PlayerColor = slot
 
     gameInfo.PlayerOptions[slot] = playerInfo
 end
