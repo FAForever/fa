@@ -295,7 +295,7 @@ UnitBlueprint {
             BuildCostEnergy = 80000,
             BuildCostMass = 2000,
             BuildTime = 10000,
-			MoveMult = 0.2,
+			MoveMult = 0.15,
 			--AccMult	= 0.5,
 			--SpeedMult = 0.5,
             Icon = 'sfs',
@@ -539,7 +539,7 @@ UnitBlueprint {
         --    Slot = 'Back',
         --},
         Switchback = {
-            BuildCostEnergy = 35000,
+            BuildCostEnergy = 20000,
             BuildCostMass = 800,
             BuildTime = 4200,
             Icon = 'ses',
