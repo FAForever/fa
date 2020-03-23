@@ -424,7 +424,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
     -- set controls that are global to the dialog
     if HasCommandLineArg("/gpgnet") then
-        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_FAF>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
     else
         bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")

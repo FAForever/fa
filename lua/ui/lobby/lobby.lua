@@ -176,16 +176,6 @@ local argv = parseCommandlineArguments()
 
 local playerRating = math.floor(Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100)
 
-local teamTooltips = {
-    'lob_team_none',
-    'lob_team_one',
-    'lob_team_two',
-    'lob_team_three',
-    'lob_team_four',
-    'lob_team_five',
-    'lob_team_six',
-}
-
 local teamNumbers = {
     "<LOC _No>",
     "1",
@@ -764,7 +754,7 @@ function FindNameForID(id)
     if (IsObserver(id)) then
         return (FindObserverNameForID(id))
     end
-    
+
     for k, player in gameInfo.PlayerOptions:pairs() do
         if player.OwnerID == id and player.Human then
             return player.PlayerName
@@ -976,7 +966,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
-    tooltipText['text'] = "Rating"
+    tooltipText['text'] = LOC("<LOC lobui_0750>Rating")
     tooltipText['body'] = LOCF("<LOC lobui_0768>%s's TrueSkill Rating is %s +/- %s", playerInfo.PlayerName, math.round(playerInfo.MEAN), math.ceil(playerInfo.DEV * 3))
     slot.tooltiprating = Tooltip.AddControlTooltip(slot.ratingText, tooltipText)
 
@@ -1471,9 +1461,9 @@ local function AssignRandomStartSpots()
             end
 
             -- abort mirroring if team sizes differ
-            if not teamsSameSize(slots) then 
+            if not teamsSameSize(slots) then
                 WARN("Mirroring disabled due to teams not having the same number of players")
-            else 
+            else
                 local masterOrder = getMasterOrder(slots[masterTeam])
                 for t, sorted in slots do
                     reorderSlots(sorted, masterOrder)
@@ -2203,7 +2193,7 @@ local function UpdateGame()
 
     SetRuleTitleText(gameInfo.GameOptions.GameRules or "")
     SetGameTitleText(gameInfo.GameOptions.Title or LOC("<LOC lobui_0427>FAF Game Lobby"))
-    
+
     if not singlePlayer and isHost and GUI.autoTeams then
         GUI.autoTeams:SetState(gameInfo.GameOptions.AutoTeams,true)
         Tooltip.DestroyMouseoverDisplay()
@@ -2289,9 +2279,9 @@ local OptionUtils = {
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
-        
+
         options.RestrictedCategories = {}
-        
+
         SetGameOptions(options)
     end
 }
@@ -2322,7 +2312,7 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
         end
         GUI.AIFillPanel:ClearItems()
         GUI.AIFillPanel:AddItems(AIStrings)
-        GUI.AIFillPanel:SetTitleText('Choose AI for auto-filling slots')
+        GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         UpdateGame()
     end
 end
@@ -2605,7 +2595,6 @@ function CreateSlotsUI(makeLabel)
             SetPlayerOption(curRow, 'Team', index)
         end
         Tooltip.AddControlTooltip(teamSelector, 'lob_team')
-        Tooltip.AddComboTooltip(teamSelector, teamTooltips)
         teamSelector.OnEvent = defaultHandler
 
         -- if not singlePlayer then
@@ -2817,7 +2806,7 @@ function CreateUI(maxPlayers)
             Changelog.CreateUI(GUI, true)
         end
     end
-    
+
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 6, 70)
@@ -2876,7 +2865,7 @@ function CreateUI(maxPlayers)
         local tooltipText = {}
         tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
         tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
-        Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0,148)
+        Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0)
         local ChangedSlots = {}
         GUI.AIFillButton.OnClick = function()
           local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
@@ -2944,7 +2933,7 @@ function CreateUI(maxPlayers)
         GUI.AIFillPanelBorder:Surround(GUI.AIFillPanel, 62, 62)
         LayoutHelpers.AtBottomIn(GUI.AIFillPanelBorder, GUI.AIFillPanel, 20)
     end
- 
+
 
 
     -- Map Preview
@@ -2964,7 +2953,7 @@ function CreateUI(maxPlayers)
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
     Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
-    
+
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
@@ -2989,7 +2978,7 @@ function CreateUI(maxPlayers)
 
     -- Checkbox Show changed Options
     local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', LOC("<LOC lobui_0422>Hide default options"), true, 11)
-    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 35, -32)
+    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 0, -32)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text=LOC("<LOC lobui_0422>Hide default options"), body=LOC("<LOC lobui_0423>Show only changed Options and Advanced Map Options")})
     cbox_ShowChangedOption.OnCheck = function(self, checked)
@@ -2998,7 +2987,7 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
-    
+
 	-- curated Maps
 	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
 	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
@@ -3090,8 +3079,8 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
-    
-    GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea( 
+
+    GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea(
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
@@ -3142,14 +3131,14 @@ function CreateUI(maxPlayers)
             self:ScrollLines(nil, lines)
         end
     end
-    -- this function informs vertical scrollbar that the chat panel can be scrolled 
+    -- this function informs vertical scrollbar that the chat panel can be scrolled
     GUI.chatPanel.IsScrollable = function(self, axis)
         return true
     end
-    GUI.chatPanel.ScrollToBottom = function(self) 
+    GUI.chatPanel.ScrollToBottom = function(self)
         self:ScrollSetTop(nil, self:GetScrollLastPage() + 1)
     end
-    GUI.chatPanel.IsScrolledToBottom = function(self) 
+    GUI.chatPanel.IsScrolledToBottom = function(self)
         return self.top >= self:GetScrollLastPage()
     end
     -- this function set how many chat lines can fit per scroll page (chatPanel)
@@ -3163,7 +3152,7 @@ function CreateUI(maxPlayers)
         GUI.chatDisplay:SetFont(fontFamily, fontSize)
         GUI.chatDisplay:ShowLines(self.top, self.bottom)
     end
-    -- set initial scrolling based on chat font size 
+    -- set initial scrolling based on chat font size
     local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
     GUI.chatPanel:SetLinesPerScrollPage(fontSize)
 
@@ -3179,7 +3168,7 @@ function CreateUI(maxPlayers)
         GUI.chatPanel:ScrollToBottom()
     end
     GUI.newMessageArrow:Disable()
-    
+
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
@@ -3430,7 +3419,7 @@ function CreateUI(maxPlayers)
 
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
 
-    
+
     -- Small buttons are 100 wide, 44 tall
 
     -- Default option button
@@ -3530,7 +3519,7 @@ function CreateUI(maxPlayers)
             AssignAutoTeams()
         end
     end
-    
+
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
     LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 0, 47)
@@ -3573,7 +3562,7 @@ function CreateUI(maxPlayers)
             end
         end
     end
-    
+
 
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
@@ -3914,8 +3903,8 @@ function RefreshOptionDisplayData(scenarioInfo)
     -- Add options from the scenario object, if any are provided.
     if scenarioInfo.options then
         if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
-            AddChatText('The options included in this map specified invalid defaults. See moholog for details.')
-            AddChatText('An arbitrary option has been selected for now: check the game options screen!')
+            AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
+            AddChatText(LOC('<LOC lobui_0398>An arbitrary option has been selected for now: check the game options screen!'))
         end
 
         for index, optData in scenarioInfo.options do
@@ -4030,7 +4019,7 @@ function AddChatText(text, playerID, scrollToBottom)
     if chatPlayerColor == nil then
       chatPlayerColor = true
     end
-    
+
     local scrolledToBottom = GUI.chatPanel:IsScrolledToBottom() or scrollToBottom
     local nameColor = "AAAAAA" -- Displaying text in grey by default if the player is observer
     local textColor = "AAAAAA"
@@ -5071,7 +5060,7 @@ function SetGameOptions(options, ignoreRefresh)
             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
                 -- Warn about attempts to load nonexistent maps.
                 if not DiskGetFileInfo(gameInfo.GameOptions.ScenarioFile) then
-                    AddChatText('The selected map does not exist.')
+                    AddChatText(LOC('<LOC lobui_0399>The selected map does not exist.'))
                 else
                     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
                     if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
@@ -5687,23 +5676,23 @@ function ShowLobbyOptionsDialog()
 
     -- slider for changing chat font size
     local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 20,
-        UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
-        UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), 
-        UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+        UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+        UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+        UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
         UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
         LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 182)
     slider_Chat_SizeFont:SetValue(currentFontSize)
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
-    
+
         local sliderValue = math.floor(self._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
-       
+
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
         -- updating chat panel with new font size
         GUI.chatPanel:SetLinesPerScrollPage(sliderValue)
         GUI.chatPanel:SetFont(nil, sliderValue)
-     
+
         if isScrolledDown then
             GUI.chatPanel:ScrollToBottom()
         end
@@ -5734,7 +5723,7 @@ function ShowLobbyOptionsDialog()
         end
         RefreshLobbyBackground()
     end
-    
+
     local cbox_FactionFontColor = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0411>Faction Font Color"))
     LayoutHelpers.AtRightTopIn(cbox_FactionFontColor, dialogContent, 20, 94)
     cbox_FactionFontColor.OnCheck = function(self, checked)
@@ -6061,11 +6050,11 @@ end
 -- Load the given preset
 function LoadPreset(presetIndex)
     local preset = LoadPresetsList()[presetIndex]
-    
+
     if not preset.GameOptions.RestrictedCategories then
         preset.GameOptions.RestrictedCategories = {}
     end
-    
+
     SetGameOptions(preset.GameOptions, true)
 
     rehostPlayerOptions = preset.PlayerOptions
@@ -6747,16 +6736,15 @@ function InitHostUtils()
                     end
                 end
                 local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
-                        'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
-                    modnames))
+                    'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby', modnames))
                 -- TODO: Verify this functionality
                 if FindNameForID(newPlayerID) then
-                    AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
+                    AddChatText(FindNameForID(newPlayerID)..LOC('<LOC lobui_0700> kicked because he does not have this mod: ')..modnames)
                 else
                     if newPlayerName then
-                        AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
+                        AddChatText(newPlayerName..LOC('<LOC lobui_0700> kicked because he does not have this mod: ')..modnames)
                     else
-                        AddChatText('The last player is kicked because he does not have this mod : '..modnames)
+                        AddChatText(LOC('<LOC lobui_0701>The last player is kicked because he does not have this mod: ')..modnames)
                     end
                 end
                 lobbyComm:EjectPeer(newPlayerID, reason)

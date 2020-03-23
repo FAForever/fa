@@ -98,24 +98,24 @@ local function EveryoneHasMod(modID)
 end
 
 local modsTags = {
- UI = { 
-    label = LOC('<LOC uiunitmanager_10>UI MODS'), 
+ UI = {
+    label = LOC('<LOC uiunitmanager_10>UI MODS'),
     text  = LOC('<LOC uiunitmanager_03>Filter UI Mods'),
     body  = LOC('<LOC uiunitmanager_04>Toggle visibility of all UI mods in above list of mods.') },
- GAME = { 
+ GAME = {
     label = LOC('<LOC uiunitmanager_11>GAME MODS'),
     text  = LOC('<LOC uiunitmanager_01>Filter Game Mods'),
     body  = LOC('<LOC uiunitmanager_02>Toggle visibility of all game mods in above list of mods.') },
- BLACKLISTED = { 
+ BLACKLISTED = {
     label = LOC('<LOC uiunitmanager_13>BLACKLISTED'),
     text  = LOC('<LOC uiunitmanager_05>Filter Blacklisted Mods'),
     body  = LOC('<LOC uiunitmanager_06>Toggle visibility of blacklisted mods in above list of mods.')},
- LOCAL = { 
+ LOCAL = {
     label = LOC('<LOC uiunitmanager_14>LOCAL MODS'),
     text  = LOC('<LOC uiunitmanager_18>Filter Local Mods'),
     body  = LOC('<LOC uiunitmanager_19>Toggle visibility of game mods that are missing by other players') },
- NO_DEPENDENCY = { 
-    label = LOC('<LOC uiunitmanager_15>NO DEPENDENCY'), 
+ NO_DEPENDENCY = {
+    label = LOC('<LOC uiunitmanager_15>NO DEPENDENCY'),
     text  = LOC('<LOC uiunitmanager_16>Filter Missing Dependency Mods'),
     body  = LOC('<LOC uiunitmanager_17>Toggle visibility of mods that are missing dependency in above list of mods.') },
 }
@@ -156,7 +156,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LayoutHelpers.AtTopIn(subtitle, dialogContent, 26)
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>OK", -1)
     --SaveButton:UseAlphaHitTest(true)
     LayoutHelpers.AtHorizontalCenterIn(SaveButton, dialogContent)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
@@ -270,7 +270,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     local filterDisabledMods = CreateModsFilter(dialogContent, 'BLACKLISTED')
     LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 65)
-    
+
     position = position + offset
     local filterNoDependencyMods = CreateModsFilter(dialogContent, 'NO_DEPENDENCY')
     LayoutHelpers.AtLeftIn(filterNoDependencyMods, dialogContent, position)
@@ -548,7 +548,7 @@ function RefreshModsList()
                 mod.sort = 'X'
                 mod.type = 'NO_DEPENDENCY'
                 mods.missingDependencies[uid] = mod
-                
+
             elseif dependencies.requires then
                 -- Construct backward-dependency map for this mod (so we can disable this one if
                 -- someone turns off something we depend on)
@@ -852,7 +852,7 @@ function CreateListElement(parent, mod, Pos)
     group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
     group.name:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.name, group, modInfoPosition, 7)
-     
+
     group.createdBy = UIUtil.CreateText(group, ' created by ', 14, UIUtil.bodyFont)
     group.createdBy:DisableHitTest()
     group.createdBy:SetColor('FFA2A5A2') -- #FFA2A5A2
@@ -906,7 +906,7 @@ function CreateListElement(parent, mod, Pos)
 
     if string.len(mod.description) > 240 then
         local description = string.sub(mod.description, 1, 240) .. '...'
-        group.desc:SetText(description) 
+        group.desc:SetText(description)
     end
 
     if mod.type == 'NO_DEPENDENCY' then
@@ -919,7 +919,7 @@ function CreateListElement(parent, mod, Pos)
             for k, v in mod.requires do
                 body = v .. ',\n' .. body
             end
-        else 
+        else
             body = nil
         end
 

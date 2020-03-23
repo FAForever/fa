@@ -241,6 +241,8 @@ function SetupPlayerLines()
             group.mass.HandleEvent = function(self, event)
                 ResourceClickProcessing(self, event, group, 'Mass')
             end
+            local bodyText = '<LOC tooltipui0716>By Ctrl+click request mass from this ally.\nBy Shift+click gives 25% mass to this ally.'
+            Tooltip.AddControlTooltip(group.mass, {text = '', body = bodyText}, 1)
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1 + 14 + 16)
@@ -258,6 +260,8 @@ function SetupPlayerLines()
             group.energy.HandleEvent = function(self, event)
                 ResourceClickProcessing(self, event, group, 'Energy')
             end
+            local bodyText = '<LOC tooltipui0717>By Ctrl+click request energy from this ally.\nBy Shift+click gives 25% energy to this ally.'
+            Tooltip.AddControlTooltip(group.energy, {text = '', body = bodyText}, 1)
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0 + 14 + 16)
@@ -285,6 +289,8 @@ function SetupPlayerLines()
                         to = 'allies', Chat = true, text = ScoresCache[group.armyID].name..' give me Engineer' })
                 end
             end
+            local bodyText = '<LOC tooltipui0718>By Ctrl+click request engineer from this ally.\nBy Shift+click gives selected units to this ally.'
+            Tooltip.AddControlTooltip(group.units, {text = '', body = bodyText}, 1)
         end
 
         group.Height:Set(group.faction.Height)
@@ -406,7 +412,8 @@ function SetupPlayerLines()
     end
 
     mapData = {}
-    mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
+    mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
+    mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
     if SessionIsReplay() then
         if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") and GetFrontEndData('syncreplayid') ~= nil and GetFrontEndData('syncreplayid') ~= 0 then
             replayID = GetFrontEndData('syncreplayid')
@@ -417,8 +424,6 @@ function SetupPlayerLines()
         elseif HasCommandLineArg("/replayid") then
             replayID =  GetCommandLineArg("/replayid", 1)[1]
         end
-        mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
-        mapData.mapname = mapData.mapname..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
         if replayID ~= -1 then
             mapData.mapname = mapData.mapname..', ID: '..replayID
         end
@@ -450,8 +455,9 @@ function SetupPlayerLines()
         end
         UpdResDisplay(DisplayResMode)
     end
-    local bodyText = 'I - '..LOC('<LOC tooltipui0714>')..'\n B - '..LOC('<LOC tooltipui0715>')..'\n S - '..LOC('<LOC uvd_0006>')
-    Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1, 70)
+    local bodyText = 'I - '..LOC('<LOC tooltipui0714>Income')..'\n B - '..
+        LOC('<LOC tooltipui0715>Balance')..'\n S - '..LOC('<LOC uvd_0006>Storage')
+    Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1)
 end
 
 function DisplayResources(resources, line, mode)
