@@ -498,7 +498,7 @@ function CreateUI()
     LayoutHelpers.SetWidth(okButton, 151)
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
     LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
-    Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0001>Closes this dialog and confirms assignments of messages'})
+    Tooltip.AddControlTooltip(okButton, {text = '<LOC _Close>Close', body = '<LOC notify_0001>Closes this dialog and confirms assignments of messages'})
     okButton.OnClick = function(self, modifiers)
         CloseUI()
     end
@@ -509,21 +509,20 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
     LayoutHelpers.AtLeftIn(defaultButton, dialogContent, 10)
     defaultButton.OnClick = function(self, modifiers)
-        UIUtil.QuickDialog(popup, "<LOC notify_009>Are you sure you want to reset all messages to their defaults?",
+        UIUtil.QuickDialog(popup, "<LOC notify_0009>Are you sure you want to reset all messages to their defaults?",
             "<LOC _Yes>", ResetMessages,
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
     Tooltip.AddControlTooltip(defaultButton,
         {
-            text = "<LOC key_binding_0008>Default Preset",
+            text = "<LOC notify_0008>Default Preset",
             body = "<LOC notify_0010>Reset all messages to their defaults"
         }
     )
 
     -- Button to toggle Notify as a whole
     local notifyButton = CreateMessageToggleButton(dialogContent, 'all', 'large')
-    notifyButton.label:SetText(LOC('<LOC notify_0029>Experimentals'))
     LayoutHelpers.AtBottomIn(notifyButton, dialogContent, -2)
     LayoutHelpers.AtHorizontalCenterIn(notifyButton, dialogContent, 10)
     notifyButton.HandleEvent = function(self, event)
@@ -531,11 +530,11 @@ function CreateUI()
             if not self.checked then
                 self.checked = true
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_down.dds'))
-                self.label:SetText('Notify Enabled')
+                self.label:SetText(LOC('<LOC notify_0029>Notify Enabled'))
             else
                 self.checked = false
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_up.dds'))
-                self.label:SetText('Notify Disabled')
+                self.label:SetText(LOC('<LOC notify_0030>Notify Disabled'))
             end
 
             Notify.toggleNotifyPermanent(not self.checked)

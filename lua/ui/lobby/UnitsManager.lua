@@ -447,8 +447,8 @@ function CreateControls(OnOk, OnCancel, isHost)
     LayoutHelpers.AtTopIn(GUI.stats, GUI.bg, 10)
     LayoutHelpers.AtRightIn(GUI.stats, GUI.bg, 10)
     Tooltip.AddControlTooltip(GUI.stats, {
-        text = 'Current Restrictions',
-        body = 'Restrictions are set using Presets (first two rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
+        text = '<LOC restricted_units_dlg_0001>Current Restrictions',
+        body = '<LOC restricted_units_dlg_0002>Restrictions are set using Presets (first four rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
             .. 'To minimize number of restrictions, first select custom restrictions and then preset restrictions.' })
 
     GUI.cancelBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Cancel>")
@@ -579,9 +579,8 @@ function UpdateRestrictionsStats()
         end
     end
 
-    local info = restrictions.Stats.Total .. ' Restrictions = ' ..
-                 restrictions.Stats.Custom .. ' Custom + ' ..
-                 restrictions.Stats.Presets .. ' Presets (' .. restrictions.Stats.Units .. ')'
+    local info = LOCF('<LOC restricted_units_dlg_0003>%s Restrictions = %s Custom + %s Presets (%s)',
+        restrictions.Stats.Total, restrictions.Stats.Custom, restrictions.Stats.Presets, restrictions.Stats.Units)
     GUI.stats:SetText(info)
 
     return restrictions.Stats

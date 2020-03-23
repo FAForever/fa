@@ -215,7 +215,7 @@ local menus = {
             },
             {
                 action = 'ShowGameInfo',
-                label = 'Show Game Info',
+                label = '<LOC _Show_Game_Info>Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
             {
@@ -235,7 +235,7 @@ local menus = {
             },
             {
                 action = 'ExitMPGame',
-                label = 'Exit to FAF',
+                label = '<LOC _Exit_to_Windows>Exit to FAF',
                 tooltip = 'esc_exit',
             },
             {

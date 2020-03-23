@@ -371,7 +371,6 @@ UnitBlueprint {
     SizeZ = 4.4,
     StrategicIconName = 'icon_factoryhq2_land',
     StrategicIconSortPriority = 215,
-    UpgradeDesc = '<LOC ueb0201_upgradedesc>Upgrading to Tech 2 Land Factory HQ',
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
