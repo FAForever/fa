@@ -96,7 +96,7 @@ OnSync = function()
     end
 
     if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
-        for k,gameResult in Sync.GameResult do
+        for _, gameResult in Sync.GameResult do
             local armyIndex, result = unpack(gameResult)
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
             GpgNetSend('GameResult', armyIndex, result)
