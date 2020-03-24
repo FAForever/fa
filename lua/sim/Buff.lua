@@ -373,7 +373,8 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         TECH1 = 10,
         TECH2 = 15,
         TECH3 = 25,
-        TECH4 = 40
+        EXPERIMENTAL = 40,
+        SUBCOMMANDER = 30
     }
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
@@ -387,17 +388,13 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             floor = v.Floor
         end
 
-        if v.CeilT1 then
-            ceilings['TECH1'] = v.CeilT1
-        end
-        if v.CeilT2 then
-            ceilings['TECH2'] = v.CeilT2
-        end
-        if v.CeilT3 then
-            ceilings['TECH3'] = v.CeilT3
-        end
-        if v.CeilT4 then
-            ceilings['TECH4'] = v.CeilT4
+        -- Take regen values from bp, keys have to match techCategory options
+        if v.BPCeilings then
+            for k_, v_ in ceilings do
+                if v.BPCeilings[k_] then
+                    ceilings[k_] = v.BPCeilings[k_]
+                end
+            end
         end
 
         ceil = ceilings[unit.techCategory]
@@ -414,7 +411,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
                     for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
                     end
                 end
             else
