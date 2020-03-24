@@ -495,12 +495,11 @@ Description = {
     ['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
 
     -- SERAPHIM -- Support Commander Presets
-    ['xsl0301_AdvancedCombat'] = "<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.",
     ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.",
     ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
     ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.",
     ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.",
-    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.",
+    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.",
 
     -- SERAPHIM -- Land Units
     ['xsl0101'] = "<LOC Unit_Description_0337> Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields.",

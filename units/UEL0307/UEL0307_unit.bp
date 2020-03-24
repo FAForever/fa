@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 30,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',
@@ -77,7 +80,7 @@ UnitBlueprint {
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 3500,
+            ShieldMaxHealth = 3000,
             ShieldRechargeTime = 24,
             ShieldRegenRate = 55,
             ShieldRegenStartTime = 3,
@@ -185,6 +188,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC uel0307_name>Parashield',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -242,7 +246,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 33,
+            MaxRadius = 28,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -254,7 +258,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

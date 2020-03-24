@@ -123,13 +123,6 @@ XEA0002 = Class(TAirUnit) {
             self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca')
         end,
     },
-
-    -- Make this unit ignore all but nuclear damage (Kills it when parked above a launcher)
-    OnDamage = function(self, instigator, amount, vector, damageType)
-        if EntityCategoryContains(categories.NUKE, instigator) then
-            self:Destroy()
-        end
-    end,
 }
 
 TypeClass = XEA0002

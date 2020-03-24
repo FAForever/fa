@@ -5,7 +5,6 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
-
 local GameVersion = import('/lua/version.lua').GetVersion
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -32,6 +31,7 @@ local Mods = import('/lua/mods.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
+local Border = import('/lua/ui/controls/border.lua').Border
 
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = import('/lua/ui/lobby/trueskill.lua').round
@@ -47,6 +47,9 @@ local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
+AIKeys = {}
+AIStrings = {}
+AITooltips = {}
 
 local IsSyncReplayServer = false
 
@@ -103,7 +106,7 @@ local HostUtils
 local mapPreviewSlotSwapFrom = 0
 local mapPreviewSlotSwap = false
 
-local teamIcons = {
+teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
     '/lobby/team_icons/team_2_icon.dds',
@@ -294,6 +297,27 @@ local slotMenuData = {
         },
     },
 }
+
+function GetNumAvailStartSpots()
+    local numAvailStartSpots = nil
+    local scenarioInfo = nil
+    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    end
+    if scenarioInfo then
+        local armyTable = MapUtil.GetArmies(scenarioInfo)
+        if armyTable then
+            if gameInfo.GameOptions['RandomMap'] == 'Off' then
+                numAvailStartSpots = table.getn(armyTable)
+            else
+                numAvailStartSpots = numberOfPlayers
+            end
+        end
+    else
+        WARN("Can't assign random start spots, no scenario selected.")
+    end
+    return numAvailStartSpots
+end
 
 local function GetSlotMenuData()
     if gameInfo.AdaptiveMap then
@@ -1389,6 +1413,74 @@ local function AssignRandomStartSpots()
             orgPlayerOptions[k] = p
         end
 
+        local mirrored = string.find(teamSpawn, 'mirrored')
+        if mirrored then
+            local rating_cmp = function(a,b) return a.rating > b.rating end
+            local slot_cmp = function(a,b) return a.slot < b.slot end
+
+            function getMasterOrder(sortedSlots)
+                local masterOrder = {}
+
+                local slot2nr = {}
+                for k, p in sortedSlots.byNr do
+                    slot2nr[p.slot] = k
+                end
+
+                for k, p in sortedSlots.byRating do
+                    table.insert(masterOrder, slot2nr[p.slot])
+                end
+
+                return masterOrder
+            end
+
+            function teamsSameSize(slots)
+                local size
+
+                for t, sorted in slots do
+                    local s = table.getn(sorted.byNr)
+                    if not size then size = s end
+
+                    if size ~= s then return false end
+                end
+
+                return true
+            end
+
+            function reorderSlots(sortedSlots, masterOrder)
+                local newSlots = {}
+                for i, j in masterOrder do
+                    table.insert(newSlots, sortedSlots.byNr[j].slot)
+                end
+
+                for i, s in newSlots do
+                    sortedSlots.byRating[i].slot = s
+                end
+            end
+
+            local slots = {}
+            local masterTeam
+
+            for _, p in data.setup do
+                if not slots[p.team] then slots[p.team] = {} end
+                if not slots[p.team].byNr then slots[p.team].byNr = {} end
+                if not slots[p.team].byRating then slots[p.team].byRating = {} end
+                if not masterTeam then masterTeam = p.team end
+
+                table.binsert(slots[p.team].byNr, p, slot_cmp)
+                table.binsert(slots[p.team].byRating, p, rating_cmp)
+            end
+
+            -- abort mirroring if team sizes differ
+            if not teamsSameSize(slots) then 
+                WARN("Mirroring disabled due to teams not having the same number of players")
+            else 
+                local masterOrder = getMasterOrder(slots[masterTeam])
+                for t, sorted in slots do
+                    reorderSlots(sorted, masterOrder)
+                end
+            end
+        end
+
         -- Rearrange the players in the slots to match the chosen configuration. The result object
         -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
         -- an object (and because swapping is too much like hard work).
@@ -1405,24 +1497,7 @@ local function AssignRandomStartSpots()
         end
     end
 
-    local numAvailStartSpots = nil
-    local scenarioInfo = nil
-    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    end
-    if scenarioInfo then
-        local armyTable = MapUtil.GetArmies(scenarioInfo)
-        if armyTable then
-            if gameInfo.GameOptions['RandomMap'] == 'Off' then
-                numAvailStartSpots = table.getn(armyTable)
-            else
-                numAvailStartSpots = numberOfPlayers
-            end
-        end
-    else
-        WARN("Can't assign random start spots, no scenario selected.")
-        return
-    end
+    local numAvailStartSpots = GetNumAvailStartSpots()
 
     local AutoTeams = gameInfo.GameOptions.AutoTeams
     local positionGroups = {}
@@ -2237,6 +2312,17 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
     if not ignoreRefresh then
         -- reload AI types in case we have enable or disable an AI mod.
         aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
+        AIKeys = {}
+        AIStrings = {}
+        AITooltips = {}
+        for _, aidata in aitypes do
+          table.insert(AIKeys, aidata.key)
+          table.insert(AIStrings, aidata.name)
+          table.insert(AITooltips, 'aitype_'..aidata.key)
+        end
+        GUI.AIFillPanel:ClearItems()
+        GUI.AIFillPanel:AddItems(AIStrings)
+        GUI.AIFillPanel:SetTitleText('Choose AI for auto-filling slots')
         UpdateGame()
     end
 end
@@ -2619,6 +2705,7 @@ function CreateUI(maxPlayers)
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
     local Prefs = import('/lua/user/prefs.lua')
     local Tooltip = import('/lua/ui/game/tooltip.lua')
+    local Combo = import('/lua/ui/controls/combo.lua')
 
     local isHost = lobbyComm:IsHost()
     local lastFaction = GetSanitisedLastFaction()
@@ -2731,7 +2818,7 @@ function CreateUI(maxPlayers)
             Changelog.CreateUI(GUI, true)
         end
     end
-
+    
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 6, 70)
@@ -2746,8 +2833,8 @@ function CreateUI(maxPlayers)
     local obsOffset
     local obsHeight
     if isHost then
-        obsHeight = 159
-        obsOffset = 545
+        obsHeight = 84--159
+        obsOffset = 620--545
     else
         obsHeight = 206
         obsOffset = 503
@@ -2763,7 +2850,105 @@ function CreateUI(maxPlayers)
     GUI.chatPanel.Width:Set(478)
     GUI.chatPanel.Height:Set(245)
 
-    
+    if isHost then
+    GUI.AIFillPanel = Combo.Combo(GUI.panel, 14, 12, false, nil)
+    GUI.AIFillPanel.Width:Set(278)
+    GUI.AIFillPanel.Left:Set(GUI.observerPanel.Left())
+    GUI.AIFillPanel.Top:Set(GUI.chatPanel.Top())
+    if (AIKeys[1] or AIStrings[1] or AITooltips[1]) == nil then
+      for _, aidata in aitypes do
+        table.insert(AIKeys, aidata.key)
+        table.insert(AIStrings, aidata.name)
+        table.insert(AITooltips, 'aitype_'..aidata.key)
+      end
+    end
+    GUI.AIFillPanel:AddItems(AIStrings)
+    GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
+    GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillPanel, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
+    GUI.AIFillButton.Width:Set(129)
+    GUI.AIFillButton.Height:Set(30)
+    LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillPanel, -10, 25)
+    GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
+    GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width())
+    GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height())
+    LayoutHelpers.RightOf(GUI.AIClearButton, GUI.AIFillButton, -19)
+    GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+    GUI.TeamCountSelector.Width:Set(44)
+    GUI.TeamCountSelector.Top:Set(GUI.AIClearButton.Top() + 5)
+    GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right())
+    local tooltipText = {}
+    tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
+    tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
+    Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0,148)
+    local ChangedSlots = {}
+    GUI.AIFillButton.OnClick = function()
+      local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
+      if ChangedSlots[1] ~= nil then
+        for i = 1, table.getn(ChangedSlots) do
+          HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], ChangedSlots[i])
+        end
+        GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
+        return
+      end
+      for Slot = 1, GetNumAvailStartSpots() do
+        if not (gameInfo.PlayerOptions[Slot] or gameInfo.ClosedSlots[Slot]) then
+          HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], Slot)
+          table.insert(ChangedSlots, Slot)
+        end
+      end
+      GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
+    end
+    GUI.AIClearButton.OnClick = function()
+      for i = 1, table.getn(ChangedSlots) do
+        HostUtils.RemoveAI(ChangedSlots[i])
+      end
+      ChangedSlots = {}
+    end
+    GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
+      local OccupiedSlots = 0
+      local AvailStartSpots = GetNumAvailStartSpots()
+      for Slot = 1, AvailStartSpots do
+        if gameInfo.PlayerOptions[Slot] ~= nil then
+          OccupiedSlots = OccupiedSlots + 1
+        end
+      end
+      local PlayersPerTeam = 0
+      if Index > 1 then
+        PlayersPerTeam = math.floor(OccupiedSlots / (Index - 1))
+      end
+      local AssignedTeam = 2
+      local Counter = 0
+      for Slot = 1, AvailStartSpots do
+        if gameInfo.PlayerOptions[Slot] then
+          if AssignedTeam > Index then
+            SetPlayerOption(Slot, 'Team', 1, true)
+          else
+            SetPlayerOption(Slot, 'Team', AssignedTeam, true)
+            Counter = Counter + 1
+            if Counter >= PlayersPerTeam then
+              AssignedTeam = AssignedTeam + 1
+              Counter = 0
+            end
+          end
+          SetSlotInfo(Slot, gameInfo.PlayerOptions[Slot])
+        end
+      end
+    end
+    local texturePath = '/scx_menu/lan-game-lobby/frame/'
+    GUI.AIFillPanelBorder = Border(GUI.panel,
+      UIUtil.SkinnableFile(texturePath .. 'topLeft.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'topRight.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'bottomLeft.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'bottomRight.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'left.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'right.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'top.dds'),
+      UIUtil.SkinnableFile(texturePath .. 'bottom.dds')
+)
+    GUI.AIFillPanelBorder:Surround(GUI.AIFillPanel, 62, 62)
+    GUI.AIFillPanelBorder.Bottom:Set(GUI.AIFillPanelBorder.Bottom() + 43)
+    end
+ 
 
 
     -- Map Preview
@@ -2819,6 +3004,15 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
+    
+	-- curated Maps
+	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
+	GUI.curatedmapsButton.OnClick = function()
+		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+	end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -2897,7 +3091,7 @@ function CreateUI(maxPlayers)
     end
 
     LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 53)
 
     ---------------------------------------------------------------------------
     -- set up chat display
@@ -3185,8 +3379,8 @@ function CreateUI(maxPlayers)
     local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     GUI.loadButton = loadButton
     UIUtil.setVisible(loadButton, singlePlayer)
-    LayoutHelpers.AtHorizontalCenterIn(loadButton, GUI.gameoptionsButton)
-    LayoutHelpers.Below(loadButton, GUI.gameoptionsButton, 9)
+    LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, launchGameButton, 7)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.loadButton, GUI.optionsPanel)
     loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
@@ -3211,8 +3405,8 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
-    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton)
-    LayoutHelpers.Below(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton, 9)
+    LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsOrPresetsBtn, launchGameButton, 7)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.optionsPanel)
 
     ---------------------------------------------------------------------------
     -- Checkbox Show changed Options
@@ -3258,10 +3452,18 @@ function CreateUI(maxPlayers)
         GUI.defaultOptions:Disable()
     else
         GUI.defaultOptions.OnClick = function()
-            -- Return all options to their default values.
-            OptionUtils.SetDefaults()
-            lobbyComm:BroadcastData({ Type = "SetAllPlayerNotReady" })
-            UpdateGame()
+            UIUtil.QuickDialog(GUI, LOC('<LOC options_0002>Are you sure you want to reset to default values?'),
+                "<LOC _Yes>", function()
+                    -- Return all options to their default values.
+                    OptionUtils.SetDefaults()
+                    lobbyComm:BroadcastData({ Type = "SetAllPlayerNotReady" })
+                    UpdateGame()
+                end,
+
+                "<LOC _Cancel>", nil,
+                nil, nil,
+                true
+            )
         end
     end
 

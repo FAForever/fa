@@ -172,7 +172,7 @@ UnitBlueprint {
     },
     Intel = {
         RadarRadius = 80,
-        SonarRadius = 82,
+        SonarRadius = 16,
         VisionRadius = 32,
         WaterVisionRadius = 16,
     },
@@ -284,10 +284,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 145,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -355,10 +353,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 145,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

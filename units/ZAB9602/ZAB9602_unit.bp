@@ -137,6 +137,9 @@ UnitBlueprint {
         BuildRate = 120,
         BuildTime = 4000,
         DifferentialUpgradeCostCalculation = true,
+        RebuildBonusIds = {
+            'zab9602',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY AEON STRUCTURE AIR',

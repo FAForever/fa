@@ -66,6 +66,8 @@ UnitBlueprint {
         'DRAGBUILD',
         'SORTINTEL',
         'NAVAL',
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -129,9 +131,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 12000,
-        BuildCostMass = 1000,#400
+        BuildCostMass = 1000,
         BuildTime = 750,
-        MaintenanceConsumptionPerSecondEnergy = 250,#100
+        MaintenanceConsumptionPerSecondEnergy = 500,
     },
     Footprint = {
         MinWaterDepth = 1.5,
@@ -272,11 +274,9 @@ UnitBlueprint {
             RateOfFire = 0.25,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

@@ -22,7 +22,8 @@ Blacklist = {
     ['xxxx-NetLag-Experimental-v3'] = HARMFUL,
 
 -- Broken --
-
+    --Old Nomads version thats not featured, and doesnt show up in the mod list
+    ['50423624-1e83-4fc2-85b3-nomadsv00074'] = BROKEN,
 -- Obselete --
 
     -- XINNONY TRY FIX CORRECT DISCONNECT
@@ -177,5 +178,19 @@ Blacklist = {
 
     -- old versions of Experimental Wars
     ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = UPGRADE,
+    
+    -- mod pack that was hidden in the vault -> blacklisting to prevent it from being used on faf
+    ['fff6f6c8-248a-11de-8c30-362b9e155667'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100002'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100003'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100004'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100005'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100006'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100007'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100008'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
 
+    -- cheat mod
+    ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
+    ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
 }

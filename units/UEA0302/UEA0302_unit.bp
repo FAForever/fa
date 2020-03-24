@@ -15,11 +15,11 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 1.5,
         LiftFactor = 7,
-        MaxAirspeed = 30,
+        MaxAirspeed = 27,
         MinAirspeed = 25,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.1,
-        TurnSpeed = 1,
+        TurnSpeed = 0.8,
         Winged = true,
     },
     Audio = {

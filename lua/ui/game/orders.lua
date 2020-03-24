@@ -564,7 +564,7 @@ local function ScriptButtonOrderBehavior(self, modifiers)
         self._mixedIcon = nil
     end
 
-    -- Mixed shields get special behaviour: turn everything on, not off
+    -- Mixed shields get special behaviour: turn everything on, not off.
     if mixed and self._data.extraInfo == 0 then
         ToggleScriptBit(currentSelection, self._data.extraInfo, false)
     else

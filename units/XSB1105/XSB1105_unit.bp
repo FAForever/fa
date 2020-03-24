@@ -192,7 +192,7 @@ UnitBlueprint {
     SizeX = 0.6,
     SizeY = 0.6,
     SizeZ = 0.6,
-    StrategicIconName = 'icon_structure_energy',  #Removed tech level 1
+    StrategicIconName = 'icon_structure_energy_storage',
     StrategicIconSortPriority = 250,
     Weapon = {
         {

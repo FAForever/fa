@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 28,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -237,6 +240,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xsl0307_name>Athanah',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -297,7 +301,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 38,
+            MaxRadius = 26,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -309,7 +313,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

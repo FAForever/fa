@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 28,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -68,7 +71,7 @@ UnitBlueprint {
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 3800,
+            ShieldMaxHealth = 3500,
             ShieldRechargeTime = 26,
             ShieldRegenRate = 58,
             ShieldRegenStartTime = 3,
@@ -198,6 +201,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC ual0307_name>Asylum',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -258,7 +262,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 33,
+            MaxRadius = 26,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -270,7 +274,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

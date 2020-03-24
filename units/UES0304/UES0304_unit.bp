@@ -387,10 +387,8 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'STRUCTURE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

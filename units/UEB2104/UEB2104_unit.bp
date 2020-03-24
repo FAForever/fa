@@ -233,7 +233,6 @@ UnitBlueprint {
             RateOfFire = 1.5,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
@@ -241,8 +240,7 @@ UnitBlueprint {
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,

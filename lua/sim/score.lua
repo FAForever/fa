@@ -66,6 +66,8 @@ function ScoreThread()
     for index, brain in ArmyBrains do
         ArmyScore[index] = {
             faction = 0,
+            name = '',
+            type = '',
             general = {
                 score = 0,
                 mass = 0,
@@ -120,8 +122,22 @@ function ScoreThread()
                     total = 0,
                     rate = 0
                 },
-                massover = 0,
-                energyover = 0
+                massover = {
+                    total = 0,
+                    rate = 0
+                },
+                energyover = {
+                    total = 0,
+                    rate = 0
+                },
+                storage = {
+                    storedMass = 0,
+                    storedEnergy = 0,
+                    maxMass = 0,
+                    maxEnergy = 0,
+                },
+                MassReclaimRate = 0,
+                EnergyReclaimRate = 0
             }
         }
 
@@ -162,12 +178,18 @@ function ScoreThread()
             ArmyScore[index].resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
             ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
             ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
-            ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
+            ArmyScore[index].resources.massover.total = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
 
             ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
-            ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
+            ArmyScore[index].resources.energyover.total = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
+
+            ArmyScore[index].resources.storage.storedMass = brain:GetEconomyStored('MASS')
+            ArmyScore[index].resources.storage.storedEnergy = brain:GetEconomyStored('ENERGY')
+
+            ArmyScore[index].resources.storage.maxMass = brain:GetArmyStat("Economy_MaxStorage_Mass", 0.0).Value
+            ArmyScore[index].resources.storage.maxEnergy = brain:GetArmyStat("Economy_MaxStorage_Energy", 0.0).Value
 
             for unitId, stats in brain.UnitStats do
                 if ArmyScore[index].blueprints[unitId] == nil then
@@ -201,13 +223,17 @@ function ScoreDisplayResourcesThread()
         for index, brain in ArmyBrains do
             local reclaimedMass = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
             local massReclaimRate = reclaimedMass - ArmyScore[index].general.lastReclaimedMass
+            ArmyScore[index].resources.MassReclaimRate = massReclaimRate
             ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
             ArmyScore[index].general.lastReclaimedMass = reclaimedMass
+            ArmyScore[index].resources.massover.rate = ArmyScore[index].resources.massin.rate - ArmyScore[index].resources.massout.rate + ArmyScore[index].resources.MassReclaimRate
 
             local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
             local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
+            ArmyScore[index].resources.EnergyReclaimRate = energyReclaimRate
             ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
             ArmyScore[index].general.lastReclaimedEnergy = reclaimedEnergy
+            ArmyScore[index].resources.energyover.rate = ArmyScore[index].resources.energyin.rate - ArmyScore[index].resources.energyout.rate + ArmyScore[index].resources.EnergyReclaimRate
         end
         WaitSeconds(0.1)
     end
@@ -216,7 +242,7 @@ end
 local observer = false
 function SyncScores()
     local my_army_index = GetFocusArmy()
-    observer = observer or my_army_index == -1
+    observer = my_army_index == -1
 
     local victory = import('/lua/victory.lua')
     if observer or victory.gameOver then
@@ -235,14 +261,11 @@ function SyncScores()
                 brain.StatsSent = true
             end
 
-            Sync.Score[index] = {}
-            Sync.Score[index].general = {}
-
-            if my_army_index == index then
-                Sync.Score[index].general.currentunits = {}
-                Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
-                Sync.Score[index].general.currentcap = {}
-                Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
+            if IsAlly(my_army_index,brain:GetArmyIndex()) then
+                Sync.Score[index] = ArmyScore[index]
+            else
+                Sync.Score[index] = {}
+                Sync.Score[index].general = {}
             end
 
             if scoreOption ~= 'no' then

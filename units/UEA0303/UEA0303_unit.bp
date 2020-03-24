@@ -21,7 +21,7 @@ UnitBlueprint {
         KTurn = 1.5,
         KTurnDamping = 2.3,
         LiftFactor = 7,
-        MaxAirspeed = 25,
+        MaxAirspeed = 22,
         MinAirspeed = 8,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.03,
@@ -190,7 +190,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 40000,
         BuildCostMass = 350,
-        BuildTime = 3000,
+        BuildTime = 4000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -320,11 +320,9 @@ UnitBlueprint {
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -394,11 +392,9 @@ UnitBlueprint {
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

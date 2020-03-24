@@ -262,9 +262,7 @@ UnitBlueprint {
             RateOfFire = 3,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretDualManipulators = false,

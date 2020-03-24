@@ -187,6 +187,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC daa0206_name>Mercy',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 15,
@@ -283,13 +284,11 @@ UnitBlueprint {
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 999999,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH4',
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 0.5,

@@ -1,5 +1,8 @@
 UnitBlueprint {
     ResolvePath = true,
+    AI = {
+        GuardScanRadius = 40, --RadarRadius
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -232,7 +235,7 @@ UnitBlueprint {
     SelectionThickness = 1.2,
     SizeX = 0.6,
     SizeY = 0.7,
-    SizeZ = 0.6,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_bot1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -294,13 +297,11 @@ UnitBlueprint {
             SlavedToBodyArcRange = 25,
             TargetCheckInterval = 0.66,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

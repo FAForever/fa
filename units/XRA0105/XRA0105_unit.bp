@@ -99,6 +99,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -311,9 +312,7 @@ UnitBlueprint {
             RateOfFire = 3,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -322,7 +321,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Laser_Muzzle',
             TurretDualManipulators = false,
             TurretPitch = -20,
-            TurretPitchRange = 45,
+            TurretPitchRange = 60,
             TurretPitchSpeed = 360,
             TurretYaw = 0,
             TurretYawRange = 180,

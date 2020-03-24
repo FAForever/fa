@@ -304,10 +304,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 135,
             TargetCheckInterval = 0.8,				#1
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.125,
@@ -381,10 +379,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 135,
             TargetCheckInterval = 0.8,				#1
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.125,
@@ -452,12 +448,10 @@ UnitBlueprint {
             RateOfFire = 0.1,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'SUBMERSIBLE',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

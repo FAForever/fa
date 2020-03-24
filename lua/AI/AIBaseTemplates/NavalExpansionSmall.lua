@@ -77,6 +77,6 @@ BaseBuilderTemplate {
             return 50
         end
 
-        return 0
+        return 1
     end,
 }

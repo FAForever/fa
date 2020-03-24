@@ -235,7 +235,7 @@ Callbacks.ValidateAssist = function(data, units)
 end
 
 function IsInvalidAssist(unit, target)
-    if target and target:GetEntityId() == unit:GetEntityId() then
+    if target and target.EntityId == unit.EntityId then
         return true
     elseif not target or not target:GetGuardedUnit() then
         return false

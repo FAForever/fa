@@ -136,6 +136,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC uab4201_name>Volcano',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,

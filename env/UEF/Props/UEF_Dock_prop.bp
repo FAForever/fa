@@ -18,7 +18,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'UEF_dock_lod1_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'Unit',
                     SpecularName = 'UEF_dock_lod1_specteam.dds',
                 },

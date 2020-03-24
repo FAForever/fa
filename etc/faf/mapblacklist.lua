@@ -1924,4 +1924,8 @@ MapBlacklist = {
     ['paradisebayv2.v0001'] = true,
     ['paradisebayv2.v0002'] = true,
     ['paradisebayv2.v0003'] = true,
+-- Maps that are hidden in the Vault
+    ['aspro_crater.v0001'] = true,
+    ['aspro_crater_remastered.v0001'] = true,
+    ['12_ultinate_you_shall_not_pass.v0001.zip'] = true,
 }

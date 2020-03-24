@@ -149,6 +149,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC url0306_name>Deceiver',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         RadarStealth = true,
@@ -219,7 +220,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

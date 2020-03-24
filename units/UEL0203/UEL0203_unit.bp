@@ -76,8 +76,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 1700,
-        MaxHealth = 1700,
+        Health = 1800,
+        MaxHealth = 1800,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4.5,
@@ -210,9 +210,9 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 2000,-- 1980
-        BuildCostMass = 360,
-        BuildTime = 1600,-- 1320
+        BuildCostEnergy = 1650,-- 1980
+        BuildCostMass = 320,
+        BuildTime = 1420,-- 1320
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -348,13 +348,11 @@ UnitBlueprint {
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

@@ -194,6 +194,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xes0205_name>Bulwark',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 32,

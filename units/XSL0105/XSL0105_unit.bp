@@ -222,6 +222,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER1ENGINEER SERAPHIM',
         },
+        MaxBuildDistance = 5,
         NeedToFaceTargetToBuild = false, -- changed to make it build faster
         StorageEnergy = 0,
         StorageMass = 10,

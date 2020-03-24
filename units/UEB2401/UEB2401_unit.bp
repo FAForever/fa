@@ -58,6 +58,7 @@ UnitBlueprint {
         'DRAGBUILD',
         'OVERLAYINDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -269,13 +270,11 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'STRUCTURE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

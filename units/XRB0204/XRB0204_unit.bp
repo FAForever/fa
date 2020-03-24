@@ -163,6 +163,8 @@ UnitBlueprint {
             BuildEffectBones = {
                 'Attachpoint01',
                 'Attachpoint02',
+                'Attachpoint01',
+                'Attachpoint02',
             },
         },
 

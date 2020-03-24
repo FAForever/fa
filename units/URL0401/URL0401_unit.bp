@@ -73,6 +73,8 @@
         'DRAGBUILD',
         'OVERLAYINDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -298,7 +300,7 @@
             MuzzleSalvoSize = 20,
             MuzzleVelocity = 160,
             MuzzleVelocityReduceDistance = 4000,
-            ProjectileId = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_proj.bp',
+            ProjectileId = '/projectiles/CIFArtilleryProton03/CIFArtilleryProton03_proj.bp',
             ProjectileLifetime = 100,
             ProjectilesPerOnFire = 1,
             RackBones = {
@@ -322,13 +324,11 @@
             RenderFireClock = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'STRUCTURE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Aim_Barrel_Muzzle',

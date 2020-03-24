@@ -51,6 +51,8 @@ UnitBlueprint {
         'OVERLAYCOUNTERINTEL',
         'SORTINTEL',
         'NAVAL', #for shipwreck mod
+        'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -123,9 +125,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 14400,
-        BuildCostMass = 1200,#480
+        BuildCostMass = 1200,
         BuildTime = 900,
-        MaintenanceConsumptionPerSecondEnergy = 400,#250
+        MaintenanceConsumptionPerSecondEnergy = 700,
     },
     Footprint = {
         MinWaterDepth = 1.5,

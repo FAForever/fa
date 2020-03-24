@@ -119,7 +119,7 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 250,
                     ShaderName = 'Aeon',
                 },
                 {
@@ -300,10 +300,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 155,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -388,10 +386,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 155,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -476,10 +472,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 155,
             TargetCheckInterval = 2,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
+                '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

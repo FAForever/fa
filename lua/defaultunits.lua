@@ -436,7 +436,7 @@ StructureUnit = Class(Unit) {
         if scus[1] then
             for _, u in scus do
                 u:SetFocusEntity(self)
-                self.Repairers[u:GetEntityId()] = u
+                self.Repairers[u.EntityId] = u
             end
         end
 
@@ -568,7 +568,7 @@ StructureUnit = Class(Unit) {
         end
 
         for k, v in self.AdjacencyBeamsBag do
-            if v.Unit:GetEntityId() == adjacentUnit:GetEntityId() then
+            if v.Unit.EntityId == adjacentUnit.EntityId then
                 return
             end
         end
@@ -637,13 +637,17 @@ FactoryUnit = Class(StructureUnit) {
 
     OnPaused = function(self)
         -- When factory is paused take some action
-        self:StopUnitAmbientSound('ConstructLoop')
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
-        if self.BuildingUnit then
+        if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
+            StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         StructureUnit.OnUnpaused(self)
     end,
@@ -1789,6 +1793,45 @@ AirUnit = Class(MobileUnit) {
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
+    
+    
+    -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
+    -- the only difference is the `elseif other.Nuke...` condition
+    -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
+    OnCollisionCheck = function(self, other, firingWeapon)
+        if self.DisallowCollisions then
+            return false
+        end
+
+        if EntityCategoryContains(categories.PROJECTILE, other) then
+            if IsAlly(self:GetArmy(), other:GetArmy()) then
+                return other.CollideFriendly
+            elseif other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
+                self:Kill()
+                return false
+            end
+        end
+
+        -- Check for specific non-collisions
+        local bp = other:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        bp = self:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), other) then
+                    return false
+                end
+            end
+        end
+        return true
+    end,
 }
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
@@ -2093,6 +2136,20 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Water' then
+            self:SetSpeedMult(mult)
+        else
+            self:SetSpeedMult(1)
+        end
+    end,
+}
+
+-- AMPHIBIOUS LAND UNITS
+AmphibiousLandUnit = Class(MobileUnit) {}
+
+SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+    OnLayerChange = function(self, new, old)
+        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        if new == 'Seabed'  then
             self:SetSpeedMult(mult)
         else
             self:SetSpeedMult(1)
@@ -2442,23 +2499,6 @@ ACUUnit = Class(CommandUnit) {
         WaitTicks(1)
         self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
-    end,
-
-    OnKilledUnit = function(self, unitKilled, massKilled)
-        -- Adjust mass based on unit killed for ACU
-        if unitKilled.techCategory then
-            local techMultipliers = {
-                TECH1 = 1,
-                TECH2 = 0.5,
-                TECH3 = 0.333334,
-                SUBCOMMANDER = 0.3,
-                EXPERIMENTAL = 0.25,
-                COMMAND = 0.05,
-            }
-            massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
-        end
-
-        CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
     end,
 
     BuildDisable = function(self)

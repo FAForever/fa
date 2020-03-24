@@ -475,6 +475,14 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
     FxImpactWater = EffectTemplate.AOblivionCannonHit02,
 }
 
+AOblivionCannonProjectile03 = Class(EmitterProjectile) {
+    FxTrails = EffectTemplate.AOblivionCannonFXTrails03,
+    FxImpactUnit = EffectTemplate.AOblivionCannonHit03,
+    FxImpactProp = EffectTemplate.AOblivionCannonHit03,
+    FxImpactLand = EffectTemplate.AOblivionCannonHit03,
+    FxImpactWater = EffectTemplate.AOblivionCannonHit03,
+}
+
 #------------------------------------------------------------------------
 #  AEON QUANTUM PROJECTILES
 #------------------------------------------------------------------------
@@ -484,9 +492,9 @@ AQuantumCannonProjectile = Class(SinglePolyTrailProjectile) {
         '/effects/emitters/quantum_cannon_munition_04_emit.bp',
     },
     PolyTrail = '/effects/emitters/quantum_cannon_polytrail_01_emit.bp',
-    FxImpactUnit = EffectTemplate.AQuantumCannonHit01,
-    FxImpactProp = EffectTemplate.AQuantumCannonHit01,
-    FxImpactLand = EffectTemplate.AQuantumCannonHit01,
+    FxImpactUnit = EffectTemplate.AQuantumDisruptorHit01,
+    FxImpactProp = EffectTemplate.AQuantumDisruptorHit01,
+    FxImpactLand = EffectTemplate.AQuantumDisruptorHit01,
 }
 
 AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) {

@@ -44,7 +44,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'Pine06_LOD2_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     ShaderName = 'TMeshAlpha',
                 },
             },

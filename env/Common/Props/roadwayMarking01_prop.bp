@@ -38,7 +38,7 @@ PropBlueprint {
                 },
                 {
                     AlbedoName = 'roadwayMarking01_albedo.dds',
-                    LODCutoff = 1000,
+                    LODCutoff = 750,
                     NormalsName = 'roadwayMarking01_normalsTS.dds',
                     ShaderName = 'NormalMappedAlpha',
                 },
