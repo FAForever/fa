@@ -271,8 +271,8 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 26400,
         BuildCostMass = 2000,
-        BuildRate = 56,
-        BuildTime = 14400,
+        BuildRate = 20,
+        BuildTime = 8400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
         },
@@ -393,7 +393,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,
-            BuildTime = 8400,
+            BuildTime = 25000,
             Icon = 'ras',
             Name = '<LOC enhancements_0097>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
@@ -906,20 +906,6 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
-        },
-    },
-    Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-        EnergyMult = 0,
-        HealthMult = 0.9,
-        MassMult = 0.9,
-        ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
         },
     },
 }
