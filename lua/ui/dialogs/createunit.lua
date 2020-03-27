@@ -272,9 +272,9 @@ function CreateDialog(x, y)
                     SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
                         Args = { bpId = creationList, count = numUnits,
                         army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-                    return
+                    if not IsKeyDown('SHIFT') then return end
                 end
-                WaitSeconds(0.05)
+                WaitSeconds(0.09)
             end
         end
     end
