@@ -6517,8 +6517,6 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            observerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, observerData.PlayerName)
-
             gameInfo.Observers[index] = observerData
 
             lobbyComm:BroadcastData(
@@ -6559,8 +6557,6 @@ function InitHostUtils()
                 end
                 return
             end
-
-            playerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, playerData.PlayerName)
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
             if not IsColorFree(playerData.PlayerColor) then
