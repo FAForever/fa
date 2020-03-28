@@ -117,8 +117,6 @@ local function HostAddPlayer(senderId, playerInfo)
         slot = slot + 1
     end
 
-    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
-
     # figure out a reasonable default color
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
