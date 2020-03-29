@@ -42,12 +42,14 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     bg.Height:Set(0)
     bg.Width:Set(0)
     bg.Depth:Set(GetFrame(0):GetTopmostDepth()+1)
-    LayoutHelpers.AtCenterIn(bg, goalControl)
 
     bg.border = CreateBorder(bg)
     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Open'}))
     local textGroup = Group(bg)
-
+    if goalControl == nil then
+        goalControl = textGroup
+    end
+    LayoutHelpers.AtCenterIn(bg, goalControl)
     local text = UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont)
     LayoutHelpers.AtCenterIn(text, GetFrame(0), -250)
     text:SetDropShadow(true)
@@ -109,6 +111,9 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             textGroup:SetAlpha(math.max(textGroup:GetAlpha()-(delta*2), 0), true)
         elseif self.time > .2 and self.time < 3 and text:GetAlpha() != 1 then
             textGroup:SetAlpha(math.min(text:GetAlpha()+(delta*2), 1), true)
+        end
+        if goalControl == textGroup then
+            self:SetAlpha(textGroup:GetAlpha(), true)
         end
 
         if self.time > 3.7 then
