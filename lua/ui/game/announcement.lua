@@ -13,7 +13,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
 local bg = false
 
-function CreateAnnouncement(text, goalControl, secondaryText, onFinished)   
+function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     local scoreDlg = import('/lua/ui/dialogs/score.lua')
     if scoreDlg.dialog then
         if onFinished then
@@ -43,17 +43,17 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     bg.Width:Set(0)
     bg.Depth:Set(GetFrame(0):GetTopmostDepth()+1)
     LayoutHelpers.AtCenterIn(bg, goalControl)
-    
+
     bg.border = CreateBorder(bg)
     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Open'}))
     local textGroup = Group(bg)
-    
+
     local text = UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont)
     LayoutHelpers.AtCenterIn(text, GetFrame(0), -250)
     text:SetDropShadow(true)
     text:SetColor(UIUtil.fontColor)
     text:SetNeedsFrameUpdate(true)
-    
+
     if secondaryText then
         secText = UIUtil.CreateText(textGroup, secondaryText, 18, UIUtil.bodyFont)
         secText:SetDropShadow(true)
@@ -68,11 +68,11 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         LayoutHelpers.FillParent(textGroup, text)
     end
     textGroup:SetAlpha(0, true)
-    
+
     bg:DisableHitTest(true)
-    
+
     bg.OnFinished = onFinished
-    
+
     bg.time = 0
     bg:SetNeedsFrameUpdate(true)
     bg.CloseSoundPlayed = false
@@ -104,13 +104,13 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             self.Height:Set(textGroup.Height)
             self.Width:Set(textGroup.Width)
         end
-        
+
         if self.time > 3 and textGroup:GetAlpha() != 0 then
             textGroup:SetAlpha(math.max(textGroup:GetAlpha()-(delta*2), 0), true)
         elseif self.time > .2 and self.time < 3 and text:GetAlpha() != 1 then
             textGroup:SetAlpha(math.min(text:GetAlpha()+(delta*2), 1), true)
         end
-        
+
         if self.time > 3.7 then
             if bg.OnFinished then
                 bg.OnFinished()
@@ -139,7 +139,7 @@ end
 
 function CreateBorder(parent)
     local border = {}
-    
+
     border.tl = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
     border.tm = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
     border.tr = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
@@ -148,34 +148,34 @@ function CreateBorder(parent)
     border.bl = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
     border.bm = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
     border.br = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-    
+
     border.tl.Bottom:Set(parent.Top)
     border.tl.Right:Set(parent.Left)
-    
+
     border.bl.Top:Set(parent.Bottom)
     border.bl.Right:Set(parent.Left)
-    
+
     border.tr.Bottom:Set(parent.Top)
     border.tr.Left:Set(parent.Right)
-    
+
     border.br.Top:Set(parent.Bottom)
     border.br.Left:Set(parent.Right)
-    
+
     border.tm.Bottom:Set(parent.Top)
     border.tm.Left:Set(parent.Left)
     border.tm.Right:Set(parent.Right)
-    
+
     border.bm.Top:Set(parent.Bottom)
     border.bm.Left:Set(parent.Left)
     border.bm.Right:Set(parent.Right)
-    
+
     border.ml.Top:Set(parent.Top)
     border.ml.Bottom:Set(parent.Bottom)
     border.ml.Right:Set(parent.Left)
-    
+
     border.mr.Top:Set(parent.Top)
     border.mr.Bottom:Set(parent.Bottom)
     border.mr.Left:Set(parent.Right)
-    
+
     return border
 end
