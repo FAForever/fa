@@ -21,6 +21,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
+local scoreMini = import(UIUtil.GetLayoutFilename('score'))
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -101,6 +102,7 @@ function CreateScoreUI(parent)
     SetLayout()
     SetupPlayerLines()
     controls.armyGroup.Height:Set(armyGroupHeight())
+    scoreMini.LayoutArmyLines()
 
     GameMain.AddBeatFunction(_OnBeat, true)
     controls.bg.OnDestroy = function(self)
@@ -142,7 +144,7 @@ end
 
 function SetLayout()
     if controls.bg then
-        import(UIUtil.GetLayoutFilename('score')).SetLayout()
+        scoreMini.SetLayout()
     end
 end
 
@@ -575,7 +577,7 @@ function _OnBeat()
                     end
                 end
             end
-            import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+            scoreMini.LayoutArmyLines()
         end
         local line = {}
         for _, data in controls.armyLines do
@@ -616,7 +618,7 @@ function _OnBeat()
         end
         if observerLine:IsHidden() and ((curFA < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
             table.insert(controls.armyLines, table.getsize(controls.armyLines), observerLine)
-            import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+            scoreMini.LayoutArmyLines()
             controls.armyGroup.Height:Set(armyGroupHeight())
             observerLine.OnHide = nil
             observerLine:Show()
