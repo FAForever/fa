@@ -151,6 +151,7 @@ Blacklist = {
     ['7749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
+    ['1dd86878-6d2f-4f6d-b879-d14d37bcd45b'] = UPGRADE, --V9
 
     -- OneClickWonder
     ['c5cc7241-d9f8-4b46-8662-ad130e426a4a'] = UPGRADE,
@@ -189,5 +190,9 @@ Blacklist = {
     ['fff6f6c8-248a-11de-8c30-362b9e100007'] = HARMFUL,
     ['fff6f6c8-248a-11de-8c30-362b9e100008'] = HARMFUL,
     ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
+    
+    -- cheat mods
+    ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
+    ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
 
 }
