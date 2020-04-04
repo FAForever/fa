@@ -453,7 +453,6 @@ UnitBlueprint {
     SizeZ = 4.8,
     StrategicIconName = 'icon_factory3_land',
     StrategicIconSortPriority = 210,
-    UpgradeDesc = '<LOC zeb9601_upgradedesc>Upgrading to Tech 3 Land Factory',
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

@@ -109,7 +109,7 @@ function CreateContent(inParent)
 
     BuildPlayerLines()
 
-    parent.Width:Set(266)
+    LayoutHelpers.SetWidth(parent, 266)
     parent.OnDestroy = function(self)
         parent = false
     end

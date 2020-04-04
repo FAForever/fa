@@ -1,5 +1,6 @@
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
 NinePatch = Class(Group) {
     __init = function(self, parent, center, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
@@ -13,8 +14,6 @@ NinePatch = Class(Group) {
             self.center.Left:Set(self.Left)
             self.center.Bottom:Set(self.Bottom)
             self.center.Right:Set(self.Right)
-
-            self.center:SetTiled(true)
         end
 
         self.tl = Bitmap(self, topLeft)
@@ -22,13 +21,9 @@ NinePatch = Class(Group) {
         self.bl = Bitmap(self, bottomLeft)
         self.br = Bitmap(self, bottomRight)
         self.l = Bitmap(self, left)
-        self.l:SetTiled(true)
         self.r = Bitmap(self, right)
-        self.r:SetTiled(true)
         self.t = Bitmap(self, top)
-        self.t:SetTiled(true)
         self.b = Bitmap(self, bottom)
-        self.b:SetTiled(true)
 
         self.tl.Bottom:Set(self.Top)
         self.tl.Right:Set(self.Left)
@@ -63,6 +58,8 @@ NinePatch = Class(Group) {
 
     -- Lay this NinePatch out around the given control
     Surround = function(self, control, horizontalPadding, verticalPadding)
+        horizontalPadding = ScaleNumber(horizontalPadding)
+        verticalPadding = ScaleNumber(verticalPadding)
         self.Left:Set(function() return control.Left() + horizontalPadding end)
         self.Right:Set(function() return control.Right() - horizontalPadding end)
         self.Top:Set(function() return control.Top() + verticalPadding end)

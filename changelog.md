@@ -1,4 +1,4 @@
-Patch 3712 (15 April, 2020)
+Patch 3713 (20 April, 2020)
 ============================
 - Land
     - Sniper Bot
@@ -114,6 +114,50 @@ Patch 3712 (15 April, 2020)
 - TurinTurambar
 - Petricpwnz
 
+Patch 3712 (4 April, 2020)
+============================
+
+- Fixed wrong rating reward when someone quit the game before it ended
+- Fixed the black plane bug for maps
+- Allowed to scale the UI for people playing with big screens
+- Changed the aesthetic of seraphim units
+- Scoreboard now group people from same team together when score is off
+- Added support for custom map Props
+- Clean up improving the simulation
+- Removed drag build from radars/sonars/stealth field and soothsayer
+- Fixed the targeting of structures with beam weapons
+- Addded Chinese translation and improved russian translation
+- Score windows closing on pressing F2
+- Added ability to spawn unit with veterancy using cheat
+- Added ability to spawn multiple units while holding shift
+- Fixed ACU playing twice the contruction visual fx when building
+- Fixed UEF construction beams animation
+- Improved the frigate sink animation rate
+- Fixed the UI of UEF navy
+- Improved CPU usage in lobby
+- Moved mod manager menu from extra menu to main menu
+- Fixed mods dependencies handling in mod manager
+- Improved simspeed and removed code that wasn\'t working
+- Improved Kennel animation and reduce lags due to kennel
+- Improved text display in game and translation
+- Fixed Russian name being wrongly displayed in lobby
+- Improved dialogue button especially for coop
+- Changed the display of the warning when trying to ctrl-k ACU in coop
+- Updated mod and map blacklist
+
+### Contributors ###
+- speed2
+- KionX
+- keyser
+- Uveso
+- BlackYps
+- Strogo
+- Stratege
+- ZeroCiel
+- Exotic-Retard
+- Lorhtan
+- Askaholic
+
 Patch 3711 (15 March, 2020)
 ============================
 - Fix a bug allowing to generate resources for free
@@ -211,8 +255,8 @@ Patch 3709 (16 December, 2019)
         - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
     - Target priorities
         - ACUs cannot be prioritised by units other than experimentals, labs, gunships, fighter/bombers and ACUs
-    - Repair
-        - Repair get 25% cost reduction
+	- Repair
+		- Repair get 25% cost reduction
     
 ### Contributors
 - Strogo

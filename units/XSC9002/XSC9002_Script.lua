@@ -12,7 +12,7 @@ XSC9002 = Class(SStructureUnit) {
     OnCreate = function(self, builder, layer)
         -- Place emitters on certain light bones on the mesh.
         for _, v in SSJammerCrystalAmbient do
-            CreateAttachedEmitter(self, 'XSC9002', self:GetArmy(), v)
+            CreateAttachedEmitter(self, 'XSC9002', self.Army, v)
         end
 
         self:ForkThread(self.LandBlipThread)
@@ -28,7 +28,7 @@ XSC9002 = Class(SStructureUnit) {
         local position = self:GetPosition()
         while not self.Dead do
             -- Spawn land blips
-            self.landChildUnit = CreateUnitHPR('XSC9010', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)
+            self.landChildUnit = CreateUnitHPR('XSC9010', self.Army, position[1], position[2], position[3], 0, 0, 0)
             self.landChildUnit.parentCrystal = self
 
             WaitSeconds(Random(7, 13))
@@ -42,7 +42,7 @@ XSC9002 = Class(SStructureUnit) {
         local position = self:GetPosition()
         while not self.Dead do
             -- Spawn air blips
-            self.airChildUnit = CreateUnitHPR('XSC9011', self:GetArmy(), position[1], position[2], position[3], 0, 0, 0)
+            self.airChildUnit = CreateUnitHPR('XSC9011', self.Army, position[1], position[2], position[3], 0, 0, 0)
             self.airChildUnit.parentCrystal = self
 
             IssuePatrol({self.airChildUnit}, {position[1] + Random(-10, 10), position[2], position[3] + Random(-10, 10)})

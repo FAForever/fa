@@ -2,6 +2,7 @@
 
 Flare = Class(Entity) {
     OnCreate = function(self, spec)
+        self.Army = self:GetArmy()
         self.Owner = spec.Owner
         self.Radius = spec.Radius or 5
         self.OffsetMult = spec.OffsetMult or 0
@@ -14,9 +15,9 @@ Flare = Class(Entity) {
     -- We only divert projectiles. The flare-projectile itself will be responsible for
     -- accepting the collision and causing the hostile projectile to impact.
     OnCollisionCheck = function(self,other)
-        myArmy = self:GetArmy()
-        otherArmy = other:GetArmy()
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
+        myArmy = self.Army
+        otherArmy = other.Army
+        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and myArmy ~= otherArmy and IsAlly(myArmy, otherArmy) == false then
             other:SetNewTarget(self.Owner)
         end
         return false
@@ -26,6 +27,7 @@ Flare = Class(Entity) {
 
 DepthCharge = Class(Entity) {
     OnCreate = function(self, spec)
+        self.Army = self:GetArmy()
         self.Owner = spec.Owner
         self.Radius = spec.Radius
         self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
@@ -36,9 +38,9 @@ DepthCharge = Class(Entity) {
     -- We only divert projectiles. The flare-projectile itself will be responsible for
     -- accepting the collision and causing the hostile projectile to impact.
     OnCollisionCheck = function(self,other)
-        myArmy = self:GetArmy()
-        otherArmy = other:GetArmy()
-        if EntityCategoryContains(categories.TORPEDO, other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
+        myArmy = self.Army
+        otherArmy = other.Army
+        if EntityCategoryContains(categories.TORPEDO, other) and myArmy ~= otherArmy and IsAlly(myArmy, otherArmy) == false then
             other:SetNewTarget(self.Owner)
         end
         return false

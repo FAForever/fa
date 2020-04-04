@@ -39,15 +39,13 @@ function initCycleButtons(values)
     local i = 1
     for i_whatever, value in values do
         cycleButtons[i] = Bitmap(cycleMap, UIUtil.SkinnableFile('/icons/units/' .. value .. '_icon.dds'))
-        cycleButtons[i].Height:Set(buttonH)
-        cycleButtons[i].Width:Set(buttonW)
+        LayoutHelpers.SetDimensions(cycleButtons[i], buttonW, buttonH)
         cycleButtons[i].Depth:Set(1002)
         LayoutHelpers.AtLeftTopIn(cycleButtons[i], cycleMap, 29 + buttonH * (i-1), 18)
         i=i+1
     end
 
-    cycleMap.Height:Set(buttonH + 36)
-    cycleMap.Width:Set((i-1) * buttonH + 58)
+    LayoutHelpers.SetDimensions(cycleMap, (i-1) * buttonH + 58, buttonH + 36)
     cycleMap:DisableHitTest(true)
 end
 
@@ -55,8 +53,7 @@ function initCycleMap()
     cycleMap = Group(GetFrame(0))
 
     cycleMap.Depth:Set(1000) --always on top
-    cycleMap.Width:Set(400)
-    cycleMap.Height:Set(150)
+    LayoutHelpers.SetDimensions(cycleMap, 400, 150)
     cycleMap.Top:Set(function() return GetFrame(0).Bottom()*.75 end)
     cycleMap.Left:Set(function() return (GetFrame(0).Right()-cycleMap.Width())/2 end)
     cycleMap:DisableHitTest()

@@ -55,12 +55,12 @@ XEB2402 = Class(TAirFactoryUnit) {
                 self.Satellite = self.newSatellite
                 self.newSatellite = nil
             else
-                self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                self.Satellite = CreateUnitHPR('XEA0002', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 self.Satellite:AttachTo(self, 'Attachpoint01')
             end
 
             -- Create warning lights and other VFX
-            local army = self:GetArmy()
+            local army = self.Army
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.10, 1.90))
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.08, -0.5, 1.60))
@@ -151,7 +151,7 @@ XEB2402 = Class(TAirFactoryUnit) {
 
     OnCaptured = function(self, captor)
         if self and not self.Dead and captor and not captor.Dead and self:GetAIBrain() ~= captor:GetAIBrain() then
-            local captorArmyIndex = captor:GetArmy()
+            local captorArmyIndex = captor.Army
 
             -- Disable unit cap for campaigns
             if ScenarioInfo.CampaignMode then

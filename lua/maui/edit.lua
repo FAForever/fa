@@ -32,6 +32,7 @@
 
 local Control = import('control.lua').Control
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
 Edit = Class(moho.edit_methods, Control) {
 
@@ -82,7 +83,7 @@ Edit = Class(moho.edit_methods, Control) {
     SetFont = function(self, family, pointsize)
         if self._font then
             self._lockFontChanges = true
-            self._font._pointsize:Set(pointsize)
+            self._font._pointsize:Set(ScaleNumber(pointsize))
             self._font._family:Set(family)
             self._lockFontChanges = false
             self:_internalSetFont()

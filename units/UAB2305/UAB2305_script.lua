@@ -16,7 +16,7 @@ UAB2305 = Class(AStructureUnit) {
 
             PlayFxWeaponUnpackSequence = function(self)
                 for k, v in self.UnpackEffects01 do
-                    CreateAttachedEmitter(self.unit, 'B04', self.unit:GetArmy(), v)
+                    CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
                 end
 
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)

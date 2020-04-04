@@ -17,8 +17,7 @@ InputDialog = Class(Popup) {
 
         -- Set up the UI Group to pass to the Popup constructor.
         local dialogContent = Group(parent)
-        dialogContent.Width:Set(364)
-        dialogContent.Height:Set(140)
+        LayoutHelpers.SetDimensions(dialogContent, 364, 140)
 
         if title then
             local titleText = UIUtil.CreateText(dialogContent, title, 17, 'Arial', true)
@@ -31,8 +30,7 @@ InputDialog = Class(Popup) {
         self.inputBox = nameEdit
         LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
         LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
-        nameEdit.Width:Set(334)
-        nameEdit.Height:Set(24)
+        LayoutHelpers.SetDimensions(nameEdit, 334, 24)
         nameEdit:AcquireFocus()
 
         if str then

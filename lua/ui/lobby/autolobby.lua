@@ -117,8 +117,6 @@ local function HostAddPlayer(senderId, playerInfo)
         slot = slot + 1
     end
 
-    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
-
     # figure out a reasonable default color
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
@@ -202,8 +200,7 @@ local function CreateUI()
     ---------------------------------------------------------------------------
     local controlGroup = Group(parent, "controlGroup")
     LayoutHelpers.AtCenterIn(controlGroup, parent)
-    controlGroup.Width:Set(970)
-    controlGroup.Height:Set(670)
+    LayoutHelpers.SetDimensions(controlGroup, 970, 670)
 
     UIUtil.ShowInfoDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 end

@@ -124,7 +124,6 @@ URS0201 = Class(CSeaUnit) {
      DeathThread = function(self, overkillRatio)
         if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
             self:PlayUnitSound('Destroyed')
-            local army = self:GetArmy()
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
             end

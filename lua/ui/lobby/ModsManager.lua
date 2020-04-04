@@ -77,7 +77,7 @@ local modDependencyMap = {}
 -- Maps uids to sets of uids of mods that depend on the first uid
 local modBackwardDependencyMap = {}
 
-function UpdateClientModStatus(mod_selec)
+function UpdateClientModStatus()
     if GUIOpen then
         modsDialog:Close()
         GUIOpen = false
@@ -98,24 +98,24 @@ local function EveryoneHasMod(modID)
 end
 
 local modsTags = {
- UI = { 
-    label = LOC('<LOC uiunitmanager_10>UI MODS'), 
+ UI = {
+    label = LOC('<LOC uiunitmanager_10>UI MODS'),
     text  = LOC('<LOC uiunitmanager_03>Filter UI Mods'),
     body  = LOC('<LOC uiunitmanager_04>Toggle visibility of all UI mods in above list of mods.') },
- GAME = { 
+ GAME = {
     label = LOC('<LOC uiunitmanager_11>GAME MODS'),
     text  = LOC('<LOC uiunitmanager_01>Filter Game Mods'),
     body  = LOC('<LOC uiunitmanager_02>Toggle visibility of all game mods in above list of mods.') },
- BLACKLISTED = { 
+ BLACKLISTED = {
     label = LOC('<LOC uiunitmanager_13>BLACKLISTED'),
     text  = LOC('<LOC uiunitmanager_05>Filter Blacklisted Mods'),
     body  = LOC('<LOC uiunitmanager_06>Toggle visibility of blacklisted mods in above list of mods.')},
- LOCAL = { 
+ LOCAL = {
     label = LOC('<LOC uiunitmanager_14>LOCAL MODS'),
     text  = LOC('<LOC uiunitmanager_18>Filter Local Mods'),
     body  = LOC('<LOC uiunitmanager_19>Toggle visibility of game mods that are missing by other players') },
- NO_DEPENDENCY = { 
-    label = LOC('<LOC uiunitmanager_15>NO DEPENDENCY'), 
+ NO_DEPENDENCY = {
+    label = LOC('<LOC uiunitmanager_15>NO DEPENDENCY'),
     text  = LOC('<LOC uiunitmanager_16>Filter Missing Dependency Mods'),
     body  = LOC('<LOC uiunitmanager_17>Toggle visibility of mods that are missing dependency in above list of mods.') },
 }
@@ -130,10 +130,10 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
     mods.availableToAll = availableMods
 
-    dialogHeight = GetFrame(0).Height() - 80
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
 
     dialogContent = Group(parent)
-    dialogContent.Width:Set(dialogWidth)
+    LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
 
     modsDialog = Popup(parent, dialogContent)
@@ -156,8 +156,8 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LayoutHelpers.AtTopIn(subtitle, dialogContent, 26)
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
-    SaveButton:UseAlphaHitTest(true)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>OK", -1)
+    --SaveButton:UseAlphaHitTest(true)
     LayoutHelpers.AtHorizontalCenterIn(SaveButton, dialogContent)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
 
@@ -167,13 +167,13 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     -- so that it is faster to find and activate mods
     scrollGroup = Group(dialogContent)
 
-    LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2)
-    scrollGroup.Top:Set(function() return subtitle.Bottom() + 10 end)
-    scrollGroup.Bottom:Set(function() return SaveButton.Top() - 70 end)
+    LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, -2)
+    LayoutHelpers.AnchorToBottom(scrollGroup, subtitle, 10)
+    LayoutHelpers.AnchorToTop(scrollGroup, SaveButton, 70)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
     scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
 
-    modsPerPage = math.floor((scrollGroup.Height() - 10) / modInfoHeight)
+    modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
 
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
     scrollGroup.top = 1
@@ -238,6 +238,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
         return mods.activated
     end
+    UIUtil.MakeInputModal(dialogContent, function() SaveButton.OnClick(SaveButton) end, function() SaveButton.OnClick(SaveButton) end)
 
     RefreshModsList()
 
@@ -269,7 +270,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     local filterDisabledMods = CreateModsFilter(dialogContent, 'BLACKLISTED')
     LayoutHelpers.AtLeftIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 65)
-    
+
     position = position + offset
     local filterNoDependencyMods = CreateModsFilter(dialogContent, 'NO_DEPENDENCY')
     LayoutHelpers.AtLeftIn(filterNoDependencyMods, dialogContent, position)
@@ -333,7 +334,7 @@ function CreateModsFilter(parent, tag)
     filterToggle.tag = tag
     filterToggle.checked = true
     filterToggle.Height:Set(height)
-    filterToggle.Width:Set(width)
+    LayoutHelpers.SetWidth(filterToggle, width)
     filterToggle.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             if not self.checked then
@@ -356,7 +357,7 @@ function CreateModsFilter(parent, tag)
             return true
         end
     end
-    filterToggle:UseAlphaHitTest(true)
+    --filterToggle:UseAlphaHitTest(true)
     Tooltip.AddControlTooltip(filterToggle, { text = modsTags[tag].text, body = modsTags[tag].body })
 
     return filterToggle
@@ -547,7 +548,7 @@ function RefreshModsList()
                 mod.sort = 'X'
                 mod.type = 'NO_DEPENDENCY'
                 mods.missingDependencies[uid] = mod
-                
+
             elseif dependencies.requires then
                 -- Construct backward-dependency map for this mod (so we can disable this one if
                 -- someone turns off something we depend on)
@@ -692,17 +693,12 @@ end
 -- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
--- @param visited The set of mods visited during this recursive set of calls (used to break cycles)
-function ActivateMod(uid, isRecursing, visited)
+function ActivateMod(uid, isRecursing)
     if mods.activated[uid] then
         return
     end
 
-    visited = visited or {}
-    if visited[uid] then
-        return
-    end
-    visited[uid] = true
+    mods.activated[uid] = true
 
     -- Dependency checking time!
     local deps = modDependencyMap[uid]
@@ -724,7 +720,7 @@ function ActivateMod(uid, isRecursing, visited)
             local doEnable = function()
                 for k, uid in activatedConflictingMods do
                     DeactivateMod(uid)
-                    ActivateMod(thisUID, true, visited)
+                    ActivateMod(thisUID, true)
                     LOG("ModsManager activated: ".. GetModNameType(thisUID))
                 end
             end
@@ -746,12 +742,11 @@ function ActivateMod(uid, isRecursing, visited)
         -- Activate any dependencies. We guaranteed that these all exist earlier on.
         if deps.requires then
             for uid, _ in deps.requires do
-                ActivateMod(uid, true, visited)
+                ActivateMod(uid, true)
                 LOG("ModsManager activated dependency: ".. GetModNameType(uid))
             end
         end
     end
-    mods.activated[uid] = true
     controlMap[uid].bg:SetCheck(true, true)
 
     if mods.selectable[uid].ui_only then
@@ -763,27 +758,22 @@ function ActivateMod(uid, isRecursing, visited)
     UpdateModsCounters()
 end
 
-function DeactivateMod(uid, visited)
+function DeactivateMod(uid)
     if not mods.activated[uid] then
         return
     end
 
-    visited = visited or {}
-    if visited[uid] then
-        return
-    end
-    visited[uid] = true
+    mods.activated[uid] = nil
 
     -- Check for backward dependencies: do other mods require this one? If so, we should disable
     -- those mods, as well.
     local victims = modBackwardDependencyMap[uid]
     if victims then
         for k, v in victims do
-            DeactivateMod(k, true, visited)
+            DeactivateMod(k, true)
         end
     end
 
-    mods.activated[uid] = nil
     controlMap[uid].bg:SetCheck(false, true)
 
     if mods.selectable[uid].ui_only then
@@ -840,11 +830,11 @@ function CreateListElement(parent, mod, Pos)
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    group.bg.Height:Set(modIconSize + 10)
-    group.bg.Width:Set(dialogWidth - 15)
+    LayoutHelpers.SetHeight(group.bg, modIconSize + 10)
+    LayoutHelpers.SetWidth(group.bg, dialogWidth - 15)
 
-    group.Height:Set(modInfoHeight)
-    group.Width:Set(dialogWidth - 25)
+    LayoutHelpers.SetHeight(group, modInfoHeight)
+    LayoutHelpers.SetWidth(group, dialogWidth - 25)
     LayoutHelpers.AtLeftTopIn(group, parent, 4, group.Height()*(Pos-1))
     LayoutHelpers.FillParent(group.bg, group)
 
@@ -853,8 +843,7 @@ function CreateListElement(parent, mod, Pos)
     end
 
     group.icon = Bitmap(group, mod.icon)
-    group.icon.Height:Set(modIconSize)
-    group.icon.Width:Set(modIconSize)
+    LayoutHelpers.SetDimensions(group.icon, modIconSize, modIconSize)
     group.icon:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 7)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
@@ -863,7 +852,7 @@ function CreateListElement(parent, mod, Pos)
     group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
     group.name:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.name, group, modInfoPosition, 7)
-     
+
     group.createdBy = UIUtil.CreateText(group, ' created by ', 14, UIUtil.bodyFont)
     group.createdBy:DisableHitTest()
     group.createdBy:SetColor('FFA2A5A2') -- #FFA2A5A2
@@ -917,7 +906,7 @@ function CreateListElement(parent, mod, Pos)
 
     if string.len(mod.description) > 240 then
         local description = string.sub(mod.description, 1, 240) .. '...'
-        group.desc:SetText(description) 
+        group.desc:SetText(description)
     end
 
     if mod.type == 'NO_DEPENDENCY' then
@@ -930,7 +919,7 @@ function CreateListElement(parent, mod, Pos)
             for k, v in mod.requires do
                 body = v .. ',\n' .. body
             end
-        else 
+        else
             body = nil
         end
 

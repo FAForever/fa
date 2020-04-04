@@ -57,7 +57,7 @@ URL0401 = Class(CLandUnit) {
 				local FxLaunch = EffectTemplate.CArtilleryFlash02 
 
 				for k, v in FxLaunch do
-					CreateEmitterAtEntity( self.unit, self.unit:GetArmy(), v )
+					CreateEmitterAtEntity( self.unit, self.unit.Army, v )
 				end
 			end, 	        
             

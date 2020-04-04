@@ -1075,7 +1075,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             exit_btn:SetCheck(false)
         end
     end
-    dual_btn = CreateDialogTabs(dialog, "Dual", "m")
+    dual_btn = CreateDialogTabs(dialog, LOC("<LOC SCORE_0122>Dual"), "m")
     LayoutHelpers.AtLeftIn(dual_btn, dialog, 467)
     dual_btn.Bottom:Set(dialog.Bottom() - 73)
     dual_btn:UseAlphaHitTest(false)
@@ -1097,7 +1097,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     end
 
     if HasCommandLineArg("/gpgnet") then
-        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Exit_to_FAF>Exit to FAF"), "r")
+        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Exit>Exit"), "r")
     else
         exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Continue>"), "r")
     end

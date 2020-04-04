@@ -11,11 +11,14 @@ local Prefs = import('/lua/user/prefs.lua')
 local Utils = import('/lua/system/utils.lua')
 
 local quickDialog = false
+-- Used to skip result reporting when we exit the game early
+isExiting = false
 
 -- Terminate the game in a vaguely graceful fashion. This may or may not reduce the amount of times
 -- sudden quits lead to players having to wait for a timeout.
 function SafeQuit()
     if SessionIsActive() and not SessionIsReplay() then
+        isExiting = true
         ForkThread(function ()
             ConExecute('ren_oblivion true')
             ConExecute('ren_ui false')

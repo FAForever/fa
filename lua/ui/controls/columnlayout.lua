@@ -19,7 +19,7 @@ ColumnLayout = Class(Group) {
     --- Add a control to the group, inserting it into the next available column.
     AddChild = function(self, control)
         self.numChildren = self.numChildren + 1
-        control.Width:Set(self.widths[self.numChildren])
+        LayoutHelpers.SetWidth(control, self.widths[self.numChildren])
         LayoutHelpers.AtLeftIn(control, self, self.positions[self.numChildren])
         LayoutHelpers.AtVerticalCenterIn(control, self, 1)
     end

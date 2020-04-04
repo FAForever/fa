@@ -63,7 +63,6 @@ UnitBlueprint {
         'MOBILESONAR',
         'OVERLAYSONAR',
         'OVERLAYANTINAVY',
-        'DRAGBUILD',
         'SORTINTEL',
         'NAVAL',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction

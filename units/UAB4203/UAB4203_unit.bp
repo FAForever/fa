@@ -35,7 +35,6 @@ UnitBlueprint {
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3COMMANDER',
         'AEON',
-        'DRAGBUILD',
         'STRUCTURE',
         'INTELLIGENCE',
         'TECH2',

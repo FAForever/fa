@@ -17,6 +17,8 @@ local SimUIVars = import('/lua/sim/SimUIState.lua')
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
 
+local PauseUnitDeathActive = false
+
 -- Cause the game to exit immediately
 function ExitGame()
     Sync.RequestingExit = true
@@ -164,7 +166,9 @@ end
 
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
-    WaitSeconds(2)
+    while PauseUnitDeathActive do
+        WaitSeconds(1)
+    end
     self:SetCanBeKilled(true)
     self:Kill(instigator, damageType, excessDamageRatio)
 end
@@ -198,7 +202,6 @@ function OverrideKilled(self, instigator, type, overkillRatio)
         self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
         self:SetCollisionShape('None')
     end
-    self:DoUnitCallbacks('OnKilled')
     self:DestroyTopSpeedEffects()
 
     if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
@@ -970,10 +973,9 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
         unit:SetBusy(false)
 
         local totalBones = unit:GetBoneCount() - 1
-        local army = unit:GetArmy()
         for _, v in import('/lua/EffectTemplates.lua').UnitTeleportSteam01 do
             for bone = 1, totalBones do
-                CreateAttachedEmitter(unit, bone, army, v)
+                CreateAttachedEmitter(unit, bone, unit.Army, v)
             end
         end
 
@@ -1792,6 +1794,7 @@ end
 
 -- CDR Death (pass hold only if it's a mid-operation death)
 function CDRDeathNISCamera(unit, hold)
+    PauseUnitDeathActive = true
     local camInfo = {
         blendTime = 1,
         holdTime = hold,
@@ -1918,6 +1921,7 @@ function OperationNISCameraThread(unitInfo, camInfo)
         end
 
     end
+    PauseUnitDeathActive = false
 end
 
 function OnPostLoad()
@@ -2104,18 +2108,14 @@ function AntiOffMapMainThread()
     end
 end
 
-IsHumanUnit = function(self)
-    local ArmyTable = ScenarioInfo.ArmySetup
-    local ArmyIndex = self:GetArmy()
-
-    for ArmyName, Army in ArmyTable do
-        if Army.ArmyIndex == ArmyIndex then
+function IsHumanUnit(self)
+    for _, Army in ScenarioInfo.ArmySetup do
+        if Army.ArmyIndex == self.Army then
             if Army.Human == true then
                 return true
             else
                 return false
             end
-
         end
     end
 end

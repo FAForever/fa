@@ -23,7 +23,7 @@ Flare = Class(Entity){
         -- We only divert projectiles. The flare-projectile itself will be responsible for
         -- accepting the collision and causing the hostile projectile to impact.
         OnCollisionCheck = function(self, other)
-            if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and (self:GetArmy() ~= other:GetArmy()) then
+            if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and (self.Army ~= other.Army) then
                 other:SetNewTarget(self.Owner)
             end
             return false
@@ -42,7 +42,7 @@ DepthCharge = Class(Entity){
     -- We only divert projectiles. The flare-projectile itself will be responsible for
     -- accepting the collision and causing the hostile projectile to impact.
     OnCollisionCheck = function(self, other)
-        if EntityCategoryContains(categories.TORPEDO, other) and self:GetArmy() ~= other:GetArmy() then
+        if EntityCategoryContains(categories.TORPEDO, other) and self.Army ~= other.Army then
             other:SetNewTarget(self.Owner)
         end
         return false
@@ -79,7 +79,7 @@ MissileRedirect = Class(Entity) {
         WaitingState = State {
             OnCollisionCheck = function(self, other)
                 if EntityCategoryContains(categories.MISSILE, other) and not EntityCategoryContains(categories.STRATEGIC, other) and
-                   other ~= self.EnemyProj and IsEnemy(self:GetArmy(), other:GetArmy()) then
+                   other ~= self.EnemyProj and IsEnemy(self.Army, other.Army) then
                     self.Enemy = other:GetLauncher()
                     self.EnemyProj = other
 
@@ -103,7 +103,7 @@ MissileRedirect = Class(Entity) {
 
                 local beams = {}
                 for k, v in self.RedirectBeams do
-                    table.insert(beams, AttachBeamEntityToEntity(self.EnemyProj, -1, self.Owner, self.AttachBone, self:GetArmy(), v))
+                    table.insert(beams, AttachBeamEntityToEntity(self.EnemyProj, -1, self.Owner, self.AttachBone, self.Army, v))
                 end
 
                 if self.Enemy then

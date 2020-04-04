@@ -98,11 +98,9 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
-        self.EntityId = self:GetEntityId()
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
-        self.Sync.id = self.EntityId
+        self.Sync.id = self:GetEntityId()
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync, SyncMeta)
 
@@ -212,6 +210,7 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
 
         -- Save common lookup info
+        self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
         self.layerCategory = bp.LayerCategory
         self.factionCategory = bp.FactionCategory
@@ -825,22 +824,21 @@ Unit = Class(moho.unit_methods) {
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
 
-            local captorArmyIndex = captor:GetArmy()
             local captorBrain = false
 
             -- Ignore army cap during unit transfer in Campaign
             if ScenarioInfo.CampaignMode then
                 captorBrain = captor:GetAIBrain()
-                SetIgnoreArmyUnitCap(captorArmyIndex, true)
+                SetIgnoreArmyUnitCap(captor.Army, true)
             end
 
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(captorArmyIndex, false)
+                SetIgnoreArmyUnitCap(captor.Army, false)
             end
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captorArmyIndex, true) or {}
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captor.Army, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1168,15 +1166,14 @@ Unit = Class(moho.unit_methods) {
         local totalBones = self:GetBoneCount()
         local bone = Random(1, totalBones) - 1
         local bpDE = self:GetBlueprint().Display.DamageEffects
-        local army = self:GetArmy()
         for _, v in effects do
             local fx
             if bpDE then
                 local num = Random(1, table.getsize(bpDE))
                 local bpFx = bpDE[num]
-                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
+                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
             else
-                fx = CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(self.FxDamageScale)
+                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(self.FxDamageScale)
             end
             table.insert(fxBag, fx)
         end
@@ -1245,12 +1242,12 @@ Unit = Class(moho.unit_methods) {
         if self.totalDamageTaken > 0 and not self.veterancyDispersed then
             self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
-        
+
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
     end,
 
     -- Argument val is true or false. False = cannot be killed
@@ -1321,11 +1318,11 @@ Unit = Class(moho.unit_methods) {
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
-        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then return end -- No XP for friendly fire...
+        if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
 
         self:CalculateVeterancyLevel(massKilled) -- Bails if we've not gone up
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
+        ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
     end,
 
     CalculateVeterancyLevel = function(self, massKilled)
@@ -1422,7 +1419,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateVeterancyBuffs = function(self, level)
         local healthBuffName = 'VeterancyMaxHealth' .. level -- Currently there is no difference between units, therefore no need for unique buffs
-        local regenBuffName = self:GetUnitId() .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
+        local regenBuffName = self.UnitId .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
 
         if not Buffs[regenBuffName] then
             -- Maps self.techCategory to a number so we can do math on it for naval units
@@ -1518,7 +1515,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if EntityCategoryContains(categories.PROJECTILE, other) then
-            if IsAlly(self:GetArmy(), other:GetArmy()) then
+            if IsAlly(self.Army, other:GetArmy()) then
                 return other.CollideFriendly
             end
         end
@@ -1553,7 +1550,7 @@ Unit = Class(moho.unit_methods) {
         local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
-            if IsAlly(self:GetArmy(), firingWeapon.unit:GetArmy()) then
+            if IsAlly(self.Army, firingWeapon.unit.Army) then
                 return false
             end
         end
@@ -1728,46 +1725,44 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SinkDestructionEffects = function(self)
-        local Util = utilities
         local sx, sy, sz = self:GetUnitSizes()
         local vol = sx * sy * sz
-        local army = self:GetArmy()
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
         local i = 0
 
         while i < 1 do
-            local randBone = Util.GetRandomInt(0, numBones)
+            local randBone = utilities.GetRandomInt(0, numBones)
             local boneHeight = self:GetPosition(randBone)[2]
             local toSurface = surfaceHeight - boneHeight
             local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
             local rs = math.max(math.min(2.5, vol / 20), 0.5)
-            local scale = Util.GetRandomFloat(rs/2, rs)
+            local scale = utilities.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
             if toSurface < 1 then
-                CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
-                CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
+                CreateAttachedEmitter(self, randBone, self.Army, '/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
+                CreateAttachedEmitter(self, randBone, self.Army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
             end
 
             if toSurface < 0 then
                 explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
-                local lifetime = Util.GetRandomInt(50, 200)
+                local lifetime = utilities.GetRandomInt(50, 200)
 
                 if toSurface > 1 then
-                    CreateEmitterAtBone(self, randBone, army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
+                    CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
                         :ScaleEmitter(scale)
                         :SetEmitterParam('LIFETIME', lifetime)
 
-                    CreateAttachedEmitter(self, -1, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                    CreateAttachedEmitter(self, -1, self.Army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
                 end
-                CreateEmitterAtBone(self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
-                CreateEmitterAtBone(self, randBone, army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
+                CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
             end
-            local rd = Util.GetRandomFloat(0.4, 1.0)
+            local rd = utilities.GetRandomFloat(0.4, 1.0)
             WaitSeconds(i + rd)
             i = i + 0.3
         end
@@ -1968,7 +1963,7 @@ Unit = Class(moho.unit_methods) {
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
             else
-                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self:GetUnitId()), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
             end
         end
     end,
@@ -2231,11 +2226,11 @@ Unit = Class(moho.unit_methods) {
             self.MovementEffectsExist = false
         end
 
-        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "built", 1)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "built", 1)
 
         -- Prevent UI mods from violating game/scenario restrictions
-        local id = self:GetUnitId()
-        local index = self:GetArmy()
+        local id = self.UnitId
+        local index = self.Army
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))
             if self ~= nil then self:Destroy() end
@@ -2427,7 +2422,7 @@ Unit = Class(moho.unit_methods) {
         local upos = unit:GetPosition()
         local props = GetReclaimablesInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         local wreckage = {}
-        local bpid = unit:GetUnitId()
+        local bpid = unit.UnitId
 
         if EntityCategoryContains(categories.ENGINEER, self) then
             for _, p in props do
@@ -2507,12 +2502,11 @@ Unit = Class(moho.unit_methods) {
 
     OnStartBuild = function(self, built, order)
         -- Prevent UI mods from violating game/scenario restrictions
-        local id = built:GetUnitId()
+        local id = built.UnitId
         local bp = built:GetBlueprint()
         local bpSelf = self:GetBlueprint()
-        local index = self:GetArmy()
-        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
-            WARN('Unit.OnStartBuild() Army ' ..index.. ' cannot build restricted unit: ' .. (bp.Description or id))
+        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, self.Army) then
+            WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
             IssueClearCommands({self})
@@ -2550,7 +2544,7 @@ Unit = Class(moho.unit_methods) {
         self:DoOnStartBuildCallbacks(built)
 
         
-        if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
+        if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
@@ -3225,7 +3219,6 @@ Unit = Class(moho.unit_methods) {
             local effects = {}
             local scale = 1
             local offset
-            local army = self:GetArmy()
             local boneTable
 
             if bpTable.Damage then
@@ -3253,7 +3246,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
-                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army)
+                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, self.Army)
                 local treadOffsetX = boneTable.Tread.TreadOffset[1]
                 if x and x > 0 then
                     if layer ~= 'Seabed' then
@@ -3271,7 +3264,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             for k, v in effects do
-                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0, offset.y or 0, offset.z or 0)
+                CreateEmitterAtBone(self, bone, self.Army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0, offset.y or 0, offset.z or 0)
             end
         end
 
@@ -3354,7 +3347,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectBag, TerrainType)
-        local army = self:GetArmy()
         local pos = self:GetPosition()
         local effects = {}
         local emit
@@ -3367,11 +3359,11 @@ Unit = Class(moho.unit_methods) {
             end
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self:GetUnitId()), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
-                        emit = CreateAttachedEmitter(self, vBone, army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                        emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                         if vTypeGroup.Offset then
                             emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                         end
@@ -3408,7 +3400,7 @@ Unit = Class(moho.unit_methods) {
 
             if not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0)) then
                 if not self.Footfalls and bpTable.Footfall then
-                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self:GetUnitId()), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
+                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
                 end
                 return false
             end
@@ -3505,12 +3497,11 @@ Unit = Class(moho.unit_methods) {
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
         if not effectBones or (effectBones and table.getn(effectBones) == 0) then
-            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
+            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
-        local army = self:GetArmy()
         for kb, vb in effectBones do
-            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP))
+            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
         end
     end,
 
@@ -3521,14 +3512,13 @@ Unit = Class(moho.unit_methods) {
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
         if not effectBones or (effectBones and table.getn(effectBones) == 0) then
-            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self:GetUnitId()), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
+            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
-        local army = self:GetArmy()
         local ZOffset = tableData.ZOffset or 0.0
         for ke, ve in self.ContrailEffects do
             for kb, vb in effectBones do
-                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, army, ve):SetEmitterParam('POSITION_Z', ZOffset))
+                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
             end
         end
     end,
@@ -3570,19 +3560,18 @@ Unit = Class(moho.unit_methods) {
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
         local duration = treads.TreadLifeTime or 10
-        local army = self:GetArmy()
 
         while true do
             -- Syntactic reference
             -- CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
-            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, army)
+            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, self.Army)
             WaitSeconds(interval)
         end
     end,
 
     CreateFootFallManipulators = function(self, footfall)
         if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
-            WARN('*WARNING: No footfall bones defined for unit ', repr(self:GetUnitId()), ', ', 'these must be defined to animation collision detector and foot plant controller')
+            WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end
 
@@ -3658,7 +3647,7 @@ Unit = Class(moho.unit_methods) {
         if self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self:GetUnitId() .. ' and it does not exist in the model.', 2)
+        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.', 2)
 
         return false
     end,
@@ -4021,10 +4010,9 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        local army =  self:GetArmy()
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
-        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, army, EffectTemplate.TTransportGlow01))
+        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
+        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
+        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
         self:TransportAnimation()
     end,
 
@@ -4323,8 +4311,7 @@ Unit = Class(moho.unit_methods) {
     -- Utility Functions
     SendNotifyMessage = function(self, trigger, source)
         local focusArmy = GetFocusArmy()
-        local army = self:GetArmy()
-        if focusArmy == -1 or focusArmy == army then
+        if focusArmy == -1 or focusArmy == self.Army then
             local id
             local unitType
             local category
@@ -4361,7 +4348,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
-                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = army}
+                local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = self.Army}
                 table.insert(Sync.EnhanceMessage, message)
             end
         end

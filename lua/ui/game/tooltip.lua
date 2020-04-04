@@ -39,8 +39,8 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
     local body = ""
     if type(ID) == 'string' then
         if TooltipInfo['Tooltips'][ID] then
-            text = LOC(TooltipInfo['Tooltips'][ID]['title'])
-            body = LOC(TooltipInfo['Tooltips'][ID]['description'])
+            text = TooltipInfo['Tooltips'][ID]['title']
+            body = TooltipInfo['Tooltips'][ID]['description']
             if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
                 for i, v in Keymapping do
                     if v == TooltipInfo['Tooltips'][ID]['keyID'] then
@@ -58,8 +58,8 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
             body = "No Description"
         end
     elseif type(ID) == 'table' then
-        text = LOC(ID.text)
-        body = LOC(ID.body)
+        text = ID.text
+        body = ID.body
     else
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
@@ -131,7 +131,7 @@ function DestroyMouseoverDisplay()
 end
 
 function CreateToolTip(parent, text)
-    local tooltip = UIUtil.CreateText(parent, text, 12, UIUtil.bodyFont)
+    local tooltip = UIUtil.CreateText(parent, LOC(text), 12, UIUtil.bodyFont)
     tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
 
     tooltip.bg = Bitmap(tooltip)
@@ -139,16 +139,14 @@ function CreateToolTip(parent, text)
     tooltip.bg.Depth:Set(function() return tooltip.Depth() - 1 end)
     tooltip.bg.Top:Set(tooltip.Top)
     tooltip.bg.Bottom:Set(tooltip.Bottom)
-    tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
-    tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
+    LayoutHelpers.AtLeftIn(tooltip.bg, tooltip, -2)
+    LayoutHelpers.AtRightIn(tooltip.bg, tooltip, -2)
 
     tooltip.border = Bitmap(tooltip)
     tooltip.border:SetSolidColor(UIUtil.tooltipBorderColor)
     tooltip.border.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
-    tooltip.border.Left:Set(function() return tooltip.bg.Left() - 1 end)
-    tooltip.border.Top:Set(function() return tooltip.bg.Top() - 1 end)
-    tooltip.border.Right:Set(function() return tooltip.bg.Right() + 1 end)
-    tooltip.border.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
+    LayoutHelpers.AtLeftTopIn(tooltip.border, tooltip, -1, -1)
+    LayoutHelpers.AtRightBottomIn(tooltip.border, tooltip, -1, -1)
 
     tooltip:DisableHitTest(true)
 
@@ -156,12 +154,12 @@ function CreateToolTip(parent, text)
 end
 
 function CreateExtendedToolTip(parent, text, desc, width)
-    if not width then width = 150 end
+    text = LOC(text)
+    desc = LOC(desc)
 
     if text ~= "" or desc ~= "" then
         local tooltip = Group(parent)
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
-        tooltip.Width:Set(width)
 
         if text ~= "" and text ~= nil then
             tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
@@ -173,8 +171,8 @@ function CreateExtendedToolTip(parent, text, desc, width)
             tooltip.bg.Depth:Set(function() return tooltip.title.Depth() - 1 end)
             tooltip.bg.Top:Set(tooltip.title.Top)
             tooltip.bg.Bottom:Set(tooltip.title.Bottom)
-            tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
-            tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
+            LayoutHelpers.AtLeftIn(tooltip.bg, tooltip, -2)
+            LayoutHelpers.AtRightIn(tooltip.bg, tooltip, -2)
         end
 
         tooltip.desc = {}
@@ -190,10 +188,19 @@ function CreateExtendedToolTip(parent, text, desc, width)
                 LayoutHelpers.Below(tooltip.desc[1], tooltip.title)
             end
 
-            local textBoxWidth = tooltip.Width()
-            tempTable = import('/lua/maui/text.lua').WrapText(LOC(desc), textBoxWidth,
+            local textBoxWidth
+            if not width then
+                textBoxWidth = tooltip.desc[1]:GetStringAdvance(desc) + 1
+                textBoxWidth = math.min(textBoxWidth, LayoutHelpers.ScaleNumber(250))
+                if tooltip.title then
+                    textBoxWidth = math.max(textBoxWidth, tooltip.title.TextAdvance())
+                end
+            else
+                textBoxWidth = LayoutHelpers.ScaleNumber(width)
+            end
+            tempTable = import('/lua/maui/text.lua').WrapText(desc, textBoxWidth,
             function(text)
-                return  tooltip.desc[1]:GetStringAdvance(text)
+                return tooltip.desc[1]:GetStringAdvance(text)
             end)
 
             for i=1, table.getn(tempTable) do
@@ -205,36 +212,46 @@ function CreateExtendedToolTip(parent, text, desc, width)
                     tooltip.desc[i].Width:Set(tooltip.desc[1].Width)
                     LayoutHelpers.Below(tooltip.desc[index], tooltip.desc[index-1])
                 end
-                tooltip.desc[i]:SetColor('FFCCCCCC') --#FFCCCCCC
+                tooltip.desc[i]:SetColor('FFCCCCCC')
             end
 
             tooltip.extbg = Bitmap(tooltip)
-            tooltip.extbg:SetSolidColor('FF000202') --#FF000202
+            tooltip.extbg:SetSolidColor('FF000202')
             tooltip.extbg.Depth:Set(function() return tooltip.desc[1].Depth() - 1 end)
             tooltip.extbg.Top:Set(tooltip.desc[1].Top)
-            tooltip.extbg.Left:Set(function() return tooltip.Left() - 2 end)
-            tooltip.extbg.Right:Set(function() return tooltip.Right() + 2 end)
+            LayoutHelpers.AtLeftIn(tooltip.extbg, tooltip, -2)
+            LayoutHelpers.AtRightIn(tooltip.extbg, tooltip, -2)
             tooltip.extbg.Bottom:Set(tooltip.desc[table.getn(tempTable)].Bottom)
         end
 
+        if not width then
+            if tooltip.title then
+                width = tooltip.title.TextAdvance()
+            else
+                width = 0
+            end
+            for _, v in tooltip.desc do
+                local w = v.TextAdvance()
+                if w > width then width = w end
+            end
+        end
+        tooltip.Width:Set(width)
 
         tooltip.extborder = Bitmap(tooltip)
         tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
         if text ~= "" and text ~= nil then
             tooltip.extborder.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
-            tooltip.extborder.Top:Set(function() return tooltip.bg.Top() - 1 end)
-            tooltip.extborder.Left:Set(function() return tooltip.bg.Left() - 1 end)
-            tooltip.extborder.Right:Set(function() return tooltip.bg.Right() + 1 end)
+            LayoutHelpers.AtLeftTopIn(tooltip.extborder, tooltip.bg, -1, -1)
+            LayoutHelpers.AtRightIn(tooltip.extborder, tooltip.bg, -1)
         else
             tooltip.extborder.Depth:Set(function() return tooltip.extbg.Depth() - 1 end)
-            tooltip.extborder.Top:Set(function() return tooltip.extbg.Top() - 1 end)
-            tooltip.extborder.Left:Set(function() return tooltip.extbg.Left() - 1 end)
-            tooltip.extborder.Right:Set(function() return tooltip.extbg.Right() + 1 end)
+            LayoutHelpers.AtLeftTopIn(tooltip.extborder, tooltip.extbg, -1, -1)
+            LayoutHelpers.AtRightIn(tooltip.extborder, tooltip.extbg, -1)
         end
         if desc ~= "" and desc ~= nil then
-            tooltip.extborder.Bottom:Set(function() return tooltip.extbg.Bottom() + 1 end)
+            LayoutHelpers.AtBottomIn(tooltip.extborder, tooltip.extbg, -1)
         else
-            tooltip.extborder.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
+            LayoutHelpers.AtBottomIn(tooltip.extborder, tooltip.bg, -1)
         end
 
         tooltip:DisableHitTest(true)

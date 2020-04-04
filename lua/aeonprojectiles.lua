@@ -133,7 +133,7 @@ ACannonTankProjectile = Class(SingleBeamProjectile) {
         SingleBeamProjectile.OnCreate(self)
         if self.PolyTrails then
             for key, value in self.PolyTrails do
-                CreateTrail(self,-1,self:GetArmy(), value)
+                CreateTrail(self, -1, self.Army, value)
             end
         end
     end,
@@ -161,10 +161,9 @@ ADepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        local army = self:GetArmy()
 
         for k, v in self.FxEnterWater do #splash
-            CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self, self.Army ,v)
         end
 
         #self:TrackTarget(false)
@@ -535,12 +534,11 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
     end,
 
     CreateTrailFX = function(self)
-        local army = self:GetArmy()
         if(self.PolyTrail) then
-            table.insert(self.TrailEmitters, CreateTrail(self, -1, army, self.PolyTrail))
+            table.insert(self.TrailEmitters, CreateTrail(self, -1, self.Army, self.PolyTrail))
         end
         for i in self.FxTrails do
-            table.insert(self.TrailEmitters, CreateEmitterOnEntity(self, army, self.FxTrails[i]))
+            table.insert(self.TrailEmitters, CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]))
         end
     end,
 
@@ -560,11 +558,10 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
     end,
 
     UpdateThread = function(self)
-        local army = self:GetArmy()
         WaitSeconds(0.3)
         self.DestroyTrailFX(self)
-        self.CreateTeleportFX(self, army)
-        local emit = CreateEmitterOnEntity(self, army, self.FxInvisible)
+        self.CreateTeleportFX(self, self.Army)
+        local emit = CreateEmitterOnEntity(self, self.Army, self.FxInvisible)
         WaitSeconds(0.45)
         emit:Destroy()
         self.CreateTeleportFX(self)
@@ -602,7 +599,7 @@ AQuarkBombProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        CreateLightParticle(self, -1, self:GetArmy(), 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
+        CreateLightParticle(self, -1, self.Army, 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
 
         if targetType == 'Terrain' or targetType == 'Prop' then
             local pos = self:GetPosition()

@@ -93,8 +93,7 @@ local WorldLabel = Class(Group) {
 
         self.Top:Set(0)
         self.Left:Set(0)
-        self.Width:Set(25)
-        self.Height:Set(25)
+        LayoutHelpers.SetDimensions(self, 25, 25)
         self:SetNeedsFrameUpdate(true)
     end,
 
@@ -118,8 +117,7 @@ function CreateReclaimLabel(view)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
     LayoutHelpers.AtLeftIn(label.mass, label)
     LayoutHelpers.AtVerticalCenterIn(label.mass, label)
-    label.mass.Height:Set(14)
-    label.mass.Width:Set(14)
+    LayoutHelpers.SetDimensions(label.mass, 14, 14)
 
     label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
@@ -135,7 +133,7 @@ function CreateReclaimLabel(view)
     label.Update = function(self)
         local view = self.parent.view
         local proj = view:Project(self.position)
-        LayoutHelpers.AtLeftTopIn(self, self.parent, proj.x - self.Width() / 2, proj.y - self.Height() / 2 + 1)
+        LayoutHelpers.AtLeftTopIn(self, self.parent, (proj.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (proj.y - self.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
         self.proj = {x=proj.x, y=proj.y }
 
     end

@@ -554,7 +554,7 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     end
 
     local button = Button(parent, up, down, over, disabled, clickCue, rolloverCue)
-    button:UseAlphaHitTest(true)
+    button:UseAlphaHitTest(false)
 
     if label and pointSize then
         button.label = CreateText(button, label, pointSize, buttonFont, dropshadow)
@@ -750,15 +750,15 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
                                     , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
                                     , "UI_Arrow_Click")
 
-    scrollbar.Left:Set(function() return attachto.Right() + offset_right end)
+    LayoutHelpers.AnchorToRight(scrollbar, attachto, offset_right)
     scrollbar.Top:Set(scrollUpButton.Bottom)
     scrollbar.Bottom:Set(scrollDownButton.Top)
 
     scrollUpButton.Left:Set(scrollbar.Left)
-    scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
+    LayoutHelpers.AtTopIn(scrollUpButton, attachto, offset_top)
 
     scrollDownButton.Left:Set(scrollbar.Left)
-    scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
+    LayoutHelpers.AtBottomIn(scrollDownButton, attachto, offset_bottom)
 
     scrollbar.Right:Set(scrollUpButton.Right)
 
@@ -834,8 +834,8 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     LayoutHelpers.AtTopIn(textLine[1], dialog, 15)
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
 
-    dialog.Width:Set(428)
-    local textBoxWidth = (dialog.Width() - 80)
+    LayoutHelpers.SetWidth(dialog, 428)
+    local textBoxWidth = (dialog.Width() - LayoutHelpers.ScaleNumber(80))
     local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
     function(text)
         return textLine[1]:GetStringAdvance(text)
@@ -859,7 +859,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         textHeight = textHeight + textLine[i]:Height()
     end
 
-    dialog.Height:Set(textHeight + 85)
+    dialog.Height:Set(textHeight + LayoutHelpers.ScaleNumber(85))
 
     local popup = Popup(parent, dialog)
     -- Don't close when the shadow is clicked.
@@ -1055,17 +1055,10 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     LayoutHelpers.AtCenterIn(ret.bottomleftglow, ret.bottomleft)
     LayoutHelpers.AtCenterIn(ret.bottomrightglow, ret.bottomright)
 
-    ret.topleft.Left:Set(function() return parent.Left() - leftOffset end)
-    ret.topleft.Top:Set(function() return parent.Top() - topOffset end)
-
-    ret.topright.Right:Set(function() return parent.Right() + rightOffset end)
-    ret.topright.Top:Set(function() return parent.Top() - topOffset end)
-
-    ret.bottomleft.Left:Set(function() return parent.Left() - leftOffset end)
-    ret.bottomleft.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
-
-    ret.bottomright.Right:Set(function() return parent.Right() + rightOffset end)
-    ret.bottomright.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
+    LayoutHelpers.AtLeftTopIn(ret.topleft, parent, -leftOffset, -topOffset)
+    LayoutHelpers.AtRightTopIn(ret.topright, parent, -rightOffset, -topOffset)
+    LayoutHelpers.AtLeftBottomIn(ret.bottomleft, parent, -leftOffset, -bottomOffset)
+    LayoutHelpers.AtRightBottomIn(ret.bottomright, parent, -rightOffset, -bottomOffset)
 
     ret:DisableHitTest(true)
     LayoutHelpers.FillParent(ret, parent)

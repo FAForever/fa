@@ -28,7 +28,7 @@ XAB1401 = Class(AStructureUnit) {
         self:ForkThread(self.ResourceMonitor)
 
         for k, v in FxAmbient do
-            CreateAttachedEmitter(self, 'Orb', self:GetArmy(), v)
+            CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
 

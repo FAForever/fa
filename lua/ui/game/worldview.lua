@@ -91,7 +91,7 @@ local function CreatePositionMarker(army, worldView)
     marker.OnFrame = function(self, delta)
         if not worldView:IsHidden() then
             local pos = worldView:Project(self.pos)
-            LayoutHelpers.AtLeftTopIn(self, worldView, pos.x - self.Width() / 2, pos.y - self.Height() / 2)
+            LayoutHelpers.AtLeftTopIn(self, worldView, (pos.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - self.Height() / 2) / LayoutHelpers.GetPixelScaleFactor())
 
             if (self:Left() < worldView:Left() or self:Top() < worldView:Top() or self:Right() > worldView:Right() or self:Bottom() > worldView:Bottom()) then
                 if not self:IsHidden() then

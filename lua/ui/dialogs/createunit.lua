@@ -37,7 +37,7 @@ end
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    group.Height:Set(30)
+    LayoutHelpers.SetHeight(group, 30)
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
@@ -110,8 +110,7 @@ local function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        group.edit.Height:Set(15)
-        group.edit.Width:Set(400)
+        LayoutHelpers.SetDimensions(group.edit, 400, 15)
         group.edit:SetText(filterSet[data.key].editText or '')
         group.edit:SetFont(UIUtil.bodyFont, 12)
         group.edit:SetMaxChars(20)
@@ -180,20 +179,10 @@ function CreateDialog(x, y)
     dialog:SetSolidColor('CC000000')
     local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
     -- set window high. 400 pixel for the window + 30 pixel for every army line
-    dialog.Height:Set(450 + 30 * NoArmies)
-    dialog.Width:Set(550)
+    LayoutHelpers.SetDimensions(dialog, 550, 450 + 30 * NoArmies)
     dialog.Left:Set(function() return math.max(math.min(x, GetFrame(0).Right() - dialog.Width()), 0) end)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-
-    ForkThread(function()
-                   while not IsKeyDown('ESCAPE') do
-                       if not dialog then return end
-                       WaitSeconds(0.05)
-                   end
-                   dialog:Destroy()
-                   dialog = false
-               end)
 
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
     LayoutHelpers.AtBottomIn(cancelBtn, dialog)
@@ -202,6 +191,16 @@ function CreateDialog(x, y)
         dialog:Destroy()
         dialog = false
     end
+
+    ForkThread(function()
+                   while dialog do
+                       if IsKeyDown('ESCAPE') then
+                           cancelBtn.OnClick()
+                           return
+                       end
+                       WaitSeconds(0.05)
+                   end
+               end)
 
     local countLabel = UIUtil.CreateText(dialog, 'Count:', 12, UIUtil.bodyFont)
     LayoutHelpers.AtBottomIn(countLabel, dialog,10)
@@ -212,28 +211,70 @@ function CreateDialog(x, y)
     count:SetBackgroundColor('ff333333')
     count:SetHighlightForegroundColor(UIUtil.highlightColor)
     count:SetHighlightBackgroundColor("880085EF")
-    count.Height:Set(15)
-    count.Width:Set(50)
+    LayoutHelpers.SetDimensions(count, 30, 15)
     count:SetFont(UIUtil.bodyFont, 12)
     count:SetMaxChars(4)
     count:SetText('1')
     LayoutHelpers.RightOf(count, countLabel, 5)
+    count.OnCharPressed = function(self, charcode)
+        if (charcode < 48) or (charcode > 57) then -- between 0 and 9
+            return true
+        end
+    end
+    count.OnNonTextKeyPressed = function(self, keycode, modifiers)
+    end
+    count.OnKeyboardFocusChange = function(self)
+        if self:GetText() == '' then
+            self:SetText('1')
+        end
+    end
 
-    local function spawnUnits(creationList, targetArmy)
-        local numUnits = 1
-        if type(tonumber(count:GetText())) == 'number' then
-            numUnits = count:GetText()
+    local veterancyLabel = UIUtil.CreateText(count, 'Veterancy:', 12, UIUtil.bodyFont)
+    LayoutHelpers.RightOf(veterancyLabel, count, 5)
+
+    local veterancyLevel = Edit(dialog)
+    veterancyLevel:SetForegroundColor(UIUtil.fontColor)
+    veterancyLevel:SetBackgroundColor('ff333333')
+    veterancyLevel:SetHighlightForegroundColor(UIUtil.highlightColor)
+    veterancyLevel:SetHighlightBackgroundColor("880085EF")
+    LayoutHelpers.SetDimensions(veterancyLevel, 30, 15)
+    veterancyLevel:SetFont(UIUtil.bodyFont, 12)
+    veterancyLevel:SetMaxChars(1)
+    veterancyLevel:SetText('0')
+    LayoutHelpers.RightOf(veterancyLevel, veterancyLabel, 5)
+    veterancyLevel.OnCharPressed = function(self, charcode)
+        if (charcode < 48) or (charcode > 53) then -- between 0 and 5
+            return true
         end
-        WaitSeconds(0.1)
-        while not IsKeyDown(1) do -- Left mouse button
-            if IsKeyDown('ESCAPE') then return end
-            WaitSeconds(0.05)
+        self:ClearText()
+    end
+    veterancyLevel.OnNonTextKeyPressed = function(self, keycode, modifiers)
+    end
+    veterancyLevel.OnKeyboardFocusChange = function(self)
+        if self:GetText() == '' then
+            self:SetText('0')
         end
-        local cursorPos = GetMouseScreenPos()
-        for unitID in creationList do
-            for i = 1, numUnits do
-                local cmd = 'CreateUnit ' .. unitID .. ' ' .. targetArmy .. ' ' .. cursorPos[1] .. ' ' .. cursorPos[2]
-                ConExecuteSave(cmd)
+    end
+
+    local function spawnUnits(creationList, targetArmy, fast)
+        if table.getsize(creationList) <= 0 then return end
+        local numUnits = tonumber(count:GetText())
+        local vetLvl = tonumber(veterancyLevel:GetText())
+        if fast then
+            SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+                Args = { bpId = creationList, count = numUnits,
+                army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+        else
+            WaitSeconds(0.1)
+            while not dialog do
+                if IsKeyDown('ESCAPE') then return end
+                if IsKeyDown(1) then -- Left mouse button
+                    SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
+                        Args = { bpId = creationList, count = numUnits,
+                        army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
+                    if not IsKeyDown('SHIFT') then return end
+                end
+                WaitSeconds(0.09)
             end
         end
     end
@@ -241,10 +282,10 @@ function CreateDialog(x, y)
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
-    createBtn.OnClick = function(button)
-        ForkThread(spawnUnits, CreationList, currentArmy - 1)
-        dialog:Destroy()
-        dialog = false
+    createBtn.HandleEvent = function(self, event)
+        if event.Type ~= 'ButtonPress' then return end
+        ForkThread(spawnUnits, CreationList, currentArmy, event.Modifiers.Right)
+        cancelBtn.OnClick()
     end
 
     local function SetFilters(filterTable)
@@ -271,12 +312,11 @@ function CreateDialog(x, y)
 
     local function CreateArmySelectionSlot(parent, index, armyData)
         local group = Bitmap(parent)
-        group.Height:Set(30)
+        LayoutHelpers.SetHeight(group, 30)
         group.Width:Set(function() return parent.Width() / 2 end)
 
         local iconBG = Bitmap(group)
-        iconBG.Height:Set(30)
-        iconBG.Width:Set(30)
+        LayoutHelpers.SetDimensions(iconBG, 30, 30)
         iconBG:SetSolidColor(armyData.color)
         LayoutHelpers.AtLeftTopIn(iconBG, group)
         iconBG:DisableHitTest()
@@ -362,7 +402,7 @@ function CreateDialog(x, y)
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
     local filterSetCombo = Combo(dialog, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    filterSetCombo.Width:Set(340)
+    LayoutHelpers.SetWidth(filterSetCombo, 340)
     LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
     filterSetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
@@ -449,8 +489,8 @@ function CreateDialog(x, y)
     end
 
     dialog.unitList = Group(dialog)
-    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - 5 end)
-    dialog.unitList.Width:Set(function() return dialog.Width() - 40 end)
+    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - LayoutHelpers.ScaleNumber(5) end)
+    dialog.unitList.Width:Set(function() return dialog.Width() - LayoutHelpers.ScaleNumber(40) end)
     LayoutHelpers.Below(dialog.unitList, filterGroups[table.getn(filterGroups)])
     dialog.unitList.top = 0
 
@@ -470,8 +510,7 @@ function CreateDialog(x, y)
         mouseover:SetSolidColor('dd115511')
 
         mouseover.img = Bitmap(mouseover)
-        mouseover.img.Height:Set(40)
-        mouseover.img.Width:Set(40)
+        LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
         LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
         if DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..unitData..'_icon.dds', true)) then
             mouseover.img:SetTexture(UIUtil.UIFile('/icons/units/'..unitData..'_icon.dds', true))
@@ -517,7 +556,7 @@ function CreateDialog(x, y)
             dialog.unitEntries[index] = Bitmap(dialog.unitList)
             dialog.unitEntries[index].Left:Set(dialog.unitList.Left)
             dialog.unitEntries[index].Right:Set(dialog.unitList.Right)
-            dialog.unitEntries[index].Height:Set(16)
+            LayoutHelpers.SetHeight(dialog.unitEntries[index], 16)
             dialog.unitEntries[index].Checked = false
             dialog.unitEntries[index].HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
@@ -542,8 +581,12 @@ function CreateDialog(x, y)
                         CreationList[self.unitID] = true
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
+                elseif event.Type == 'ButtonPress' and event.Modifiers.Right then
+                    CreationList[self.unitID] = true
+                    ForkThread(spawnUnits, CreationList, currentArmy, true)
+                    cancelBtn:OnClick()
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy - 1)
+                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy, false)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)
@@ -682,11 +725,10 @@ function NameSet(callback)
     nameDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
 
     local label = UIUtil.CreateText(nameDialog, "Name your filter set:", 16, UIUtil.buttonFont)
-    label.Top:Set(function() return nameDialog.Top() + 30 end)
-    label.Left:Set(function() return nameDialog.Left() + 35 end)
+    LayoutHelpers.AtLeftTopIn(label, nameDialog, 35, 30)
 
     local cancelButton = UIUtil.CreateButtonStd(nameDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
-    cancelButton.Top:Set(function() return nameDialog.Top() + 112 end)
+    LayoutHelpers.AtTopIn(cancelButton, nameDialog, 112)
     cancelButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
     cancelButton.OnClick = function(self, modifiers)
         nameDialog:Destroy()
@@ -696,7 +738,7 @@ function NameSet(callback)
     --TODO this should be in layout
     local nameEdit = Edit(nameDialog)
     LayoutHelpers.AtLeftTopIn(nameEdit, nameDialog, 35, 60)
-    nameEdit.Width:Set(283)
+    LayoutHelpers.SetWidth(nameEdit, 283)
     nameEdit.Height:Set(nameEdit:GetFontHeight())
     nameEdit:ShowBackground(false)
     nameEdit:AcquireFocus()

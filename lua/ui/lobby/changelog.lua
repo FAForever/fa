@@ -12,8 +12,7 @@ local data = import('/lua/ui/lobby/changelogData.lua')
 --- Creates the popup window with the game patch changelog.
 function CreateUI(parent, showPatch)
     local dialogContent = Group(parent)
-    dialogContent.Width:Set(1000)
-    dialogContent.Height:Set(700)
+    LayoutHelpers.SetDimensions(dialogContent, 1000, 700)
 
     local changelogPopup = Popup(parent, dialogContent)
     changelogPopup.OnClosed = function()
@@ -24,7 +23,7 @@ function CreateUI(parent, showPatch)
     TextBG:SetSolidColor('ff000000')
     TextBG.Left:Set(function() return dialogContent.Left() + 10 end)
     TextBG.Right:Set(function() return dialogContent.Right() - 10 end)
-    TextBG.Height:Set(24)
+    LayoutHelpers.SetHeight(TextBG, 24)
     LayoutHelpers.AtTopIn(TextBG, dialogContent, 7)
 
     -- Title
@@ -35,7 +34,7 @@ function CreateUI(parent, showPatch)
     -- Dropdown menu to select a patch
     local VersionSelection = Combo(TextBG, 12, 20, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
     VersionSelection._text:SetFont('Arial Gras', 15)
-    VersionSelection.Width:Set(70)
+    LayoutHelpers.SetWidth(VersionSelection, 70)
     -- Fill it with all patch numbers
     local items = {}
     for _, patch in data.gamePatches do
@@ -62,8 +61,7 @@ function CreateUI(parent, showPatch)
     dialogContent.InfoList = InfoList
     InfoList:SetFont(UIUtil.bodyFont, Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 12)
     InfoList:SetColors(nil, "00000000")
-    InfoList.Width:Set(972)
-    InfoList.Height:Set(610)
+    LayoutHelpers.SetDimensions(InfoList, 972, 610)
     LayoutHelpers.AtLeftIn(InfoList, dialogContent, 10)
     LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)

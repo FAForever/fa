@@ -9,17 +9,6 @@ local selectionOverlay = {
         Tooltip = "overlay_selection",
 }
 
-SelectedInfoOn = true
-SelectedOverlayOn = true
-
-if options.gui_enhanced_unitview == 0 then
-   SelectedInfoOn = false
-end
-
-if options.gui_enhanced_unitrings == 0 then
-   SelectedOverlayOn = false
-end
-
 function GetUnitRolloverInfo(unit)
     local info = {}
 
@@ -64,36 +53,3 @@ function GetUnitRolloverInfo(unit)
     return info
 end
 
-function ToggleOn()
-   if SelectedInfoOn then
-      SelectedInfoOn = false
-   else
-      SelectedInfoOn = true
-   end
-end
-
-function ToggleOverlayOn()
-   if SelectedOverlayOn then
-      SelectedOverlayOn = false
-      DeactivateSingleRangeOverlay()
-   else
-      SelectedOverlayOn = true
-      local selUnits = GetSelectedUnits()
-      if selUnits and table.getn(selUnits) == 1 then
-         ActivateSingleRangeOverlay()
-      end
-   end
-end
-
-function ActivateSingleRangeOverlay()
-   ConExecute('range_RenderSelected true')
-end
-
-function DeactivateSingleRangeOverlay()
-   local info = selectionOverlay
-   local pref = Prefs.GetFromCurrentProfile(info.Pref)
-   if pref == nil then
-      pref = true
-   end
-   ConExecute(info.Pref..' '..tostring(pref))
-end

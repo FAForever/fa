@@ -10,13 +10,9 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/Bitmap.lua').Bitmap
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
 local WrapText = import('/lua/maui/text.lua').WrapText
 local Movie = import('/lua/maui/movie.lua').Movie
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local econ = import('/lua/ui/game/economy.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local MISSION_TEXT_TIMEOUT = 10
@@ -75,22 +71,29 @@ function PlayMFDMovie(movie, text)
         controls.movieBrackets.panel:SetAlpha(0)
         
         controls.movieBrackets.cover = Bitmap(controls.movieBrackets, UIUtil.UIFile(prefix[movie[4]].texture))
-        controls.movieBrackets.cover.Height:Set(190)
-        controls.movieBrackets.cover.Width:Set(190)
-        controls.movieBrackets.cover.Depth:Set(function() return controls.movieBrackets.panel.Depth() - 1 end)
+        LayoutHelpers.SetDimensions(controls.movieBrackets.cover, 190, 190)
+        LayoutHelpers.DepthUnderParent(controls.movieBrackets.cover, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.cover, controls.movieBrackets.panel)
         controls.movieBrackets.cover:SetAlpha(0)
         
         controls.movieBrackets.movie = Movie(controls.movieBrackets, movie[1])
-        controls.movieBrackets.movie.Height:Set(190)
-        controls.movieBrackets.movie.Width:Set(190)
-        controls.movieBrackets.movie.Depth:Set(function() return controls.movieBrackets.panel.Depth() - 1 end)
+        LayoutHelpers.SetDimensions(controls.movieBrackets.movie, 190, 190)
+        LayoutHelpers.DepthUnderParent(controls.movieBrackets.movie, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.movie, controls.movieBrackets.panel)
         controls.movieBrackets.movie:SetAlpha(0)
         
         controls.subtitles = CreateSubtitles(controls.movieBrackets, text[1])
         
         controls.movieBrackets.movie.OnFinished = function(self)
+            if (not controls.movieBrackets.movie:IsLoaded()) and (self.loadCheck == nil) then
+                ForkThread(
+                function(self, duration, onFinished)
+                    WaitSeconds(duration)
+                    onFinished(self)
+                end, self, GetMovieDuration(movie[1]), controls.movieBrackets.movie.OnFinished)
+                self.loadCheck = true
+                return
+            end
             controls.movieBrackets.panel:SetNeedsFrameUpdate(true)
             controls.movieBrackets.panel.sound = PlaySound(Sound{Bank='Interface', Cue=prefix[movie[4]].cue..'_Out'})
             controls.subtitles:Contract()
@@ -149,12 +152,14 @@ function PlayMFDMovie(movie, text)
             end
             local finishedHeight = false
             local finishedWidth = false
-            local newHeight = math.min(self.Height() + (delta * 600), self.BitmapHeight())
-            local newWidth = math.min(self.Width() + (delta * 600), self.BitmapWidth())
-            if newHeight == self.BitmapHeight() then
+            local bitmapHeight = LayoutHelpers.ScaleNumber(self.BitmapHeight())
+            local bitmapWidth = LayoutHelpers.ScaleNumber(self.BitmapWidth())
+            local newHeight = math.min(self.Height() + (delta * 600), bitmapHeight)
+            local newWidth = math.min(self.Width() + (delta * 600), bitmapWidth)
+            if newHeight == bitmapHeight then
                 finishedHeight = true
             end
-            if newWidth == self.BitmapWidth() then
+            if newWidth == bitmapWidth then
                 finishedWidth = true
             end
             self.Height:Set(newHeight)
@@ -244,7 +249,8 @@ function CreateSubtitles(parent, text)
     bg.mr.Top:Set(bg.Top)
     bg.mr.Bottom:Set(bg.Bottom)
     
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), 300, 
+    local textWidth = LayoutHelpers.ScaleNumber(300)
+    local wrapped = WrapText(LOC(text), textWidth, 
         function(curText) return bg.text[1]:GetStringAdvance(curText) end)
         
     for index, line in wrapped do
@@ -273,8 +279,8 @@ function CreateSubtitles(parent, text)
             end
             local newWidth = self.Width() + (delta * 800)
             local finishedWidth = false
-            if newWidth > 300 then
-                newWidth = 300
+            if newWidth > textWidth then
+                newWidth = textWidth
                 finishedWidth = true
             end
             if finishedWidth then

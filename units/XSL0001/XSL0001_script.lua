@@ -54,7 +54,7 @@ XSL0001 = Class(ACUUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     GetUnitsToBuff = function(self, bp)
@@ -150,7 +150,7 @@ XSL0001 = Class(ACUUnit) {
             end
 
             Buff.ApplyBuff(self, buff2)
-            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self.Army, '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
             if self.RegenThreadHandle then
                 KillThread(self.RegenThreadHandle)
                 self.RegenThreadHandle = nil
