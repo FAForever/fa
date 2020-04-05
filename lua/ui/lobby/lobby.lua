@@ -1374,13 +1374,12 @@ function PossiblyAnnounceGameFull()
     for i = 1, numOpenSlots do
         if not gameInfo.ClosedSlots[i] then
             if not gameInfo.PlayerOptions[i] then
-                return
+                return false
             end
         end
     end
 
-    -- Game is full, let's tell the client.
-    GpgNetSend("GameFull")
+    return true
 end
 
 local function AssignRandomStartSpots()
@@ -2033,7 +2032,7 @@ local function TryLaunch(skipNoObserversCheck)
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
-        
+
         PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
         SetPreference('PreGameData',PreGameData)
         lobbyComm:LaunchGame(gameInfo)
@@ -4430,7 +4429,6 @@ local MessageHandlers = {
             else
                 HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
             end
-            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
         end
     },
 
@@ -4623,11 +4621,13 @@ local MessageHandlers = {
     SlotAssigned = {
         Accept = IsFromHost,
         Handle = function(data)
+            local emptySlot = gameInfo.PlayerOptions[data.Slot] == nil
             gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
-            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
-            PossiblyAnnounceGameFull()
+            if PossiblyAnnounceGameFull() and emptySlot then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
         end
     },
 
@@ -4961,7 +4961,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
+            	--PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
                 lobbyComm:BroadcastData(
                 {
                     Type = 'Peer_Really_Disconnected',
@@ -5489,7 +5489,7 @@ function ShowRuleDialog()
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
-        end
+        end, gameInfo.GameOptions.GameRules
 )
 end
 
@@ -6250,6 +6250,9 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            if PossiblyAnnounceGameFull() then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
         end,
 
         SetSlotClosedSpawnMex = function(slot)
@@ -6269,6 +6272,9 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            if PossiblyAnnounceGameFull() then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
@@ -6318,6 +6324,7 @@ function InitHostUtils()
 
         ConvertObserverToPlayer = function(fromObserverSlot, toPlayerSlot, ignoreMsg)
             -- If no slot is specified (user clicked "go player" button), select a default.
+            local insteadAI = false
             if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
                 toPlayerSlot = HostUtils.FindEmptySlot()
 
@@ -6328,6 +6335,7 @@ function InitHostUtils()
                         if slot and not slot.Human then
                             HostUtils.RemoveAI(i)
                             toPlayerSlot = i
+                            insteadAI = true
                             break
                         end
                     end
@@ -6380,6 +6388,10 @@ function InitHostUtils()
             AssignAutoTeams()
 
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
+
+            if PossiblyAnnounceGameFull() and (not insteadAI) then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
         end,
 
         RemoveAI = function(slot)
@@ -6575,7 +6587,6 @@ function InitHostUtils()
             SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
-            PossiblyAnnounceGameFull()
         end,
 
         --- Add an AI to the game in the given slot.
