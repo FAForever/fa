@@ -75,10 +75,10 @@ function SetLayout()
 end
 
 function CreateChatBackground()
-    local location = {Top = function() return GetFrame(0).Bottom() - LayoutHelpers.ScaleNumber(393) end,
-        Left = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(8) end,
-        Right = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(430) end,
-        Bottom = function() return GetFrame(0).Bottom() - LayoutHelpers.ScaleNumber(238) end}
+    local location = {Top = GetFrame(0).Bottom() - 393,
+                      Left = GetFrame(0).Left() + 8,
+                      Right = GetFrame(0).Left() + 430,
+                      Bottom = GetFrame(0).Bottom() - 238}
     local bg = Window(GetFrame(0), '', nil, true, true, nil, nil, 'chat_window', location)
     bg.Depth:Set(200)
 
