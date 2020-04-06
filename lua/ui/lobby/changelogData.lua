@@ -1,6 +1,16 @@
 last_version = 3713
 gamePatches = {
     {
+		version = 3713,
+		name = 'Game Version 3713',
+		description = {
+            '- Fixed a bug leading to black screen for some players',
+            '',
+            '**Contributors**',
+            '- speed2',
+		},
+	},
+    {
 		version = 3712,
 		name = 'Game Version 3712',
 		description = {
