@@ -1,3 +1,10 @@
+Patch 3713 (7 April, 2020)
+============================
+- Fix a bug allowing to generate resources for free
+
+### Contributors ###
+- speed2
+
 Patch 3712 (4 April, 2020)
 ============================
 

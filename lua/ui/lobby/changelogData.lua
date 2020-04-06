@@ -1,4 +1,4 @@
-last_version = 3712
+last_version = 3713
 gamePatches = {
     {
 		version = 3712,
