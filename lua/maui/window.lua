@@ -468,10 +468,18 @@ Window = Class(Group) {
                 self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
             end
         elseif defaultPosition then
-            self.Left:Set(LayoutHelpers.ScaleNumber(defaultPosition.Left))
-            self.Top:Set(LayoutHelpers.ScaleNumber(defaultPosition.Top))
-            self.Bottom:Set(LayoutHelpers.ScaleNumber(defaultPosition.Bottom))
-            self.Right:Set(LayoutHelpers.ScaleNumber(defaultPosition.Right))
+            -- Scale only if it's a number, else it's already scaled lazyvar
+            if type(defaultPosition.Left) == 'number' then
+                self.Left:Set(LayoutHelpers.ScaleNumber(defaultPosition.Left))
+                self.Top:Set(LayoutHelpers.ScaleNumber(defaultPosition.Top))
+                self.Bottom:Set(LayoutHelpers.ScaleNumber(defaultPosition.Bottom))
+                self.Right:Set(LayoutHelpers.ScaleNumber(defaultPosition.Right))
+            else
+                self.Left:Set(defaultPosition.Left)
+                self.Top:Set(defaultPosition.Top)
+                self.Bottom:Set(defaultPosition.Bottom)
+                self.Right:Set(defaultPosition.Right)
+            end
         end
     end,
     
