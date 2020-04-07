@@ -1,4 +1,4 @@
-Patch 3713 (20 April, 2020)
+Patch 3714 (20 April, 2020)
 ============================
 - Land
     - Sniper Bot
@@ -107,12 +107,19 @@ Patch 3713 (20 April, 2020)
             - T2: 1.5
             - T3: 1.25
     - ACU won't survive an ACU explosion under 2500 hp by vetting anymore (veterancy is gained right after ACU explosion)
-        
+
 ### Contributors
 - Strogo
 - keyser
 - TurinTurambar
 - Petricpwnz
+
+Patch 3713 (7 April, 2020)
+============================
+- Fix a bug allowing to generate resources for free
+
+### Contributors ###
+- speed2
 
 Patch 3712 (4 April, 2020)
 ============================
