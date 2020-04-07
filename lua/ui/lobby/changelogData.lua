@@ -1,8 +1,8 @@
-last_version = 3713
+last_version = 3714
 gamePatches = {
 	{
-		version = 3713,
-		name = 'Game Version 3713',
+		version = 3714,
+		name = 'Game Version 3714',
 		description = {
             '**Land**',
             '- Sniper Bot',
