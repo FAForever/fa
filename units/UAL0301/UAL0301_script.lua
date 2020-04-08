@@ -8,6 +8,7 @@
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
+local ADFChronoDampener = AWeapons.ADFChronoDampener
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -15,6 +16,7 @@ local Buff = import('/lua/sim/Buff.lua')
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
+		ChronoDampener = Class(ADFChronoDampener) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
     },
 
@@ -26,6 +28,7 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
+		self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self.UnitBeingBuilt = nil
@@ -53,7 +56,31 @@ UAL0301 = Class(CommandUnit) {
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Shields
+         -- ChronoDampener
+        elseif enh == 'ChronoDampener' then
+            self:SetWeaponEnabledByLabel('ChronoDampener', true)
+            if not Buffs['AeonSACUChronoDampener'] then
+				BuffBlueprint {
+					Name = 'AeonSACUChronoDampener',
+					DisplayName = 'AeonSACUChronoDampener',
+					BuffType = 'DamageStabilization',
+					Stacks = 'REPLACE',
+					Duration = -1,
+					Affects = {
+						MaxHealth = {
+							Add = bp.NewHealth,
+							Mult = 1.0,
+						},
+					},
+				}
+			end
+			Buff.ApplyBuff(self, 'AeonSACUChronoDampener')
+		elseif enh == 'ChronoDampenerRemove' then
+		    if Buff.HasBuff(self, 'AeonSACUChronoDampener') then
+				Buff.RemoveBuff(self, 'AeonSACUChronoDampener')
+			end
+			self:SetWeaponEnabledByLabel('ChronoDampener', false)
+		-- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
