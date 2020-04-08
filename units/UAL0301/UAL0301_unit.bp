@@ -398,30 +398,6 @@ UnitBlueprint {
             },
             Slot = 'RCH',
         },
-        Sacrifice = {
-            BuildCostEnergy = 2500,
-            BuildCostMass = 150,
-            BuildTime = 700,
-            Icon = 'sp',
-            Name = '<LOC enhancements_0026>Sacrificial System',
-            Slot = 'LCH',
-            UpgradeUnitAmbientBones = {
-                'UAL0301',
-            },
-        },
-        SacrificeRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = 'sp',
-            Name = '<LOC enhancements_0027>Remove Sacrificial System',
-            Prerequisite = 'Sacrifice',
-            RemoveEnhancements = {
-                'Sacrifice',
-                'SacrificeRemove',
-            },
-            Slot = 'LCH',
-        },
         Shield = {
             BuildCostEnergy = 64950,
             BuildCostMass = 1200,
