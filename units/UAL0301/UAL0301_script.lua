@@ -154,18 +154,32 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCURegenRate') then
                 Buff.RemoveBuff(self, 'AeonSCURegenRate')
             end
-        -- StabilitySupressant
-        elseif enh =='StabilitySuppressant' then
+        -- GunRange
+        elseif enh =='GunRange' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
         elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end
+		-- GunAoe
+        elseif enh =='GunAoe' then
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+        elseif enh =='GunAoeRemove' then
+            local bp = self:GetBlueprint().Enhancements['GunAoe']
+            if not bp then return end
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageRadiusMod(-bp.NewDamageRadiusMod)
+        -- GunDps
+        elseif enh =='GunDps' then
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(bp.GunDamageMod)
+        elseif enh =='GunDpsRemove' then
+            local bp = self:GetBlueprint().Enhancements['GunDps']
+            if not bp then return end
+            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(-bp.GunDamageMod)
     end,
 
     CreateHeavyShield = function(self, bp)
