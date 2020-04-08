@@ -108,7 +108,7 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
         local TerrainType = GetTerrainType(pos.x,pos.z)
         local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName]
         if effectTable ~= nil then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             for k, v in effectTable do
                 CreateAttachedEmitter(self.unit, muzzle, army, v)
             end
@@ -210,7 +210,7 @@ SDFExperimentalPhasonLaser = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
@@ -239,7 +239,7 @@ SDFUltraChromaticBeamGenerator = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
+            local army = self.unit.Army
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do

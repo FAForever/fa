@@ -31,10 +31,7 @@ Popup = Class(Group) {
 
         local background = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
 
-        background.Left:Set(function() return content.Left() + 64 end)
-        background.Right:Set(function() return content.Right() - 64 end)
-        background.Top:Set(function() return content.Top() + 64 end)
-        background.Bottom:Set(function() return content.Bottom() - 64 end)
+        LayoutHelpers.FillParentFixedBorder(background, content, 64)
 
         LayoutHelpers.DepthUnderParent(background, content)
 

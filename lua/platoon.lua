@@ -507,7 +507,7 @@ Platoon = Class(moho.platoon_methods) {
         if not experimental then
             return
         end
-        local ID = experimental:GetUnitId()
+        local ID = experimental.UnitId
         --LOG('Starting experimental behaviour...' .. ID)
         if ID == 'uel0401' then
             return behaviors.FatBoyBehavior(self)
@@ -2473,7 +2473,7 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         --LOG('* UnitUpgradeAI: PlatoonName:'..repr(self.BuilderName))
         for k, v in platoonUnits do
-            --LOG('* UnitUpgradeAI: Upgrading unit '..v:GetUnitId()..' ('..v.factionCategory..')')
+            --LOG('* UnitUpgradeAI: Upgrading unit '..v.UnitId..' ('..v.factionCategory..')')
             local upgradeID
             -- Get the factionindex from the unit to get the right update (in case we have captured this unit from another faction)
             UnitBeingUpgradeFactionIndex = FactionToIndex[v.factionCategory] or factionIndex
@@ -2481,9 +2481,9 @@ Platoon = Class(moho.platoon_methods) {
             if self.PlatoonData.OverideUpgradeBlueprint then
                 local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
                 if not tempUpgradeID then
-                    --WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unitID is empty' )
+                    --WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v.UnitId) .. ' failed. (Override unitID is empty' )
                 elseif type(tempUpgradeID) ~= 'string' then
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ' failed. (Override unit not present.)' )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v.UnitId) .. ' failed. (Override unit not present.)' )
                 elseif v:CanBuild(tempUpgradeID) then
                     upgradeID = tempUpgradeID
                 else
@@ -2491,34 +2491,34 @@ Platoon = Class(moho.platoon_methods) {
                     -- this can happen if the AI relcaimed a factory and tries to upgrade to a support factory without having a HQ factory from the reclaimed factory faction.
                     -- in this case we fall back to HQ upgrade template and upgrade to a HQ factory instead of support.
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint UnitId:CanBuild(tempUpgradeID) failed. (Override tree not available, upgrading to default instead.)
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v:GetUnitId()) .. ':CanBuild( '..tempUpgradeID..' ) failed. (Override tree not available, upgrading to default instead.)' )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI WARNING: OverideUpgradeBlueprint ' .. repr(v.UnitId) .. ':CanBuild( '..tempUpgradeID..' ) failed. (Override tree not available, upgrading to default instead.)' )
                 end
             end
             if not upgradeID and EntityCategoryContains(categories.MOBILE, v) then
-                upgradeID = aiBrain:FindUpgradeBP(v:GetUnitId(), UnitUpgradeTemplates[UnitBeingUpgradeFactionIndex])
+                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, UnitUpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a UnitUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ABC1234
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ' .. repr(v:GetUnitId()) )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ' .. repr(v.UnitId) )
                 end
             elseif not upgradeID then
-                upgradeID = aiBrain:FindUpgradeBP(v:GetUnitId(), StructureUpgradeTemplates[UnitBeingUpgradeFactionIndex])
+                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, StructureUpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ABC1234
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v:GetUnitId()) .. '  faction: ' .. repr(v.factionCategory) )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v.UnitId) .. '  faction: ' .. repr(v.factionCategory) )
                 end
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
                 -- in case the unit can't upgrade with upgradeID, warn the programmer
                 -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: ABC1234:CanBuild(upgradeID) failed!
-                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: ' .. repr(v:GetUnitId()) .. ':CanBuild( '..upgradeID..' ) failed!' )
+                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: ' .. repr(v.UnitId) .. ':CanBuild( '..upgradeID..' ) failed!' )
                 continue
             end
             if upgradeID then
                 upgradeIssued = true
                 IssueUpgrade({v}, upgradeID)
-                --LOG('-- Upgrading unit '..v:GetUnitId()..' ('..v.factionCategory..') with '..upgradeID)
+                --LOG('-- Upgrading unit '..v.UnitId..' ('..v.factionCategory..') with '..upgradeID)
             end
         end
         if not upgradeIssued then
@@ -3855,7 +3855,7 @@ Platoon = Class(moho.platoon_methods) {
             aiBrain.LastTaunt = GetGameTimeSeconds() + randelay
             SUtils.AIDelayChat('enemies', ArmyBrains[aiBrain:GetArmyIndex()].Nickname, 't4taunt', nil, randelay)
         end
-        local ID = experimental:GetUnitId()
+        local ID = experimental.UnitId
 
         self:SetPlatoonFormationOverride('AttackFormation')
 
@@ -5368,7 +5368,7 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
-            if v:TestCommandCaps('RULEUCC_Dive') and v:GetUnitId() != 'uas0401' then
+            if v:TestCommandCaps('RULEUCC_Dive') and v.UnitId != 'uas0401' then
                 IssueDive({v})
             end
         end
@@ -6603,7 +6603,7 @@ Platoon = Class(moho.platoon_methods) {
         local AINames = import('/lua/AI/sorianlang.lua').AINames
         if units and table.getn(units) > 0 then
             for k, v in units do
-                local ID = v:GetUnitId()
+                local ID = v.UnitId
                 if AINames[ID] then
                     local num = Random(1, table.getn(AINames[ID]))
                     v:SetCustomName(AINames[ID][num])

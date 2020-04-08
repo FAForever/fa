@@ -19,9 +19,9 @@ XRB2309 = Class(CStructureUnit) {
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:StartSinkingFromBuild()
 
-        local army = self:GetArmy() -- Add inital sinking effects
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
+        -- Add inital sinking effects
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
 
         ChangeState(self, self.IdleState)
     end,
@@ -32,8 +32,7 @@ XRB2309 = Class(CStructureUnit) {
         if GetSurfaceHeight(position[1], position[3]) > position[2] then return end
 
         -- Add sinking effect for the duration of the sinking
-        local army = self:GetArmy()
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
 
         -- Create sinker projectile
         local bone = 0
@@ -97,7 +96,7 @@ XRB2309 = Class(CStructureUnit) {
         local bp = self:GetBlueprint()
 
         -- Add an initial death explosion
-        local army = self:GetArmy()
+        local army = self.Army
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
 

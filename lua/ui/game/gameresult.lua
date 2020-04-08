@@ -7,6 +7,8 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+local sessionInfo = SessionGetScenarioInfo()
+
 local OtherArmyResultStrings = {
     victory = '<LOC usersync_0001>%s wins!',
     defeat = '<LOC usersync_0002>%s has been defeated!',
@@ -42,7 +44,7 @@ function DoGameResult(armyIndex, result)
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
-    if not SessionIsReplay() then
+    if (not SessionIsReplay()) and (sessionInfo.Options.CheatsEnabled ~= 'true') then
         SetFocusArmy(-1)
     end
 

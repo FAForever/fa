@@ -1051,3 +1051,12 @@ end
 function moho.discovery_service_methods()
 end
 
+------
+-- New functions from engine patch:
+------
+
+-- Returns list of deposits
+-- Type: 0 - All, 1 - Mass, 2 - Energy
+-- Result: {{X1,X2,Z1,Z2,Type,Dist},...}
+function GetDepositsAroundPoint(X, Z, Radius, Type)
+end

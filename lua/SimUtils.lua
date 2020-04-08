@@ -61,7 +61,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
     end
-    local fromBrain = GetArmyBrain(units[1]:GetArmy())
+    local fromBrain = GetArmyBrain(units[1].Army)
     local shareUpgrades
     
     if ScenarioInfo.Options.Share == 'FullShare' then 
@@ -76,7 +76,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
     local upgradeKennels = {}
     
     for k,v in units do
-        local owner = v:GetArmy()
+        local owner = v.Army
         -- Only allow units not attached to be given. This is because units will give all of it's children over
         -- aswell, so we only want the top level units to be given.
         -- Units currently being captured is also denied
@@ -90,7 +90,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         local unit = v
         local bp = unit:GetBlueprint()
-        local unitId = unit:GetUnitId()
+        local unitId = unit.UnitId
 
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount()  -- looks like one of these 2 works for SMDs also
@@ -524,7 +524,7 @@ end
 
 function GiveUnitsToPlayer(data, units)
     if units then
-        local owner = units[1]:GetArmy()
+        local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
             TransferUnitsOwnership(units, data.To)
         end

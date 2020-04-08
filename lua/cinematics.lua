@@ -127,7 +127,7 @@ function CameraTrackEntities(units, zoom, seconds)
     local army = GetFocusArmy()
     if army ~= -1 then
         for i, v in units do
-            if army ~= v:GetArmy() then
+            if army ~= v.Army then
                 units[i] = v:GetBlip(army)
             end
         end

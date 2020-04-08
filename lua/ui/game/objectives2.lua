@@ -20,11 +20,8 @@ local GameMain = import('/lua/ui/game/gamemain.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Button = import('/lua/maui/button.lua').Button
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Movie = import('/lua/maui/movie.lua').Movie
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
 local cmdMode = import('/lua/ui/game/commandmode.lua')
 local UIPing = import('/lua/ui/game/ping.lua')
@@ -91,7 +88,7 @@ function CreateUI(inParent)
             local position = GetMouseWorldPos()
             for _, v in position do
                 local var = v
-                if var != v then
+                if var ~= v then
                     return
                 end
             end
@@ -200,7 +197,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
                 needsLayoutUpdate = true
             end
             objectives[update.tag][update.updateField] = update.updateData
-        elseif update.updateField == 'target' and update.updateField != 'timer' then
+        elseif update.updateField == 'target' and update.updateField ~= 'timer' then
             if controls.objItems[update.tag] then
                 if update.updateData.TargetTag == 1 then
                     if not controls.objItems[update.tag].ImageLocked and update.updateData.BlueprintId and DiskGetFileInfo('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds') then
@@ -285,8 +282,7 @@ function UpdateObjectiveItems(skipAnnounce)
             group.icon = Bitmap(group.bg, UIUtil.UIFile('/dialogs/objective-unit/help-lg-graphics_bmp.dds'))
         end
         LayoutHelpers.AtCenterIn(group.icon, group.bg, -6, -1)
-        group.icon.Height:Set(40)
-        group.icon.Width:Set(40)
+        LayoutHelpers.SetDimensions(group.icon, 40, 40)
         group.icon:DisableHitTest()
 
         group.icon.flash = Bitmap(group.icon, UIUtil.UIFile('/game/units_bmp/glow.dds'))
@@ -467,7 +463,7 @@ function LayoutObjectiveItems()
             objectiveWidth = objectiveWidth + item.Width()
             prevControl = item
         end
-        controls.objectiveContainer.Width:Set(objectiveWidth+20)
+        controls.objectiveContainer.Width:Set(objectiveWidth + LayoutHelpers.ScaleNumber(20))
         controls.objectiveContainer:Show()
     else
         controls.objectiveContainer:Hide()
@@ -558,13 +554,13 @@ function CreateTooltip(parentControl, objData, container)
 
         controls.tooltip.text.title:SetText(LOC(objData.title) or LOC(objData.Name))
         local progressStr = ''
-        if objData.progress and objData.progress != '' then
+        if objData.progress and objData.progress ~= '' then
             progressStr = LOC(objData.progress)
         elseif objData.targets.Type == 'Timer' and objData.targets.Time > 0 then
             progressStr = string.format("%02d:%02d", math.floor(objData.targets.Time/60), math.floor(math.mod(objData.targets.Time, 60)))
         end
         controls.tooltip.text.progress:SetText(progressStr)
-        controls.tooltip.Width:Set(function() return math.max(180, controls.tooltip.text.title.Width()) end)
+        controls.tooltip.Width:Set(function() return math.max(LayoutHelpers.ScaleNumber(180), controls.tooltip.text.title.Width()) end)
 
         local curLine = 1
         local wrapped = import('/lua/maui/text.lua').WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
@@ -593,11 +589,11 @@ function CreateTooltip(parentControl, objData, container)
             for id, control in controls.tooltip.text do
                 if id == 'desc' then
                     for _, line in control do
-                        if line:GetText() != '' then
+                        if line:GetText() ~= '' then
                             totHeight = totHeight + line.Height()
                         end
                     end
-                elseif control:GetText() != '' then
+                elseif control:GetText() ~= '' then
                     totHeight = control.Height() + totHeight
                 end
             end
@@ -609,9 +605,9 @@ function CreateTooltip(parentControl, objData, container)
 
     controls.tooltip:DisableHitTest(true)
     LayoutHelpers.AtVerticalCenterIn(controls.tooltip.connector, container)
-    controls.tooltip.connector.Right:Set(function() return container.Left() + 7 end)
+    LayoutHelpers.AnchorToLeft(controls.tooltip.connector, container, -7)
     LayoutHelpers.LeftOf(controls.tooltip, container, 32)
-    controls.tooltip.Top:Set(function() return container.Top() + 16 end)
+    LayoutHelpers.AtTopIn(controls.tooltip, container, 16)
 end
 
 function DestroyTooltip()
@@ -645,8 +641,8 @@ function AddPingGroups(groupData, onload)
         controls.squads[id] = Bitmap(controls.bg, UIUtil.UIFile('/game/ping-icons/panel-icon_bmp.dds'))
         controls.squads[id].btn = Button(controls.squads[id], icon, icon, icon, icon)
         LayoutHelpers.AtCenterIn(controls.squads[id].btn, controls.squads[id])
-        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - 16 end)
-        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - 16 end)
+        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - LayoutHelpers.ScaleNumber(16) end)
+        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - LayoutHelpers.ScaleNumber(16) end)
         controls.squads[id].btn.Data = pingGroup
         controls.squads[id].btn.OnClick = function(self, modifiers)
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))

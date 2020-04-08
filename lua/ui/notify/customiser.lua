@@ -36,8 +36,7 @@ end
 
 local function EditMessage(parent, data, line)
     local dialogContent = Group(parent)
-    dialogContent.Height:Set(150)
-    dialogContent.Width:Set(900)
+    LayoutHelpers.SetDimensions(dialogContent, 900, 150)
 
     local messagePopup = Popup(popup, dialogContent)
 
@@ -237,7 +236,7 @@ function CreateLine()
 
     LayoutHelpers.AtLeftIn(line.message, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.message, line)
-    LayoutHelpers.AtRightIn(line.description, line, line.Width() - keyBindingWidth + 30)
+    LayoutHelpers.LeftOf(line.description, line.message, 30)
     LayoutHelpers.AtVerticalCenterIn(line.description, line)
 
     line.HandleEvent = function(self, event)
@@ -466,8 +465,7 @@ function CreateUI()
 
     -- Create the main box
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(980)
-    dialogContent.Height:Set(730)
+    LayoutHelpers.SetDimensions(dialogContent, 980, 730)
 
     -- Handle using keypress to exit
     dialogContent.HandleEvent = function(self, event)
@@ -497,35 +495,34 @@ function CreateUI()
 
     -- Button to confirm changes and exit
     local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC _OK>")
-    okButton.Width:Set(151)
+    LayoutHelpers.SetWidth(okButton, 151)
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
     LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
-    Tooltip.AddControlTooltip(okButton, {text = 'Close Dialog', body = '<LOC notify_0001>Closes this dialog and confirms assignments of messages'})
+    Tooltip.AddControlTooltip(okButton, {text = '<LOC _Close>Close', body = '<LOC notify_0001>Closes this dialog and confirms assignments of messages'})
     okButton.OnClick = function(self, modifiers)
         CloseUI()
     end
 
     -- Button to reset everything
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC notify_0008>Default Preset")
-    defaultButton.Width:Set(151)
+    LayoutHelpers.SetWidth(defaultButton, 151)
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
     LayoutHelpers.AtLeftIn(defaultButton, dialogContent, 10)
     defaultButton.OnClick = function(self, modifiers)
-        UIUtil.QuickDialog(popup, "<LOC notify_009>Are you sure you want to reset all messages to their defaults?",
+        UIUtil.QuickDialog(popup, "<LOC notify_0009>Are you sure you want to reset all messages to their defaults?",
             "<LOC _Yes>", ResetMessages,
             "<LOC _No>", nil, nil, nil, true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
     Tooltip.AddControlTooltip(defaultButton,
         {
-            text = "<LOC key_binding_0008>Default Preset",
+            text = "<LOC notify_0008>Default Preset",
             body = "<LOC notify_0010>Reset all messages to their defaults"
         }
     )
 
     -- Button to toggle Notify as a whole
     local notifyButton = CreateMessageToggleButton(dialogContent, 'all', 'large')
-    notifyButton.label:SetText(LOC('<LOC notify_0029>Experimentals'))
     LayoutHelpers.AtBottomIn(notifyButton, dialogContent, -2)
     LayoutHelpers.AtHorizontalCenterIn(notifyButton, dialogContent, 10)
     notifyButton.HandleEvent = function(self, event)
@@ -533,11 +530,11 @@ function CreateUI()
             if not self.checked then
                 self.checked = true
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_down.dds'))
-                self.label:SetText('Notify Enabled')
+                self.label:SetText(LOC('<LOC notify_0029>Notify Enabled'))
             else
                 self.checked = false
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_up.dds'))
-                self.label:SetText('Notify Disabled')
+                self.label:SetText(LOC('<LOC notify_0030>Notify Disabled'))
             end
 
             Notify.toggleNotifyPermanent(not self.checked)
@@ -567,7 +564,7 @@ function CreateUI()
     -- Button to toggle ACU notifications
     local acuButton = CreateMessageToggleButton(dialogContent, 'acus', 'medium')
     acuButton.label:SetText(LOC('<LOC notify_0011>ACUs'))
-    acuButton.Width:Set(151)
+    LayoutHelpers.SetWidth(acuButton, 151)
     LayoutHelpers.Below(acuButton, title, 10)
     LayoutHelpers.AtLeftIn(acuButton, dialogContent, 10)
     Tooltip.AddControlTooltip(acuButton,
@@ -580,7 +577,7 @@ function CreateUI()
     -- Button to toggle Experimental notifications
     local expButton = CreateMessageToggleButton(dialogContent, 'experimentals', 'medium')
     expButton.label:SetText(LOC('<LOC notify_0014>Experimentals'))
-    expButton.Width:Set(151)
+    LayoutHelpers.SetWidth(expButton, 151)
     LayoutHelpers.Below(expButton, title, 10)
     LayoutHelpers.RightOf(expButton, acuButton, 10)
     Tooltip.AddControlTooltip(expButton,
@@ -593,7 +590,7 @@ function CreateUI()
     -- Button to toggle tech notifications
     local techButton = CreateMessageToggleButton(dialogContent, 'tech', 'medium')
     techButton.label:SetText(LOC('<LOC notify_0017>Tech'))
-    techButton.Width:Set(151)
+    LayoutHelpers.SetWidth(techButton, 151)
     LayoutHelpers.Below(techButton, title, 10)
     LayoutHelpers.RightOf(techButton, expButton, 10)
     Tooltip.AddControlTooltip(techButton,
@@ -606,7 +603,7 @@ function CreateUI()
     -- Button to toggle 'other' notifications
     local otherButton = CreateMessageToggleButton(dialogContent, 'other', 'medium')
     otherButton.label:SetText(LOC('<LOC notify_0020>Other'))
-    otherButton.Width:Set(151)
+    LayoutHelpers.SetWidth(otherButton, 151)
     LayoutHelpers.Below(otherButton, title, 10)
     LayoutHelpers.RightOf(otherButton, techButton, 10)
     Tooltip.AddControlTooltip(otherButton,
@@ -619,7 +616,7 @@ function CreateUI()
     -- Button to toggle ACU Overlay
     local overlayButton = CreateMessageToggleButton(dialogContent, 'overlay', 'medium')
     overlayButton.label:SetText(LOC('<LOC notify_0023>Overlays'))
-    overlayButton.Width:Set(151)
+    LayoutHelpers.SetWidth(overlayButton, 151)
     LayoutHelpers.Below(overlayButton, title, 10)
     LayoutHelpers.RightOf(overlayButton, otherButton, 10)
     overlayButton.HandleEvent = function(self, event)
@@ -653,7 +650,7 @@ function CreateUI()
     -- Button to toggle displaying only default messages
     local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'custom', 'medium')
     defaultMessagesButton.label:SetText(LOC('<LOC notify_0026>Show Custom'))
-    defaultMessagesButton.Width:Set(151)
+    LayoutHelpers.SetWidth(defaultMessagesButton, 151)
     LayoutHelpers.Below(defaultMessagesButton, title, 10)
     LayoutHelpers.RightOf(defaultMessagesButton, overlayButton, 10)
     defaultMessagesButton.HandleEvent = function(self, event)
@@ -686,11 +683,11 @@ function CreateUI()
 
     -- This contains all the actual dropdowns etc
     mainContainer = Group(dialogContent)
-    mainContainer.Left:Set(function() return dialogContent.Left() + 10 end)
-    mainContainer.Right:Set(function() return dialogContent.Right() - 20 end)
-    mainContainer.Top:Set(function() return acuButton.Bottom() + 10 end)
-    mainContainer.Bottom:Set(function() return okButton.Top() - 24 end)
-    mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - 10 end)
+    LayoutHelpers.AtLeftIn(mainContainer, dialogContent, 10)
+    LayoutHelpers.AtRightIn(mainContainer, dialogContent, 20)
+    LayoutHelpers.AnchorToBottom(mainContainer, acuButton, 10)
+    LayoutHelpers.AnchorToTop(mainContainer, okButton, 24)
+    mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - (10) end)
     mainContainer.top = 0
     UIUtil.CreateLobbyVertScrollbar(mainContainer)
 

@@ -776,12 +776,12 @@ local function CreatePresets()
         "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T1 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t1.dds")
     CreatePreset("DIRECTFIRE_BASE_T2",
-        "<LOC restricted_units_info_DIRECTFIRE_BASE_T1>Prevents T2 structures with direct-fire weapons",
-        "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T2 Point Defenses",
+        "<LOC restricted_units_info_DIRECTFIRE_BASE_T2>Prevents T2 structures with direct-fire weapons",
+        "<LOC restricted_units_data_DIRECTFIRE_BASE_T2>No T2 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t2.dds")
     CreatePreset("DIRECTFIRE_BASE_T3",
-        "<LOC restricted_units_info_DIRECTFIRE_BASE_T1>Prevents T3 structures with direct-fire weapons",
-        "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T3 Point Defenses",
+        "<LOC restricted_units_info_DIRECTFIRE_BASE_T3>Prevents T3 structures with direct-fire weapons",
+        "<LOC restricted_units_data_DIRECTFIRE_BASE_T3>No T3 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t3.dds")
     -- SHIELD GENERATORS restrictions
     CreatePreset("SHIELD_AIR",

@@ -44,7 +44,6 @@ UnitBlueprint {
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3COMMANDER',
         'SUBMERSIBLE',
-        'DRAGBUILD',
         'MOBILE',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',

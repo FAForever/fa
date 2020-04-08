@@ -50,9 +50,9 @@ function EconWatch(aiBrain)
                 if unit.Dead then continue end
                 local upgradeID
                 if EntityCategoryContains(categories.MOBILE, unit) then
-                    upgradeID = aiBrain:FindUpgradeBP(unit:GetUnitId(), UnitUpgradeTemplates[factionIndex])
+                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UnitUpgradeTemplates[factionIndex])
                 else
-                    upgradeID = aiBrain:FindUpgradeBP(unit:GetUnitId(), StructureUpgradeTemplates[factionIndex])
+                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
                 end
                 if upgradeID and EntityCategoryContains(categories.STRUCTURE, unit) and not unit:CanBuild(upgradeID) then
                     continue

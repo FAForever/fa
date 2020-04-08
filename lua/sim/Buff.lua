@@ -284,7 +284,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'RadarRadius' then
             local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
             if not unit:IsIntelEnabled('Radar') then
-                unit:InitIntel(unit:GetArmy(),'Radar', val)
+                unit:InitIntel(unit.Army,'Radar', val)
                 unit:EnableIntel('Radar')
             else
                 unit:SetIntelRadius('Radar', val)
@@ -297,7 +297,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'OmniRadius' then
             local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
             if not unit:IsIntelEnabled('Omni') then
-                unit:InitIntel(unit:GetArmy(),'Omni', val)
+                unit:InitIntel(unit.Army,'Omni', val)
                 unit:EnableIntel('Omni')
             else
                 unit:SetIntelRadius('Omni', val)
@@ -405,7 +405,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
                 -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
                 -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit:GetUnitId() .. ' and buff ' .. buffName) return end
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
 
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
@@ -500,7 +500,7 @@ function PlayBuffEffect(unit, buffName, trsh)
     end
 
     for k, fx in def.Effects do
-        local bufffx = CreateAttachedEmitter(unit, 0, unit:GetArmy(), fx)
+        local bufffx = CreateAttachedEmitter(unit, 0, unit.Army, fx)
         if def.EffectsScale then
             bufffx:ScaleEmitter(def.EffectsScale)
         end

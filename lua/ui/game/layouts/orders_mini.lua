@@ -43,8 +43,7 @@ function SetLayout()
         controls.bracketRightMid = nil
     end
 
-    controls.orderButtonGrid.Width:Set(GameCommon.iconWidth * horzCols)
-    controls.orderButtonGrid.Height:Set(GameCommon.iconHeight * horzRows)
+    LayoutHelpers.SetDimensions(controls.orderButtonGrid, GameCommon.iconWidth * horzCols, GameCommon.iconHeight * horzRows)
     LayoutHelpers.AtCenterIn(controls.orderButtonGrid, controls.bg, 0, -1)
     controls.orderButtonGrid:AppendRows(horzRows)
     controls.orderButtonGrid:AppendCols(horzCols)

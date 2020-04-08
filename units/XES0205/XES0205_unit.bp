@@ -110,7 +110,7 @@ UnitBlueprint {
                         Bones = {
                             'XES0205',
                         },
-                        Scale = 0.35,
+                        Scale = 1,
                         Type = 'SeaIdle01',
                     },
                 },
@@ -203,7 +203,7 @@ UnitBlueprint {
         HelpText = '<LOC xes0205_help>Shield Boat',
     },
     LifeBarHeight = 0.075,
-    LifeBarOffset = 1.1,
+    LifeBarOffset = 1.7,
     LifeBarSize = 1.1,
     Physics = {
         BackUpDistance = 5,
@@ -233,7 +233,7 @@ UnitBlueprint {
     },
     SelectionSizeX = 0.9,
     SelectionSizeZ = 2.7,   
-    SelectionThickness = 0.55,
+    SelectionThickness = 0.2,
     SizeX = 1.575,
     SizeY = 1.2,
     SizeZ = 4.125,

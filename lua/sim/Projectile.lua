@@ -129,11 +129,12 @@ Projectile = Class(moho.projectile_methods, Entity) {
             MetaImpactAmount = nil,
             MetaImpactRadius = nil,
         }
+        self.Army = self:GetArmy()
         self.Trash = TrashBag()
         local bp = self:GetBlueprint()
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
-        local snd = self:GetBlueprint().Audio.ExistLoop
+        local snd = bp.Audio.ExistLoop
         if snd then
             self:SetAmbientSound(snd, nil)
         end
@@ -148,7 +149,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     OnCollisionCheck = function(self, other)
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
-        if self:GetArmy() == other:GetArmy() then return false end
+        if self.Army == other.Army then return false end
 
         local dnc_cats = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
         if EntityCategoryContains(dnc_cats, self) and EntityCategoryContains(dnc_cats, other) then
@@ -194,7 +195,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if not self or self:BeenDestroyed() then
             return
         end
-        local health = self:GetHealth()
+
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
         if health <= 0 then
@@ -215,7 +216,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        self:CreateImpactEffects(self:GetArmy(), self.FxOnKilled, self.FxOnKilledScale)
+        self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
 
@@ -269,7 +270,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self:GetArmy() == firingWeapon.unit:GetArmy() then
+        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
             return false
         end
 
@@ -318,7 +319,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'ProjectileUnderWater
         local ImpactEffects = {}
         local ImpactEffectScale = 1
-        local army = self:GetArmy()
         local bp = self:GetBlueprint()
         local bpAud = bp.Audio
 
@@ -348,7 +348,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             ImpactEffects = self.FxImpactLand
             ImpactEffectScale = self.FxLandHitScale
             if self.FxImpactLandScorch then
-                Explosion.CreateRandomScorchSplatAtObject(self, self.FxImpactLandScorchScale, 150, 20, army)
+                Explosion.CreateRandomScorchSplatAtObject(self, self.FxImpactLandScorchScale, 150, 20, self.Army)
             end
         elseif targetType == 'Air' then
             ImpactEffects = self.FxImpactNone
@@ -369,9 +369,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
-        local TerrainEffects = self:GetTerrainEffects(targetType, self:GetBlueprint().Display.ImpactEffects.Type)
-        self:CreateImpactEffects(army, ImpactEffects, ImpactEffectScale)
-        self:CreateTerrainEffects(army, TerrainEffects, self:GetBlueprint().Display.ImpactEffects.Scale or 1)
+        local TerrainEffects = self:GetTerrainEffects(targetType, bp.Display.ImpactEffects.Type)
+        self:CreateImpactEffects(self.Army, ImpactEffects, ImpactEffectScale)
+        self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
 
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then

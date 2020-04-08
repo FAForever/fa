@@ -17,7 +17,7 @@ SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
                 SHeavyCavitationTorpedo.OnCreate(self)
                                 self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
                 self:ForkThread(self.PauseUntilTrack)
-                CreateEmitterOnEntity(self,self:GetArmy(),EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+                CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
         end,
 
         PauseUntilTrack = function(self)

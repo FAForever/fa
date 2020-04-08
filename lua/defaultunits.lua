@@ -4,22 +4,16 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local Unit = import('/lua/sim/Unit.lua').Unit
-local Shield = import('shield.lua').Shield
 local explosion = import('defaultexplosions.lua')
-local Util = import('utilities.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
-local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
 local teleportTime = {}
 
 local CreateScaledBoom = function(unit, overkill, bone)
@@ -59,7 +53,6 @@ StructureUnit = Class(Unit) {
 
     RotateTowardsEnemy = function(self)
         local bp = self:GetBlueprint()
-        local army = self:GetArmy()
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
         local x, y = GetMapSize()
@@ -67,10 +60,10 @@ StructureUnit = Class(Unit) {
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE + categories.LAND + categories.NAVAL)
         local units = brain:GetUnitsAroundPoint(cats, pos, 2 * (bp.AI.GuardScanRadius or 100), 'Enemy')
         for _, u in units do
-            local blip = u:GetBlip(army)
+            local blip = u:GetBlip(self.Army)
             if blip then
-                local on_radar = blip:IsOnRadar(army)
-                local seen = blip:IsSeenEver(army)
+                local on_radar = blip:IsOnRadar(self.Army)
+                local seen = blip:IsSeenEver(self.Army)
 
                 if on_radar or seen then
                     local epos = u:GetPosition()
@@ -152,7 +145,6 @@ StructureUnit = Class(Unit) {
             tarmac = specTarmac
         end
 
-        local army = self:GetArmy()
         local w = tarmac.Width
         local l = tarmac.Length
         local fadeout = tarmac.FadeOut
@@ -188,14 +180,14 @@ StructureUnit = Class(Unit) {
 
         -- Players and AI can build buildings outside of their faction. Get the *building's* faction to determine the correct tarrain-specific tarmac
         local factionTable = {e = 1, a = 2, r = 3, s = 4}
-        local faction  = factionTable[string.sub(self:GetUnitId(), 2, 2)]
+        local faction  = factionTable[string.sub(self.UnitId, 2, 2)]
         if albedo and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
                 albedo2 = albedo2 .. GetTarmac(faction, terrain)
             end
 
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, self.Army, 0)
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
                 self.Trash:Add(tarmacHndl)
@@ -203,7 +195,7 @@ StructureUnit = Class(Unit) {
         end
 
         if normal and tarmac.Normal then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
@@ -212,7 +204,7 @@ StructureUnit = Class(Unit) {
         end
 
         if glow and tarmac.Glow then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
@@ -245,13 +237,12 @@ StructureUnit = Class(Unit) {
 
     CreateBlinkingLights = function(self, color)
         self:DestroyBlinkingLights()
-        local bp = self:GetBlueprint().Display.BlinkingLights
-        local bpEmitters = self:GetBlueprint().Display.BlinkingLightsFx
-        if bp then
-            local fxbp = bpEmitters[color]
-            for _, v in bp do
+        local bp = self:GetBlueprint()
+        if bp.Display.BlinkingLights then
+            local fxbp = bp.Display.BlinkingLightsFx[color]
+            for _, v in bp.Display.BlinkingLights do
                 if type(v) == 'table' then
-                    local fx = CreateAttachedEmitter(self, v.BLBone, self:GetArmy(), fxbp)
+                    local fx = CreateAttachedEmitter(self, v.BLBone, self.Army, fxbp)
                     fx:OffsetEmitter(v.BLOffsetX or 0, v.BLOffsetY or 0, v.BLOffsetZ or 0)
                     fx:ScaleEmitter(v.BLScale or 1)
                     table.insert(self.FxBlinkingLightsBag, fx)
@@ -376,15 +367,15 @@ StructureUnit = Class(Unit) {
         if FactionName == 'UEF' then
             self:HideBone(0, true)
             self.BeingBuiltShowBoneTriggered = false
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag)
             end
         elseif FactionName == 'Aeon' then
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateAeonBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
             end
         elseif FactionName == 'Seraphim' then
-            if bp.General.UpgradesFrom ~= builder:GetUnitId() then
+            if bp.General.UpgradesFrom ~= builder.UnitId then
                 self:ForkThread(EffectUtil.CreateSeraphimBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
             end
         end
@@ -605,6 +596,11 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnCreate(self)
+
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+
+
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
     end,
@@ -653,7 +649,7 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         aiBrain:ESRegisterUnitEnergyStorage(self)
         local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
@@ -689,7 +685,7 @@ FactoryUnit = Class(StructureUnit) {
                 self:CreateBlinkingLights('Green')
                 self.BlinkingLightsState = state
             elseif bls == 'Red' then
-                local aiBrain = GetArmyBrain(self:GetArmy())
+                local aiBrain = GetArmyBrain(self.Army)
                 local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
                 local curMass = aiBrain:GetEconomyStoredRatio('MASS')
                 if curEnergy > 0.11 and curMass > 0.11 then
@@ -972,7 +968,7 @@ EnergyStorageUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitEnergyStorage(self)
         local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
         if curEnergy > 0.11 then
@@ -1221,7 +1217,7 @@ MassStorageUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self:GetArmy())
+        local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         local curMass = aiBrain:GetEconomyStoredRatio('MASS')
         if curMass > 0.11 then
@@ -1331,7 +1327,6 @@ SonarUnit = Class(StructureUnit) {
 
     TimedIdleSonarEffects = function(self)
         local layer = self:GetCurrentLayer()
-        local army = self:GetArmy()
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
@@ -1341,7 +1336,7 @@ SonarUnit = Class(StructureUnit) {
 
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            local emit = CreateAttachedEmitter(self, vBone, army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            local emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
                                 emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
@@ -1522,7 +1517,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
+        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
@@ -1530,7 +1525,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.CaptureEffectsBag)
+        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     -- Units with layer change effects (amphibious units like Megalith) need
@@ -1641,7 +1636,6 @@ AirUnit = Class(MobileUnit) {
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
-        local army = self:GetArmy()
         if new == 'Down' then
             -- Turn off the ambient hover sound
             self:StopUnitAmbientSound('ActiveLoop')
@@ -1701,7 +1695,7 @@ AirUnit = Class(MobileUnit) {
 
         -- Damage the area we hit. For damage, use the value which may have been adjusted by a shield impact
         if not self.deathWep or not self.DeathCrashDamage then -- Bail if stuff is missing
-            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint? ' .. self:GetUnitId())
+            WARN('defaultunits.lua OnImpact: did not find a deathWep on the plane! Is the weapon defined in the blueprint? ' .. self.UnitId)
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
@@ -1709,7 +1703,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
             self.colliderProj = nil
@@ -1736,7 +1730,6 @@ AirUnit = Class(MobileUnit) {
     end,
 
     CreateUnitAirDestructionEffects = function(self, scale)
-        local army = self:GetArmy()
         local scale = explosion.GetAverageBoundingXZRadius(self)
         explosion.CreateDefaultHitExplosion(self, scale)
 
@@ -1747,8 +1740,6 @@ AirUnit = Class(MobileUnit) {
 
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
-        local bp = self:GetBlueprint()
-
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
@@ -1982,13 +1973,18 @@ ConstructionUnit = Class(MobileUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
 
+        local bp = self:GetBlueprint()
+
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
+
         self.EffectsBag = {}
-        if self:GetBlueprint().General.BuildBones then
+        if bp.General.BuildBones then
             self:SetupBuildBones()
         end
 
-        if self:GetBlueprint().Display.AnimationBuild then
-            self.BuildingOpenAnim = self:GetBlueprint().Display.AnimationBuild
+        if bp.Display.AnimationBuild then
+            self.BuildingOpenAnim = bp.Display.AnimationBuild
         end
 
         if self.BuildingOpenAnim then
@@ -2029,7 +2025,7 @@ ConstructionUnit = Class(MobileUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-        if unitBeingBuilt:GetUnitId() == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
             self.Upgrading = true
             self.BuildingUnit = false
         end
@@ -2165,6 +2161,13 @@ CommandUnit = Class(WalkingLandUnit) {
         self.rightGunLabel = rightGunName
     end,
 
+    OnCreate = function(self)
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+
+        WalkingLandUnit.OnCreate(self)
+    end,
+
     ResetRightArm = function(self)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
@@ -2220,16 +2223,8 @@ CommandUnit = Class(WalkingLandUnit) {
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
 
-        local bp = self:GetBlueprint()
-        local isUpgrade = order == 'Upgrade'
-        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
-
-        if not isUpgrade then
+        if order ~= 'Upgrade' then
             self.BuildingUnit = true
-        end
-
-        if showEffects then
-            self:StartBuildingEffects(unitBeingBuilt, order)
         end
 
         -- Check if we're about to try and build something we shouldn't. This can only happen due to
@@ -2305,10 +2300,9 @@ CommandUnit = Class(WalkingLandUnit) {
         end
 
         local totalBones = self:GetBoneCount() - 1
-        local army = self:GetArmy()
         for k, v in EffectTemplate.UnitTeleportSteam01 do
             for bone = 1, totalBones do
-                CreateAttachedEmitter(self, bone, army, v)
+                CreateAttachedEmitter(self, bone, self.Army, v)
             end
         end
 
@@ -2336,7 +2330,7 @@ CommandUnit = Class(WalkingLandUnit) {
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
 
-        local teleDelay = self:GetBlueprint().General.TeleportDelay
+        local teleDelay = bp.General.TeleportDelay
 
         if teleDelay then
             energyCostMod = (time + teleDelay) / time
@@ -2429,7 +2423,7 @@ ACUUnit = Class(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
     
@@ -2446,8 +2440,8 @@ ACUUnit = Class(CommandUnit) {
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
 
-        if self:GetHealth() < ArmyBrains[self:GetArmy()]:GetUnitStat(self:GetUnitId(), "lowest_health") then
-            ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self.UnitId, "lowest_health") then
+            ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         end
     end,
 
@@ -2455,8 +2449,8 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.OnKilled(self, instigator, type, overkillRatio)
 
         -- If there is a killer, and it's not me
-        if instigator and instigator:GetArmy() ~= self:GetArmy() then
-            local instigatorBrain = ArmyBrains[instigator:GetArmy()]
+        if instigator and instigator.Army ~= self.Army then
+            local instigatorBrain = ArmyBrains[instigator.Army]
 
             Sync.EnforceRating = true
             WARN('ACU kill detected. Rating for ranked games is now enforced.')
@@ -2466,16 +2460,16 @@ ACUUnit = Class(CommandUnit) {
             --     'DeathExplosion' - when normal unit is killed
             --     'Nuke' - when Paragon is killed
             --     'Deathnuke' - when ACU is killed
-            if IsAlly(self:GetArmy(), instigator:GetArmy()) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
+            if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
-                Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy()}
+                Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             else
                 ForkThread(function()
                     instigatorBrain:ReportScore()
                 end)
             end
         end
-        ArmyBrains[self:GetArmy()].CommanderKilledBy = (instigator or self):GetArmy()
+        ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,
 
     ResetRightArm = function(self)
@@ -2497,8 +2491,10 @@ ACUUnit = Class(CommandUnit) {
 
     GiveInitialResources = function(self)
         WaitTicks(1)
-        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
-        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+        local bp = self:GetBlueprint()
+        local aiBrain = self:GetAIBrain()
+        aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
+        aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
     end,
 
     BuildDisable = function(self)

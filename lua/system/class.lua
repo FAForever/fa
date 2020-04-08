@@ -330,22 +330,6 @@ function ChangeState(obj, newstate)
         newstate = obj[newstate]
     end
 
-    assert(getmetatable(newstate)==State)
-
-    local oldtype = getmetatable(obj)
-    if(getmetatable(oldtype)==Class) then
-        -- The object is an instance of a class which has not yet been assigned a state.
-        -- Make sure it's the same class this state is defined for.
-        assert(oldtype == newstate.__bases[1], "Tried to set a state, but the state wasn't defined on this object")
-    elseif(getmetatable(oldtype)==State) then
-        -- The object is an instance of a class that's already changed states.
-        -- Make sure it was defined in the same class we were.
-        assert(oldtype.__bases[1] == newstate.__bases[1], "Tried to changes states, but the new state wasn't defined on this object")
-    else
-        -- The object is not a class instance at all.
-        error("Attempted to change states on something other than a class instance")
-    end
-
     -- Ignore redundant state changes.
     if getmetatable(obj)==newstate then
         debug.traceback(nil, "Ignoring no-op state change...")

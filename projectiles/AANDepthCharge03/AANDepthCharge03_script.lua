@@ -28,10 +28,8 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     OnEnterWater = function(self)
         #ADepthChargeProjectile.OnEnterWater(self)
 
-        local army = self:GetArmy()
-
         for i in self.FxEnterWater do #splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
+            CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
         end
 
         #self:SetMaxSpeed(20)
@@ -74,7 +72,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
             LifeTime = 10,
             Omni = false,
             Vision = false,
-            Army = self:GetArmy(),
+            Army = self.Army,
         }
         local vizEntity = VizMarker(spec)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)

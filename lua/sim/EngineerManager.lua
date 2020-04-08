@@ -595,7 +595,7 @@ EngineerManager = Class(BuilderManager) {
         elseif EntityCategoryContains(categories.STRUCTURE, unitBeingBuilt) then
             self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
         else
-            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt:GetUnitId())
+            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt.UnitId)
         end
     end,
 

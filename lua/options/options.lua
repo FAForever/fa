@@ -285,6 +285,22 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_0283>UI Scale",
+                key = 'ui_scale',
+                restart = true,
+                type = 'toggle',
+                default = 1.0,
+                custom = {
+                    states = {
+                        {text = "100%", key = 1.0,},
+                        {text = "125%", key = 1.25,},
+                        {text = "150%", key = 1.5,},
+                        {text = "175%", key = 1.75,},
+                        {text = "200%", key = 2.0,},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0151>Display Subtitles",
                 key = 'subtitles',
                 type = 'toggle',
@@ -539,19 +555,6 @@ options = {
             {
                 title = "<LOC OPTIONS_0234>Single Unit Selected Info",
                 key = 'gui_enhanced_unitview',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0235>Single Unit Selected Rings",
-                key = 'gui_enhanced_unitrings',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -1152,47 +1155,6 @@ options = {
                     max = 100,
                     inc = 1,
                 },
-            },
-        },
-    },
-}
-
-extraOpts = {
-    {
-        default = 1,
-        label = "<LOC lobui_0708>- Ladder Game -",
-        help = "<LOC lobui_0706>If enabled, the game will count as Ranked Game for www.fa-ladder.com website",
-        key = 'LadderGame',
-        pref = 'Lobby_Ladder_Game',
-        values = {
-            {
-                text = "<LOC _No>No",
-                help = "<LOC lobui_0604>No Ranked Mode",
-                key = 'Off',
-            },
-            {
-                text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0605>Ranked Mode set",
-                key = 'On',
-            },
-        },
-    },
-    {
-        default = 1,
-        label = "<LOC lobui_0720>Score",
-        help = "<LOC lobui_0721>Set score on or off during the game",
-        key = 'Score',
-        pref = 'Lobby_Score',
-        values = {
-            {
-                text = "<LOC _On>On",
-                help = "<LOC lobui_0722>Score is enabled",
-                key = 'yes',
-            },
-            {
-                text = "<LOC _Off>Off",
-                help = "<LOC lobui_0723>Score is disabled",
-                key = 'no',
             },
         },
     },

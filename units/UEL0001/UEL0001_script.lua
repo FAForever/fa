@@ -71,9 +71,9 @@ UEL0001 = Class(ACUUnit) {
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         else
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -91,7 +91,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -110,7 +110,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -143,7 +143,7 @@ UEL0001 = Class(ACUUnit) {
         if not bp then return end
         if enh == 'LeftPod' then
             local location = self:GetPosition('AttachSpecial02')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'LeftPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -151,7 +151,7 @@ UEL0001 = Class(ACUUnit) {
             self.LeftPod = pod
         elseif enh == 'RightPod' then
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'RightPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)

@@ -33,7 +33,7 @@ XRB3301 = Class(CRadarUnit) {
         self.OmniEffectsBag = {}
 
         for k, v in CSoothSayerAmbient do
-            table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v))
+            table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
         end
     end,
 
@@ -79,7 +79,7 @@ XRB3301 = Class(CRadarUnit) {
                 self.OmniEffectsBag = {}
             end
             for k, v in CSoothSayerAmbient do
-                table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self:GetArmy(), v))
+                table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
             end
             ChangeState(self, self.ExpandingVision)
         end

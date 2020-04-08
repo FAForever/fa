@@ -724,7 +724,7 @@ Tooltips = {
         description = "",
     },
     map_select_supportedplayers = {
-        title = "<LOC OPTIONS_0145>Max. Players",
+        title = "<LOC MAPSEL_0009>Supported Players",
         description = "<LOC OPTIONS_0146>Sort by the maximum number of Players allowed",
     },
     options_vsync = {
@@ -734,6 +734,10 @@ Tooltips = {
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
+    },
+    options_ui_scale = {
+        title = "<LOC OPTIONS_0283>UI Scale",
+        description = "<LOC OPTIONS_0284>Changes the size of all UI elements. (requires game restart)",
     },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
@@ -823,10 +827,6 @@ Tooltips = {
         title = "<LOC OPTIONS_0251>Cycle reset time",
         description = "<LOC OPTIONS_0252>Time in milliseconds until hotbuild cycle will reset",
     },
-    options_advanced_statistics = {
-        title = "<LOC OPTIONS_0213>Advanced Statistics",
-        description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
-    },
     options_maximum_reclaim_count = {
         title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
         description = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
@@ -910,34 +910,6 @@ Tooltips = {
         title = '<LOC lobui_0090>',
         description = '',
     },
-    lob_team_none = {
-        title = '<LOC tooltipui0631>No Team',
-        description = '',
-    },
-    lob_team_one = {
-        title = '<LOC tooltipui0632>Team 1',
-        description = '',
-    },
-    lob_team_two = {
-        title = '<LOC tooltipui0633>Team 2',
-        description = '',
-    },
-    lob_team_three = {
-        title = '<LOC tooltipui0634>Team 3',
-        description = '',
-    },
-    lob_team_four = {
-        title = '<LOC tooltipui0635>Team 4',
-        description = '',
-    },
-    lob_team_five = {
-        title = '<LOC lobui_0746>Team 5',
-        description = '',
-    },
-    lob_team_six = {
-        title = '<LOC lobui_0747>Team 6',
-        description = '',
-    },
     ['Give Units'] = {
         title = '<LOC tooltips_0000>Give Units',
         description = '',
@@ -999,28 +971,12 @@ Tooltips = {
         description='<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
     },
     map_type = {
-        title = "<LOC lobui_0583>Map Type",
+        title = "<LOC MAPSEL_0032>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
     },
     lob_disable_allmods = {
         title = "<LOC lobui_0600>Disable All Mods",
         description = "<LOC lobui_0601>Click to disable all the mods at once",
-    },
-    lob_UnitCap_125 = {
-        title = "<LOC lobui_0719>125",
-        description = "<LOC lobui_0720>125 units per player may be in play",
-    },
-    lob_UnitCap_375 = {
-        title = "<LOC lobui_0721>375",
-        description = "<LOC lobui_0722>375 units per player may be in play",
-    },
-    lob_UnitCap_625 = {
-        title = "<LOC lobui_0723>625",
-        description = "<LOC lobui_0724>625 units per player may be in play",
-    },
-    lob_UnitCap_875 = {
-        title = "<LOC lobui_0725>875",
-        description = "<LOC lobui_0726>875 units per player may be in play",
     },
     lob_click_LargeMapPreview = {
         title = "<LOC lobui_0618>Large Preview",

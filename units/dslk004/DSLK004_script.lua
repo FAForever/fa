@@ -113,14 +113,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
 
     CreateBeamEffects = function(self)
         -- Destructively overwriting this function to make it use AttachBeamEntityToEntity()
-        local army = self:GetArmy()
         for k, y in self.FxBeamStartPoint do
-            local fx = CreateAttachedEmitter(self, 0, army, y):ScaleEmitter(self.FxBeamStartPointScale)
+            local fx = CreateAttachedEmitter(self, 0, self.Army, y):ScaleEmitter(self.FxBeamStartPointScale)
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         for k, y in self.FxBeamEndPoint do
-            local fx = CreateAttachedEmitter(self, 1, army, y):ScaleEmitter(self.FxBeamEndPointScale)
+            local fx = CreateAttachedEmitter(self, 1, self.Army, y):ScaleEmitter(self.FxBeamEndPointScale)
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
@@ -129,10 +128,10 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
             if self.TargetEntity then
-                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, army, bp)
+                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, self.Army, bp)
             else
-                fxBeam = CreateBeamEmitter(bp, army)
-                AttachBeamToEntity(fxBeam, self, 0, army)
+                fxBeam = CreateBeamEmitter(bp, self.Army)
+                AttachBeamToEntity(fxBeam, self, 0, self.Army)
             end
 
             -- collide on start if it's a continuous beam
@@ -172,7 +171,6 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
         local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -181,7 +179,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
-                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army)
+                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
                 LastPosition = CurrentPosition
                 skipCount = 1
             else
@@ -230,13 +228,12 @@ DSLK004 = Class(SLandUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 
-        local army =  self:GetArmy()
         local EfctTempl = {
             '/units/DSLK004/effects/orbeffect_01.bp',
             '/units/DSLK004/effects/orbeffect_02.bp',
         }
         for k, v in EfctTempl do
-            CreateAttachedEmitter(self, 'Orb', army, v)
+            CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
 }

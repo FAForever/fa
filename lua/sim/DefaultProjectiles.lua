@@ -23,9 +23,8 @@ EmitterProjectile = Class(Projectile) {
 
     OnCreate = function(self)
         Projectile.OnCreate(self)
-        local army = self:GetArmy()
         for i in self.FxTrails do
-            CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
         end
     end,
 }
@@ -41,7 +40,7 @@ SingleBeamProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         if self.BeamName then
-            CreateBeamEmitterOnEntity(self, -1, self:GetArmy(), self.BeamName)
+            CreateBeamEmitterOnEntity(self, -1, self.Army, self.BeamName)
         end
     end,
 }
@@ -54,9 +53,8 @@ MultiBeamProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         local beam = nil
-        local army = self:GetArmy()
         for k, v in self.Beams do
-            CreateBeamEmitterOnEntity(self, -1, army, v)
+            CreateBeamEmitterOnEntity(self, -1, self.Army, v)
         end
     end,
 }
@@ -64,16 +62,15 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 -- Nukes
 NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
-        local army = self:GetArmy()
         local launcher = self:GetLauncher()
-        self.Nuke = true
-        self.CreateEffects(self, self.InitialEffects, army, 1)
+		self.Nuke = true
+        self.CreateEffects(self, self.InitialEffects, self.Army, 1)
         self:TrackTarget(false)
         WaitSeconds(2.5) -- Height
         self:SetCollision(true)
-        self.CreateEffects(self, self.LaunchEffects, army, 1)
+        self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
         WaitSeconds(2.5)
-        self.CreateEffects(self, self.ThrustEffects, army, 3)
+        self.CreateEffects(self, self.ThrustEffects, self.Army, 3)
         WaitSeconds(2.5)
         self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)
@@ -185,8 +182,8 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
-        if self.PolyTrail != '' then
-            CreateTrail(self, -1, self:GetArmy(), self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+        if self.PolyTrail ~= '' then
+            CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
         end
     end,
 }
@@ -202,17 +199,16 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
         EmitterProjectile.OnCreate(self)
         if self.PolyTrails then
             local NumPolyTrails = table.getn(self.PolyTrails)
-            local army = self:GetArmy()
 
-            if self.RandomPolyTrails != 0 then
+            if self.RandomPolyTrails ~= 0 then
                 local index = nil
                 for i = 1, self.RandomPolyTrails do
                     index = math.floor(Random(1, NumPolyTrails))
-                    CreateTrail(self, -1, army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
+                    CreateTrail(self, -1, self.Army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
                 end
             else
                 for i = 1, NumPolyTrails do
-                    CreateTrail(self, -1, army, self.PolyTrails[i]):OffsetEmitter(0, 0, self.PolyTrailOffset[i])
+                    CreateTrail(self, -1, self.Army, self.PolyTrails[i]):OffsetEmitter(0, 0, self.PolyTrailOffset[i])
                 end
             end
         end
@@ -233,8 +229,8 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        if self.BeamName != '' then
-            CreateBeamEmitterOnEntity(self, -1, self:GetArmy(), self.BeamName)
+        if self.BeamName ~= '' then
+            CreateBeamEmitterOnEntity(self, -1, self.Army, self.BeamName)
         end
     end,
 }
@@ -251,9 +247,8 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
     OnCreate = function(self)
         MultiPolyTrailProjectile.OnCreate(self)
         local beam = nil
-        local army = self:GetArmy()
         for k, v in self.Beams do
-            CreateBeamEmitterOnEntity(self, -1, army, v)
+            CreateBeamEmitterOnEntity(self, -1, self.Army, v)
         end
     end,
 }
@@ -273,24 +268,22 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self, inWater)
         if inWater then
-            local army = self:GetArmy()
             for i in self.FxTrails do
-                CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+                CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
             end
-            if self.PolyTrail != '' then
-                CreateTrail(self, -1, self:GetArmy(), self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+            if self.PolyTrail ~= '' then
+                CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
             end
         end
     end,
 
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
-        local army = self:GetArmy()
         for i in self.FxTrails do
-            CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
         end
-        if self.PolyTrail != '' then
-            CreateTrail(self, -1, self:GetArmy(), self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+        if self.PolyTrail ~= '' then
+            CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
         end
     end,
 
@@ -330,7 +323,7 @@ OverchargeProjectile = Class() {
         LOG(targetType)
         LOG(targetEntity)
         if targetEntity and IsUnit(targetEntity) then
-            LOG(targetEntity:GetUnitId())
+            LOG(targetEntity.UnitId)
         end]]
 
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
@@ -357,7 +350,6 @@ OverchargeProjectile = Class() {
         -- Set the damage dealt by the projectile for hitting the floor or an ACUUnit
         -- Energy drained is calculated by the relationship equations
         local damage = data.minDamage
-        local army = self:GetArmy()
 
         if targetEntity then
             -- Handle hitting shields. We want the unit underneath, not the shield itself
@@ -376,8 +368,8 @@ OverchargeProjectile = Class() {
                 local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
                 local energyLimit = energyAvailable * data.energyMult
                 
-                if OCProjectiles[army] > 1 then
-                    energyLimit = energyLimit / OCProjectiles[army]
+                if OCProjectiles[self.Army] > 1 then
+                    energyLimit = energyLimit / OCProjectiles[self.Army]
                 end
                 
                 local energyLimitDamage = self:EnergyAsDamage(energyLimit)
@@ -429,7 +421,7 @@ OverchargeProjectile = Class() {
             launcher:ForkThread(function()
                 WaitFor(launcher.EconDrain)
                 RemoveEconomyEvent(launcher, launcher.EconDrain)
-                OCProjectiles[army] = OCProjectiles[army] - 1
+                OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
             end)
         end
@@ -484,12 +476,12 @@ OverchargeProjectile = Class() {
     end,
     
     OnCreate = function(self)
-        local army = self:GetArmy()
-                
-        if not OCProjectiles[army] then
-            OCProjectiles[army] = 0
+        self.Army = self:GetArmy()
+
+        if not OCProjectiles[self.Army] then
+            OCProjectiles[self.Army] = 0
         end
         
-        OCProjectiles[army] = OCProjectiles[army] + 1
+        OCProjectiles[self.Army] = OCProjectiles[self.Army] + 1
     end,
 }

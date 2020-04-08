@@ -80,7 +80,7 @@ Combo = Class(Group) {
         LayoutHelpers.AtRightIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
-        self._btnMid.Left:Set(function() return self._btnLeft.Right() - 1 end)
+        LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
 
         self._text = UIUtil.CreateText(self._btnMid, "", pointSize, UIUtil.bodyFont)
@@ -89,15 +89,15 @@ Combo = Class(Group) {
         -- text control is height of text/font, and from left to button
         self.Height:Set(function() return math.max(self._text.Height(), self._btnMid.Height()) end)
         self._text.Top:Set(self._btnMid.Top)
-        self._text.Left:Set(function() return self._btnLeft.Left() + 5 end)
-        self._text.Right:Set(function() return self._btnMid.Right() + 5 end)
+        LayoutHelpers.AtLeftIn(self._text, self._btnLeft, 5)
+        LayoutHelpers.AtRightIn(self._text, self._btnMid, -5)
         self._text:SetClipToWidth(true)
         self._text:SetDropShadow(true)
 
         self._dropdown = Group(self._text)
         self._dropdown.Top:Set(self.Bottom)
         self._dropdown.Right:Set(function() return self.Right() end)
-        self._dropdown.Width:Set(function() return self.Width() - 5 end)
+        self._dropdown.Width:Set(function() return self.Width() - LayoutHelpers.ScaleNumber(5) end)
 
         local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
         local ddum = Bitmap(self._dropdown, bitmaps.list.um)
@@ -419,12 +419,12 @@ BitmapCombo = Class(Group) {
         LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
 
-        self._btnMid.Left:Set(function() return self._btnLeft.Right() - 1 end)
+        LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
 
         self._bitmap = Bitmap(self._btnMid)
         LayoutHelpers.AtTopIn(self._bitmap, self._btnMid, 2)
-        self._bitmap.Left:Set(function() return self._btnLeft.Left() + 5 end)
+        LayoutHelpers.AtLeftIn(self._bitmap, self._btnLeft, 5)
         self._bitmap:DisableHitTest()
 
         self._dropdown = Group(self)
@@ -667,8 +667,7 @@ BitmapCombo = Class(Group) {
             -- Evil hack to make the coloured block appear wide enough.
             -- Handily, we only use this in one place, so it probably won't cause the world to end.
             -- TODO: Do this sanely using the layout system.
-            bmp.Width:Set(30)
-            bmp.Height:Set(12)
+            LayoutHelpers.SetDimensions(bmp, 30, 12)
         else
             bmp:SetTexture(UIUtil.SkinnableFile(name))
         end

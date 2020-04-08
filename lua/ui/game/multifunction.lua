@@ -207,12 +207,7 @@ function Create(parent)
     local function CreateOverlayBtn(buttonData)
         local btn = false
         if buttonData.button then
-            btn = Button(controls.bg,
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_down.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_over.dds'),
-                UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'),
-                'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            btn = UIUtil.CreateButtonStd(controls.bg, '/game/mfd_btn/'..buttonData.bitmap, nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
             Tooltip.AddButtonTooltip(btn, buttonData.tooltip)
         else
             btn = Checkbox(controls.bg,
@@ -226,7 +221,7 @@ function Create(parent)
             Tooltip.AddCheckboxTooltip(btn, buttonData.tooltip)
         end
         btn.ID = buttonData.id
-        btn:UseAlphaHitTest(true)
+        --btn:UseAlphaHitTest(true)
 
         if buttonData.dropout then
             btn.dropout = Checkbox(btn,
@@ -244,14 +239,9 @@ function Create(parent)
     end
 
     local function CreatePingBtn(buttonData)
-        local btn = Button(controls.bg,
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_up.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_down.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_over.dds'),
-            UIUtil.SkinnableFile('/game/mfd_btn/'..buttonData.bitmap..'_btn_dis.dds'),
-            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+        local btn = UIUtil.CreateButtonStd(controls.bg, '/game/mfd_btn/'..buttonData.bitmap, nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
         Tooltip.AddButtonTooltip(btn, buttonData.tooltip)
-        btn:UseAlphaHitTest(true)
+        --btn:UseAlphaHitTest(true)
         btn.ID = buttonData.pingType
         btn.cursor = buttonData.cursor
         if SessionIsReplay() or GetFocusArmy() == -1 then
@@ -379,8 +369,7 @@ function CreateMapDropout(parent)
 
             bg.treehorz = Bitmap(bg)
             bg.treehorz:SetSolidColor(UIUtil.fontColor)
-            bg.treehorz.Height:Set(1)
-            bg.treehorz.Width:Set(6)
+            LayoutHelpers.SetDimensions(bg.treehorz, 6, 1)
             LayoutHelpers.AtLeftIn(bg.treehorz, bg)
             LayoutHelpers.AtVerticalCenterIn(bg.treehorz, bg)
 
@@ -426,7 +415,7 @@ function CreateMapDropout(parent)
 
             return bg
         end
-        # Make an option group consisting of a checkbox and a name
+        -- Make an option group consisting of a checkbox and a name
         local group = Group(bg)
         local mapControl = inMapControl
         local camName = mapControl._cameraName
@@ -479,7 +468,7 @@ function CreateMapDropout(parent)
         group.treeVert.Top:Set(group.title.Bottom)
         group.treeVert.Bottom:Set(function() return group.toggles[table.getsize(group.toggles)].Top() + (group.toggles[1].Height()/2) end)
 
-        group.Width:Set(170)
+        LayoutHelpers.SetWidth(group, 170)
         group.Height:Set(function() return group.title.Height() + (table.getsize(group.toggles) * group.toggles[1].Height()) end)
         return group
     end
@@ -641,7 +630,7 @@ function CreateFilterDropout(parent)
                 self.check:Hide()
             end
             for _, control in bg.items do
-                if control.Data.Type == self.Data.Type and control != self then
+                if control.Data.Type == self.Data.Type and control ~= self then
                     if control.Data.Combo then
                         continue
                     end
@@ -898,10 +887,9 @@ function CreateFilterDropout(parent)
         end
     end
 
-    bg.Height:Set(30)
-    bg.Width:Set(5)
-    bg.Left:Set(function() return controls.bg.Right() + 36 end)
-    bg.Top:Set(function() return controls.bg.Top() + 23 end)
+    LayoutHelpers.SetDimensions(bg, 30, 5)
+    LayoutHelpers.AnchorToRight(bg, controls.bg, 36)
+    LayoutHelpers.AtTopIn(bg, controls.bg, 23)
     bg.TargetWidth = maxWidth
     bg.TargetHeight = totalHeight + 10
     bg:SetNeedsFrameUpdate(true)
@@ -986,10 +974,10 @@ end
 function CreateDropoutBG(createConnector)
     local bg = Bitmap(controls.bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
 
-    if createConnector != false then
+    if createConnector ~= false then
         bg.connector = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
         LayoutHelpers.AtVerticalCenterIn(bg.connector, controls.bg)
-        bg.connector.Left:Set(function() return controls.bg.Right() - 2 end)
+        LayoutHelpers.AnchorToRight(bg.connector, controls.bg, -2)
         bg.connector.Depth:Set(function() return bg.Depth() - 5 end)
     end
 

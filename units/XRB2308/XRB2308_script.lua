@@ -18,7 +18,7 @@ XRB2308 = Class(CStructureUnit) {
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
         
         local pos = self:GetPosition()
-        local armySelf = self:GetArmy()
+        local armySelf = self.Army
         local health = self:GetHealth()
         local armies = ListArmies()
         local spottedByArmy = {}
@@ -73,7 +73,7 @@ XRB2308 = Class(CStructureUnit) {
         local bp = self:GetBlueprint()
 
         -- Add an initial death explosion
-        local army = self:GetArmy()
+        local army = self.Army
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
 

@@ -54,11 +54,10 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
-        local army = self.unit:GetArmy()
         local bp = self:GetBlueprint()
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
             end
         end
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
@@ -106,11 +105,10 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local army = self.unit:GetArmy()
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+                    CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
                 end
             end
             if self.RotatorManip then
@@ -357,14 +355,14 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.OnCreate(self)
 
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
-        self.SphereEffectEntity:AttachBoneTo(-1, self.unit,self:GetBlueprint().RackBones[1].MuzzleBones[1])
+        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.6)
         self.SphereEffectEntity:SetVizToAllies('Intel')
         self.SphereEffectEntity:SetVizToNeutrals('Intel')
         self.SphereEffectEntity:SetVizToEnemies('Intel')
 
-        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit:GetArmy(), self.SphereEffectBp)
+        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
 
         self.unit.Trash:Add(self.SphereEffectEntity)
         self.unit.Trash:Add(emit)
@@ -407,9 +405,8 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
-        local army = self.unit:GetArmy()
         for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit,-2,army,v)
+            CreateEmitterAtBone(self.unit, -2, self.unit.Army, v)
         end
         KamikazeWeapon.OnFire(self)
     end,

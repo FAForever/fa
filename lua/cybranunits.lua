@@ -118,7 +118,7 @@ CConstructionUnit = Class(ConstructionUnit){
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 }
 
@@ -128,7 +128,7 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, self:GetArmy(), v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,
@@ -201,7 +201,7 @@ CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
    
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
@@ -339,39 +339,41 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         -- Structure stuff
         CStructureUnit.OnCreate(self)
 
+        local bp = self:GetBlueprint()
+
         -- Construction stuff
         self.EffectsBag = {}
-        if self:GetBlueprint().General.BuildBones then
+        if bp.General.BuildBones then
             self:SetupBuildBones()
         end
 
-        if self:GetBlueprint().Display.AnimationBuild then
-            self.BuildingOpenAnim = self:GetBlueprint().Display.AnimationBuild
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
+
+        -- Set up building animation
+        if bp.Display.AnimationOpen then
+            self.BuildingOpenAnim = bp.Display.AnimationOpen
         end
 
-        if self.BuildingOpenAnim then
-            self.BuildingOpenAnimManip = CreateAnimator(self)
-            self.BuildingOpenAnimManip:SetPrecedence(1)
-            self.BuildingOpenAnimManip:PlayAnim(self.BuildingOpenAnim, false):SetRate(0)
-            if self.BuildArmManipulator then
-                self.BuildArmManipulator:Disable()
-            end
-        end
+        self.AnimationManipulator = CreateAnimator(self)
+        self.Trash:Add(self.AnimationManipulator)
+
         self.BuildingUnit = false
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        local unitid = self:GetBlueprint().General.UpgradesTo
-
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
+
+        self.AnimationManipulator:PlayAnim(self.BuildingOpenAnim, false):SetRate(1)
 
         CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
+
         -- If created with F2 on land, then play the transform anim.
         if self:GetCurrentLayer() == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
@@ -379,11 +381,11 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self:GetBlueprint().General.BuildBones.BuildEffectBones), self.BuildEffectsBag)
+        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self.BuildEffectBones), self.BuildEffectsBag)
         if buildbots then
-            EffectUtil.CreateCybranEngineerBuildEffects(self, self:GetBlueprint().General.BuildBones.BuildEffectBones, buildbots, self.BuildEffectsBag)
+            EffectUtil.CreateCybranEngineerBuildEffects(self, self.BuildEffectBones, buildbots, self.BuildEffectsBag)
         else
-            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -393,14 +395,9 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
-
-        if self.BuildingOpenAnimManip and self.BuildArmManipulator then
-            self.StoppedBuilding = true
-        elseif self.BuildingOpenAnimManip then
-            self.BuildingOpenAnimManip:SetRate(-1)
-        end
-
         self.BuildingUnit = false
+
+        self.AnimationManipulator:SetRate(-1)
     end,
 
     OnPaused = function(self)
@@ -442,27 +439,6 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         CStructureUnit.StopBuildingEffects(self, unitBeingBuilt)
     end,
 
-    WaitForBuildAnimation = function(self, enable)
-        if self.BuildArmManipulator then
-            WaitFor(self.BuildingOpenAnimManip)
-            if (enable) then
-                self.BuildArmManipulator:Enable()
-            end
-        end
-    end,
-
-    OnPrepareArmToBuild = function(self)
-        CStructureUnit.OnPrepareArmToBuild(self)
-
-        if self.BuildingOpenAnimManip then
-            self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
-            if self.BuildArmManipulator then
-                self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
-            end
-        end
-    end,
-
     OnStopBuilderTracking = function(self)
         CStructureUnit.OnStopBuilderTracking(self)
 
@@ -482,7 +458,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
+        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
@@ -490,7 +466,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0, }, self.CaptureEffectsBag)
+        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 }
 

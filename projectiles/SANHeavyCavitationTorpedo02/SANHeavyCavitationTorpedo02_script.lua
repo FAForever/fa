@@ -29,20 +29,19 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     OnEnterWater = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnEnterWater(self)
-        local army = self:GetArmy()
 
         for i in self.FxEnterWaterEmitter do #splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            CreateEmitterAtEntity(self,self.Army,self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
         self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
         self:SetCollideSurface(false)
     end,
 
     OnCreate = function(self)
         SHeavyCavitationTorpedo.OnCreate(self)
         self:ForkThread(self.ProjectileSplit)
-        self.AirTrails = CreateEmitterOnEntity(self,self:GetArmy(),EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
+        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
     end,
 
     ProjectileSplit = function(self)
@@ -72,7 +71,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
 
         # Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self:GetArmy(), v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
 
         # Launch projectiles at semi-random angles away from split location

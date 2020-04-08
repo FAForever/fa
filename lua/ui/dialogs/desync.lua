@@ -22,8 +22,7 @@ function UpdateDialog(beatNumber, strings)
     end
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(400)
-    dialogContent.Height:Set(320)
+    LayoutHelpers.SetDimensions(dialogContent, 400, 320)
 
     dialog = Popup(GetFrame(0), dialogContent)
 

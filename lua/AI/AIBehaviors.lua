@@ -514,7 +514,7 @@ function AirLandToggleThread(unit)
         WaitSeconds(2)
     end
 
-    local unitCat = ParseEntityCategory(unit:GetUnitId())
+    local unitCat = ParseEntityCategory(unit.UnitId)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
         local position = unit:GetPosition()
@@ -1465,7 +1465,7 @@ function AirLandToggleThreadSorian(unit)
     local weapons = bp.Weapon
     local antiAirRange
     local landRange
-    local unitCat = ParseEntityCategory(unit:GetUnitId())
+    local unitCat = ParseEntityCategory(unit.UnitId)
     for _, v in weapons do
         if v.ToggleWeapon then
             local weaponType = 'Land'

@@ -137,7 +137,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
     },
 
     CreateRollOffEffects = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local unitB = self.UnitBeingBuilt
         for k, v in self.RollOffBones do
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)

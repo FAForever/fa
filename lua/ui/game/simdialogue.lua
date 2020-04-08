@@ -34,22 +34,10 @@ function CreateSimDialogue(newDialogues)
         bg.blWidget = Bitmap(bg, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
         bg.brWidget = Bitmap(bg, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
         
-        local leftOff = -25
-        local topOff = -10
-        local rightOff = 25
-        local bottomOff = 10
-        
-        bg.tlWidget.Left:Set(function() return bg.tl.Left() + leftOff end)
-        bg.tlWidget.Top:Set(function() return bg.tl.Top() + topOff end)
-        
-        bg.trWidget.Right:Set(function() return bg.tr.Right() + rightOff end)
-        bg.trWidget.Top:Set(function() return bg.tr.Top() + topOff end)
-        
-        bg.blWidget.Left:Set(function() return bg.bl.Left() + leftOff end)
-        bg.blWidget.Bottom:Set(function() return bg.bl.Bottom() + bottomOff end)
-        
-        bg.brWidget.Right:Set(function() return bg.br.Right() + rightOff end)
-        bg.brWidget.Bottom:Set(function() return bg.br.Bottom() + bottomOff end)
+        LayoutHelpers.AtLeftTopIn(bg.tlWidget, bg.tl, -25, -10)
+        LayoutHelpers.AtRightTopIn(bg.trWidget, bg.tr, -25, -10)
+        LayoutHelpers.AtRightBottomIn(bg.brWidget, bg.br, -25, -10)
+        LayoutHelpers.AtLeftBottomIn(bg.blWidget, bg.bl, -25, -10)
         
         bg.tl.Depth:Set(bg.Depth)
         bg.t.Depth:Set(bg.Depth)
@@ -108,7 +96,7 @@ function CreateSimDialogue(newDialogues)
         dlg.ID = info.ID
         dlg.background = CreateBackground(dlg)
         dlg.text = MultiLineText(dlg, UIUtil.bodyFont, 18, 'ffffffff')
-        dlg.text.Width:Set(300)
+        LayoutHelpers.SetWidth(dlg.text, 300)
         LayoutHelpers.AtTopIn(dlg.text, dlg)
         LayoutHelpers.AtHorizontalCenterIn(dlg.text, dlg)
         dlg.text:SetText(LOC(info.text) or '')
@@ -212,10 +200,13 @@ function SetDialogueText(updatedDialogueText)
     for _, info in updatedDialogueText do
         if dialogues[info.ID] then
             dialogues[info.ID].text:SetText(info.text)
-            if dialogues[info.ID].text._text[1] then
-                LayoutHelpers.Below(dialogues[info.ID].btns[1], dialogues[info.ID].text._text[table.getsize(dialogues[info.ID].text._text)], 5)
-            else
-                LayoutHelpers.AtLeftTopIn(dialogues[info.ID].btns[1], dialogues[info.ID], 5, 5)
+            dialogues[info.ID].text:SetColor(UIUtil.fontColor)
+            if dialogues[info.ID].btns[1] then
+                if dialogues[info.ID].text._text[1] then
+                    LayoutHelpers.Below(dialogues[info.ID].btns[1], dialogues[info.ID].text._text[table.getsize(dialogues[info.ID].text._text)], 5)
+                else
+                    LayoutHelpers.AtLeftTopIn(dialogues[info.ID].btns[1], dialogues[info.ID], 5, 5)
+                end
             end
             dialogues[info.ID]:CalcHeight()
         end

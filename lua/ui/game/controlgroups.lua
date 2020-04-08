@@ -83,8 +83,7 @@ function OnSelectionSetChanged(name, units, applied)
         local bg = Bitmap(controls.container, UIUtil.SkinnableFile('/game/avatar/avatar-control-group_bmp.dds'))
 
         bg.icon = Bitmap(bg)
-        bg.icon.Width:Set(28)
-        bg.icon.Height:Set(20)
+        LayoutHelpers.SetDimensions(bg.icon, 28, 20)
         LayoutHelpers.AtCenterIn(bg.icon, bg, 0, -4)
 
         bg.label = UIUtil.CreateText(bg.icon, label, 18, UIUtil.bodyFont)
@@ -117,7 +116,7 @@ function OnSelectionSetChanged(name, units, applied)
                         break
                     end
                 end
-                if iconID != '' and UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true) then
+                if iconID ~= '' and UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true) then
                     self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true))
                 else
                     self.icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')

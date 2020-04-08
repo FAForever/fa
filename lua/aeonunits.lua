@@ -46,13 +46,13 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 ---------------------------------------------------------------
 AFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
    
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') then
+        if self:IsUnitState('Building') and self.unitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
@@ -62,7 +62,7 @@ AFactoryUnit = Class(FactoryUnit) {
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
+        if self:IsUnitState('Building') and self.unitBeingBuilt then
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
@@ -123,10 +123,9 @@ AEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        local army =  self:GetArmy()
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, army, v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,
@@ -198,7 +197,7 @@ ASonarUnit = Class(SonarUnit) {}
 ---------------------------------------------------------------
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
      

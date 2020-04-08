@@ -36,17 +36,17 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Make certain the weapon has essential aspects defined
         if not bp.RackBones then
-           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
         if not bp.MuzzleSalvoSize then
-           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
         if not bp.MuzzleSalvoDelay then
-           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
            error(strg, 2)
            return
         end
@@ -73,12 +73,12 @@ DefaultProjectileWeapon = Class(Weapon) {
         self.NumMuzzles = self.NumMuzzles / table.getn(bp.RackBones)
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * bp.MuzzleSalvoDelay
         if totalMuzzleFiringTime > (1 / rof) then
-            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return false
         end
         if bp.RackRecoilDistance ~= 0 and bp.MuzzleSalvoDelay ~= 0 then
-            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return false
         end
@@ -215,7 +215,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit:GetArmy(), v):ScaleEmitter(self.FxMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
         end
     end,
 
@@ -223,7 +223,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayFxMuzzleChargeSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxChargeMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit:GetArmy(), v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
         end
     end,
 
@@ -233,7 +233,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         local bp = self:GetBlueprint()
         for k, v in self.FxRackChargeMuzzleFlash do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, self.unit:GetArmy(), v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
+                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
             end
         end
         if bp.Audio.ChargeStart then
@@ -444,7 +444,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             local bp = self:GetBlueprint()
             if not bp.RackBones then
-                error('Error on rackbones ' .. self.unit:GetUnitId())
+                error('Error on rackbones ' .. self.unit.UnitId)
             end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
@@ -688,7 +688,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                             self.unit:NukeCreatedAtUnit()
 
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
+                            local launchData = { army = self.unit.Army-1, location = self:GetCurrentTargetPos()}
                             if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
                             table.insert(Sync.NukeLaunchData, launchData)
                             self.unit:RemoveNukeSiloAmmo(1)
@@ -1079,12 +1079,12 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self:GetBlueprint()
         if not bp.BeamCollisionDelay then
-            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end
         if not bp.BeamLifetime then
-            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end
@@ -1131,7 +1131,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     PlayFxBeamStart = function(self, muzzle)
-        local army = self.unit:GetArmy()
         local bp = self:GetBlueprint()
         local beam
         local beamTable
@@ -1317,11 +1316,10 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 
         local launcher = self.unit
         local pos = proj:GetPosition()
-        local army = launcher:GetArmy()
         local brain = launcher:GetAIBrain()
         local damageType = bp.DamageType
-        proj.InnerRing:DoNukeDamage(launcher, pos, brain, army, damageType)
-        proj.OuterRing:DoNukeDamage(launcher, pos, brain, army, damageType)
+        proj.InnerRing:DoNukeDamage(launcher, pos, brain, launcher.Army, damageType)
+        proj.OuterRing:DoNukeDamage(launcher, pos, brain, launcher.Army, damageType)
 
         -- Stop it calling DoDamage any time in the future.
         proj.DoDamage = function(self, instigator, DamageData, targetEntity) end

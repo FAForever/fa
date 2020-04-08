@@ -318,7 +318,7 @@ end
 -- Create a filter dropdown and title from the table above
 function CreateFilter(parent, filterData)
     local group = Group(parent)
-    group.Width:Set(286)
+    LayoutHelpers.SetWidth(group, 286)
 
     group.title = UIUtil.CreateText(group, filterData.FilterName, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(group.title, group, 2)
@@ -327,13 +327,13 @@ function CreateFilter(parent, filterData)
 
     group.combo = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.AtVerticalCenterIn(group.combo, group.title)
-    group.combo.Right:Set(function() return group.Right() - 10 end)
-    group.combo.Width:Set(80)
+    LayoutHelpers.AtRightIn(group.combo, group, 10)
+    LayoutHelpers.SetWidth(group.combo, 80)
 
     local comboBg = Bitmap(group)
     comboBg.Depth:Set(group.Depth)
-    comboBg.Width:Set(group.Width() + 4)
-    comboBg.Height:Set(group.Height() + 4)
+    comboBg.Width:Set(group.Width() + LayoutHelpers.ScaleNumber(4))
+    comboBg.Height:Set(group.Height() + LayoutHelpers.ScaleNumber(4))
     LayoutHelpers.AtLeftTopIn(comboBg, group, -2, -4)
     comboBg:SetTexture(UIUtil.UIFile('/dialogs/mapselect03/options-panel-bar_bmp.dds'))
 
@@ -376,8 +376,8 @@ function CreateFilter(parent, filterData)
     if not filterData.NoDelimiter then
         group.comboFilter = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         LayoutHelpers.AtVerticalCenterIn(group.comboFilter, group.title)
-        group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
-        group.comboFilter.Width:Set(60)
+        LayoutHelpers.AnchorToLeft(group.comboFilter, group.combo, 5)
+        LayoutHelpers.SetWidth(group.comboFilter, 60)
 
         group.comboFilter:AddItems({"=", ">=", "<="}, filterFactory.SelectedComparator)
 
@@ -465,8 +465,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     -- control layout
     dialogContent = Group(over)
-    dialogContent.Width:Set(956)
-    dialogContent.Height:Set(692)
+    LayoutHelpers.SetDimensions(dialogContent, 956, 692)
 
     popup = Popup(over, dialogContent)
 
@@ -560,7 +559,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     -- A Group to enclose the map info elements.
     local mapInfoGroup = Group(dialogContent)
-    mapInfoGroup.Width:Set(MAP_PREVIEW_SIZE)
+    LayoutHelpers.SetWidth(mapInfoGroup, MAP_PREVIEW_SIZE)
     LayoutHelpers.Below(mapInfoGroup, preview, 23)
     dialogContent.mapInfoGroup = mapInfoGroup
     local descriptionTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0000>Map Info", 18)
@@ -570,8 +569,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     description = ItemList(mapInfoGroup, "mapselect:description")
     description:SetFont(UIUtil.bodyFont, 14)
     description:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
-    description.Width:Set(271)
-    description.Height:Set(234)
+    LayoutHelpers.SetDimensions(description, 271, 234)
     LayoutHelpers.Below(description, descriptionTitle)
     UIUtil.CreateLobbyVertScrollbar(description, 2, -1, -25)
     mapInfoGroup.Bottom:Set(description.Bottom)
@@ -602,8 +600,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.Below(namefilterTitle, filters[table.getn(filters)], 10)
 
     filterName = Edit(filterGroup)
-    filterName.Width:Set(MAP_PREVIEW_SIZE)
-    filterName.Height:Set(22)
+    LayoutHelpers.SetDimensions(filterName, MAP_PREVIEW_SIZE, 22)
     filterName:SetFont(UIUtil.bodyFont, 16)
     filterName:SetForegroundColor(UIUtil.fontColor)
     filterName:ShowBackground(true)
@@ -619,8 +616,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     nameFilter = filterName
 
     -- Expand the group to encompass all the filter controls
-    filterGroup.Bottom:Set(function() return filterName.Bottom() + 3 end)
-    filterGroup.Right:Set(function() return filters[table.getn(filters)].Right() + 1 end)
+    LayoutHelpers.AtBottomIn(filterGroup, filterName, -3)
+    LayoutHelpers.AtRightIn(filterGroup, filters[table.getn(filters)], -1)
 
     local mapSelectGroup = Group(dialogContent)
     dialogContent.mapSelectGroup = mapSelectGroup
@@ -639,7 +636,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     --TODO what is this getting under when it's in over state?
     mapList.Depth:Set(function() return dialogContent.Depth() + 10 end)
     -- Allocating space for the scrollbar.
-    mapList.Width:Set(function() return mapSelectGroup.Width() - 21 end)
+    mapList.Width:Set(function() return mapSelectGroup.Width() - LayoutHelpers.ScaleNumber(21) end)
     mapList.Bottom:Set(mapInfoGroup.Bottom)
     LayoutHelpers.Below(mapList, mapListTitle)
     mapList:AcquireKeyboardFocus(true)
@@ -668,7 +665,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     local OptionGroup = Group(dialogContent)
     dialogContent.OptionGroup = OptionGroup
     UIUtil.SurroundWithBorder(OptionGroup, '/scx_menu/lan-game-lobby/frame/')
-    OptionGroup.Width:Set(290)
+    LayoutHelpers.SetWidth(OptionGroup, 290)
     OptionGroup.Bottom:Set(mapSelectGroup.Bottom)
     LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
     SetupOptionsPanel(OptionGroup, curOptions)
@@ -714,7 +711,7 @@ function RefreshOptions(skipRefresh)
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-        OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
     end
     OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
@@ -761,7 +758,7 @@ function SetupOptionsPanel(parent, curOptions)
 
     OptionContainer = Group(parent)
     OptionContainer.Height:Set(function() return parent.Height() - title.Height() end)
-    OptionContainer.Width:Set(function() return parent.Width() - 18 end)
+    OptionContainer.Width:Set(function() return parent.Width() - LayoutHelpers.ScaleNumber(18) end)
     OptionContainer.top = 0
     LayoutHelpers.Below(OptionContainer, title, 2)
 
@@ -770,7 +767,7 @@ function SetupOptionsPanel(parent, curOptions)
 
     local function CreateOptionCombo(parent)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        combo.Width:Set(266)
+        LayoutHelpers.SetWidth(combo, 266)
         local itemArray = {}
         combo.keyMap = {}
         local tooltipTable = {}
@@ -785,8 +782,8 @@ function SetupOptionsPanel(parent, curOptions)
     local function CreateOptionElements()
         local function CreateElement(index)
             local optionGroup = Group(OptionContainer)
-            optionGroup.Height:Set(46)
-            optionGroup.Width:Set(function() return OptionContainer.Width() + 4 end)
+            LayoutHelpers.SetHeight(optionGroup, 46)
+            optionGroup.Width:Set(function() return OptionContainer.Width() + LayoutHelpers.ScaleNumber(4) end)
 
             optionGroup.bg = Bitmap(optionGroup)
             optionGroup.bg.Depth:Set(optionGroup.Depth)
@@ -1079,8 +1076,7 @@ end
 function GUI_OldMap(over)
     local GUI = UIUtil.CreateScreenGroup(over, "CreateMapPopup ScreenGroup")
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(1000)
-    dialogContent.Height:Set(100)
+    LayoutHelpers.SetDimensions(dialogContent, 1000, 100)
 
     local ChangelogData = import('/lua/ui/lobby/changelogData.lua')
     local OldMapPopup = Popup(GUI, dialogContent)

@@ -35,7 +35,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH1',
         'SONAR',
-        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',

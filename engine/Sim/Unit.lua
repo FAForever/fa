@@ -223,6 +223,9 @@ end
 -- Example: 'KILLS'.
 -- @param statName String, name of the stat to find out.
 -- @param [defaultVal] TODO.
+-- Special case for the Salem:
+--   GetStat("h1_SetSalemAmph", 0 or 1) 
+--   Disable/Enable amphibious mode
 function Unit:GetStat(statName, [defaultVal])
 end
 

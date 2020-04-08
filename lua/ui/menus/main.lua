@@ -10,14 +10,11 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local EffectHelpers = import('/lua/maui/effecthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
 local Group = import('/lua/maui/group.lua').Group
 local Prefs = import('/lua/user/prefs.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua')
 local Movie = import('/lua/maui/movie.lua').Movie
 local Mods = import('/lua/mods.lua')
 local GetVersion = import('/lua/version.lua').GetVersion
@@ -66,12 +63,6 @@ function CreateUI()
     local menuExtras = {
         title = '<LOC tooltipui0355>Extras',
         {
-            name = '<LOC _Mod_Manager>',
-            tooltip = 'mainmenu_mod',
-            action = function() ButtonMod() end,
-            color = menuFontColorAlt,
-        },
-        {
             name = '<LOC OPTIONS_0073>Credits',
             tooltip = 'options_credits',
             action = function() ButtonCredits() end,
@@ -85,6 +76,14 @@ function CreateUI()
         {
             name = '<LOC _Back>',
             action = function() ButtonBack() end,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
             color = menuFontColorAlt,
         },
         {
@@ -124,6 +123,12 @@ function CreateUI()
             color = menuFontColorAlt,
         },
         {
+            name = '<LOC _Mod_Manager>',
+            tooltip = 'mainmenu_mod',
+            action = function() ButtonMod() end,
+            color = menuFontColorAlt,
+        },
+        {
             name = '<LOC tooltipui0355>Extras',
             tooltip = 'mainmenu_extras',
             action = function() ButtonExtras() end,
@@ -140,9 +145,6 @@ function CreateUI()
             action = function() ButtonExit() end,
         }
     }
-
-    local largestMenu = menuTop
-    local mainMenuSize = table.getn(largestMenu)
 
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
@@ -189,9 +191,9 @@ function CreateUI()
 
     local scrollingBG = Bitmap(botBorderLeft)
     scrollingBG:SetSolidColor('ff000000')
-    scrollingBG.Left:Set(function() return botBorderLeft.Right() - 30 end)
-    scrollingBG.Right:Set(function() return botBorderRight.Left() + 30 end)
-    scrollingBG.Height:Set(20)
+    LayoutHelpers.AnchorToRight(scrollingBG, botBorderLeft, -30)
+    LayoutHelpers.AnchorToLeft(scrollingBG, botBorderRight, -30)
+    LayoutHelpers.SetHeight(scrollingBG, 30)
     LayoutHelpers.AtBottomIn(scrollingBG, border)
 
     -- legal text
@@ -257,16 +259,20 @@ function CreateUI()
     LayoutHelpers.AtCenterIn(menuBracketBar, menuBracketMiddle, 60)
 
     local menuBracketLeft = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketLeft, menuBracketMiddle, 200, -190)
+    LayoutHelpers.AtLeftTopIn(menuBracketLeft, menuBracketMiddle, -178)
+    menuBracketLeft.Height:Set(mainMenuGroup.Height)
 
     local menuBracketLeftGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-left-energy_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketLeftGlow, menuBracketLeft, 0, 22)
+    LayoutHelpers.AtRightTopIn(menuBracketLeftGlow, menuBracketLeft, -10, 20)
+    LayoutHelpers.AtBottomIn(menuBracketLeftGlow, menuBracketLeft, 10)
 
     local menuBracketRight = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketRight, menuBracketMiddle, 200, 190)
+    LayoutHelpers.AtRightTopIn(menuBracketRight, menuBracketMiddle, -178)
+    menuBracketRight.Height:Set(mainMenuGroup.Height)
 
     local menuBracketRightGlow = Bitmap(mainMenuGroup, UIUtil.UIFile('/scx_menu/main-menu/bracket-right-energy_bmp.dds'))
-    LayoutHelpers.AtCenterIn(menuBracketRightGlow, menuBracketRight, 0, -22)
+    LayoutHelpers.AtLeftTopIn(menuBracketRightGlow, menuBracketRight, -10, 20)
+    LayoutHelpers.AtBottomIn(menuBracketRightGlow, menuBracketRight, 10)
 
     menuBracketMiddle.Top:Set(function() return topBorder.Bottom() - menuBracketLeft.Height() end)
     LayoutHelpers.AtHorizontalCenterIn(menuBracketMiddle, border)
@@ -282,7 +288,7 @@ function CreateUI()
         control:SetNeedsFrameUpdate(true)
         if animIn then
             control.mod = 1
-            PlaySound(Sound({Bank = 'Interface', Cue = 'X_Main_Menu_On_Start'}))
+            --PlaySound(Sound({Bank = 'Interface', Cue = 'X_Main_Menu_On_Start'}))
         else
             control.mod = -1
         end
@@ -330,7 +336,7 @@ function CreateUI()
         -- title
         mainMenu.titleBack = Bitmap(mainMenuGroup, UIUtil.UIFile('/menus/main03/panel-top_bmp.dds'))
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
-        LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 10)
+        LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 0)
 
         mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, GetPreference("profile.current"), 26)
         LayoutHelpers.AtCenterIn(mainMenu.titleTxt, mainMenu.titleBack, 3)
@@ -386,15 +392,15 @@ function CreateUI()
         end
 
         mainMenu.profile.leftBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_left.dds'))
-        mainMenu.profile.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
+        LayoutHelpers.AtRightIn(mainMenu.profile.leftBracket, menuBracketLeft, 15)
         LayoutHelpers.AtTopIn(mainMenu.profile.leftBracket, mainMenu.profile, -52)
-        mainMenu.profile.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
+        LayoutHelpers.DepthUnderParent(mainMenu.profile.leftBracket, menuBracketLeft)
         mainMenu.profile.leftBracket:SetAlpha(0)
 
         mainMenu.profile.rightBracket = Bitmap(mainMenu.profile, UIUtil.UIFile('/scx_menu/profile-brackets/bracket-lg_bmp_right.dds'))
-        mainMenu.profile.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
+        LayoutHelpers.AtLeftIn(mainMenu.profile.rightBracket, menuBracketRight, 15)
         LayoutHelpers.AtTopIn(mainMenu.profile.rightBracket, mainMenu.profile, -52)
-        mainMenu.profile.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
+        LayoutHelpers.DepthUnderParent(mainMenu.profile.rightBracket, menuBracketRight)
         mainMenu.profile.rightBracket:SetAlpha(0)
 
         mainMenu.profile.SetItemAlpha = function(self, alpha)
@@ -509,10 +515,10 @@ function CreateUI()
                     mainMenu[k].btn.label:SetColor(v.color)
                 end
                 if k == 1 then
-                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu.profile)
+                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu.profile, -5)
                 else
                     local lastBtn = k - 1
-                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu[lastBtn].btn, -5)
+                    LayoutHelpers.CenteredBelow(mainMenu[k].btn, mainMenu[lastBtn].btn, -6)
                 end
                 if v.action then
                     mainMenu[k].btn.glow = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/large-btn/large_btn_glow.dds'))
@@ -548,14 +554,14 @@ function CreateUI()
                 end
 
                 mainMenu[k].btn.leftBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_left.dds'))
-                mainMenu[k].btn.leftBracket.Right:Set(function() return menuBracketLeft.Right() - 15 end)
+                LayoutHelpers.AtRightIn(mainMenu[k].btn.leftBracket, menuBracketLeft, 15)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.leftBracket, mainMenu[k].btn, -6)
-                mainMenu[k].btn.leftBracket.Depth:Set(function() return menuBracketLeft.Depth() - 1 end)
+                LayoutHelpers.DepthUnderParent(mainMenu[k].btn.leftBracket, menuBracketLeft)
 
                 mainMenu[k].btn.rightBracket = Bitmap(mainMenu[k].btn, UIUtil.UIFile('/scx_menu/main-menu/bracket_bmp_right.dds'))
-                mainMenu[k].btn.rightBracket.Left:Set(function() return menuBracketRight.Left() + 15 end)
+                LayoutHelpers.AtLeftIn(mainMenu[k].btn.rightBracket, menuBracketRight, 15)
                 LayoutHelpers.AtTopIn(mainMenu[k].btn.rightBracket, mainMenu[k].btn, -6)
-                mainMenu[k].btn.rightBracket.Depth:Set(function() return menuBracketRight.Depth() - 1 end)
+                LayoutHelpers.DepthUnderParent(mainMenu[k].btn.rightBracket, menuBracketRight)
 
                 mainMenu[k].btn:Disable()
                 mainMenu[k].btn:SetAlpha(0, true)
@@ -589,8 +595,8 @@ function CreateUI()
                             self.first = false
                         end
                         local change = (delta * 200)
-                        local rightGoal = function() return self.Left() + 40 end
-                        local leftGoal = function() return self.Right() - 38 end
+                        local rightGoal = function() return self.Left() + LayoutHelpers.ScaleNumber(40) end
+                        local leftGoal = function() return self.Right() - LayoutHelpers.ScaleNumber(38) end
                         if self.leftBracket.Right() < rightGoal() then
                             local newRight = self.leftBracket.Right() + change
                             if newRight > rightGoal() then
@@ -625,8 +631,8 @@ function CreateUI()
                     control.OnRolloverEvent = function() end
                     control.OnClick = function() end
                     control.OnFrame = function(self, delta)
-                        local rightGoal = function() return menuBracketLeft.Right() - 15 end
-                        local leftGoal = function() return menuBracketRight.Left() + 15 end
+                        local rightGoal = function() return menuBracketLeft.Right() - LayoutHelpers.ScaleNumber(15) end
+                        local leftGoal = function() return menuBracketRight.Left() + LayoutHelpers.ScaleNumber(15) end
 
                         local change = (delta * 200)
                         if self.leftBracket.Right() > rightGoal() then
@@ -676,7 +682,7 @@ function CreateUI()
         end
 
         -- set final dimensions/placement of mainMenuGroup
-        mainMenuGroup.Height:Set(function() return (mainMenuSize * buttonHeight) + mainMenu.titleBack.Height() end)
+        mainMenuGroup.Height:Set(function() return (table.getn(menuTable) * buttonHeight) + mainMenu.titleBack.Height() end)
         mainMenuGroup.Width:Set(mainMenu.titleBack.Width)
         LayoutHelpers.AtHorizontalCenterIn(mainMenuGroup, border)
 

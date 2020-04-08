@@ -10,7 +10,6 @@ LocGlobals = {
     GT=">"
 }
 
-
 local function dbFilename(la)
     return '/loc/' .. la .. '/strings_db.lua'
 end
@@ -31,14 +30,22 @@ local function okLanguage(la)
     return la
 end
 
+local usdb = {}
+if okLanguage('us') then
+    doscript(dbFilename('us'), usdb)
+end
+
 local function loadLanguage(la)
     local la = okLanguage(la)
 
     -- reload strings file...
-    local newdb = {}
-    doscript(dbFilename(la), newdb)
+    loc_table = {}
+    doscript(dbFilename(la), loc_table)
     __language = la
-    loc_table = newdb
+
+    if (la ~= 'us') and (usdb ~= {}) then
+        table.assimilate(loc_table, usdb)
+    end
     -- load localisation from AI mods
     LocalisationAILobby()
 
