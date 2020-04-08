@@ -109,7 +109,8 @@ UAL0301 = Class(CommandUnit) {
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         -- Engineering Focus Module
         elseif enh =='EngineeringFocusingModule' then
-            if not Buffs['AeonSCUBuildRate'] then
+            self:AddCommandCap('RULEUCC_Sacrifice')
+			if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonSCUBuildRate',
                     DisplayName = 'AeonSCUBuildRate',
@@ -126,7 +127,8 @@ UAL0301 = Class(CommandUnit) {
             end
             Buff.ApplyBuff(self, 'AeonSCUBuildRate')
         elseif enh == 'EngineeringFocusingModuleRemove' then
-            if Buff.HasBuff(self, 'AeonSCUBuildRate') then
+            self:RemoveCommandCap('RULEUCC_Sacrifice')
+			if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
         -- SystemIntegrityCompensator
@@ -152,11 +154,6 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCURegenRate') then
                 Buff.RemoveBuff(self, 'AeonSCURegenRate')
             end
-        -- Sacrifice
-        elseif enh == 'Sacrifice' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
-        elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')
         -- StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
