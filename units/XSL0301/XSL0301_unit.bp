@@ -127,6 +127,9 @@ UnitBlueprint {
             Level5 = 25,
         },
     },
+	BuffFields = {
+        RegenField = 'SeraphimSCURegenBuffField',
+    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTFA',
@@ -510,6 +513,38 @@ UnitBlueprint {
                 y = 50,
             },
         },
+		RegenAura = {
+			BuildCostEnergy = 37500,
+			BuildCostMass = 1500,
+			BuildTime = 6000
+			Icon = 'nrf',
+			Name = '<LOC enhancements_0125>Restoration Field',
+			Radius = 30,
+			RegenFloor = 3,
+			RegenCeilingT1 = 15,
+			RegenCeilingT2 = 35,
+			RegenCeilingT3 = 70,
+			RegenCeilingT4 = 200,
+			RegenPerSecond = 0.03
+			Slot = 'RCH',
+			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
+			UpgradeUnitAmbientBones = {
+				'Body',
+			},
+		},
+		RegenAuraRemove = {
+			BuildCostEnergy = 1,
+            BuildCostMass = 1,
+			BuildTime = 0.1,
+			Icon = 'nrf',
+			Name = '<LOC enhancements_0126>Remove Restoration Field',
+			Prerequisite = 'RegenAura',
+			RemoveEnhancements = {
+				'RegenAura',
+				'RegenAuraRemove',
+			},
+			Slot = 'RCH',
+		},
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
