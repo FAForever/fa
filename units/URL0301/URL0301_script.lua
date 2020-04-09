@@ -61,7 +61,9 @@ URL0301 = Class(CCommandUnit) {
         self:SetMaintenanceConsumptionInactive()
         -- Disable enhancement-based Intels until enhancements are built
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
-        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self:DisableUnitIntel('Enhancement', 'RadarStealthField')
+		self:DisableUnitIntel('Enhancement', 'SonarStealth')
+		self:DisableUnitIntel('Enhancement', 'SonarStealthField')
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
@@ -139,53 +141,76 @@ URL0301 = Class(CCommandUnit) {
 		end
 			KillThread(self.SpeedThreadHandle)
 			self.SpeedThreadHandle = nil
-		elseif enh == 'CloakingGenerator' then
-            self.StealthEnh = false
-            self.CloakEnh = true
-            self:EnableUnitIntel('Enhancement', 'Cloak')
-            if not Buffs['CybranSCUCloakBonus'] then
-               BuffBlueprint {
-                    Name = 'CybranSCUCloakBonus',
-                    DisplayName = 'CybranSCUCloakBonus',
-                    BuffType = 'SCUCLOAKBONUS',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
-                Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
-            end
-            Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
-        elseif enh == 'CloakingGeneratorRemove' then
-            self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.StealthEnh = false
-            self.CloakEnh = false
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
-                Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
-            end
-        elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
-            if self.IntelEffectsBag then
-                EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
-                self.IntelEffectsBag = nil
-            end
-            self.CloakEnh = false
-            self.StealthEnh = true
-            self:EnableUnitIntel('Enhancement', 'RadarStealth')
-            self:EnableUnitIntel('Enhancement', 'SonarStealth')
-        elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = false
-            self.CloakEnh = false
+		-- elseif enh == 'CloakingGenerator' then
+            -- self.StealthEnh = false
+            -- self.CloakEnh = true
+            -- self:EnableUnitIntel('Enhancement', 'Cloak')
+            -- if not Buffs['CybranSCUCloakBonus'] then
+               -- BuffBlueprint {
+                    -- Name = 'CybranSCUCloakBonus',
+                    -- DisplayName = 'CybranSCUCloakBonus',
+                    -- BuffType = 'SCUCLOAKBONUS',
+                    -- Stacks = 'ALWAYS',
+                    -- Duration = -1,
+                    -- Affects = {
+                        -- MaxHealth = {
+                            -- Add = bp.NewHealth,
+                            -- Mult = 1.0,
+                        -- },
+                    -- },
+                -- }
+            -- end
+            -- if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
+                -- Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
+            -- end
+            -- Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
+        -- elseif enh == 'CloakingGeneratorRemove' then
+            -- self:DisableUnitIntel('Enhancement', 'Cloak')
+            -- self.StealthEnh = false
+            -- self.CloakEnh = false
+            -- self:RemoveToggleCap('RULEUTC_CloakToggle')
+            -- if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
+                -- Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
+            -- end
+        -- elseif enh == 'StealthGenerator' then
+            -- self:AddToggleCap('RULEUTC_CloakToggle')
+            -- if self.IntelEffectsBag then
+                -- EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+                -- self.IntelEffectsBag = nil
+            -- end
+            -- self.CloakEnh = false
+            -- self.StealthEnh = true
+            -- self:EnableUnitIntel('Enhancement', 'RadarStealth')
+            -- self:EnableUnitIntel('Enhancement', 'SonarStealth')
+        -- elseif enh == 'StealthGeneratorRemove' then
+            -- self:RemoveToggleCap('RULEUTC_CloakToggle')
+            -- self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            -- self:DisableUnitIntel('Enhancement', 'SonarStealth')
+            -- self.StealthEnh = false
+            -- self.CloakEnh = false
+		--Stealth Field
+		elseif enh == 'StealthField' then
+			self:AddToggleCap('RULEUTC_CloakToggle')
+			if self.IntelEffectsBag then
+				EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+				self.IntelEffectsBag = nil
+			end
+			self.CloakEnh = false
+			self.StealthEnh = false
+			self.StealthFieldEnh = true
+			self:EnableUnitIntel('Enhancement', 'RadarStealth')
+			self:EnableUnitIntel('Enhancement', 'SonarStealth')
+			self:EnableUnitIntel('Enhancement', 'RadarStealthField')
+			self:EnableUnitIntel('Enhancement', 'SonarStealthField')
+		elseif enh == 'StealthFieldRemove' then
+			self:RemoveToggleCap('RULEUTC_CloakToggle')
+			self:DisableUnitIntel('Enhancement', 'RadarStealth')
+			self:DisableUnitIntel('Enhancement', 'SonarStealth')
+			self:DisableUnitIntel('Enhancement', 'RadarStealthFieldRadius')
+			self:DisableUnitIntel('Enhancement', 'SonarStealthFieldRadius')
+			self.StealthFieldEnh = false
+			self.StealthEnh = false
+			self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
             self:ShowBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)
