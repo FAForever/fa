@@ -66,13 +66,80 @@ URL0301 = Class(CCommandUnit) {
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
     end,
+	
+	GetUnitsToBuff = function(self, bp)
+        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+        local brain = self:GetAIBrain()
+        local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
+        local units = {}
 
+        for _, u in all do
+            if not u.Dead and not u:IsBeingBuilt() then
+                table.insert(units, u)
+            end
+        end
+
+        return units
+    end,
+
+    SpeedBuffThread = function(self, type)
+        local bp = self:GetBlueprint().Enhancements[type]
+        local buff = 'CybranSACU' .. type
+
+        while not self.Dead do
+            local units = self:GetUnitsToBuff(bp)
+            for _,unit in units do
+                Buff.ApplyBuff(unit, buff)
+                unit:RequestRefreshUI()
+            end
+            WaitSeconds(5)
+        end
+    end,
+	
     -- Enhancements
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        if enh == 'CloakingGenerator' then
+        --Acceleration Field
+		if enh == 'AccelerationField' then
+			local buff
+			local type
+			
+			 buff = 'CybranSACU' .. enh
+			 
+			 if not Buffs[buff] then
+				local buff_bp = {
+					Name = buff,
+					DisplayName = buff,
+					BuffType = 'COMMANDERAURA_' .. enh,
+					Stacks = 'REPLACE',
+					Duration = 5,
+					Affects = {
+						MoveMult2 = {
+							Mult = bp.MoveMult,
+						},
+					},
+				}
+				BuffBlueprint(buff_bp)
+			end
+			
+			if self.SpeedThreadHandle then
+				KillThread(self.SpeedThreadHandle)
+				self.SpeedThreadHandle = nil
+			end
+			
+			self.SpeedThreadHandle = self:ForkThread(self.SpeedBuffThread, enh)
+		elseif enh == 'AccelerationFieldRemove' then
+			if self.ShieldEffectsBag then
+				for k, v in self.ShieldEffectsBag do
+					v:Destroy()
+				end
+			self.ShieldEffectsBag = {}
+		end
+			KillThread(self.SpeedThreadHandle)
+			self.SpeedThreadHandle = nil
+		elseif enh == 'CloakingGenerator' then
             self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')

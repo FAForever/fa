@@ -111,6 +111,9 @@ UnitBlueprint {
             Level5 = 25,
         },
     },
+	BuffFields = {
+		AccelerationField = 'CybSCUSpeedBuff',	
+	},
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTSC1',
@@ -288,6 +291,31 @@ UnitBlueprint {
         TeleportTimeMod = 0.0001,
     },
     Enhancements = {
+		AccelerationField = {
+			BuildCostEnergy = 80000,
+			BuildCostMass = 2000,
+			BuildTime = 8000,
+			MoveMult = 0.15,
+			Icon = 'sfs',
+			MaintenanceConsumptionPerSecondEnergy = 500,
+			Name = '<LOC enhancements_0101>Personal Stealth Generator',
+			Radius = 40,
+			Slot = 'Back',
+			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
+		},
+		AccelerationFieldRemove = {
+			BuildCostEnergy = 1,
+			BuildCostMass = 1,
+            BuildTime = 0.1,
+			Icon = 'sfs',
+			Name = '<LOC enhancements_0102>Remove Personal Stealth Generator',
+			Prerequisite = 'AccelerationField',
+			RemoveEnhancements = {
+				'AccelerationField',
+				'AccelerationFieldRemove',
+			},
+			Slot = 'Back',
+		},
         CloakingGenerator = {
             BuildCostEnergy = 382200,
             BuildCostMass = 5000,
