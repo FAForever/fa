@@ -295,7 +295,7 @@ UnitBlueprint {
 			BuildCostEnergy = 80000,
 			BuildCostMass = 2000,
 			BuildTime = 8000,
-			MoveMult = 0.15,
+			MoveMult = 1.15,
 			Icon = 'sfs',
 			MaintenanceConsumptionPerSecondEnergy = 500,
 			Name = '<LOC enhancements_0101>Personal Stealth Generator',

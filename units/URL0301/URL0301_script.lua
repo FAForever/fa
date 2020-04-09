@@ -206,8 +206,8 @@ URL0301 = Class(CCommandUnit) {
 			self:RemoveToggleCap('RULEUTC_CloakToggle')
 			self:DisableUnitIntel('Enhancement', 'RadarStealth')
 			self:DisableUnitIntel('Enhancement', 'SonarStealth')
-			self:DisableUnitIntel('Enhancement', 'RadarStealthFieldRadius')
-			self:DisableUnitIntel('Enhancement', 'SonarStealthFieldRadius')
+			self:DisableUnitIntel('Enhancement', 'RadarStealthField')
+			self:DisableUnitIntel('Enhancement', 'SonarStealthField')
 			self.StealthFieldEnh = false
 			self.StealthEnh = false
 			self.CloakEnh = false
