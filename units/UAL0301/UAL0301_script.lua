@@ -138,7 +138,6 @@ UAL0301 = Class(CommandUnit) {
         elseif enh =='GunRangeRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-        end
 		-- GunAoe
         elseif enh =='GunAoe' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
@@ -157,6 +156,7 @@ UAL0301 = Class(CommandUnit) {
             if not bp then return end
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageMod(-bp.GunDamageMod)
+        end
     end,
 
     CreateHeavyShield = function(self, bp)
