@@ -84,8 +84,9 @@ URL0303 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
         -- Now handle our special buff and FX
+        local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in original_bp do
             if v.Add.OnDeath then
                 bp = v
             end
