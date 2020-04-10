@@ -51,6 +51,7 @@ end
 local timers = {}
 
 function StartCountdown(entryData)
+    cdDuration = entryData['duration'] or 5
     local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
     for _, viewControl in views do
         local view = viewControl
@@ -60,7 +61,7 @@ function StartCountdown(entryData)
         if timers[view._cameraName][entryData.entity] then
             timers[view._cameraName][entryData.entity]:Destroy()
         end
-        timers[view._cameraName][entryData.entity] = UIUtil.CreateText(view, '5', 18, UIUtil.bodyFont)
+        timers[view._cameraName][entryData.entity] = UIUtil.CreateText(view, tostring(cdDuration), 18, UIUtil.bodyFont)
         local text = timers[view._cameraName][entryData.entity]
         text:SetDropShadow(true)
         text:SetColor('ffff7f00')
@@ -68,7 +69,7 @@ function StartCountdown(entryData)
         text.userEntity = GetUnitById(entryData.entity)
         text.position = text.userEntity:GetPosition()
         text.time = 0
-        text.curTime = 5
+        text.curTime = cdDuration
         text.startTime = GetGameTimeSeconds()
         text:SetAlpha(1)
         text:SetNeedsFrameUpdate(true)
@@ -89,7 +90,7 @@ function StartCountdown(entryData)
         end
         text.OnFrame = function(self, delta)
             self.time = self.time + delta
-            if not self.userEntity or self.time > 5 then
+            if not self.userEntity or self.time > cdDuration then
                 self:Destroy()
                 timers[view._cameraName][entryData.entity] = nil
             end
