@@ -399,15 +399,13 @@ UnitBlueprint {
             },
             Slot = 'LCH',
         },
-        EnhancedSensors = {
+        GunUpgrade = {
             BuildCostEnergy = 34000,
             BuildCostMass = 800,
             BuildTime = 3100,
-            Icon = 'sre',
-            Name = '<LOC enhancements_0141>Enhanced Sensor System',
+            Icon = 'cba',
+            Name = '<LOC enhancements_0141>GunUpgrade',
             NewMaxRadius = 35,
-            NewOmniRadius = 60,
-            NewVisionRadius = 36,
             ShowBones = {
                 'Back_Upgrade',
             },
@@ -419,19 +417,19 @@ UnitBlueprint {
                 'Torso',
             },
         },
-        EnhancedSensorsRemove = {
+        GunUpgradeRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = {
                 'Back_Upgrade',
             },
-            Icon = 'sre',
-            Name = '<LOC enhancements_0142>Remove Enhanced Sensor System',
-            Prerequisite = 'EnhancedSensors',
+            Icon = 'cba',
+            Name = '<LOC enhancements_0142>Remove GunUpgrade',
+            Prerequisite = 'GunUpgrade',
             RemoveEnhancements = {
-                'EnhancedSensors',
-                'EnhancedSensorsRemove',
+                'GunUpgrade',
+                'GunUpgradeRemove',
             },
             Slot = 'Back',
         },
@@ -679,9 +677,9 @@ UnitBlueprint {
     },
     Intel = {
         FreeIntel = true,
-        OmniRadius = 16,
-        VisionRadius = 26,
-        WaterVisionRadius = 26,
+        OmniRadius = 60,
+        VisionRadius = 36,
+        WaterVisionRadius = 36,
     },
     Interface = {
         HelpText = '<LOC xsl0301_help>Support Armored Command Unit',

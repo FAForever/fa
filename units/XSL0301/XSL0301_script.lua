@@ -221,19 +221,14 @@ XSL0301 = Class(CommandUnit) {
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
         -- Enhanced Sensor Systems
-        elseif enh == 'EnhancedSensors' then
-            self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
-            self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
+        elseif enh == 'GunUpgrade' then
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local wep = self:GetWeaponByLabel('OverCharge')
             wep:ChangeMaxRadius(35)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(35)
-        elseif enh == 'EnhancedSensorsRemove' then
-            local bpIntel = self:GetBlueprint().Intel
-            self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
-            self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
+        elseif enh == 'GunUpgradeRemove' then
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local wep = self:GetWeaponByLabel('OverCharge')
