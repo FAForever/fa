@@ -41,6 +41,7 @@ UAL0301 = Class(CommandUnit) {
         self:SetCapturable(false)
         self:HideBone('Turbine', true)
         self:SetupBuildBones()
+		self:SetWeaponEnabledByLabel('ChronoDampener', false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
