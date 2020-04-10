@@ -514,7 +514,7 @@ UnitBlueprint {
 		RegenAura = {
 			BuildCostEnergy = 37500,
 			BuildCostMass = 1500,
-			BuildTime = 6000
+			BuildTime = 6000,
 			Icon = 'nrf',
 			Name = '<LOC enhancements_0125>Restoration Field',
 			Radius = 30,
@@ -523,7 +523,7 @@ UnitBlueprint {
 			RegenCeilingT2 = 35,
 			RegenCeilingT3 = 70,
 			RegenCeilingT4 = 200,
-			RegenPerSecond = 0.03
+			RegenPerSecond = 0.03,
 			Slot = 'RCH',
 			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
 			UpgradeUnitAmbientBones = {
