@@ -644,7 +644,8 @@ UnitBlueprint {
 			HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the Regen aura and engineering upgrade.',
 			SortCategory = 'SORTOTHER',
 			UnitName = '<LOC xsl0301_Rambo_name>SACU (Support preset)',
-    },
+		},
+	},
     General = {
         BuildBones = {
             AimBone = 'Left_Arm_Muzzle',
