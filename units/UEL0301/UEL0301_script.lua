@@ -42,6 +42,8 @@ UEL0301 = Class(CommandUnit) {
         self:HideBone('SAM', true)
 		self:GetWeaponByLabel('Grenade').NeedsUpgrade = true
         self:SetupBuildBones()
+		self.HasLeftPod = false
+        self.HasRightPod = false
     end,
 
     __init = function(self)
@@ -64,30 +66,62 @@ UEL0301 = Class(CommandUnit) {
         end
     end,
 
-    RebuildPod = function(self)
-        if self.HasPod == true then
-            self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-            self:RequestRefreshUI()
-            WaitFor(self.RebuildingPod)
-            self:SetWorkProgress(0.0)
-            RemoveEconomyEvent(self, self.RebuildingPod)
-            self.RebuildingPod = nil
-            local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'Pod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.Pod = pod
+    RebuildPod = function(self, PodNumber)
+        if PodNumber == 1 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod2 ~= nil then
+                WaitFor(self.RebuildingPod2)
+            end
+            if self.HasLeftPod == true then
+                self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self:RequestRefreshUI()
+                WaitFor(self.RebuildingPod)
+                self:SetWorkProgress(0.0)
+                RemoveEconomyEvent(self, self.RebuildingPod)
+                self.RebuildingPod = nil
+                local location = self:GetPosition('AttachSpecial01')
+                local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
+                pod:SetParent(self, 'LeftPod')
+                pod:SetCreator(self)
+                self.Trash:Add(pod)
+                self.LeftPod = pod
+            end
+        elseif PodNumber == 2 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod ~= nil then
+                WaitFor(self.RebuildingPod)
+            end
+            if self.HasRightPod == true then
+                self.RebuildingPod2 = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self:RequestRefreshUI()
+                WaitFor(self.RebuildingPod2)
+                self:SetWorkProgress(0.0)
+                RemoveEconomyEvent(self, self.RebuildingPod2)
+                self.RebuildingPod2 = nil
+                local location = self:GetPosition('AttachSpecial01')
+                local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
+                pod:SetParent(self, 'RightPod')
+                pod:SetCreator(self)
+                self.Trash:Add(pod)
+                self.RightPod = pod
+            end
         end
+        self:RequestRefreshUI()
     end,
 
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
-            if self.HasPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod)
+            if pod == 'LeftPod' then
+                if self.HasLeftPod == true then
+                    self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+                end
+            elseif pod == 'RightPod' then
+                if self.HasRightPod == true then
+                    self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+                end
             end
         else
-            self:CreateEnhancement('PodRemove')
+            self:CreateEnhancement(pod..'Remove')
         end
     end,
 
@@ -95,27 +129,47 @@ UEL0301 = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        if enh == 'Pod' then
+        if enh == 'LeftPod' then
             local location = self:GetPosition('AttachSpecial01')
             local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'Pod')
+            pod:SetParent(self, 'LeftPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
-            self.HasPod = true
-            self.Pod = pod
-        elseif enh == 'PodRemove' then
-            if self.HasPod == true then
-                self.HasPod = false
-                if self.Pod and not self.Pod:BeenDestroyed() then
-                    self.Pod:Kill()
-                    self.Pod = nil
+            self.HasLeftPod = true
+            self.LeftPod = pod
+        elseif enh == 'RightPod' then
+            local location = self:GetPosition('AttachSpecial01')
+            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
+            pod:SetParent(self, 'RightPod')
+            pod:SetCreator(self)
+            self.Trash:Add(pod)
+            self.HasRightPod = true
+            self.RightPod = pod
+        elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
+            if self.HasLeftPod == true then
+                self.HasLeftPod = false
+                if self.LeftPod and not self.LeftPod.Dead then
+                    self.LeftPod:Kill()
+                    self.LeftPod = nil
                 end
                 if self.RebuildingPod ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
                     self.RebuildingPod = nil
                 end
             end
+            if self.HasRightPod == true then
+                self.HasRightPod = false
+                if self.RightPod and not self.RightPod.Dead then
+                    self.RightPod:Kill()
+                    self.RightPod = nil
+                end
+                if self.RebuildingPod2 ~= nil then
+                    RemoveEconomyEvent(self, self.RebuildingPod2)
+                    self.RebuildingPod2 = nil
+                end
+            end
             KillThread(self.RebuildThread)
+            KillThread(self.RebuildThread2)
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
