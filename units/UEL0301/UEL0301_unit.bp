@@ -584,7 +584,6 @@ UnitBlueprint {
             BuildIconSortPriority = 30,
             Description = '<LOC uel0301_BubbleShield_desc>SACU (Shield preset)',
             Enhancements = {
-                'Shield',
                 'ShieldGeneratorField',
             },
             HelpText = '<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.',
@@ -596,9 +595,9 @@ UnitBlueprint {
             Description = '<LOC uel0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'AdvancedCoolingUpgrade',
-                'HighExplosiveOrdnance',
+				'Shield',
             },
-            HelpText = '<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.',
+            HelpText = '<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and shield generator enhancements.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC uel0301_Combat_name>SACU (Combatant preset)',
         },
@@ -606,22 +605,25 @@ UnitBlueprint {
             BuildIconSortPriority = 20,
             Description = '<LOC uel0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
-                'Pod',
+                'LeftPod',
+				'RightPod',
             },
-            HelpText = '<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.',
+            HelpText = '<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancements.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC uel0301_Engineer_name>SACU (Engineer preset)',
         },
-        IntelJammer = {
+        Support = {
             BuildIconSortPriority = 35,
-            Description = '<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)',
+            Description = '<LOC uel0301_IntelJammer_desc>SACU (Support preset)',
             Enhancements = {
-                'RadarJammer',
                 'SensorRangeEnhancer',
+				'LeftPod',
+				'RightPod',
+				'ShieldGeneratorField',
             },
-            HelpText = '<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.',
+            HelpText = '<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer, enhanced sensor system engineering drones and bubble shield generator enhancements.',
             SortCategory = 'SORTOTHER',
-            UnitName = '<LOC uel0301_IntelJammer_name>SACU (Intel Jammer preset)',
+            UnitName = '<LOC uel0301_IntelJammer_name>SACU (Support preset)',
         },
         Rambo = {
             BuildIconSortPriority = 25,
