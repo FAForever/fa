@@ -370,41 +370,6 @@ UnitBlueprint {
             },
             Slot = 'Back',
         },
-        RadarJammer = {
-            BuildCostEnergy = 8000,
-            BuildCostMass = 300,
-            BuildTime = 2500,
-            Icon = 'rj',
-            MaintenanceConsumptionPerSecondEnergy = 100,
-            Name = '<LOC enhancements_0067>Radar Jammer',
-            NewJammerRadius = 26,
-            ShowBones = {
-                'Jetpack',
-            },
-            Slot = 'Back',
-            UpgradeEffectBones = {
-                'Jetpack',
-            },
-            UpgradeUnitAmbientBones = {
-                'UEL0301',
-            },
-        },
-        RadarJammerRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = {
-                'Jetpack',
-            },
-            Icon = 'rj',
-            Name = '<LOC enhancements_0068>Remove Radar Jammer',
-            Prerequisite = 'RadarJammer',
-            RemoveEnhancements = {
-                'RadarJammer',
-                'RadarJammerRemove',
-            },
-            Slot = 'Back',
-        },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,
@@ -445,8 +410,10 @@ UnitBlueprint {
             BuildCostMass = 600,
             BuildTime = 3000,
             Icon = 'sre',
-            Name = '<LOC enhancements_0071>Enhanced Sensor System',
-            NewOmniRadius = 80,
+            MaintenanceConsumptionPerSecondEnergy = 50,
+			Name = '<LOC enhancements_0071>Enhanced Sensor System',
+            NewJammerRadius = 26,
+			NewOmniRadius = 80,
             NewVisionRadius = 45,
             ShowBones = {
                 'SAM',

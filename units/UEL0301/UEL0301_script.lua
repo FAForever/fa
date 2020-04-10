@@ -148,13 +148,20 @@ UEL0301 = Class(CommandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh == 'SensorRangeEnhancer' then
+        --Sensor + Jammer
+		elseif enh == 'SensorRangeEnhancer' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
+			self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
+			self.RadarJammerEnh = true
+			self:EnableUnitIntel('Enhancement', 'Jammer')
         elseif enh == 'SensorRangeEnhancerRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
+			self:SetIntelRadius('Jammer', 0)
+			self:DisableUnitIntel('Enhancement', 'Jammer')
+			self.RadarJammerEnh = false
         elseif enh == 'RadarJammer' then
             self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
             self.RadarJammerEnh = true
