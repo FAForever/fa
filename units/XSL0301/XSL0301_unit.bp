@@ -584,9 +584,9 @@ UnitBlueprint {
             BuildIconSortPriority = 15,
             Description = '<LOC xsl0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
-                'EnhancedSensors',
+                'GunUpgrade',
             },
-            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.',
+            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the Gun Upgrade enhancement.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Combat_name>SACU (Combatant preset)',
         },
@@ -626,7 +626,7 @@ UnitBlueprint {
             BuildIconSortPriority = 35,
             Description = '<LOC xsl0301_Rambo_desc>SACU (Rambo preset)',
             Enhancements = {
-                'EnhancedSensors',
+                'GunUpgrade',
                 'DamageStabilization',
                 'Overcharge',
             },
@@ -634,6 +634,16 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
         },
+		Support = {
+			BuildIconSortPriority = 35,
+			Description = '<LOC xsl0301_Rambo_desc>SACU (Support preset)',
+			Enhancements = {
+				'RegenAura',
+				'EngineeringThroughput',
+			},
+			HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the Regen aura and engineering upgrade.',
+			SortCategory = 'SORTOTHER',
+			UnitName = '<LOC xsl0301_Rambo_name>SACU (Support preset)',
     },
     General = {
         BuildBones = {
