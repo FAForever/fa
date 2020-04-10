@@ -79,7 +79,7 @@ XSL0301 = Class(CommandUnit) {
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         -- Regenerative Aura
-		        if enh == 'RegenAura' then
+		    if enh == 'RegenAura' then
             local buff
             local type
 
@@ -96,12 +96,15 @@ XSL0301 = Class(CommandUnit) {
                     Affects = {
                         Regen = {
                             Add = 0,
+							Floor = bp.RegenFloor,
                             Mult = bp.RegenPerSecond,
-                            --Floor = bp.RegenFloor,
-                            --CeilT1 = bp.RegenCeilingT1,
-                            --CeilT2 = bp.RegenCeilingT2,
-                            --CeilT3 = bp.RegenCeilingT3,
-                            --CeilT4 = bp.RegenCeilingT4,
+                            BPCeilings = {
+								TECH1 = bp.RegenCeilingT1,
+								TECH2 = bp.RegenCeilingT2,
+								TECH3 = bp.RegenCeilingT3,
+								EXPERIMENTAL = bp.RegenCeilingT4,
+								SUBCOMMANDER = bp.RegenCeilingSCU,
+							},
                         },
                     },
                 }
