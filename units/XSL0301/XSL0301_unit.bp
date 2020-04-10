@@ -335,7 +335,7 @@ UnitBlueprint {
     },
     Enhancements = {
         DamageStabilization = {
-            BuildCostEnergy = 76800,
+            BuildCostEnergy = 75000,
             BuildCostMass = 2500,
             BuildTime = 5900,
             Icon = 'dss',
@@ -371,9 +371,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         EngineeringThroughput = {
-            BuildCostEnergy = 51800,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 30000,
+            BuildCostMass = 1500,
+            BuildTime = 6000,
             Icon = 'efm',
             Name = '<LOC enhancements_0143>Rapid Fabricator',
             NewBuildRate = 98,
@@ -400,9 +400,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         GunUpgrade = {
-            BuildCostEnergy = 34000,
+            BuildCostEnergy = 16000,
             BuildCostMass = 800,
-            BuildTime = 3100,
+            BuildTime = 3200,
             Icon = 'cba',
             Name = '<LOC enhancements_0141>GunUpgrade',
             NewMaxRadius = 35,
@@ -436,7 +436,7 @@ UnitBlueprint {
         Missile = {
             BuildCostEnergy = 46000,
             BuildCostMass = 1500,
-            BuildTime = 4200,
+            BuildTime = 6000,
             Icon = 'tmu',
             Name = '<LOC enhancements_0145>Tactical Missile Launcher',
             ShowBones = {
@@ -467,9 +467,9 @@ UnitBlueprint {
             Slot = 'Back',
         },
         Overcharge = {
-            BuildCostEnergy = 283500,
+            BuildCostEnergy = 225000,
             BuildCostMass = 4500,
-            BuildTime = 12600,
+            BuildTime = 18000,
             Icon = 'oc',
             Name = '<LOC enhancements_0139>Overcharge',
             Slot = 'RCH',
