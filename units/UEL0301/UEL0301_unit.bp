@@ -487,7 +487,6 @@ UnitBlueprint {
             Mesh = '/effects/entities/Shield01/Shield01_mesh',
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             Name = '<LOC enhancements_0074>Shield Generator Field',
-            Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 52000,
             ShieldRechargeTime = 215,
@@ -512,7 +511,6 @@ UnitBlueprint {
             Name = '<LOC enhancements_0075>Remove Shields',
             Prerequisite = 'ShieldGeneratorField',
             RemoveEnhancements = {
-                'Shield',
                 'ShieldGeneratorField',
                 'ShieldGeneratorFieldRemove',
             },
