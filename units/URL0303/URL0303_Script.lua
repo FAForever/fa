@@ -68,7 +68,7 @@ URL0303 = Class(CWalkingLandUnit) {
         local bufffx2 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
         self.Trash:Add(bufffx1)
         self.Trash:Add(bufffx2)
-        StartCountdown(self:GetEntityId(), blueprint.SecondsBeforeExplosionWhenCharging)
+        StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)
         WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
         self:Kill()
     end,
