@@ -232,7 +232,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

@@ -292,7 +292,7 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',

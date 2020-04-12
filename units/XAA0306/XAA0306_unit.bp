@@ -331,7 +331,7 @@ UnitBlueprint {
                 'SUBMERSIBLE',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE * ANTIAIR)',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

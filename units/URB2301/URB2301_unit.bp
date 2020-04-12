@@ -227,7 +227,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

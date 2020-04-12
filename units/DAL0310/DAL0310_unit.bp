@@ -277,7 +277,7 @@ UnitBlueprint {
             TranscendentPriorities = {'SHIELD'},
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

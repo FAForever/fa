@@ -273,7 +273,7 @@ UnitBlueprint {
                 'COMMAND',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'STRUCTURE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

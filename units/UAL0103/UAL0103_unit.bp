@@ -254,7 +254,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 40,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
