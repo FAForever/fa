@@ -50,6 +50,7 @@ UnitBlueprint {
         'HOVER',
         'TANK',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0.1,
     Defense = {

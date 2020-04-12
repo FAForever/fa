@@ -52,6 +52,7 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
         'DUMMYGSRWEAPON',
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {

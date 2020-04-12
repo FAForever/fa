@@ -53,6 +53,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'BOT',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {
