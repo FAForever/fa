@@ -340,9 +340,10 @@ UnitBlueprint {
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
+                'AIR MOBILE TECH2 BOMBER',
+                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
