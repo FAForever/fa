@@ -269,6 +269,10 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
+                'TECH3 STRUCTURE',
+                'TECH2 STRUCTURE',
+                'TECH1 STRUCTURE',
+                'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

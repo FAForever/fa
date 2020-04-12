@@ -290,7 +290,10 @@ UnitBlueprint {
             SlavedToBody = true,
             TargetCheckInterval = 3.5,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
+                'TECH3 STRUCTURE',
+                'TECH2 STRUCTURE',
+                'TECH1 STRUCTURE',
+                'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -368,7 +371,10 @@ UnitBlueprint {
             SlavedToBody = true,
             TargetCheckInterval = 3.5,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
+                'TECH3 STRUCTURE',
+                'TECH2 STRUCTURE',
+                'TECH1 STRUCTURE',
+                'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
