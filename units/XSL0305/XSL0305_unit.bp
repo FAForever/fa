@@ -343,6 +343,9 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 3,
             TargetPriorities = {
+                'SNIPER',
+                '(ARTILLERY - TECH1)',
+                'SHIELD',
                 'COMMAND',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -420,6 +423,9 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 3,
             TargetPriorities = {
+                'SNIPER',
+                '(ARTILLERY - TECH1)',
+                'SHIELD',
                 'COMMAND',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
