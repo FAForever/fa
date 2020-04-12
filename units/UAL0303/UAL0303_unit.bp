@@ -65,6 +65,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'BOT',
         'OVERLAYDIRECTFIRE',
+        'PERSONALSHIELD',
     },
     CollisionOffsetY = 0,
     Defense = {
