@@ -691,4 +691,6 @@ keyActions = {
         category = 'hotbuildingExtra', order = 1309,},
     ['t3_support_naval_factory'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("T3_Support_Naval_Factory")',
         category = 'hotbuildingExtra', order = 1310,},
+    ['templates_factory'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("TemplateFactory")',
+        category = 'hotbuildingExtra', order = 1311,},
 }
