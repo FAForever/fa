@@ -91,6 +91,9 @@ unitkeygroups = {
 
         "T2_Cruiser",
     },
+    ["TemplateFactory"] = {
+        "_factory_templates", -- Special :)
+    },
     ["EngyStation"] = {
         "Engineering_Station",
 

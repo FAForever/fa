@@ -8,6 +8,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local CommandMode = import('/lua/ui/game/commandmode.lua')
 local Construction = import('/lua/ui/game/construction.lua')
 local Templates = import('/lua/ui/game/build_templates.lua')
+local FactoryTemplates = import('/lua/ui/templates_factory.lua')
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -144,7 +145,7 @@ function getUnitKeyGroups()
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
-            elseif value == '_upgrade' or value == '_templates' then
+            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
                 table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
@@ -266,6 +267,131 @@ function buildActionBuilding(name, modifier)
     CommandMode.StartCommandMode("build", {name = cmd})
 end
 
+function buildActionFactoryTemplate(modifier)
+    local options = Prefs.GetFromCurrentProfile('options')
+
+    -- Try to delete old units except for the one currently in construction
+    -- if modifier == 'Alt' then
+        -- local currentCommandQueue = Construction.getCurrentCommandQueue()
+        -- if currentCommandQueue then
+            -- for index = table.getn(currentCommandQueue), 1, -1 do
+                -- local count = currentCommandQueue[index].count
+                -- if index == 1 then
+                    -- count = count - 1
+                -- end
+                -- DecreaseBuildCountInQueue(index, count)
+            -- end
+        -- end
+    -- end
+
+    -- Reset everything that could be fading or running
+    hideCycleMap()
+
+    -- Find all avaiable templates
+    local effectiveTemplates = {}
+    local effectiveIcons = {}
+    local allFactoryTemplates = FactoryTemplates.GetTemplates()
+
+    if (not allFactoryTemplates) or table.getsize(allFactoryTemplates) == 0 then
+        return
+    end
+
+    local selection = GetSelectedUnits()
+    local availableOrders,    availableToggles, buildableCategories = GetUnitCommandData(selection)
+    local buildable = EntityCategoryGetUnitList(buildableCategories)
+    for templateIndex, template in allFactoryTemplates do
+        local valid = true
+        for _, entry in template.templateData do
+            if type(entry) == 'table' then
+                if not table.find(buildable, entry.id) then
+                    valid = false
+                    break
+                end
+            end
+        end
+        if valid then
+            template.templateID = templateIndex
+            table.insert(effectiveTemplates, template)
+            table.insert(effectiveIcons, template.icon)
+        end
+    end
+
+    local maxPos = table.getsize(effectiveTemplates)
+    if maxPos == 0 then
+        return
+    end
+
+    -- Check if the selection/key has changed
+    if cycleLastName == '_factory_templates' and cycleLastMaxPos == maxPos then
+        cyclePos = cyclePos + 1
+        if cyclePos > maxPos then
+            cyclePos = 1
+        end
+    else
+        initCycleButtons(effectiveIcons)
+        cyclePos = 1
+        cycleLastName = '_factory_templates'
+        cycleLastMaxPos = maxPos
+    end
+    
+    if options.hotbuild_cycle_preview == 1 then
+        -- Highlight the active button
+        for i, button in cycleButtons do
+            if i == cyclePos then
+                button:SetAlpha(1, true)
+            else
+                button:SetAlpha(0.4, true)
+            end
+        end
+        cycleMap:Show()
+        -- Start the fading thread
+        cycleThread = ForkThread(function()
+            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
+            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+            WaitSeconds(stayTime)
+            if not cycleMap:IsHidden() then
+                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+            end
+            WaitSeconds(fadeTime)
+            cyclePos = 0
+        end)
+    else
+        cycleThread = ForkThread(function()
+            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
+            cyclePos = 0
+        end)
+    end
+    
+    local template = effectiveTemplates[cyclePos]
+    local selectedTemplate = template.templateData
+    
+    if maxPos == 1 then
+        for _, units in selectedTemplate do
+            local v = units.id
+            local count = units.count
+            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+        end
+    else
+        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        local oldHandleEvent = worldview.HandleEvent
+        worldview.HandleEvent = function(self, event)
+            if event.Type == 'ButtonPress' then
+                if event.Modifiers.Middle then
+                    for _, units in selectedTemplate do
+                        local v = units.id
+                        local count = units.count
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                    end
+                end
+            end
+        end
+    end
+    
+
+    -- WaitSeconds(5)
+
+    
+end
 
 -- Some of the work here is redundant when cycle_preview is disabled
 function buildActionTemplate(modifier)
@@ -440,6 +566,10 @@ end
 function buildActionUnit(name, modifier)
     local values = unitkeygroups[name]
 
+    if table.find(values, "_factory_templates") then
+        return buildActionFactoryTemplate(modifier)
+    end
+    
     -- Try to delete old units except for the one currently in construction
     if modifier == 'Alt' then
         local currentCommandQueue = Construction.getCurrentCommandQueue()
