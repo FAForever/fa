@@ -2321,16 +2321,17 @@ CommandUnit = Class(WalkingLandUnit) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
         
-        local bp = self:GetBlueprint().Economy
-        local energyCost, time
-        if bp then
-            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
-            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bp.TeleportTimeMod or 0.01)
-        end
-
+        local bp = self:GetBlueprint()
+        local bpEco = bp.Economy
         local teleDelay = bp.General.TeleportDelay
+        local energyCost, time
+
+        if bpEco then
+            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
+            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
+        end
 
         if teleDelay then
             energyCostMod = (time + teleDelay) / time
