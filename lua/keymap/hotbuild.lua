@@ -267,22 +267,8 @@ function buildActionBuilding(name, modifier)
     CommandMode.StartCommandMode("build", {name = cmd})
 end
 
-function buildActionFactoryTemplate(modifier)
+function buildActionFactoryTemplate()
     local options = Prefs.GetFromCurrentProfile('options')
-
-    -- Try to delete old units except for the one currently in construction
-    -- if modifier == 'Alt' then
-        -- local currentCommandQueue = Construction.getCurrentCommandQueue()
-        -- if currentCommandQueue then
-            -- for index = table.getn(currentCommandQueue), 1, -1 do
-                -- local count = currentCommandQueue[index].count
-                -- if index == 1 then
-                    -- count = count - 1
-                -- end
-                -- DecreaseBuildCountInQueue(index, count)
-            -- end
-        -- end
-    -- end
 
     -- Reset everything that could be fading or running
     hideCycleMap()
@@ -297,7 +283,7 @@ function buildActionFactoryTemplate(modifier)
     end
 
     local selection = GetSelectedUnits()
-    local availableOrders,    availableToggles, buildableCategories = GetUnitCommandData(selection)
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
     for templateIndex, template in allFactoryTemplates do
         local valid = true
@@ -372,6 +358,7 @@ function buildActionFactoryTemplate(modifier)
             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
         end
     else
+        CommandMode.StartCommandMode("build", {name = ''})
         local worldview = import('/lua/ui/game/worldview.lua').viewLeft
         local oldHandleEvent = worldview.HandleEvent
         worldview.HandleEvent = function(self, event)
@@ -385,12 +372,7 @@ function buildActionFactoryTemplate(modifier)
                 end
             end
         end
-    end
-    
-
-    -- WaitSeconds(5)
-
-    
+    end 
 end
 
 -- Some of the work here is redundant when cycle_preview is disabled
@@ -410,7 +392,7 @@ function buildActionTemplate(modifier)
     end
 
     local selection = GetSelectedUnits()
-    local availableOrders,    availableToggles, buildableCategories = GetUnitCommandData(selection)
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
