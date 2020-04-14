@@ -169,6 +169,93 @@ function init()
     CommandMode.AddEndBehavior(resetCycle)
 end
 
+-- UI for the cycle
+function hotbuildCyclePreview()
+    local options = Prefs.GetFromCurrentProfile('options')
+    if options.hotbuild_cycle_preview == 1 then
+        -- Highlight the active button
+        for i, button in cycleButtons do
+            if i == cyclePos then
+                button:SetAlpha(1, true)
+            else
+                button:SetAlpha(0.4, true)
+            end
+        end
+
+        cycleMap:Show()
+        -- Start the fading thread
+        cycleThread = ForkThread(function()
+            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
+            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+            
+            WaitSeconds(stayTime)
+            if not cycleMap:IsHidden() then
+                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+            end
+            WaitSeconds(fadeTime)
+            cyclePos = 0
+        end)
+    else
+        cycleThread = ForkThread(function()
+            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
+            cyclePos = 0
+        end)
+    end
+end
+
+function cycleUnits(name, effectiveTemplates, effectiveIcons, selection)
+    local maxPos = table.getsize(effectiveTemplates)
+    if maxPos == 0 then
+        return
+    end
+
+    -- Check if the selection/key has changed
+    if cycleLastName == name and cycleLastMaxPos == maxPos and old_selection == selection[1] then
+        cyclePos = cyclePos + 1
+        if cyclePos > maxPos then
+            cyclePos = 1
+        end
+    else
+        initCycleButtons(effectiveIcons)
+        cyclePos = 1
+        cycleLastName = name
+        cycleLastMaxPos = maxPos
+        old_selection = selection[1]
+    end
+    return maxPos
+end
+
+-- look for template that can be built
+function availableTemplate(allTemplates,buildable)
+    local effectiveTemplates = {}
+    local effectiveIcons = {}
+    for templateIndex, template in allTemplates do
+        local valid = true
+        for _, entry in template.templateData do
+            if type(entry) == 'table' then
+                if entry.id then
+                    if not table.find(buildable, entry.id) then -- factory templates
+                        valid = false
+                        break
+                    end
+                else 
+                    if not table.find(buildable, entry[1]) then -- build templates
+                        valid = false
+                        break
+                    end
+                end
+            end
+        end
+        if valid then
+            template.templateID = templateIndex
+            table.insert(effectiveTemplates, template)
+            table.insert(effectiveIcons, template.icon)
+        end
+    end
+    return effectiveTemplates, effectiveIcons
+end
+
+
 -- The actual key action callback, called each time a 'Hotbuild' category action is activated
 function buildAction(name)
     local modifier = ""
@@ -215,53 +302,9 @@ function buildActionBuilding(name, modifier)
         end
     end
 
-    local maxPos = table.getsize(effectiveValues)
-    if maxPos == 0 then
-        return
-    end
+    cycleUnits(name, effectiveValues, effectiveValues, selection)
 
-    -- Check if the selection/key has changed
-    if cycleLastName == name and cycleLastMaxPos == maxPos then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
-        end
-    else
-        initCycleButtons(effectiveValues)
-        cyclePos = 1
-        cycleLastName = name
-        cycleLastMaxPos = maxPos
-    end
-
-    if options.hotbuild_cycle_preview == 1 then
-        -- Highlight the active button
-        for i, button in cycleButtons do
-            if i == cyclePos then
-                button:SetAlpha(1, true)
-            else
-                button:SetAlpha(0.4, true)
-            end
-        end
-
-        cycleMap:Show()
-        -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
-    else
-        cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
-            cyclePos = 0
-        end)
-    end
+    hotbuildCyclePreview()
 
     local cmd = effectiveValues[cyclePos]
     ClearBuildTemplates()
@@ -275,8 +318,6 @@ function buildActionFactoryTemplate()
     hideCycleMap()
 
     -- Find all avaiable templates
-    local effectiveTemplates = {}
-    local effectiveIcons = {}
     local allFactoryTemplates = FactoryTemplates.GetTemplates()
 
     if (not allFactoryTemplates) or table.getsize(allFactoryTemplates) == 0 then
@@ -286,69 +327,12 @@ function buildActionFactoryTemplate()
     local selection = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-    for templateIndex, template in allFactoryTemplates do
-        local valid = true
-        for _, entry in template.templateData do
-            if type(entry) == 'table' then
-                if not table.find(buildable, entry.id) then
-                    valid = false
-                    break
-                end
-            end
-        end
-        if valid then
-            template.templateID = templateIndex
-            table.insert(effectiveTemplates, template)
-            table.insert(effectiveIcons, template.icon)
-        end
-    end
 
-    local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then
-        return
-    end
+    effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
-    -- Check if the selection/key has changed
-    if cycleLastName == '_factory_templates' and cycleLastMaxPos == maxPos and old_selection == selection[1] then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
-        end
-    else
-        initCycleButtons(effectiveIcons)
-        cyclePos = 1
-        cycleLastName = '_factory_templates'
-        cycleLastMaxPos = maxPos
-        old_selection = selection[1]
-    end
+    maxPos = cycleUnits('_factory_templates', effectiveTemplates, effectiveIcons, selection)
     
-    if options.hotbuild_cycle_preview == 1 then
-        -- Highlight the active button
-        for i, button in cycleButtons do
-            if i == cyclePos then
-                button:SetAlpha(1, true)
-            else
-                button:SetAlpha(0.4, true)
-            end
-        end
-        cycleMap:Show()
-        -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
-    else
-        cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
-            cyclePos = 0
-        end)
-    end
+    hotbuildCyclePreview()
     
     local template = effectiveTemplates[cyclePos]
     local selectedTemplate = template.templateData
@@ -441,70 +425,12 @@ function buildActionTemplate(modifier)
             end
         end
     else
-        for templateIndex, template in allTemplates do
-            local valid = true
-            for _, entry in template.templateData do
-                if type(entry) == 'table' then
-                    if not table.find(buildableUnits, entry[1]) then
-                        valid = false
-                        break
-                    end
-                end
-            end
-            if valid then
-                template.templateID = templateIndex
-                table.insert(effectiveTemplates, template)
-                table.insert(effectiveIcons, template.icon)
-            end
-        end
+        effectiveTemplates, effectiveIcons = availableTemplate(allTemplates,buildableUnits)
     end
 
-    local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then
-        return
-    end
+    cycleUnits('_templates', effectiveTemplates, effectiveIcons, selection)
 
-    -- Check if the selection/key has changed
-    if cycleLastName == '_templates' and cycleLastMaxPos == maxPos then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
-        end
-    else
-        initCycleButtons(effectiveIcons)
-        cyclePos = 1
-        cycleLastName = '_templates'
-        cycleLastMaxPos = maxPos
-    end
-
-    if options.hotbuild_cycle_preview == 1 then
-        -- Highlight the active button
-        for i, button in cycleButtons do
-            if i == cyclePos then
-                button:SetAlpha(1, true)
-            else
-                button:SetAlpha(0.4, true)
-            end
-        end
-
-        cycleMap:Show()
-        -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
-    else
-        cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
-            cyclePos = 0
-        end)
-    end
+    hotbuildCyclePreview()
 
     local template = effectiveTemplates[cyclePos]
     local cmd = template.templateData[3][1]
