@@ -24,6 +24,7 @@ local cycleThread = false
 local cycleLastName
 local cycleLastMaxPos
 local cycleButtons = {}
+local old_selection
 
 local modifiersKeys = {}
 
@@ -308,7 +309,7 @@ function buildActionFactoryTemplate()
     end
 
     -- Check if the selection/key has changed
-    if cycleLastName == '_factory_templates' and cycleLastMaxPos == maxPos then
+    if cycleLastName == '_factory_templates' and cycleLastMaxPos == maxPos and old_selection == selection[1] then
         cyclePos = cyclePos + 1
         if cyclePos > maxPos then
             cyclePos = 1
@@ -318,6 +319,7 @@ function buildActionFactoryTemplate()
         cyclePos = 1
         cycleLastName = '_factory_templates'
         cycleLastMaxPos = maxPos
+        old_selection = selection[1]
     end
     
     if options.hotbuild_cycle_preview == 1 then
