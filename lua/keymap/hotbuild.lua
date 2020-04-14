@@ -371,6 +371,8 @@ function buildActionFactoryTemplate()
                         local count = units.count
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
                     end
+                elseif event.Modifiers.Left then
+                    CommandMode.EndCommandMode(false)
                 end
             end
         end
