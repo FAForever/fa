@@ -345,6 +345,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SNIPER',
                 '(ARTILLERY - TECH1)',
+                'ANTISHIELD',
                 'SHIELD',
                 'COMMAND',
                 'TECH3 MOBILE',
