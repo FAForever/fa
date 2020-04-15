@@ -250,7 +250,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
-                'EXPERIMENTAL ARTILLERY',
+                '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
                 'TECH3 ANTIMISSILE',
                 'NUKE STRUCTURE',
                 'ORBITALSYSTEM',
