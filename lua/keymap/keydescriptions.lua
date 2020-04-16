@@ -291,29 +291,26 @@ keyDescriptions = {
     ['Execute_Paste_Buffer'] = '<LOC key_desc_0252>[Debug] Execute Paste Buffer',
     ['select_air_no_transport'] = '<LOC key_desc_0253>Select air but no transports',
     ['select_air_transport'] = '<LOC key_desc_0254>Select only transports',
-    ['lock_zoom'] = '<LOC key_desc_0255>lock the zoom to current level',
+    ['lock_zoom'] = '<LOC key_desc_0255>Lock the zoom to current level',
 
     -- Hotbuild
-    ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',
-    ['sensors'] = '<LOC key_desc_0257>build sensors + T1 sub marines',
-    ['shields'] = '<LOC key_desc_0258>build shields/steath fields + LAB + Interceptors + Frigates',
-    ['tmd'] = '<LOC key_desc_0259>build Tactical Missiles Defense + T1 Tanks + T1 Bombers + Attack boat',
-    ['xp'] = '<LOC key_desc_0260>build experimentals + mobile T1 AA + T1 light Transports',
-    ['mobilearty'] = '<LOC key_desc_0261>build T1 artilleries + T1 light gunship',
-    ['mass'] = '<LOC key_desc_0262>build mass extractors + T2 Engineers',
-    ['massfab'] = '<LOC key_desc_0263>build mass fabricators + T2 Bots + T2 air fighters + T2 subs',
-    ['pgen'] = '<LOC key_desc_0264>build power generators + T2 Tanks + T2 Torpedo Bombers + T2 Destroyers',
-    ['templates'] = '<LOC key_desc_0265>build templates + T2 Hover Tanks + T2 Gunships + T2 Cruisers',
-    ['engystation'] = '<LOC key_desc_0266>build engineers stations + T2 Mobile AA + T2 Air Transports + T2 Boats',
-    ['mml'] = '<LOC key_desc_0267>build Mobile Missiles launchers + T2 Air Guided Missile (mercy)',
-    ['mobileshield'] = '<LOC key_desc_0268>build T2 Mobiles Shields and mobile Stealth fields',
-    ['fieldengy'] = '<LOC key_desc_0269>build UEF T2 Field Engineer',
-    ['defense'] = '<LOC key_desc_0270>build Point Defenses + walls + T3 Engineers',
-    ['aa'] = '<LOC key_desc_0271>build Anti Air + Air Staging Facilities + T3 Assault bots + Snipers + T3 Air scouts + T3 Subs',
-    ['torpedo'] = '<LOC key_desc_0272>build Torpedo defenses + T3 Heavy bots + ASF + Battleships',
-    ['arties'] = '<LOC key_desc_0273>build Artilleries defenses + T3 Strategic Bombers + Aircraft Carriers + Battlecruiser',
-    ['tml'] = '<LOC key_desc_0274>build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
-    ['upgrades'] = '<LOC key_desc_0275>build Upgrades + T3 Mobile Anti Air + T3 Air Transport + T3 torpedo bomber',
+    ['builders'] = '<LOC key_desc_0256>build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith 
+    ['radars'] = '<LOC key_desc_0257>build radars (+ perimeter & eye of Rhianne) + land scouts + air scouts',
+    ['shields'] = '<LOC key_desc_0258>build shields + mobiles Shields & shield disruptors + shield boat',
+    ['tmd'] = '<LOC key_desc_0259>build tactical missiles defense & strategic missile defense',
+    ['xp'] = '<LOC key_desc_0260>build experimentals + mobile bomb + guided missile',
+    ['sonars'] = '<LOC key_desc_0261>build sonars + transports + amphibious & hover tanks',
+    ['mass'] = '<LOC key_desc_0262>build mass extractors & mass fabricators + tanks (Harbinger/Brick/Percival/Othuums & T2/T1 tanks) + bombers + frigates/destroyers/battlecruisers/battleships', -- also Brick from Megalith 
+    ['stealth'] = '<LOC key_desc_0263>build steath fields & cybran T3 sonar + mobile Stealth fields + counter intelligence boat',
+    ['pgen'] = '<LOC key_desc_0264>build power generators + snipers & Loyalist/titan & gattling/rocket bots & LABs + gunships (+ Restorer)',
+    ['templates'] = '<LOC key_desc_0265>build templates + factory templates',
+    ['engystation'] = '<LOC key_desc_0266>build engineers stations + field engineers',
+    ['defense'] = '<LOC key_desc_0270>build Point Defenses + walls',
+    ['aa'] = '<LOC key_desc_0271>build anti air + air staging facilities + T3 mobile AA & flaks & T1 mobile AA + ASFs & Swiftwings & interceptors + aircrafts carriers & cruiser & attack boat', -- also flak & T3 maa from Megalith 
+    ['torpedo'] = '<LOC key_desc_0272>build torpedo defenses + torpedo bombers + submarines & torpedo boat',
+    ['arties'] = '<LOC key_desc_0273>build static artilleries + mobile artilleries', -- also T3 arty from Megalith 
+    ['tml'] = '<LOC key_desc_0274>build tactical missile launchers & strategic missile launchers + mobile missile launchers + missile ships & sera/uef cruiser',
+    ['upgrades'] = '<LOC key_desc_0275>build Upgrades',
 
     -- Extra
     ['land_factory'] = '<LOC key_desc_0276>build Land Factory',
@@ -427,5 +424,4 @@ keyDescriptions = {
     ['t3_support_land_factory'] = '<LOC key_desc_0385>build T3 Support Land Factory',
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
-    ['templates_factory'] = '<LOC key_desc_0389>build factory templates',
 }
