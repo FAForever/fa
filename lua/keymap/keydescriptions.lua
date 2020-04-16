@@ -299,17 +299,17 @@ keyDescriptions = {
     ['shields'] = 'build shields + mobiles Shields & shield disruptors + shield boat',
     ['tmd'] = 'build tactical missiles defense & strategic missile defense',
     ['xp'] = 'build experimentals + mobile bomb + guided missile',
-    ['sonars'] = 'build sonars + transports + amphibious & hover tanks',
-    ['mass'] = 'build mass extractors/fabricators + tanks + bombers + frigates/destroyers/battlecruisers/battleships', -- also Brick from Megalith 
-    ['stealth'] = 'build steath fields & cybran T3 sonar + mobile Stealth fields + counter intelligence boat',
-    ['pgen'] = 'build power generators + snipers & Loyalist/titan & gattling/rocket bots & LABs + gunships (+ Restorer)',
+    ['sonars'] = 'build sonars + transports + amphibious / hover tanks',
+    ['mass'] = 'build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith 
+    ['stealth'] = 'build steath fields & cybran T3 sonar + mobile stealth fields + counter intelligence boat',
+    ['pgen'] = 'build power generators / storage + snipers & Loyalist / titan & gattling / rocket bots & LABs + gunships',
     ['templates'] = 'build templates + factory templates',
     ['engystation'] = 'build engineers stations + field engineers',
-    ['defense'] = 'build Point Defenses + walls',
-    ['aa'] = 'build static AA + air staging + mobile AA/flaks + air fighters + aircrafts carriers/cruiser/attack boat', -- also flak & T3 maa from Megalith 
+    ['defense'] = 'build point defenses + walls',
+    ['aa'] = 'build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 maa from Megalith 
     ['torpedo'] = 'build torpedo defenses + torpedo bombers + submarines & torpedo boat',
     ['arties'] = 'build static artilleries + mobile artilleries', -- also T3 arty from Megalith 
-    ['tml'] = 'build TML & SML + mobile missile launchers + missile ships & sera/uef cruiser',
+    ['tml'] = 'build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers',
     ['upgrades'] = 'build Upgrades',
 
     -- Extra
