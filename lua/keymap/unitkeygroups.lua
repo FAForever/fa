@@ -98,7 +98,8 @@ unitkeygroups = {
     ["Pgen"] = {
         "Power_Generator",
         "Hydrocarbon_Power_Plant",
-
+		"Energy_Storage",
+        
         "T3_Sniper_Bot",
         "url0303", -- Loyalist
         "uel0303", -- Titan
@@ -164,7 +165,6 @@ unitkeygroups = {
         "Heavy_Artillery_Installation",
         "Artillery_Installation",
 
-
         "T3_Mobile_Heavy_Artillery",
         "xrl0005", -- T3 arty for Megalith
         "T1_Mobile_Light_Artillery",
@@ -176,6 +176,8 @@ unitkeygroups = {
         "T3_Mobile_Missile_Platform",
         "T2_Mobile_Missile_Launcher",
         
+        "xss0302", -- sera battleship
+        "T3_Strategic_Missile_Submarine",
         "T3_Missile_Ship",
         "xss0202", -- sera cruiser
         "ues0202", -- uef cruiser

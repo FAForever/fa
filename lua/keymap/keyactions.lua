@@ -441,7 +441,7 @@ keyActions = {
         category = 'hotbuilding', order = 1106,},
     ['mass'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Mass")',
         category = 'hotbuilding', order = 1107,},
-    ['massfab'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("MassFab")',
+    ['stealth'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Stealth")',
         category = 'hotbuilding', order = 1108,},
     ['pgen'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Pgen")',
         category = 'hotbuilding', order = 1109,},
