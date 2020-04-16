@@ -203,12 +203,7 @@ function hotbuildCyclePreview()
     end
 end
 
-function cycleUnits(name, effectiveTemplates, effectiveIcons, selection)
-    local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then
-        return
-    end
-
+function cycleUnits(maxPos, name, effectiveIcons, selection)
     -- Check if the selection/key has changed
     if cycleLastName == name and cycleLastMaxPos == maxPos and old_selection == selection[1] then
         cyclePos = cyclePos + 1
@@ -222,7 +217,7 @@ function cycleUnits(name, effectiveTemplates, effectiveIcons, selection)
         cycleLastMaxPos = maxPos
         old_selection = selection[1]
     end
-    return maxPos
+    return
 end
 
 -- look for template that can be built
@@ -268,7 +263,7 @@ function buildAction(name)
     local selection = GetSelectedUnits()
     if selection then
         -- If current selection is engineer or commander
-        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) > 0 then
+        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE or categories.ENGINEER - categories.STRUCTURE, selection)) > 0 then
             buildActionBuilding(name, modifier)
         else -- Buildqueue or normal applying all the command
             buildActionUnit(name, modifier)
@@ -302,7 +297,12 @@ function buildActionBuilding(name, modifier)
         end
     end
 
-    cycleUnits(name, effectiveValues, effectiveValues, selection)
+    local maxPos = table.getsize(effectiveValues)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, name, effectiveValues, selection)
 
     hotbuildCyclePreview()
 
@@ -330,7 +330,12 @@ function buildActionFactoryTemplate()
 
     effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
-    maxPos = cycleUnits('_factory_templates', effectiveTemplates, effectiveIcons, selection)
+    local maxPos = table.getsize(effectiveTemplates)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, '_factory_templates', effectiveIcons, selection)
     
     hotbuildCyclePreview()
     
@@ -354,9 +359,10 @@ function buildActionFactoryTemplate()
                         local v = units.id
                         local count = units.count
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                        CommandMode.EndCommandMode(true)
                     end
                 elseif event.Modifiers.Left then
-                    CommandMode.EndCommandMode(false)
+                    CommandMode.EndCommandMode(true)
                 end
             end
         end
@@ -428,7 +434,12 @@ function buildActionTemplate(modifier)
         effectiveTemplates, effectiveIcons = availableTemplate(allTemplates,buildableUnits)
     end
 
-    cycleUnits('_templates', effectiveTemplates, effectiveIcons, selection)
+    local maxPos = table.getsize(effectiveTemplates)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, '_templates', effectiveIcons, selection)
 
     hotbuildCyclePreview()
 
@@ -475,12 +486,15 @@ function hideCycleMap()
     cycleMap:SetAlpha(1, true)
 end
 
-function buildActionUnit(name, modifier)
+function buildActionUnit(name, modifier)    
     local values = unitkeygroups[name]
 
     if table.find(values, "_factory_templates") then
         return buildActionFactoryTemplate(modifier)
     end
+    
+    -- Reset everything that could be fading or running
+    hideCycleMap()
     
     -- Try to delete old units except for the one currently in construction
     if modifier == 'Alt' then
@@ -496,27 +510,58 @@ function buildActionUnit(name, modifier)
         end
     end
 
-    for i, v in values do
-        if v == '_upgrade' and buildActionUpgrade() then
+    for i, value in values do
+        if value == '_upgrade' and buildActionUpgrade() then
             return
         end
     end
+    
     local count = 1
     if modifier == 'Shift' then
         count = 5
     end
 
-    local selectedUnits = GetSelectedUnits()
-    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selectedUnits)
+    local selection = GetSelectedUnits()
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-
-    for i, v in values do
-        for ii, ba in buildable do
-            if v == ba then
-                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+    
+    local effectiveValues = {}
+    for _, value in values do
+        for i, buildableValue in buildable do
+            if value == buildableValue then
+                table.insert(effectiveValues, value)
             end
         end
     end
+    
+    local maxPos = table.getsize(effectiveValues)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, name, effectiveValues, selection)
+    
+    hotbuildCyclePreview()
+    
+    local unit = effectiveValues[cyclePos]
+    
+    if maxPos == 1 then
+        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+    else
+        CommandMode.StartCommandMode("build", {name = ''})
+        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        local oldHandleEvent = worldview.HandleEvent
+        worldview.HandleEvent = function(self, event)
+            if event.Type == 'ButtonPress' then
+                if event.Modifiers.Middle then
+                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+                    CommandMode.EndCommandMode(true)
+                elseif event.Modifiers.Left then
+                    CommandMode.EndCommandMode(true)
+                end
+            end
+        end
+    end 
 end
 
 -- Does not upgrade T1 facs that are currently upgrading to T2 to T3 when issued
