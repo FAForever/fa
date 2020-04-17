@@ -1986,7 +1986,7 @@ ConstructionUnit = Class(MobileUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-        if (unitBeingBuilt.UnitId or unitBeingBuilt:GetUnitId) == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
+        if (unitBeingBuilt.UnitId or unitBeingBuilt:GetUnitId()) == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
             self.Upgrading = true
             self.BuildingUnit = false
         end
@@ -2384,7 +2384,7 @@ ACUUnit = Class(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        ArmyBrains[self.Army]:SetUnitStat(self.UnitId or self:GetUnitId, "lowest_health", self:GetHealth())
+        ArmyBrains[self.Army]:SetUnitStat(self.UnitId or self:GetUnitId(), "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
     
@@ -2401,8 +2401,8 @@ ACUUnit = Class(CommandUnit) {
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
 
-        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self.UnitId or self:GetUnitId, "lowest_health") then
-            ArmyBrains[self.Army]:SetUnitStat(self.UnitId or self:GetUnitId, "lowest_health", self:GetHealth())
+        if self:GetHealth() < ArmyBrains[self.Army]:GetUnitStat(self.UnitId or self:GetUnitId(), "lowest_health") then
+            ArmyBrains[self.Army]:SetUnitStat(self.UnitId or self:GetUnitId(), "lowest_health", self:GetHealth())
         end
     end,
 
