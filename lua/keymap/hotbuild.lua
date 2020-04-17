@@ -24,7 +24,7 @@ local cycleThread = false
 local cycleLastName
 local cycleLastMaxPos
 local cycleButtons = {}
-local old_selection
+local oldSelection
 
 local modifiersKeys = {}
 
@@ -186,7 +186,7 @@ function hotbuildCyclePreview()
         -- Start the fading thread
         cycleThread = ForkThread(function()
             local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+            local fadeTime = stayTime
             
             WaitSeconds(stayTime)
             if not cycleMap:IsHidden() then
@@ -205,7 +205,7 @@ end
 
 function cycleUnits(maxPos, name, effectiveIcons, selection)
     -- Check if the selection/key has changed
-    if cycleLastName == name and cycleLastMaxPos == maxPos and old_selection == selection[1] then
+    if cycleLastName == name and cycleLastMaxPos == maxPos and oldSelection == selection[1] then
         cyclePos = cyclePos + 1
         if cyclePos > maxPos then
             cyclePos = 1
@@ -215,7 +215,7 @@ function cycleUnits(maxPos, name, effectiveIcons, selection)
         cyclePos = 1
         cycleLastName = name
         cycleLastMaxPos = maxPos
-        old_selection = selection[1]
+        oldSelection = selection[1]
     end
     return
 end
@@ -359,7 +359,6 @@ function buildActionFactoryTemplate()
                         local v = units.id
                         local count = units.count
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
-                        CommandMode.EndCommandMode(true)
                     end
                 elseif event.Modifiers.Left then
                     CommandMode.EndCommandMode(true)
@@ -555,7 +554,6 @@ function buildActionUnit(name, modifier)
             if event.Type == 'ButtonPress' then
                 if event.Modifiers.Middle then
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
-                    CommandMode.EndCommandMode(true)
                 elseif event.Modifiers.Left then
                     CommandMode.EndCommandMode(true)
                 end

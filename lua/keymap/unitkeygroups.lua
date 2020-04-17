@@ -98,7 +98,7 @@ unitkeygroups = {
     ["Pgen"] = {
         "Power_Generator",
         "Hydrocarbon_Power_Plant",
-		"Energy_Storage",
+        "Energy_Storage",
         
         "T3_Sniper_Bot",
         "url0303", -- Loyalist
@@ -133,7 +133,7 @@ unitkeygroups = {
         "Air_Staging",
         
         "T3_Mobile_AA",
-        "drlk005", -- T3 maa for Megalith
+        "drlk005", -- T3 mobile anti air for Megalith
         "T2_Mobile_Anti_Air_Cannon",
         "T2_Mobile_AA_Flak_Artillery",
         "xrl0004", -- T2 flak for Megalith
