@@ -86,6 +86,7 @@ UnitBlueprint {
         'T1SUBMARINE',
         'OVERLAYSONAR',
         'OVERLAYANTINAVY',
+        'SNIPEMODE',
     },
     CollisionOffsetX = 0.05,
     CollisionOffsetY = -0.25,

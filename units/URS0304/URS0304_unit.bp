@@ -87,6 +87,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYINDIRECTFIRE',
         'OVERLAYANTINAVY',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     CollisionOffsetZ = 0.25,
