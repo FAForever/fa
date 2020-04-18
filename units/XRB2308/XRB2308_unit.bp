@@ -62,6 +62,7 @@ UnitBlueprint {
         'STEALTH',
         'SUBMERSIBLE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.375,
     Defense = {
