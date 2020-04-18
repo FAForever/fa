@@ -131,6 +131,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'CANNOTUSEAIRSTAGING',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     Defense = {

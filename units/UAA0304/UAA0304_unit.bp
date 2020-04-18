@@ -107,6 +107,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
         'STRATEGICBOMBER',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0.2,
     Defense = {

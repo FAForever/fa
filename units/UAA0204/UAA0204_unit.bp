@@ -105,6 +105,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYSONAR',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0.1,
     Defense = {

@@ -115,6 +115,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYRADAR',
         'STRATEGICBOMBER',
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {
