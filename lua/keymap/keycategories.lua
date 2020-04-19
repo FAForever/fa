@@ -1,24 +1,26 @@
 -- defines help categories for key actions
 
 keyCategories = {
-    ['ui'] = "<LOC keymap_category_0000>UI",
-    ['selection'] = "<LOC keymap_category_0004>Selection",
-    ['camera'] = "<LOC keymap_category_0025>Camera",
-    ['orders'] = "<LOC keymap_category_0036>Orders",
-    ['game'] = "<LOC keymap_category_0079>Game",
-    ['chat'] = "<LOC keymap_category_0087>Chat",
-    ['debug'] = "<LOC keymap_category_0088>Debug",
-    ['user'] = "<LOC keymap_category_0090>User",
-    ['hotbuilding'] = "<LOC keymap_category_091>Hotbuilding",
-    ['hotbuildingExtra'] = "<LOC keymap_category_092>Hotbuilding - Extra keys",
-    ['none'] = "<LOC keymap_category_0089>Unassigned Actions",
-    ['mods'] = "<LOC keymap_category_0091>Mods",
+    ['ui'] = "UI",
+    ['selection'] = "Selection",
+    ['camera'] = "Camera",
+    ['orders'] = "Orders",
+    ['game'] = "Game",
+    ['chat'] = "Chat",
+    ['debug'] = "Debug",
+    ['user'] = "User",
+    ['hotbuilding'] = "Hotbuilding",
+    ['hotbuildingAlternative'] = "Alternative Hotbuilding",
+    ['hotbuildingExtra'] = "Hotbuilding - Extra keys",
+    ['none'] = "Unassigned Actions",
+    ['mods'] = "Mods",
 }
 
 keyCategoryOrder = {
     'orders',
     'selection',
     'hotbuilding',
+    'hotbuildingAlternative',
     'hotbuildingExtra',
     'camera',
     'ui',

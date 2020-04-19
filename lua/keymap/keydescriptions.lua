@@ -294,23 +294,45 @@ keyDescriptions = {
     ['lock_zoom'] = 'Lock the zoom to current level',
 
     -- Hotbuild
-    ['builders'] = 'build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith 
-    ['radars'] = 'build radars (+ perimeter & eye of Rhianne) + land scouts + air scouts',
-    ['shields'] = 'build shields + mobiles Shields & shield disruptors + shield boat',
-    ['tmd'] = 'build tactical missiles defense & strategic missile defense',
-    ['xp'] = 'build experimentals + mobile bomb + guided missile',
-    ['sonars'] = 'build sonars + transports + amphibious / hover tanks',
-    ['mass'] = 'build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith 
-    ['stealth'] = 'build steath fields & cybran T3 sonar + mobile stealth fields + counter intelligence boat',
-    ['pgen'] = 'build power generators / storage + snipers & Loyalist / titan & gattling / rocket bots & LABs + gunships',
-    ['templates'] = 'build templates + factory templates',
-    ['engystation'] = 'build engineers stations + field engineers',
-    ['defense'] = 'build point defenses + walls',
-    ['aa'] = 'build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 maa from Megalith 
-    ['torpedo'] = 'build torpedo defenses + torpedo bombers + submarines & torpedo boat',
-    ['arties'] = 'build static artilleries + mobile artilleries', -- also T3 arty from Megalith 
-    ['tml'] = 'build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers',
-    ['upgrades'] = 'build Upgrades',
+    ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',
+    ['sensors'] = '<LOC key_desc_0257>build sensors + T1 sub marines',
+    ['shields'] = '<LOC key_desc_0258>build shields/steath fields + LAB + Interceptors + Frigates',
+    ['tmd'] = '<LOC key_desc_0259>build Tactical Missiles Defense + T1 Tanks + T1 Bombers + Attack boat',
+    ['xp'] = '<LOC key_desc_0260>build experimentals + mobile T1 AA + T1 light Transports',
+    ['mobilearty'] = '<LOC key_desc_0261>build T1 artilleries + T1 light gunship',
+    ['mass'] = '<LOC key_desc_0262>build mass extractors + T2 Engineers',
+    ['massfab'] = '<LOC key_desc_0263>build mass fabricators + T2 Bots + T2 air fighters + T2 subs',
+    ['pgen'] = '<LOC key_desc_0264>build power generators + T2 Tanks + T2 Torpedo Bombers + T2 Destroyers',
+    ['templates'] = '<LOC key_desc_0265>build templates + T2 Hover Tanks + T2 Gunships + T2 Cruisers',
+    ['engystation'] = '<LOC key_desc_0266>build engineers stations + T2 Mobile AA + T2 Air Transports + T2 Boats',
+    ['mml'] = '<LOC key_desc_0267>build Mobile Missiles launchers + T2 Air Guided Missile (mercy)',
+    ['mobileshield'] = '<LOC key_desc_0268>build T2 Mobiles Shields and mobile Stealth fields',
+    ['fieldengy'] = '<LOC key_desc_0269>build UEF T2 Field Engineer',
+    ['defense'] = '<LOC key_desc_0270>build Point Defenses + walls + T3 Engineers',
+    ['aa'] = '<LOC key_desc_0271>build Anti Air + Air Staging Facilities + T3 Assault bots + Snipers + T3 Air scouts + T3 Subs',
+    ['torpedo'] = '<LOC key_desc_0272>build Torpedo defenses + T3 Heavy bots + ASF + Battleships',
+    ['arties'] = '<LOC key_desc_0273>build Artilleries defenses + T3 Strategic Bombers + Aircraft Carriers + Battlecruiser',
+    ['tml'] = '<LOC key_desc_0274>build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
+    ['upgrades'] = '<LOC key_desc_0275>build Upgrades + T3 Mobile Anti Air + T3 Air Transport + T3 torpedo bomber',
+
+    -- Alternative Hotbuild
+    ['alt_builders'] = 'build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith 
+    ['alt_radars'] = 'build radars (+ perimeter & eye of Rhianne) + land scouts + air scouts',
+    ['alt_shields'] = 'build shields + mobiles Shields & shield disruptors + shield boat',
+    ['alt_tmd'] = 'build tactical missiles defense & strategic missile defense',
+    ['alt_xp'] = 'build experimentals + mobile bomb + guided missile',
+    ['alt_sonars'] = 'build sonars + transports + amphibious / hover tanks',
+    ['alt_mass'] = 'build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith 
+    ['alt_stealth'] = 'build steath fields & cybran T3 sonar + mobile stealth fields + counter intelligence boat',
+    ['alt_pgen'] = 'build power generators / storage + snipers & Loyalist / titan & gattling / rocket bots & LABs + gunships',
+    ['alt_templates'] = 'build templates + factory templates',
+    ['alt_engystation'] = 'build engineers stations + field engineers',
+    ['alt_defense'] = 'build point defenses + walls',
+    ['alt_aa'] = 'build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 mobile anti air from Megalith 
+    ['alt_torpedo'] = 'build torpedo defenses + torpedo bombers + submarines & torpedo boat',
+    ['alt_arties'] = 'build static artilleries + mobile artilleries', -- also T3 arty from Megalith 
+    ['alt_tml'] = 'build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers',
+    ['alt_upgrades'] = 'build Upgrades',
 
     -- Extra
     ['land_factory'] = 'build Land Factory',
