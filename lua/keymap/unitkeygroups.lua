@@ -3,7 +3,185 @@
 -- TODO: Find a way to generate this table using categories or something enable mod compatibility
 
 unitkeygroups = {
+
+    -- hotbuild
     ["Builders"] = {
+        "Land_Factory",
+        "Air_Factory",
+        "Naval_Factory",
+        "Quantum_Gateway",
+        "T1_Engineer",
+        "url0301", -- sACUs
+        "ual0301",
+        "uel0301",
+        "xsl0301",
+    },
+    ["Sensors"] = {
+        "Omni_Sensor",
+        "Radar_System",
+        "Sonar_Platform",
+        "Sonar_System",
+        "Perimeter_Monitoring_System",
+        "Quantum_Optics_Facility",
+        "T1_Land_Scout",
+        "T1_Combat_Scout",
+        "T1_Air_Scout",
+        "T1_Attack_Submarine",
+    },
+    ["Shields"] = {
+        "Heavy_Shield_Generator",
+        "Shield_Generator",
+        "Stealth_Field_Generator",
+        "T1_Light_Assault_Bot",
+        "T1_Interceptor",
+        "T1_Frigate",
+    },
+    ["TMD"] = {
+        "Tactical_Missile_Defense",
+        "Strategic_Missile_Defense",
+        "T1_Tank",
+        "T1_Assault_Bot", -- Mantis
+        "T1_Attack_Bomber",
+        "T1_Attack_Boat", -- Aeon only
+    },
+    ["XP"] = {
+        "Experimental",
+        "T1_Mobile_Anti_Air_Gun",
+        "T1_Light_Air_Transport",
+    },
+    ["Mobilearty"] = {
+        "T1_Mobile_Light_Artillery",
+        "T1_Light_Gunship",
+    },
+    -- Second Row
+    ["Mass"] = {
+        "Mass_Extractor",
+        "T2_Engineer",
+    },
+    ["MassFab"] = {
+        "Mass_Fabricator",
+
+        "T2_Gatling_Bot",
+        "T2_Rocket_Bot",
+        "T2_Assault_Bot",
+
+        "T2_Fighter/Bomber",
+        "T2_Combat_Fighter",
+
+        "T2_Submarine_Hunter",
+        "T2_Torpedo_Boat",
+        "T2_Submarine_Killer",
+    },
+    ["Pgen"] = {
+        "Power_Generator",
+        "Hydrocarbon_Power_Plant",
+
+        "T2_Heavy_Tank",
+
+        "T2_Torpedo_Bomber",
+
+        "T2_Destroyer",
+    },
+    ["Templates"] = {
+        "_templates", -- Special :)
+
+        "T2_Hover_Tank",
+        "T2_Assault_Tank",
+        "T2_Amphibious_Tank",
+
+        "T2_Gunship",
+
+        "T2_Cruiser",
+    },
+    ["EngyStation"] = {
+        "Engineering_Station",
+
+        "T2_Mobile_Anti_Air_Cannon",
+        "T2_Mobile_AA_Flak_Artillery",
+
+        "T2_Air_Transport",
+
+        "T2_Counter_Intelligence_Boat",
+        "T2_Shield_Boat",
+    },
+    ["MML"] = {
+        "T2_Mobile_Missile_Launcher",
+        "T2_Guided_Missile",
+    },
+    ["MobileShield"] = {
+        "T2_Mobile_Shield_Generator",
+        "T2_Mobile_Stealth_Field_System",
+    },
+    ["FieldEngy"] = {
+        "T2_Field_Engineer",
+    },
+    -- Row 3 XCVBNM
+    ["Defense"] = {
+        "Heavy_Point_Defense",
+        "Point_Defense",
+        "Wall_Section",
+
+        "T3_Engineer",
+    },
+    ["AA"] = {
+        "Anti_Air",
+        "Air_Staging",
+
+        "T3_Sniper_Bot",
+        "url0303", -- Loyalist
+        "uel0303", -- Titan
+
+        "T3_Spy_Plane",
+
+        "T3_Strategic_Missile_Submarine",
+        "T3_Submarine_Hunter",
+    },
+    ["Torpedo"] = {
+        "Torpedo_Ambushing_System",
+        "Torpedo_Launcher",
+
+        "ual0303", -- Harbinger
+        "xrl0305", -- Brick
+        "xel0305", -- Percival
+        "xsl0303", -- Seraphim Tank
+
+        "T3_Air_Superiority_Fighter",
+
+        "T3_Battleship",
+    },
+    ["Arties"] = {
+        "Artillery_Installation",
+        "Heavy_Artillery_Installation",
+
+        "T3_Strategic_Bomber",
+
+        "T3_Mobile_Heavy_Artillery",
+
+        "T3_Aircraft_Carrier",
+        "T3_Battlecruiser",
+    },
+    ["TML"] = {
+        "Tactical_Missile_Launcher",
+        "Strategic_Missile_Launcher",
+
+        "T3_Mobile_Missile_Platform",
+        "T3_Shield_Disruptor",
+        "T3_Mobile_Shield_Generator",
+
+        "T3_Heavy_Gunship",
+        "T3_AA_Gunship",
+
+        "T3_Missile_Ship",
+    },
+    ["Upgrades"] = {
+        "_upgrade",
+        "T3_Mobile_AA",
+        "T3_Heavy_Air_Transport",
+        "T3_Torpedo_Bomber",
+    },
+    
+    -- alternative hotbuild
+    ["Alt_Builders"] = {
         "Land_Factory",
         "Air_Factory",
         "Naval_Factory",
@@ -18,7 +196,7 @@ unitkeygroups = {
         "uel0301",
         "xsl0301",
     },
-    ["Radars"] = {
+    ["Alt_Radars"] = {
         "Omni_Sensor",
         "Radar_System",
         "Perimeter_Monitoring_System",
@@ -30,7 +208,7 @@ unitkeygroups = {
         "T3_Spy_Plane",
         "T1_Air_Scout",
     },
-    ["Shields"] = {
+    ["Alt_Shields"] = {
         "Heavy_Shield_Generator",
         "Shield_Generator",
         
@@ -40,18 +218,18 @@ unitkeygroups = {
         
         "T2_Shield_Boat",
     },
-    ["TMD"] = {
+    ["Alt_TMD"] = {
         "Tactical_Missile_Defense",
         "Strategic_Missile_Defense",
     },
-    ["XP"] = {
+    ["Alt_XP"] = {
         "Experimental",
         
         "T2_Mobile_Bomb",
         
         "T2_Guided_Missile",
     },
-    ["Sonars"] = {
+    ["Alt_Sonars"] = {
         "Sonar_Platform",
         "Sonar_System",
 
@@ -63,8 +241,7 @@ unitkeygroups = {
         "T2_Assault_Tank",
         "T2_Amphibious_Tank",
     },
-    -- Second Row
-    ["Mass"] = {
+    ["Alt_Mass"] = {
         "Mass_Extractor",
         "Mass_Fabricator",
         
@@ -87,7 +264,7 @@ unitkeygroups = {
         "T2_Destroyer",
         "T1_Frigate",
     },
-    ["Stealth"] = {
+    ["Alt_Stealth"] = {
         "Stealth_Field_Generator",
         "urs0305", -- cybran sonar
         
@@ -95,7 +272,7 @@ unitkeygroups = {
         
         "T2_Counter_Intelligence_Boat",
     },
-    ["Pgen"] = {
+    ["Alt_Pgen"] = {
         "Power_Generator",
         "Hydrocarbon_Power_Plant",
         "Energy_Storage",
@@ -112,23 +289,22 @@ unitkeygroups = {
         "T2_Gunship",
         "T1_Light_Gunship",
     },
-    ["Templates"] = {
+    ["Alt_Templates"] = {
         "_templates", -- Special :)
 
         "_factory_templates", -- Special :)
     },
-    ["EngyStation"] = {
+    ["Alt_EngyStation"] = {
         "Engineering_Station",
 
         "T2_Field_Engineer",
     },
-    -- Row 3 XCVBNM
-    ["Defense"] = {
+    ["Alt_Defense"] = {
         "Heavy_Point_Defense",
         "Point_Defense",
         "Wall_Section",
     },
-    ["AA"] = {
+    ["Alt_AA"] = {
         "Anti_Air",
         "Air_Staging",
         
@@ -147,7 +323,7 @@ unitkeygroups = {
         "T2_Cruiser",
         "T1_Attack_Boat", -- Aeon only
     },
-    ["Torpedo"] = {
+    ["Alt_Torpedo"] = {
         "Torpedo_Ambushing_System",
         "Torpedo_Launcher",
         
@@ -161,7 +337,7 @@ unitkeygroups = {
         "T2_Submarine_Killer",
         "T1_Attack_Submarine",
     },
-    ["Arties"] = {
+    ["Alt_Arties"] = {
         "Heavy_Artillery_Installation",
         "Artillery_Installation",
 
@@ -169,7 +345,7 @@ unitkeygroups = {
         "xrl0005", -- T3 arty for Megalith
         "T1_Mobile_Light_Artillery",
     },
-    ["TML"] = {
+    ["Alt_TML"] = {
         "Tactical_Missile_Launcher",
         "Strategic_Missile_Launcher",
 
@@ -182,9 +358,11 @@ unitkeygroups = {
         "xss0202", -- sera cruiser
         "ues0202", -- uef cruiser
     },
-    ["Upgrades"] = {
+    ["Alt_Upgrades"] = {
         "_upgrade",
     },
+    
+    -- extra hotkeys
     ["Experimental"] = {
         -- Aeon
         "ual0401", -- Galactic Colossus
@@ -484,6 +662,7 @@ unitkeygroups = {
     ["Perimeter_Monitoring_System"] = {
         "xrb3301",
     },
+    -- units
     ["T2_Guided_Missile"] = {
     "daa0206",
     },
