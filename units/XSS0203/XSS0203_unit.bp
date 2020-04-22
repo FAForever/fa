@@ -349,9 +349,11 @@ UnitBlueprint {
             SlavedToBodyArcRange = 10,
             TargetCheckInterval = 1.5,
             TargetPriorities = {
+                'TECH2 LIGHTBOAT',
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'ANTINAVY',
                 'MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
@@ -462,7 +464,8 @@ UnitBlueprint {
             ReTargetOnMiss = true,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'NAVAL MOBILE',
+                'MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
