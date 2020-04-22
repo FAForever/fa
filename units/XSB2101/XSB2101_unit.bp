@@ -241,8 +241,12 @@ UnitBlueprint {
             ReTargetOnMiss = true,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'MOBILE',
+                'MOBILE EXPERIENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH1 ARTILLERIE',
+                'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
