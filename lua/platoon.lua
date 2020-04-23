@@ -1986,18 +1986,18 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     AssistBody = function(self)
-        local platoonUnits = self:GetPlatoonUnits()
-        local eng = platoonUnits[1]
-        eng.AssistPlatoon = self
         local aiBrain = self:GetBrain()
-        local assistData = self.PlatoonData.Assist
-        local platoonPos = self:GetPlatoonPosition()
-        local assistee = false
-        local assistingBool = false
         WaitTicks(5)
         if not aiBrain:PlatoonExists(self) then
             return
         end
+        local platoonUnits = self:GetPlatoonUnits()
+        local eng = platoonUnits[1]
+        eng.AssistPlatoon = self
+        local assistData = self.PlatoonData.Assist
+        local platoonPos = self:GetPlatoonPosition()
+        local assistee = false
+        local assistingBool = false
         if not eng.Dead then
             local guardedUnit = eng:GetGuardedUnit()
             if guardedUnit and not guardedUnit.Dead then
@@ -2117,28 +2117,9 @@ Platoon = Class(moho.platoon_methods) {
         local x,z = aiBrain:GetArmyStartPos()
         local cons = self.PlatoonData.Construction
         local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile
-
-        -- Old version of delaying the build of an experimental.
-        -- This was implemended but a depricated function from sorian AI. 
-        -- makes the same as the new DelayEqualBuildPlattons. Can be deleted if all platoons are rewritten to DelayEqualBuildPlattons
-        -- (This is also the wrong place to do it. Should be called from Buildermanager BEFORE the builder is selected)
-        if cons.T4 then
-            if not aiBrain.T4Building then
-                --LOG('EngineerBuildAI'..repr(cons))
-                aiBrain.T4Building = true
-                ForkThread(SUtils.T4Timeout, aiBrain)
-                --LOG('Building T4 uinit, delaytime started')
-            else
-                --LOG('BLOCK building T4 unit; aiBrain.T4Building = TRUE')
-                WaitTicks(1)
-                self:PlatoonDisband()
-                return
-            end
-        end
-
         local eng
         for k, v in platoonUnits do
-            if not v.Dead and EntityCategoryContains(categories.ENGINEER, v) then --DUNCAN - was construction
+            if not v.Dead and EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, v) then --DUNCAN - was construction
                 IssueClearCommands({v})
                 if not eng then
                     eng = v
@@ -2149,7 +2130,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if not eng or eng.Dead then
-            WaitTicks(1)
+            coroutine.yield(1)
             self:PlatoonDisband()
             return
         end
@@ -2183,7 +2164,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- if we have nothing to build, disband!
         if not cons.BuildStructures then
-            WaitTicks(1)
+            coroutine.yield(1)
             self:PlatoonDisband()
             return
         end
@@ -2359,7 +2340,7 @@ Platoon = Class(moho.platoon_methods) {
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
         elseif cons.AvoidCategory then
             relative = false
-            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager:GetLocationCoords()
+            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
             local cat = cons.AdjacencyCategory
             -- convert text categories like 'MOBILE AIR' to 'categories.MOBILE * categories.AIR'
             if type(cat) == 'string' then
@@ -2372,7 +2353,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                WaitTicks(1)
+                coroutine.yield(1)
                 self:PlatoonDisband()
                 return
             end
@@ -2381,7 +2362,7 @@ Platoon = Class(moho.platoon_methods) {
             table.insert(baseTmplList, baseTmpl)
         elseif cons.AdjacencyCategory then
             relative = false
-            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager:GetLocationCoords()
+            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
             local cat = cons.AdjacencyCategory
             -- convert text categories like 'MOBILE AIR' to 'categories.MOBILE * categories.AIR'
             if type(cat) == 'string' then
@@ -2390,7 +2371,7 @@ Platoon = Class(moho.platoon_methods) {
             local radius = (cons.AdjacencyDistance or 50)
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                WaitTicks(1)
+                coroutine.yield(1)
                 self:PlatoonDisband()
                 return
             end
@@ -2439,7 +2420,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     else
                         if aiBrain:PlatoonExists(self) then
-                            WaitTicks(1)
+                            coroutine.yield(1)
                             self:PlatoonDisband()
                             return
                         end
@@ -2449,15 +2430,13 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -- wait in case we're still on a base
-        if not eng.Dead then
-            local count = 0
-            while eng:IsUnitState('Attached') and count < 2 do
-                WaitSeconds(6)
-                count = count + 1
-            end
+        local count = 0
+        while not eng.Dead and eng:IsUnitState('Attached') and count < 2 do
+            coroutine.yield(60)
+            count = count + 1
         end
 
-        if not eng:IsUnitState('Building') then
+        if not eng.Dead and not eng:IsUnitState('Building') then
             return self.ProcessBuildCommand(eng, false)
         end
     end,
@@ -3555,33 +3534,17 @@ Platoon = Class(moho.platoon_methods) {
     --       nil
     -------------------------------------------------------
     WatchForNotBuilding = function(eng)
-        WaitTicks(5)
+        coroutine.yield(10)
         local aiBrain = eng:GetAIBrain()
 
-        --DUNCAN - Trying to stop commander leaving projects, also added moving as well.
-        while not eng.Dead and (eng.GoingHome or eng:IsUnitState("Building") or
-                  eng:IsUnitState("Attacking") or eng:IsUnitState("Repairing") or eng:IsUnitState("Guarding") or
-                  eng:IsUnitState("Reclaiming") or eng:IsUnitState("Capturing") or eng.ProcessBuild != nil
-                  or eng.UnitBeingBuiltBehavior or eng:IsUnitState("Moving") or eng:IsUnitState("Upgrading") or eng:IsUnitState("Enhancing")
-                 ) do
-            WaitSeconds(3)
-
-            --if eng.CDRHome then
-            --  LOG('*AI DEBUG: Commander waiting for building.')
-            --  eng:PrintCommandQueue()
-            --end
-            --if eng.GoingHome then
-            --  LOG('*AI DEBUG: Commander waiting for building: return home.')
-            --end
-            --if eng.UnitBeingBuiltBehavior then
-            --  LOG('*AI DEBUG: Commander waiting for building: unit being built.')
-            --end
+        while not eng.Dead
+            and eng.GoingHome
+            or eng.UnitBeingBuiltBehavior
+            or eng.ProcessBuild != nil
+            or not eng:IsIdleState()
+        do
+            coroutine.yield(30)
         end
-
-        --if not eng.CDRHome and not eng:IsIdleState() then LOG('Error in idlestate...' .. eng.Sync.id) end
-        --if eng.CDRHome then
-        --  LOG('*AI DEBUG: After Commander wait for building.')
-        --end
 
         eng.NotBuildingThread = nil
         if not eng.Dead and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
@@ -3605,22 +3568,14 @@ Platoon = Class(moho.platoon_methods) {
     --       nil (tail calls into a behavior function)
     -------------------------------------------------------
     ProcessBuildCommand = function(eng, removeLastBuild)
-        --DUNCAN - Trying to stop commander leaving projects
-        if not eng or eng.Dead or not eng.PlatoonHandle or eng.GoingHome or eng.UnitBeingBuiltBehavior or eng:IsUnitState("Upgrading") or eng:IsUnitState("Enhancing") or eng:IsUnitState("Guarding") then
-            if eng then eng.ProcessBuild = nil end
-            --LOG('*AI DEBUG: Commander skipping process build.')
+        if not eng or eng.Dead or not eng.PlatoonHandle then
             return
         end
-
-        if eng.CDRHome then
-            --LOG('*AI DEBUG: Commander starting process build...')
-        end
-
         local aiBrain = eng.PlatoonHandle:GetBrain()
+
         if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
-                --LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand top " .. eng.Sync.id)
-                --if eng.CDRHome then LOG('*AI DEBUG: Commander process build platoon disband...') end
+                --LOG("* AI-DEBUG: ProcessBuildCommand: Disbanding Engineer Platoon in ProcessBuildCommand top " .. eng.Sync.id)
                 if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist then
                     eng.PlatoonHandle:PlatoonDisband()
                 end
@@ -3631,24 +3586,27 @@ Platoon = Class(moho.platoon_methods) {
 
         -- it wasn't a failed build, so we just finished something
         if removeLastBuild then
+            --LOG('* AI-DEBUG: ProcessBuildCommand: table.remove(eng.EngineerBuildQueue, 1) removeLastBuild')
             table.remove(eng.EngineerBuildQueue, 1)
-        end
-
-        function BuildToNormalLocation(location)
-            return {location[1], 0, location[2]}
-        end
-
-        function NormalToBuildLocation(location)
-            return {location[1], location[3], 0}
         end
 
         eng.ProcessBuildDone = false
         IssueClearCommands({eng})
         local commandDone = false
         while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
+            if eng:IsUnitState('BlockCommandQueue') then
+                while not eng.Dead and eng:IsUnitState('BlockCommandQueue') do
+                    --LOG('* AI-DEBUG: ProcessBuildCommand: Unit BlockCommandQueue is true, delaying build')
+                    coroutine.yield(1)
+                end
+            end
             local whatToBuild = eng.EngineerBuildQueue[1][1]
-            local buildLocation = BuildToNormalLocation(eng.EngineerBuildQueue[1][2])
+            local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
             local buildRelative = eng.EngineerBuildQueue[1][3]
+            --LOG('* AI-DEBUG: ProcessBuildCommand: whatToBuild = '..repr(whatToBuild))
+            if not eng.NotBuildingThread then
+                eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
+            end
             -- see if we can move there first
             if AIUtils.EngineerMoveWithSafePath(aiBrain, eng, buildLocation) then
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
@@ -3656,25 +3614,14 @@ Platoon = Class(moho.platoon_methods) {
                     return
                 end
 
+                -- check to see if we need to reclaim or capture...
+                AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation)
+                    -- check to see if we can repair
+                AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
+                        -- otherwise, go ahead and build the next structure there
+                aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
                 if not eng.NotBuildingThread then
                     eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
-                end
-
-                local engpos = eng:GetPosition()
-                while not eng.Dead and eng:IsUnitState("Moving") and VDist2(engpos[1], engpos[3], buildLocation[1], buildLocation[3]) > 15 do
-                    WaitSeconds(2)
-                end
-
-                -- check to see if we need to reclaim or capture...
-                if not AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation) then
-                    -- check to see if we can repair
-                    if not AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation) then
-                        -- otherwise, go ahead and build the next structure there
-                        aiBrain:BuildStructure(eng, whatToBuild, NormalToBuildLocation(buildLocation), buildRelative)
-                        if not eng.NotBuildingThread then
-                            eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
-                        end
-                    end
                 end
                 commandDone = true
             else
@@ -3686,7 +3633,6 @@ Platoon = Class(moho.platoon_methods) {
         -- final check for if we should disband
         if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) <= 0 then
             if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) then
-                --LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand bottom " .. eng.Sync.id)
                 eng.PlatoonHandle:PlatoonDisband()
             end
             if eng then eng.ProcessBuild = nil end
@@ -5952,12 +5898,6 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         local aiBrain = self:GetBrain()
         local cons = self.PlatoonData.Construction
-
-        if cons.T4 and not aiBrain.T4Building then
-            aiBrain.T4Building = true
-            ForkThread(SUtils.T4Timeout, aiBrain)
-        end
-
         local platoonUnits = self:GetPlatoonUnits()
         local armyIndex = aiBrain:GetArmyIndex()
         local x,z = aiBrain:GetArmyStartPos()
@@ -5976,7 +5916,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if not eng or eng.Dead then
-            WaitTicks(1)
+            coroutine.yield(1)
             self:PlatoonDisband()
             return
         end
@@ -6009,7 +5949,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- if we have nothing to build, disband!
         if not cons.BuildStructures then
-            WaitTicks(1)
+            coroutine.yield(1)
             self:PlatoonDisband()
             return
         end
@@ -6183,12 +6123,12 @@ Platoon = Class(moho.platoon_methods) {
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
         elseif cons.AvoidCategory then
             relative = false
-            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager:GetLocationCoords()
+            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
             local cat = ParseEntityCategory(cons.AdjacencyCategory)
             local avoidCat = ParseEntityCategory(cons.AvoidCategory)
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                WaitTicks(1)
+                coroutine.yield(1)
                 self:PlatoonDisband()
                 return
             end
@@ -6197,11 +6137,11 @@ Platoon = Class(moho.platoon_methods) {
             table.insert(baseTmplList, baseTmpl)
         elseif cons.AdjacencyCategory then
             relative = false
-            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager:GetLocationCoords()
+            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
             local cat = ParseEntityCategory(cons.AdjacencyCategory)
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                WaitTicks(1)
+                coroutine.yield(1)
                 self:PlatoonDisband()
                 return
             end
@@ -6250,7 +6190,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     else
                         if aiBrain:PlatoonExists(self) then
-                            WaitTicks(1)
+                            coroutine.yield(1)
                             self:PlatoonDisband()
                             return
                         end
@@ -6263,12 +6203,12 @@ Platoon = Class(moho.platoon_methods) {
         if not eng.Dead then
             local count = 0
             while eng:IsUnitState('Attached') and count < 2 do
-                WaitSeconds(6)
+                coroutine.yield(60)
                 count = count + 1
             end
         end
 
-        if not eng:IsUnitState('Building') then
+        if not eng.Dead and not eng:IsUnitState('Building') then
             return self.ProcessBuildCommandSorian(eng, false)
         end
     end,

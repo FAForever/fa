@@ -310,7 +310,8 @@ function CommanderThread(cdr, platoon)
 
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr:IsUnitState("Upgrading") then
+        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
+        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
             if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
@@ -342,7 +343,8 @@ function CommanderThreadImproved(cdr, platoon)
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
         and not cdr:IsUnitState("Building") and not cdr:IsUnitState("Guarding")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
-        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing") then
+        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing")
+        and not cdr:IsUnitState('BlockCommandQueue') then
             -- if we have nothing to build...
             if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
                 -- check if the we have still a platton assigned to the CDR
@@ -834,6 +836,9 @@ end
 -- The shield, else false
 -------------------------------------------------------
 function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
+    if attackingUnit.Dead or targetUnit.Dead then
+        return false
+    end
     local aiBrain = attackingUnit:GetAIBrain()
     local tPos = targetUnit:GetPosition()
     local aPos = attackingUnit:GetPosition()
@@ -2025,7 +2030,8 @@ function CommanderThreadSorian(cdr, platoon)
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not cdr:IsUnitState("Building")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr.UnitBeingBuiltBehavior and not cdr:IsUnitState("Upgrading")
-        and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100) then
+        and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100)
+        and not cdr:IsUnitState('BlockCommandQueue') then
             if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
