@@ -1153,7 +1153,7 @@ function Nuke(aiBrain)
                         break
                     end
                 end
-                ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
+                aiBrain:ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
             end
             -- Keep track of old targets
             table.insert(oldTarget, target)

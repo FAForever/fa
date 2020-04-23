@@ -295,7 +295,7 @@ function ConditionalBuildSuccessful(conditionalUnit)
 
         -- Register death callback
         TriggerFile.CreateUnitDeathTrigger(function(unit)
-            ForkThread(function()
+            aiBrain:ForkThread(function()
                 WaitSeconds(waitTime)
                 ScenarioInfo.ConditionalBuildLocks[selectedBuild.name] = false
             end)
@@ -1156,7 +1156,7 @@ function BaseManagerNukeAI(platoon)
 end
 
 function AMUnlockBuildTimer(platoon)
-    ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
+    platoon:ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
 end
 
 function AMUnlockRatio(platoon)
@@ -1197,7 +1197,7 @@ function AMUnlockRatioTimer(platoon)
     local callback = function(unit)
                          platoon.LivingUnits = platoon.LivingUnits - 1
                          if platoon.Locked and platoon.PlatoonData.Ratio > (platoon.LivingUnits / platoon.MaxUnits) then
-                             ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
+                             platoon:ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
                              platoon.Locked = false
                          end
                      end

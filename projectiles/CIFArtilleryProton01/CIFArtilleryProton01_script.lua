@@ -13,7 +13,7 @@ CIFArtilleryProton01 = Class(CArtilleryProtonProjectile) {
         if targetType == 'Terrain' or targetType == 'Prop' then
             CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 20, 20, 350, 200, self.Army )  
         end
-        ForkThread(self.ForceThread, self, self:GetPosition())
+        self:ForkThread(self.ForceThread, self, self:GetPosition())
         self:ShakeCamera( 20, 3, 0, 1 )        
     end,
 

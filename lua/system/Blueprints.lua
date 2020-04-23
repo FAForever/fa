@@ -374,6 +374,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
             tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
+            tempBp.CategoriesHash[string.upper(name..'PRESET')] = true
             -- clean up some data that's not needed anymore
             tempBp.CategoriesHash['USEBUILDPRESETS'] = false
             tempBp.EnhancementPresets = nil

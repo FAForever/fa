@@ -2032,7 +2032,7 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
+                self:ForkThread(self.WaitForBuildAnimation, self, true)
             end
         end
 
@@ -2042,7 +2042,7 @@ ConstructionUnit = Class(MobileUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
         end
     end,
 
@@ -2176,7 +2176,7 @@ CommandUnit = Class(WalkingLandUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
         end
     end,
 

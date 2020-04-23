@@ -75,10 +75,10 @@ function ExecutePlan(aiBrain)
         end
 
         if aiBrain.Sorian then
-            ForkThread(UnitCapWatchThreadSorian, aiBrain)
-            ForkThread(behaviors.NukeCheck, aiBrain)
+            aiBrain:ForkThread(UnitCapWatchThreadSorian, aiBrain)
+            aiBrain:ForkThread(behaviors.NukeCheck, aiBrain)
         else
-            ForkThread(UnitCapWatchThread, aiBrain)
+            aiBrain:ForkThread(UnitCapWatchThread, aiBrain)
         end
     end
     if aiBrain.PBM then

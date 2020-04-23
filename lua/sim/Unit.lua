@@ -1787,11 +1787,11 @@ Unit = Class(moho.unit_methods) {
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
-        self:DestroyAllDamageEffects()
-        self:DestroyTopSpeedEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
+        if not self.BagsDestroyed then
+            self:DestroyAllBuildEffects()
+            self:DestroyAllTrashBags()
+            self.BagsDestroyed = true
+        end
 
         -- Stop any motion sounds we may have
         self:StopUnitAmbientSound('AmbientMove')
@@ -1841,7 +1841,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
-        self:PlayUnitSound('Destroyed')
         self:DestroyUnit(overkillRatio)
     end,
 
@@ -1852,6 +1851,7 @@ Unit = Class(moho.unit_methods) {
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
+        self:PlayUnitSound('Destroyed')
         self:Destroy()
     end,
 
@@ -1890,6 +1890,59 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    DestroyAllTrashBags = function(self)
+        -- Some bags should really be managed by their classes
+        -- but for mod compatibility reasons we delete them all here.
+        for _, v in self.EffectsBag or {} do
+            v:Destroy()
+        end
+        for k, v in self.ShieldEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.ReleaseEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.AmbientExhaustEffectsBag or {} do
+            v:Destroy()
+        end
+        for k, v in self.OmniEffectsBag or {} do
+            v:Destroy()
+        end
+        for k, v in self.AdjacencyBeamsBag or {} do
+            v.Trash:Destroy()
+            self.AdjacencyBeamsBag[k] = nil
+        end
+        for _, v in self.IntelEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.TeleportDestChargeBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.TeleportSoundChargeBag or {} do
+            v:Destroy()
+        end
+        for _, EffectsBag in self.DamageEffectsBag or {} do
+            for _, v in EffectsBag do
+                v:Destroy()
+            end
+        end
+        for _, v in self.IdleEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.TopSpeedEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.BeamExhaustEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.MovementEffectsBag or {} do
+            v:Destroy()
+        end
+        for _, v in self.TransportBeamEffectsBag or {} do
+            v:Destroy()
+        end
+    end,
+
     OnDestroy = function(self)
         self.Dead = true
 
@@ -1909,14 +1962,23 @@ Unit = Class(moho.unit_methods) {
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
-
-        self:DestroyAllBuildEffects()
-
+        -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
+        if not self.BagsDestroyed then
+            self:DestroyAllBuildEffects()
+            self:DestroyAllTrashBags()
+        end
+        
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
         end
 
         RemoveAllUnitEnhancements(self)
+
+        -- remove all callbacks from the unit
+        if self.EventCallbacks then
+            self.EventCallbacks = nil
+        end
+
         ChangeState(self, self.DeadState)
     end,
 
@@ -4165,8 +4227,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopRocking = function(self)
-        KillThread(self.StartRockThread)
-        self.StopRockThread = self:ForkThread(self.EndRockingThread)
+        if self.StartRockThread then
+            KillThread(self.StartRockThread)
+            self.StopRockThread = self:ForkThread(self.EndRockingThread)
+        end
     end,
 
     RockingThread = function(self)

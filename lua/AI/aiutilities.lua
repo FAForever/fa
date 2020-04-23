@@ -1524,7 +1524,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     repeat
-        WaitSeconds(2)
+        coroutine.yield(20)
         local allDead = true
         local transDead = true
         for k, v in units do
@@ -1572,11 +1572,20 @@ function UseTransports(units, transports, location, transportPlatoon)
     if table.getn(transports) ~= 0 then
         -- If no location then we have loaded transports then return true
         if location then
+            -- Adding Surface Height, so the transporter get not confused, because the target is under the map (reduces unload time)
+            location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
             local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
             if safePath then
+                local LastPos
                 for _, p in safePath do
                     IssueMove(transports, p)
+                    LastPos = p
                 end
+                IssueMove(transports, location)
+                IssueTransportUnload(transports, location)
+            else
+                IssueMove(transports, location)
+                IssueTransportUnload(transports, location)
             end
         else
             return true
@@ -1586,12 +1595,9 @@ function UseTransports(units, transports, location, transportPlatoon)
         return false
     end
 
-    -- Adding Surface Height, so thetransporter get not confused, because the target is under the map (reduces unload time)
-    location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
-    IssueTransportUnload(transports, location)
     local attached = true
     while attached do
-        WaitSeconds(2)
+        coroutine.yield(20)
         local allDead = true
         for _, v in transports do
             if not v.Dead then
@@ -1833,8 +1839,8 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
                 unit.ReclaimInProgress = true
                 IssueReclaim({eng}, unit)
             end
+            Reclaiming = true
         end
-        Reclaiming = true
     end
     -- reclaim rocks etc or we can't build mexes or hydros
     local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
@@ -1842,6 +1848,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
         for k,v in Reclaimables do
             if v.MaxMassReclaim and v.MaxMassReclaim > 0 or v.MaxEnergyReclaim and v.MaxEnergyReclaim > 0 then
                 IssueReclaim({eng}, v)
+                Reclaiming = true
             end
         end
     end
