@@ -1156,7 +1156,7 @@ function BaseManagerNukeAI(platoon)
 end
 
 function AMUnlockBuildTimer(platoon)
-    platoon:ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
+    ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
 end
 
 function AMUnlockRatio(platoon)
@@ -1197,7 +1197,7 @@ function AMUnlockRatioTimer(platoon)
     local callback = function(unit)
                          platoon.LivingUnits = platoon.LivingUnits - 1
                          if platoon.Locked and platoon.PlatoonData.Ratio > (platoon.LivingUnits / platoon.MaxUnits) then
-                             platoon:ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
+                             ForkThread(AMPlatoonHelperFunctions.UnlockTimer, platoon.PlatoonData.LockTimer, platoon.PlatoonData.PlatoonName)
                              platoon.Locked = false
                          end
                      end

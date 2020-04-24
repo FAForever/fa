@@ -90,7 +90,7 @@ BuilderGroup {
             if econThread then
                 KillThread(econThread)
             end
-            econThread = aiBrain:ForkThread(EconWatch, aiBrain)
+            econThread = aiBrain:ForkThread(EconWatch)
         end,
         OnStrategyDeactivate = function(self, aiBrain)
             Builders[self.BuilderName].Running = false

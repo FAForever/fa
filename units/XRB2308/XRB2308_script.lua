@@ -36,7 +36,7 @@ XRB2308 = Class(CStructureUnit) {
 
         
         if not self:IsIdleState() then --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
-            self:ForkThread(self.CreateNewHarmsWithDelay, self, armySelf, pos, spottedByArmy, fireState)
+            self:ForkThread(self.CreateNewHarmsWithDelay, armySelf, pos, spottedByArmy, fireState)
         else
             self:Destroy()
             
