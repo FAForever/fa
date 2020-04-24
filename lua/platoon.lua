@@ -1563,7 +1563,7 @@ Platoon = Class(moho.platoon_methods) {
                         WaitTicks(5)
                     end
 
-                    self:ForkThread(SPAI.LandAssaultWithTransports, self)
+                    self:ForkThread(SPAI.LandAssaultWithTransports)
                     break
                 else
                     local location = AIUtils.RandomLocation(aiBrain:GetArmyStartPos())

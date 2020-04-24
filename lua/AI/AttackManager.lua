@@ -304,9 +304,9 @@ AttackManager = Class({
                     if v.FormCallbacks then
                         for cbNum, callback in v.FormCallbacks do
                             if type(callback) == 'function' then
-                                self:ForkThread(callback, tempPlatoon)
+                                ForkThread(callback, tempPlatoon)
                             else
-                                self:ForkThread(import(callback[1])[callback[2]], tempPlatoon)
+                                ForkThread(import(callback[1])[callback[2]], tempPlatoon)
                             end
                             --LOG('*AM DEBUG: AM Master Platoon Form callback: ', repr(callback[2]), ' Builder Named: ', repr(v.BuilderName))
                         end

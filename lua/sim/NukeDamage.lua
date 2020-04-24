@@ -15,7 +15,7 @@ NukeAOE = Class() {
         if self.TotalTime == 0 then
             import('/lua/sim/DamageArea.lua').DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true, brain, army)
         else
-            brain:ForkThread(self.SlowNuke, self, instigator, pos)
+            ForkThread(self.SlowNuke, self, instigator, pos)
         end
     end,
 
