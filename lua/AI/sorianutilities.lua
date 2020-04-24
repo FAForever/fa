@@ -1190,24 +1190,6 @@ end
 --        nil
 -- -----------------------------------------------------
 function LaunchNukesTimed(aiBrain, nukesToFire, target)
-if aiBrain then
-    LOG('*** LaunchNukesTimed aiBrain ')
-    DebugArray(aiBrain)
-else
-    LOG('*** LaunchNukesTimed no arg1 ')
-end
-if nukesToFire then
-    LOG('*** LaunchNukesTimed nukesToFire ')
-    DebugArray(nukesToFire)
-else
-    LOG('*** LaunchNukesTimed no nukesToFire ')
-end
-if target then
-    LOG('*** LaunchNukesTimed target ')
-    DebugArray(target)
-else
-    LOG('*** LaunchNukesTimed no target ')
-end
     local nukes = {}
     for k,v in nukesToFire do
         local pos = v:GetPosition()
