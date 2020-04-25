@@ -1576,10 +1576,8 @@ function UseTransports(units, transports, location, transportPlatoon)
             location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
             local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
             if safePath then
-                local LastPos
                 for _, p in safePath do
                     IssueMove(transports, p)
-                    LastPos = p
                 end
                 IssueMove(transports, location)
                 IssueTransportUnload(transports, location)

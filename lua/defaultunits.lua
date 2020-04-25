@@ -2032,7 +2032,7 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
+                self:ForkThread(self.WaitForBuildAnimation, true)
             end
         end
 
