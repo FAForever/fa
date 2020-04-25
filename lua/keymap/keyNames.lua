@@ -167,4 +167,5 @@ keyNames = {
     ['FB'] = 'Zoom',
     ['FD'] = 'PA1',
     ['FE'] = 'OemClear',
+    ['E2'] = 'Chevron',
 }
