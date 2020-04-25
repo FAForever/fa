@@ -26,6 +26,7 @@ local signs = {
     ["NumStar"] = "*",
     ["NumSlash"] = "/",
     ["Quote"] = "'",
+    ["Chevron"] = "<",
 }
 
 -- Which colour do we make the label? Shift is not taken into account here
@@ -189,7 +190,7 @@ function getKeyTables()
         end
     end
 
-    -- Handle signs for uupgrades seperately
+    -- Handle signs for upgrades seperately
     if upgradeKey then
         if signs[upgradeKey.key] then
             upgradeKey.key = signs[upgradeKey.key]

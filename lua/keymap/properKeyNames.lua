@@ -167,4 +167,5 @@ properKeyNames = {
     ['Zoom'] = '<LOC properkeyname_0163>Zoom',
     ['PA1'] = '<LOC properkeyname_0164>PA1',
     ['OemClear'] = '<LOC properkeyname_0165>OemClear',
+    ['Chevron'] = '<LOC properkeyname_0166>Chevron',
 }
