@@ -1844,7 +1844,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
     if Reclaimables and table.getn( Reclaimables ) > 0 then
         for k,v in Reclaimables do
-            if v.MaxMassReclaim and v.MaxMassReclaim > 0 or v.MaxEnergyReclaim and v.MaxEnergyReclaim > 0 then
+            if v.MaxMassReclaim > 0 or v.MaxEnergyReclaim > 0 then
                 IssueReclaim({eng}, v)
                 Reclaiming = true
             end
