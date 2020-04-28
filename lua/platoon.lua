@@ -3589,12 +3589,6 @@ Platoon = Class(moho.platoon_methods) {
         IssueClearCommands({eng})
         local commandDone = false
         while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
-            if eng:IsUnitState('BlockCommandQueue') then
-                while not eng.Dead and eng:IsUnitState('BlockCommandQueue') do
-                    --LOG('* AI-DEBUG: ProcessBuildCommand: Unit BlockCommandQueue is true, delaying build')
-                    coroutine.yield(1)
-                end
-            end
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
             local buildRelative = eng.EngineerBuildQueue[1][3]
