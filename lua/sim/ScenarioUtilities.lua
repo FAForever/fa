@@ -335,7 +335,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
                 cdrUnit:HideBone(0, true)
-                ForkThread(CommanderWarpDelay, cdrUnit, 3)
+                ForkThread(CommanderWarpDelay, cdrUnit, 3, GetArmyBrain(strArmy))
             end
 
             local rotateOpt = ScenarioInfo.Options['RotateACU']
@@ -354,8 +354,10 @@ function CreateInitialArmyGroup(strArmy, createCommander)
     return tblGroup, cdrUnit
 end
 
-function CommanderWarpDelay(cdrUnit, delay)
-    cdrUnit:SetBlockCommandQueue(true)
+function CommanderWarpDelay(cdrUnit, delay, ArmyBrain)
+    if ArmyBrain.BrainType == 'Human' then
+        cdrUnit:SetBlockCommandQueue(true)
+    end
     WaitSeconds(delay)
     cdrUnit:PlayCommanderWarpInEffect()
 end
