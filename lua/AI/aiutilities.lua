@@ -1445,6 +1445,8 @@ function UseTransports(units, transports, location, transportPlatoon)
         return false
     end
 
+    IssueClearCommands(transports)
+
     for num, unit in transports do
         local id = unit.UnitId
         if not transSlotTable[id] then
