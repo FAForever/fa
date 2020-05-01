@@ -3537,7 +3537,7 @@ Platoon = Class(moho.platoon_methods) {
         coroutine.yield(10)
         local aiBrain = eng:GetAIBrain()
 
-        while not eng.Dead and (eng.GoingHome or eng.UnitBeingBuiltBehavior or eng.ProcessBuild != nil or not eng:IsIdleState()) do
+        while not eng.Dead and not eng.PlatoonHandle.UsingTransport and (eng.GoingHome or eng.UnitBeingBuiltBehavior or eng.ProcessBuild != nil or not eng:IsIdleState()) do
             coroutine.yield(30)
         end
 
