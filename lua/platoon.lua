@@ -3621,11 +3621,10 @@ Platoon = Class(moho.platoon_methods) {
 
         -- final check for if we should disband
         if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) <= 0 then
-            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) then
+            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport then
+                --LOG('* AI-DEBUG: ProcessBuildCommand: eng.PlatoonHandle:PlatoonDisband() 2')
                 eng.PlatoonHandle:PlatoonDisband()
             end
-            if eng then eng.ProcessBuild = nil end
-            return
         end
         if eng then eng.ProcessBuild = nil end
     end,
