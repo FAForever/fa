@@ -1,4 +1,4 @@
-Patch 3714 (20 April, 2020)
+Patch 3714 (3 May, 2020)
 ============================
 - Land
     - Tech 1 Land
@@ -244,6 +244,7 @@ Patch 3714 (20 April, 2020)
             - T3: 1.25
     - ACU won't survive an ACU explosion under 2500 hp by vetting anymore (veterancy is gained right after ACU explosion)
     - A bomb from a strat bomber no longer collides with ASF. 
+    - All mobile shields and land scouts now stop at an appropriate range from enemy units when using an attack move.
 
 ### Contributors
 - Strogo
