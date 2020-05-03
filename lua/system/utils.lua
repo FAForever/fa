@@ -524,6 +524,43 @@ function table.unique(t)
     return unique
 end
 
+-- flatten nested keys of a table into dot notation
+function table.flatten(t, ret, index)
+    if type(t) ~= 'table' then
+        ret[index] = t
+        return
+    end
+
+    ret = ret or {}
+    for k, v in t do
+        table.flatten(v, ret, index and (index .. '.' .. k) or k)
+    end
+
+    return ret
+end
+
+-- inflate a table with dot-notation into a multi-dimension table
+function table.inflate(t)
+    if type(t) ~= 'table' then return t end
+    local nested, curr = {}, nil
+
+    for k, v in pairs(t) do
+        local last_t, last_key
+
+        curr = nested
+        for key in string.gfind(k, '([^.]+)') do
+            key = tonumber(key) or key
+            curr[key] = curr[key] or {}
+            last_key, last_t = key, curr
+            curr = curr[key]
+        end
+
+        last_t[last_key] = table.inflate(v)
+    end
+
+    return nested
+end
+
 --- Returns items as a single string, separated by the delimiter
 function StringJoin(items, delimiter)
     local str = "";

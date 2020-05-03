@@ -30,7 +30,7 @@ OnSync = function()
     end
 
     if Sync.ObjectiveTimer then
-        if Sync.ObjectiveTimer != false then
+        if Sync.ObjectiveTimer ~= false then
             import('/lua/ui/game/timer.lua').SetTimer(Sync.ObjectiveTimer)
         else
             import('/lua/ui/game/timer.lua').ResetTimer()
@@ -83,19 +83,23 @@ OnSync = function()
     end
 
     if not table.empty(Sync.Score) then
-        import('/lua/ui/game/score.lua').currentScores = Sync.Score
-        if not Sync.FullScoreSync then
-            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
+        local score = table.inflate(Sync.Score)
+        import('/lua/ui/game/score.lua').currentScores = score
+
+        if Sync.FullScoreSync then
+            import('/lua/ui/game/scoreaccum.lua').OnFullSync(score)
+        else
+            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(score)
         end
     end
 
-    if Sync.FullScoreSync then
-        if not table.empty(Sync.ScoreAccum) then
-            import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
-        end
+    if not table.empty(Sync.ScoreHistory) then
+        local history = table.inflate(Sync.ScoreHistory)
+       
+        import('/lua/ui/game/scoreaccum.lua').scoreData.historical = history
     end
 
-    if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
+    if not table.empty(Sync.GameResult) and not import("/lua/ui/dialogs/eschandler.lua").isExiting then
         for _, gameResult in Sync.GameResult do
             local armyIndex, result = unpack(gameResult)
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
@@ -105,8 +109,9 @@ OnSync = function()
     end
 
     if Sync.StatsToSend then
-        local json = import('/lua/system/dkson.lua').json.encode({ stats = Sync.StatsToSend })
-        LOG('Sending stats: '..json)
+        local inflated = table.inflate(Sync.StatsToSend)
+        local json = import('/lua/system/dkson.lua').json.encode({ stats = inflated })
+        SPEW('Sending stats: '..json)
         GpgNetSend('JsonStats', json)
         Sync.StatsToSend = nil
     end
@@ -121,7 +126,7 @@ OnSync = function()
         end
     end
 
-    if Sync.Paused != PreviousSync.Paused then
+    if Sync.Paused ~= PreviousSync.Paused then
         import("/lua/ui/game/gamemain.lua").OnPause(Sync.Paused);
     end
 
@@ -146,7 +151,7 @@ OnSync = function()
         local isare = LOC('<LOC cheating_fragment_0000>is')
         local srcs = SessionGetCommandSourceNames()
         for k,v in ipairs(Sync.Cheaters) do
-            if names != '' then
+            if names ~= '' then
                 names = names .. ', '
                 isare = LOC('<LOC cheating_fragment_0001>are')
             end
@@ -221,7 +226,7 @@ OnSync = function()
         import('/lua/ui/game/objectives2.lua').RemovePingGroups(Sync.RemovePingGroups)
     end
 
-    if Sync.SetAlliedVictory != nil then
+    if Sync.SetAlliedVictory ~= nil then
         import('/lua/ui/game/diplomacy.lua').SetAlliedVictory(Sync.SetAlliedVictory)
     end
 
@@ -269,7 +274,7 @@ OnSync = function()
         import('/lua/ui/game/gamemain.lua').IsSavedGame = true
     end
 
-    if Sync.ChangeCameraZoom != nil then
+    if Sync.ChangeCameraZoom ~= nil then
         import('/lua/ui/game/gamemain.lua').SimChangeCameraZoom(Sync.ChangeCameraZoom)
     end
 end
