@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 28,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -259,7 +262,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 33,
+            MaxRadius = 26,
             RackBones = {
                 {
                     MuzzleBones = {

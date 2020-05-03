@@ -111,8 +111,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 1500,
-        BuildCostMass = 297,
-        BuildTime = 1320,
+        BuildCostMass = 290,
+        BuildTime = 1300,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -141,7 +141,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20,
+        VisionRadius = 22,
     },
     Interface = {
         HelpText = '<LOC url0202_help>Heavy Tank',
@@ -216,7 +216,7 @@ UnitBlueprint {
             FiringTolerance = 0,
             Label = 'MainGun',
             LeadTarget = false,
-            MaxRadius = 23,
+            MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             ProjectilesPerOnFire = 1,

@@ -44,6 +44,39 @@ URL0303 = Class(CWalkingLandUnit) {
             RedirectRateOfFire = bp.RedirectRateOfFire
         }
         self.Trash:Add(antiMissile)
+        self.ChargingInitiated = false
+        self.ChargingInProgress = false
+    end,
+
+    InitiateCharge = function(self)
+        if self.ChargingInitiated then return end
+
+        self.ChargingInitiated = true
+        local blueprint = self:GetBlueprint()
+        local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
+        self.Trash:Add(bufffx3)
+        WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
+
+        self.ChargingInProgress = true
+        self:SetWeaponEnabledByLabel('Disintigrator', false)
+        self:SetWeaponEnabledByLabel('HeavyBolter', false)
+        self:SetAccMult(blueprint.Physics.ChargeAccMult)
+        self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
+        -- EMP duration mult added in DoDeathWeapon 
+
+        local bufffx1 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
+        local bufffx2 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
+        self.Trash:Add(bufffx1)
+        self.Trash:Add(bufffx2)
+        StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)
+        WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
+        self:Kill()
+    end,
+
+    OnScriptBitSet = function(self, bit)
+        if bit == 7 then
+            self:ForkThread(self.InitiateCharge)
+        end
     end,
 
     DoDeathWeapon = function(self)
@@ -52,10 +85,14 @@ URL0303 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
         -- Now handle our special buff and FX
+        local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in original_bp do
             if v.Add.OnDeath then
                 bp = v
+            end
+            if self.ChargingInProgress then
+                bp.Duration = bp.DurationWhenCharging
             end
         end
 

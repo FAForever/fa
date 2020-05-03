@@ -783,11 +783,11 @@ UnitBlueprint {
         {
             Damage = 4000,
             DamageFriendly = true,
-            DamageRadius = 7,
+            DamageRadius = 6,
             DamageType = 'DeathExplosion',
             DisplayName = 'Death Weapon',
             DummyWeapon = true,
-            Label = 'DeathWeapon',
+            Label = 'SpiderDeath',
             WeaponCategory = 'Death',
         },
     },

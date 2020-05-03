@@ -11,6 +11,7 @@ local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
 local AANDepthChargeBombWeapon = aWeapons.AANDepthChargeBombWeapon
 local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
 local explosion = import('/lua/defaultexplosions.lua')
+local CzarShield = import('/lua/shield.lua').CzarShield
 
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
@@ -68,6 +69,17 @@ UAA0310 = Class(AirTransport) {
     OnFailedToBuild = function(self)
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
+    end,
+	
+    CreateShield = function(self, bpShield)
+        local bpShield = table.deepcopy(bpShield)
+        self:DestroyShield()
+
+        self.MyShield = CzarShield(bpShield, self)
+
+        self:SetFocusEntity(self.MyShield)
+        self:EnableShield()
+        self.Trash:Add(self.MyShield)
     end,
 
     IdleState = State {

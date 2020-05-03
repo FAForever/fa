@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 50, --RadarRadius
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -260,7 +263,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'LaserTurret',
-            MaxRadius = 25,
+            MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,

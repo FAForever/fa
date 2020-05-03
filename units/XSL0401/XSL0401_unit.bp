@@ -696,9 +696,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 10000,
+            Damage = 7000,
             DamageFriendly = true,
-            DamageRadius = 8,
+            DamageRadius = 6,
             DamageType = 'DeathExplosion',
             DisplayName = 'Collossus Death',
             DummyWeapon = true,

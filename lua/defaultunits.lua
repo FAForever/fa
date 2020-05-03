@@ -1784,6 +1784,45 @@ AirUnit = Class(MobileUnit) {
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
+    
+    
+    -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
+    -- the only difference is the `elseif other.Nuke...` condition
+    -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
+    OnCollisionCheck = function(self, other, firingWeapon)
+        if self.DisallowCollisions then
+            return false
+        end
+
+        if EntityCategoryContains(categories.PROJECTILE, other) then
+            if IsAlly(self:GetArmy(), other:GetArmy()) then
+                return other.CollideFriendly
+            elseif other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
+                self:Kill()
+                return false
+            end
+        end
+
+        -- Check for specific non-collisions
+        local bp = other:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        bp = self:GetBlueprint()
+        if bp.DoNotCollideList then
+            for _, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), other) then
+                    return false
+                end
+            end
+        end
+        return true
+    end,
 }
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
@@ -2282,16 +2321,17 @@ CommandUnit = Class(WalkingLandUnit) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
         
-        local bp = self:GetBlueprint().Economy
-        local energyCost, time
-        if bp then
-            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
-            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bp.TeleportTimeMod or 0.01)
-        end
-
+        local bp = self:GetBlueprint()
+        local bpEco = bp.Economy
         local teleDelay = bp.General.TeleportDelay
+        local energyCost, time
+
+        if bpEco then
+            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
+            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
+        end
 
         if teleDelay then
             energyCostMod = (time + teleDelay) / time
@@ -2456,23 +2496,6 @@ ACUUnit = Class(CommandUnit) {
         local aiBrain = self:GetAIBrain()
         aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
         aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
-    end,
-
-    OnKilledUnit = function(self, unitKilled, massKilled)
-        -- Adjust mass based on unit killed for ACU
-        if unitKilled.techCategory then
-            local techMultipliers = {
-                TECH1 = 1,
-                TECH2 = 0.5,
-                TECH3 = 0.333334,
-                SUBCOMMANDER = 0.3,
-                EXPERIMENTAL = 0.25,
-                COMMAND = 0.05,
-            }
-            massKilled = massKilled * (techMultipliers[unitKilled.techCategory] or 1)
-        end
-
-        CommandUnit.OnKilledUnit(self, unitKilled, massKilled)
     end,
 
     BuildDisable = function(self)

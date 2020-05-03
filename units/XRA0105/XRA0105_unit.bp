@@ -321,7 +321,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Laser_Muzzle',
             TurretDualManipulators = false,
             TurretPitch = -20,
-            TurretPitchRange = 45,
+            TurretPitchRange = 60,
             TurretPitchSpeed = 360,
             TurretYaw = 0,
             TurretYawRange = 180,

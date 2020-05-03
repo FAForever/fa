@@ -367,6 +367,15 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
     local floor = 0
+    local ceil = 0
+    -- Dynamic ceilings with fallback values for sera regen field
+    local ceilings = {
+        TECH1 = 10,
+        TECH2 = 15,
+        TECH3 = 25,
+        EXPERIMENTAL = 40,
+        SUBCOMMANDER = 30
+    }
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
@@ -378,6 +387,17 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         if v.Floor then
             floor = v.Floor
         end
+
+        -- Take regen values from bp, keys have to match techCategory options
+        if v.BPCeilings then
+            for k_, v_ in ceilings do
+                if v.BPCeilings[k_] then
+                    ceilings[k_] = v.BPCeilings[k_]
+                end
+            end
+        end
+
+        ceil = ceilings[unit.techCategory]
 
         if v.Mult then
             if affectType == 'Regen' then
@@ -391,7 +411,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
                     for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), v.Ceil or 999999)
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
                     end
                 end
             else

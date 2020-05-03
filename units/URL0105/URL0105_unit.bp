@@ -190,6 +190,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER1ENGINEER CYBRAN',
         },
+        MaxBuildDistance = 5,
         StorageEnergy = 0,
         StorageMass = 10,
         TeleportEnergyMod = 0.15,

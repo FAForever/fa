@@ -222,7 +222,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 75,
             MuzzleVelocityReduceDistance = 800,
-            ProjectileId = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_proj.bp',
+            ProjectileId = '/projectiles/CIFArtilleryProton02/CIFArtilleryProton02_proj.bp',
             ProjectileLifetime = 120,
             ProjectilesPerOnFire = 1,
             RackBones = {

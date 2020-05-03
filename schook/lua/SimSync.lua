@@ -137,14 +137,15 @@ function FloatingEntityText(entityId, text)
     end
 end
 
-function StartCountdown(entityId)
+function StartCountdown(entityId, duration)
+    cdDuration = duration or 5
     if not entityId then
         WARN('Trying to start countdown text with no entityId.')
         return false
     else
         if GetEntityById(entityId).Army == GetFocusArmy() then
             if not Sync.StartCountdown then Sync.StartCountdown = {} end
-            table.insert(Sync.StartCountdown, {entity = entityId})
+            table.insert(Sync.StartCountdown, {entity = entityId, duration = cdDuration})
         end
     end
 end
