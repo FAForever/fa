@@ -113,8 +113,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
-            self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
-            self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
+            self:ForkThread(self.InitialAIThread)
 
             self.PlatoonNameCounter = {}
             self.PlatoonNameCounter['AttackForce'] = 0
@@ -758,6 +757,13 @@ AIBrain = Class(moho.aibrain_methods) {
             self:ForkThread(self.EvaluateAIThread)
         end
         self.ConstantEval = eval
+    end,
+
+    InitialAIThread = function(self)
+        -- delay the AI so it can't reclaim the start area before it's cleared from the ACU landing blast.
+        WaitTicks(30)
+        self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
+        self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
     end,
 
     EvaluateAIThread = function(self)
