@@ -412,16 +412,6 @@ StructureUnit = Class(Unit) {
 
     end,
 
-    -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
-    -- will time out over the time spec'd or 300 seconds.
-    OnDestroy = function(self)
-        Unit.OnDestroy(self)
-        local orient = self.TarmacBag.Orientation
-        local currentBP = self.TarmacBag.CurrentBP
-        self:DestroyTarmac()
-        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
-    end,
-
     OnKilled = function(self, instigator, type, overkillRatio)
         local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
         if scus[1] then
@@ -432,6 +422,12 @@ StructureUnit = Class(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
+        -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
+        -- will time out over the time spec'd or 300 seconds.
+        local orient = self.TarmacBag.Orientation
+        local currentBP = self.TarmacBag.CurrentBP
+        self:DestroyTarmac()
+        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
     CheckRepairersForRebuild = function(self, wreckage)
