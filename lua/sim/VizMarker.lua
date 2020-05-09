@@ -26,19 +26,19 @@ VizMarker = Class(Entity) {
     OnCreate = function(self)
         Entity.OnCreate(self)
         Warp(self, Vector(self.X, 0, self.Z))
-        if self.Omni != false then
+        if self.Omni then
             self:InitIntel(self.Army, 'Omni', self.Radius)
             self:EnableIntel('Omni')
         end
-        if self.Radar != false then
+        if self.Radar then
             self:InitIntel(self.Army, 'Radar', self.Radius)
             self:EnableIntel('Radar')
         end
-        if self.Vision != false then
+        if self.Vision then
             self:InitIntel(self.Army, 'Vision', self.Radius)
             self:EnableIntel('Vision')
         end
-        if self.WaterVision != false then
+        if self.WaterVision then
             self:InitIntel(self.Army, 'WaterVision', self.Radius)
             self:EnableIntel('WaterVision')
         end
