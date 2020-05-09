@@ -29,7 +29,10 @@ function RemoteViewing(SuperClass)
         OnKilled = function(self, instigator, type, overkillRatio)
             SuperClass.OnKilled(self, instigator, type, overkillRatio)
             if self.RemoteViewingData.Satellite then
+                self.RemoteViewingData.Satellite:DisableIntel('Omni')
+                self.RemoteViewingData.Satellite:DisableIntel('Radar')
                 self.RemoteViewingData.Satellite:DisableIntel('Vision')
+                self.RemoteViewingData.Satellite:DisableIntel('WaterVision')
                 self.RemoteViewingData.Satellite:Destroy()
             end
             self:SetMaintenanceConsumptionInactive()
@@ -84,6 +87,7 @@ function RemoteViewing(SuperClass)
                         Omni = false,
                         Radar = false,
                         Vision = true,
+                        WaterVision = false,
                         Army = self:GetAIBrain():GetArmyIndex(),
                     }
                     self.RemoteViewingData.Satellite = VizMarker(spec)
@@ -92,7 +96,10 @@ function RemoteViewing(SuperClass)
                     -- Move and reactivate old visible area
                     if not self.RemoteViewingData.Satellite:BeenDestroyed() then
                         Warp( self.RemoteViewingData.Satellite, self.RemoteViewingData.VisibleLocation )
+                        self.RemoteViewingData.Satellite:EnableIntel('Omni')
+                        self.RemoteViewingData.Satellite:EnableIntel('Radar')
                         self.RemoteViewingData.Satellite:EnableIntel('Vision')
+                        self.RemoteViewingData.Satellite:EnableIntel('WaterVision')
                     end
                 end
                 -- monitor resources
@@ -108,7 +115,10 @@ function RemoteViewing(SuperClass)
             if self.RemoteViewingData.DisableCounter > 1 then return end
             -- disable vis entity and monitor resources
             if not self:IsDead() and self.RemoteViewingData.Satellite then
+                self.RemoteViewingData.Satellite:DisableIntel('Omni')
+                self.RemoteViewingData.Satellite:DisableIntel('Radar')
                 self.RemoteViewingData.Satellite:DisableIntel('Vision')
+                self.RemoteViewingData.Satellite:DisableIntel('WaterVision')
             end
         end,
 
