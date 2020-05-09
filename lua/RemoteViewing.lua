@@ -88,7 +88,7 @@ function RemoteViewing(SuperClass)
                         Radar = false,
                         Vision = true,
                         WaterVision = true,
-                        Army = self:GetAIBrain():GetArmyIndex(),
+                        Army = self.Army,
                     }
                     self.RemoteViewingData.Satellite = VizMarker(spec)
                     self.Trash:Add(self.RemoteViewingData.Satellite)
