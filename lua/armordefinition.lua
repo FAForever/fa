@@ -55,14 +55,6 @@ armordefinition = {
     },
     {
         # Armor Type name
-        'FireBeetle',
-
-        # Armor Definition
-        'Normal 1.0',
-        'FireBeetleExplosion 0.0',
-    },
-    {
-        # Armor Type name
         'ASF',
 
         # Armor Definition
