@@ -117,7 +117,7 @@ UnitBlueprint {
     CollisionOffsetY = 0.9,
     Defense = {
         AirThreatLevel = 50,
-        ArmorType = 'Light',
+        ArmorType = 'Experimental',
         EconomyThreatLevel = 0,
         Health = 90000,
         MaxHealth = 90000,
