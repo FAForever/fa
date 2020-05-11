@@ -55,6 +55,16 @@ armordefinition = {
     },
     {
         # Armor Type name
+        'ExperimentalStructure',
+
+        # Armor Definition
+        'Normal 1.0',
+        'Overcharge 0.25',
+        'Deathnuke 0.032',
+        'ExperimentalFootfall 0.0',
+    },
+    {
+        # Armor Type name
         'ASF',
 
         # Armor Definition
