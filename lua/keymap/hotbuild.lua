@@ -27,6 +27,9 @@ local cycleButtons = {}
 local oldSelection
 
 local modifiersKeys = {}
+local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+local oldHandleEvent = worldview.HandleEvent
+
 
 function initCycleButtons(values)
     local buttonH = 48
@@ -250,6 +253,43 @@ function availableTemplate(allTemplates,buildable)
     return effectiveTemplates, effectiveIcons
 end
 
+function factoryHotkey(units, count)
+    CommandMode.StartCommandMode("build", {name = ''})
+    worldview.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if event.Modifiers.Left then
+                if type(units) == "string" then
+                    if IsKeyDown("Shift") then
+                        count = 5
+                    end
+                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", units, count)
+                    count = 1
+                    factoryHotkey(units, count)
+                else
+                    for _, unit in units do
+                        local v = unit.id
+                        local count = unit.count
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                    end
+                    worldview.HandleEvent = oldHandleEvent(self, event)
+                end
+            else
+                worldview.HandleEvent = oldHandleEvent(self, event)
+            end
+        end
+    end
+end
+
+function hideCycleMap()
+    if (cycleThread) then
+        KillThread(cycleThread)
+    end
+
+    cycleMap:SetNeedsFrameUpdate(false)
+    cycleMap.OnFrame = function(self, elapsedTime) end
+    cycleMap:Hide()
+    cycleMap:SetAlpha(1, true)
+end
 
 -- The actual key action callback, called each time a 'Hotbuild' category action is activated
 function buildAction(name)
@@ -349,23 +389,8 @@ function buildActionFactoryTemplate()
             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
         end
     else
-        CommandMode.StartCommandMode("build", {name = ''})
-        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
-        local oldHandleEvent = worldview.HandleEvent
-        worldview.HandleEvent = function(self, event)
-            if event.Type == 'ButtonPress' then
-                if event.Modifiers.Middle then
-                    for _, units in selectedTemplate do
-                        local v = units.id
-                        local count = units.count
-                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
-                    end
-                elseif event.Modifiers.Left then
-                    CommandMode.EndCommandMode(true)
-                end
-            end
-        end
-    end 
+        factoryHotkey(selectedTemplate)
+    end
 end
 
 -- Some of the work here is redundant when cycle_preview is disabled
@@ -474,18 +499,7 @@ function buildActionTemplate(modifier)
     end
 end
 
-function hideCycleMap()
-    if (cycleThread) then
-        KillThread(cycleThread)
-    end
-
-    cycleMap:SetNeedsFrameUpdate(false)
-    cycleMap.OnFrame = function(self, elapsedTime) end
-    cycleMap:Hide()
-    cycleMap:SetAlpha(1, true)
-end
-
-function buildActionUnit(name, modifier)    
+function buildActionUnit(name, modifier)
     local values = unitkeygroups[name]
 
     if table.find(values, "_factory_templates") then
@@ -547,18 +561,7 @@ function buildActionUnit(name, modifier)
     if maxPos == 1 then
         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
     else
-        CommandMode.StartCommandMode("build", {name = ''})
-        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
-        local oldHandleEvent = worldview.HandleEvent
-        worldview.HandleEvent = function(self, event)
-            if event.Type == 'ButtonPress' then
-                if event.Modifiers.Middle then
-                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
-                elseif event.Modifiers.Left then
-                    CommandMode.EndCommandMode(true)
-                end
-            end
-        end
+        factoryHotkey(unit, count)
     end 
 end
 
