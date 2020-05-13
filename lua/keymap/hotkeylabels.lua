@@ -25,9 +25,9 @@ local signs = {
     ["NumStar"] = "*",
     ["NumSlash"] = "/",
     ["Quote"] = "'",
-    ["LeftBracket"] = "[",
+    ["LeftBracket"] = "[", -- this key is the rightbracket for azerty
     ["RightBracket"] = "]",
-    ["Chevron"] = "<",
+    ["Chevron"] = "<", -- added for french keyboard
 }
 
 -- Which colour do we make the label? Shift is not taken into account here
