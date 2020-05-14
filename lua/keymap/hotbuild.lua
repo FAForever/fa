@@ -173,7 +173,7 @@ function init()
 end
 
 -- UI for the cycle
-function hotbuildCyclePreview()
+function hotbuildCyclePreview(maxPos, factoryFlag)
     local options = Prefs.GetFromCurrentProfile('options')
     if options.hotbuild_cycle_preview == 1 then
         -- Highlight the active button
@@ -187,17 +187,19 @@ function hotbuildCyclePreview()
 
         cycleMap:Show()
         -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = stayTime
-            
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
+        if not factoryFlag or maxPos == 1 then
+            cycleThread = ForkThread(function()
+                local stayTime = options.hotbuild_cycle_reset_time / 2000.0
+                local fadeTime = stayTime
+                
+                WaitSeconds(stayTime)
+                if not cycleMap:IsHidden() then
+                    Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+                end
+                WaitSeconds(fadeTime)
+                cyclePos = 0
+            end)
+        end
     else
         cycleThread = ForkThread(function()
             WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
@@ -272,9 +274,19 @@ function factoryHotkey(units, count)
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
                     end
                     worldview.HandleEvent = oldHandleEvent(self, event)
+                    cycleThread = ForkThread(function()
+                        local options = Prefs.GetFromCurrentProfile('options')
+                        local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+                        Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+                    end)
                 end
             else
                 worldview.HandleEvent = oldHandleEvent(self, event)
+                cycleThread = ForkThread(function()
+                    local options = Prefs.GetFromCurrentProfile('options')
+                    local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+                    Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+                end)
             end
         end
     end
@@ -353,6 +365,7 @@ end
 
 function buildActionFactoryTemplate()
     local options = Prefs.GetFromCurrentProfile('options')
+    local factoryFlag = true
 
     -- Reset everything that could be fading or running
     hideCycleMap()
@@ -377,7 +390,7 @@ function buildActionFactoryTemplate()
     
     cycleUnits(maxPos, '_factory_templates', effectiveIcons, selection)
     
-    hotbuildCyclePreview()
+    hotbuildCyclePreview(maxPos, factoryFlag)
     
     local template = effectiveTemplates[cyclePos]
     local selectedTemplate = template.templateData
@@ -501,6 +514,7 @@ end
 
 function buildActionUnit(name, modifier)
     local values = unitkeygroups[name]
+    local factoryFlag = true
 
     if table.find(values, "_factory_templates") then
         return buildActionFactoryTemplate(modifier)
@@ -554,7 +568,7 @@ function buildActionUnit(name, modifier)
     
     cycleUnits(maxPos, name, effectiveValues, selection)
     
-    hotbuildCyclePreview()
+    hotbuildCyclePreview(maxPos, factoryFlag)
     
     local unit = effectiveValues[cyclePos]
     
