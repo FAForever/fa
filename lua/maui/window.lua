@@ -433,7 +433,7 @@ Window = Class(Group) {
         parent.Height.OnDirty = function(var)
             if self.Bottom() > parent.Bottom() then
                 local Height = math.min(self.Height(), parent.Height())
-                self.Bottom:Set(parent.Bottom)
+                self.Bottom:Set(parent.Bottom())
                 self.Top:Set(self.Bottom() - Height)
             end
             if OldHeightOnDirty then
@@ -444,7 +444,7 @@ Window = Class(Group) {
         parent.Width.OnDirty = function(var)
             if self.Right() > parent.Right() then
                 local Width = math.min(self.Width(), parent.Width())
-                self.Right:Set(parent.Right)
+                self.Right:Set(parent.Right())
                 self.Left:Set(self.Right() - Width)
             end
             if OldWidthOnDirty then
