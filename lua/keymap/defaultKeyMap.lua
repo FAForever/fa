@@ -139,7 +139,7 @@ defaultKeyMap = {
     ['Shift-G']             = 'shift_spreadattack',
 
     ['B']                   = 'toggle_build_mode',
-    ['Alt-R']               = 'toggle_reclaim_labels',
+    ['Alt-Slash']           = 'toggle_reclaim_labels',
 
     ['Z']                   = 'pause_unit',
 
@@ -162,7 +162,7 @@ defaultKeyMap = {
 debugKeyMap = {
     ['Ctrl-Alt-P']          = 'debug_navpath',
     ['Alt-F2']              = 'debug_create_unit',
-    ['Alt-T']               = 'debug_teleport',
+    ['Alt-Z']               = 'debug_teleport',
     ['Alt-A']               = 'debug_run_opponent_AI',
     ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
@@ -192,17 +192,17 @@ debugKeyMap = {
     ['Ctrl-Alt-W']          = 'debug_render_wireframe',
     ['Ctrl-Shift-W']        = 'debug_weapons',
     ['Ctrl-Alt-O']          = 'debug_grid',
-    ['Alt-Q']               = 'debug_show_focus_ui_control',
-    ['Alt-W']               = 'debug_dump_focus_ui_control',
-    ['Alt-D']               = 'debug_dump_ui_controls',
-    ['Alt-V']               = 'debug_skeletons',
-    ['Alt-B']               = 'debug_bones',
+    ['Alt-P']               = 'debug_show_focus_ui_control',
+    ['Alt-O']               = 'debug_dump_focus_ui_control',
+    ['Alt-J']               = 'debug_dump_ui_controls',
+    ['Alt-I']               = 'debug_skeletons',
+    ['Alt-K']               = 'debug_bones',
 
     ['Ctrl-Shift-X']        = 'debug_redo_console_command',
     ['Ctrl-Shift-C']        = 'debug_copy_units',
     ['Ctrl-Shift-V']        = 'debug_paste_units',
 
-    ['Alt-N']               = 'debug_nodamage',
+    ['Alt-Q']               = 'debug_nodamage',
     ['Ctrl-Alt-E']          = 'debug_show_emmitter_window',
     ['Ctrl-Alt-Z']          = 'debug_sally_shears',
     ['Ctrl-Shift-Alt-C']    = 'debug_collision',
