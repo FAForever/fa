@@ -213,7 +213,7 @@ function cycleUnits(maxPos, name, effectiveIcons, selection, modifier)
     if cycleLastName == name and cycleLastMaxPos == maxPos and oldSelection == selection[1] then
         if modifier == 'Alt' then
             cyclePos = cyclePos - 1
-            if cyclePos == 0 then
+            if cyclePos < 1 then
                 cyclePos = maxPos
             end
         else
@@ -369,7 +369,7 @@ function buildActionBuilding(name, modifier)
     CommandMode.StartCommandMode("build", {name = cmd})
 end
 
-function buildActionFactoryTemplate()
+function buildActionFactoryTemplate(modifier)
     local options = Prefs.GetFromCurrentProfile('options')
     local factoryFlag = true
 
