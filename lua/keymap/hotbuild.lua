@@ -208,12 +208,19 @@ function hotbuildCyclePreview(maxPos, factoryFlag)
     end
 end
 
-function cycleUnits(maxPos, name, effectiveIcons, selection)
+function cycleUnits(maxPos, name, effectiveIcons, selection, modifier)
     -- Check if the selection/key has changed
     if cycleLastName == name and cycleLastMaxPos == maxPos and oldSelection == selection[1] then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
+        if modifier == 'Alt' then
+            cyclePos = cyclePos - 1
+            if cyclePos == 0 then
+                cyclePos = maxPos
+            end
+        else
+            cyclePos = cyclePos + 1
+            if cyclePos > maxPos then
+                cyclePos = 1
+            end
         end
     else
         initCycleButtons(effectiveIcons)
@@ -308,10 +315,9 @@ function buildAction(name)
     local modifier = ""
     if IsKeyDown("Shift") then
         modifier = "Shift"
-    elseif IsKeyDown("Alt") then
+    elseif IsKeyDown("MENU") then -- IsKeyDown("Alt") doesn't work, engine error
         modifier = "Alt"
     end
-
     local selection = GetSelectedUnits()
     if selection then
         -- If current selection is engineer or commander
@@ -354,7 +360,7 @@ function buildActionBuilding(name, modifier)
         return
     end
     
-    cycleUnits(maxPos, name, effectiveValues, selection)
+    cycleUnits(maxPos, name, effectiveValues, selection, modifier)
 
     hotbuildCyclePreview()
 
@@ -388,7 +394,7 @@ function buildActionFactoryTemplate()
         return
     end
     
-    cycleUnits(maxPos, '_factory_templates', effectiveIcons, selection)
+    cycleUnits(maxPos, '_factory_templates', effectiveIcons, selection, modifier)
     
     hotbuildCyclePreview(maxPos, factoryFlag)
     
@@ -476,7 +482,7 @@ function buildActionTemplate(modifier)
         return
     end
     
-    cycleUnits(maxPos, '_templates', effectiveIcons, selection)
+    cycleUnits(maxPos, '_templates', effectiveIcons, selection, modifier)
 
     hotbuildCyclePreview()
 
@@ -523,20 +529,6 @@ function buildActionUnit(name, modifier)
     -- Reset everything that could be fading or running
     hideCycleMap()
     
-    -- Try to delete old units except for the one currently in construction
-    if modifier == 'Alt' then
-        local currentCommandQueue = Construction.getCurrentCommandQueue()
-        if currentCommandQueue then
-            for index = table.getn(currentCommandQueue), 1, -1 do
-                local count = currentCommandQueue[index].count
-                if index == 1 then
-                    count = count - 1
-                end
-                DecreaseBuildCountInQueue(index, count)
-            end
-        end
-    end
-
     for i, value in values do
         if value == '_upgrade' and buildActionUpgrade() then
             return
@@ -566,7 +558,7 @@ function buildActionUnit(name, modifier)
         return
     end
     
-    cycleUnits(maxPos, name, effectiveValues, selection)
+    cycleUnits(maxPos, name, effectiveValues, selection, modifier)
     
     hotbuildCyclePreview(maxPos, factoryFlag)
     
