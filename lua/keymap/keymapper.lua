@@ -253,14 +253,25 @@ function GenerateHotbuildModifiers()
     local modifiers = {}
 
     for key, info in keyDetails do
-        if info.action["category"] == "hotbuilding" then
+        local cat = info.action["category"]
+        if cat == "hotbuilding" or cat == "hotbuildingAlternative" or cat == "hotbuildingExtra" then
             if key ~= nil then
-                local modKey = "Shift-" .. key
-                local modBinding = keyDetails[modKey]
-                if not modBinding then
-                    modifiers[modKey] =  info.action
+                local shiftModKey = "Shift-" .. key
+                local altModKey = "Alt-" .. key
+                local shiftModBinding = keyDetails[shiftModKey]
+                local altModBinding = keyDetails[altModKey]
+                if not shiftModBinding and not altModBinding then
+                    modifiers[shiftModKey] =  info.action
+                    modifiers[altModKey] =  info.action
+                elseif not shiftModBinding then
+                    modifiers[shiftModKey] =  info.action
+                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                elseif not altModBinding then
+                    modifiers[altModKey] =  info.action
+                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
                 else
-                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
+                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
+                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
                 end
             end
         end
