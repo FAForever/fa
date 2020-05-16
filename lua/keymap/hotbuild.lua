@@ -320,8 +320,8 @@ function buildAction(name)
     end
     local selection = GetSelectedUnits()
     if selection then
-        -- If current selection is engineer or commander
-        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE or categories.ENGINEER - categories.STRUCTURE, selection)) > 0 then
+        -- If current selection is engineer or commander or megalith
+        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) > 0 or table.getsize(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN, selection)) > 0 then
             buildActionBuilding(name, modifier)
         else -- Buildqueue or normal applying all the command
             buildActionUnit(name, modifier)
