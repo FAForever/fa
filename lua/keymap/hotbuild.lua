@@ -294,6 +294,7 @@ function factoryHotkey(units, count)
                     local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
                     Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
                 end)
+                CommandMode.EndCommandMode()
             end
         end
     end
