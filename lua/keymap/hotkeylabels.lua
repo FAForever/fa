@@ -128,7 +128,7 @@ function getKeyTables()
                 local i = item.lower(item)
 
                 if __blueprints[i] then
-                    helpIdRelations[i] = g
+                    helpIdRelations[i] = {g}
                 else
                     otherRelations[i] = g
                 end
@@ -140,10 +140,12 @@ function getKeyTables()
     local changed = true
     while changed do
         changed = false
-        for id, group in helpIdRelations do
-            if otherRelations[group] then -- Check if the group contained more than just unit IDs
-                helpIdRelations[id] = otherRelations[group].lower(otherRelations[group])
-                changed = true
+        for id, group in pairs(helpIdRelations) do
+            for key, value in pairs(group) do
+                if otherRelations[value] then -- Check if the group contained more than just unit IDs
+                    table.insert(helpIdRelations[id], otherRelations[value].lower(otherRelations[value]))
+                    changed = true
+                end
             end
         end
     end
@@ -154,12 +156,14 @@ function getKeyTables()
         local baseKey, colour = getKeyUse(keyCombo)  -- Returns the base key without modifiers, and a colour key to say which modifiers got removed (Were there)
 
         -- Handle unit IDs
-        for id, group in helpIdRelations do
-            if group == action then -- If it's an action that's assigned to a key at all, link the id to the key
-                idRelations[id] = {
-                    ["key"] = baseKey,
-                    ["colour"] = colour,
-                }
+        for id, group in pairs(helpIdRelations) do
+            for key, value in pairs(group) do
+                if value == action then -- If it's an action that's assigned to a key at all, link the id to the key
+                    idRelations[id] = {
+                        ["key"] = baseKey,
+                        ["colour"] = colour,
+                    }
+                end
             end
         end
 
