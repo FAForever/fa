@@ -130,21 +130,22 @@ function getKeyTables()
                 if __blueprints[i] then
                     helpIdRelations[i] = {g}
                 else
-                    otherRelations[i] = g
+                    if otherRelations[i] then
+                        table.insert(otherRelations[i], g)
+                    else
+                        otherRelations[i] = {g}
+                    end
                 end
             end
         end
     end
 
     -- Go through unitkeygroups to properly map IDs
-    local changed = true
-    while changed do
-        changed = false
-        for id, group in pairs(helpIdRelations) do
-            for key, value in pairs(group) do
-                if otherRelations[value] then -- Check if the group contained more than just unit IDs
-                    table.insert(helpIdRelations[id], otherRelations[value].lower(otherRelations[value]))
-                    changed = true
+    for id, group in pairs(helpIdRelations) do
+        for key, value in group do
+            if otherRelations[value] then -- Check if the group contained more than just unit IDs
+                for ids, values in pairs(otherRelations[value]) do
+                    table.insert(helpIdRelations[id], values.lower(values))
                 end
             end
         end
@@ -157,7 +158,7 @@ function getKeyTables()
 
         -- Handle unit IDs
         for id, group in pairs(helpIdRelations) do
-            for key, value in pairs(group) do
+            for key, value in group do
                 if value == action then -- If it's an action that's assigned to a key at all, link the id to the key
                     idRelations[id] = {
                         ["key"] = baseKey,
