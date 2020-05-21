@@ -10,6 +10,7 @@ unitkeygroups = {
         "Air_Factory",
         "Naval_Factory",
         "Quantum_Gateway",
+        
         "T1_Engineer",
         "url0301", -- sACUs
         "ual0301",
@@ -23,39 +24,52 @@ unitkeygroups = {
         "Sonar_System",
         "Perimeter_Monitoring_System",
         "Quantum_Optics_Facility",
+        
         "T1_Land_Scout",
         "T1_Combat_Scout",
+        
         "T1_Air_Scout",
+        
         "T1_Attack_Submarine",
     },
     ["Shields"] = {
         "Heavy_Shield_Generator",
         "Shield_Generator",
         "Stealth_Field_Generator",
+        
         "T1_Light_Assault_Bot",
+        
         "T1_Interceptor",
+        
         "T1_Frigate",
     },
     ["TMD"] = {
         "Tactical_Missile_Defense",
         "Strategic_Missile_Defense",
+        
         "T1_Tank",
         "T1_Assault_Bot", -- Mantis
+        
         "T1_Attack_Bomber",
+        
         "T1_Attack_Boat", -- Aeon only
     },
     ["XP"] = {
         "Experimental",
+        
         "T1_Mobile_Anti_Air_Gun",
+        
         "T1_Light_Air_Transport",
     },
     ["Mobilearty"] = {
         "T1_Mobile_Light_Artillery",
+        
         "T1_Light_Gunship",
     },
     -- Second Row
     ["Mass"] = {
         "Mass_Extractor",
+        
         "T2_Engineer",
     },
     ["MassFab"] = {
@@ -106,6 +120,7 @@ unitkeygroups = {
     },
     ["MML"] = {
         "T2_Mobile_Missile_Launcher",
+        
         "T2_Guided_Missile",
     },
     ["MobileShield"] = {
