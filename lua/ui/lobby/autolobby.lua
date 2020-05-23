@@ -42,6 +42,7 @@ local gameInfo = {
         UnitCap = '1000',
         Ranked = true,
         PrebuiltUnits = 'Off',
+        Share = 'FullShare',
     },
     PlayerOptions = {},
     Observers = {},
