@@ -77,7 +77,6 @@ function OnSync()
             data[k].id = clients[army] and clients[army].uid or 0
         end
 
-        GpgNetSend('TeamkillHappened', data.time, data.victim.id, data.victim.name,  data.instigator.id, data.instigator.name)
         WARN(string.format("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
 
         if GetFocusArmy() == victim then

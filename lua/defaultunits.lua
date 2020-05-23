@@ -2452,18 +2452,8 @@ ACUUnit = Class(CommandUnit) {
             Sync.EnforceRating = true
             WARN('ACU kill detected. Rating for ranked games is now enforced.')
 
-            -- If we are teamkilled, filter out death explostions of allied units that were not coused by player's self destruct order
-            -- Damage types:
-            --     'DeathExplosion' - when normal unit is killed
-            --     'Nuke' - when Paragon is killed
-            --     'Deathnuke' - when ACU is killed
-            if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
-                WARN('Teamkill detected')
+            if IsAlly(self.Army, instigator.Army) and (ScenarioInfo.Options.CheatsEnabled ~= true) and (instigatorBrain.BrainType ~= 'AI') then
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                ForkThread(function()
-                    instigatorBrain:ReportScore()
-                end)
             end
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
