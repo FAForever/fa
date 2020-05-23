@@ -501,8 +501,6 @@ keyActions = {
         category = 'hotbuildingAlternative', order = 1118,},
     ['alt_tml'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Alt_TML")',
         category = 'hotbuildingAlternative', order = 1119,},
-    ['alt_upgrades'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Alt_Upgrades")',
-        category = 'hotbuildingAlternative', order = 1120,},
 
     -- EXTRA
     ['land_factory'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Land_Factory")',

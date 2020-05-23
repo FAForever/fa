@@ -127,7 +127,7 @@ defaultKeyMap = {
     ['V']                   = 'alt_torpedo',
     ['B']                   = 'alt_arties',
     ['N']                   = 'alt_tml',
-    ['M']                   = 'alt_upgrades',
+    ['M']                   = 'upgrades',
 
     ['Tab']                 = 'pause_unit',
 
