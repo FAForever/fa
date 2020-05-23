@@ -6,14 +6,6 @@ local construction = import('/lua/ui/game/construction.lua')
 local orders = import('/lua/ui/game/orders.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
--- Don't want to check these groups, they mess up some bindings
-local ignoreGroups = {
-    "t3_armored_assault_bot",
-    "t3_siege_assault_bot",
-    "t3_tank",
-    "t3_siege_tank"
-}
-
 -- Turn engine string reference to certain symbols into the actual symbol
 local signs = {
     ["Comma"] = ",",
@@ -123,18 +115,20 @@ function getKeyTables()
     -- Get them from the building tab
     for groupName, groupItems in unitkeygroups do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
         local g = groupName.lower(groupName)
-        if not isToBeIgnored(g) then
-            for _, item in groupItems do
-                local i = item.lower(item)
+        for _, item in groupItems do
+            local i = item.lower(item)
 
-                if __blueprints[i] then
+            if __blueprints[i] then
+                if not helpIdRelations[i] then
                     helpIdRelations[i] = {g}
                 else
-                    if otherRelations[i] then
-                        table.insert(otherRelations[i], g)
-                    else
-                        otherRelations[i] = {g}
-                    end
+                    table.insert(helpIdRelations[i], g)
+                end
+            else
+                if otherRelations[i] then
+                    table.insert(otherRelations[i], g)
+                else
+                    otherRelations[i] = {g}
                 end
             end
         end
@@ -224,17 +218,6 @@ function getKeyTables()
     end
 
     return idRelations, upgradeKey, orderKeys
-end
-
--- Some groups get ignored
-function isToBeIgnored(name)
-    for _, group in ignoreGroups do
-        if name == group then
-            return true
-        end
-    end
-
-    return false
 end
 
 -- Determine which modifier keys are present in the keybind string
