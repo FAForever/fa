@@ -11,11 +11,8 @@ unitkeygroups = {
         "Naval_Factory",
         "Quantum_Gateway",
         
+        "Support_Armored_Command_Unit",
         "T1_Engineer",
-        "url0301", -- sACUs
-        "ual0301",
-        "uel0301",
-        "xsl0301",
     },
     ["Sensors"] = {
         "Omni_Sensor",
@@ -143,8 +140,7 @@ unitkeygroups = {
         "Air_Staging",
 
         "T3_Sniper_Bot",
-        "url0303", -- Loyalist
-        "uel0303", -- Titan
+        "T3_Siege_Assault_Bot", -- Loyalist & Titan
 
         "T3_Spy_Plane",
 
@@ -155,10 +151,8 @@ unitkeygroups = {
         "Torpedo_Ambushing_System",
         "Torpedo_Launcher",
 
-        "ual0303", -- Harbinger
-        "xrl0305", -- Brick
-        "xel0305", -- Percival
-        "xsl0303", -- Seraphim Tank
+        "T3_armored_assault_bot", -- Brick & Percival
+        "T3_Tank", -- Othumms & Harbinger
 
         "T3_Air_Superiority_Fighter",
 
@@ -203,13 +197,10 @@ unitkeygroups = {
         "Quantum_Gateway",
         "xrl0002", -- T3 engineer for Megalith
         
+        "Support_Armored_Command_Unit",
         "T3_Engineer",
         "T2_Engineer",
         "T1_Engineer",
-        "url0301", -- sACUs
-        "ual0301",
-        "uel0301",
-        "xsl0301",
     },
     ["Alt_Radars"] = {
         "Omni_Sensor",
@@ -231,6 +222,8 @@ unitkeygroups = {
         "T3_Mobile_Shield_Generator",
         "T2_Mobile_Shield_Generator",
         
+        "T3_Heavy_Air_Transport",
+        
         "T2_Shield_Boat",
     },
     ["Alt_TMD"] = {
@@ -248,23 +241,21 @@ unitkeygroups = {
         "Sonar_Platform",
         "Sonar_System",
 
-        "T3_Heavy_Air_Transport",
-        "T2_Air_Transport",
-        "T1_Light_Air_Transport",
-
         "T2_Hover_Tank",
         "T2_Assault_Tank",
         "T2_Amphibious_Tank",
+
+        "T3_Heavy_Air_Transport",
+        "T2_Air_Transport",
+        "T1_Light_Air_Transport",
     },
     ["Alt_Mass"] = {
         "Mass_Extractor",
         "Mass_Fabricator",
         
-        "ual0303", -- Harbinger
-        "xrl0305", -- Brick
         "xrl0003", -- Brick for Megalith
-        "xel0305", -- Percival
-        "xsl0303", -- Seraphim Tank
+        "T3_armored_assault_bot", -- Brick & Percival
+        "T3_Tank", -- Othumms & Harbinger
         "T2_Heavy_Tank",
         "T2_Assault_Bot",
         "T1_Tank",
@@ -293,8 +284,7 @@ unitkeygroups = {
         "Energy_Storage",
         
         "T3_Sniper_Bot",
-        "url0303", -- Loyalist
-        "uel0303", -- Titan
+        "T3_Siege_Assault_Bot", -- Loyalist & Titan
         "T2_Gatling_Bot",
         "T2_Rocket_Bot",
         "T1_Light_Assault_Bot",
@@ -815,7 +805,7 @@ unitkeygroups = {
     },
     ["T3_Tank"] = {
         "ual0303",
-        "uel0303",
+        "xsl0303",
     },
     ["T3_Mobile_Heavy_Artillery"] = {
         "ual0304",
@@ -889,6 +879,7 @@ unitkeygroups = {
     },
     ["T3_Siege_Assault_Bot"] = {
         "url0303",
+        "uel0303",
     },
     ["T2_Mobile_Stealth_Field_System"] = {
         "url0306",
@@ -961,13 +952,16 @@ unitkeygroups = {
     ["T2_Mobile_Anti_Air_Cannon"] = {
         "xsl0205",
     },
-    ["T3_Siege_Tank"] = {
-        "xsl0303",
-    },
     ["T3_Mobile_Shield_Generator"] = {
         "xsl0307",
     },
     ["T3_Submarine_Hunter"] = {
         "xss0304",
     },
+    ["Support_Armored_Command_Unit"] = {
+        "url0301",
+        "ual0301",
+        "uel0301",
+        "xsl0301",
+    }
 }
