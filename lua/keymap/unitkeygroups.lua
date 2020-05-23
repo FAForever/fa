@@ -373,9 +373,6 @@ unitkeygroups = {
         "xss0202", -- sera cruiser
         "ues0202", -- uef cruiser
     },
-    ["Alt_Upgrades"] = {
-        "_upgrade",
-    },
     
     -- extra hotkeys
     ["Experimental"] = {
