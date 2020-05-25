@@ -198,7 +198,7 @@ UEL0001 = Class(ACUUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
-            ForkThread(function()
+            self:ForkThread(function()
                 WaitTicks(1)
                 self:CreateShield(bp)
                 self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
