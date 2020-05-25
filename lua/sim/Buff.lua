@@ -264,7 +264,11 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetSpeedMult(val)
             unit:SetAccMult(val)
             unit:SetTurnMult(val)
-        elseif atype == 'Stun' and not afterRemove then
+        elseif atype == 'MoveMult2' then
+            local val = BuffCalculate(unit, buffName, 'MoveMult2', 1)
+            unit:SetSpeedMult(val)
+            unit:SetAccMult(val)
+		elseif atype == 'Stun' and not afterRemove then
             unit:SetStunned(buffDef.Duration or 1, instigator)
             if unit.Anims then
                 for k, manip in unit.Anims do
