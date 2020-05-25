@@ -384,9 +384,9 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
                     end
                 end
             end
-            keys = table.copy(AIKeys)
-            strings = table.copy(AIStrings)
-            tooltips = table.copy(AITooltips)
+            table.destructiveCat(keys, AIKeys)
+            table.destructiveCat(strings, AIStrings)
+            table.destructiveCat(tooltips, AITooltips)
         elseif key == 'move' then
             -- Generate the "move player to slot X" entries.
             for i = 1, numOpenSlots, 1 do
