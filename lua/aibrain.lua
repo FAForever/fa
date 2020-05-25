@@ -113,8 +113,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
-            self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
-            self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
+            self:ForkThread(self.InitialAIThread)
 
             self.PlatoonNameCounter = {}
             self.PlatoonNameCounter['AttackForce'] = 0
@@ -760,6 +759,13 @@ AIBrain = Class(moho.aibrain_methods) {
         self.ConstantEval = eval
     end,
 
+    InitialAIThread = function(self)
+        -- delay the AI so it can't reclaim the start area before it's cleared from the ACU landing blast.
+        WaitTicks(30)
+        self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
+        self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
+    end,
+
     EvaluateAIThread = function(self)
         local personality = self:GetPersonality()
         local factionIndex = self:GetFactionIndex()
@@ -1092,12 +1098,15 @@ AIBrain = Class(moho.aibrain_methods) {
     GetManagerCount = function(self, type)
         local count = 0
         for k, v in self.BuilderManagers do
+            if not v.BaseType then
+                continue
+            end
             if type then
-                if type == 'Start Location' and not (string.find(k, 'ARMY_') or string.find(k, 'Large Expansion')) then
+                if type == 'Start Location' and v.BaseType ~= 'MAIN' and v.BaseType ~= 'Blank Marker' then
                     continue
-                elseif type == 'Naval Area' and not (string.find(k, 'Naval Area')) then
+                elseif type == 'Naval Area' and v.BaseType ~= 'Naval Area' then
                     continue
-                elseif type == 'Expansion Area' and (not (string.find(k, 'Expansion Area') or string.find(k, 'EXPANSION_AREA')) or string.find(k, 'Large Expansion')) then
+                elseif type == 'Expansion Area' and v.BaseType ~= 'Expansion Area' and v.BaseType ~= 'Large Expansion Area' then
                     continue
                 end
             end
@@ -1243,6 +1252,7 @@ AIBrain = Class(moho.aibrain_methods) {
             },
             BuilderHandles = {},
             Position = position,
+            BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
         }
         self.NumBases = self.NumBases + 1
     end,

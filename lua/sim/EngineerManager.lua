@@ -134,7 +134,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowMassRepeatThread = function(self)
-        WaitSeconds(3)
+        coroutine.yield(30)
         if self.Brain.LowMassMode then
             self:LowMass()
         end
@@ -241,7 +241,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowEnergyRepeatThread = function(self)
-        WaitSeconds(3)
+        coroutine.yield(30)
         if self.Brain.LowEnergyMode then
             self:LowEnergy()
         end
@@ -281,6 +281,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     AddUnit = function(self, unit, dontAssign)
+        --LOG('+ AddUnit')
         for k,v in self.ConsumptionUnits do
             if EntityCategoryContains(v.Category, unit) then
                 table.insert(v.Units, { Unit = unit, Status = true })
@@ -315,7 +316,7 @@ EngineerManager = Class(BuilderManager) {
 
                     import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
 
-                    if EntityCategoryContains(categories.ENGINEER, unit) then
+                    if EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, unit) then
                         local unitConstructionFinished = function(unit, finishedUnit)
                                                     -- Call function on builder manager; let it handle the finish of work
                                                     local aiBrain = unit:GetAIBrain()
@@ -338,8 +339,7 @@ EngineerManager = Class(BuilderManager) {
                 end
 
                 if not dontAssign then
-                    --self:AssignEngineerTask(unit)
-                    self:ForkThread(self.InitialWait, unit)
+                    self:ForkEngineerTask(unit)
                 end
 
                 return
@@ -356,8 +356,6 @@ EngineerManager = Class(BuilderManager) {
 
     GetNumCategoryUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
-            local numUnits = EntityCategoryCount(category, self.ConsumptionUnits[unitType].UnitsList)
-            --LOG('*AI DEBUG: '..self.Brain.Nickname..' - GetNumCategoryUnits returns '..numUnits..' at '..self.LocationType)
             return EntityCategoryCount(category, self.ConsumptionUnits[unitType].UnitsList)
         end
         return 0
@@ -573,14 +571,14 @@ EngineerManager = Class(BuilderManager) {
         end
     end,
 
-    TaskFinished = function(self, unit)
-        if VDist3(self.Location, unit:GetPosition()) > self.Radius and not EntityCategoryContains(categories.COMMAND, unit) then
-            self:ReassignUnit(unit)
+    TaskFinished = function(manager, unit)
+        if VDist3(manager.Location, unit:GetPosition()) > manager.Radius and not EntityCategoryContains(categories.COMMAND, unit) then
+            manager:ReassignUnit(unit)
         else
-            self:AssignEngineerTask(unit)
+            manager:ForkEngineerTask(unit)
         end
     end,
-
+    
     UnitConstructionStarted = function(self, unit, unitBeingBuilt)
         if EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
             self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
@@ -625,16 +623,6 @@ EngineerManager = Class(BuilderManager) {
         self.Brain:RemoveConsumption(self.LocationType, unit)
     end,
 
-    EngineerWaiting = function(self, unit)
-        WaitSeconds(5)
-        self:AssignEngineerTask(unit)
-    end,
-
-    InitialWait = function(self, unit)
-        WaitSeconds(2)
-        self:AssignEngineerTask(unit)
-    end,
-
     AssignTimeout = function(self, builderName)
         local oldPri = self:GetBuilderPriority(builderName)
         if oldPri then
@@ -661,24 +649,40 @@ EngineerManager = Class(BuilderManager) {
         return template
     end,
 
-    DelayAssign = function(self, unit)
-        if not unit.DelayThread then
-            unit.DelayThread = unit:ForkThread(self.DelayAssignBody, self)
+    ForkEngineerTask = function(manager, unit)
+        if unit.ForkedEngineerTask then
+            KillThread(unit.ForkedEngineerTask)
+            unit.ForkedEngineerTask = unit:ForkThread(manager.Wait, manager, 3)
+        else
+            unit.ForkedEngineerTask = unit:ForkThread(manager.Wait, manager, 20)
         end
     end,
 
-    DelayAssignBody = function(unit, manager)
-        WaitSeconds(1)
+    DelayAssign = function(manager, unit, delaytime)
+        if unit.ForkedEngineerTask then
+            KillThread(unit.ForkedEngineerTask)
+        end
+        unit.ForkedEngineerTask = unit:ForkThread(manager.Wait, manager, delaytime or 10)
+    end,
+
+    Wait = function(unit, manager, ticks)
+        coroutine.yield(ticks)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
-        unit.DelayThread = nil
+    end,
+
+    EngineerWaiting = function(manager, unit)
+        coroutine.yield(50)
+        if not unit.Dead then
+            manager:AssignEngineerTask(unit)
+        end
     end,
 
     AssignEngineerTask = function(self, unit)
-        unit.LastActive = GetGameTimeSeconds()
+        --LOG('+ AssignEngineerTask')
         if unit.UnitBeingAssist or unit.UnitBeingBuilt then
-            self:DelayAssign(self, unit)
+            self:DelayAssign(unit, 50)
             return
         end
 
@@ -687,7 +691,7 @@ EngineerManager = Class(BuilderManager) {
         unit.MinNumAssistees = nil
 
         if self.AssigningTask then
-            self:DelayAssign(self, unit)
+            self:DelayAssign(unit, 50)
             return
         else
             self.AssigningTask = true
@@ -762,7 +766,7 @@ EngineerManager = Class(BuilderManager) {
             return
         end
         self.AssigningTask = false
-        self:ForkThread(self.EngineerWaiting, unit)
+        self:DelayAssign(unit, 50)
     end,
 
     ManagerLoopBody = function(self,builder,bType)
