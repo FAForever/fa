@@ -30,10 +30,10 @@ end
 --- Orders the builder to build a unit.
 -- @param builder Unit, (engineer) to use.
 -- @param blueprintID Unit's bp ID to build, example: 'ueb0101'.
--- @param locationInfo Table {x, z, 0}.
--- @param something TODO: true/false.
+-- @param buildLocation Table {x, z, 0}.
+-- @param buildRelative: true/false. true = build coordinates are relative to the starting location, false = absolute coords
 -- @return true/false
-function CAiBrain:BuildStructure(builder, blueprintID, locationInfo, something)
+function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
 
 --- Orders a mobile factory to build a unit.

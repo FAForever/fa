@@ -3590,15 +3590,14 @@ Platoon = Class(moho.platoon_methods) {
         while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
-            if GetTerrainHeight(buildLocation[1], buildLocation[2]) > GetSurfaceHeight(buildLocation[1], buildLocation[2]) then
+            if GetTerrainHeight(buildLocation[1], buildLocation[3]) > GetSurfaceHeight(buildLocation[1], buildLocation[3]) then
                 --land
-                buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[2])
+                buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
             else
                 --water
-                buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[2])
+                buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
             end
             local buildRelative = eng.EngineerBuildQueue[1][3]
-
             if not eng.NotBuildingThread then
                 eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
             end
