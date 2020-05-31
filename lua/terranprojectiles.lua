@@ -90,14 +90,15 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
+        if targetType ~= 'UnitAir' and targetType ~= 'Water' then
             CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, self.Army)
             CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, self.Army)
             self:ShakeCamera(20, 1, 0, 1)
+            
+            local pos = self:GetPosition()
+            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
         end
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
