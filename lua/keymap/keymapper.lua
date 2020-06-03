@@ -16,7 +16,7 @@ function GetActionName(action)
     if KeyDescriptions[action] then
         name = LOC(KeyDescriptions[action])
     else
-        name = LOC("<LOC key_binding_0001>No description text") .. ' for action ' .. action
+        name = LOC('<LOC kb_'..action..'>'..action)
     end
     -- check if action is meant to be mapped with a key modifier, e.g. attack vs shift_attack action
     if string.find(action, 'shift_') == 1 then
