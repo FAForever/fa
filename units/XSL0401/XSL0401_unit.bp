@@ -309,7 +309,7 @@ UnitBlueprint {
             Damage = 6000,
             DamageRadius = 4,
             DamageType = 'Normal',
-            DisplayName = 'Experimental Phason Beam Generator',
+            DisplayName = 'Phason Beam Generator',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -696,9 +696,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 7000,
+            Damage = 10000,
             DamageFriendly = true,
-            DamageRadius = 6,
+            DamageRadius = 8,
             DamageType = 'DeathExplosion',
             DisplayName = 'Collossus Death',
             DummyWeapon = true,
