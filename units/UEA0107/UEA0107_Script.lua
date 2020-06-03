@@ -12,8 +12,14 @@ local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local DummyWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
 
 UEA0107 = Class(AirTransport) {
+
+        Weapons = {
+            GuidanceSystem = Class(DummyWeapon) {},
+        },
+
         AirDestructionEffectBones = { 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
             'Left_Front_Leg','Right_Front_Leg','Left_Back_Leg','Right_Back_Leg'},
 
