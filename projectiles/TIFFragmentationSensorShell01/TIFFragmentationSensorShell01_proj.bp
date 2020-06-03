@@ -45,5 +45,7 @@ ProjectileBlueprint {
         LeadTarget = false,
         TurnRate = 360,
         VelocityAlign = true,
+        Fragments = 5,
+        FragmentId = '/projectiles/TIFFragmentationSensorShell02/TIFFragmentationSensorShell02_proj.bp'
     },
 }
