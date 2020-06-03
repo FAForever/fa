@@ -19,6 +19,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
+local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
 
 local selectedUnit = nil
@@ -362,11 +363,11 @@ function UpdateWindow(info)
             controls.fuelBar:SetValue(info.fuelRatio)
         end
 
-	if info.shieldRatio > 0 and info.fuelRatio > 0 then
-	    controls.store = 1
-	else
-	    controls.store = 0
-	end
+        if info.shieldRatio > 0 and info.fuelRatio > 0 then
+            controls.store = 1
+        else
+            controls.store = 0
+        end
 
         if info.health then
             controls.healthBar:Show()
@@ -374,10 +375,10 @@ function UpdateWindow(info)
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
 
-        if not info.userUnit then
-            unitHP[1] = info.health
-            unitHP.blueprintId = info.blueprintId
-        end
+            if not info.userUnit then
+                unitHP[1] = info.health
+                unitHP.blueprintId = info.blueprintId
+            end
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
@@ -393,10 +394,12 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy stars
-        local currentLevel = UnitData[info.entityId].VeteranLevel
-        local massKilled = UnitData[info.entityId].totalMassKilled
-        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
-        local myValue = UnitData[info.entityId].myValue
+        local data = UnitData[info.entityId]
+        local currentLevel = data.VeteranLevel
+        local massKilled = data.totalMassKilled
+        local massKilledTrue = data.totalMassKilledTrue
+        local myValue = data.myValue
+        local manualVeterancy = data.manualVeterancy
 
         for level = 1, 5 do
             if currentLevel >= level then
@@ -408,16 +411,32 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy progress bar
-        if massKilled and myValue then
-            local progress = math.min(massKilled / myValue, 5) - currentLevel
+        if massKilled then
+            local progress = false
+            if myValue then
+                progress = math.min(massKilled / myValue, 5) - currentLevel
+            elseif manualVeterancy then
+                local m = manualVeterancy[currentLevel] or 0
+                local lvl = math.min(currentLevel + 1, 5)
+
+                progress = (massKilled - m) / bp.VeteranMass[lvl]
+            end
+
             if progress then
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
                     controls.vetTitle:SetText('Veterancy')
 
-                    local nextLevel = myValue * (currentLevel + 1)
+                    local nextLevel
                     local text
+
+                    if myValue then
+                        nextLevel = myValue * (currentLevel + 1)
+                    else
+                        nextLevel = manualVeterancy[currentLevel + 1]
+                    end
+
                     if nextLevel >= 1000000 then
                         text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
                     elseif nextLevel >= 100000 then
@@ -631,7 +650,7 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
-    import(UIUtil.GetLayoutFilename('unitview')).SetLayout()
+    unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
@@ -695,22 +714,22 @@ function CreateUI()
             if self:GetAlpha() < 1 then
                 self:SetAlpha(1, true)
             end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)
+            unitViewLayout.PositionWindow()
+            unitViewLayout.UpdateStatusBars(controls)
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end
     end
 
     -- This section is for the small icons showing what active enhancements an ACU has
-	controls.enhancements = {}
-	controls.enhancements['RCH'] = Bitmap(controls.bg)
-	controls.enhancements['Back'] = Bitmap(controls.bg)
-	controls.enhancements['LCH'] = Bitmap(controls.bg)
+    controls.enhancements = {}
+    controls.enhancements['RCH'] = Bitmap(controls.bg)
+    controls.enhancements['Back'] = Bitmap(controls.bg)
+    controls.enhancements['LCH'] = Bitmap(controls.bg)
 
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
 end
 
 function OnSelection(units)
