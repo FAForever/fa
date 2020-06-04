@@ -424,6 +424,7 @@ Description = {
     ['ual0105'] = "<LOC Unit_Description_0273> Tech 1 amphibious construction, repair, capture and reclamation unit.",
     ['ual0208'] = "<LOC Unit_Description_0274> Tech 2 amphibious construction, repair, capture and reclamation unit.",
     ['ual0309'] = "<LOC Unit_Description_0275> Tech 3 amphibious construction, repair, capture and reclamation unit.",
+    ['sab0104'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
 
     -- AEON -- Factories HQ
     ['uab0101'] = "<LOC Unit_Description_0276> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
@@ -560,6 +561,9 @@ Description = {
     ['xsl0105'] = "<LOC Unit_Description_0387> Tech 1 amphibious construction, repair, capture and reclamation unit.",
     ['xsl0208'] = "<LOC Unit_Description_0388> Tech 2 amphibious construction, repair, capture and reclamation unit.",
     ['xsl0309'] = "<LOC Unit_Description_0389> Tech 3 amphibious construction, repair, capture and reclamation unit.",
+    ['ssb0104'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
+    ['ssb0204'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
+    ['ssb0304'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
 
     -- SERAPHIM -- Factories HQ
     ['xsb0101'] = "<LOC Unit_Description_0390> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
