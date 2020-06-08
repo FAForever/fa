@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFSuthanusArtilleryShell02/SIFSuthanusArtilleryShell02_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Suthanus Artillery Shell Projectile script, XSB2302
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+------------------------------------------------------------
+--
+--  File     :  /data/projectiles/SIFSuthanusArtilleryShell02/SIFSuthanusArtilleryShell02_script.lua
+--  Author(s):  Gordon Duclos, Aaron Lundquist
+--
+--  Summary  :  Suthanus Artillery Shell Projectile script, XSB2302
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------
 
 local SSuthanusArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanusArtilleryShell
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

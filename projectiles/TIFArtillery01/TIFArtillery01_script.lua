@@ -1,6 +1,6 @@
-#
-# Terran Artillery Projectile
-#
+--
+-- Terran Artillery Projectile
+--
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local TArtilleryProjectilePolytrail = import('/lua/terranprojectiles.lua').TArtilleryProjectilePolytrail
 TIFArtillery01 = Class(TArtilleryProjectilePolytrail) {

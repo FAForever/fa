@@ -1,6 +1,6 @@
-#
-# Cybran EMP Grenade
-#
+--
+-- Cybran EMP Grenade
+--
 local CArtilleryProjectile = import('/lua/cybranprojectiles.lua').CArtilleryProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 

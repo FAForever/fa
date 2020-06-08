@@ -1,6 +1,6 @@
-#
-# Aeon Mortar
-#
+--
+-- Aeon Mortar
+--
 local AArtilleryProjectile = import('/lua/aeonprojectiles.lua').AArtilleryProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 

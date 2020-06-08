@@ -1,6 +1,6 @@
-#
-# Aeon Artillery Projectile
-#
+--
+-- Aeon Artillery Projectile
+--
 local AArtilleryProjectile = import('/lua/aeonprojectiles.lua').AArtilleryProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
