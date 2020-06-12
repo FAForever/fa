@@ -1,10 +1,22 @@
 --
--- Terran Fragmentation/Sensor Shells
+-- Terran T1 Artillery Fragmentation/Sensor Shells : uel0103
 --
 local TArtilleryProjectile = import('/lua/terranprojectiles.lua').TArtilleryProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 TIFFragmentationSensorShell02 = Class(TArtilleryProjectile) {
+    OnImpact = function(self, targetType, targetEntity)
+        local radius = self.DamageData.DamageRadius
+        local pos = self:GetPosition()
+        
+        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+        end
+        
+        TArtilleryProjectile.OnImpact(self, targetType, targetEntity)
+    end,
+    
     FxTrails     = EffectTemplate.TFragmentationSensorShellTrail,
     FxImpactUnit = EffectTemplate.TFragmentationSensorShellHit,
     FxImpactLand = EffectTemplate.TFragmentationSensorShellHit,
