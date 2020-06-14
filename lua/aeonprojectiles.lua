@@ -601,13 +601,15 @@ AQuarkBombProjectile = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle(self, -1, self.Army, 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
 
-        if targetType ~= 'UnitAir' and targetType ~= 'Water' then
+        if targetType != 'UnitAir' and targetType != 'Water' and targetType != 'Shield' then
             local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+
             DefaultExplosion.CreateScorchMarkSplat(self, 3)
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
-            DamageRing(self, pos, 0.1, self.DamageData.DamageRadius, 10, 'Fire', false, false)
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+            DamageRing(self, pos, 0.1, radius, 10, 'Fire', false, false)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
         end
 
         EmitterProjectile.OnImpact(self, targetType, targetEntity)

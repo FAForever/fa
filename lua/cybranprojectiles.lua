@@ -67,16 +67,19 @@ CIFProtonBombProjectile = Class(NullShell) {
     FxImpactLand = EffectTemplate.CProtonBombHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        CreateLightParticle(self, -1, self.Army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
-        CreateLightParticle(self, -1, self.Army, 8, 22, 'glow_03', 'ramp_antimatter_02')
+        local army = self.Army
+        CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
+        CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
 
-        if targetType ~= 'UnitAir' and targetType ~= 'Water' then
+        if targetType != 'UnitAir' and targetType != 'Water' and targetType != 'Shield' then
             local pos = self:GetPosition()
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+            local radius = self.DamageData.DamageRadius
+
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
-            DamageRing(self, pos, 0.1, self.DamageData.DamageRadius, 10, 'Fire', false, false)
-            CreateDecal(pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 12, 12, 150, 200, self.Army)
+            DamageRing(self, pos, 0.1, radius, 10, 'Fire', false, false)
+            CreateDecal(pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 12, 12, 150, 200, army)
         end
 
         local blanketSides = 12

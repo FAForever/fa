@@ -90,14 +90,19 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
-        if targetType ~= 'UnitAir' and targetType ~= 'Water' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, self.Army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, self.Army)
+        if targetType != 'UnitAir' and targetType != 'Water' and targetType != 'Shield' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local rand = util.GetRandomFloat(0,2*math.pi)
+            local army = self.Army
+            local scale = self.FxSplatScale
+            
+            CreateDecal(pos, rand, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 50, army)
+            CreateDecal(pos, rand, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 50, army)
             self:ShakeCamera(20, 1, 0, 1)
             
-            local pos = self:GetPosition()
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-            DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
         end
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,

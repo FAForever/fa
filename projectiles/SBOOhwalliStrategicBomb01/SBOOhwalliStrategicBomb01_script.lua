@@ -11,12 +11,13 @@ local SOhwalliStrategicBombProjectile = import('/lua/seraphimprojectiles.lua').S
 
 SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile){
     OnImpact = function(self, targetType, targetEntity)
-        LOG(targetType)
-        if targetType ~= 'UnitAir' then
-            self:CreateProjectile('/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp', 0, 0, 0, 0, 0, 0):SetCollision(false)
+        if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
             local pos = self:GetPosition()
-            DamageArea( self, pos, self.DamageData.DamageRadius, 1, 'Force', true )
-            DamageArea( self, pos, self.DamageData.DamageRadius, 1, 'Force', true )   
+            local radius = self.DamageData.DamageRadius
+            
+            self:CreateProjectile('/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp', 0, 0, 0, 0, 0, 0):SetCollision(false)
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )   
         end
         SOhwalliStrategicBombProjectile.OnImpact(self, targetType, targetEntity)
     end,
