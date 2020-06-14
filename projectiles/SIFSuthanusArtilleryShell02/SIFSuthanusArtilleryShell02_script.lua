@@ -23,19 +23,19 @@ SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
             radius = 0
         end
 
-		if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
-			local rotation = RandomFloat(0,2*math.pi)
+        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
 	        
-			CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, army)
-			CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, army)
+            CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, army)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, army)
             
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
-		end
+        end
         
         SSuthanusArtilleryShell.OnImpact(self, targetType, targetEntity)
-	end,
+    end,
 }
 
 TypeClass = SIFSuthanusArtilleryShell02
