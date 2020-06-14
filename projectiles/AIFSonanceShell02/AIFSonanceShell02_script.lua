@@ -14,12 +14,12 @@ AIFSonanceShell02 = Class(AArtilleryProjectile) {
     FxImpactLand =  EffectTemplate.ASonanceWeaponHit02,
     
     OnImpact = function(self, targetType, targetEntity)
-        local rotation = RandomFloat(0,2*math.pi)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local army = self.Army
-        
         if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
             CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, army)
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, army)
 

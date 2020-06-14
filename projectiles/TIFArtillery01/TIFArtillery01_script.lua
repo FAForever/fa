@@ -10,10 +10,10 @@ TIFArtillery01 = Class(TArtilleryProjectilePolytrail) {
     FxImpactLand = EffectTemplate.TAPDSHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-    
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
 		if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+        
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end

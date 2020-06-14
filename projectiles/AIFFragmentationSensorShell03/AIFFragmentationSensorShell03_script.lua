@@ -15,14 +15,14 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        local rotation = RandomFloat(0,2*math.pi)
-        local size = RandomFloat(2.25,3.75)
-        local pos = self:GetPosition()
-        
-        CreateDecal(pos, rotation, 'scorch_004_albedo', '', 'Albedo', size, size, 300, 15, self:GetArmy())
-        
-        local radius = self.DamageData.DamageRadius
         if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            local rotation = RandomFloat(0,2*math.pi)
+            local size = RandomFloat(2.25,3.75)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+        
+            CreateDecal(pos, rotation, 'scorch_004_albedo', '', 'Albedo', size, size, 300, 15, self:GetArmy())
+            
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end

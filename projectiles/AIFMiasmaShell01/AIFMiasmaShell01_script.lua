@@ -9,8 +9,6 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
         -- Sounds for all other impacts, ie: Impact<targetTypeName>
         local bp = self:GetBlueprint().Audio
         local snd = bp['Impact'.. targetType]
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
         
         if snd then
             self:PlaySound(snd)
@@ -30,6 +28,9 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
         self:Destroy()
         
 		if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end

@@ -12,10 +12,10 @@ local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoA
 
 SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) {
     OnImpact = function(self, targetType, targetEntity) 
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        
         if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end

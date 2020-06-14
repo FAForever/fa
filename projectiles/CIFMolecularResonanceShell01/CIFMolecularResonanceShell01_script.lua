@@ -6,12 +6,14 @@ local CIFMolecularResonanceShell = import('/lua/cybranprojectiles.lua').CIFMolec
 CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
 	OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
+        
         CreateLightParticle( self, -1, army, 24, 5, 'glow_03', 'ramp_red_10' )
         CreateLightParticle( self, -1, army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
 		
         if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end

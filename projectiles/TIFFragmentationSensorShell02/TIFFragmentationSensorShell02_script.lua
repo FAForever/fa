@@ -6,10 +6,10 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 TIFFragmentationSensorShell02 = Class(TArtilleryProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
-        
         if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
         end
