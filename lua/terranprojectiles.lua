@@ -90,7 +90,7 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'UnitAir' and targetType != 'Water' and targetType != 'Shield' then
+        if targetType ~= 'UnitAir' and targetType ~= 'Water' and targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             local rand = util.GetRandomFloat(0,2*math.pi)
@@ -404,7 +404,7 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end

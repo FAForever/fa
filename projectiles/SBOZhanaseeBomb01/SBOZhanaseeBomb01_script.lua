@@ -21,7 +21,7 @@ SBOZhanaseeBombProjectile01 = Class(SZhanaseeBombProjectile){
         self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect01/SBOZhanaseeBombEffect01_proj.bp', 0, 0, 0, 0, 10.0, 0):SetCollision(false):SetVelocity(0,10.0, 0)
         self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect02/SBOZhanaseeBombEffect02_proj.bp', 0, 0, 0, 0, 0.05, 0):SetCollision(false):SetVelocity(0,0.05, 0)
         
-        if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             

@@ -11,7 +11,7 @@ local SOhwalliStrategicBombProjectile = import('/lua/seraphimprojectiles.lua').S
 
 SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile){
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             

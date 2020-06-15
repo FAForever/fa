@@ -71,7 +71,7 @@ CIFProtonBombProjectile = Class(NullShell) {
         CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
         CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
 
-        if targetType != 'UnitAir' and targetType != 'Water' and targetType != 'Shield' then
+        if targetType ~= 'UnitAir' and targetType ~= 'Water' and targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
 
@@ -631,7 +631,7 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
     # are just visual.
     # ---------------------------------------------------------------------------
     OnImpact = function(self, TargetType, TargetEntity)
-        if self.Impacted == false and TargetType != 'Air' then
+        if self.Impacted == false and TargetType ~= 'Air' then
             self.Impacted = true
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
@@ -711,7 +711,7 @@ CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end
