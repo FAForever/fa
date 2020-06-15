@@ -23,7 +23,7 @@ SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
             radius = 0
         end
 
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
 	        

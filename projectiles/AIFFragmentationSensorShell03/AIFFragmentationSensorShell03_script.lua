@@ -15,7 +15,7 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             local rotation = RandomFloat(0,2*math.pi)
             local size = RandomFloat(2.25,3.75)
             local pos = self:GetPosition()

@@ -4,7 +4,7 @@
 local TArtilleryAntiMatterProjectile = import('/lua/terranprojectiles.lua').TArtilleryAntiMatterProjectile02
 TIFAntiMatterShells01 = Class(TArtilleryAntiMatterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             

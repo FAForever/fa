@@ -10,7 +10,7 @@ CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
         CreateLightParticle( self, -1, army, 24, 5, 'glow_03', 'ramp_red_10' )
         CreateLightParticle( self, -1, army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
 		
-        if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             
@@ -25,7 +25,7 @@ CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end

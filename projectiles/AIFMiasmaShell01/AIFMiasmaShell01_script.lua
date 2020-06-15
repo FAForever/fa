@@ -27,7 +27,7 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
                 
         self:Destroy()
         
-		if targetType != 'Water' or targetType != 'UnitAir' or targetType != 'Shield' then
+		if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
 

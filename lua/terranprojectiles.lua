@@ -97,7 +97,7 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         local army = self.Army
         local scale = self.FxSplatScale
         
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             CreateDecal(pos, rotation, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 50, army)
             CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 50, army)
             
@@ -127,7 +127,7 @@ TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
         local scale = self.FxSplatScale
         
         #CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             CreateDecal(pos, rotation, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 30, army)
             CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 30, army)
             
@@ -415,7 +415,7 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end

@@ -14,7 +14,7 @@ AIFSonanceShell02 = Class(AArtilleryProjectile) {
     FxImpactLand =  EffectTemplate.ASonanceWeaponHit02,
     
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius

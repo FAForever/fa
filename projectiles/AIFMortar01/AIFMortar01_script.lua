@@ -6,7 +6,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 AIFMortar01 = Class(AArtilleryProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Water' and targetType != 'UnitAir' and targetType != 'Shield' then
+        if targetType ~= 'Water' and targetType ~= 'UnitAir' and targetType ~= 'Shield' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             

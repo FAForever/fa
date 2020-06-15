@@ -12,7 +12,7 @@ local SSuthanusMobileArtilleryShell = import('/lua/seraphimprojectiles.lua').SSu
 
 SIFSuthanusArtilleryShell01 = Class(SSuthanusMobileArtilleryShell) {
     OnImpact = function(self, targetType, targetEntity)
-        if targetType != 'Shield' and targetType != 'Water' and targetType != 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             
