@@ -769,13 +769,6 @@ EngineerManager = Class(BuilderManager) {
         self:DelayAssign(unit, 50)
     end,
 
-    ManagerLoopBody = function(self,builder,bType)
-        if builder.OldPriority and not builder.SetByStrat then
-            builder:ResetPriority()
-        end
-        BuilderManager.ManagerLoopBody(self,builder,bType)
-    end,
-
     BuilderParamCheck = function(self,builder,params)
         local unit = params[1]
 
