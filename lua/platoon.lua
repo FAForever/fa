@@ -6623,68 +6623,68 @@ Platoon = Class(moho.platoon_methods) {
 
         -- defaults
         first = first or 1 
-        last = last or table.getn(path);
-        local formation = self.PlatoonData.UseFormation or 'NoFormation';
+        last = last or table.getn(path)
+        local formation = self.PlatoonData.UseFormation or 'NoFormation'
 
         -- check if we have a formation, IssueFormMove doesn't work if the formation argument is 'NoFormation'.
         if formation == 'NoFormation' then 
-            WARN('MovePathOrientedByFuture: No platoon formation provided, defaulting to GrowthFormation.');
-            formation = 'GrowthFormation';
+            WARN('MovePathOrientedByFuture: No platoon formation provided, defaulting to GrowthFormation.')
+            formation = 'GrowthFormation'
         end
 
         -- check if we have a path, if no path we can return immediately
         if first == last then
-            return;
+            return
         end
 
         -- if we only have one node to cross we cannot determine the next orientation we need
         if last - first < 2 then 
-            MovePathOrientedByPast(self, path, first, last);
-            return;
+            MovePathOrientedByPast(self, path, first, last)
+            return
         end
 
         -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
         if not path[first].x then 
-            local oldPath = path;
-            path = {};
+            local oldPath = path
+            path = {}
             for k, node in oldPath do
-                table.insert(path, Vector(node[1], node[2], node[3]));
+                table.insert(path, Vector(node[1], node[2], node[3]))
             end
         end
 
         -- pre-compute the angles
-        local angles = { };
+        local angles = { }
         for k = first, last, 1 do 
     
-            local curr = path[k];
-            local next = path[k + 1];
+            local curr = path[k]
+            local next = path[k + 1]
     
             -- if we're trying to look beyond the last node of the path, look at the last two nodes instead
             if k + 1 > last then 
-                curr = path[k - 1];
-                next = path[k];
+                curr = path[k - 1]
+                next = path[k]
             end
 
             -- base orientation when the angle is 0 for the function IssueFormMove
             local base = Vector( 0, 0, 1 )
-            local direction = Utilities.GetDirectionVector(next, curr);
-            local angle = Utilities.GetFull2DAngle(base, direction);
-            angles[k] = angle;
+            local direction = Utilities.GetDirectionVector(next, curr)
+            local angle = Utilities.GetAngleCCW(base, direction)
+            angles[k] = angle
         end
 
         -- move over the path, store the commands
-        local commands = { };
-        local units = self:GetPlatoonUnits();
+        local commands = { }
+        local units = self:GetPlatoonUnits()
         for k = first, last, 1 do 
-            local point = path[k];
-            local angle = angles[k];
-            local command = IssueFormMove(units, point, formation, angle);
-            table.insert(commands, command);
+            local point = path[k]
+            local angle = angles[k]
+            local command = IssueFormMove(units, point, formation, angle)
+            table.insert(commands, command)
         end
 
-        return commands;
+        return commands
     end,
 
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
@@ -6697,62 +6697,62 @@ Platoon = Class(moho.platoon_methods) {
 
         -- defaults
         first = first or 1 
-        last = last or table.getn(path);
-        local formation = self.PlatoonData.UseFormation or 'NoFormation';
+        last = last or table.getn(path)
+        local formation = self.PlatoonData.UseFormation or 'NoFormation'
 
         -- check if we have a formation, IssueFormMove doesn't work if the formation argument is 'NoFormation'.
         if formation == 'NoFormation' then 
-            WARN('MovePathOrientedByPast: No platoon formation provided, defaulting to GrowthFormation.');
-            formation = 'GrowthFormation';
+            WARN('MovePathOrientedByPast: No platoon formation provided, defaulting to GrowthFormation.')
+            formation = 'GrowthFormation'
         end
 
         -- check if we have a path, if no path we can return immediately
         if first == last then
-            return;
+            return
         end
 
         -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
         if not path[first].x then 
-            local oldPath = path;
-            path = {};
+            local oldPath = path
+            path = {}
             for k, node in oldPath do
-                table.insert(path, Vector(node[1], node[2], node[3]));
+                table.insert(path, Vector(node[1], node[2], node[3]))
             end
         end
 
         -- pre-compute the angles
-        local angles = { };
+        local angles = { }
         for k = first, last, 1 do 
     
-            local curr = path[k - 1];
-            local next = path[k];
+            local curr = path[k - 1]
+            local next = path[k]
     
             -- if we're trying to look before the first node of the path, use the platoons current position instead
             if k - 1 < first then 
-                local pos = self:GetPlatoonPosition();
-                curr = Vector(pos[1], pos[2], pos[3]);
+                local pos = self:GetPlatoonPosition()
+                curr = Vector(pos[1], pos[2], pos[3])
             end
 
             -- base orientation when the angle is 0 for the function IssueFormMove
             local base = Vector( 0, 0, 1 )
-            local direction = Utilities.GetDirectionVector(next, curr);
-            local angle = Utilities.GetFull2DAngle(base, direction);
-            angles[k] = angle;
+            local direction = Utilities.GetDirectionVector(next, curr)
+            local angle = Utilities.GetAngleCCW(base, direction)
+            angles[k] = angle
         end
 
         -- move over the path, store the commands
-        local commands = { };
-        local units = self:GetPlatoonUnits();
+        local commands = { }
+        local units = self:GetPlatoonUnits()
         for k = first, last, 1 do 
-            local point = path[k];
-            local angle = angles[k];
-            local command = IssueFormMove(units, point, formation, angle);
-            table.insert(commands, command);
+            local point = path[k]
+            local angle = angles[k]
+            local command = IssueFormMove(units, point, formation, angle)
+            table.insert(commands, command)
         end
 
-        return commands;
+        return commands
     end,
     
 }
