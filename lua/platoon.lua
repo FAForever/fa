@@ -6611,15 +6611,14 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
     end,
-
-    --- Moves the platoon along the path, orientating at each node to match the line from the current node to the next 
-    -- node. If the path is only one node long, MovePathOrientedByPast is used instead.
+    
+    --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
     -- @param first The index of the first node of the path, is by default 1.
     -- @param last The index of the last node of the path, is by default the length of the path.
     -- @return Table of commands.
-    MovePathOrientedByFuture = function (self, path, first, last)
+    IssuePatrolPath = function (self, path, first, last) 
 
         -- defaults
         first = first or 1 
@@ -6628,18 +6627,12 @@ Platoon = Class(moho.platoon_methods) {
 
         -- check if we have a formation, IssueFormMove doesn't work if the formation argument is 'NoFormation'.
         if formation == 'NoFormation' then 
-            WARN('MovePathOrientedByFuture: No platoon formation provided, defaulting to GrowthFormation.')
+            WARN('MovePathOrientedByPast: No platoon formation provided, defaulting to GrowthFormation.')
             formation = 'GrowthFormation'
         end
 
         -- check if we have a path, if no path we can return immediately
         if first == last then
-            return
-        end
-
-        -- if we only have one node to cross we cannot determine the next orientation we need
-        if last - first < 2 then 
-            MovePathOrientedByPast(self, path, first, last)
             return
         end
 
@@ -6658,13 +6651,12 @@ Platoon = Class(moho.platoon_methods) {
         local angles = { }
         for k = first, last, 1 do 
     
-            local curr = path[k]
-            local next = path[k + 1]
+            local curr = path[k - 1]
+            local next = path[k]
     
-            -- if we're trying to look beyond the last node of the path, look at the last two nodes instead
-            if k + 1 > last then 
-                curr = path[k - 1]
-                next = path[k]
+            -- if we're trying to look before the first node of the path, use the platoons current position instead
+            if k - 1 < first then 
+                curr = path[last]
             end
 
             -- base orientation when the angle is 0 for the function IssueFormMove
@@ -6680,21 +6672,22 @@ Platoon = Class(moho.platoon_methods) {
         for k = first, last, 1 do 
             local point = path[k]
             local angle = angles[k]
-            local command = IssueFormMove(units, point, formation, angle)
+            local command = IssueFormPatrol(units, point, formation, angle)
             table.insert(commands, command)
         end
 
         return commands
     end,
 
-    --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
+    
+    --- Issues a command to the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
+    -- @param command Commands with parameters (units, position, formation, degrees) such as IssueFormMove or IssueFormMoveAggressive.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
     -- @param first The index of the first node of the path, is by default 1.
     -- @param last The index of the last node of the path, is by default the length of the path.
     -- @return Table of commands.
-    MovePathOrientedByPast = function (self, path, first, last) 
-
+    IssueCommandPath = function(self, command, path, first, last)
         -- defaults
         first = first or 1 
         last = last or table.getn(path)
@@ -6706,7 +6699,7 @@ Platoon = Class(moho.platoon_methods) {
             formation = 'GrowthFormation'
         end
 
-        -- check if we have a path, if no path we can return immediately
+        -- check if we have a path, if there is no path we can return immediately
         if first == last then
             return
         end
@@ -6748,11 +6741,31 @@ Platoon = Class(moho.platoon_methods) {
         for k = first, last, 1 do 
             local point = path[k]
             local angle = angles[k]
-            local command = IssueFormMove(units, point, formation, angle)
+            local command = command(units, point, formation, angle)
             table.insert(commands, command)
         end
 
         return commands
+    end,
+
+    --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
+    -- @param self The platoon itself.
+    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
+    -- @param first The index of the first node of the path, is by default 1.
+    -- @param last The index of the last node of the path, is by default the length of the path.
+    -- @return Table of commands.
+    IssueAggressiveMovePath = function (self, path, first, last) 
+        return self:IssueCommandPath(IssueFormAggressiveMove, path, first, last);
+    end,
+
+    --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
+    -- @param self The platoon itself.
+    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
+    -- @param first The index of the first node of the path, is by default 1.
+    -- @param last The index of the last node of the path, is by default the length of the path.
+    -- @return Table of commands.
+    IssueMovePath = function (self, path, first, last) 
+        return self:IssueCommandPath(IssueFormMove, path, first, last);
     end,
     
 }
