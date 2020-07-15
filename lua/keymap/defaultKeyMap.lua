@@ -139,7 +139,7 @@ defaultKeyMap = {
     ['Shift-G']             = 'shift_spreadattack',
 
     ['B']                   = 'toggle_build_mode',
-    ['Alt-Slash']           = 'toggle_reclaim_labels',
+    ['Ctrl-Alt-R']           = 'toggle_reclaim_labels',
 
     ['Z']                   = 'pause_unit',
 
@@ -194,15 +194,15 @@ debugKeyMap = {
     ['Ctrl-Alt-O']          = 'debug_grid',
     ['Alt-P']               = 'debug_show_focus_ui_control',
     ['Alt-O']               = 'debug_dump_focus_ui_control',
-    ['Alt-J']               = 'debug_dump_ui_controls',
-    ['Alt-I']               = 'debug_skeletons',
-    ['Alt-K']               = 'debug_bones',
+    ['Ctrl-Alt-D']          = 'debug_dump_ui_controls',
+    ['Ctrl-Alt-V']          = 'debug_skeletons',
+    ['Ctrl-Alt-K']          = 'debug_bones',
 
     ['Ctrl-Shift-X']        = 'debug_redo_console_command',
     ['Ctrl-Shift-C']        = 'debug_copy_units',
     ['Ctrl-Shift-V']        = 'debug_paste_units',
 
-    ['Alt-Q']               = 'debug_nodamage',
+    ['Ctrl-Alt-N']          = 'debug_nodamage',
     ['Ctrl-Alt-E']          = 'debug_show_emmitter_window',
     ['Ctrl-Alt-Z']          = 'debug_sally_shears',
     ['Ctrl-Shift-Alt-C']    = 'debug_collision',
