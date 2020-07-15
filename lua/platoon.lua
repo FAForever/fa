@@ -6680,7 +6680,8 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     
-    --- Issues a command to the platoon along the path, orientating at each node to match the line from the previous node to the current node.
+    --- Issues a command to the platoon along the path, orientating at each node to match the line from the previous 
+    -- node to the current node. Do not use this function directly, use IssueAggressiveMovePath or IssueMovePath instead.
     -- @param self The platoon itself.
     -- @param command Commands with parameters (units, position, formation, degrees) such as IssueFormMove or IssueFormMoveAggressive.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
@@ -6704,7 +6705,7 @@ Platoon = Class(moho.platoon_methods) {
             return
         end
 
-        -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
+        -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
         if not path[first].x then 
@@ -6728,7 +6729,7 @@ Platoon = Class(moho.platoon_methods) {
                 curr = Vector(pos[1], pos[2], pos[3])
             end
 
-            -- base orientation when the angle is 0 for the function IssueFormMove
+            -- base orientation when the angle is 0
             local base = Vector( 0, 0, 1 )
             local direction = Utilities.GetDirectionVector(next, curr)
             local angle = Utilities.GetAngleCCW(base, direction)
@@ -6755,7 +6756,7 @@ Platoon = Class(moho.platoon_methods) {
     -- @param last The index of the last node of the path, is by default the length of the path.
     -- @return Table of commands.
     IssueAggressiveMovePath = function (self, path, first, last) 
-        return self:IssueCommandPath(IssueFormAggressiveMove, path, first, last);
+        return self:IssueCommandPath(IssueFormAggressiveMove, path, first, last)
     end,
 
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
@@ -6765,7 +6766,7 @@ Platoon = Class(moho.platoon_methods) {
     -- @param last The index of the last node of the path, is by default the length of the path.
     -- @return Table of commands.
     IssueMovePath = function (self, path, first, last) 
-        return self:IssueCommandPath(IssueFormMove, path, first, last);
+        return self:IssueCommandPath(IssueFormMove, path, first, last)
     end,
     
 }
