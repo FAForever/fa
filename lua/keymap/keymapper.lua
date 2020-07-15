@@ -29,7 +29,7 @@ function GetDefaultKeyMapName()
     return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
 end
 
--- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+-- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or 'hotbuildKeyMap.lua' (FAF) or 'alternatehotbuildKeyMap.lua' (FAF)
 function SetDefaultKeyMapName(preset)
     Prefs.SetToCurrentProfile("UserKeyMapName", preset)
 end
@@ -145,7 +145,7 @@ function ClearUserKeyMap()
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
 end
 
--- resets UserKeyMap in game references file and saves new keybinding preset: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+-- resets UserKeyMap in game references file and saves new keybinding preset: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF) or 'alternatehotbuildKeyMap.lua' (FAF)
 function ResetUserKeyMapTo(newPreset)
     local oldPreset = GetDefaultKeyMapName()
     LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')

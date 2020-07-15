@@ -59,6 +59,14 @@ local function ResetBindingToHotbuildKeyMap()
     keyContainer:Filter(keyword)
 end
 
+local function ResetBindingToalternativeKeyMap()
+    IN_ClearKeyMap()
+    KeyMapper.ResetUserKeyMapTo('alternativeKeyMap.lua')
+    IN_AddKeyMapTable(KeyMapper.GetKeyActions())
+    keyTable = FormatData()
+    keyContainer:Filter(keyword)
+end
+
 local function ConfirmNewKeyMap()
     KeyMapper.SaveUserKeyMap()
     IN_ClearKeyMap()
@@ -530,21 +538,7 @@ function CreateUI()
     LayoutHelpers.AtTopIn(title, dialogContent, 12)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
-    local offset = dialogContent.Width() / 5
-
-    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
-    LayoutHelpers.SetWidth(closeButton, 200)
-    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
-    LayoutHelpers.AtRightIn(closeButton, dialogContent, offset - (closeButton.Width() / 2))
-    Tooltip.AddControlTooltip(closeButton,
-    {
-        text = '<LOC _Close>Close',
-        body = '<LOC key_binding_0021>Closes this dialog and confirms assignments of key bindings'
-    })
-    closeButton.OnClick = function(self, modifiers)
-        -- confirmation of changes will occur on OnClosed of this UI
-        CloseUI()
-    end
+    local offset = dialogContent.Width() / 5.25
 
     popup.OnClosed = function(self)
         ConfirmNewKeyMap()
@@ -553,7 +547,7 @@ function CreateUI()
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0004>Default Preset")
     LayoutHelpers.SetWidth(defaultButton, 200)
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() / 2))
+    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() * 3 / 4))
     defaultButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default (GPG) preset?",
             "<LOC _Yes>", ResetBindingToDefaultKeyMap,
@@ -569,7 +563,7 @@ function CreateUI()
     local hotbuildButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0009>Hotbuild Preset")
     LayoutHelpers.SetWidth(hotbuildButton, 200)
     LayoutHelpers.AtBottomIn(hotbuildButton, dialogContent, 10)
-    LayoutHelpers.AtHorizontalCenterIn(hotbuildButton, dialogContent)
+    LayoutHelpers.AtLeftIn(hotbuildButton, defaultButton, offset + (defaultButton.Width() * 1 / 4))
     hotbuildButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0008>Are you sure you want to reset all key bindings to the hotbuild (FAF) preset?",
             "<LOC _Yes>", ResetBindingToHotbuildKeyMap,
@@ -581,6 +575,36 @@ function CreateUI()
         text = "<LOC key_binding_0009>Hotbuild Preset",
         body = '<LOC key_binding_0020>Reset all key bindings to the hotbuild (FAF) preset'
     })
+
+    local alternativeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0025>Alternative Preset")
+    LayoutHelpers.SetWidth(alternativeButton, 200)
+    LayoutHelpers.AtBottomIn(alternativeButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(alternativeButton, hotbuildButton, offset + (defaultButton.Width() * 1 / 4))
+    alternativeButton.OnClick = function(self, modifiers)
+        UIUtil.QuickDialog(popup, "<LOC key_binding_0024>Are you sure you want to reset all key bindings to the alternative (FAF) preset?",
+            "<LOC _Yes>", ResetBindingToalternativeKeyMap,
+            "<LOC _No>", nil, nil, nil, true,
+            {escapeButton = 2, enterButton = 1, worldCover = false})
+    end
+    Tooltip.AddControlTooltip(alternativeButton,
+    {
+        text = "<LOC key_binding_0025>Alternative Preset",
+        body = '<LOC key_binding_0026>Reset all key bindings to the alternative (FAF) preset'
+    })
+
+    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
+    LayoutHelpers.SetWidth(closeButton, 200)
+    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(closeButton, alternativeButton, offset + (defaultButton.Width() * 1 / 4))
+    Tooltip.AddControlTooltip(closeButton,
+    {
+        text = '<LOC _Close>Close',
+        body = '<LOC key_binding_0021>Closes this dialog and confirms assignments of key bindings'
+    })
+    closeButton.OnClick = function(self, modifiers)
+        -- confirmation of changes will occur on OnClosed of this UI
+        CloseUI()
+    end
 
     dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
