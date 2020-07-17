@@ -826,6 +826,9 @@ FactoryUnit = Class(StructureUnit) {
         if not bp then return 0, px, py, pz end
 
         local vectorObj = self:GetRallyPoint()
+
+        if not vectorObj then return 0, px, py, pz end
+
         local bpKey = 1
         local distance, lowest = nil
         for k, v in bp do
