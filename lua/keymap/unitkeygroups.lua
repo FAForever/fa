@@ -308,6 +308,8 @@ unitkeygroups = {
         "Heavy_Point_Defense",
         "Point_Defense",
         "Wall_Section",
+        
+        "_upgrade",
     },
     ["Alt_AA"] = {
         "Anti_Air",
