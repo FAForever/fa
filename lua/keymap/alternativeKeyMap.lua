@@ -4,6 +4,7 @@
 -- Shift = 0x10
 -- Ctrl = 0x11
 -- Alt = 0x12
+-- Works only for QWERTY (american keyboard)
 defaultKeyMap = {
     ['Esc']                 = 'stop',
     ['Shift-Esc']           = 'soft_stop',
@@ -99,18 +100,20 @@ defaultKeyMap = {
     ['Ctrl-Alt-T']          = 'track_unit_second_mon',
     ['Ctrl-V']              = 'cam_free',
 
-    ['T']                   = 'move',
-    ['W']                   = 'attack',
+    ['W']                   = 'move',
+    ['I']                   = 'spreadattack',
+    ['R']                   = 'attack',
     ['Q']                   = 'reclaim',
-    ['R']                   = 'guard',
+    ['T']                   = 'repair',
     ['E']                   = 'overcharge',
-    ['Quote']               = 'toggle_repeat_build',
+    ['Tilde']               = 'toggle_repeat_build',
 
-    ['Shift-A']             = 'shift_reclaim',
-    ['Shift-Q']             = 'shift_patrol',
-    ['Shift-I']             = 'shift_guard',
-    ['Shift-O']             = 'shift_overcharge',
-    ['Shift-Z']             = 'shift_spreadattack',
+    ['Shift-Q']             = 'shift_reclaim',
+    ['Shift-I']             = 'shift_spreadattack',
+    ['Shift-T']             = 'shift_repair',
+    ['Shift-W']             = 'shift_move',
+    ['Shift-E']             = 'shift_overcharge',
+    ['Shift-R']             = 'shift_attack',
 
     ['Z']                   = 'alt_builders',
     ['V']                   = 'alt_radars',
@@ -122,13 +125,12 @@ defaultKeyMap = {
     ['J']                   = 'alt_stealth',
     ['C']                   = 'alt_pgen',
     ['A']                   = 'alt_templates',
-    ['K']                   = 'alt_engystation',
-    ['G']                   = 'alt_defense',
+    ['M']                   = 'alt_engystation',
     ['D']                   = 'alt_aa',
     ['F']                   = 'alt_torpedo',
     ['S']                   = 'alt_arties',
     ['Y']                   = 'alt_tml',
-    ['M']                   = 'upgrades',
+    ['G']                   = 'alt_defense',
 
     ['Tab']                 = 'pause_unit',
 
