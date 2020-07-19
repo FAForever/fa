@@ -4,7 +4,8 @@
 -- Shift = 0x10
 -- Ctrl = 0x11
 -- Alt = 0x12
--- Works only for QWERTY (american keyboard)
+-- Set up for QWERTY (american keyboard)
+
 defaultKeyMap = {
     ['Esc']                 = 'stop',
     ['Shift-Esc']           = 'soft_stop',
@@ -100,21 +101,27 @@ defaultKeyMap = {
     ['Ctrl-Alt-T']          = 'track_unit_second_mon',
     ['Ctrl-V']              = 'cam_free',
 
-    ['W']                   = 'move',
-    ['I']                   = 'spreadattack',
-    ['R']                   = 'attack',
     ['Q']                   = 'reclaim',
+    ['Alt-Q']               = 'capture',
+    ['W']                   = 'move',
+    ['Alt-W']               = 'patrol',
+    ['I']                   = 'assist',
     ['T']                   = 'repair',
+    ['R']                   = 'attack',
+    ['Alt-R']               = 'spreadattack',
     ['E']                   = 'overcharge',
     ['Tilde']               = 'toggle_repeat_build',
 
     ['Shift-Q']             = 'shift_reclaim',
-    ['Shift-I']             = 'shift_spreadattack',
-    ['Shift-T']             = 'shift_repair',
+    ['Shift-Alt-Q']         = 'shift_capture',
     ['Shift-W']             = 'shift_move',
-    ['Shift-E']             = 'shift_overcharge',
+    ['Shift-Alt-W']         = 'patrol',
+    ['Shift-I']             = 'shift_assist',
+    ['Shift-T']             = 'shift_repair',
     ['Shift-R']             = 'shift_attack',
-
+    ['Shift-Alt-R']         = 'shift_spreadattack',
+    ['Shift-E']             = 'shift_overcharge',
+    
     ['Z']                   = 'alt_builders',
     ['V']                   = 'alt_radars',
     ['H']                   = 'alt_shields',

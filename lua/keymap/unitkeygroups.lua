@@ -151,7 +151,7 @@ unitkeygroups = {
         "Torpedo_Ambushing_System",
         "Torpedo_Launcher",
 
-        "T3_armored_assault_bot", -- Brick & Percival
+        "T3_Armored_Assault_Bot", -- Brick & Percival
         "T3_Tank", -- Othumms & Harbinger
 
         "T3_Air_Superiority_Fighter",
@@ -254,7 +254,7 @@ unitkeygroups = {
         "Mass_Fabricator",
         
         "xrl0003", -- Brick for Megalith
-        "T3_armored_assault_bot", -- Brick & Percival
+        "T3_Armored_Assault_Bot", -- Brick & Percival
         "T3_Tank", -- Othumms & Harbinger
         "T2_Heavy_Tank",
         "T2_Assault_Bot",
