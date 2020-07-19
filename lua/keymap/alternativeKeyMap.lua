@@ -158,8 +158,8 @@ defaultKeyMap = {
 }
 
 debugKeyMap = {
+    ['Ctrl-Alt-N']          = 'debug_nodamage',
     ['Alt-F2']              = 'debug_create_unit',
-    ['Ctrl-T']              = 'debug_teleport',
     ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
     ['Ctrl-F9']             = 'debug_toggle_log_window',
@@ -167,4 +167,7 @@ debugKeyMap = {
     ['Ctrl-Shift-V']        = 'debug_paste_units',
     ['Ctrl-Alt-Z']          = 'debug_sally_shears',
     ['Ctrl-Shift-F1']       = 'debug_toggle_pannels',
+    ['Ctrl-Alt-D']          = 'debug_dump_ui_controls',
+    ['Ctrl-Alt-V']          = 'debug_skeletons',
+    ['Ctrl-Alt-B']          = 'debug_bones',
 }
