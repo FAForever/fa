@@ -4,6 +4,8 @@
 -- Shift = 0x10
 -- Ctrl = 0x11
 -- Alt = 0x12
+-- Set up for QWERTY (american keyboard)
+
 defaultKeyMap = {
     ['Esc']                 = 'stop',
     ['Shift-Esc']           = 'soft_stop',

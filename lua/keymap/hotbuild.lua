@@ -280,24 +280,23 @@ function factoryHotkey(units, count)
                         local count = unit.count
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
                     end
-                    worldview.HandleEvent = oldHandleEvent(self, event)
-                    cycleThread = ForkThread(function()
-                        local options = Prefs.GetFromCurrentProfile('options')
-                        local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-                        Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-                    end)
+                    StopCycleMap(self, event)
                 end
             else
-                worldview.HandleEvent = oldHandleEvent(self, event)
-                cycleThread = ForkThread(function()
-                    local options = Prefs.GetFromCurrentProfile('options')
-                    local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-                    Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-                end)
-                CommandMode.EndCommandMode()
+                StopCycleMap(self, event)
             end
         end
     end
+end
+
+function StopCycleMap(self, event)
+    worldview.HandleEvent = oldHandleEvent(self, event)
+    cycleThread = ForkThread(function()
+        local options = Prefs.GetFromCurrentProfile('options')
+        local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+        Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+    end)
+    CommandMode.EndCommandMode()
 end
 
 function hideCycleMap()

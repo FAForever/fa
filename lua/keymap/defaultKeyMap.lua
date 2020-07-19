@@ -139,7 +139,7 @@ defaultKeyMap = {
     ['Shift-G']             = 'shift_spreadattack',
 
     ['B']                   = 'toggle_build_mode',
-    ['Ctrl-Alt-R']           = 'toggle_reclaim_labels',
+    ['Ctrl-Alt-R']          = 'toggle_reclaim_labels',
 
     ['Z']                   = 'pause_unit',
 
