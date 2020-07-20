@@ -25,6 +25,14 @@ local textHistory = ""
 local subtitleThread = false
 local videoQueue = {}
 
+local prefix = {
+    Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
+    Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
+    UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
+    Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
+    NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}
+}
+
 controls = {
     infoBG = false,
     infoText = false,
@@ -53,13 +61,7 @@ end
 
 local currentMovie = false
 function PlayMFDMovie(movie, text)
-    if not controls.movieBrackets then
-        local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
-            Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
-            UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
-            Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
-            NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
-        
+    if not controls.movieBrackets then        
         controls.movieBrackets = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/transmission/video-brackets.dds'))
         controls.movieBrackets.Height:Set(1)
         controls.movieBrackets.Width:Set(1)
