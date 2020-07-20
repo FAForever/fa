@@ -283,6 +283,8 @@ function factoryHotkey(units, count)
                     end
                     StopCycleMap(self, event)
                 end
+            else
+                StopCycleMap(self, event)
             end
         elseif stopFlag == true then
             StopCycleMap(self, event)
