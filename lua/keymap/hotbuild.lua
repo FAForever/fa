@@ -265,6 +265,7 @@ end
 function factoryHotkey(units, count)
     CommandMode.StartCommandMode("build", {name = ''})
     worldview.HandleEvent = function(self, event)
+        local stopFlag = CommandMode.getMyStopValue()
         if event.Type == 'ButtonPress' then
             if event.Modifiers.Left then
                 if type(units) == "string" then
@@ -282,9 +283,9 @@ function factoryHotkey(units, count)
                     end
                     StopCycleMap(self, event)
                 end
-            else
-                StopCycleMap(self, event)
             end
+        elseif stopFlag == true then
+            StopCycleMap(self, event)
         end
     end
 end

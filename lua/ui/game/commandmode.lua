@@ -204,7 +204,13 @@ function AssistMex(command)
     end
 end
 
+function getMyStopValue()
+    local returnvalue = stopFlag
+    return returnvalue
+end
+
 function OnCommandIssued(command)
+    stopFlag = false
     if not command.Clear then
         issuedOneCommand = true
     else
@@ -273,6 +279,7 @@ function OnCommandIssued(command)
     elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
         EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
     elseif command.CommandType == 'Stop' then
+        stopFlag = true
         EnhancementQueueFile.clearEnhancements(command.Units)
     else
         if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
