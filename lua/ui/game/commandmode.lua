@@ -205,8 +205,7 @@ function AssistMex(command)
 end
 
 function getMyStopValue()
-    local returnvalue = stopFlag
-    return returnvalue
+    return stopFlag
 end
 
 function OnCommandIssued(command)
