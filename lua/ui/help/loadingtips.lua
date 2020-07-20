@@ -18,7 +18,7 @@ Tips = {
     "<LOC loadingtip_0016>Tech 1 Mass Extractors only need a few seconds to pay back their investment",
     "<LOC loadingtip_0017>Rebuilding structures on their wrecks saves you 50% of the construction cost and time",
     "<LOC loadingtip_0018>An un-upgraded ACU is equivalent to 20 T1 tanks and 2 T1 Engineers",
-    "<LOC loadingtip_0019>You should build Tactical Missile Defense as soon as you have T2",
+    "<LOC loadingtip_0019>You should build Tactical Missile Defense soon after you have reached T2",
     "<LOC loadingtip_0020>A hydrocarbon generator has the same power outcome as 5 T1 Power Generators, but it's much cheaper",
     "<LOC loadingtip_0021>Aeon T3 Mobile Artillery can shoot while it's moving",
     "<LOC loadingtip_0022>Include reclaiming rocks around your start position into your build order",
