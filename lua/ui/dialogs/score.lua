@@ -116,6 +116,14 @@ local tabs = {
     },
 }
 
+local prefix = {
+    Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
+    Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
+    UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
+    Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
+    NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}
+}
+
 -- determine which data to show based on current page, data type and column
 local function UpdateDisplay()
     -- show elapsed time
@@ -793,12 +801,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         elseif tabData.button == "campaign" then
             -- Set up campaign display
             local opData = operationVictoryTable.opData
-
-            local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
-                Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
-                UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
-                Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
-                NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
 
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)
