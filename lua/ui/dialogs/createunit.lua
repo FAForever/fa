@@ -345,15 +345,15 @@ end
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 6 then
-        LayoutHelpers.SetHeight(group, 30 + math.floor(table.getn(data.choices)/6) * 25)
+    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
+        LayoutHelpers.SetHeight(group, 30 + math.floor((table.getn(data.choices) - 1)/5) * 25)
     else
         LayoutHelpers.SetHeight(group, 30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 6 then
+    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
         LayoutHelpers.AtTopIn(group.check, group, 2)
     else
         LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -369,7 +369,7 @@ local function CreateNameFilter(data)
 
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 6 then
+    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
         LayoutHelpers.AtTopIn(group.label, group, 7)
     else
         LayoutHelpers.AtVerticalCenterIn(group.label, group)
@@ -382,12 +382,12 @@ local function CreateNameFilter(data)
             group.items[index] = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
             if index == 1 then
                 LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
-            elseif index < 7 then
+            elseif index < 6 then
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             else
-                LayoutHelpers.Below(group.items[index], group.items[index-6])
+                LayoutHelpers.Below(group.items[index], group.items[index-5])
             end
-            if index < 7 then
+            if index < 6 then
                 LayoutHelpers.AtTopIn(group.items[index], group)
             end
 
@@ -503,8 +503,9 @@ function CreateDialog(x, y)
     dialog = Bitmap(GetFrame(0))
     dialog:SetSolidColor('CC000000')
     local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
-    -- set window high. 400 pixel for the window + 30 pixel for every army line
-    LayoutHelpers.SetDimensions(dialog, 550, 450 + 30 * NoArmies)
+    local NoMods = math.floor((table.getn(nameFilters[3].choices) - 1)/5)
+    -- set window high. 400 pixel for the window + 30 pixel for every army line + 25 for every extra source row
+    LayoutHelpers.SetDimensions(dialog, 510, 450 + 30 * NoArmies + NoMods * 25)
     dialog.Left:Set(function() return math.max(math.min(x, GetFrame(0).Right() - dialog.Width()), 0) end)
     dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
