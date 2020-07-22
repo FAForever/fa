@@ -40,9 +40,9 @@ Platoon = Class(moho.platoon_methods) {
         self.CreationTime = GetGameTimeSeconds()
     end,
 
-    SetPlatoonData = function(self, dataTable)
-        self.PlatoonData = table.deepcopy(dataTable)
-    end,
+SetPlatoonData = function(self, dataTable)
+    self.PlatoonData = table.deepcopy(dataTable)
+end,
 
     SetPartOfAttackForce = function(self)
         if not self.PlatoonData then
@@ -6615,25 +6615,38 @@ Platoon = Class(moho.platoon_methods) {
     --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param first The index of the first node of the path, is by default 1.
-    -- @param last The index of the last node of the path, is by default the length of the path.
+    -- @param opts A table of optional values, containing:
+    --        opts.First the index of the first node the path
+    --        opts.Last the index of the last node of the path
+    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
     -- @return Table of commands.
-    IssuePatrolPath = function (self, path, first, last) 
+    IssuePatrolAlongRoute = function(self, path, opts)
+        -- check for optional / default values
+        local first = opts.First or 1 
+        local last = opts.Last or table.getn(path)
+        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
 
-        -- defaults
-        first = first or 1 
-        last = last or table.getn(path)
-        local formation = self.PlatoonData.UseFormation or 'NoFormation'
+        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
+        -- self:SetPlatoonFormationOverride(formation) 
 
-        -- check if we have a formation, IssueFormMove doesn't work if the formation argument is 'NoFormation'.
-        if formation == 'NoFormation' then 
-            WARN('MovePathOrientedByPast: No platoon formation provided, defaulting to GrowthFormation.')
-            formation = 'GrowthFormation'
-        end
+        -- keep track of all the commands we issued
+        local commands = { }
 
         -- check if we have a path, if no path we can return immediately
-        if first == last then
-            return
+        if first > last then
+            return commands
+        end
+
+        -- we have no formation, further computations are not required
+        if formation == 'NoFormation' then 
+            local units = self:GetPlatoonUnits()
+            for k = first, last do 
+                local point = path[k]
+                local command = IssuePatrol(units, point)
+                table.insert(commands, command)
+            end
+
+            return commands
         end
 
         -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
@@ -6649,7 +6662,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- pre-compute the angles
         local angles = { }
-        for k = first, last, 1 do 
+        for k = first, last do 
     
             local curr = path[k - 1]
             local next = path[k]
@@ -6666,10 +6679,9 @@ Platoon = Class(moho.platoon_methods) {
             angles[k] = angle
         end
 
-        -- move over the path, store the commands
-        local commands = { }
+        -- move over the path in formation
         local units = self:GetPlatoonUnits()
-        for k = first, last, 1 do 
+        for k = first, last do 
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormPatrol(units, point, formation, angle)
@@ -6678,31 +6690,43 @@ Platoon = Class(moho.platoon_methods) {
 
         return commands
     end,
-
     
-    --- Issues a command to the platoon along the path, orientating at each node to match the line from the previous 
-    -- node to the current node. Do not use this function directly, use IssueAggressiveMovePath or IssueMovePath instead.
+    --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
-    -- @param command Commands with parameters (units, position, formation, degrees) such as IssueFormMove or IssueFormMoveAggressive.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param first The index of the first node of the path, is by default 1.
-    -- @param last The index of the last node of the path, is by default the length of the path.
+    -- @param opts A table of optional values, containing:
+    --        opts.First the index of the first node the path
+    --        opts.Last the index of the last node of the path
+    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
     -- @return Table of commands.
-    IssueCommandPath = function(self, command, path, first, last)
-        -- defaults
-        first = first or 1 
-        last = last or table.getn(path)
-        local formation = self.PlatoonData.UseFormation or 'NoFormation'
+    IssueAggressiveMoveAlongRoute = function(self, path, opts)
+        -- check for optional / default values
+        local first = opts.First or 1 
+        local last = opts.Last or table.getn(path)
+        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
 
-        -- check if we have a formation, IssueFormMove doesn't work if the formation argument is 'NoFormation'.
-        if formation == 'NoFormation' then 
-            WARN('MovePathOrientedByPast: No platoon formation provided, defaulting to GrowthFormation.')
-            formation = 'GrowthFormation'
-        end
+        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
+        -- self:SetPlatoonFormationOverride(formation) 
+
+        -- keep track of all the commands we issued
+        local commands = { }
 
         -- check if we have a path, if there is no path we can return immediately
-        if first == last then
-            return
+        if first > last then
+            return commands
+        end
+
+        -- we have no formation, further computations are not required
+        if formation == 'NoFormation' then 
+            -- store the commands / orders
+            local units = self:GetPlatoonUnits()
+            for k = first, last do 
+                local point = path[k]
+                local command = IssueAggressiveMove(units, point)
+                table.insert(commands, command)
+            end
+
+            return commands
         end
 
         -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
@@ -6718,7 +6742,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- pre-compute the angles
         local angles = { }
-        for k = first, last, 1 do 
+        for k = first, last do 
     
             local curr = path[k - 1]
             local next = path[k]
@@ -6737,36 +6761,96 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -- move over the path, store the commands
-        local commands = { }
         local units = self:GetPlatoonUnits()
-        for k = first, last, 1 do 
+        for k = first, last do 
             local point = path[k]
             local angle = angles[k]
-            local command = command(units, point, formation, angle)
+            local command = IssueFormAggressiveMove(units, point, formation, angle)
             table.insert(commands, command)
         end
 
         return commands
     end,
 
-    --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
-    -- @param self The platoon itself.
-    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param first The index of the first node of the path, is by default 1.
-    -- @param last The index of the last node of the path, is by default the length of the path.
-    -- @return Table of commands.
-    IssueAggressiveMovePath = function (self, path, first, last) 
-        return self:IssueCommandPath(IssueFormAggressiveMove, path, first, last)
-    end,
-
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param first The index of the first node of the path, is by default 1.
-    -- @param last The index of the last node of the path, is by default the length of the path.
+    -- @param opts A table of optional values, containing:
+    --        opts.First the index of the first node the path
+    --        opts.Last the index of the last node of the path
+    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
     -- @return Table of commands.
-    IssueMovePath = function (self, path, first, last) 
-        return self:IssueCommandPath(IssueFormMove, path, first, last)
+    IssueMoveAlongRoute = function(self, path, opts)
+        -- check for optional / default values
+        local first = opts.First or 1 
+        local last = opts.Last or table.getn(path)
+        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
+
+        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
+        -- self:SetPlatoonFormationOverride(formation) 
+
+        -- keep track of all the commands we issued
+        local commands = { }
+        
+        -- check if we have a path, if there is no path we can return immediately
+        if first > last then
+            return { }
+        end
+
+        -- we have no formation, further computations are not required
+        if formation == 'NoFormation' then 
+            -- store the commands / orders
+            local units = self:GetPlatoonUnits()
+            for k = first, last do 
+                local point = path[k]
+                local command = IssueMove(units, point)
+                table.insert(commands, command)
+            end
+
+            return commands
+        end
+
+        -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
+        -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
+        -- a list of vectors. Convert it if neccesary.
+        if not path[first].x then 
+            local oldPath = path
+            path = {}
+            for k, node in oldPath do
+                table.insert(path, Vector(node[1], node[2], node[3]))
+            end
+        end
+
+        -- pre-compute the angles
+        local angles = { }
+        for k = first, last do 
+    
+            local curr = path[k - 1]
+            local next = path[k]
+    
+            -- if we're trying to look before the first node of the path, use the platoons current position instead
+            if k - 1 < first then 
+                local pos = self:GetPlatoonPosition()
+                curr = Vector(pos[1], pos[2], pos[3])
+            end
+
+            -- base orientation when the angle is 0
+            local base = Vector( 0, 0, 1 )
+            local direction = Utilities.GetDirectionVector(next, curr)
+            local angle = Utilities.GetAngleCCW(base, direction)
+            angles[k] = angle
+        end
+
+        -- move over the path, store the commands
+        local units = self:GetPlatoonUnits()
+        for k = first, last do 
+            local point = path[k]
+            local angle = angles[k]
+            local command = IssueFormMove(units, point, formation, angle)
+            table.insert(commands, command)
+        end
+
+        return commands
     end,
     
 }
