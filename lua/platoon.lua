@@ -40,9 +40,9 @@ Platoon = Class(moho.platoon_methods) {
         self.CreationTime = GetGameTimeSeconds()
     end,
 
-SetPlatoonData = function(self, dataTable)
-    self.PlatoonData = table.deepcopy(dataTable)
-end,
+    SetPlatoonData = function(self, dataTable)
+        self.PlatoonData = table.deepcopy(dataTable)
+    end,
 
     SetPartOfAttackForce = function(self)
         if not self.PlatoonData then
