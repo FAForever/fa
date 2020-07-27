@@ -72,7 +72,17 @@ UAL0401 = Class(AWalkingLandUnit) {
         end
 
         self:DestroyAllDamageEffects()
-        self:CreateWreckage(overkillRatio)
+        local wreckage = self:CreateWreckage(overkillRatio)
+
+        -- change the collision box of the wreckage to match the animation
+        local cx, cy, cz, sx, sy, sz;
+        cx = 0        -- 0
+        cy = 0        -- 3.5
+        cz = 3.0      -- 0
+        sx = 1.25     -- 1.25
+        sy = 0.75     -- 3.25
+        sz = 3.75     -- 0.75
+        wreckage:SetCollisionShape('Box', cx, cy, cz, sx, sy, sz)
 
         -- CURRENTLY DISABLED UNTIL DESTRUCTION
         -- Create destruction debris out of the mesh, currently these projectiles look like crap,
