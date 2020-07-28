@@ -16,7 +16,6 @@ local Prefs = import('/lua/user/prefs.lua')
 local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
 local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
 local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
-
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 
@@ -204,12 +203,7 @@ function AssistMex(command)
     end
 end
 
-function getMyStopValue()
-    return stopFlag
-end
-
 function OnCommandIssued(command)
-    stopFlag = false
     if not command.Clear then
         issuedOneCommand = true
     else
@@ -278,7 +272,6 @@ function OnCommandIssued(command)
     elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
         EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
     elseif command.CommandType == 'Stop' then
-        stopFlag = true
         EnhancementQueueFile.clearEnhancements(command.Units)
     else
         if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
