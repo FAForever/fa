@@ -547,7 +547,7 @@ function CreateUI()
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0004>Default Preset")
     LayoutHelpers.SetWidth(defaultButton, 200)
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() * 3 / 4))
+    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, (offset - (defaultButton.Width() * 3 / 4)) / LayoutHelpers.GetPixelScaleFactor())
     defaultButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default (GPG) preset?",
             "<LOC _Yes>", ResetBindingToDefaultKeyMap,
@@ -563,7 +563,7 @@ function CreateUI()
     local hotbuildButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0009>Hotbuild Preset")
     LayoutHelpers.SetWidth(hotbuildButton, 200)
     LayoutHelpers.AtBottomIn(hotbuildButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(hotbuildButton, defaultButton, offset + (defaultButton.Width() * 1 / 4))
+    LayoutHelpers.AtLeftIn(hotbuildButton, defaultButton, (offset + (defaultButton.Width() * 1 / 4)) / LayoutHelpers.GetPixelScaleFactor())
     hotbuildButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0008>Are you sure you want to reset all key bindings to the hotbuild (FAF) preset?",
             "<LOC _Yes>", ResetBindingToHotbuildKeyMap,
@@ -579,7 +579,7 @@ function CreateUI()
     local alternativeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0025>Alternative Preset")
     LayoutHelpers.SetWidth(alternativeButton, 200)
     LayoutHelpers.AtBottomIn(alternativeButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(alternativeButton, hotbuildButton, offset + (defaultButton.Width() * 1 / 4))
+    LayoutHelpers.AtLeftIn(alternativeButton, hotbuildButton, (offset + (defaultButton.Width() * 1 / 4))/ LayoutHelpers.GetPixelScaleFactor())
     alternativeButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0024>Are you sure you want to reset all key bindings to the alternative (FAF) preset?",
             "<LOC _Yes>", ResetBindingToalternativeKeyMap,
@@ -595,7 +595,7 @@ function CreateUI()
     local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
     LayoutHelpers.SetWidth(closeButton, 200)
     LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(closeButton, alternativeButton, offset + (defaultButton.Width() * 1 / 4))
+    LayoutHelpers.AtLeftIn(closeButton, alternativeButton, (offset + (defaultButton.Width() * 1 / 4))/ LayoutHelpers.GetPixelScaleFactor())
     Tooltip.AddControlTooltip(closeButton,
     {
         text = '<LOC _Close>Close',
