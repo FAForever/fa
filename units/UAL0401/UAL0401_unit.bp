@@ -558,6 +558,12 @@ UnitBlueprint {
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
+        CollisionOffsetAfterDeathAnimationX = 0,
+        CollisionOffsetAfterDeathAnimationY = 0,
+        CollisionOffsetAfterDeathAnimationZ = 3,
+        SizeAfterDeathAnimationX = 2.5,
+        SizeAfterDeathAnimationY = 1.5,
+        SizeAfterDeathAnimationZ = 6.5,
         WreckageLayers = {
             Air = false,
             Land = true,

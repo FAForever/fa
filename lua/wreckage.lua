@@ -83,14 +83,40 @@ Wreckage = Class(Prop) {
 }
 
 --- Create a wreckage prop.
-function CreateWreckage(bp, position, orientation, mass, energy, time)
+function CreateWreckage(bp, position, orientation, mass, energy, time, deathAnimationPlayed)
+    local wreck = bp.Wreckage
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
     prop:SetOrientation(orientation, true)
-
     prop:SetScale(bp.Display.UniformScale)
-    prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX * 0.5, bp.SizeY * 0.5, bp.SizeZ * 0.5)
+
+    -- take the default center (cx, cy, cz) and size (sx, sy, sz)
+    local cx, cy, cz, sx, sy, sz;
+    cx = bp.CollisionOffsetX
+    cy = bp.CollisionOffsetY
+    cz = bp.CollisionOffsetZ
+    sx = bp.SizeX
+    sy = bp.SizeY
+    sz = bp.SizeZ
+
+    -- if a death animation is played the wreck hitbox may need some changes
+    if deathAnimationPlayed then 
+        cx = wreck.CollisionOffsetAfterDeathAnimationX or cx 
+        cy = wreck.CollisionOffsetAfterDeathAnimationY or cy 
+        cz = wreck.CollisionOffsetAfterDeathAnimationZ or cZ 
+        sx = wreck.SizeAfterDeathAnimationX or sx 
+        sy = wreck.SizeAfterDeathAnimationY or sy 
+        sz = wreck.SizeAfterDeathAnimationZ or sz 
+    end
+
+    -- adjust the size, these dimensions are in both directions based on the center
+    sx = sx * 0.5
+    sy = sy * 0.5
+    sz = sz * 0.5
+
+    -- create the collision box
+    prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
 
     prop:SetMaxHealth(bp.Defense.Health)
     prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
