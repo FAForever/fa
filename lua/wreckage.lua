@@ -104,7 +104,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathAnim
     if deathAnimationPlayed then 
         cx = wreck.CollisionOffsetAfterDeathAnimationX or cx 
         cy = wreck.CollisionOffsetAfterDeathAnimationY or cy 
-        cz = wreck.CollisionOffsetAfterDeathAnimationZ or cZ 
+        cz = wreck.CollisionOffsetAfterDeathAnimationZ or cz 
         sx = wreck.SizeAfterDeathAnimationX or sx 
         sy = wreck.SizeAfterDeathAnimationY or sy 
         sz = wreck.SizeAfterDeathAnimationZ or sz 
