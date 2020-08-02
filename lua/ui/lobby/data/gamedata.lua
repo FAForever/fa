@@ -8,6 +8,7 @@ local WatchedValueArray = import('/lua/ui/lobby/data/watchedvalue/watchedvaluear
 
 function CreateGameInfo(maxPlayerSlots, initialValues)
     local gameInfo = {
+        ModOptions = initialValues.ModOptions or {},
         GameOptions = initialValues.GameOptions or {},
         PlayerOptions = WatchedValueArray(maxPlayerSlots),
         Observers = WatchedValueArray(maxPlayerSlots),

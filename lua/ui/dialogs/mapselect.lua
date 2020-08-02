@@ -52,6 +52,7 @@ local Options = {}
 local OptionSource = {}
 local OptionContainer = false
 local advOptions = false
+local modOptions = false
 local changedOptions = {}
 local restrictedCategories = nil
 
@@ -419,6 +420,34 @@ function LoadScenarios(force)
     return scenarios
 end
 
+function LoadModOptions()
+
+    -- get the selected game mods
+    local mods = Mods.GetGameMods()
+
+    -- load in the options file for each mod
+    local optionsPerMod = { }
+    for k, mod in mods do 
+        local directory = mod.location
+        local file = 'mod_options.lua'
+        local path = directory .. '/' .. file 
+
+        if DiskGetFileInfo(path) then
+            local options = {}
+            doscript(path, options)
+            if options.options ~= nil then 
+                local data = { }
+                data.title = mod.name .. " Options"
+                data.options = options.options
+                table.insert(optionsPerMod, data)
+            end
+        end
+
+    end
+
+    return optionsPerMod
+end
+
 function PreloadMap(row)
     local scen = scenarios[scenarioKeymap[row+1]]
 
@@ -450,8 +479,11 @@ local OnMapChanged = function(self, row, noSound)
     end
 end
 
-function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
+function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, setModOptions, availableMods, OnModsChanged)
     LoadScenarios()
+
+    -- initialise the option list for mods
+    modOptions = LoadModOptions();
 
     -- Initialise the selected scenario from the name we were passed.
     for i, scenario in scenarios do
@@ -710,10 +742,28 @@ function RefreshOptions(skipRefresh)
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}          
     end
-    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+
+    -- check if we have mods with options
+    local n = 0
+    if modOptions then 
+
+        -- count the number of mods with options
+        n = table.getn(modOptions)
+
+        -- add them in
+        for k, data in modOptions do 
+            OptionSource[2 + k] = data  
+        end
+    end
+
+    -- check for map options
+    OptionSource[2 + n + 1] = {title = "<LOC lobui_0164>Map options", options = advOptions or {}}
+
+    if skipRefresh then 
+        OptionSource[2 + n + 2] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+    end
 
     Options = {}
 

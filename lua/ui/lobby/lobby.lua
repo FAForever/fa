@@ -2027,9 +2027,7 @@ local function TryLaunch(skipNoObserversCheck)
         -- check if rehosting still works for non-host players.
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
-        -- set the mods
-        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
+        -- todo: add in mod options
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
@@ -2282,6 +2280,10 @@ local OptionUtils = {
             end
         end
 
+        for index, option in modOpts do 
+            options[option.key] = option.values[option.default].key or option.values[option.default]
+        end
+
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
@@ -2296,6 +2298,8 @@ local OptionUtils = {
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
 function OnModsChanged(simMods, UIMods, ignoreRefresh)
+    LOG("Changed!")
+    LOG(repr(simMods));
     -- We depend upon ModsManager to not allow the user to change mods they shouldn't be able to
     selectedSimMods = simMods
     selectedUIMods = UIMods
@@ -3063,6 +3067,7 @@ function CreateUI(maxPlayers)
                 singlePlayer,
                 gameInfo.GameOptions.ScenarioFile,
                 gameInfo.GameOptions,
+                gameInfo.ModOptions,
                 availableMods,
                 OnModsChanged
             )
@@ -4256,6 +4261,9 @@ function UpdateClientModStatus(newHostSimMods)
 
         selectedUIMods = SetUtils.Subtract(selectedUIMods, bannedMods)
     end
+
+    LOG("Updating the mods")
+    LOG(repr(newHostSimMods))
 
     Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
 end
