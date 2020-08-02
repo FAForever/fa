@@ -689,6 +689,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
         end
     end
 
+    LOG(repr(mods))
     for i,mod in mods or {} do
         current_mod = mod -- used in UnitBlueprint()
         task = 'Blueprints Loading: modded files from "' .. mod.name .. '" mod'

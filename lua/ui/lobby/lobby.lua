@@ -2028,6 +2028,11 @@ local function TryLaunch(skipNoObserversCheck)
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- todo: add in mod options
+        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+
+        LOG("Information send to the map: ")
+        LOG(repr(gameInfo))
+        
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
