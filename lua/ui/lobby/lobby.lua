@@ -2026,9 +2026,11 @@ local function TryLaunch(skipNoObserversCheck)
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
         -- load in the default map options if they are not set manually
-        for _, option in scenarioInfo.options do 
-            if not gameInfo.GameOptions[option.key] then 
-                gameInfo.GameOptions[option.key] = option.default
+        if scenarioInfo.options then 
+            for _, option in scenarioInfo.options do 
+                if not gameInfo.GameOptions[option.key] then 
+                    gameInfo.GameOptions[option.key] = option.default
+                end
             end
         end
 
