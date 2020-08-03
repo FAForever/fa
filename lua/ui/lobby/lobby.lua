@@ -33,6 +33,8 @@ local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
+local ModUtil = import('/lua/ui/modutil.lua')
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
 local Player = Trueskill.Player
@@ -2030,9 +2032,6 @@ local function TryLaunch(skipNoObserversCheck)
         -- todo: add in mod options
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
-        LOG("Information send to the map: ")
-        LOG(repr(gameInfo))
-        
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
@@ -2303,8 +2302,6 @@ local OptionUtils = {
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
 function OnModsChanged(simMods, UIMods, ignoreRefresh)
-    LOG("Changed!")
-    LOG(repr(simMods));
     -- We depend upon ModsManager to not allow the user to change mods they shouldn't be able to
     selectedSimMods = simMods
     selectedUIMods = UIMods
@@ -3021,13 +3018,25 @@ function CreateUI(maxPlayers)
             local mapSelectDialog
 
             autoRandMap = false
-            local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+            local function selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
+
+                LOG("Changed regular options:")
+                LOG(repr(changedOptions))
+
+                LOG("Changed mod options:")
+                LOG(repr(changedModOptions))
+
                 local options = {}
                 if autoRandMap then
                     options['ScenarioFile'] = selectedScenario.file
                 else
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
+
+                    -- Keep track of the mod
+                    for optionKey, data in changedModOptions do
+                        options[optionKey] = data.value
+                    end
 
                     -- remove old 'Advanced options incase of new map
                     if gameInfo.GameOptions.ScenarioFile and string.lower(selectedScenario.file) ~= string.lower(gameInfo.GameOptions.ScenarioFile) then
@@ -5052,6 +5061,9 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
 end
 
 function SetGameOptions(options, ignoreRefresh)
+
+    LOG("Setting game options")
+    LOG(repr(options))
     if not lobbyComm:IsHost() then
         WARN('Attempt to set game option by a non-host')
         return
@@ -5091,6 +5103,11 @@ function SetGameOptions(options, ignoreRefresh)
             GpgNetSend('GameOption', key, val)
         end
     end
+
+    lobbyComm:BroadcastData {
+        Type = 'GameMods',
+        Options = options
+    }
 
     lobbyComm:BroadcastData {
         Type = 'GameOptions',

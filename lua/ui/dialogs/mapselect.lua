@@ -21,6 +21,7 @@ local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').Resource
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local MainMenu = import('/lua/ui/menus/main.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
+local ModUtil = import('/lua/ui/modutil.lua')
 local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -53,8 +54,11 @@ local OptionSource = {}
 local OptionContainer = false
 local advOptions = false
 local modOptions = false
-local changedOptions = {}
+local changedOptions = { }
+local changedModOptions = { }
 local restrictedCategories = nil
+
+local optionsPanel = nil
 
 local popup = nil
 local dialogContent = nil
@@ -420,34 +424,6 @@ function LoadScenarios(force)
     return scenarios
 end
 
-function LoadModOptions()
-
-    -- get the selected game mods
-    local mods = Mods.GetGameMods()
-
-    -- load in the options file for each mod
-    local optionsPerMod = { }
-    for k, mod in mods do 
-        local directory = mod.location
-        local file = 'mod_options.lua'
-        local path = directory .. '/' .. file 
-
-        if DiskGetFileInfo(path) then
-            local options = {}
-            doscript(path, options)
-            if options.options ~= nil then 
-                local data = { }
-                data.title = mod.name .. " Options"
-                data.options = options.options
-                table.insert(optionsPerMod, data)
-            end
-        end
-
-    end
-
-    return optionsPerMod
-end
-
 function PreloadMap(row)
     local scen = scenarios[scenarioKeymap[row+1]]
 
@@ -483,7 +459,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LoadScenarios()
 
     -- initialise the option list for mods
-    modOptions = LoadModOptions();
+    modOptions = ModUtil.LoadModOptions();
 
     -- Initialise the selected scenario from the name we were passed.
     for i, scenario in scenarios do
@@ -546,7 +522,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end
         end
         selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -571,15 +547,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end,
             true)
     end
-
-    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
-    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
-    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
-    modButton.OnClick = function(self, modifiers)
-        -- direct import allows data caching in ModsManager
-        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, OnModsChanged)
-    end
-    dialogContent.modButton = modButton
 
     UIUtil.MakeInputModal(dialogContent)
 
@@ -702,11 +669,30 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
     SetupOptionsPanel(OptionGroup, curOptions)
 
+    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
+    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
+    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
+    modButton.OnClick = function(self, modifiers)
+
+        local NewOnModsChanged = function (...)
+            -- call the original function that changes the selected mods
+            OnModsChanged(unpack(arg))
+            -- initialise the option list for the selected mods
+            modOptions = ModUtil.LoadModOptions()
+            -- refresh the options
+            RefreshOptions(false)
+        end
+
+        -- direct import allows data caching in ModsManager
+        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, NewOnModsChanged)
+    end
+    dialogContent.modButton = modButton
+
     selectButton.OnClick = function(self, modifiers)
         if mapIsOutdated() then
             GUI_OldMap(over)
         end
-        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -725,7 +711,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
         selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -970,10 +956,17 @@ function SetupOptionsPanel(parent, curOptions)
                 --
                 if optData.default then realDefValue = optData.default end
                 line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
+
+                -- TODO: Take into account if it is a mod option
                 line.combo.OnClick = function(self, index, text)
                     local value = optData.values[index].key
                     if value == nil then value = optData.values[index] end
-                    changedOptions[optData.key] = {value = value, index = index}
+                    if optData.isModOption then 
+                        changedModOptions[optData.key] = {value = value, index = index}
+                    else 
+                        changedOptions[optData.key] = {value = value, index = index}
+                    end
+
                     if line.combo.EnableColor then
                         line.combo._text:SetColor('DBBADB')
                     end
