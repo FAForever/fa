@@ -456,7 +456,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LoadScenarios()
 
     -- initialise the option list for mods
-    modOptions = ModUtil.LoadModOptions();
+    modOptions = ModUtil.LoadModOptionsFormatted();
 
     -- Initialise the selected scenario from the name we were passed.
     for i, scenario in scenarios do
@@ -675,7 +675,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             -- call the original function that changes the selected mods
             OnModsChanged(unpack(arg))
             -- initialise the option list for the selected mods
-            modOptions = ModUtil.LoadModOptions()
+            modOptions = ModUtil.LoadModOptionsFormatted()
             -- refresh the options
             RefreshOptions(false)
         end

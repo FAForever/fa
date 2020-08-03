@@ -6,7 +6,20 @@ local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 
-function LoadModOptions()
+-- Returns a table of tables where each subtable contains a list of 
+-- options along with the name of the mod. The format is:
+-- { 
+--     {
+--         title,  (string)
+--         options (table)
+--     }
+--     {
+--         title,  (string)
+--         options (table)
+--     }
+--     ...
+-- }
+function LoadModOptionsFormatted()
 
     -- returns a function that given an option, checks if they key matches.
     local function CheckForClash(option, key)
@@ -77,4 +90,24 @@ function LoadModOptions()
     end
 
     return optionsPerMod
+end
+
+-- Returns a list of the options of all mods in a single list to match the layout set by map, 
+-- team, game and AI options defined in (for example) lobbyOptions.lua. The format is:
+-- { 
+--      option,
+--      option,
+--      option,
+--      ...
+-- }
+function LoadModOptions()
+    local stripped = { }
+    local modOptions = LoadModOptionsFormatted()
+    for _, options in modOptions do
+        for _, option in options.options do  
+            table.insert(stripped, option)
+        end
+    end
+
+    return stripped
 end

@@ -2028,8 +2028,8 @@ local function TryLaunch(skipNoObserversCheck)
         -- load in the defaults of mods if they are not set manually
         local modOptions = ModUtil.LoadModOptions();
         if modOptions then 
-            for _, mod in modOptions do 
-                for k, option in mod.options do 
+            for _, options in modOptions do 
+                for k, option in options do 
                     if not gameInfo.GameOptions[option.key] then 
                         LOG("Loading default mod option: " .. tostring (option.key) .. " = " .. tostring (option.default))
                         gameInfo.GameOptions[option.key] = option.default
@@ -2053,7 +2053,6 @@ local function TryLaunch(skipNoObserversCheck)
         -- check if rehosting still works for non-host players.
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
-        -- todo: add in mod options
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         SetWindowedLobby(false)
@@ -2295,9 +2294,13 @@ local OptionUtils = {
     -- Set all game options to their default values.
     SetDefaults = function()
         local options = {}
+
+        -- default the team options
         for index, option in teamOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
+
+        -- default the global options
         for index, option in globalOpts do
             -- Exception to make AllowObservers work because the engine requires
             -- the keys to be bool. Custom options should use 'True' or 'False'
@@ -2308,10 +2311,23 @@ local OptionUtils = {
             end
         end
 
-        for index, option in modOpts do 
-            options[option.key] = option.values[option.default].key or option.values[option.default]
+        -- default the map options
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        if scenarioInfo.options then 
+            for _, option in scenarioInfo.options do 
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
         end
 
+        -- default the mod options
+        local modOptions = ModUtil.LoadModOptions();
+        if modOptions then 
+            for _, option in modOptions do 
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
+        end
+
+        -- default the AI options
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
@@ -3933,6 +3949,12 @@ function RefreshOptionDisplayData(scenarioInfo)
             local gameOption = gameInfo.GameOptions[optData.key]
             addFormattedOption(optData, gameOption)
         end
+    end
+
+    -- initialise the option list for mods
+    modOptions = ModUtil.LoadModOptions();
+    if modOptions then 
+        addOptionsFrom(modOptions)
     end
 
     -- Add the core options to the formatted option lists
