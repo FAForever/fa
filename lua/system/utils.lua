@@ -59,6 +59,16 @@ function table.find(t,val)
     -- return nil by falling off the end
 end
 
+--- table.contains(t,val) returns true when one element matches the predicate,
+--- Otherwise, returns false
+function table.predicate(t, pred, ...)
+    for k, v in t do 
+        if pred(v, unpack(arg)) then 
+            return true
+        end
+    end
+end
+
 --- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
 function table.subset(t1,t2)
     if not t1 and not t2 then return true end  -- nothing is in nothing

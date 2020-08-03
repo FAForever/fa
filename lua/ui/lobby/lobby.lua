@@ -2013,9 +2013,33 @@ local function TryLaunch(skipNoObserversCheck)
         end
         gameInfo.GameOptions['Ratings'] = allRatings
         gameInfo.GameOptions['ClanTags'] = clanTags
-
+        
+        -- load in the defaults of maps if they are not set manually
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        if scenarioInfo.options then 
+            for _, option in scenarioInfo.options do 
+                if not gameInfo.GameOptions[option.key] then 
+                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (option.default))
+                    gameInfo.GameOptions[option.key] = option.default
+                end
+            end
+        end
 
+        -- load in the defaults of mods if they are not set manually
+        local modOptions = ModUtil.LoadModOptions();
+        if modOptions then 
+            for _, mod in modOptions do 
+                for k, option in mod.options do 
+                    if not gameInfo.GameOptions[option.key] then 
+                        LOG("Loading default mod option: " .. tostring (option.key) .. " = " .. tostring (option.default))
+                        gameInfo.GameOptions[option.key] = option.default
+                    end
+                end
+            end
+        end
+
+        -- clear out all the unknown settings from maps / mods?
+        
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
@@ -3018,13 +3042,10 @@ function CreateUI(maxPlayers)
             local mapSelectDialog
 
             autoRandMap = false
-            local function selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
+            local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
 
                 LOG("Changed regular options:")
                 LOG(repr(changedOptions))
-
-                LOG("Changed mod options:")
-                LOG(repr(changedModOptions))
 
                 local options = {}
                 if autoRandMap then
@@ -3032,11 +3053,6 @@ function CreateUI(maxPlayers)
                 else
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
-
-                    -- Keep track of the mod
-                    for optionKey, data in changedModOptions do
-                        options[optionKey] = data.value
-                    end
 
                     -- remove old 'Advanced options incase of new map
                     if gameInfo.GameOptions.ScenarioFile and string.lower(selectedScenario.file) ~= string.lower(gameInfo.GameOptions.ScenarioFile) then
@@ -3081,7 +3097,6 @@ function CreateUI(maxPlayers)
                 singlePlayer,
                 gameInfo.GameOptions.ScenarioFile,
                 gameInfo.GameOptions,
-                gameInfo.ModOptions,
                 availableMods,
                 OnModsChanged
             )
@@ -5061,9 +5076,6 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
 end
 
 function SetGameOptions(options, ignoreRefresh)
-
-    LOG("Setting game options")
-    LOG(repr(options))
     if not lobbyComm:IsHost() then
         WARN('Attempt to set game option by a non-host')
         return

@@ -55,7 +55,6 @@ local OptionContainer = false
 local advOptions = false
 local modOptions = false
 local changedOptions = { }
-local changedModOptions = { }
 local restrictedCategories = nil
 
 local optionsPanel = nil
@@ -455,7 +454,7 @@ local OnMapChanged = function(self, row, noSound)
     end
 end
 
-function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, setModOptions, availableMods, OnModsChanged)
+function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
     LoadScenarios()
 
     -- initialise the option list for mods
@@ -522,7 +521,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end
         end
         selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -692,7 +691,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         if mapIsOutdated() then
             GUI_OldMap(over)
         end
-        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -711,7 +710,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
         selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, changedModOptions, restrictedCategories)
+        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
 
@@ -723,18 +722,18 @@ end
 
 
 function RefreshOptions(skipRefresh)
-    -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
-    -- it also means it's a flag that tells you this is the first time the dialog has been opened
-    -- so we'll use this flag to reset the options sources so they can set up for multiplayer
-    if skipRefresh then
-        OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}          
-    end
+    -- reset the whole options sources every time the options are refreshed. In practice 
+    -- this doesn't happen too often. 
+    OptionSource = { }
 
-    -- check if we have mods with options
+    -- add in team options
+    OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
+    -- add in game options
+    OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}    
+
+    -- add in mod options
     local n = 0
     if modOptions then 
-
         -- count the number of mods with options
         n = table.getn(modOptions)
 
@@ -744,12 +743,11 @@ function RefreshOptions(skipRefresh)
         end
     end
 
-    -- check for map options
+    -- add in map options
     OptionSource[2 + n + 1] = {title = "<LOC lobui_0164>Map options", options = advOptions or {}}
 
-    if skipRefresh then 
-        OptionSource[2 + n + 2] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
-    end
+    -- add in AI options
+    OptionSource[2 + n + 2] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
 
     Options = {}
 
@@ -766,6 +764,7 @@ function RefreshOptions(skipRefresh)
         return false
     end
 
+    -- construct the format used in OptionContainer:CalcVisible().
     for _, OptionTable in OptionSource do
         if ShouldShowOptionCategory(OptionTable.options) then
             table.insert(Options, {type = 'title', text = OptionTable.title})
@@ -776,6 +775,10 @@ function RefreshOptions(skipRefresh)
             end
         end
     end
+
+    -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
+    -- it also means it's a flag that tells you this is the first time the dialog has been opened
+    -- so we'll use this flag to reset the options sources so they can set up for multiplayer
     if not skipRefresh then
         -- Remove all info about advancedOptions in changedOptions
         -- So we have a clean slate regarding the advanced options each map switch
@@ -957,15 +960,11 @@ function SetupOptionsPanel(parent, curOptions)
                 if optData.default then realDefValue = optData.default end
                 line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
 
-                -- TODO: Take into account if it is a mod option
+                -- TODO: Take into account if it is a mod option?
                 line.combo.OnClick = function(self, index, text)
                     local value = optData.values[index].key
                     if value == nil then value = optData.values[index] end
-                    if optData.isModOption then 
-                        changedModOptions[optData.key] = {value = value, index = index}
-                    else 
-                        changedOptions[optData.key] = {value = value, index = index}
-                    end
+                    changedOptions[optData.key] = {value = value, index = index}
 
                     if line.combo.EnableColor then
                         line.combo._text:SetColor('DBBADB')
