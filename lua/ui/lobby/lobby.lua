@@ -2018,6 +2018,7 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.options then 
             for _, option in scenarioInfo.options do 
                 if not gameInfo.GameOptions[option.key] then 
+                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (option.default))
                     gameInfo.GameOptions[option.key] = option.default
                 end
             end
