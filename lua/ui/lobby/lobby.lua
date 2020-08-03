@@ -3341,6 +3341,8 @@ function CreateUI(maxPlayers)
     GUI.OptionContainer.IsScrollable = function(self, axis)
         return true
     end
+
+    -- todo?
     -- determines what controls should be visible or not
     GUI.OptionContainer.CalcVisible = function(self)
         local function SetTextLine(line, data, lineID)
@@ -3951,18 +3953,18 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
 
-    -- initialise the option list for mods
+    -- add in the global / team options
+    addOptionsFrom(teamOptions)
+    addOptionsFrom(globalOpts)
+
+
+    -- add in the mod options
     modOptions = ModUtil.LoadModOptions();
     if modOptions then 
         addOptionsFrom(modOptions)
     end
 
-    -- Add the core options to the formatted option lists
-    addOptionsFrom(globalOpts)
-    addOptionsFrom(teamOptions)
-    addOptionsFrom(AIOpts)
-
-    -- Add options from the scenario object, if any are provided.
+    -- add in the map options
     if scenarioInfo.options then
         if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
             AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
@@ -3973,6 +3975,9 @@ function RefreshOptionDisplayData(scenarioInfo)
             addFormattedOption(optData, gameInfo.GameOptions[optData.key])
         end
     end
+
+    -- add in the AI options
+    addOptionsFrom(AIOpts)
 
     GUI.OptionContainer:CalcVisible()
 end
