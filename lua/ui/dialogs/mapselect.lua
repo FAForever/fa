@@ -57,8 +57,6 @@ local modOptions = false
 local changedOptions = { }
 local restrictedCategories = nil
 
-local optionsPanel = nil
-
 local popup = nil
 local dialogContent = nil
 
