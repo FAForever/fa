@@ -211,7 +211,7 @@ function OptionsFormatted(scenario, mods)
     )
 end
 
-function OptionsCorrected(entries, noContentMessage)
+function OptionsFormattedMessage(entries, noContentMessage)
     local corrected = { }
     for k, entry in entries do 
         -- add in the entry itself
@@ -230,6 +230,52 @@ function OptionsCorrected(entries, noContentMessage)
                 table.insert(corrected, MakeText(noContentMessage))
             end
         end
+    end
+    return corrected
+end
+
+function OptionsFormattedRemoved(entries)
+    local previous = entries
+    local corrected = { }
+
+    -- allows us to recursively remove sections and subsections
+    local removing = true 
+    while removing do 
+
+        -- start off clean
+        corrected = { }
+
+        -- assume this is the last iteration
+        removing = false
+        for k, entry in previous do 
+            -- check if a title has content, keep it
+            if entry.type == 'title' then 
+                if TitleHasContent(previous, k) then 
+                    table.insert(corrected, entry)
+                else
+                    -- check again, see if some title now has no elements under it
+                    removing = true
+                end
+            end
+
+            -- check if a subtitle has content, keep it
+            if entry.type == 'subtitle' then 
+                if SubtitleHasContent(previous, k) then 
+                    table.insert(corrected, entry)
+                else
+                    -- check again, see if some title now has no elements under it
+                    removing = true
+                end
+            end
+
+            -- add in everything else
+            if not (entry.type == 'title' or entry.type == 'subtitle') then
+                table.insert(corrected, entry)
+            end
+        end
+
+        -- switch it up
+        previous = corrected
     end
     return corrected
 end

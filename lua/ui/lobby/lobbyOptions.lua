@@ -111,6 +111,24 @@ teamOptions =
 
 globalOpts = {
     {
+        default = 2,
+        label = "<LOC lobui_0592>Allow Observers",
+        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
+        key = 'AllowObservers',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0594>Observers are allowed",
+                key = true,
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0595>Observers are not allowed",
+                key = false,
+            }
+        },
+    },
+    {
         default = 8,
         label = "<LOC lobui_0102>Unit Cap",
         help = "<LOC lobui_0103>Set the maximum number of units that can be in play",
@@ -121,7 +139,39 @@ globalOpts = {
             '125','250', '375', '500', '625', '750', '875', '1000', '1250', '1500'
         },
     },
-
+    {
+        default = 2,
+        label = "<LOC lobui_0740>Share Conditions",
+        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
+        key = 'Share',
+        values = {
+            {
+                text = "<LOC lobui_0742>Full Share",
+                help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
+                key = 'FullShare',
+            },
+            {
+                text = "<LOC lobui_0744>Share Until Death",
+                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+                key = 'ShareUntilDeath',
+            },
+            {
+                text = "<LOC lobui_0762>Traitors",
+                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+                key = 'TransferToKiller',
+            },
+            {
+                text = "<LOC lobui_0766>Defectors",
+                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+                key = 'Defectors',
+            },
+            {
+                text = "<LOC lobui_0764>Civilian Desertion",
+                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+                key = 'CivilianDeserter',
+            },
+        },
+    },
     {
         default = 1,
         label = "<LOC lobui_0434>Share Unit Cap at Death",
@@ -235,24 +285,6 @@ globalOpts = {
                 text = "<LOC lobui_0264>Adjustable",
                 help = "<LOC lobui_0265>Adjustable in-game",
                 key = 'adjustable',
-            },
-        },
-    },
-    {
-        default = 2,
-        label = "<LOC lobui_0592>Allow Observers",
-        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
-        key = 'AllowObservers',
-        values = {
-            {
-                text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0594>Observers are allowed",
-                key = true,
-            },
-            {
-                text = "<LOC _No>No",
-                help = "<LOC lobui_0595>Observers are not allowed",
-                key = false,
             },
         },
     },
@@ -387,39 +419,6 @@ globalOpts = {
                 text = "<LOC _Off>Off",
                 help = "<LOC lobui_0730>Score is disabled",
                 key = 'no',
-            },
-        },
-    },
-   {
-        default = 2,
-        label = "<LOC lobui_0740>Share Conditions",
-        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
-        key = 'Share',
-        values = {
-            {
-                text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
-                key = 'FullShare',
-            },
-            {
-                text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
-                key = 'ShareUntilDeath',
-            },
-            {
-                text = "<LOC lobui_0762>Traitors",
-                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
-                key = 'TransferToKiller',
-            },
-            {
-                text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
-                key = 'Defectors',
-            },
-            {
-                text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
-                key = 'CivilianDeserter',
             },
         },
     },

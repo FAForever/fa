@@ -3261,8 +3261,8 @@ function CreateUI(maxPlayers)
 
             element.bg2 = Bitmap(element)
             element.bg2:SetSolidColor('ff0d1016')
-            element.bg2.Left:Set(function() return element.bg.Left() - 1 end)
-            element.bg2.Right:Set(function() return element.bg.Right() + 1 end)
+            element.bg2.Left:Set(function() return element.bg.Left() + 1 end)
+            element.bg2.Right:Set(function() return element.bg.Right() - 1 end)
             element.bg2.Bottom:Set(function() return element.bg.Bottom() - 1 end)
             element.bg2.Top:Set(function() return element.value.Top() + 1 end)
 
@@ -3358,7 +3358,7 @@ function CreateUI(maxPlayers)
             line.bg2:Show()
 
             -- default background colors
-            line.bg:SetSolidColor('ff080a0e')
+            line.bg:SetSolidColor('ff212021')
             line.bg2:SetSolidColor('ff0d1016')
 
             -- set the title tooltip
@@ -3395,10 +3395,10 @@ function CreateUI(maxPlayers)
                 -- line.value:SetFont(UIUtil.bodyFont, 14)
                 -- line.value:SetColor(UIUtil.fontColor)
 
-                line.bg:SetSolidColor('ff0d1016')
-                line.bg2:SetSolidColor('ff0d1016')
+                line.bg:SetSolidColor('00000000')
+                line.bg2:SetSolidColor('00000000')
 
-                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 8)
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line)
             end
 
@@ -3411,10 +3411,10 @@ function CreateUI(maxPlayers)
                 -- line.value:SetFont(UIUtil.bodyFont, 14)
                 -- line.value:SetColor(UIUtil.fontColor)
 
-                line.bg:SetSolidColor('ff0d1016')
-                line.bg2:SetSolidColor('ff0d1016')
+                line.bg:SetSolidColor('00000000')
+                line.bg2:SetSolidColor('00000000')
 
-                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 8)
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line)
             end
 
@@ -3427,10 +3427,10 @@ function CreateUI(maxPlayers)
                 -- line.value:SetFont(UIUtil.bodyFont, 14)
                 -- line.value:SetColor(UIUtil.fontColor)
 
-                line.bg:SetSolidColor('ff0d1016')
-                line.bg2:SetSolidColor('ff0d1016')
+                line.bg:SetSolidColor('00000000')
+                line.bg2:SetSolidColor('00000000')
 
-                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 8)
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line)
             end
 
@@ -4093,10 +4093,10 @@ function RefreshOptionDisplayData(scenarioInfo)
     -- for the formatted options, correct the sections that have no content. Must 
     -- be done _before_ the mod / unti restriction information is prepended!
     local noContentMessageDefaults = "No options available"
-    local withDefaultOptions = OptionUtil.OptionsCorrected(tooltippedOptions, noContentMessageDefaults)
+    local withDefaultOptions = OptionUtil.OptionsFormattedRemoved(tooltippedOptions, noContentMessageDefaults)
 
     local noContentMessageNoDefaults = "No options changed or available"
-    local withoutDefaultOptions = OptionUtil.OptionsCorrected(defaultOnlyOptions, noContentMessageNoDefaults)
+    local withoutDefaultOptions = OptionUtil.OptionsFormattedRemoved(defaultOnlyOptions, noContentMessageNoDefaults)
 
     -- concat it all together, adding in the mods / unit restrictions information
     formattedOptions = table.cat(formattedOptions, withDefaultOptions)

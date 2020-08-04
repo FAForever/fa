@@ -729,7 +729,7 @@ function RefreshOptions(skipRefresh)
 
     -- correct it such that subtitles / titles with no content show a message, etc.
     local noContentMessage = "No options available"
-    Options = OptionUtil.OptionsCorrected(Options, noContentMessage)
+    Options = OptionUtil.OptionsFormattedMessage(Options, noContentMessage)
 
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
