@@ -133,7 +133,7 @@ function ModOptionsFormatted(mods)
     for k, mod in mods do 
 
         -- add in the subtitle
-        table.insert(options, MakeSubTitle(mod.name .. " Options"))
+        table.insert(options, MakeSubTitle(mod.name))
 
         -- determine the path to the options file
         local directory = mod.location
