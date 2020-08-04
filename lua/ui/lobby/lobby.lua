@@ -34,6 +34,7 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
 local ModUtil = import('/lua/ui/modutil.lua')
+local OptionUtil = import('/lua/ui/optionutil.lua')
 
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
@@ -3059,10 +3060,6 @@ function CreateUI(maxPlayers)
 
             autoRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-
-                LOG("Changed regular options:")
-                LOG(repr(changedOptions))
-
                 local options = {}
                 if autoRandMap then
                     options['ScenarioFile'] = selectedScenario.file
@@ -3264,10 +3261,10 @@ function CreateUI(maxPlayers)
 
             element.bg2 = Bitmap(element)
             element.bg2:SetSolidColor('ff0d1016')
-            element.bg2.Left:Set(function() return element.bg.Left() + 1 end)
-            element.bg2.Right:Set(function() return element.bg.Right() - 1 end)
+            element.bg2.Left:Set(function() return element.bg.Left() - 1 end)
+            element.bg2.Right:Set(function() return element.bg.Right() + 1 end)
             element.bg2.Bottom:Set(function() return element.bg.Bottom() - 1 end)
-            element.bg2.Top:Set(function() return element.value.Top() + 0 end)
+            element.bg2.Top:Set(function() return element.value.Top() + 1 end)
 
             LayoutHelpers.SetHeight(element, 36)
             element.Width:Set(GUI.OptionContainer.Width)
@@ -3345,29 +3342,124 @@ function CreateUI(maxPlayers)
     -- todo?
     -- determines what controls should be visible or not
     GUI.OptionContainer.CalcVisible = function(self)
-        local function SetTextLine(line, data, lineID)
-            if data.mod then
-                -- The special label at the top stating the number of mods.
+
+        -- this function overrides what was previously set on the index. Aka, any value that
+        -- some other type of UI changed on some lineID must be reset, otherwise values 'spill'
+        -- over to the next value when you scroll.
+
+        local function SetTextLine(line, entry, lineID)
+
+            -- handling
+            line.bg.HandleEvent = Group.HandleEvent
+            line.bg2.HandleEvent = Bitmap.HandleEvent
+
+            -- show the backgrounds
+            line.bg:Show()
+            line.bg2:Show()
+
+            -- default background colors
+            line.bg:SetSolidColor('ff080a0e')
+            line.bg2:SetSolidColor('ff0d1016')
+
+            -- set the title tooltip
+            if entry.tooltipTitle then
+                Tooltip.AddControlTooltip(line.bg, entry.tooltipTitle)
+            end
+
+            -- set the value tooltip
+            if entry.tooltipValue then 
+                Tooltip.AddControlTooltip(line.bg2, entry.tooltipValue)
+            end
+
+            if entry.type == 'header' then 
+                line.text:SetText(LOCF(entry.title, entry.key))
+                line.text:SetFont(UIUtil.bodyFont, 14)
                 line.text:SetColor('ffff7777')
+
+                line.value:SetText(LOCF(entry.content, entry.key))
+                line.value:SetFont(UIUtil.bodyFont, 14)
+                line.value:SetColor(UIUtil.fontColor)
+
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5)
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
                 LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetRight(line.value)
-            else
-                -- Game options.
+            end
+
+            if entry.type == 'title' then
+                line.text:SetText(LOC(entry.text))
+                line.text:SetFont(UIUtil.titleFont, 14, 3)
+                line.text:SetColor(UIUtil.fontOverColor)
+
+                line.value:SetText('')
+                -- line.value:SetFont(UIUtil.bodyFont, 14)
+                -- line.value:SetColor(UIUtil.fontColor)
+
+                line.bg:SetSolidColor('ff0d1016')
+                line.bg2:SetSolidColor('ff0d1016')
+
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line)
+            end
+
+            if entry.type == 'subtitle' then 
+                line.text:SetText(LOC(entry.text))
+                line.text:SetFont(UIUtil.titleFont, 12, 3)
+                line.text:SetColor(UIUtil.fontOverColor)
+
+                line.value:SetText('')
+                -- line.value:SetFont(UIUtil.bodyFont, 14)
+                -- line.value:SetColor(UIUtil.fontColor)
+
+                line.bg:SetSolidColor('ff0d1016')
+                line.bg2:SetSolidColor('ff0d1016')
+
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line)
+            end
+
+            if entry.type == 'text' then 
+                line.text:SetText(LOC(entry.text))
+                line.text:SetFont(UIUtil.bodyFont, 10)
+                line.text:SetColor(UIUtil.fontOverColor)
+
+                line.value:SetText('')
+                -- line.value:SetFont(UIUtil.bodyFont, 14)
+                -- line.value:SetColor(UIUtil.fontColor)
+
+                line.bg:SetSolidColor('ff0d1016')
+                line.bg2:SetSolidColor('ff0d1016')
+
+                LayoutHelpers.AtLeftTopIn(line.text, line, 5, 6)
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line)
+            end
+
+            if entry.type == 'spacer' then 
+                line.text:SetText('')
+                -- line.text:SetFont(UIUtil.bodyFont, 14)
+                -- line.text:SetColor(UIUtil.fontOverColor)
+
+                line.value:SetText('')
+                -- line.value:SetFont(UIUtil.bodyFont, 14)
+                -- line.value:SetColor(UIUtil.fontColor)
+
+                -- handling
+                line.bg.HandleEvent = Group.HandleEvent
+                line.bg2.HandleEvent = Bitmap.HandleEvent
+            end
+
+            if entry.type == 'option' then 
                 line.text:SetColor(UIUtil.fontColor)
+                line.text:SetFont(UIUtil.bodyFont, 14)
+                line.text:SetText(LOCF(entry.text, entry.key))
+
+                line.value:SetFont(UIUtil.bodyFont, 14)
+                line.value:SetText(LOCF(entry.value, entry.key))
+                line.value:SetColor(UIUtil.fontColor)    
+
                 LayoutHelpers.AtLeftTopIn(line.text, line, 5)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
-            end
-            line.text:SetText(LOCF(data.text, data.key))
-            line.bg:Show()
-            line.value:SetText(LOCF(data.value, data.key))
-            line.bg2:Show()
-            line.bg.HandleEvent = Group.HandleEvent
-            line.bg2.HandleEvent = Bitmap.HandleEvent
-            if data.tooltip then
-                Tooltip.AddControlTooltip(line.bg, data.tooltip)
-                Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
         end
 
@@ -3832,16 +3924,12 @@ function setupChatEdit(chatPanel)
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
-    local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
-    local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-    local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-    if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    end
+
+    -- reset the (nondefault) formatted options
     formattedOptions = {}
     nonDefaultFormattedOptions = {}
 
-    -- Show a summary of the number of active mods.
+    -- Update the number of active mods
     local modStr = false
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
     local modNumUI = table.getn(Mods.GetUiMods()) or 0
@@ -3867,20 +3955,19 @@ function RefreshOptionDisplayData(scenarioInfo)
             modStr = modNumUI..' UI Mod'
         end
     end
+
     if modStr then
-        local option = {
-            text = modStr,
-            value = LOC('<LOC lobby_0003>Check Mod Manager'),
-            mod = true,
-            tooltip = 'Lobby_Mod_Option',
-            valueTooltip = 'Lobby_Mod_Option'
-        }
+        local title = modStr
+        local content = LOC('<LOC lobby_0003>Check Mod Manager')
+        local tooltipTitle = 'Lobby_Mod_Option'
+        local tooltipValue = 'Lobby_Mod_Option'
+        local option = OptionUtil.MakeHeader(title, content, tooltipTitle, tooltipValue)
 
         table.insert(formattedOptions, option)
         table.insert(nonDefaultFormattedOptions, option)
     end
 
-    -- Update the unit restrictions display.
+    -- Update the unit restrictions display
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
         local restrNum = table.getn(gameInfo.GameOptions.RestrictedCategories)
         if restrNum ~= 0 then
@@ -3891,93 +3978,138 @@ function RefreshOptionDisplayData(scenarioInfo)
                 restrictLabel = LOCF("<LOC lobui_0414>%d Build Restrictions", restrNum)
             end
 
-            local option = {
-                text = restrictLabel,
-                value = LOC("<LOC lobui_0416>Check Unit Manager"),
-                mod = true,
-                tooltip = 'Lobby_BuildRestrict_Option',
-                valueTooltip = 'Lobby_BuildRestrict_Option'
-            }
+            local title = restrictLabel
+            local content = LOC("<LOC lobui_0416>Check Unit Manager")
+            local tooltipTitle = 'Lobby_BuildRestrict_Option'
+            local tooltipValue = 'Lobby_BuildRestrict_Option'
+            local option = OptionUtil.MakeHeader(title, content, tooltipTitle, tooltipValue)
 
             table.insert(formattedOptions, option)
             table.insert(nonDefaultFormattedOptions, option)
         end
     end
 
-    -- Add an option to the formattedOption lists
-    local function addFormattedOption(optData, gameOption)
-        -- Don't show multiplayer-only options in single-player
-        if optData.mponly and singlePlayer then
-            return
-        end
+    -- Update the team, game, AI, mod and map options
 
-        -- Don't bother for options with only one value. These are usually someone trying to do
-        -- something clever with a mod or such, not "real" options we care about.
-        if table.getn(optData.values) <= 1 then
-            return
-        end
+    -- retrieve the sim mods
+    local mods = Mods.GetGameMods()
 
-        local option = {
-            text = optData.label,
-            tooltip = { text = optData.label, body = optData.help }
-        }
+    -- retrieve the current scenario
+    if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    end
 
-        -- Options are stored as keys from the values array in optData. We want to display the
-        -- descriptive string in the UI, so let's go dig it out.
+    -- get all the titles, subtitles and options we can find. Then 
+    -- make a deepcopy so that appended information doesn't leak backwards
+    local shallow = OptionUtil.OptionsFormatted(scenarioInfo, mods)
+    local entries = table.deepcopy(shallow)
 
-        -- Scan the values array to find the one with the key matching our value for that option.
-        for k, val in optData.values do
-            local key = val.key or val
-
-            if key == gameOption then
-                option.key = key
-                option.value = val.text or optData.value_text
-                option.valueTooltip = {text = optData.label, body = val.help or optData.value_help}
-
-                table.insert(formattedOptions, option)
-
-                -- Add this option to the non-default set for the UI.
-                if k ~= optData.default then
-                    table.insert(nonDefaultFormattedOptions, option)
+    -- only keep valid options
+    local validOptions = { }
+    for k, entry in entries do
+        if entry.type == 'option' then
+            -- Don't show multiplayer-only options in single-player
+            if not (entry.data.mponly and singlePlayer) then
+                -- Don't bother for options with only one value. These are usually someone trying to do
+                -- something clever with a mod or such, not "real" options we care about.
+                if not (table.getn(entry.data.values) <= 1) then                    
+                    table.insert(validOptions, entry)
                 end
-
-                break
             end
+        else
+            -- keep all the titles, subtitles and spacers
+            table.insert(validOptions, entry)
         end
     end
 
-    local function addOptionsFrom(optionObject)
-        for index, optData in optionObject do
-            local gameOption = gameInfo.GameOptions[optData.key]
-            addFormattedOption(optData, gameOption)
+    -- add tooltips to the options
+    local tooltippedOptions = { }
+    for k, entry in validOptions do 
+        if entry.type == 'option' then
+
+            -- add in a title tooltip
+            entry.tooltipTitle = {
+                text = entry.data.label,
+                body = entry.data.help
+            }
+
+            local gameOption = gameInfo.GameOptions[entry.data.key]
+            if gameOption then 
+                -- its a previously set game option
+                for k, val in entry.data.values do
+                    -- find the corresponding set game option
+                    local key = val.key or val
+                    if key == gameOption then
+                        entry.key = key
+                        entry.value = val.text or entry.data.value_text
+                        entry.tooltipValue = {
+                            text = entry.data.label, 
+                            body = val.help or entry.data.value_help
+                        }
+        
+                        table.insert(tooltippedOptions, entry)   
+                        break
+                    end
+                end      
+            else
+                -- isn't a previously set game option
+                local defaultValue = entry.data.values[entry.default]
+                entry.key = defaultValue.key or defaultValue
+                entry.value = defaultValue.text or entry.data.value_text
+                entry.tooltipValue = {
+                    text = entry.data.label, 
+                    body = defaultValue.help or entry.data.value_help
+                }
+
+                table.insert(tooltippedOptions, entry)  
+            end
+        else
+            -- keep all the titles, subtitles and spacers
+            table.insert(tooltippedOptions, entry)
         end
     end
 
-    -- add in the global / team options
-    addOptionsFrom(teamOptions)
-    addOptionsFrom(globalOpts)
-
-
-    -- add in the mod options
-    modOptions = ModUtil.LoadModOptions();
-    if modOptions then 
-        addOptionsFrom(modOptions)
+    -- separate the options to default-only / all options
+    local defaultOnlyOptions = { }
+    for k, entry in tooltippedOptions do 
+        if entry.type == 'option' then
+            for k, val in entry.data.values do
+                -- get the key and the corresponding game option
+                local key = val.key or val
+                local gameOption = gameInfo.GameOptions[entry.data.key]
+                if key == gameOption then
+                    if k ~= entry.data.default then
+                        table.insert(defaultOnlyOptions, entry)
+                    end 
+                    break
+                end
+            end            
+        else
+            -- keep all the titles, subtitles and spacers
+            table.insert(defaultOnlyOptions, entry)
+        end
     end
 
-    -- add in the map options
+    -- for the formatted options, correct the sections that have no content. Must 
+    -- be done _before_ the mod / unti restriction information is prepended!
+    local noContentMessageDefaults = "No options available"
+    local withDefaultOptions = OptionUtil.OptionsCorrected(tooltippedOptions, noContentMessageDefaults)
+
+    local noContentMessageNoDefaults = "No options changed or available"
+    local withoutDefaultOptions = OptionUtil.OptionsCorrected(defaultOnlyOptions, noContentMessageNoDefaults)
+
+    -- concat it all together, adding in the mods / unit restrictions information
+    formattedOptions = table.cat(formattedOptions, withDefaultOptions)
+    nonDefaultFormattedOptions = table.cat(nonDefaultFormattedOptions, withoutDefaultOptions)
+
+    -- todo jip: move this to optionutil?
+    -- add in a warning for when map options are invalid
     if scenarioInfo.options then
         if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
             AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
             AddChatText(LOC('<LOC lobui_0398>An arbitrary option has been selected for now: check the game options screen!'))
         end
-
-        for index, optData in scenarioInfo.options do
-            addFormattedOption(optData, gameInfo.GameOptions[optData.key])
-        end
     end
-
-    -- add in the AI options
-    addOptionsFrom(AIOpts)
 
     GUI.OptionContainer:CalcVisible()
 end

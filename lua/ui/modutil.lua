@@ -1,5 +1,6 @@
 
 local Mods = import('/lua/mods.lua')
+local OptionUtils = import('/lua/ui/optionutil.lua')
 
 -- used to detect team / game / ai <-> mod option clashes
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
@@ -19,6 +20,67 @@ local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 --     }
 --     ...
 -- }
+
+-- {
+--     { 
+--         type = title
+--         text = string
+--     }
+--     {
+--         type = subtitle
+--         text = string
+--     }
+--     {
+--         type = spacer
+--     }
+--     {
+--         type = option
+--         option = {
+--             ...
+--         }
+--     }
+-- }
+
+-- {
+--     title = string
+--     options = {
+--         ...
+--     }
+-- }
+
+-- which gets converted to
+
+-- {
+--     { 
+--         type = title
+--         text = string
+--     }
+--     {
+--         {
+--             type = option
+--             text = optionData.label
+--             data = optionData
+--             default = optionData.default
+--         }
+--         ...
+--     }
+--     ...
+-- }
+
+
+-- {
+--     {
+--         type = subtitle
+--         text = string 
+--     }
+--     {
+--         type = option
+--         text = optionData.label
+--         data = optionData
+--         default = optionData.default
+--     }
+--     ...
+-- }
 function LoadModOptionsFormatted()
 
     -- returns a function that given an option, checks if they key matches.
@@ -30,8 +92,12 @@ function LoadModOptionsFormatted()
     local mods = Mods.GetGameMods()
 
     -- load in the options file for each mod
-    local optionsPerMod = { }
+    local options = { }
     for k, mod in mods do 
+
+        -- add in the subtitle
+        table.insert(options, OptionUtils.MakeSubTitle(mod.name .. " Options"))
+
         -- determine the path to the options file
         local directory = mod.location
         local file = 'mod_options.lua'
@@ -40,13 +106,14 @@ function LoadModOptionsFormatted()
         -- does such a file exist?
         if DiskGetFileInfo(path) then
             -- try to retrieve the options
-            local options = {}
-            doscript(path, options)
-            if options.options ~= nil then 
-                local valids = { }
+            local data = {}
+            doscript(path, data)
+
+            if data.options ~= nil then 
 
                 -- go over the options, find out if there is a name clash with the team / game options
-                for k, option in options.options do 
+                for k, option in data.options do 
+
                     local key = option.key
                     local clashed = false 
 
@@ -76,20 +143,17 @@ function LoadModOptionsFormatted()
 
                     -- if we haven't clashed, consider it a valid option!
                     if not clashed then 
-                        table.insert(valids, option)
+                        local text = option.label
+                        local data = option
+                        local default = option.default
+                        table.insert(options, OptionUtils.MakeOption(text, data, default))
                     end
                 end
-
-                -- store it in the expected format in mapselect.lua
-                local data = { }
-                data.title = mod.name .. " Options"
-                data.options = valids
-                table.insert(optionsPerMod, data)
             end
         end
     end
 
-    return optionsPerMod
+    return options
 end
 
 -- Returns a list of the options of all mods in a single list to match the layout set by map, 
@@ -101,13 +165,14 @@ end
 --      ...
 -- }
 function LoadModOptions()
-    local stripped = { }
-    local modOptions = LoadModOptionsFormatted()
-    for _, options in modOptions do
-        for _, option in options.options do  
-            table.insert(stripped, option)
+    local optionsStripped = { }
+
+    local optionsformatted = LoadModOptionsFormatted()
+    for _, entry in optionsformatted do
+        if entry.type == 'option' then
+            table.insert(optionsStripped, entry.data)
         end
     end
 
-    return stripped
+    return optionsStripped
 end
