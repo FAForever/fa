@@ -6,23 +6,23 @@ ProjectileBlueprint {
             LodCutoff = 'DefaultLodCutoff',
         },
         ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
+            Bank = 'Impacts',
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
     },
     Categories = {
-        'UEF',
+        'CYBRAN',
         'PROJECTILE',
         'INDIRECTFIRE',
         'STRATEGIC',
@@ -30,11 +30,11 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 25000,
-        MaxHealth = 25000,
+        Health = 60000,
+        MaxHealth = 60000,
     },
-    Description = 'UEF Nuclear Missile',
-    DesiredShooterCap = 1,
+    Description = 'Seraphim Experimental Strategic Missile',
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 5,
         CameraFollowsProjectile = true,
@@ -42,31 +42,33 @@ ProjectileBlueprint {
             IconFadeInZoom = 200,
             LODs = {
                 {
-                    ShaderName = 'TMeshGlow',
+
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
                 },
             },
         },
-        UniformScale = 0.035,
+        UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 1350000,
-        BuildCostMass = 12000,
-        BuildTime = 450000,
+        BuildCostEnergy = 6000,
+        BuildCostMass = 600,
+        BuildTime = 129600,
     },
     General = {
         Category = 'Missile',
         EntityCategory = {
-            'UEF',
+            'CYBRAN',
             'PROJECTILE',
             'INDIRECTFIRE',
             'STRATEGIC',
             'MISSILE',
             'NOSPLASHDAMAGE',
         },
-        Faction = 'UEF',
+        Faction = 'Cybran',
     },
     Interface = {
-        HelpText = 'UEF Nuclear Missile',
+        HelpText = 'Seraphim Experimental Strategic Missile',
     },
     Physics = {
         Acceleration = 3,

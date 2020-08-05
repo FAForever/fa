@@ -30,8 +30,8 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 25,
-        MaxHealth = 25,
+        Health = 25000,
+        MaxHealth = 25000,
     },
     Description = 'Seraphim Inferno Strategic Missile',
     DesiredShooterCap = 1,
