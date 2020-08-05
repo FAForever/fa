@@ -400,7 +400,7 @@ UnitBlueprint {
             BuildTime = 3200,
             Icon = 'nms',
             Name = '<LOC enhancements_0095>Nanite Missile System',
-            Slot = 'Back',
+            Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'URL0301',
             },
@@ -416,7 +416,7 @@ UnitBlueprint {
                 'NaniteMissileSystem',
                 'NaniteMissileSystemRemove',
             },
-            Slot = 'Back',
+            Slot = 'RCH',
         },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
