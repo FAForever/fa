@@ -616,7 +616,7 @@ UnitBlueprint {
             BuildIconSortPriority = 25,
             Description = '<LOC xsl0301_NanoCombat_desc>SACU (Nano Combatant preset)',
             Enhancements = {
-                'EnhancedSensors',
+                'GunUpgrade',
                 'DamageStabilization',
             },
             HelpText = '<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.',
