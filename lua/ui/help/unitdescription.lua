@@ -176,23 +176,27 @@ Description = {
 
     -- CYBRAN -- Support Commander Units/Upgrades
     ['url0301'] = "<LOC Unit_Description_0115> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
-    ['url0301-cfs'] = "<LOC Unit_Description_0116> Cloaks the SACU from optical sensors. Can be detected by Omni Sensors. Requires Energy to run.",
+   -- ['url0301-cfs'] = "<LOC Unit_Description_0116> Cloaks the SACU from optical sensors. Can be detected by Omni Sensors. Requires Energy to run.",
     ['url0301-emp'] = "<LOC Unit_Description_0117>EMP burst effectively disables enemy units for a few seconds.",
     ['url0301-fc'] = "<LOC Unit_Description_0118> Greatly enhances the pulse laser's cohesion, almost doubling its damage output.",
     ['url0301-nms'] = "<LOC Unit_Description_0119>Adds AA defensive system.",
     ['url0301-ras'] = "<LOC Unit_Description_0120> Increases SACU's resource generation.",
     ['url0301-ses'] = "<LOC Unit_Description_0121>Speeds up all engineering-related functions.",
     ['url0301-srs'] = "<LOC Unit_Description_0122> Greatly increases the speed at which the SACU repairs itself.",
-    ['url0301-sfs'] = "<LOC Unit_Description_0123> Hides the SACU from radar. Requires Energy to run.",
-
+    ['url0301-sfs'] = "<LOC Unit_Description_0466> Stealth field.",
+	['url0301-cfs'] = "<LOC Unit_Description_0465> Acceleration field.",
+	
+--LOC Unit_Description_0466
     -- CYBRAN -- Support Commander Presets
     ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
     ['url0301_Cloak'] = "<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and dis-integrator amplifier enhancements.",
-    ['url0301_Combat'] = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and dis-integrator amplifier enhancements.",
+    ['url0301_Combat'] = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the dis-integrator amplifier enhancement.",
     ['url0301_Engineer'] = "<LOC url0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
     ['url0301_Rambo'] = "<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, dis-integrator amplifier and nano-repair system enhancements.",
     ['url0301_RAS'] = "<LOC url0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
     ['url0301_Stealth'] = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
+	['url0301_SupportSpeed'] = "<LOC url0301_AccelerationSupport_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system, acceleration field and engineering upgrade enhancement.",
+	['url0301_SupportStealth'] = "<LOC url0301_StealthSupport_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system, stealth field and engineering upgrade enhancement.",
 
     -- CYBRAN -- Land Units
     ['url0101'] = "<LOC Unit_Description_0124> Fast, lightly armored reconnaissance vehicle. Equipped with a cloaking field.",
