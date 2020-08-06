@@ -95,13 +95,11 @@ OnSync = function()
         end
     end
 
-    if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
-            LOG(string.format('Sending game result: %i %s', armyIndex, result))
-            GpgNetSend('GameResult', armyIndex, result)
-            import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
-        end
+    for _, gameResult in Sync.GameResult do
+        local armyIndex, result = unpack(gameResult)
+        LOG(string.format('Sending game result: %i %s', armyIndex, result))
+        GpgNetSend('GameResult', armyIndex, result)
+        import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
     if Sync.StatsToSend then
