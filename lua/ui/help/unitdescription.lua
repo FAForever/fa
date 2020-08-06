@@ -486,18 +486,20 @@ Description = {
     ['xsl0301'] = "<LOC Unit_Description_0433> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
     ['xsl0301-tmu'] = "<LOC Unit_Description_0434> Mounts a tactical cruise missile launcher onto the back of the SACU.",
     ['xsl0301-dss'] = "<LOC Unit_Description_0435> Increases the speed at which the SACU repairs itself. Also increases hit points.",
-    ['xsl0301-sre'] = "<LOC Unit_Description_0436> Greatly expands the range of the standard on-board SACU sensor systems, including Omni.",
+    ['xsl0301-cba'] = "<LOC Unit_Description_0436> Increases the SCUs gun range.",
     ['xsl0301-efm'] = "<LOC Unit_Description_0437> Speeds up all engineering-related functions.",
     ['xsl0301-pqt'] = "<LOC Unit_Description_0439> Adds teleporter. Requires considerable Energy to activate.",
     ['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
+	['xsl0301-nrf'] = "<LOC Unit_Description_0466> Regen Aura.",
 
     -- SERAPHIM -- Support Commander Presets
-    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.",
+    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the gun upgrade enhancement.",
     ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
     ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.",
     ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.",
     ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.",
-
+	['xsl0301_Support'] = "<LOC xsl0301_Support_help>Support Armored Command Unit. Enhanced during construction with the engineering upgrade and regen aura enhancements.",
+	
     -- SERAPHIM -- Land Units
     ['xsl0101'] = "<LOC Unit_Description_0337> Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields.",
     ['xsl0201'] = "<LOC Unit_Description_0338> Lightly armored tank. Armed with a single cannon.",
