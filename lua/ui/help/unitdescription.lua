@@ -345,13 +345,18 @@ Description = {
     ['ual0301-htsg'] = "<LOC Unit_Description_0172> Upgrades the SACU's protective shield. Requires Energy to run.",
     ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
+	['ual0301-cba'] = "<LOC Unit_Description_00467> Increases SCU gun range.",
+	['ual0301-hsa'] = "<LOC Unit_Description_00468> Increases SCU gun projectile damage per shot.",
+	['ual0301-cd'] = "<LOC Unit_Description_00469> adds chrono.",
 
     -- AEON -- Support Commander Presets
     ['ual0301_Engineer']     = "<LOC ual0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with rapid fabrication enhancement.",
-    ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a heavy personal shield and the reacton refractor enhancements.",
+    ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a heavy personal shield, gun range and gun projectile dmg enhancements.",
     ['ual0301_RAS'] = "<LOC ual0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
     ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
     ['ual0301_SimpleCombat'] = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
+	['ual0301_AoECombat'] = "<LOC ual0301_AoECombat_help>Support Armored Command Unit. Enhanced during construction with gun AoE, gun range and light shield enhancement.",
+	['ual0301_Support'] = "<LOC ual0301_Support_help>Support Armored Command Unit. Enhanced during construction with Chrono, engineering upgrade and light shield enhancement.",
 
     -- AEON -- Land Units
     ['ual0101'] = "<LOC Unit_Description_0223> Fast, lightly armored reconnaissance vehicle. Armed with a laser and a state-of-the-art sensor suite.",
