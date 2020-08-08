@@ -28,10 +28,24 @@ local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 local ModListTabs = function()
     local listicle = {
         {
-            title = 'Core Game',
-            key = 'vanilla',
+            title = 'SC',
+            key = 'sc1',
             sortFunc = function(unitID, modloc)
-                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/"
+                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) == 'u'
+            end,
+        },
+        {
+            title = 'SC-FA',
+            key = 'scx1',
+            sortFunc = function(unitID, modloc)
+                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) == 'x'
+            end,
+        },
+        {
+            title = 'SC Patch',
+            key = 'dlc',
+            sortFunc = function(unitID, modloc)
+                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
             end,
         }
     }
@@ -53,7 +67,7 @@ local ModListTabs = function()
                     if string.len(name) <= l then return name end --If it's short, just gief
 
                     name = string.gsub(name, "%([^()]*%)", "") --Remove any brackets
-                    name = string.gsub(name, "[ \s]+$", "") --Remove trailing spaces, because I can't be arsed to work out how to do both in one regex
+                    name = string.gsub(name, "[ %s]+$", "") --Remove trailing spaces, because I can't be arsed to work out how to do both in one regex
                     if string.len(name) <= l then return name end
 
                     local commonlong = { --Shrink some common long words to be recognisble
