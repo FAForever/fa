@@ -126,18 +126,18 @@ function processIncomingMessage(sender, msg)
     if customMessagesDisabled then
         local message = defaultMessages[category][source]
         if trigger == 'started' then
-            msg.text = 'Starting ' .. message
+            msg.text = LOC('<LOC notify_starting>') .. message
         elseif trigger == 'cancelled' then
-            msg.text = message .. ' cancelled'
+            msg.text = message .. LOC('<LOC notify_cancelled>')
         elseif trigger == 'completed' then
             local time = msg.data.time
             if time then
-                msg.text = message .. ' done! (' .. time .. 's)'
+                msg.text = message .. LOC('<LOC notify_done>') .. ' (' .. time .. 's)'
             else
-                msg.text = message .. ' done!'
+                msg.text = message .. LOC('<LOC notify_done>')
             end
         else
-            msg.text = 'Doing abnormal things with ' .. message
+            msg.text = LOC('<LOC notify_abnormal>') .. message
         end
     end
     return true

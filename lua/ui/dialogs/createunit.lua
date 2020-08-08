@@ -16,7 +16,6 @@ local activeFilters = {}
 local activeFilterTypes = {}
 local specialFilterControls = {}
 local filterSet = {}
-local currentArmy = GetFocusArmy()
 local UnitList = {}
 local CreationList = {}
 
@@ -512,16 +511,21 @@ function CreateDialog(x, y)
         return
     end
 
+    local currentArmy = GetFocusArmy()
+    if currentArmy < 1 then
+        currentArmy = 1
+    end
+
     CreationList = {}
 
     dialog = Bitmap(GetFrame(0))
     dialog:SetSolidColor('CC000000')
-    local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
+    local NoArmies = math.ceil(GetArmiesTable().numArmies / 2) + 1
     local NoMods = math.floor((table.getn(nameFilters[3].choices) - 1)/5)
     -- set window high. 400 pixel for the window + 30 pixel for every army line + 25 for every extra source row
     LayoutHelpers.SetDimensions(dialog, 510, 450 + 30 * NoArmies + NoMods * 25)
-    dialog.Left:Set(function() return math.max(math.min(x, GetFrame(0).Right() - dialog.Width()), 0) end)
-    dialog.Top:Set(function() return math.max(math.min(y, GetFrame(0).Bottom() - dialog.Height()), 0) end)
+    dialog.Left:Set(function() return math.max(math.min(x - dialog.Width() / 2, GetFrame(0).Right() - dialog.Width()), 0) end)
+    dialog.Top:Set(function() return math.max(math.min(y - dialog.Height() / 2, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
@@ -533,14 +537,14 @@ function CreateDialog(x, y)
     end
 
     ForkThread(function()
-                   while dialog do
-                       if IsKeyDown('ESCAPE') then
-                           cancelBtn.OnClick()
-                           return
-                       end
-                       WaitSeconds(0.05)
-                   end
-               end)
+        while dialog do
+            if IsKeyDown('ESCAPE') then
+                cancelBtn.OnClick()
+                return
+            end
+            WaitSeconds(0.05)
+        end
+    end)
 
     local countLabel = UIUtil.CreateText(dialog, 'Count:', 12, UIUtil.bodyFont)
     LayoutHelpers.AtBottomIn(countLabel, dialog,10)
@@ -605,16 +609,25 @@ function CreateDialog(x, y)
                 Args = { bpId = creationList, count = numUnits,
                 army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
         else
-            WaitSeconds(0.1)
+            WaitSeconds(0.15)
+            local shiftPressed = false
             while not dialog do
                 if IsKeyDown('ESCAPE') then return end
                 if IsKeyDown(1) then -- Left mouse button
                     SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
                         Args = { bpId = creationList, count = numUnits,
                         army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-                    if not IsKeyDown('SHIFT') then return end
+                    if IsKeyDown('SHIFT') then
+                        shiftPressed = true
+                        WaitSeconds(0.02)
+                    else
+                        return
+                    end
                 end
-                WaitSeconds(0.09)
+                WaitSeconds(0.07)
+                if shiftPressed and (not IsKeyDown('SHIFT')) then
+                   return
+                end
             end
         end
     end
@@ -622,9 +635,8 @@ function CreateDialog(x, y)
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
-    createBtn.HandleEvent = function(self, event)
-        if event.Type ~= 'ButtonPress' then return end
-        ForkThread(spawnUnits, CreationList, currentArmy, event.Modifiers.Right)
+    createBtn.OnClick = function(button)
+        ForkThread(spawnUnits, CreationList, currentArmy, IsKeyDown(0))
         cancelBtn.OnClick()
     end
 
@@ -719,7 +731,6 @@ function CreateDialog(x, y)
 
     armiesGroup.armySlots = {}
     local lowestControl = false
-    local NoArmies = math.ceil( ( table.getn(GetArmiesTable().armiesTable) / 2 ) + 1 )
     for i, val in GetArmiesTable().armiesTable do
 
         armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
