@@ -186,7 +186,7 @@ function SetupSession()
 
     -- Preloads AI templates from AI mods
     AIModTemplatesPreloader()
-    
+
     ResetSyncTable()
 end
 
@@ -224,6 +224,17 @@ end
 function BeginSession()
     LOG('BeginSession...')
     SPEW('Active mods in sim: ', repr(__active_mods))
+
+    GameOverListeners = {}
+    ForkThread(function()
+        while not IsGameOver() do
+            WaitTicks(1)
+        end
+        for _, v in GameOverListeners do
+            v()
+        end
+    end)
+
     ForkThread(GameTimeLogger)
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
