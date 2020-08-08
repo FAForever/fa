@@ -223,7 +223,7 @@ function UpdateData()
     end
 
     -- set score data
-    curInfo.scoreData = import('/lua/ui/game/scoreaccum.lua').scoreData
+    curInfo.scoreData = hotstats.scoreData
 end
 
 function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
@@ -232,10 +232,18 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
         return
     end
     scoreScreenActive = true
-
     SessionEndGame()
     DisableWorldSounds()
     StopAllSounds()
+    ForkThread(function()
+        while not(hotstats.scoreData.interval and hotstats.scoreData.current and hotstats.scoreData.history) do
+            WaitSeconds(0.5)
+        end
+        CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
+    end)
+end
+
+function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
     UpdateData()
 
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
