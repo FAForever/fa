@@ -95,7 +95,9 @@ OnSync = function()
         end
     end
 
-    if not Sync.RequestingExit then
+    # It turns out that legitimate results are always accompanied by a score update.
+    # We can use this to detect bogus results caused by leaving the game early.
+    if not table.empty(Sync.Score) then
         for _, gameResult in Sync.GameResult do
             local armyIndex, result = unpack(gameResult)
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
