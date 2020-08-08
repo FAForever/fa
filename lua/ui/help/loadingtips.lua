@@ -24,7 +24,7 @@ Tips = {
     "<LOC loadingtip_0022>Include reclaiming rocks around your start position into your build order",
     "<LOC loadingtip_0023>The small yellow ring around the ACU and Engineers shows their build range",
     "<LOC loadingtip_0024>An Aeon ACU with the Enhanced Quantum Disruptor upgrade has a larger range than the other ACUs",
-    "<LOC loadingtip_0025>Reclaiming volatile buildings when they are about to die won't trigger the explosion",
+    "<LOC loadingtip_0025>Reclaiming volatile buildings when they are about to die prevents triggering the explosion",
     "<LOC loadingtip_0026>You need 2500HP on your ACU to survive another ACU's explosion",
     "<LOC loadingtip_0027>Protect your T1 Point Defences with walls around it",
     "<LOC loadingtip_0028>Build your own Air Scouts; don't rely on anyone else",
@@ -41,4 +41,6 @@ Tips = {
     "<LOC loadingtip_0039>Your Engineers on Patrol or Attack-Move order will stop reclaiming when your storage is nearly full",
     "<LOC loadingtip_0040>Stealth only hides units from radar, cloak only from vision",
     "<LOC loadingtip_0041>Veterancy is based on the mass value of the killed unit and how much damage a unit dealt to it",
+    "<LOC loadingtip_0042>You need 1 energy storage to kill T1 and most T2 units, 2 for ilshy/obsidian and T3 siege bots, 3 for ohtuum/harbi and 4 for T3 assault bots",
+    "<LOC loadingtip_0043>Sonar can't spot stealth underwater units, you need water vision or omni",
 }
