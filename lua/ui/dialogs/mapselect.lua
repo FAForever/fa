@@ -457,7 +457,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LoadScenarios()
 
     -- initialise the option list for mods
-    modOptions = ModUtil.LoadModOptionsFormatted();
+    local mods = Mods.GetGameMods()
+    modOptions = OptionUtil.ModOptionsFormatted(mods);
 
     -- Initialise the selected scenario from the name we were passed.
     for i, scenario in scenarios do
@@ -676,7 +677,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             -- call the original function that changes the selected mods
             OnModsChanged(unpack(arg))
             -- initialise the option list for the selected mods
-            modOptions = ModUtil.LoadModOptionsFormatted()
+            local mods = Mods.GetGameMods()
+            modOptions = OptionUtil.ModOptionsFormatted(mods)
             -- refresh the options
             RefreshOptions(false)
         end
@@ -729,7 +731,7 @@ function RefreshOptions(skipRefresh)
 
     -- correct it such that subtitles / titles with no content show a message, etc.
     local noContentMessage = "No options available"
-    Options = OptionUtil.OptionsFormattedMessage(Options, noContentMessage)
+    Options = OptionUtil.OptionsCorrectedWithMessage(Options, noContentMessage)
 
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened

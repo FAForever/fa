@@ -2031,7 +2031,7 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.options then 
             for _, option in scenarioInfo.options do 
                 if not gameInfo.GameOptions[option.key] then 
-                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (option.default))
+                    LOG("Loading default map option: key of \'" .. tostring (option.key) .. "\' = " .. tostring (option.default))
                     gameInfo.GameOptions[option.key] = option.default
                 end
             end
@@ -2039,12 +2039,13 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- TODO: check the new layout
         -- load in the defaults of mods if they are not set manually
-        local modOptions = ModUtil.LoadModOptions();
+        local mods = Mods.GetGameMods()
+        local modOptions = OptionUtil.ModOptionsRaw(mods);
         if modOptions then 
               for k, option in modOptions do 
-                  if not gameInfo.GameOptions[option.key] then 
-                      LOG("Loading default mod option: " .. tostring (option.key) .. " = " .. tostring (option.default))
-                      gameInfo.GameOptions[option.key] = option.default
+                    if not gameInfo.GameOptions[option.key] then 
+                        LOG("Loading default mod option: key of \'" .. tostring (option.key) .. "\' = " .. tostring (option.default))
+                        gameInfo.GameOptions[option.key] = option.default
                   end
               end
         end
@@ -2329,7 +2330,8 @@ local OptionUtils = {
         end
 
         -- default the mod options
-        local modOptions = ModUtil.LoadModOptions();
+        local mods = Mods.GetGameMods()
+        local modOptions = OptionUtil.ModOptionsRaw(mods);
         if modOptions then 
             for _, option in modOptions do 
                 options[option.key] = option.values[option.default].key or option.values[option.default]
@@ -4067,10 +4069,10 @@ function RefreshOptionDisplayData(scenarioInfo)
     -- for the formatted options, correct the sections that have no content. Must 
     -- be done _before_ the mod / unti restriction information is prepended!
     local noContentMessageDefaults = "No options available"
-    local withDefaultOptions = OptionUtil.OptionsFormattedRemoved(tooltippedOptions, noContentMessageDefaults)
+    local withDefaultOptions = OptionUtil.OptionsCorrectedWithRemoval(tooltippedOptions, noContentMessageDefaults)
 
     local noContentMessageNoDefaults = "No options changed or available"
-    local withoutDefaultOptions = OptionUtil.OptionsFormattedRemoved(defaultOnlyOptions, noContentMessageNoDefaults)
+    local withoutDefaultOptions = OptionUtil.OptionsCorrectedWithRemoval(defaultOnlyOptions, noContentMessageNoDefaults)
 
     -- concat it all together, adding in the mods / unit restrictions information
     formattedOptions = table.cat(formattedOptions, withDefaultOptions)

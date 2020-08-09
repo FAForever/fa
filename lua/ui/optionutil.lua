@@ -195,6 +195,19 @@ function ModOptionsFormatted(mods)
     return table.cat(title, options)
 end
 
+function ModOptionsRaw(mods)
+    local formatted = ModOptionsFormatted(mods)
+
+    local stripped = { }
+    for _, entry in formatted do
+        if entry.type == 'option' then
+            table.insert(stripped, entry.data)
+        end
+    end
+
+    return stripped
+end
+
 function OptionsFormatted(scenario, mods)
     local teamOptionsFormatted = TeamOptionsFormatted()
     local gameOptionsFormatted = GameOptionsFormatted()
@@ -211,7 +224,7 @@ function OptionsFormatted(scenario, mods)
     )
 end
 
-function OptionsFormattedMessage(entries, noContentMessage)
+function OptionsCorrectedWithMessage(entries, noContentMessage)
     local corrected = { }
     for k, entry in entries do 
         -- add in the entry itself
@@ -234,7 +247,7 @@ function OptionsFormattedMessage(entries, noContentMessage)
     return corrected
 end
 
-function OptionsFormattedRemoved(entries)
+function OptionsCorrectedWithRemoval(entries)
     local previous = entries
     local corrected = { }
 
