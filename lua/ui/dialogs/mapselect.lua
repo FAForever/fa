@@ -976,7 +976,6 @@ function SetupOptionsPanel(parent, curOptions)
                     changedOptions[entry.data.key] = {value = value, index = index}
 
                     if line.combo.EnableColor then
-                        LOG("Coloring!")
                         line.combo._text:SetColor('DBBADB')
                     end
                 end
