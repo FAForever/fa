@@ -16,7 +16,6 @@ local Prefs = import('/lua/user/prefs.lua')
 local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
 local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
 local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
-
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 

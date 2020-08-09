@@ -95,7 +95,7 @@ OnSync = function()
         end
     end
 
-    if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
+    if not Sync.RequestingExit then
         for _, gameResult in Sync.GameResult do
             local armyIndex, result = unpack(gameResult)
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
