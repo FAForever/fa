@@ -1,6 +1,6 @@
-#
-# Terran Napalm Carpet Bomb
-#
+--
+-- Terran Napalm Carpet Bomb
+--
 local TNapalmCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmCarpetBombProjectile
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
