@@ -23,6 +23,7 @@ local NullShell = DefaultProjectileFile.NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local DefaultExplosion = import('defaultexplosions.lua')
 
 
 #------------------------------------------------------------------------
@@ -71,7 +72,7 @@ CIFProtonBombProjectile = Class(NullShell) {
         CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
         CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
 
-        if targetType ~= 'UnitAir' and targetType ~= 'Water' and targetType ~= 'Shield' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
 
@@ -492,6 +493,22 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.CCorsairMissileHit01,
     FxImpactLand = EffectTemplate.CCorsairMissileLandHit01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+			local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 150, 30, army)
+        end
+        
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -630,8 +647,8 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
     # Note: Damage is done once in AOE by main projectile. Secondary projectiles
     # are just visual.
     # ---------------------------------------------------------------------------
-    OnImpact = function(self, TargetType, TargetEntity)
-        if self.Impacted == false and TargetType ~= 'Air' then
+    OnImpact = function(self, targetType, targetEntity)
+        if self.Impacted == false and targetType ~= 'Air' then
             self.Impacted = true
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
@@ -640,12 +657,12 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
-            SinglePolyTrailProjectile.OnImpact(self, TargetType, TargetEntity)
+            SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
         end
     end,
 
     # Overiding Destruction
-    OnImpactDestroy = function(self, TargetType, TargetEntity)
+    OnImpactDestroy = function(self, targetType, targetEntity)
         self:ForkThread(self.DelayedDestroyThread)
     end,
 
