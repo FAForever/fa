@@ -7,7 +7,23 @@
 -- @param position Table with position {x, y z}.
 -- @param threat Number reptresenting the threat.
 -- @param decay Number, the thread is decreasing by time.
--- @param threatType Types: TODO.
+-- @param threatType Types:
+--                          Overall
+--                          OverallNotAssigned
+--                          StructuresNotMex
+--                          Structures
+--                          Naval
+--                          Air
+--                          Land
+--                          Experimental
+--                          Commander
+--                          Artillery
+--                          AntiAir
+--                          AntiSurface
+--                          AntiSub
+--                          Economy
+--                          Unknown
+
 function CAiBrain:AssignThreatAtPosition(position, threat, [decay], [threatType])
 end
 
@@ -30,10 +46,10 @@ end
 --- Orders the builder to build a unit.
 -- @param builder Unit, (engineer) to use.
 -- @param blueprintID Unit's bp ID to build, example: 'ueb0101'.
--- @param locationInfo Table {x, z, 0}.
--- @param something TODO: true/false.
+-- @param buildLocation Table {x, z, 0}.
+-- @param buildRelative: true/false. true = build coordinates are relative to the starting location, false = absolute coords
 -- @return true/false
-function CAiBrain:BuildStructure(builder, blueprintID, locationInfo, something)
+function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
 
 --- Orders a mobile factory to build a unit.
@@ -58,12 +74,12 @@ end
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
 end
 
---- TODO.
--- @param startPos  Table with position {x, y z}, current position.
--- @param endPos position Table with position {x, y z}, desired position.
+--- Returns true in case terrain is not blocking weapon fire from attackPosition to targetPosition.
+-- @param attackPosition  Table with position {x, y z}
+-- @param targetPosition position Table with position {x, y z}
 -- @param arcType Types: 'high', 'low', 'none'.
 -- @return true/false
-function CAiBrain:CheckBlockingTerrain(startPos, endPos, arcType)
+function CAiBrain:CheckBlockingTerrain(attackPosition, targetPosition, arcType)
 end
 
 --- Spawns a resource building near position.
@@ -84,11 +100,11 @@ end
 function CAiBrain:CreateUnitNearSpot(blueprintID, posX, posY).
 end
 
---- TODO.
+--- Returns UnitID for buildingType
 -- @param builder Unit-engineer to build with.
--- @param type
--- @param buildingTypes
-function CAiBrain:DecideWhatToBuild(builder, type, buildingTypes)
+-- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
+-- @param buildingTemplate Table for each faction to get the UnitID for a buildingType
+function CAiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
 end
 
 --- Disbands a given platoon.
@@ -104,10 +120,19 @@ end
 --- TODO.
 function CAiBrain:FindClosestArmyWithBase()
 end
-
---- TODO.
--- @return x, z, distance
-function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
+ 
+--- Find a free build place
+-- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
+-- @param whatToBuild UnitID
+-- @param baseTemplate A default table with buildingTypes of all factions and searchpattern for a build place
+-- @param relative true/false. true = build coordinates are relative to the starting location, false = absolute coords
+-- @param closeToBuilder true/false. Build near the engineer or the base the engineer is part of.
+-- @param optIgnoreAlliance nil/Enemy ignores enemy buildings like massextractors
+-- @param BuildLocationX Position where we start to search for a free build area
+-- @param BuildLocationZ
+-- @param optIgnoreThreatUnder Ignores enemy threat under value
+-- @return PlaceToBuild {x, z, y}
+function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
 end
 
 --- Return an unit that matches the unit name.
@@ -179,45 +204,45 @@ function CAiBrain:GetCurrentUnits(category)
 end
 
 --- Returns current resource income.
--- @param resource 'Energy' or 'Mass'.
+-- @param resource 'ENERGY' or 'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyIncome(resource)
 end
 
 --- Return how much of the resource the brains wants to use.
 -- This is used for calculating Paragon's production.
--- @param resource 'Energy' or 'Mass'.
+-- @param resource 'ENERGY' or 'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyRequested(resource)
 end
 
 --- Return current resource amout in storage.
--- @param resource 'Energy' or 'Mass'.
+-- @param resource 'ENERGY' or 'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
--- @param resource 'Energy' or 'Mass'.
+-- @param resource 'ENERGY' or 'MASS'.
 -- @return Float Number 0.0 - 1
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
---- TODO.
--- @param resource 'Energy' or 'Mass'.
--- @return TODO.
+--- Returns the relative resource income. (production - usage)
+-- @param resource 'ENERGY' or 'MASS'.
+-- @return Number. (0.1 = 1)
 function CAiBrain:GetEconomyTrend(resource)
 end
 
 --- Returns current resource usage.
 -- When stalling, this number is same as the current income.
--- @param resource 'Energy' or 'Mass'.
+-- @param resource 'ENERGY' or 'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyUsage(resource)
 end
 
 --- Returns the faction of the army represented by this brain.
--- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim.
+-- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
 -- @return Number.
 function CAiBrain:GetFactionIndex()
 end
@@ -225,9 +250,15 @@ end
 --- Returns a position with highest threat and the threat value.
 -- Always reports a threatvalue of zero for Allies or self.
 -- threatType and armyIndex are not required.
--- @param ring Number, in game unit.
--- @param restriction TODO.
--- @param threatType TODO Find out all threat types.
+-- @param ring Number 1 or 2
+-- 1 = Single, 2 = With surrounding IMPA blocks 
+-- ..........   ..........
+-- ..........   ....xxx...
+-- .....X....   ....xXx...
+-- ..........   ....xxx...
+-- ..........   ..........
+-- @param restriction true/false TODO.
+-- @param threatType see AssignThreatAtPosition
 -- @param armyIndex Army's number, if not specified, uses all enemy armies.
 -- @return position, value Position table {x, y, z}, value Number.
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
@@ -246,7 +277,7 @@ end
 function CAiBrain:GetMapWaterRatio()
 end
 
---- TODO. Number of no rush ticks left?
+--- TODO. Number of no rush ticks left
 -- @return Number.
 function CAiBrain:GetNoRushTicks()
 end
@@ -272,7 +303,7 @@ function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Return the personality for this brain to use.
--- @return TODO.
+-- @return AIPersonalityTemplate from aipersonality.lua
 function CAiBrain:GetPersonality()
 end
 
@@ -291,7 +322,7 @@ end
 -- @param position Table with position {x, y, z}.
 -- @param radius Number in game units.
 -- @param restriction TODO.
--- @param threatType TODO.
+-- @param threatType see AssignThreatAtPosition
 -- @param armyIndex Army's number, if specified uses, only this brain.
 -- @return Number.
 function CAiBrain:GetThreatAtPosition(position, radius, restriction, threatType, armyIndex)
@@ -301,7 +332,7 @@ end
 -- @param position Table with position {x, y, z}.
 -- @param position2 Table with position {x, y, z}.
 -- @param restriction
--- @param threatType
+-- @param threatType see AssignThreatAtPosition
 -- @param armyIndex Army's number, if specified uses, only this brain.
 -- @return Number.
 function CAiBrain:GetThreatBetweenPositions(position, position2, restriction, threatType, armyIndex)
@@ -311,7 +342,7 @@ end
 -- @param position Table with position {x, y, z}.
 -- @param radius Number in game units.
 -- @param restriction
--- @param threatType
+-- @param threatType see AssignThreatAtPosition
 -- @param armyIndex
 -- @return Table {{x, z, threatValue}, {...}, ...}.
 function CAiBrain:GetThreatsAroundPosition(position, radius, restriction, threatType, armyIndex)
@@ -349,12 +380,12 @@ function CAiBrain:IsAnyEngineerBuilding(category)
 end
 
 --- Returns true if opponent AI should be running.
--- @return true/false
+-- @return true/false (not used in FAF)
 function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
--- @param name or '', This is NOT platoon's unique name. TODO: probably template's name.
+-- @param name or '', custom platoon name
 -- @param aiPlan Plan to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
 -- @return Platoon.
 function CAiBrain:MakePlatoon(name, aiPlan)

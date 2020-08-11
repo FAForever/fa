@@ -1153,7 +1153,7 @@ function Nuke(aiBrain)
                         break
                     end
                 end
-                ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
+                aiBrain:ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
             end
             -- Keep track of old targets
             table.insert(oldTarget, target)
@@ -1189,7 +1189,7 @@ end
 --    Returns:
 --        nil
 -- -----------------------------------------------------
-function LaunchNukesTimed(nukesToFire, target)
+function LaunchNukesTimed(aiBrain, nukesToFire, target)
     local nukes = {}
     for k,v in nukesToFire do
         local pos = v:GetPosition()

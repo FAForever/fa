@@ -309,7 +309,7 @@ UnitBlueprint {
             Damage = 6000,
             DamageRadius = 4,
             DamageType = 'Normal',
-            DisplayName = 'Experimental Phason Beam Generator',
+            DisplayName = 'Phason Beam Generator',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',

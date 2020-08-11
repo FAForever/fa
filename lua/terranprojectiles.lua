@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #------------------------------------------------------------------------
 #  TERRAN PROJECTILES SCRIPTS
@@ -23,6 +23,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
 local util = import('utilities.lua')
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 
 TFragmentationGrenade= Class(EmitterProjectile) {
@@ -93,17 +94,19 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
-            local rand = util.GetRandomFloat(0,2*math.pi)
+            local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
             local scale = self.FxSplatScale
+        
+            CreateDecal(pos, rotation, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 50, army)
+            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 50, army)
             
-            CreateDecal(pos, rand, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 50, army)
-            CreateDecal(pos, rand, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 50, army)
             self:ShakeCamera(20, 1, 0, 1)
             
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
         end
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
@@ -117,15 +120,23 @@ TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
     FxImpactLand = EffectTemplate.TAntiMatterShellHit02,
 
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+        local rotation = RandomFloat(0,2*math.pi)
+        local army = self.Army
+        local scale = self.FxSplatScale
+        
         #CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        if targetType == 'Terrain' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, self.Army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, self.Army)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
+            CreateDecal(pos, rotation, 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 150, 30, army)
+            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 150, 30, army)
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            
             self:ShakeCamera(20, 1, 0, 1)
         end
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

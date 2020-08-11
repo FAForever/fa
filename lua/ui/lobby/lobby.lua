@@ -2025,6 +2025,16 @@ local function TryLaunch(skipNoObserversCheck)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
+        -- load in the default map options if they are not set manually
+        if scenarioInfo.options then 
+            for _, option in scenarioInfo.options do 
+                if not gameInfo.GameOptions[option.key] then 
+                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (option.default))
+                    gameInfo.GameOptions[option.key] = option.default
+                end
+            end
+        end
+
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end

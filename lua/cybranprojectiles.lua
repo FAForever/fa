@@ -231,9 +231,16 @@ CArtilleryProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
+            
+            EmitterProjectile.OnImpact(self, targetType, targetEntity)
+        end
     end,
 }
 
@@ -249,9 +256,25 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+        local army = self.Army
+        local radius = self.DamageData.DamageRadius
+        
+        CreateLightParticle( self, -1, army, radius * 2, 12, 'glow_03', 'ramp_red_06' )
+        CreateLightParticle( self, -1, army, radius * 2, 22, 'glow_03', 'ramp_antimatter_02' )
+    
+        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
+            local pos = self:GetPosition()
+            
+            CreateDecal( pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', radius * 2, radius * 2, 350, 200, army ) 
+            
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
+            
+            EmitterProjectile.OnImpact(self, targetType, targetEntity)
+        end
+        
+        self:ShakeCamera( 20, 3, 0, 1 )
     end,
 }
 
