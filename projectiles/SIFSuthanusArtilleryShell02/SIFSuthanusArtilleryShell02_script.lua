@@ -23,17 +23,20 @@ SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
             radius = 0
         end
 
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
 	        
-            CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, army)
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, army)
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
             
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            DamageArea( self, pos, radius, 1, 'Force', true )
+            CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', radius+3, radius+3, 250, 200, army)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+7, radius+7, 250, 200, army)
+        
         end
         
+        self:ShakeCamera(20, 2, 0, 1)
+
         SSuthanusArtilleryShell.OnImpact(self, targetType, targetEntity)
     end,
 }

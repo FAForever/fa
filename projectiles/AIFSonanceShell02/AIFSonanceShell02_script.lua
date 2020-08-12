@@ -14,21 +14,21 @@ AIFSonanceShell02 = Class(AArtilleryProjectile) {
     FxImpactLand =  EffectTemplate.ASonanceWeaponHit02,
     
     OnImpact = function(self, targetType, targetEntity)
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' then
-            local rotation = RandomFloat(0,2*math.pi)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             local army = self.Army
             
-            CreateDecal(pos, rotation, 'crater_radial01_normals', '', 'Alpha Normals', 10, 10, 300, 0, army)
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 12, 12, 300, 0, army)
-
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
+            
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_normals', '', 'Alpha Normals', radius+2, radius+2, 250, 200, army)
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius+5, radius+5, 250, 200, army)
+        
         end
         
+        self:ShakeCamera(20, 2, 0, 1)
 
- 
         AArtilleryProjectile.OnImpact( self, targetType, targetEntity )
     end,
 }
