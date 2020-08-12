@@ -236,7 +236,7 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
 
-    # Hit Effects
+    -- Hit Effects
     FxImpactUnit = EffectTemplate.CProtonArtilleryHit01,
     FxImpactProp = EffectTemplate.CProtonArtilleryHit01,
     FxImpactLand = EffectTemplate.CProtonArtilleryHit01,
@@ -252,8 +252,6 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             
-            CreateDecal( pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 150, army ) 
-            
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
@@ -261,7 +259,6 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
             EmitterProjectile.OnImpact(self, targetType, targetEntity)
         end
         
-        self:ShakeCamera( 20, 3, 0, 1 )
     end,
 }
 

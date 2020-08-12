@@ -88,22 +88,17 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactLand = EffectTemplate.TAntiMatterShellHit01,
     FxLandHitScale = 1,
     FxImpactUnderWater = {},
-    FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
+        -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
-            local army = self.Army
-            local scale = self.FxSplatScale
         
-            CreateDecal(pos, RandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', scale, scale, 250, 200, army)
-            CreateDecal(pos, RandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', scale * 2, scale * 2, 250, 200, army)
-            
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
             
-            self:ShakeCamera(20, 1, 0, 1)
         end
 
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
@@ -117,31 +112,12 @@ TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
     FxImpactUnit = EffectTemplate.TAntiMatterShellHit02,
     FxImpactProp = EffectTemplate.TAntiMatterShellHit02,
     FxImpactLand = EffectTemplate.TAntiMatterShellHit02,
-
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local army = self.Army
-        
-        -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            CreateDecal(pos, RandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', radius + 1, radius + 1, 200, 150, army)
-            CreateDecal(pos, RandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', radius + 6, radius + 6, 200, 150, army)
-            
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            
-            self:ShakeCamera(20, 1, 0, 1)
-        end
-
-        EmitterProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 TArtilleryAntiMatterSmallProjectile = Class(TArtilleryAntiMatterProjectile02) {
     FxLandHitScale = 0.5,
     FxUnitHitScale = 0.5,
-    FxSplatScale = 4,
+    FxSplatScale = 6,
 }
 
 #------------------------------------------------------------------------
