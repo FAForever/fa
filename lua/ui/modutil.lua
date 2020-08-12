@@ -105,14 +105,19 @@ function LoadModOptionsFormatted()
 
         -- does such a file exist?
         if DiskGetFileInfo(path) then
+
+            LOG("File exists: " .. path)
+
             -- try to retrieve the options
             local data = {}
             doscript(path, data)
 
-            if data.options ~= nil then 
+            -- try to find the options, added in for backwards compatibility
+            local unformattedOptions = data.options or data.AIOpts
+            if unformattedOptions ~= nil then 
 
                 -- go over the options, find out if there is a name clash with the team / game options
-                for k, option in data.options do 
+                for k, option in unformattedOptions do 
 
                     local key = option.key
                     local clashed = false 

@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: functions that make it simpler to set up control layouts.
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 --* Percentage versus offset

@@ -7,6 +7,7 @@ local Mods = import('/lua/mods.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Group = import('/lua/maui/group.lua').Group
+local Button = import('/lua/maui/button.lua').Button
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
@@ -323,7 +324,7 @@ function CreateModsFilter(parent, tag)
     local filterToggle = UIUtil.CreateButton(parent,
             states.active,
             states.active,
-            states.highlight,
+            states.over,
             states.disabled,
             --' - '.. count,
             modsTags[tag].label .. ' - '.. count,
@@ -818,10 +819,31 @@ end
 function CreateListElement(parent, mod, Pos)
     local group = Group(parent)
 
+    local offsetForInformationButton = 50
+
     -- changed fixed-size checkboxes to scalable checkboxes
     group.filtered = false
     group.pos = Pos
     group.modInfo = mod
+
+    -- construct the button
+    group.information = Button(
+        group, 
+        '/textures/ui/common/dialogs/mod-manager/mod-information-up.png',
+        '/textures/ui/common/dialogs/mod-manager/mod-information-down.png',
+        '/textures/ui/common/dialogs/mod-manager/mod-information-hover.png',
+        '/textures/ui/common/dialogs/mod-manager/mod-information-disabled.png'
+    )
+
+    LayoutHelpers.SetDimensions(group.information, 36, 36)
+    LayoutHelpers.AtLeftTopIn(group.information, group, -44, 7)
+    LayoutHelpers.AtVerticalCenterIn(group.information, group)
+
+    group.information.OnClick = function(self)
+        import('/lua/ui/dialogs/modDetails.lua').CreateDialog(parent, mod)
+    end
+
+    -- the general background used as a checkbox
     group.bg = Checkbox(group,
         UIUtil.SkinnableFile('/MODS/blank.dds'),
         UIUtil.SkinnableFile('/MODS/single.dds'),
@@ -830,18 +852,20 @@ function CreateListElement(parent, mod, Pos)
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+
     LayoutHelpers.SetHeight(group.bg, modIconSize + 10)
-    LayoutHelpers.SetWidth(group.bg, dialogWidth - 15)
+    LayoutHelpers.SetWidth(group.bg, dialogWidth - 115)
 
     LayoutHelpers.SetHeight(group, modInfoHeight)
-    LayoutHelpers.SetWidth(group, dialogWidth - 25)
-    LayoutHelpers.AtLeftTopIn(group, parent, 4, group.Height()*(Pos-1))
+    LayoutHelpers.SetWidth(group, dialogWidth - (25 + offsetForInformationButton))
+    LayoutHelpers.AtLeftTopIn(group, parent, 4 + offsetForInformationButton, group.Height()*(Pos-1))
     LayoutHelpers.FillParent(group.bg, group)
 
     if not mod.icon or mod.icon == '' then
         WARN('ModsManager cannot load an icon for mod: ' .. mod.title .. ' - ' .. mod.location)
     end
 
+    -- mod icon
     group.icon = Bitmap(group, mod.icon)
     LayoutHelpers.SetDimensions(group.icon, modIconSize, modIconSize)
     group.icon:DisableHitTest()
@@ -904,8 +928,8 @@ function CreateListElement(parent, mod, Pos)
         group.bg.HandleEvent = function() return true end
     end
 
-    if string.len(mod.description) > 240 then
-        local description = string.sub(mod.description, 1, 240) .. '...'
+    if string.len(mod.description) > 220 then
+        local description = string.sub(mod.description, 1, 220) .. '...'
         group.desc:SetText(description)
     end
 

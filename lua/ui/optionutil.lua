@@ -123,33 +123,28 @@ end
 
 function ModOptionsFormatted(mods)
 
+    local options = { }
+
     -- returns a function that given an option, checks if the key matches.
     local function CheckForClash(option, key)
         return option.key == key
     end
 
-    -- load in the options file for each mod
-    local options = { }
-    for k, mod in mods do 
-
-        -- add in the subtitle
-        table.insert(options, MakeSubTitle(mod.name))
-
-        -- determine the path to the options file
-        local directory = mod.location
-        local file = 'mod_options.lua'
-        local path = directory .. '/' .. file 
+    local function FindOptionsOfMod(path)
 
         -- does such a file exist?
         if DiskGetFileInfo(path) then
+
             -- try to retrieve the options
             local data = {}
             doscript(path, data)
 
-            if data.options ~= nil then 
+            -- find the options, keep backwards compatibility in mind
+            local unformattedOptions = data.options or data.AIOpts
+            if unformattedOptions ~= nil then 
 
                 -- go over the options, find out if there is a name clash with the team / game options
-                for k, option in data.options do 
+                for k, option in unformattedOptions do 
 
                     local key = option.key
                     local clashed = false 
@@ -188,6 +183,24 @@ function ModOptionsFormatted(mods)
                 end
             end
         end
+    end
+
+    -- load in the options file for each mod
+    for k, mod in mods do 
+
+        -- add in the subtitle
+        table.insert(options, MakeSubTitle(mod.name))
+
+        -- determine the path to the options file
+        local directory = mod.location
+        local file = 'mod_options.lua'
+        local path = directory .. '/' .. file 
+        FindOptionsOfMod(path)
+
+        -- determine the path to the backwards compatible AI options file
+        local file_old = 'lua/ai/lobbyoptions/lobbyoptions.lua'
+        local path = directory .. '/' .. file_old
+        FindOptionsOfMod(path)
     end
 
     -- add in the title of the section

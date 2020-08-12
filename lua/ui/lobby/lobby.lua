@@ -85,32 +85,6 @@ local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
--- Add lobby options from AI mods
-function ImportModAIOptions()
-    local simMods = import('/lua/mods.lua').AllMods()
-    local OptionData
-    local alreadyStored
-    for Index, ModData in simMods do
-        if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
-            OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
-                -- check, if we have this option already stored
-                alreadyStored = false
-                for k, v in AIOpts do
-                    if v.key == t.key then
-                        alreadyStored = true
-                        break
-                    end
-                end
-                if not alreadyStored then
-                    table.insert(AIOpts, t)
-                end
-            end
-        end
-    end
-end
-ImportModAIOptions()
-
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
 
@@ -3556,7 +3530,6 @@ function CreateUI(maxPlayers)
     end
 
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
-
 
     -- Small buttons are 100 wide, 44 tall
 
