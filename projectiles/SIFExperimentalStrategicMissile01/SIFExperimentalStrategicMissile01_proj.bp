@@ -30,8 +30,8 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 60,
-        MaxHealth = 60,
+        Health = 60000,
+        MaxHealth = 60000,
     },
     Description = 'Seraphim Experimental Strategic Missile',
     DesiredShooterCap = 2,
