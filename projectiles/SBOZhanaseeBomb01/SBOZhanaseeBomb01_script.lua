@@ -27,7 +27,7 @@ SBOZhanaseeBombProjectile01 = Class(SZhanaseeBombProjectile){
             
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )              
-            CreateDecal( pos, RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 40, 40, 300, 200, army)          
+            CreateDecal( pos, RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 40, 40, 300, 250, army)
         end
         
 		SZhanaseeBombProjectile.OnImpact(self, targetType, targetEntity) 

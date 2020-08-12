@@ -22,10 +22,10 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) {
             local pos = self:GetPosition()
             local army = self.Army
 
-            DamageRing(self, pos, 0.1, radius+1, 10, 'Fire', false, false)
+            DamageRing(self, pos, 0.1, 5/4 * radius, 10, 'Fire', false, false)
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 30, army)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 50, army)
         end
         TNapalmHvyCarpetBombProjectile.OnImpact(self, targetType, targetEntity)
     end,

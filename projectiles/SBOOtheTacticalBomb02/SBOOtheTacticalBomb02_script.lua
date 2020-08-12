@@ -20,7 +20,7 @@ SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb) {
             
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true ) 
-            CreateDecal( pos, RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', radius*5, radius*5, 300, 50, army)          
+            CreateDecal( pos, RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', radius*5, radius*5, 300, 70, army)          
         end
         
 		SOtheTacticalBomb.OnImpact(self, targetType, targetEntity) 
