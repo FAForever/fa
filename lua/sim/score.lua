@@ -48,7 +48,8 @@ local function ScoreResourcesThread()
     while not victory.gameOver do
         WaitSeconds(1)
         for index, brain in ArmyBrains do
-            if brain:IsDefeated() or ArmyIsCivilian(index) then continue end
+            if ArmyIsCivilian(index) then continue end
+            if (ArmyScore[index].Defeated ~= nil) and (ArmyScore[index].Defeated < 0) then continue end
             local Score = ArmyScore[index].resources
             local lastReclaimedMass = Score.massin.reclaimed
             Score.massin.reclaimed = brain:GetArmyStat("Economy_Reclaimed_Mass", 0).Value
@@ -66,8 +67,13 @@ local function ScoreHistoryThread()
         WaitSeconds(scoreData.interval)
         local data = {}
         for index, brain in ArmyBrains do
-            if brain:IsDefeated() or ArmyIsCivilian(index) then continue end
-            data[index] = table.deepcopy(scoreData.current[index])
+            local Score = scoreData.current[index]
+            if ArmyIsCivilian(index) then continue end
+            if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
+            if (Score.Defeated ~= nil) and (Score.Defeated < GetGameTimeSeconds()) then
+                Score.Defeated = -1
+            end
+            data[index] = table.deepcopy(Score)
         end
         table.insert(scoreData.history, data)
     end
@@ -129,7 +135,7 @@ local function ScoreThread()
                     storedMass = 0,
                     storedEnergy = 0,
                     maxMass = 0,
-                    maxEnergy = 0,
+                    maxEnergy = 0
                 }
             }
         }
@@ -153,8 +159,12 @@ local function ScoreThread()
                 WaitSeconds(updInterval)
             end
             NextTime = NextTime + updInterval
-            if brain:IsDefeated() or ArmyIsCivilian(index) then continue end
             local Score = ArmyScore[index]
+            if ArmyIsCivilian(index) then continue end
+            if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
+            if (Score.Defeated == nil) and brain:IsDefeated() then
+                Score.Defeated = CurTime + 15
+            end
             Score.type = brain.BrainType
             Score.general.score = CalculateBrainScore(brain)
 
