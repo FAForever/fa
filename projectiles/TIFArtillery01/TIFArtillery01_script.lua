@@ -10,12 +10,16 @@ TIFArtillery01 = Class(TArtilleryProjectilePolytrail) {
     FxImpactLand = EffectTemplate.TAPDSHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-		if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
+            local army = self.Army
         
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius*2, radius*2, 200, 100, army)
         end
     
         TArtilleryProjectilePolytrail.OnImpact(self, targetType, targetEntity)
