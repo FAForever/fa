@@ -25,6 +25,8 @@ SIFSuthanusArtilleryShell01 = Class(SSuthanusMobileArtilleryShell) {
             CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 200, 150, army)
         end
         
+        self:ShakeCamera( 20, 1, 0, 1 )
+
         SSuthanusMobileArtilleryShell.OnImpact(self, targetType, targetEntity)
     end,
 }

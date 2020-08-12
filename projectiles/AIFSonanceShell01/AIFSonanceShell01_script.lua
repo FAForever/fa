@@ -20,6 +20,8 @@ AIFSonanceShell01 = Class(AArtilleryProjectile) {
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+2, radius+2, 200, 150, army)
         end
         
+        self:ShakeCamera( 20, 1, 0, 1 )
+
         AArtilleryProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
