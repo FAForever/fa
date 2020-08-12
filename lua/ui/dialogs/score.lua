@@ -138,8 +138,23 @@ local function UpdateDisplay()
     for index, info in ipairs(curInfo) do
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
-        sortOrder[index].sortKey = curInfo.scoreData.current[index][curScoreKey][curSortCol][curType]
-                                   or curInfo.scoreData.current[index][curScoreKey][curSortCol]
+
+        local PlayerData = curInfo.scoreData.current[index]
+        PlayerData.general.mass = PlayerData.resources.massin.total
+        PlayerData.general.energy = PlayerData.resources.energyin.total
+        PlayerData.resources.massover = {}
+        PlayerData.resources.energyover = {}
+        PlayerData.resources.massover.total = PlayerData.resources.massout.excess
+        PlayerData.resources.energyover.total = PlayerData.resources.energyout.excess
+        PlayerData.resources.massover.rate = math.max(0, PlayerData.resources.massin.rate -
+            PlayerData.resources.massout.rate + PlayerData.resources.massin.reclaimRate +
+            PlayerData.resources.storage.storedMass - PlayerData.resources.storage.maxMass)
+        PlayerData.resources.energyover.rate = math.max(0, PlayerData.resources.energyin.rate -
+            PlayerData.resources.energyout.rate + PlayerData.resources.energyin.reclaimRate +
+            PlayerData.resources.storage.storedEnergy - PlayerData.resources.storage.maxEnergy)
+
+        sortOrder[index].sortKey = PlayerData[curScoreKey][curSortCol][curType]
+                                or PlayerData[curScoreKey][curSortCol]
     end
 
     table.sort(sortOrder, function(first, second)

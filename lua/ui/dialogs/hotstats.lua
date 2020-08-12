@@ -482,6 +482,9 @@ function return_value(periode,player,path)
         if path[3]==nil or path[3]==false then val=scoreData.current[player][path[1]][path[2]]
         else val=scoreData.current[player][path[1]][path[2]][path[3]] end
     else
+        if scoreData.history[periode][player] == nil then
+            scoreData.history[periode][player] = scoreData.history[periode-1][player]
+        end
         if path[3]==nil or path[3]==false then val=scoreData.history[periode][player][path[1]][path[2]]
         else val=scoreData.history[periode][player][path[1]][path[2]][path[3]] end
     end
