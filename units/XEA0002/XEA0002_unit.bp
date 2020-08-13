@@ -253,10 +253,9 @@ UnitBlueprint {
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
                 'TECH3 ANTIMISSILE',
                 'NUKE STRUCTURE',
-                'ORBITALSYSTEM',
                 'TECH3 STRUCTURE ARTILLERY',
                 'TECH3 ENERGYPRODUCTION',
-                'COMMAND',
+                'ORBITALSYSTEM',
                 'SHIELD',
                 'EXPERIMENTAL MOBILE',
                 'TECH3 STRUCTURE',

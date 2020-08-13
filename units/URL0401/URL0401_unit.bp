@@ -328,10 +328,9 @@
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
                 'TECH3 ANTIMISSILE',
                 'NUKE STRUCTURE',
-                'ORBITALSYSTEM',
                 'TECH3 STRUCTURE ARTILLERY',
                 'TECH3 ENERGYPRODUCTION',
-                'COMMAND',
+                'ORBITALSYSTEM',
                 'EXPERIMENTAL MOBILE',
                 'TECH3 STRUCTURE',
                 'TECH3 MOBILE',

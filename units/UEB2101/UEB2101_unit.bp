@@ -206,9 +206,9 @@ UnitBlueprint {
             ReTargetOnMiss = true,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
-                'MOBILE EXPERIENTAL',
+                'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
-                'MOBILE TECH1 ARTILLERIE',
+                'MOBILE TECH1 ARTILLERY',
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
