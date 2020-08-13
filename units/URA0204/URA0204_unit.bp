@@ -110,6 +110,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYSONAR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -339,7 +340,7 @@ UnitBlueprint {
                 'NAVAL * TECH2',
                 'NAVAL * TECH3',
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

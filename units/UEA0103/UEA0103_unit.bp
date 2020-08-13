@@ -108,6 +108,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYRADAR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,

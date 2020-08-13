@@ -109,6 +109,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,

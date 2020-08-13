@@ -53,6 +53,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'BOT',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -270,10 +271,14 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 3,
             TargetPriorities = {
+                'SNIPER',
+                '(ARTILLERY - TECH1)',
+                'ANTISHIELD',
+                'SHIELD',
                 'COMMAND',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'STRUCTURE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

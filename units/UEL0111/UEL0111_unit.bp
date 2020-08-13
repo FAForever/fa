@@ -63,6 +63,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -266,7 +267,14 @@ UnitBlueprint {
             SlavedToBody = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
+                'STRUCTURE SHIELD',
+                'STRUCTURE DEFENSE ANTIMISSILE',
                 'STRUCTURE DEFENSE',
+                'TECH2 ARTILLERY',
+                'TECH3 SNIPER',
+                'TECH3 ARTILLERY',
+                'TECH2 MOBILE SILO', -- MML
+                'STRUCTURE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
