@@ -377,6 +377,7 @@ function GetModUnits(mod)
 end
 
 function GetModsUnits(searchMods)
+    LOG("Called ModsManager!");
     UnitsAnalyzer.FetchBlueprints(searchMods, true)
     local bps = UnitsAnalyzer.GetBlueprintsList(searchMods, true)
     bps = table.merged(bps.Units, bps.Enhancements)

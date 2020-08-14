@@ -6,6 +6,8 @@ local modIconSize = 50
 local modInfoPosition = modIconSize + 15
 local modInfoHeight = modIconSize + 20
 
+local Prefs = import('/lua/user/prefs.lua')
+
 local Mods = import('/lua/mods.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -251,6 +253,9 @@ function CreateDialog(parent, mod)
         -- attempt to lower the page index
         local index = math.max(dialogContent.pageIndex - 1, dialogContent.pageMin)
         dialogContent.pageIndex = index 
+
+        local profile = Prefs.GetCurrentProfile()
+        LOG(repr(profile))
 
         -- load in the page
         LoadPage(dialogContent, index);

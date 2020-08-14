@@ -237,6 +237,26 @@ function OptionsFormatted(scenario, mods)
     )
 end
 
+function FindPreloadOptions(scenario, mods)
+
+    local preloads = { }
+
+    -- gather all the options
+    local formatted = OptionsFormatted(scenario, mods)
+
+    -- check if an option is tagged as 'preload'
+    for k, formattee in formatted do 
+        if formattee.type == 'option' then 
+            if formattee.data.preload then 
+                table.insert(preloads, formattee.data.key)
+            end
+        end
+    end
+
+    LOG(repr(preloads))
+    return preloads
+end
+
 function OptionsCorrectedWithMessage(entries, noContentMessage)
     local corrected = { }
     for k, entry in entries do 

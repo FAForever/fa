@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Access to preferences that are used in the UI
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local optionsLogic = import('/lua/options/optionsLogic.lua')

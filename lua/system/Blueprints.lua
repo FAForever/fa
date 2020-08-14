@@ -47,6 +47,8 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
+local Prefs = import('/lua/user/prefs.lua')
+
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
@@ -630,6 +632,7 @@ end
 
 function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
 
+    LOG("Called!")
     local task = 'Blueprints Loading... '
     local progress = nil
     local total = nil
@@ -676,6 +679,8 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     
     -- load blueprints from active map directory
     if PreGameData and PreGameData.CurrentMapDir then
+        LOG("-------------------------------------")
+        LOG(repr(PreGameData))
         task = 'Blueprints Loading: Blueprints from current map'
         files = DiskFindFiles(PreGameData.CurrentMapDir, pattern)
         for k,file in files do

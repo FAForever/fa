@@ -1282,6 +1282,7 @@ end
 local fetchThread = nil
 -- Fetch asynchronously all unit blueprints from the game and given active sim mods
 function FetchBlueprints(activeMods, skipGameFiles, taskNotifier)
+    LOG("Called fetching!")
     local bps = {}
 
     StopBlueprints()

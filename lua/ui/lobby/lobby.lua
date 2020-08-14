@@ -2011,7 +2011,6 @@ local function TryLaunch(skipNoObserversCheck)
             end
         end
 
-        -- TODO: check the new layout
         -- load in the defaults of mods if they are not set manually
         local mods = Mods.GetGameMods()
         local modOptions = OptionUtil.ModOptionsRaw(mods);
@@ -2030,6 +2029,26 @@ local function TryLaunch(skipNoObserversCheck)
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
 
+        --------------------------------------------------------------------------
+        -- at this point we assume that all the options that is defined loaded  --
+        -- from maps, mods and any other source, is actually loaded.            --
+
+        -- keep track of options that should be available before the map loads, e.g., for blueprint modding
+        local preloads = { }
+        local prekeys = OptionUtil.FindPreloadOptions(scenarioInfo, mods);
+
+        for k, prekey in prekeys do 
+            if gameInfo.GameOptions[prekey] then 
+                preloads[prekey] = gameInfo.GameOptions[prekey]
+            end
+        end
+
+        PreGameData.PreloadedOptions = preloads
+
+        -- keep track of the map to allow us to check for custom props inside the map
+        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+        SetPreference('PreGameData',PreGameData)
+
         HostUtils.SendArmySettingsToServer()
 
         -- Tell everyone else to launch and then launch ourselves.
@@ -2045,8 +2064,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-        SetPreference('PreGameData',PreGameData)
         lobbyComm:LaunchGame(gameInfo)
     end
 
