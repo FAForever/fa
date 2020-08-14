@@ -320,11 +320,19 @@ UnitBlueprint {
             BuildTime = 6000,
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
-            NewMaxRadius = 35,
+            NewDamageRadius = 2,
+			--NewMaxRadius = 35,
             ShowBones = {
                 'SAM',
             },
             Slot = 'RCH',
+			UpgradeEffectBones = {
+                'SAM',
+                'Cannon_Muzzle',
+            },
+            UpgradeUnitAmbientBones = {
+                'UEL0301',
+            },
         },
         HighExplosiveOrdnanceRemove = {
             BuildCostEnergy = 1,
@@ -335,7 +343,8 @@ UnitBlueprint {
             },
             Icon = 'heo',
             Name = '<LOC enhancements_0064>Remove Heavy Plasma Refractor',
-            NewMaxRadius = 25,
+            NewDamageRadius = -2,
+			--NewMaxRadius = 25,
             Prerequisite = 'HighExplosiveOrdnance',
             RemoveEnhancements = {
                 'HighExplosiveOrdnance',
