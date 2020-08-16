@@ -6615,19 +6615,14 @@ Platoon = Class(moho.platoon_methods) {
     --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param opts A table of optional values, containing:
-    --        opts.First the index of the first node the path
-    --        opts.Last the index of the last node of the path
-    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
+    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssuePatrolAlongRoute = function(self, path, opts)
-        -- check for optional / default values
-        local first = opts.First or 1 
-        local last = opts.Last or table.getn(path)
-        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
+    IssuePatrolAlongRoute = function(self, path)
 
-        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
-        -- self:SetPlatoonFormationOverride(formation) 
+        -- check for optional / default values
+        local first = 1 
+        local last = table.getn(path)
+        local formation = self.PlatoonData.UseFormation or 'NoFormation'
 
         -- keep track of all the commands we issued
         local commands = { }
@@ -6637,7 +6632,9 @@ Platoon = Class(moho.platoon_methods) {
             return commands
         end
 
-        -- we have no formation, further computations are not required
+        -- we have no formation, further computations are not required. We use this
+        -- shortcut because calling IssueFormPatrol() with no formation causes them
+        -- to not move at all.
         if formation == 'NoFormation' then 
             local units = self:GetPlatoonUnits()
             for k = first, last do 
@@ -6660,6 +6657,10 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
 
+        -- store locally for better performance
+        local GetAngleCCW = Utilities.GetAngleCCW
+        local GetDirectionVector = Utilities.GetDirectionVector
+
         -- pre-compute the angles
         local angles = { }
         for k = first, last do 
@@ -6674,8 +6675,8 @@ Platoon = Class(moho.platoon_methods) {
 
             -- base orientation when the angle is 0 for the function IssueFormMove
             local base = Vector( 0, 0, 1 )
-            local direction = Utilities.GetDirectionVector(next, curr)
-            local angle = Utilities.GetAngleCCW(base, direction)
+            local direction = GetDirectionVector(next, curr)
+            local angle = GetAngleCCW(base, direction)
             angles[k] = angle
         end
 
@@ -6694,19 +6695,13 @@ Platoon = Class(moho.platoon_methods) {
     --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param opts A table of optional values, containing:
-    --        opts.First the index of the first node the path
-    --        opts.Last the index of the last node of the path
-    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
+    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssueAggressiveMoveAlongRoute = function(self, path, opts)
+    IssueAggressiveMoveAlongRoute = function(self, path)
         -- check for optional / default values
-        local first = opts.First or 1 
-        local last = opts.Last or table.getn(path)
-        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
-
-        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
-        -- self:SetPlatoonFormationOverride(formation) 
+        local first = 1 
+        local last = table.getn(path)
+        local formation = self.PlatoonData.UseFormation or 'NoFormation'
 
         -- keep track of all the commands we issued
         local commands = { }
@@ -6716,7 +6711,9 @@ Platoon = Class(moho.platoon_methods) {
             return commands
         end
 
-        -- we have no formation, further computations are not required
+        -- we have no formation, further computations are not required. We use this
+        -- shortcut because calling IssueFormAggressiveMove() with no formation causes 
+        -- them to not move at all.
         if formation == 'NoFormation' then 
             -- store the commands / orders
             local units = self:GetPlatoonUnits()
@@ -6740,6 +6737,10 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
 
+        -- store locally for better performance
+        local GetAngleCCW = Utilities.GetAngleCCW
+        local GetDirectionVector = Utilities.GetDirectionVector
+
         -- pre-compute the angles
         local angles = { }
         for k = first, last do 
@@ -6755,8 +6756,8 @@ Platoon = Class(moho.platoon_methods) {
 
             -- base orientation when the angle is 0
             local base = Vector( 0, 0, 1 )
-            local direction = Utilities.GetDirectionVector(next, curr)
-            local angle = Utilities.GetAngleCCW(base, direction)
+            local direction = GetDirectionVector(next, curr)
+            local angle = GetAngleCCW(base, direction)
             angles[k] = angle
         end
 
@@ -6775,19 +6776,13 @@ Platoon = Class(moho.platoon_methods) {
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param opts A table of optional values, containing:
-    --        opts.First the index of the first node the path
-    --        opts.Last the index of the last node of the path
-    --        opts.UseFormation the formation to use for the platoon, overrides the formation of the squads
+    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssueMoveAlongRoute = function(self, path, opts)
+    IssueMoveAlongRoute = function(self, path)
         -- check for optional / default values
-        local first = opts.First or 1 
-        local last = opts.Last or table.getn(path)
-        local formation = opts.UseFormation or self.PlatoonData.UseFormation or 'NoFormation'
-
-        -- This is done elsewhere too after checking for self.PlatoonData.UseFormation. Should we do this here?
-        -- self:SetPlatoonFormationOverride(formation) 
+        local first = 1 
+        local last = table.getn(path)
+        local formation = self.PlatoonData.UseFormation or 'NoFormation'
 
         -- keep track of all the commands we issued
         local commands = { }
@@ -6797,7 +6792,9 @@ Platoon = Class(moho.platoon_methods) {
             return { }
         end
 
-        -- we have no formation, further computations are not required
+        -- we have no formation, further computations are not required. We use this
+        -- shortcut because calling IssueFormMove() with no formation causes them 
+        -- to not move at all.
         if formation == 'NoFormation' then 
             -- store the commands / orders
             local units = self:GetPlatoonUnits()
@@ -6821,6 +6818,10 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
 
+        -- store locally for better performance
+        local GetAngleCCW = Utilities.GetAngleCCW
+        local GetDirectionVector = Utilities.GetDirectionVector
+
         -- pre-compute the angles
         local angles = { }
         for k = first, last do 
@@ -6836,8 +6837,8 @@ Platoon = Class(moho.platoon_methods) {
 
             -- base orientation when the angle is 0
             local base = Vector( 0, 0, 1 )
-            local direction = Utilities.GetDirectionVector(next, curr)
-            local angle = Utilities.GetAngleCCW(base, direction)
+            local direction = GetDirectionVector(next, curr)
+            local angle = GetAngleCCW(base, direction)
             angles[k] = angle
         end
 
