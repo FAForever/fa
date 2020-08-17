@@ -10,12 +10,16 @@ CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
         CreateLightParticle( self, -1, army, 24, 5, 'glow_03', 'ramp_red_10' )
         CreateLightParticle( self, -1, army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
 		
-        if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
+            local army = self.Army
             
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
+            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
         end
         
 		CIFMolecularResonanceShell.OnImpact(self, targetType, targetEntity)  

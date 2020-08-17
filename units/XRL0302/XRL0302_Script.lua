@@ -117,7 +117,6 @@ XRL0302 = Class(CWalkingLandUnit) {
     
     OnDestroy = function(self)
         CWalkingLandUnit.OnDestroy(self)
-        self:DoDeathWeapon()
     end,
 }
 

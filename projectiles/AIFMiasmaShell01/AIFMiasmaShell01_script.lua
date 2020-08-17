@@ -27,7 +27,8 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
                 
         self:Destroy()
         
-		if targetType ~= 'Water' or targetType ~= 'UnitAir' or targetType ~= 'Shield' then
+        -- already kill the trees, so better make them fall. Even if it would be better that it doesn't kill trees at all.
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
 
