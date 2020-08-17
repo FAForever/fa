@@ -91,8 +91,11 @@ URL0301 = Class(CCommandUnit) {
         while not self.Dead do
             local units = self:GetUnitsToBuff(bp)
             for _,unit in units do
-                Buff.ApplyBuff(unit, buff)
-                unit:RequestRefreshUI()
+				local unitCat = ParseEntityCategory(bp.UnitCategory)
+				if not unitCat == 'EXPERIMENTAL' then
+					Buff.ApplyBuff(unit, buff)
+					unit:RequestRefreshUI()
+				end
             end
             WaitSeconds(5)
         end
