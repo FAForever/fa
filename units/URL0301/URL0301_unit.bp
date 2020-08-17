@@ -683,7 +683,7 @@ UnitBlueprint {
         ConstructionBar = true,
         FactionName = 'Cybran',
         Icon = 'amph',
-        SelectionPriority = 3,
+        --SelectionPriority = 3,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
     },
