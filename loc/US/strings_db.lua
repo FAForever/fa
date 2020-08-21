@@ -1539,7 +1539,7 @@ Unit_Description_0093="Provides 500 mass storage. Construct next to extractors o
 Unit_Description_0094="Generates 500 Energy per second. Construct next to other structures for adjacency bonus."
 Unit_Description_0095="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0096="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
-Unit_Description_0097="Generates 18 mass per second. Must be construcusingted on mass deposits. Construct structures next to mass extractor for adjacency bonus."
+Unit_Description_0097="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
 Unit_Description_0098="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 
 -- UEF -- Engineers
