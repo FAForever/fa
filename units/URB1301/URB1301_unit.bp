@@ -52,6 +52,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SORTECONOMY',
+        'VOLATILE',
     },
     CollisionOffsetY = -0.25,
     Defense = {

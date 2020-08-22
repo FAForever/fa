@@ -38,6 +38,7 @@ UnitBlueprint {
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'VOLATILE',
     },
     Defense = {
         AirThreatLevel = 0,
