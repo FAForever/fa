@@ -1114,7 +1114,10 @@ Unit = Class(moho.unit_methods) {
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-
+                
+                if not EntityCategoryContains(categories.VOLATILE, self) then
+                    self:SetReclaimable(false)
+                end
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
