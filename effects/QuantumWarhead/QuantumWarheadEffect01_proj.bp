@@ -6,7 +6,7 @@ ProjectileBlueprint {
                 {
                     ShaderName = 'TMeshQuantumNuke',
                     NormalsName = 'QuantumWarheadEffect01_normals.dds',
-                    LODCutoff = -1.0,
+                    LODCutoff = 600.0,
                 },
             },
         },
