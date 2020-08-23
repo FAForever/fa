@@ -9,6 +9,7 @@ local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 XSB2401 = Class(SStructureUnit) {
     Weapons = {
@@ -22,6 +23,7 @@ XSB2401 = Class(SStructureUnit) {
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
         },
+        DeathWeapon = Class(DeathNukeWeapon) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)

@@ -75,6 +75,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'VOLATILE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     CollisionOffsetY = -0.25,
@@ -92,6 +93,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_deathaoe>Volatile',
         },
         AnimationDeath = {
             {
@@ -335,6 +337,43 @@ UnitBlueprint {
             WeaponUnpackAnimation = '/units/uab2305/uab2305_alaunchsequence.sca',
             WeaponUnpackAnimationRate = 10,
             WeaponUnpacks = true,
+        },
+        {
+            AboveWaterTargetsOnly = true,
+            CollideFriendly = false,
+            Damage = 0,
+            DamageFriendly = true,
+            DamageRadius = 0,
+            DamageType = 'Nuke',
+            DisplayName = 'Death Weapon',
+            FireOnDeath = true,
+            FiringTolerance = 2,
+            Label = 'DeathWeapon',
+            MaxRadius = 1,
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
+            MuzzleVelocity = 0,
+            NukeInnerRingDamage = 20000,
+            NukeInnerRingRadius = 15,
+            NukeInnerRingTotalTime = 0,
+            NukeOuterRingDamage = 5000,
+            NukeOuterRingRadius = 20,
+            NukeOuterRingTotalTime = 0,
+            ProjectileId = '/projectiles/SIFExperimentalStrategicDeath01/SIFExperimentalStrategicDeath01_proj.bp',
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        0,
+                    },
+                    RackBone = 0,
+                },
+            },
+            RackRecoilDistance = 0,
+            RateOfFire = 1,
+            TargetCheckInterval = 9999999,
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            Turreted = false,
+            WeaponCategory = 'Death',
         },
     },
     Wreckage = {
