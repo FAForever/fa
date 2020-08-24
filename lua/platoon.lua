@@ -6617,10 +6617,10 @@ Platoon = Class(moho.platoon_methods) {
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
     -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssuePatrolAlongRoute = function(self, path)
+    IssuePatrolAlongRoute = function(self, path, formation)
 
         -- check for optional / default values
-        local formation = self.PlatoonData.UseFormation or 'NoFormation'
+        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
         -- check if the parameters are correct
         if not path or not (type(path) == 'table') then
@@ -6702,9 +6702,9 @@ Platoon = Class(moho.platoon_methods) {
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
     -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssueAggressiveMoveAlongRoute = function(self, path)
+    IssueAggressiveMoveAlongRoute = function(self, path, formation)
         -- check for optional / default values
-        local formation = self.PlatoonData.UseFormation or 'NoFormation'
+        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
         -- check if the parameters are correct
         if not path or not (type(path) == 'table') then
@@ -6789,9 +6789,9 @@ Platoon = Class(moho.platoon_methods) {
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
     -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     -- @return Table of commands.
-    IssueMoveAlongRoute = function(self, path)
+    IssueMoveAlongRoute = function(self, path, formation)
         -- check for optional / default values
-        local formation = self.PlatoonData.UseFormation or 'NoFormation'
+        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
         
         -- check if the parameters are correct
         if not path or not (type(path) == 'table') then
