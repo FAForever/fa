@@ -102,19 +102,12 @@ AIBrain = Class(moho.aibrain_methods) {
             if string.find(per, 'sorian') then
                 self.Sorian = true
             end
-            if string.find(per, 'uveso') then
-                self.Uveso = true
-            end
-            if string.find(per, 'dilli') then
-                self.Dilli = true
-            end
             if DiskGetFileInfo('/lua/AI/altaiutilities.lua') then
                 self.Duncan = true
             end
 
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
-            self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
-            self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
+            self:ForkThread(self.InitialAIThread)
 
             self.PlatoonNameCounter = {}
             self.PlatoonNameCounter['AttackForce'] = 0
@@ -496,11 +489,6 @@ AIBrain = Class(moho.aibrain_methods) {
     OnDefeat = function(self)
         self:SetResult("defeat")
 
-        -- For Sorian AI
-        if self.BrainType == 'AI' then
-            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
-        end
-
         SetArmyOutOfGame(self:GetArmyIndex())
 
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
@@ -543,22 +531,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-            -- Used to remove unique platoon handles from Sorian AI units
-            local function RemovePlatoonHandleFromUnit(units)
-                if not self.Sorian then return end
-
-                for _, unit in units do
-                    if not unit.Dead then
-                        if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
-                            unit.PlatoonHandle:Stop()
-                            unit.PlatoonHandle:PlatoonDisbandNoAssign()
-                        end
-                        IssueStop({unit})
-                        IssueClearCommands({unit})
-                    end
-                end
-            end
-
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
             local function TransferUnitsToBrain(brains)
                 if table.getn(brains) > 0 then
@@ -574,9 +546,6 @@ AIBrain = Class(moho.aibrain_methods) {
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and table.getn(units) > 0 then
-
-                            RemovePlatoonHandleFromUnit(units)
-
                             TransferUnitsOwnership(units, brain.index)
                             WaitSeconds(1)
                         end
@@ -597,9 +566,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 local KillerIndex = 0
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                 if units and table.getn(units) > 0 then
-
-                    RemovePlatoonHandleFromUnit(units)
-
                     if victoryOption == 'demoralization' then
                         KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
@@ -614,9 +580,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Return units transferred during the game to me
             local function ReturnBorrowedUnits()
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-
-                RemovePlatoonHandleFromUnit(units)
-
                 local borrowed = {}
                 for index, unit in units do
                     local oldowner = unit.oldowner
@@ -702,27 +665,56 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
 
-        ForkThread(KillArmy)
-
-        if self.BuilderManagers then
-            self.ConditionsMonitor:Destroy()
-            for k, v in self.BuilderManagers do
-                v.EngineerManager:SetEnabled(false)
-                v.EngineerManager:Destroy()
-                v.FactoryManager:SetEnabled(false)
-                v.FactoryManager:Destroy()
-                v.PlatoonFormManager:SetEnabled(false)
-                v.PlatoonFormManager:Destroy()
-                if v.StrategyManager then
-                    v.StrategyManager:SetEnabled(false)
-                    v.StrategyManager:Destroy()
+        -- AI
+        if self.BrainType == 'AI' then
+            -- print AI "ilost" text to chat
+            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
+            -- remove PlatoonHandle from all AI units before we kill / transfer the army
+            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            if units and table.getn(units) > 0 then
+                for _, unit in units do
+                    if not unit.Dead then
+                        if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
+                            unit.PlatoonHandle:Stop()
+                            unit.PlatoonHandle:PlatoonDisbandNoAssign()
+                        end
+                        IssueStop({unit})
+                        IssueClearCommands({unit})
+                    end
                 end
-                self.BuilderManagers[k] = nil
             end
+            -- Stop the AI from executing AI plans
+            self.RepeatExecution = false
+            -- removing AI BrainConditionsMonitor
+            if self.ConditionsMonitor then
+                self.ConditionsMonitor:Destroy()
+            end
+            -- removing AI BuilderManagers
+            if self.BuilderManagers then
+                for k, v in self.BuilderManagers do
+                    v.EngineerManager:SetEnabled(false)
+                    v.FactoryManager:SetEnabled(false)
+                    v.PlatoonFormManager:SetEnabled(false)
+                    v.EngineerManager:Destroy()
+                    v.FactoryManager:Destroy()
+                    v.PlatoonFormManager:Destroy()
+                    if v.StrategyManager then
+                        v.StrategyManager:SetEnabled(false)
+                        v.StrategyManager:Destroy()
+                    end
+                    self.BuilderManagers[k].EngineerManager = nil
+                    self.BuilderManagers[k].FactoryManager = nil
+                    self.BuilderManagers[k].PlatoonFormManager = nil
+                    self.BuilderManagers[k].BaseSettings = nil
+                    self.BuilderManagers[k].BuilderHandles = nil
+                    self.BuilderManagers[k].Position = nil
+                end
+            end
+            -- delete the AI pathcache
+            self.PathCache = nil
         end
-        
-        -- delete the pathcache
-        self.PathCache = nil
+
+        ForkThread(KillArmy)
 
         if self.Trash then
             self.Trash:Destroy()
@@ -758,6 +750,13 @@ AIBrain = Class(moho.aibrain_methods) {
             self:ForkThread(self.EvaluateAIThread)
         end
         self.ConstantEval = eval
+    end,
+
+    InitialAIThread = function(self)
+        -- delay the AI so it can't reclaim the start area before it's cleared from the ACU landing blast.
+        WaitTicks(30)
+        self.EvaluateThread = self:ForkThread(self.EvaluateAIThread)
+        self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
     end,
 
     EvaluateAIThread = function(self)
@@ -1092,12 +1091,15 @@ AIBrain = Class(moho.aibrain_methods) {
     GetManagerCount = function(self, type)
         local count = 0
         for k, v in self.BuilderManagers do
+            if not v.BaseType then
+                continue
+            end
             if type then
-                if type == 'Start Location' and not (string.find(k, 'ARMY_') or string.find(k, 'Large Expansion')) then
+                if type == 'Start Location' and v.BaseType ~= 'MAIN' and v.BaseType ~= 'Blank Marker' then
                     continue
-                elseif type == 'Naval Area' and not (string.find(k, 'Naval Area')) then
+                elseif type == 'Naval Area' and v.BaseType ~= 'Naval Area' then
                     continue
-                elseif type == 'Expansion Area' and (not (string.find(k, 'Expansion Area') or string.find(k, 'EXPANSION_AREA')) or string.find(k, 'Large Expansion')) then
+                elseif type == 'Expansion Area' and v.BaseType ~= 'Expansion Area' and v.BaseType ~= 'Large Expansion Area' then
                     continue
                 end
             end
@@ -1243,6 +1245,7 @@ AIBrain = Class(moho.aibrain_methods) {
             },
             BuilderHandles = {},
             Position = position,
+            BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
         }
         self.NumBases = self.NumBases + 1
     end,

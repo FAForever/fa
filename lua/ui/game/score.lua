@@ -30,8 +30,6 @@ local observerLine = false
 
 ----  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()
-local localArmyID = GetFocusArmy()
-local replayID = -1
 
 local lastUnitWarning = false
 local unitWarningUsed = false
@@ -115,29 +113,40 @@ function CreateScoreUI(parent)
 
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg.OnFrame = function(self, delta)
-        local newRight = self.Right() + (1000*delta)
-        if newRight > savedParent.Right() + self.Width() then
-            newRight = savedParent.Right() + self.Width()
-            self:Hide()
-            self:SetNeedsFrameUpdate(false)
+        if controls.collapseArrow:IsChecked() then
+            local newRight = self.Right() + (1000 * delta)
+            if newRight > savedParent.Right() + self.Width() then
+                self.Right:Set(function() return savedParent.Right() + self.Width() end)
+                self:Hide()
+                self:SetNeedsFrameUpdate(false)
+            else
+                self.Right:Set(newRight)
+            end
+        else
+            local newRight = self.Right() - (1000*delta)
+            if newRight < savedParent.Right() - 3 then
+                self.Right:Set(function() return savedParent.Right() - 18 end)
+                self:SetNeedsFrameUpdate(false)
+            else
+                self.Right:Set(newRight)
+            end
         end
-        self.Right:Set(newRight)
     end
     controls.collapseArrow:SetCheck(true, true)
 end
 
-function blockOnHide(self, hidden)
+local function blockOnHide(self, hidden)
     return true
 end
 
-function fmtnum(ns)
-    if (math.abs(ns) < 1000) then         -- 0 to 999
+local function fmtnum(ns)
+    if (math.abs(ns) < 1000) then        -- 0 to 999
         return string.format("%01.0f", ns)
     elseif (math.abs(ns) < 10000) then   -- 1.0K to 9.9K
         return string.format("%01.1fk", ns / 1000)
     elseif (math.abs(ns) < 1000000) then -- 10K to 999K
         return string.format("%01.0fk", ns / 1000)
-    else                       -- 1.0M to ....
+    else                                 -- 1.0M to ....
         return string.format("%01.1fm", ns / 1000000)
     end
 end
@@ -148,12 +157,12 @@ function SetLayout()
     end
 end
 
-function UpdResDisplay(mode)
+local function UpdResDisplay(mode)
     for index, scoreData in ScoresCache do
-        if scoreData.resources.massover.rate then
+        if scoreData.resources then
             for _, line in controls.armyLines do
                 if line.armyID == index then
-                    DisplayResources(scoreData.resources,line,mode)
+                    DisplayResources(scoreData.resources, line, mode)
                     break
                 end
             end
@@ -161,7 +170,23 @@ function UpdResDisplay(mode)
     end
 end
 
-function ResourceClickProcessing(self, event, uiGroup, resType)
+local function LinesColoring(curFA)
+    for _, line in controls.armyLines do
+        if curFA > 0 and line.armyID > 0 and IsAlly(curFA, line.armyID) then
+            line.bg:SetSolidColor('ff00c000')
+            if line.bg:GetAlpha() < 0.2 then
+                line.bg:SetAlpha(0.2)
+            end
+        elseif line.bg.SetSolidColor then
+            line.bg:SetSolidColor('ffa0a0a0')
+            if line.bg:GetAlpha() < 0.6 then
+                line.bg:SetAlpha(0)
+            end
+        end
+    end
+end
+
+local function ResourceClickProcessing(self, event, uiGroup, resType)
     if (event.Type == 'MouseEnter') or (event.Type == 'MouseExit') then
         if event.Type == 'MouseEnter' then
             DisplayStorage = DisplayStorage + 1
@@ -173,10 +198,15 @@ function ResourceClickProcessing(self, event, uiGroup, resType)
     elseif event.Type == 'ButtonPress' then
         --if not event.Modifiers.Left then return end
         local armyID = uiGroup.armyID
-        if IsObserver() or (GetFocusArmy() == armyID) then return end
+        if IsObserver() then return end
         if event.Modifiers.Shift then
+            if GetFocusArmy() == armyID then
+                SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                    to = 'allies', Chat = true, text = 'Who needs '..resType..'?' })
+                return
+            end
             local scoreData = ScoresCache[armyID]
-            if not scoreData.resources.massover.rate then return end
+            if not scoreData.resources then return end
             local EconData = GetEconomyTotals()
             local ResVolume = EconData.stored[string.upper(resType)]
             if ResVolume <= 0 then return end
@@ -193,7 +223,13 @@ function ResourceClickProcessing(self, event, uiGroup, resType)
             SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
                 text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[armyID].name })
         elseif event.Modifiers.Ctrl then
-            SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true, text = 'Give me '..resType })
+            if GetFocusArmy() == armyID then
+                SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                    to = 'allies', Chat = true, text = 'Give me '..resType })
+            else
+                SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                    to = 'allies', Chat = true, text = ScoresCache[armyID].name..' give me '..resType })
+            end
         end
     end
 end
@@ -300,7 +336,8 @@ function SetupPlayerLines()
         group.armyID = armyIndex
 
         group.bg = Bitmap(group)
-        group.bg:SetSolidColor('00000000')
+        group.bg:SetSolidColor('ffa0a0a0')
+        group.bg:SetAlpha(0)
         group.bg.Height:Set(group.faction.Height)
         group.bg.Left:Set(group.faction.Right)
         group.bg.Right:Set(group.Right)
@@ -309,11 +346,17 @@ function SetupPlayerLines()
         group.bg.Depth:Set(group.Depth)
         group.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                self.bg:SetSolidColor('ff777777')
+                self.bg:SetAlpha(0.6)
             elseif event.Type == 'MouseExit' then
-                self.bg:SetSolidColor('00000000')
+                local curFA = GetFocusArmy()
+                if curFA > 0 and self.armyID > 0 and IsAlly(curFA, self.armyID) then
+                    self.bg:SetAlpha(0.2)
+                else
+                    self.bg:SetAlpha(0)
+                end
             elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) then
                 ConExecute('SetFocusArmy '..tostring(self.armyID - 1))
+                LinesColoring(self.armyID)
             end
         end
 
@@ -416,19 +459,9 @@ function SetupPlayerLines()
     mapData = {}
     mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
     mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
-    if SessionIsReplay() then
-        if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") and GetFrontEndData('syncreplayid') ~= nil and GetFrontEndData('syncreplayid') ~= 0 then
-            replayID = GetFrontEndData('syncreplayid')
-        elseif HasCommandLineArg("/savereplay") then
-            local url = GetCommandLineArg("/savereplay", 1)[1]
-            local lastpos = string.find(url, "/", 20)
-            replayID = string.sub(url, 20, lastpos-1)
-        elseif HasCommandLineArg("/replayid") then
-            replayID =  GetCommandLineArg("/replayid", 1)[1]
-        end
-        if replayID ~= -1 then
-            mapData.mapname = mapData.mapname..', ID: '..replayID
-        end
+    local replayID = UIUtil.GetReplayId()
+    if replayID then
+        mapData.mapname = mapData.mapname..', ID: '..replayID
     end
 
     controls.armyLines[index] = CreateMapNameLine(mapData)
@@ -463,12 +496,12 @@ function SetupPlayerLines()
 end
 
 function DisplayResources(resources, line, mode)
-    if resources.massover.rate then
+    if resources then
         local Tmp = {}
         if mode == 0 then
             Tmp = {Mass = resources.massin.rate, Energy = resources.energyin.rate}
         elseif mode == 1 then
-            Tmp = {Mass = resources.massover.rate, Energy = resources.energyover.rate}
+            Tmp = {Mass = resources.massin.rate - resources.massout.rate, Energy = resources.energyin.rate - resources.energyout.rate}
         elseif mode == 2 then
             Tmp = {Mass = resources.storage.storedMass * 0.1, Energy = resources.storage.storedEnergy * 0.1}
         end
@@ -515,32 +548,23 @@ function _OnBeat()
         end
     end
 
+    local curFA = GetFocusArmy()
     if currentScores then
-        local armiesInfo = GetArmiesTable().armiesTable
         ScoresCache = currentScores
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
-                    if scoreData.general.score == -1 then
-                        line.score:SetText('')
-                    else
+                    if scoreData.general.score >= 0 then
                         line.score:SetText(fmtnum(scoreData.general.score))
-                        line.scoreNumber = scoreData.general.score
                     end
 
                     if DisplayStorage > 0 then
-                        DisplayResources(scoreData.resources,line,2)
+                        DisplayResources(scoreData.resources, line, 2)
                     else
-                        DisplayResources(scoreData.resources,line,DisplayResMode)
+                        DisplayResources(scoreData.resources, line, DisplayResMode)
                     end
 
-                    if GetFocusArmy() == index then
-                        if scoreData.general.currentcap.count > 0 then
-                            SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
-                        end
-                    end
-
-                    if (not line.OOG) and (armiesInfo[index].outOfGame) then
+                    if (not line.OOG) and (scoreData.Defeated) then
                         line.OOG = true
                         line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
                         line.color:SetSolidColor('ff000000')
@@ -555,7 +579,12 @@ function _OnBeat()
                 end
             end
         end
-        local curFA = GetFocusArmy()
+        LinesColoring(curFA)
+
+        local scoreData = currentScores[curFA]
+        if scoreData.general.currentcap then
+            SetUnitText(scoreData.general.currentunits, scoreData.general.currentcap)
+        end
         if (curFA > 0) and (not SessionIsReplay()) then
             local di = 1
             for si, data in controls.armyLines do
@@ -589,7 +618,6 @@ function _OnBeat()
         currentScores = false -- dont render score UI until next score update
     end
 
-    local curFA = GetFocusArmy()
     if prevArmy ~= curFA then
         for _, line in controls.armyLines do
             if line.armyID == prevArmy then
@@ -663,30 +691,11 @@ function ToggleScoreControl(state)
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
             controls.bg:SetNeedsFrameUpdate(true)
-            controls.bg.OnFrame = function(self, delta)
-                local newRight = self.Right() - (1000*delta)
-                if newRight < savedParent.Right() - 3 then
-                    self.Right:Set(function() return savedParent.Right() - 18 end)
-                    self:SetNeedsFrameUpdate(false)
-                else
-                    self.Right:Set(newRight)
-                end
-            end
         else
             Prefs.SetToCurrentProfile("scoreoverlay", false)
             local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
             PlaySound(sound)
             controls.bg:SetNeedsFrameUpdate(true)
-            controls.bg.OnFrame = function(self, delta)
-                local newRight = self.Right() + (1000*delta)
-                if newRight > savedParent.Right() + self.Width() then
-                    self.Right:Set(function() return savedParent.Right() + self.Width() end)
-                    self:Hide()
-                    self:SetNeedsFrameUpdate(false)
-                else
-                    self.Right:Set(newRight)
-                end
-            end
             controls.collapseArrow:SetCheck(true, true)
         end
     else
@@ -732,7 +741,6 @@ function Contract()
     end
 end
 
-
 function InitialAnimation(state)
     controls.bg.Right:Set(savedParent.Right() + controls.bg.Width())
     controls.bg:Hide()
@@ -740,23 +748,11 @@ function InitialAnimation(state)
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)
-        controls.bg.OnFrame = function(self, delta)
-            local newRight = self.Right() - (1000*delta)
-            if newRight < savedParent.Right() - 3 then
-                self.Right:Set(function() return savedParent.Right() - 18 end)
-                self:SetNeedsFrameUpdate(false)
-            else
-                self.Right:Set(newRight)
-            end
-        end
     end
 end
 
 function NoteGameSpeedChanged(newSpeed)
     gameSpeed = newSpeed
-    if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' and controls.time then
-        controls.time:SetText(string.format("%s (%+d)", GetGameTime(), gameSpeed))
-    end
     if observerLine.speedSlider then
         observerLine.speedSlider:SetValue(gameSpeed)
     end

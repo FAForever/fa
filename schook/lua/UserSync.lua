@@ -84,24 +84,23 @@ OnSync = function()
 
     if not table.empty(Sync.Score) then
         import('/lua/ui/game/score.lua').currentScores = Sync.Score
-        if not Sync.FullScoreSync then
-            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
-        end
     end
 
-    if Sync.FullScoreSync then
-        if not table.empty(Sync.ScoreAccum) then
-            import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
-        end
+    if not table.empty(Sync.ScoreAccum) then
+        import('/lua/ui/dialogs/hotstats.lua').scoreData = Sync.ScoreAccum
     end
 
-    if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
+
+    for _, gameResult in Sync.GameResult do
+        local armyIndex, result = unpack(gameResult)
+
+        # It turns out that legitimate results are always accompanied by a score update.
+        # We can use this to detect bogus results caused by leaving the game early.
+        if not table.empty(Sync.Score) then
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
             GpgNetSend('GameResult', armyIndex, result)
-            import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
         end
+        import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
     if Sync.StatsToSend then

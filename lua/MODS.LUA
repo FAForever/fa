@@ -321,27 +321,66 @@ function AllSelectableMods()
     return r
 end
 
--- sorts mods according to their before/after lists, otherwise alphabetically
--- returns true when first less than second
-local function ModComp(first, second)
+-- topological sort the mods using before/after lists
+-- log a warning and return nil in case of a cycle
+local function ModTopSort(mods_to_sort)
+    local required_for = {}
+    for uid,mod in mods_to_sort do
+        required_for[uid] = {}
+    end
 
-    if _mod_cache[first].before then
-        for i,uid in _mod_cache[first].before do
-            if _mod_cache[second].uid == uid then
-                return true
+    for uid,mod in mods_to_sort do
+        if _mod_cache[uid].before then
+            for i,before_uid in _mod_cache[uid].before do
+                if mods_to_sort[before_uid] ~= nil then
+                    table.insert(required_for[uid], before_uid)
+                end
+            end
+        end
+
+        if _mod_cache[uid].after then
+            for i,after_uid in _mod_cache[uid].after do
+                if mods_to_sort[after_uid] ~= nil then
+                    table.insert(required_for[after_uid], uid)
+                end
             end
         end
     end
 
-    if _mod_cache[first].after then
-        for i,uid in _mod_cache[first].after do
-            if _mod_cache[second].uid == uid then
-                return false
-            end
+    local result = {}
+    local processing = {}
+    local done_with = {}
+
+    local function visit(uid)
+        if done_with[uid] then
+            return 0
+        end
+        if processing[uid] then
+            return 1
+        end
+
+        processing[uid] = true
+        for i,child_uid in required_for[uid] do
+            local r = visit(child_uid)
+            if r == 1 then return 1 end
+        end
+
+        processing[uid] = false
+        done_with[uid] = true
+        table.insert(result, mods_to_sort[uid])
+        return 0
+    end
+
+    local r = 0
+    for uid,mod in mods_to_sort do
+        r = visit(uid)
+        if r == 1 then
+            WARN('Inconsistent mod order lists, load order will be arbitrary')
+            return
         end
     end
 
-    return first < second
+    return table.reverse(result)
 end
 
 -- Get a list of ingame UI mods that should be active, based on preferences.
@@ -353,12 +392,22 @@ local function GetActiveModsFiltered(filter, selected)
     end
 
     local all_mods = AllMods()
-    local r = {}
-    for uid,m in sortedpairs(all_mods, ModComp) do
-        if selected[uid] and filter(m) then
+    local filtered = {}
+
+    for uid,mod in all_mods do
+        if selected[uid] and filter(mod) then
+            filtered[uid] = mod
+        end
+    end
+
+    local r = ModTopSort(filtered)
+    if r == nil then
+        r = {}
+        for uid,m in filtered do
             table.insert(r,m)
         end
     end
+
     return r
 end
 

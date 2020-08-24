@@ -157,11 +157,18 @@ function CreateExtendedToolTip(parent, text, desc, width)
     text = LOC(text)
     desc = LOC(desc)
 
-    if text ~= "" or desc ~= "" then
+    if text == '' then
+         text = nil
+    end
+    if desc == '' then
+         desc = nil
+    end
+
+    if text or desc then
         local tooltip = Group(parent)
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
 
-        if text ~= "" and text ~= nil then
+        if text then
             tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
             tooltip.title.Top:Set(tooltip.Top)
             tooltip.title.Left:Set(tooltip.Left)
@@ -178,10 +185,10 @@ function CreateExtendedToolTip(parent, text, desc, width)
         tooltip.desc = {}
         local tempTable = false
 
-        if desc ~= "" and desc ~= nil then
+        if desc then
             tooltip.desc[1] = UIUtil.CreateText(tooltip, "", 12, UIUtil.bodyFont)
             tooltip.desc[1].Width:Set(tooltip.Width)
-            if text == "" and text ~= nil then
+            if text == nil then
                 tooltip.desc[1].Top:Set(tooltip.Top)
                 tooltip.desc[1].Left:Set(tooltip.Left)
             else
@@ -239,7 +246,7 @@ function CreateExtendedToolTip(parent, text, desc, width)
 
         tooltip.extborder = Bitmap(tooltip)
         tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
-        if text ~= "" and text ~= nil then
+        if text then
             tooltip.extborder.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
             LayoutHelpers.AtLeftTopIn(tooltip.extborder, tooltip.bg, -1, -1)
             LayoutHelpers.AtRightIn(tooltip.extborder, tooltip.bg, -1)
@@ -248,7 +255,7 @@ function CreateExtendedToolTip(parent, text, desc, width)
             LayoutHelpers.AtLeftTopIn(tooltip.extborder, tooltip.extbg, -1, -1)
             LayoutHelpers.AtRightIn(tooltip.extborder, tooltip.extbg, -1)
         end
-        if desc ~= "" and desc ~= nil then
+        if desc then
             LayoutHelpers.AtBottomIn(tooltip.extborder, tooltip.extbg, -1)
         else
             LayoutHelpers.AtBottomIn(tooltip.extborder, tooltip.bg, -1)
@@ -256,15 +263,15 @@ function CreateExtendedToolTip(parent, text, desc, width)
 
         tooltip:DisableHitTest(true)
 
-        if text ~= "" and text ~= nil then
+        if text then
             tooltip.Width:Set(function() return math.max(tooltip.title.Width(), width) end)
         else
             tooltip.Width:Set(function() return width end)
         end
 
-        if text == "" and text ~= nil then
+        if text == nil then
             tooltip.Height:Set(function() return (tooltip.desc[1].Height() * table.getn(tempTable)) end)
-        elseif desc == "" and desc ~= nil then
+        elseif desc == nil then
             tooltip.Height:Set(function() return tooltip.title.Height() end)
             tooltip.Width:Set(function() return tooltip.title.Width() end)
         else
@@ -297,6 +304,21 @@ function AddControlTooltip(control, tooltipID, delay, width)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             CreateMouseoverDisplay(self, tooltipID, delay, true, width)
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+
+function AddAutoUpdatedControlTooltip(control, displayText, displayBody, delay, width)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            CreateMouseoverDisplay(self, {text= displayText(),
+            body=displayBody()}, delay, true, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end

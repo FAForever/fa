@@ -1269,6 +1269,7 @@ UnitBlueprint {
             DisplayName = 'Teleport in',
             DummyWeapon = true,
             Label = 'TeleportWeapon',
+            ManualFire = true,
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',

@@ -81,9 +81,9 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
     if aiBrain.Sorian then
         AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation))
     else
-        AIUtils.EngineerTryReclaimCaptureArea(aiBrain, builder, BuildToNormalLocation(buildLocation)) 
+        AIUtils.EngineerTryReclaimCaptureArea(aiBrain, builder, BuildToNormalLocation(buildLocation))
     end
-    
+
     aiBrain:BuildStructure(builder, whatToBuild, buildLocation, false)
 
     local newEntry = {whatToBuild, buildLocation, relative}
@@ -160,25 +160,19 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we  want to build, return
         if not HasTech then
-            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for Builder: '..__blueprints[BuildUnitWithID].Description or  "Unknown")
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for engineer: '..repr(builder:GetBlueprint().BlueprintId))
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Building ('..repr(BuildUnitWithID)..') has Techlevel ('..HasTech..')')
+            SPEW('*AIExecuteBuildStructure: Engineer ('..repr(builder:GetBlueprint().BlueprintId)..') has Techlevel ('..HasTech..')')
         end
-        --LOG('*AIExecuteBuildStructure: We have TECH'..HasTech..' engineer.')
+
         if HasTech < NeedTech then
-            WARN('*AIExecuteBuildStructure: TECH'..NeedTech..' Unit "'..BuildUnitWithID..'" is assigned to TECH'..HasTech..' buildplatoon! ('..repr(buildingType)..')')
+            WARN('*AIExecuteBuildStructure: TECH'..HasTech..' Unit "'..BuildUnitWithID..'" is assigned to build TECH'..NeedTech..' buildplatoon! ('..repr(buildingType)..')')
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..NeedTech..') can build BuildUnitWithID: '..repr(BuildUnitWithID))
+            SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..HasTech..') can build TECH'..NeedTech..' BuildUnitWithID: '..repr(BuildUnitWithID))
         end
-        local IsRestricted = import('/lua/game.lua').IsRestricted
-        if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
-            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
-            AntiSpamList[buildingType] = true
-            return false
-        end
-        
+
         HasFaction = builder.factionCategory
         NeedFaction = string.upper(__blueprints[string.lower(BuildUnitWithID)].General.FactionName)
         if HasFaction ~= NeedFaction then
@@ -187,7 +181,14 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         else
             SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
         end
-       
+
+        local IsRestricted = import('/lua/game.lua').IsRestricted
+        if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
+            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
+            AntiSpamList[buildingType] = true
+            return false
+        end
+
         WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
         return false
     end

@@ -16,11 +16,12 @@ local Button = import('/lua/maui/button.lua').Button
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local TooltipInfo = import('/lua/ui/help/tooltips.lua')
 local Prefs = import('/lua/user/prefs.lua')
-local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
 local Select = import('/lua/ui/game/selection.lua')
 local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
 local SetWeaponPriorities = import('/lua/keymap/misckeyactions.lua').SetWeaponPriorities
+local CommandMode = import('/lua/ui/game/commandmode.lua')
+local Construction = import('/lua/ui/game/construction.lua')
 
 controls = import('/lua/ui/controls.lua').Get()
 
@@ -174,9 +175,9 @@ end
 local function StandardOrderBehavior(self, modifiers)
     -- If we're checked, end the current command mode, otherwise start it
     if self:IsChecked() then
-        import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+        CommandMode.EndCommandMode(true)
     else
-        import('/lua/ui/game/commandmode.lua').StartCommandMode("order", {name=self._order})
+        CommandMode.StartCommandMode("order", {name=self._order})
     end
 end
 
@@ -330,7 +331,7 @@ function ClearCommands(units)
         EnhancementQueue.clearEnhancements(units)
         ForkThread(function() -- Wait a tick for the callback to do its job then refresh the UI to remove ghost enhancement orders
             WaitSeconds(0.1)
-            import('/lua/ui/game/construction.lua').RefreshUI()
+            Construction.RefreshUI()
         end)
 
         local ids = {}
@@ -345,7 +346,7 @@ end
 
 function SoftStop(units)
     local units = units or GetSelectedUnits()
-    import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
+    Construction.ResetOrderQueues(units)
     ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
     Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
 end
@@ -528,7 +529,7 @@ end
 
 local function AttackMoveBehavior(self, modifiers)
     if self:IsChecked() then
-        import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+        CommandMode.EndCommandMode(true)
     else
         local modeData = {
             name="RULEUCC_Script",
@@ -536,13 +537,13 @@ local function AttackMoveBehavior(self, modifiers)
             TaskName='AttackMove',
             cursor = 'ATTACK_MOVE',
         }
-        import('/lua/ui/game/commandmode.lua').StartCommandMode("order", modeData)
+        CommandMode.StartCommandMode("order", modeData)
     end
 end
 
 local function AbilityButtonBehavior(self, modifiers)
     if self:IsChecked() then
-        CM.EndCommandMode(true)
+        CommandMode.EndCommandMode(true)
     else
         local modeData = {
             name="RULEUCC_Script",
@@ -550,7 +551,7 @@ local function AbilityButtonBehavior(self, modifiers)
             TaskName=self._script,
             cursor = self._cursor,
         }
-        CM.StartCommandMode("order", modeData)
+        CommandMode.StartCommandMode("order", modeData)
     end
 end
 
@@ -800,11 +801,11 @@ function CycleRetaliateStateUp()
 end
 
 local function pauseFunc()
-    import('/lua/ui/game/construction.lua').EnablePauseToggle()
+    Construction.EnablePauseToggle()
 end
 
 local function disPauseFunc()
-    import('/lua/ui/game/construction.lua').DisablePauseToggle()
+    Construction.DisablePauseToggle()
 end
 
 local function NukeBtnText(button)
@@ -1527,7 +1528,7 @@ function SetupOrdersControl(parent, mfd)
     SetLayout(UIUtil.currentLayout)
 
     -- Setup command mode behaviors
-    import('/lua/ui/game/commandmode.lua').AddStartBehavior(
+    CommandMode.AddStartBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
             if orderCheckbox then
@@ -1535,7 +1536,7 @@ function SetupOrdersControl(parent, mfd)
             end
         end
 )
-    import('/lua/ui/game/commandmode.lua').AddEndBehavior(
+    CommandMode.AddEndBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
             if orderCheckbox then

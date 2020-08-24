@@ -19,6 +19,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
+local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
 
 local selectedUnit = nil
 local updateThread = nil
@@ -31,39 +33,39 @@ function OverchargeCanKill()
         local ACU
         local ACUBp
         local bp
-    
+
         for _, unit in selected do
             if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
                 ACU = unit
                 break
             end
-        end  
-        
+        end
+
         if ACU then
             ACUBp = ACU:GetBlueprint()
-            
+
             if ACUBp.Weapon[2].Overcharge then
                 bp = ACUBp.Weapon[2].Overcharge
             elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
                 bp = ACUBp.Weapon[3].Overcharge
             -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
             end
-            
+
             if bp then
                 local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
                 -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
                 local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
-                
+
                 if damage > bp.maxDamage then
                     damage = bp.maxDamage
                 end
-            
-                if targetCategories.COMMAND then 
+
+                if targetCategories.COMMAND then
                     if unitHP[1] < bp.commandDamage then
                        unitHP[1] = nil
                        return true
                     else
-                       unitHP[1] = nil 
+                       unitHP[1] = nil
                        return false
                     end
                 elseif targetCategories.STRUCTURE then
@@ -71,17 +73,17 @@ function OverchargeCanKill()
                         unitHP[1] = nil
                         return true
                     else
-                        unitHP[1] = nil 
+                        unitHP[1] = nil
                         return false
                         end
                 elseif unitHP[1] < damage then
                     unitHP[1] = nil
                     return true
                 else
-                    unitHP[1] = nil 
+                    unitHP[1] = nil
                     return false
-                end                    
-            end 
+                end
+            end
         end
     end
 end
@@ -294,20 +296,24 @@ function UpdateWindow(info)
         end
         local description = LOC(bp.Description)
         if techLevel then
-            description = LOCF("Tech %d %s", techLevel, bp.Description)
+            description = LOC('<LOC _Tech>')..techLevel..' '..description
         end
         LayoutHelpers.AtTopIn(controls.name, controls.bg, 10)
         controls.name:SetFont(UIUtil.bodyFont, 14)
+        local name = ''
         if info.customName then
-            controls.name:SetText(LOCF('%s: %s', info.customName, description))
+            name = LOC(info.customName)
         elseif bp.General.UnitName then
-            controls.name:SetText(LOCF('%s: %s', bp.General.UnitName, description))
-        else
-            controls.name:SetText(LOCF('%s', description))
+            name = LOC(bp.General.UnitName)
         end
-        if controls.name:GetStringAdvance(controls.name:GetText()) > controls.name.Width() then
-            LayoutHelpers.AtTopIn(controls.name, controls.bg, 14)
-            controls.name:SetFont(UIUtil.bodyFont, 10)
+        if name ~='' then
+            name = name..': '
+        end
+        controls.name:SetText(name..description)
+        local scale = controls.name.Width() / controls.name.TextAdvance()
+        if scale < 1 then
+            LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
+            controls.name:SetFont(UIUtil.bodyFont, 14 * scale)
         end
         for index = 1, table.getn(statFuncs) do
             local i = index
@@ -356,23 +362,23 @@ function UpdateWindow(info)
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-		
-	if info.shieldRatio > 0 and info.fuelRatio > 0 then
-	    controls.store = 1
-	else
-	    controls.store = 0
-	end
-		
+
+        if info.shieldRatio > 0 and info.fuelRatio > 0 then
+            controls.store = 1
+        else
+            controls.store = 0
+        end
+
         if info.health then
             controls.healthBar:Show()
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
-	    
-        if not info.userUnit then
-            unitHP[1] = info.health
-            unitHP.blueprintId = info.blueprintId
-        end	
+
+            if not info.userUnit then
+                unitHP[1] = info.health
+                unitHP.blueprintId = info.blueprintId
+            end
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
@@ -388,13 +394,13 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy stars
-        local currentLevel = UnitData[info.entityId].VeteranLevel
-        local massKilled = UnitData[info.entityId].totalMassKilled
-        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
-        local myValue = UnitData[info.entityId].myValue
-        local manualVeterancy = UnitData[info.entityId].manualVeterancy
-        local bp = __blueprints[info.blueprintId]
-        
+        local data = UnitData[info.entityId]
+        local currentLevel = data.VeteranLevel
+        local massKilled = data.totalMassKilled
+        local massKilledTrue = data.totalMassKilledTrue
+        local myValue = data.myValue
+        local manualVeterancy = data.manualVeterancy
+
         for level = 1, 5 do
             if currentLevel >= level then
                 controls.vetIcons[level]:Show()
@@ -412,25 +418,25 @@ function UpdateWindow(info)
             elseif manualVeterancy then
                 local m = manualVeterancy[currentLevel] or 0
                 local lvl = math.min(currentLevel + 1, 5)
-                
+
                 progress = (massKilled - m) / bp.VeteranMass[lvl]
             end
-            
+
             if progress then
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
                     controls.vetTitle:SetText('Veterancy')
-                    
+
                     local nextLevel
                     local text
-                    
+
                     if myValue then
                         nextLevel = myValue * (currentLevel + 1)
                     else
                         nextLevel = manualVeterancy[currentLevel + 1]
-                    end    
-                    
+                    end
+
                     if nextLevel >= 1000000 then
                         text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
                     elseif nextLevel >= 100000 then
@@ -445,7 +451,7 @@ function UpdateWindow(info)
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(1)
                     controls.vetTitle:SetText('Mass killed')
-                    
+
                     local text
                     if massKilledTrue >= 1000000 then
                         text = string.format('%.2fM', massKilledTrue / 1000000)
@@ -454,10 +460,10 @@ function UpdateWindow(info)
                     elseif massKilledTrue >= 10000 then
                         text = string.format('%.1fK', massKilledTrue / 1000)
                     else
-                        text = massKilledTrue 
+                        text = massKilledTrue
                     end
-                    
-                    controls.nextVet:SetText(text)    
+
+                    controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
                 end
@@ -508,13 +514,33 @@ function UpdateWindow(info)
             controls.actionText:Hide()
         end
 
-        if Prefs.GetOption('uvd_format') == 'full' and bp.Display.Abilities then
+        local lines = nil
+        if Prefs.GetOption('uvd_format') == 'full' then
+            lines = {}
+            --Get not autodetected abilities
+            if bp.Display.Abilities then
+                for _, id in bp.Display.Abilities do
+                    local ability = unitviewDetail.ExtractAbilityFromString(id)
+                    if not unitviewDetail.IsAbilityExist[ability] then
+                        table.insert(lines, LOC(id))
+                    end
+                end
+            end
+            --Autodetect abilities
+            for id, func in unitviewDetail.IsAbilityExist do
+                if (id ~= 'ability_building') and (id ~= 'ability_repairs') and
+                   (id ~= 'ability_reclaim') and (id ~= 'ability_capture') and func(bp) then
+                    table.insert(lines, LOC('<LOC '..id..'>'))
+                end
+            end
+        end
+        if lines and (table.getn(lines) > 0) then
             local i = 1
             local maxWidth = 0
-            local index = table.getn(bp.Display.Abilities)
-            while bp.Display.Abilities[index] do
+            local index = table.getn(lines)
+            while lines[index] do
                 if not controls.abilityText[i] then
-                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, LOC(bp.Display.Abilities[index]), 12, UIUtil.bodyFont)
+                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, lines[index], 12, UIUtil.bodyFont)
                     controls.abilityText[i]:DisableHitTest()
                     if i == 1 then
                         LayoutHelpers.AtLeftIn(controls.abilityText[i], controls.abilities)
@@ -523,7 +549,7 @@ function UpdateWindow(info)
                         LayoutHelpers.Above(controls.abilityText[i], controls.abilityText[i-1])
                     end
                 else
-                    controls.abilityText[i]:SetText(LOC(bp.Display.Abilities[index]))
+                    controls.abilityText[i]:SetText(lines[index])
                 end
                 maxWidth = math.max(maxWidth, controls.abilityText[i].Width())
                 index = index - 1
@@ -624,7 +650,7 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
-    import(UIUtil.GetLayoutFilename('unitview')).SetLayout()
+    unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
@@ -688,22 +714,22 @@ function CreateUI()
             if self:GetAlpha() < 1 then
                 self:SetAlpha(1, true)
             end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
+            unitViewLayout.PositionWindow()
+            unitViewLayout.UpdateStatusBars(controls)
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end
     end
 
     -- This section is for the small icons showing what active enhancements an ACU has
-	controls.enhancements = {}
-	controls.enhancements['RCH'] = Bitmap(controls.bg)
-	controls.enhancements['Back'] = Bitmap(controls.bg)
-	controls.enhancements['LCH'] = Bitmap(controls.bg)
+    controls.enhancements = {}
+    controls.enhancements['RCH'] = Bitmap(controls.bg)
+    controls.enhancements['Back'] = Bitmap(controls.bg)
+    controls.enhancements['LCH'] = Bitmap(controls.bg)
 
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
 end
 
 function OnSelection(units)
