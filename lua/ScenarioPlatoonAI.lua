@@ -2,7 +2,11 @@
 -- File     :  /lua/ai/ScenarioPlatoonAI.lua
 -- Author(s):  Drew Staltman
 -- Summary  :  Houses a number of AI threads that are used in operations
+<<<<<<< HEAD
 -- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+=======
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+>>>>>>> 2acb9e2fde7072a42d457403b24efa36077f4f64
 ------------------------------------------------------------------------
 
 local Utilities = import('/lua/utilities.lua')
