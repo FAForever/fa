@@ -220,6 +220,28 @@ function GetAngleInBetween(v1, v2)
     return math.acos(dotp) * (360 / (math.pi * 2))
 end
 
+--- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle 
+-- is computed in a counter clockwise direction: if the base is to the south ({0, 0, 1}) then the direction to the east ({1, 0, 0}) is 90 degrees.
+-- @param base The base direction from which the angle will be computed in a counter clockwise fashion.
+-- @param direction The direction from which we want to compute the angle given a base.
+function GetAngleCCW(base, direction) 
+
+    local bn = NormalizeVector(base)
+    local dn = NormalizeVector(direction)
+
+    -- compute the orthogonal vector to determine if we need to take the inverse
+    local ort = { bn[3], 0, -bn[1] }
+
+    -- compute the radians, correct it accordingly
+    local rads = math.acos(bn[1] * dn[1] + bn[3] * dn[3])
+    if ort[1] * dn[1] + ort[3] * dn[3] < 0 then 
+        rads = 2 * math.pi - rads
+    end
+
+    -- convert to degrees
+    return (180 / math.pi) * rads
+end
+
 function UserConRequest(string)
     if not Sync.UserConRequests then
         Sync.UserConRequests = {}
