@@ -21,6 +21,8 @@ local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').Resource
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local MainMenu = import('/lua/ui/menus/main.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
+local ModUtil = import('/lua/ui/modutil.lua')
+local OptionUtil = import('/lua/ui/optionutil.lua')
 local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -52,7 +54,8 @@ local Options = {}
 local OptionSource = {}
 local OptionContainer = false
 local advOptions = false
-local changedOptions = {}
+local modOptions = false
+local changedOptions = { }
 local restrictedCategories = nil
 
 local popup = nil
@@ -453,6 +456,10 @@ end
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
     LoadScenarios()
 
+    -- initialise the option list for mods
+    local mods = Mods.GetGameMods()
+    modOptions = OptionUtil.ModOptionsFormatted(mods);
+
     -- Initialise the selected scenario from the name we were passed.
     for i, scenario in scenarios do
         if string.lower(scenario.file) == string.lower(defaultScenarioName) then
@@ -539,15 +546,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end,
             true)
     end
-
-    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
-    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
-    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
-    modButton.OnClick = function(self, modifiers)
-        -- direct import allows data caching in ModsManager
-        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, OnModsChanged)
-    end
-    dialogContent.modButton = modButton
 
     UIUtil.MakeInputModal(dialogContent)
 
@@ -670,6 +668,26 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
     SetupOptionsPanel(OptionGroup, curOptions)
 
+    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
+    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
+    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
+    modButton.OnClick = function(self, modifiers)
+
+        local NewOnModsChanged = function (...)
+            -- call the original function that changes the selected mods
+            OnModsChanged(unpack(arg))
+            -- initialise the option list for the selected mods
+            local mods = Mods.GetGameMods()
+            modOptions = OptionUtil.ModOptionsFormatted(mods)
+            -- refresh the options
+            RefreshOptions(false)
+        end
+
+        -- direct import allows data caching in ModsManager
+        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, NewOnModsChanged)
+    end
+    dialogContent.modButton = modButton
+
     selectButton.OnClick = function(self, modifiers)
         if mapIsOutdated() then
             GUI_OldMap(over)
@@ -705,47 +723,26 @@ end
 
 
 function RefreshOptions(skipRefresh)
+    -- get the current sim mods
+    local mods = Mods.GetGameMods()
+
+    -- format it all such that there are titles, subtitles, options, etc.
+    Options = OptionUtil.OptionsFormatted(selectedScenario, mods)
+
+    -- correct it such that subtitles / titles with no content show a message, etc.
+    local noContentMessage = "No options available"
+    Options = OptionUtil.OptionsCorrectedWithMessage(Options, noContentMessage)
+
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
-    if skipRefresh then
-        OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
-    end
-    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
-
-    Options = {}
-
-    --- Check that the given option source has at least one option with at least 2 possibilities, or
-    -- there's no need to draw the UI. Maps/mods can cause whole categories to vanish, and we don't
-    -- want to leave a dangling title.
-    local function ShouldShowOptionCategory(options)
-        for k, optionData in options do
-            if table.getn(optionData.values) > 1 then
-                return true
-            end
-        end
-
-        return false
-    end
-
-    for _, OptionTable in OptionSource do
-        if ShouldShowOptionCategory(OptionTable.options) then
-            table.insert(Options, {type = 'title', text = OptionTable.title})
-            for optionIndex, optionData in OptionTable.options do
-                if not(isSinglePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
-                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
-                end
-            end
-        end
-    end
     if not skipRefresh then
-        -- Remove all info about advancedOptions in changedOptions
-        -- So we have a clean slate regarding the advanced options each map switch
-        for _,optionData in OptionSource[4].options do
-            changedOptions[optionData.key] = nil
-        end
+        -- TODO: check this
+        -- -- Remove all info about advancedOptions in changedOptions
+        -- -- So we have a clean slate regarding the advanced options each map switch
+        -- for _,optionData in OptionSource[4].options do
+        --     changedOptions[optionData.key] = nil
+        -- end
 
         OptionContainer:CalcVisible()
     end
@@ -853,88 +850,143 @@ function SetupOptionsPanel(parent, curOptions)
 
     -- determines what controls should be visible or not
     OptionContainer.CalcVisible = function(self)
-        local function SetTextLine(line, data, lineID)
-            local function UseSavedValue(data)
-                -- always use saved data when looking at currently hosted map
+        local function SetTextLine(line, entry, lineID)
+
+            -- ???
+            local function UseSavedValue(entry)
+                -- always use saved entry when looking at currently hosted map
                 if string.lower(selectedScenario.file) == string.lower(curOptions.ScenarioFile) then
                     return true
                 end
-                -- otherwise, don't use saved data for advanced options
+                -- otherwise, don't use saved entry for advanced options
                 local advancedOptions = OptionSource[4].options
                 for _,option in advancedOptions do
-                    if option.key == data.key then
+                    if option.key == entry.key then
                         return false
                     end
                 end
-                -- use saved data for non-advanced options
+                -- use saved entry for non-advanced options
                 return true
             end
-            if data.type == 'title' then
-                line.text:SetText(LOC(data.text))
+
+            -- remove any (previously) attached tooltips
+            line.HandleEvent = Group.HandleEvent
+            Tooltip.RemoveComboTooltip(line.combo)
+
+            if entry.type == 'title' then
+                -- construct the UI
+                line.text:SetText(LOC(entry.text))
                 line.text:SetFont(UIUtil.titleFont, 14, 3)
                 line.text:SetColor(UIUtil.fontOverColor)
                 line.bg:SetSolidColor('00000000')
                 line.combo:Hide()
+
+                -- position it
                 LayoutHelpers.AtLeftTopIn(line.text, line, 0, 20)
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line)
-            elseif data.type == 'spacer' then
+            end
+
+            if entry.type == 'subtitle' then 
+                -- construct the UI
+                line.text:SetText(LOC(entry.text))
+                line.text:SetFont(UIUtil.titleFont, 12, 3)
+                line.text:SetColor(UIUtil.fontOverColor)
+                line.bg:SetSolidColor('00000000')
+                line.combo:Hide()
+
+                -- position it
+                LayoutHelpers.AtLeftTopIn(line.text, line, 0, 20)
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line)
+            end
+
+            if entry.type == 'text' then 
+                -- construct the UI
+                line.text:SetText(LOC(entry.text))
+                line.text:SetFont(UIUtil.bodyFont, 10, 3)
+                line.text:SetColor(UIUtil.fontOverColor)
+                line.bg:SetSolidColor('00000000')
+                line.combo:Hide()
+
+                -- position it
+                LayoutHelpers.AtLeftTopIn(line.text, line, 0, 20)
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line)
+            end
+
+            if entry.type == 'spacer' then 
+                -- construct the UI
                 line.text:SetText('')
                 line.combo:Hide()
-            else
-                line.text:SetText(LOC(data.text))
+            end
+
+            if entry.type == 'option' then 
+                -- construct the UI
+                line.text:SetText(LOC(entry.text))
                 line.text:SetFont(UIUtil.bodyFont, 14)
                 line.text:SetColor(UIUtil.fontColor)
                 line.bg:SetTexture(UIUtil.UIFile('/dialogs/mapselect03/options-panel-bar_bmp.dds'))
                 LayoutHelpers.AtLeftTopIn(line.text, line, 10, 5)
                 line.combo:ClearItems()
                 line.combo:Show()
-                local itemArray = {}
                 line.combo.keyMap = {}
+
+                -- a set of tables that describe the items and their tooltips
+                local itemArray = {}
                 local tooltipTable = {}
 
-                local defValue = false
-                local realDefValue = false
-                local optData = data.data
+                -- the index that marks the default value, is not always set
+                local indexDefault = entry.data.default or false
 
-                for index, val in optData.values do
+                -- the index that marks the current value, is not always set
+                local indexCurrent = indexDefault or 1
+                if changedOptions[entry.data.key].index then
+                    -- if we've changed this option previously, use that index instead
+                    indexCurrent = changedOptions[entry.data.key].index
+                end
+
+                for index, val in entry.data.values do
                     local key = val.key or val
-                    local text = val.text or optData.value_text
-                    local help = val.help or optData.value_help
+
+                    -- values of an option can have individual tooltips or option-wide tooltips
+                    local text = val.text or entry.data.value_text
+                    local help = val.help or entry.data.value_help
+
+                    -- store the information
                     itemArray[index] = LOCF(text, key)
                     line.combo.keyMap[key] = index
-                    tooltipTable[index]={text=optData.label, body=LOCF(help, key)}
+                    tooltipTable[index]={
+                        text=entry.data.label, 
+                        body=LOCF(help, key)
+                    }
 
-                    -- only use current settings of advanced options for current map
-                    if curOptions[optData.key] and key == curOptions[optData.key] and UseSavedValue(optData) then
-                        defValue = index
+                    -- if we've changed this option previously, use that index instead
+                    if curOptions[entry.data.key] and key == curOptions[entry.data.key] then
+                        indexCurrent = index
                     end
                 end
-                -- use changed option values
-                if changedOptions[optData.key].index then
-                    defValue = changedOptions[optData.key].index
-                end
-                -- if not yet set and no changed option value, use default
-                if not defValue then
-                    defValue = optData.default or 1
-                end
-                --
-                if optData.default then realDefValue = optData.default end
-                line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
+
+                -- add in the items
+                line.combo:AddItems(itemArray, indexCurrent, indexDefault)
+
+                -- add in the callback that when clicked, the changed option is stored for future use
                 line.combo.OnClick = function(self, index, text)
-                    local value = optData.values[index].key
-                    if value == nil then value = optData.values[index] end
-                    changedOptions[optData.key] = {value = value, index = index}
+
+                    -- retrieve the value, do some error checking and store it for future use
+                    local value = entry.data.values[index].key
+                    if value == nil then value = entry.data.values[index] end
+                    changedOptions[entry.data.key] = {value = value, index = index}
+
                     if line.combo.EnableColor then
                         line.combo._text:SetColor('DBBADB')
                     end
                 end
+
                 line.HandleEvent = Group.HandleEvent
-                Tooltip.AddControlTooltip(line, {text=optData.label,body=optData.help})
+                Tooltip.AddControlTooltip(line, {text=entry.data.label,body=entry.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
                     line.combo:SetItem(line.combo.keyMap[key])
                 end
-            end
+            end 
         end
         for i, v in OptionDisplay do
             if Options[i + self.top] then

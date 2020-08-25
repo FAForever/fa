@@ -271,11 +271,11 @@ local function LoadModInfo(filename)
         author = '',
         copyright = '',
         exclusive = false,
-        icon = '/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds',
+        icon = '/textures/ui/common/dialogs/mod-manager/generic-icon-square.png',
         selectable = true,
         hookdir = '/hook',      -- specify the name of the hook sub-directory
         shadowdir = '/shadow',  -- specify the name of shadow sub-directory
-        uid = filename, -- default uid to name, should be a unique id
+        uid = filename,         -- default uid to name, should be a unique id
     }
     local ok, result = pcall(doscript, filename, env)
     if ok then

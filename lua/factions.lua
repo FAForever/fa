@@ -43,6 +43,7 @@ function GetCustomFactions(FactionsTable, AllowedMods)
         FactionsTable = {}
     end
     local FactionFiles = DiskFindFiles('/lua/CustomFactions', '*.lua')
+    WARN(repr(FactionFiles))
     local SelectedMods = GetSelectedMods(AllowedMods)
     for k, file in FactionFiles do
 
@@ -54,7 +55,10 @@ function GetCustomFactions(FactionsTable, AllowedMods)
             continue
         end
 
+        LOG("Hello!")
+
         for s, t in FactionFile.FactionList do
+            WARN(repr(t))
             if type(t) == 'table' then
                 if t.ModsPrerequisite and (type(t.ModsPrerequisite) ~= 'table' or not TableHasKeys(SelectedMods, t.ModsPrerequisite)) then
                     continue
