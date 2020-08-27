@@ -1104,6 +1104,7 @@ Unit = Class(moho.unit_methods) {
 
         local health = self:GetHealth()
         if health < 1 then
+            -- this if statement is an issue too
             if damageType == 'Reclaimed' then
                 self:Destroy()
             else
@@ -1223,7 +1224,6 @@ Unit = Class(moho.unit_methods) {
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
-            self.DeathAnimationPlayed = true
             self.DisallowCollisions = true
         end
 
@@ -1595,6 +1595,12 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint().Display[anim]
         if bp then
             local animBlock = self:ChooseAnimBlock(bp)
+
+            -- for determining wreckage offset after dying with an animation
+            if anim == 'AnimationDeath' then 
+                self.DeathHitBox = animBlock.HitBox
+            end
+
             if animBlock.Mesh then
                 self:SetMesh(animBlock.Mesh)
             end
@@ -1661,7 +1667,7 @@ Unit = Class(moho.unit_methods) {
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
         local time  = time * 2
 
-        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathAnimationPlayed)
+        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.

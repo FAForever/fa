@@ -102,6 +102,15 @@ UnitBlueprint {
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 1,
+
+                HitBox = {
+                    CollisionOffsetX = 0,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 3,
+                    SizeX = 2.5,
+                    SizeY = 1.0,
+                    SizeZ = 6.5,
+                },
             },
         },
         AnimationWalk = '/units/ual0401/ual0401_awalk.sca',
@@ -558,12 +567,6 @@ UnitBlueprint {
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        CollisionOffsetAfterDeathAnimationX = 0,
-        CollisionOffsetAfterDeathAnimationY = 0,
-        CollisionOffsetAfterDeathAnimationZ = 3,
-        SizeAfterDeathAnimationX = 2.5,
-        SizeAfterDeathAnimationY = 1.5,
-        SizeAfterDeathAnimationZ = 6.5,
         WreckageLayers = {
             Air = false,
             Land = true,
