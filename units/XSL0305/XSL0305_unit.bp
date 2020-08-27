@@ -72,6 +72,15 @@ UnitBlueprint {
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 1,
+
+                HitBox = {
+                    CollisionOffsetX = -0.65,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = -0.65,
+                    SizeX = 1.0,
+                    SizeY = 0.8,
+                    SizeZ = 1.0,
+                },
             },
         },
         IdleEffects = {

@@ -131,6 +131,15 @@ UnitBlueprint {
             {
                 Animation = '/units/xrl0403/xrl0403_adeath.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = 1,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 1.25,
+                    SizeX = 4.6,
+                    SizeY = 3.0,
+                    SizeZ = 7.3,
+                },
             },
         },
         AnimationWalk = '/units/xrl0403/xrl0403_awalk01.sca',
