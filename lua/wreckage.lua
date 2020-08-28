@@ -46,10 +46,8 @@ Wreckage = Class(Prop) {
     -- This function has the handle the case when *this* unit has already been destroyed. Notably,
     -- this means we have to calculate the health from the reclaim values, instead of going the
     -- other way.
-
-    -- todo: take into account box dimensions?
     Clone = function(self)
-        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim)
+        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim, self:GetCollisionExtents())
 
         -- Figure out the health this wreck had before it was deleted. We can't use any native
         -- functions like GetHealth(), so we use the latest known value
