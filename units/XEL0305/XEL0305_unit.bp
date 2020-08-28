@@ -113,7 +113,7 @@ UnitBlueprint {
             },
             {
                 Animation = '/units/xel0305/xel0305_adeath03.sca',
-                Weight = 1000000,
+                Weight = 100,
 
                 HitBox = {
                     CollisionOffsetX = 0,

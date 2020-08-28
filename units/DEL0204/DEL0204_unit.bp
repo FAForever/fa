@@ -84,7 +84,7 @@ UnitBlueprint {
                 Animation = '/units/del0204/del0204_ADeath02.sca',
                 AnimationRateMax = 1.5,
                 AnimationRateMin = 0.5,
-                Weight = 10000,
+                Weight = 100,
 
                 HitBox = {
                     CollisionOffsetX = 0,

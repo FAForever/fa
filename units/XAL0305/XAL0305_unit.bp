@@ -102,7 +102,7 @@ UnitBlueprint {
                 Animation = '/units/xal0305/xal0305_adeath03.sca',
                 AnimationRateMax = 1.25,
                 AnimationRateMin = 0.75,
-                Weight = 1000,
+                Weight = 1,
 
                 HitBox = {
                     CollisionOffsetX = -0.75,
