@@ -505,7 +505,7 @@ UnitBlueprint {
             BuildTime = 3200,
             Icon = 'cba',
             Name = '<LOC enhancements_0031>Reacton Refractor',
-            NewMaxRadius = 40,
+            NewMaxRadius = 37,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
