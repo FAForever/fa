@@ -229,10 +229,11 @@ UEL0301 = Class(CommandUnit) {
 		elseif enh =='HighExplosiveOrdnance' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
-            --wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh =='HighExplosiveOrdnanceRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
+			wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
 		end
 	end,
 

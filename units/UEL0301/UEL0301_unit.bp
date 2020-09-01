@@ -321,7 +321,7 @@ UnitBlueprint {
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
             NewDamageRadius = 2,
-			--NewMaxRadius = 35,
+			NewMaxRadius = 29,
             ShowBones = {
                 'SAM',
             },
@@ -344,7 +344,7 @@ UnitBlueprint {
             Icon = 'heo',
             Name = '<LOC enhancements_0064>Remove Heavy Plasma Refractor',
             NewDamageRadius = -2,
-			--NewMaxRadius = 25,
+			NewMaxRadius = 25,
             Prerequisite = 'HighExplosiveOrdnance',
             RemoveEnhancements = {
                 'HighExplosiveOrdnance',
@@ -481,9 +481,9 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         Shield = {
-            BuildCostEnergy = 45000,
-            BuildCostMass = 1500,
-            BuildTime = 6000,
+            BuildCostEnergy = 75000,
+            BuildCostMass = 2500,
+            BuildTime = 10000,
             Icon = 'psg',
             ShowBones = {
                 'Jetpack',
@@ -495,7 +495,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 26000,#32000
+            ShieldMaxHealth = 20000,#32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
