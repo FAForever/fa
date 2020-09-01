@@ -524,7 +524,7 @@ UnitBlueprint {
 			RegenCeilingT3 = 70,
 			RegenCeilingT4 = 200,
 			RegenCeilingSCU = 140,
-			RegenPerSecond = 0.01,
+			RegenPerSecond = 0.003,
 			Slot = 'Back',
 			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
 			UpgradeUnitAmbientBones = {
