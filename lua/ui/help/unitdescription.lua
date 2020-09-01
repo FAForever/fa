@@ -44,6 +44,7 @@ Description = {
     ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, gun speed and granade launcher enhancements.",
     ['uel0301_RAS'] = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
 	['uel0301_Support'] = "<LOC uel0301_Support_help>Support Armored Command Unit. Enhanced during construction with a bubble shield, jamming and 2 drones.",
+	['uel0301_BasicCombat'] = "<LOC uel0301_Support_help>Support Armored Command Unit. Enhanced during construction with the AdvancedCoolingUpgrade.",
 
     -- UEF -- Land Units
     ['uel0101'] = "<LOC Unit_Description_0025>Fast, lightly armored reconnaissance vehicle. Armed with a machine gun and a state-of-the-art sensor suite.",
