@@ -405,7 +405,7 @@ UnitBlueprint {
             BuildTime = 3200,
             Icon = 'cba',
             Name = '<LOC enhancements_0436>Gun Upgrade',
-            NewMaxRadius = 35,
+            NewMaxRadius = 33,
             ShowBones = {
                 'Back_Upgrade',
             },
