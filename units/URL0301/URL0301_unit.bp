@@ -375,7 +375,7 @@ UnitBlueprint {
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
             NewDamageMod = 200,
-            NewMaxRadius = 35,
+            NewMaxRadius = 33,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'URL0301',
