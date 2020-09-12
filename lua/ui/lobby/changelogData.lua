@@ -1,5 +1,15 @@
-last_version = 3715
+last_version = 3716
 gamePatches = {
+    {
+        version = 3716,
+        name = 'Hotfix 3716',
+        description = {
+            '- Fixed cybran arty explosion when hitting shields',
+            '',
+            '**Contributors**',
+            '- keyser',
+        },
+    },
     {
         version = 3715,
         name = 'Game Version 3715',

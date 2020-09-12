@@ -1,3 +1,10 @@
+Hotfix 3716 (12 September, 2020)
+============================
+- Fixed cybran arty explosion when hitting shields
+
+### Contributors
+- keyser
+
 Patch 3715 (12 September, 2020)
 ============================
 ### Lobby
@@ -312,7 +319,7 @@ Patch 3714 (3 May, 2020)
 
 Patch 3713 (7 April, 2020)
 ============================
-- Fix a bug allowing to generate resources for free
+- Fixed a bug allowing to generate resources for free
 
 ### Contributors ###
 - speed2
