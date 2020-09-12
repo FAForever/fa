@@ -256,9 +256,9 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
             
-            EmitterProjectile.OnImpact(self, targetType, targetEntity)
         end
         
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
