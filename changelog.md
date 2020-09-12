@@ -1,12 +1,12 @@
 Patch 3715 (12 September, 2020)
 ============================
 ### Lobby
-Allowed single player lobby to get the features from the multiplayer lobby
-Adapted autolobby for team matchmaker
-Improved russian translation of the lobby
+- Allowed single player lobby to get the features from the multiplayer lobby
+- Adapted autolobby for team matchmaker
+- Improved russian translation of the lobby
 
 ### Gameplay
-Added - an alternative hotkey layout using cycle when building unit in factory
+- Added an alternative hotkey layout using cycle when building unit in factory
 - Added a hotkey to access factory template (unit queue template in factory)
 - Allowed to bind action to the "chevron" key
 - Improved AI
