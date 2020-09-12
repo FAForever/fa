@@ -34,7 +34,7 @@ gamePatches = {
             '**Other**',
             '- Improved unit description in game',
             '- Updated resource structure description',
-            '- Improved usability cheat menu',
+            '- Improved usability of the cheat menu',
             '- Allowed cheat menu to spawn modded unit',
             '- Improved the loading tips',
             '- Moved faction data out of the functions',
