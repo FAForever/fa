@@ -1,3 +1,7 @@
+local utils = import('/lua/system/utils.lua')
+
+local hasSeenResult = false
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 local baseOnSync = OnSync
 OnSync = function()
@@ -94,13 +98,16 @@ OnSync = function()
     for _, gameResult in Sync.GameResult do
         local armyIndex, result = unpack(gameResult)
 
-        # It turns out that legitimate results are always accompanied by a score update.
-        # We can use this to detect bogus results caused by leaving the game early.
-        if not table.empty(Sync.Score) then
+        # Only send defeat results if the player has not been defeated yet
+        if not hasSeenResult or not utils.StringStartsWith(result, "defeat") then
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
             GpgNetSend('GameResult', armyIndex, result)
+            import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
+
+            if armyIndex == GetFocusArmy() then
+                hasSeenResult = true
+            end
         end
-        import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
     if Sync.StatsToSend then
