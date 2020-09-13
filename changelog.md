@@ -1,3 +1,12 @@
+Hotfix 3717 (13 September, 2020)
+============================
+- Fixed coop not working
+- Fixed all games being unrated
+
+### Contributors
+- KionX
+- Askaholic
+
 Hotfix 3716 (12 September, 2020)
 ============================
 - Fixed cybran arty explosion when hitting shields

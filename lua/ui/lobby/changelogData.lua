@@ -1,5 +1,17 @@
-last_version = 3716
+last_version = 3717
 gamePatches = {
+    {
+        version = 3717,
+        name = 'Hotfix 3717',
+        description = {
+            '- Fixed coop not working',
+            '- Fixed all games being unrated',
+            '',
+            '**Contributors**',
+            '- KionX',
+            '- Askaholic',
+        },
+    },
     {
         version = 3716,
         name = 'Hotfix 3716',
