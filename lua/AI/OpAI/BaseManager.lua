@@ -665,9 +665,7 @@ BaseManager = Class {
 
             for num, unit in units do
                 for uNum, upgrade in upgradeTable do
-                    if self:CheckEnhancement(unit, upgrade) then
-                        unit:CreateEnhancement(upgrade)
-                    end
+                    unit:CreateEnhancement(upgrade)
                 end
             end
         end
@@ -691,203 +689,34 @@ BaseManager = Class {
             return false
         end
 
-        -- Which table to use to determine upgrade dependencies.
-        local crossCheckTable = false
-        if unitType == 'DefaultACU' then
-            crossCheckTable = self.ACUUpgradeNames
-        elseif unitType == 'DefaultSACU' then
-            crossCheckTable = self.SACUUpgradeNames
-        end
-
-        -- Find unit faction
-        local faction = 0
-        if EntityCategoryContains(categories.UEF, unit) then
-            faction = 'uef'
-        elseif EntityCategoryContains(categories.AEON, unit) then
-            faction = 'aeon'
-        elseif EntityCategoryContains(categories.CYBRAN, unit) then
-            faction = 'cybran'
-        elseif EntityCategoryContains(categories.SERAPHIM, unit) then
-            faction = 'seraphim'
-        end
-
-        -- Check upgrade info, if any final upgrades are missing or pre-requisites return true
-        for num, upgradeName in upgradeTable do
-            -- Check requirements for the upgrade
-            if crossCheckTable then
-                for uName, uData in crossCheckTable do
-                    if not unit:HasEnhancement(upgradeName) then
-                        -- Ff can build the upgradeName then return out that specific upgrade; already has requirement
-                        if uName == upgradeName and not uData[1] and self:EnhancementFactionCheck(faction, uData[3]) then
-                            return upgradeName
-                        -- Ff it has a requirement and the requirement isn't built, spit out the requirement
-                        elseif uName == upgradeName and uData[1] and self:EnhancementFactionCheck(faction, uData[3]) then
-                            if not unit:HasEnhancement(uData[1]) then
-                                return uData[1]
-                            else
-                                return upgradeName
-                            end
-                        end
-                    end
-                end
-            else
-                -- No requirement, return upgrade name
-                if not unit:HasEnhancement(upgradeName) then
-                    return upgradeName
-                end
-            end
-        end
-
-        return false
-    end,
-
-    -- Returns appropriate faction table for upgrades
-    EnhancementFactionCheck = function(self, faction, factionTable)
-        if factionTable[1] == 'all' then
-            return true
-        end
-        for k, v in factionTable do
-            if faction == v then
-                return true
-            end
-        end
-
-        return false
-    end,
-
-    -- Check if a unit has upgrade
-    CheckEnhancement = function(self, unit, upgrade)
-        if unit.Dead then
+        local allEnhancements = unit:GetBlueprint().Enhancements
+        if not allEnhancements then
             return false
         end
 
-        -- Find faction of the unit (for ACU and sACU upgrades)
-        local faction
-        if EntityCategoryContains(categories.UEF, unit) then
-            faction = 'uef'
-        elseif EntityCategoryContains(categories.CYBRAN, unit) then
-            faction = 'cybran'
-        elseif EntityCategoryContains(categories.AEON, unit) then
-            faction = 'aeon'
-        elseif EntityCategoryContains(categories.SERAPHIM, unit) then
-            faction = 'seraphim'
-        end
-
-        -- Choose which table to find the upgrade data in
-        local upgradeTable = false
-        if EntityCategoryContains(categories.COMMAND, unit) then
-            upgradeTable = self.ACUUpgradeNames
-        elseif EntityCategoryContains(categories.SUBCOMMANDER, unit) then
-            upgradeTable = self.SACUUpgradeNames
-        end
-
-        -- Check upgrades
-        if not upgradeTable then
-            return true
-        end
-
-        for upgradeName, upgradeData in upgradeTable do
-            if upgrade == upgradeName then
-                for num, fac in upgradeData[3] do
-                    if fac == 'all' or faction and faction == fac then
-                        if upgradeData[1] then
-                            if unit:HasEnhancement(upgradeData[1]) then
-                                return true
-                            else
-                                return false
-                            end
-                        else
-                            return true
-                        end
+        for _, upgradeName in upgradeTable do
+            -- Find the upgrade in the unit's bp
+            local bpUpgrade = allEnhancements[upgradeName]
+            if bpUpgrade then
+                if not unit:HasEnhancement(upgradeName) then
+                    -- If we already have upgarde at that slot, remove it first
+                    if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
+                        return SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] .. 'Remove'
+                    -- Check for required upgrades
+                    elseif bpUpgrade.Prerequisite and not unit:HasEnhancement(bpUpgrade.Prerequisite) then
+                        return bpUpgrade.Prerequisite
+                    -- No requirement and stop available, return upgrade name
+                    else
+                        return upgradeName
                     end
                 end
+            else
+                error('*Base Manager Error: ' .. self.BaseName .. ', enhancement: ' .. upgradeName .. ' was not found in the unit\'s bp.')
             end
         end
 
         return false
     end,
-
-    -- Table for upgrade requirements for ACU
-    ACUUpgradeNames = {
-        -- UpgadeName = {prereq/false, slot, {factions/all}},
-        AdvancedEngineering = {false, 'LCH', {'all'}},
-        T3Engineering = {'AdvancedEngineering', 'LCH', {'all'}},
-        ResourceAllocation = {false, 'RCH', {'all'}},
-        ResourceAllocationAdvanced = {'ResourceAllocation', 'Back', {'aeon', 'seraphim'}},
-        Shield = {false, 'Back', {'uef', 'aeon'}},
-        Teleporter = {false, 'Back', {'all'}},
-
-        -- UEF
-        DamageStabilization = {false, 'LCH', {'uef'}},
-        HeavyAntiMatterCannon = {false, 'RCH', {'uef'}},
-        LeftPod = {false, 'Back', {'uef'}},
-        RightPod = {'LeftPod', 'Back', {'uef'}},
-        ShieldGeneratorField = {'Shield', 'Back', {'uef'}},
-        TacticalMissile = {false, 'Back', {'uef'}},
-        TacticalNukeMissile = {'TacticalMissile', 'Back', {'uef'}},
-
-        -- Cybran
-        CloakingGenerator = {'StealthGenerator', 'Back', {'cybran'}},
-        CoolingUpgrade = {false, 'LCH', {'cybran'}},
-        MicrowaveLaserGenerator = {false, 'RCH', {'cybran'}},
-        NaniteTorpedoTube = {false, 'RCH', {'cybran'}},
-        StealthGenerator = {false, 'Back', {'cybran'}},
-
-        -- Aeon
-        ChronoDampener = {false, 'Back', {'aeon'}},
-        CrysalisBeam = {false, 'LCH', {'aeon'}},
-        EnhancedSensors = {false, 'RCH', {'aeon'}},
-        HeatSink = {false, 'RCH', {'aeon'}},
-        ShieldHeavy = {'Shield', 'Back', {'aeon'}},
-
-        -- Seraphim
-        AdvancedRegenAura = {'RegenAura', 'RCH', {'seraphim'}},
-        BlastAttack = {false, 'LCH', {'seraphim'}},
-        DamageStabilization = {false, 'Back', {'seraphim'}},
-        DamageStabilizationAdvanced = {'DamageStabilization', 'Back', {'seraphim'}},
-        Missile = {false, 'Back', {'seraphim'}},
-        RateOfFire = {false, 'RCH', {'seraphim'}},
-        RegenAura = {false, 'RCH', {'seraphim'}},
-    },
-
-    -- Table for upgrade requirements for SACU
-    SACUUpgradeNames = {
-        -- UpgadeName = {prereq/false, slot, {factions/all}},
-        Shield = {false, 'Back', {'uef', 'aeon', 'seraphim'}},
-        ResourceAllocation = {false, 'RCH', {'aeon', 'cybran', 'uef'}},
-
-        -- UEF
-        AdvancedCoolingUpgrade = {false, 'LCH', {'uef'}},
-        HighExplosiveOrdnance = {false, 'RCH', {'uef'}},
-        Pod = {false, 'Back', {'uef'}},
-        RadarJammer = {false, 'Back', {'uef'}},
-        SensorRangeEnhancer = {false, 'LCH', {'uef'}},
-        ShieldGeneratorField = {'Shield', 'Back', {'uef'}},
-
-        -- Cybran
-        CloakingGenerator = {'StealthGenerator', 'Back', {'cybran'}},
-        EMPCharge = {false, 'LCH', {'cybran'}},
-        FocusConverter = {false, 'RCH', {'cybran'}},
-        NaniteMissileSystem = {false, 'Back', {'cybran'}},
-        SelfRepairSystem = {false, 'Back', {'cybran'}},
-        StealthGenerator = {false, 'Back', {'cybran'}},
-        SwitchBack = {false, 'LCH', {'cybran'}},
-
-        -- Aeon
-        EngineeringFocusingModule = {false, 'LCH', {'aeon'}},
-        ShieldHeavy = {'Shield', 'Back', {'aeon'}},
-        StabilitySuppressant = {false, 'RCH', {'aeon'}},
-        SystemIntegrityCompensator = {false, 'Back', {'aeon'}},
-        Teleporter = {false, 'Back', {'aeon'}},
-
-        -- Seraphim
-        DamageStabilization = {false, 'LCH', {'seraphim'}},
-        EngineeringThroughput = {false, 'LCH', {'seraphim'}},
-        EnhancedSensors = {false, 'Back', {'seraphim'}},
-        Missile = {false, 'Back', {'seraphim'}},
-        Overcharge = {false, 'RCH', {'seraphim'}},
-        Teleporter = {false, 'RCH', {'seraphim'}},
-    },
 
     SetACUUpgrades = function(self, upgradeTable, startActive)
         self:SetUnitUpgrades(upgradeTable, 'DefaultACU', startActive)
