@@ -15,6 +15,8 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
+        'SorianEditSupportFactoryUpgrades',
+        'SorianEditSupportFactoryUpgradesNAVY',
         'SorianEmergencyUpgradeBuilders',
         'SorianMassFabPause',
 

@@ -15,6 +15,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1NavalUpgradeBuilders',
         'SorianT2NavalUpgradeBuilders',
+        'SorianEditSupportFactoryUpgradesNAVY',
 
         # Pass engineers to main as needed
         #'Engineer Transfers',
