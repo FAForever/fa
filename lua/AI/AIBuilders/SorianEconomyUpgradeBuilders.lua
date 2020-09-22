@@ -1,17 +1,17 @@
---***************************************************************************
---*
---**  File     :  /mods/Sorian Edit/lua/ai/SorianEditEconomyUpgradeBuilders.lua
---**
---**  Summary  : Default economic builders for skirmish
---**
---**  Copyright © 205 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+#***************************************************************************
+#*
+#**  File     :  /lua/ai/SorianEconomyUpgradeBuilders.lua
+#**
+#**  Summary  : Default economic builders for skirmish
+#**
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
-local ExBaseTmpl = 'ExpansionBaseTemplates'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
-local Adj22Tmpl = 'Adjacency22'
+local ExBaseTmpl = 'ExpansionBaseTemplates'
+local Adj2x2Tmpl = 'Adjacency2x2'
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local MABC = '/lua/editor/MarkerBuildConditions.lua'
@@ -22,66 +22,424 @@ local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
-local SIBC = '/mods/Sorian Edit/lua/editor/SorianEditInstantBuildConditions.lua'
-local SBC = '/mods/Sorian Edit/lua/editor/SorianEditBuildConditions.lua'
-
--------------------------------------
--- NEW EXTRACTOR UPGRADE FUNCTION AND THREAD --
-
--- The New Thread and Function are located in SorianEditUtilites.lua and Platoon.lua
--- This New Thread and Function will auto upgrade mexes depending on the economy 
--- This will elimate the need for Strategies to upgrade mexes as this will adapt to the economy itself and the situation
--- This will also fix endless issues with Sorian's Mass Stalls
--------------------------------------
+local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
+local SBC = '/lua/editor/SorianBuildConditions.lua'
 
 BuilderGroup {
-    BuilderGroupName = 'SorianEditTime Exempt Extractor Upgrades',
+    BuilderGroupName = 'SorianTime Exempt Extractor Upgrades Expansion',
     BuildersType = 'PlatoonFormBuilder',
     Builder {
-        BuilderName = 'Sorian Extractor upgrade',
-        PlatoonTemplate = 'AddToMassExtractorUpgradePlatoon',
-        Priority = 40000,
-        InstanceCount = 4,
-        FormRadius = 10000,
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless Single Expansion',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 2,
+        Priority = 200,
         BuilderConditions = {
-			{ UCBC, 'GreaterThanGameTimeSeconds', { 200 } },
-            { UCBC, 'HaveGreaterThanArmyPoolWithCategory', { 5, categories.MASSEXTRACTION} },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 3.5, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 2, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { UCBC, 'UnitsGreaterAtLocation', { 'MAIN', 3, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
         },
-        BuilderData = {
-            AIPlan = 'ExtractorUpgradeAISorian',
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Single Expansion',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 2,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 20, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 2, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'UnitsGreaterAtLocation', { 'MAIN', 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
         },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Multiple Expansion',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 4,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 35, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 4, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'UnitsGreaterAtLocation', { 'MAIN', 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+}
+
+BuilderGroup {
+    BuilderGroupName = 'SorianTime Exempt Extractor Upgrades',
+    BuildersType = 'PlatoonFormBuilder',
+    Builder {
+        BuilderName = 'T1 Mass Extractor Upgrade Storage Based',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 0, #200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageCurrent', { 600, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T1 Mass Extractor Upgrade Bleed Off',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageRatio', { 1.0, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless Single',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 2.2, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+        },
+        FormRadius = 10000,
         BuilderType = 'Any',
     },
 
     Builder {
-        BuilderName = 'Sorian Extractor upgrade - Multiple',
-        PlatoonTemplate = 'AddToMassExtractorUpgradePlatoon',
-        Priority = 40000,
-        InstanceCount = 4,
-        FormRadius = 10000,
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless Two',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 2,
+        Priority = 200,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanArmyPoolWithCategory', { 7, categories.MASSEXTRACTION} },
-			{ UCBC, 'GreaterThanGameTimeSeconds', { 350 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 6, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 2, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
         },
-        BuilderData = {
-            AIPlan = 'ExtractorUpgradeAISorian',
-        },
+        FormRadius = 10000,
         BuilderType = 'Any',
     },
-	
+
     Builder {
-        BuilderName = 'Sorian Extractor upgrade - Multiple2',
-        PlatoonTemplate = 'AddToMassExtractorUpgradePlatoon',
-        Priority = 40000,
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless LOTS',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
         InstanceCount = 4,
-        FormRadius = 10000,
+        Priority = 200,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanArmyPoolWithCategory', { 8, categories.MASSEXTRACTION} },
-			{ UCBC, 'GreaterThanGameTimeSeconds', { 400 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 15, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 4, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
         },
-        BuilderData = {
-            AIPlan = 'ExtractorUpgradeAISorian',
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T2 Mass Extractor Upgrade Storage Based',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 0, #200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageCurrent', { 3000, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
         },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T2 Mass Extractor Upgrade Bleed Off',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageRatio', { 1.0, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 1,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome', { 13, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.90, 1.2 }},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Multiple',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 3,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome',  { 20, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.90, 1.2 }},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless - Later',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 1,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome', { 13, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Multiple - Later',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 3,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome',  { 20, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+}
+
+BuilderGroup {
+    BuilderGroupName = 'SorianTime Exempt Extractor Upgrades - Rush',
+    BuildersType = 'PlatoonFormBuilder',
+    Builder {
+        BuilderName = 'T1 Mass Extractor Upgrade Storage Based - Rush',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 0, #200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageCurrent', { 600, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T1 Mass Extractor Upgrade Bleed Off - Rush',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageRatio', { 1.0, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless Single - Rush',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 2.2, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY TECH2' }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+
+    Builder {
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless Two - Rush',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 2,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 6, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 2, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY TECH2' }},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+
+    Builder {
+        BuilderName = 'Sorian T1 Mass Extractor Upgrade Timeless LOTS - Rush',
+        PlatoonTemplate = 'T1MassExtractorUpgrade',
+        InstanceCount = 4,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconIncome',  { 15, 10}},
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 4, 'MASSEXTRACTION TECH2', 'MASSEXTRACTION' } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY TECH2' }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T2 Mass Extractor Upgrade Storage Based - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 0, #200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageCurrent', { 3000, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'T2 Mass Extractor Upgrade Bleed Off - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        InstanceCount = 1,
+        Priority = 200,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { EBC, 'GreaterThanEconStorageRatio', { 1.0, 0 } },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0, 1.2 }},
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 1,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome', { 13, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.90, 1.2 }},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Multiple - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 3,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome',  { 20, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.90, 1.2 }},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'MASSEXTRACTION TECH2, MASSEXTRACTION TECH3' }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless - Later - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 1,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome', { 13, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
+        BuilderType = 'Any',
+    },
+    Builder {
+        BuilderName = 'Sorian T2 Mass Extractor Upgrade Timeless Multiple - Later - Rush',
+        PlatoonTemplate = 'T2MassExtractorUpgrade',
+        Priority = 200,
+        InstanceCount = 3,
+        BuilderConditions = {
+            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'ENERGYPRODUCTION TECH2, ENERGYPRODUCTION TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 3, 'MASSEXTRACTION TECH3', 'MASSEXTRACTION' } },
+            { SIBC, 'GreaterThanEconIncome',  { 20, 50 } },
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.2 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'MASSEXTRACTION TECH3' }},
+        },
+        FormRadius = 10000,
         BuilderType = 'Any',
     },
 }
@@ -99,12 +457,12 @@ BuilderGroup {
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2,  categories.MASSEXTRACTION * (categories.TECH2 +  categories.TECH3) } },
-                { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
-				{ EBC, 'GreaterThanEconIncome',  { 10, 50 } },
-				{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
-                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'MOBILE TECH2, FACTORY TECH2', 'Enemy'}},
-            },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
+			{ EBC, 'GreaterThanEconIncome',  { 10, 50 } },
+			{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'MOBILE TECH2, FACTORY TECH2', 'Enemy'}},
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -114,12 +472,12 @@ BuilderGroup {
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MASSEXTRACTION TECH3'} },
-                { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH3 RESEARCH'}},
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.RESEARCH * categories.TECH2 } },
-				{ UCBC, 'GreaterThanGameTimeSeconds', { 500 } },
-                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'MOBILE TECH3, FACTORY TECH3', 'Enemy'}},
-				{ EBC, 'GreaterThanEconIncome',  { 20, 50 } },
-            },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH3 RESEARCH'}},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.RESEARCH * categories.TECH2 } },
+			{ UCBC, 'GreaterThanGameTimeSeconds', { 500 } },
+            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 0, 'MOBILE TECH3, FACTORY TECH3', 'Enemy'}},
+			{ EBC, 'GreaterThanEconIncome',  { 20, 50 } },
+        },
         BuilderType = 'Any',
     },
 }
@@ -137,12 +495,12 @@ BuilderGroup {
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 4,  categories.MASSEXTRACTION * (categories.TECH2 +  categories.TECH3) } },
-                { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
-                ----{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
-				{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
-                { EBC, 'GreaterThanEconIncome',  { 14, 30}},
-            },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
+            ----{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
+			{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
+            { EBC, 'GreaterThanEconIncome',  { 14, 30}},
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -153,12 +511,12 @@ BuilderGroup {
         FormDebugFunction = nil,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 4,  categories.MASSEXTRACTION * (categories.TECH2 +  categories.TECH3) } },
-                { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY AIR TECH2 RESEARCH, FACTORY AIR TECH3 RESEARCH'}},
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.AIR * categories.TECH1 } },
-                ----{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
-				{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
-                { EBC, 'GreaterThanEconIncome',  { 10, 35}},
-            },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY AIR TECH2 RESEARCH, FACTORY AIR TECH3 RESEARCH'}},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.AIR * categories.TECH1 } },
+            --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
+			{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
+            { EBC, 'GreaterThanEconIncome',  { 10, 35}},
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -168,17 +526,17 @@ BuilderGroup {
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 4,  categories.MASSEXTRACTION * (categories.TECH2 +  categories.TECH3) } },
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
-                { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
-                --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY LAND TECH2, FACTORY LAND TECH3'}},
-                ----{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
-				{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
-                { EBC, 'GreaterThanEconIncome',  { 10, 35}},
-                --{ EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingUpgrade', { 2, categories.FACTORY * categories.LAND * categories.TECH1 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'FACTORY LAND TECH2 RESEARCH, FACTORY LAND TECH3 RESEARCH'}},
+            --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY LAND TECH2, FACTORY LAND TECH3'}},
+            ----{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, 'MASSEXTRACTION TECH2'}},
+			{ UCBC, 'GreaterThanGameTimeSeconds', { 300 } },
+            { EBC, 'GreaterThanEconIncome',  { 10, 35}},
+            --{ EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-                { IBC, 'BrainNotLowPowerMode', {} },
-            },
+            { IBC, 'BrainNotLowPowerMode', {} },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -199,7 +557,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
 }
@@ -222,7 +580,7 @@ BuilderGroup {
 				{ UCBC, 'GreaterThanGameTimeSeconds', { 200 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
    
@@ -241,7 +599,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconIncome',  { 3, 25}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
 
@@ -340,7 +698,7 @@ BuilderGroup {
                 { UCBC, 'GreaterThanGameTimeSeconds', { 400 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -355,7 +713,7 @@ BuilderGroup {
                 { UCBC, 'GreaterThanGameTimeSeconds', { 400 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
 
@@ -467,7 +825,7 @@ BuilderGroup {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 7,  categories.MASSEXTRACTION * (categories.TECH2 +  categories.TECH3) } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
    --[[ -- ================================= --
@@ -508,7 +866,7 @@ BuilderGroup {
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { IBC, 'BrainNotLowMassMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
 
@@ -561,7 +919,7 @@ BuilderGroup {
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
                 { IBC, 'BrainNotLowPowerMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -579,7 +937,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -595,7 +953,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
 }
@@ -617,7 +975,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -634,7 +992,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -681,7 +1039,7 @@ BuilderGroup {
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
                 { IBC, 'BrainNotLowPowerMode', {} },
-            },
+        },
         BuilderType = 'Any',
     },
 
@@ -705,7 +1063,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
 }
@@ -729,7 +1087,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
     Builder {
@@ -748,7 +1106,7 @@ BuilderGroup {
                 { EBC, 'GreaterThanEconStorageRatio', { 0.04, 0.01 } },
 			{ EBC, 'GreaterThanEconTrend', { 0.0, 0.0 } },
 			{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 0.95 }},
-            },
+        },
         BuilderType = 'Any',
     },
 }
