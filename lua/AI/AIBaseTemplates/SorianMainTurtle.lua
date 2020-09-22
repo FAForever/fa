@@ -1,4 +1,4 @@
-#***************************************************************************
+S#***************************************************************************
 #*
 #**  File     :  /lua/ai/AIBaseTemplates/SorianMainTurtle.lua
 #**  Author(s): Michael Robbins aka Sorian
@@ -16,8 +16,8 @@ BaseBuilderTemplate {
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
         'SorianEmergencyUpgradeBuilders',
-        'SorianEditSupportFactoryUpgrades',
-        'SorianEditSupportFactoryUpgradesNAVY',
+        'SorianSupportFactoryUpgrades',
+        'SorianSupportFactoryUpgradesNAVY',
         'SorianMassFabPause',
 
         # Engineer Builders

@@ -15,7 +15,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
-        'SorianEditSupportFactoryUpgradesNAVY',
+        'SorianSupportFactoryUpgradesNAVY',
 
         # Engineer Builders
         'SorianEngineerFactoryBuilders',

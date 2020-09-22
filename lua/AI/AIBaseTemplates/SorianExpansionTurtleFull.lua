@@ -1,4 +1,4 @@
-#***************************************************************************
+So#***************************************************************************
 #*
 #**  File     :  /lua/ai/AIBaseTemplates/SorianExpansionTurtleFull.lua
 #**
@@ -14,8 +14,8 @@ BaseBuilderTemplate {
         # Factory upgrades
         'SorianT1BalancedUpgradeBuildersExpansion',
         'SorianT2BalancedUpgradeBuildersExpansion',
-        'SorianEditSupportFactoryUpgrades',
-        'SorianEditSupportFactoryUpgradesNAVY',
+        'SorianSupportFactoryUpgrades',
+        'SorianSupportFactoryUpgradesNAVY',
 
         # Engineer Builders
         'SorianEngineerFactoryBuilders',
