@@ -54,22 +54,22 @@ function CreateWeatherThread()
 
     -- early opt out: definition tries to use a type that is not part of the style
     if not (definition.WeatherTypes[1].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[1].Type] then
-        WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[1].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        WARN('Intention to generate weather but type 1 \'' .. definition.WeatherTypes[1].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
         return
     end
 
     if not (definition.WeatherTypes[2].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[2].Type] then
-        WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[2].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        WARN('Intention to generate weather but type 2 \'' .. definition.WeatherTypes[2].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
         return
     end
 
     if not (definition.WeatherTypes[3].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[3].Type] then
-        WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[3].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        WARN('Intention to generate weather but type 3 \'' .. definition.WeatherTypes[3].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
         return
     end
 
     if not (definition.WeatherTypes[4].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[4].Type] then
-        WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[4].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        WARN('Intention to generate weather but type 4 \'' .. definition.WeatherTypes[4].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
         return
     end
 
@@ -78,7 +78,7 @@ function CreateWeatherThread()
         if not (cluster.forceType == "None") then 
             if not MapWeatherList[style][cluster.forceType] then 
                 WARN(
-                    'Intention to generate weather but a forced type \'' .. cluster.forceType .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.',
+                    'Intention to generate weather but a forced type \'' .. cluster.forceType .. '\'  of \'' .. k .. '\' cluster is not part of the map style \'' .. style .. '\' , aborting weather generation.',
                     'A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style])
                 )
             end
@@ -106,7 +106,7 @@ function GetWeatherMarkerData(mapScale)
     local definitionMarkers = { }
 
     if markers then
-        for k, marker in markers do
+        for _, marker in markers do
             if marker.type == 'Weather Generator' then
                 table.insert(generatorMarkers, marker)
             elseif marker.type == 'Weather Definition' then 
@@ -117,7 +117,7 @@ function GetWeatherMarkerData(mapScale)
 
     -- transform the definition markers into a more useful, abstract format
     local definitions = {}
-    for k, marker in definitionMarkers do 
+    for _, marker in definitionMarkers do 
         table.insert(definitions, 
             {
                 MapStyle = marker.MapStyle or "None",
@@ -146,8 +146,7 @@ function GetWeatherMarkerData(mapScale)
     -- transform the generator markers into a more useful, abstract format
     local clusters = {}
     local defaultcloudclusterSpread = math.floor(((mapScale[1] + mapScale[2]) * 0.5) * 0.15)
-    for k, marker in generatorMarkers do 
-
+    for _, marker in generatorMarkers do 
         local cluster = { 
             clusterSpread = marker.cloudSpread or defaultcloudclusterSpread, 
             cloudCount = marker.cloudCount or 10, 
@@ -177,7 +176,7 @@ end
 function GetRandomWeatherEffectType( definition )
     -- compute the total range
     local range = 0
-    for k, v in definition.WeatherTypes do
+    for _, v in definition.WeatherTypes do
         range = range + v.Chance
     end
     
@@ -186,7 +185,7 @@ function GetRandomWeatherEffectType( definition )
 
     -- determine which marker has the number in its range
     local sum = 0
-    for k, v in definition.WeatherTypes do
+    for _, v in definition.WeatherTypes do
         if sum <= pick and pick <= sum + v.Chance then 
             return v.Type
         else
@@ -197,7 +196,7 @@ end
 
 function SetClusterEffectData(weather, style, globalType, clusters)
     -- determine the weather type for each cluster
-    for k, cluster in clusters do 
+    for _, cluster in clusters do 
         if cluster.forceType == "None" then 
             local emitters = weather[style][globalType]
             cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
@@ -213,7 +212,7 @@ function ClustersToEmitters( clusters )
     local nc = table.getn(clusters)
     
     -- for each cluster...
-    for k, cluster in clusters do 
+    for _, cluster in clusters do 
 
         -- there is a chance it doesn't spawn at all
         local spawn = util.GetRandomFloat( 0, 1 )
@@ -253,7 +252,7 @@ function ClustersToEmitters( clusters )
                 Warp( cloud, Vector(x,y,z) )
 
                 -- spawn the weather effects
-                for k, effect in cluster.effects do
+                for _, effect in cluster.effects do
 
                     -- create the emitter
                     local entity = cloud 
