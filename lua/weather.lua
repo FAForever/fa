@@ -12,186 +12,261 @@ function CreateWeather()
 end
 
 function CreateWeatherThread()
-	local MapScale = ScenarioInfo.size -- x,z map scaling
-	local WeatherDefinition, ClusterData = GetWeatherMarkerData(MapScale)
-	local MapStyle = WeatherDefinition.MapStyle
-	local WeatherEffectsType = GetRandomWeatherEffectType( WeatherDefinition )
-	--WeatherEffectsType = 'StormClouds'
-	if WeatherEffectsType == 'None' then
+	-- read out the markers with regard to the weather
+	local definitions, clusters = GetWeatherMarkerData(ScenarioInfo.size)
+
+	local nd = table.getn(definitions)
+	local nc = table.getn(clusters)
+
+	-- early opt: no definitions, no clusters
+	if nd == 0 and nc == 0 then 
+		WARN('Intention to generate weather but the corresponding [Weather Definition] and [Weather Generator] markers are not placed in map, aborting weather generation.')
 		return
-	end	
-	
-	local numClusters = table.getn( ClusterData )
-	LOG( 'Weather Definition ' .. repr(WeatherDefinition))
-	--LOG( 'Cluster Data ' .. repr(ClusterData))
-	LOG( 'Weather Effect Type: ', WeatherEffectsType )
-	
-	if not WeatherDefinition.WeatherTypes and numClusters then
-		LOG(' WARNING: Weather, no [Weather Definition] marker placed, with [Weather Generator] markers placed in map, aborting weather generation')
+	end 
+
+	-- early opt out: no clusters
+	if nd > 0 and nc == 0 then 
+		WARN('Intention to generate weather but there are no [Weather Generator] markers placed in map, aborting weather generation.') 
+		return
+	end
+
+	-- early opt out: no definitions
+	if nd == 0 and nc > 0 then 
+		WARN('Intention to generate weather but there are no [Weather Definition] markers placed in map, aborting weather generation.')  
+		return
+	end
+
+	-- a heads up that multiple definitions make no sense
+	local definition = definitions[1]
+	if nd > 1 then
+		WARN('Multiple [Weather Definition] markers in map - only the first one in the _save.lua file is used.')
+	end
+
+	-- early opt out: map style is unknown
+	local style = definition.MapStyle
+	if not table.find(MapStyleList, style) then 
+		WARN('Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.')
+		WARN('A full list of available styles is: \r\n' .. repr(MapStyleList) )  
+		return
+	end
+
+	-- early opt out: definition tries to use a type that is not part of the style
+	if not (definition.WeatherTypes[1].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[1].Type] then
+		WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[1].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+		return
+	end
+
+	if not (definition.WeatherTypes[2].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[2].Type] then
+		WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[2].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+		return
+	end
+
+	if not (definition.WeatherTypes[3].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[3].Type] then
+		WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[3].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+		return
+	end
+
+	if not (definition.WeatherTypes[4].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[4].Type] then
+		WARN('Intention to generate weather but type \'' .. definition.WeatherTypes[4].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+		return
+	end
+
+	-- early opt out: a generator tries to force a type that is not part of the style
+	for k, cluster in clusters do 
+		if not (cluster.forceType == "None") then 
+			if not MapWeatherList[style][cluster.forceType] then 
+				WARN('Intention to generate weather but a forced type \'' .. cluster.forceType .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+				WARN('A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style]))  
+			end
+		end
+	end
+
+	-- determine the global weather type and do an early opt out
+	local globalType = GetRandomWeatherEffectType(definition)
+	if globalType == "None" then
+		LOG("Intention to generate weather but the \'None\' weather type was randomly chosen from the definition, aborting weather generation.")
 		return 
 	end
-		
-	-- If we have any clusters, then generate cluster list
-	if numClusters != 0 then
-		local notfoundMapStyle = true
-		for k, v in MapStyleList do
-			if MapStyle == v then
-				SpawnWeatherAtClusterList( ClusterData, MapStyle, WeatherEffectsType )
-				notfoundMapStyle = false
+
+	-- determine the weather effects per marker, clusters are send by reference and therefore changed in place.
+	SetClusterEffectData(MapWeatherList, style, globalType, clusters)
+
+	-- spawn 'dem rainy weather!
+	ClustersToEmitters( clusters, style, type )
+end
+
+function GetWeatherMarkerData(mapScale)
+	-- find all the weather definition and weather generator markers
+	local markers = ScenarioUtils.GetMarkers()
+	local generatorMarkers = { }
+	local definitionMarkers = { }
+
+	if markers then
+		for k, marker in markers do
+			if marker.type == 'Weather Generator' then
+				table.insert(generatorMarkers, marker)
+			end
+
+			if marker.type == 'Weather Definition' then 
+				table.insert(definitionMarkers, marker)
 			end
 		end
-		
-		if notfoundMapStyle and (MapStyle != 'None') then
-			LOG(' WARNING: Weather Map style [' .. MapStyle .. '] not defined. Define this as one of the Map Style Definitions. ' .. repr(MapStyleList))
-		end
 	end
-end
 
-function GetWeatherMarkerData(MapScale)
-    local markers = ScenarioUtils.GetMarkers()
-    local WeatherDefinition = {}
-    local ClusterDataList = {}
-    local defaultcloudclusterSpread = math.floor(((MapScale[1] + MapScale[2]) * 0.5) * 0.15)
-
-    --Make a list of all the markers in the scenario that are of the markerType
-    if markers then
-        for k, v in markers do
-			-- Read in weather cluster positions and data
-            if v.type == 'Weather Generator' then
-                table.insert( ClusterDataList, { 
-					clusterSpread = v.cloudSpread or defaultcloudclusterSpread, 
-					cloudCount = v.cloudCount or 10, 
-					cloudCountRange = v.cloudCountRange or 0,
-					cloudHeight = v.cloudHeight or 180,
-					cloudHeightRange = v.cloudHeightRange or 10,
-					position = v.position,
-					emitterScale = v.cloudEmitterScale or 1,
-					emitterScaleRange = v.cloudEmitterScaleRange or 0,
-					forceType = v.ForceType or "None",
-					spawnChance = v.spawnChance or 1,
-				} )
-			-- Read in weather definition
-            elseif v.type == 'Weather Definition' then
-				if table.getn( WeatherDefinition ) > 0 then
-					LOG('WARNING: Weather, multiple weather definitions found. Last read Weather definition will override any previous ones.')
-				end					                
-				WeatherDefinition = {
-					MapStyle = v.MapStyle or "None",
-					WeatherTypes = {
-						{
-							Type = v.WeatherType01 or "None",
-							Chance = v.WeatherType01Chance or 0.25,
-						},
-						{
-							Type = v.WeatherType02 or "None",
-							Chance = v.WeatherType02Chance or 0.25,
-						},
-						{
-							Type = v.WeatherType03 or "None",
-							Chance = v.WeatherType03Chance or 0.25,
-						},
-						{
-							Type = v.WeatherType04 or "None",
-							Chance = v.WeatherType04Chance or 0.25,
-						},															
+	-- transform the definition markers into a more useful, abstract format
+	local definitions = {}
+	for k, marker in definitionMarkers do 
+		table.insert(definitions, 
+			{
+				MapStyle = marker.MapStyle or "None",
+				WeatherTypes = {
+					{
+						Type = marker.WeatherType01 or "None",
+						Chance = marker.WeatherType01Chance or 0.25,
 					},
-					Direction = v.WeatherDriftDirection or {0,0,0},
-				}
-            end
-        end
-    end
-    return WeatherDefinition,ClusterDataList
+					{
+						Type = marker.WeatherType02 or "None",
+						Chance = marker.WeatherType02Chance or 0.25,
+					},
+					{
+						Type = marker.WeatherType03 or "None",
+						Chance = marker.WeatherType03Chance or 0.25,
+					},
+					{
+						Type = marker.WeatherType04 or "None",
+						Chance = marker.WeatherType04Chance or 0.25,
+					},															
+				},
+			}
+		)
+	end
+
+	-- transform the generator markers into a more useful, abstract format
+	local clusters = {}
+	local defaultcloudclusterSpread = math.floor(((mapScale[1] + mapScale[2]) * 0.5) * 0.15)
+	for k, marker in generatorMarkers do 
+
+		local cluster = { 
+			clusterSpread = marker.cloudSpread or defaultcloudclusterSpread, 
+			cloudCount = marker.cloudCount or 10, 
+			cloudCountRange = marker.cloudCountRange or 0,
+			cloudHeight = marker.cloudHeight or 180,
+			cloudHeightRange = marker.cloudHeightRange or 10,
+			position = marker.position,
+			emitterScale = marker.cloudEmitterScale or 1,
+			emitterScaleRange = marker.cloudEmitterScaleRange or 0,
+			forceType = marker.ForceType or "None",
+			spawnChance = marker.spawnChance or 1,
+		} 
+
+		-- make it default to true if it is not defined
+		cluster.visibleThroughFog = marker.visibleThroughFog
+		if cluster.visibleThroughFog == nil then 
+			cluster.visibleThroughFog = true 
+		end
+
+		table.insert( clusters, cluster)
+	end
+
+	-- return it all
+	return definitions, clusters
 end
 
-function GetRandomWeatherEffectType( WeatherDefinition )
-	local chance = 0
-	for k, v in WeatherDefinition.WeatherTypes do
-		chance = chance + v.Chance
+function GetRandomWeatherEffectType( definition )
+	-- compute the total range
+	local range = 0
+	for k, v in definition.WeatherTypes do
+		range = range + v.Chance
 	end
 	
-	local pick = util.GetRandomFloat( 0, chance )
-	--LOG( pick )
-	chance = 0
-	
-	for k, v in WeatherDefinition.WeatherTypes do
-		--LOG( 'Chance ' .. chance .. 'chance + v.Chance ' .. chance + v.Chance )
-		if (chance <= pick) and (pick <= (chance + v.Chance)) then 
-			--LOG( 'Pick: ' .. v.Type )
+	-- choose a random number in that range
+	local pick = util.GetRandomFloat( 0, range )
+
+	-- determine which marker has the number in its range
+	local sum = 0
+	for k, v in definition.WeatherTypes do
+		if (sum <= pick) and (pick <= (sum + v.Chance)) then 
 			return v.Type
 		else
-			chance = chance + v.Chance
+			sum = sum + v.Chance
 		end
 	end
-	
-	return nil
 end
 
-function SpawnWeatherAtClusterList( ClusterData, MapStyle, EffectType )
-	local numClusters = table.getn( ClusterData )
-	local WeatherEffects = MapWeatherList[MapStyle][EffectType]
-	
-	-- Exit out early, if for some reason, we have no effects defined for this
-	if (WeatherEffects == nil) or (WeatherEffects != nil and (table.getn(WeatherEffects) == 0)) then
-		return	
-	end
-	
-	-- Parse through cluster position and datal
-	for i = 1, numClusters do
-		-- Determine whether current cluster should spawn or not
-		if ClusterData[i].spawnChance < 1 then
-			local pick
-			if util.GetRandomFloat( 0, 1 ) > ClusterData[i].spawnChance then
-				LOG( 'Cluster ' .. i .. ' No clouds generated ' )
-				continue
-			end
-		end
-	
-		local clusterSpreadHalfSize = ClusterData[i].clusterSpread * 0.5
-		local numCloudsPerCluster = nil
-		if ClusterData[i].cloudCountRange != 0 then
-			numCloudsPerCluster = util.GetRandomInt(ClusterData[i].cloudCount - ClusterData[i].cloudCountRange / 2,ClusterData[i].cloudCount + ClusterData[i].cloudCountRange / 2)
+function SetClusterEffectData(weather, style, globalType, clusters)
+	-- determine the weather type for each cluster
+	for k, cluster in clusters do 
+		if cluster.forceType == "None" then 
+			local emitters = weather[style][globalType]
+			cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
 		else
-			numCloudsPerCluster = ClusterData[i].cloudCount
+			local emitters = weather[style][cluster.forceType]
+			cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
 		end
-		local clusterEffectMaxScale = ClusterData[i].emitterScale + ClusterData[i].emitterScaleRange
-		local clusterEffectMinScale = ClusterData[i].emitterScale - ClusterData[i].emitterScaleRange
+	end
+end
+
+function ClustersToEmitters( clusters )
+
+	local nc = table.getn(clusters)
 	
-		LOG( 'Cluster ' .. i .. ', Clouds generated ', numCloudsPerCluster )
-		
-		-- Calculate weather cluster entity positional range
-		local LeftX = ClusterData[i].position[1] - clusterSpreadHalfSize
-		local TopZ = ClusterData[i].position[3] - clusterSpreadHalfSize
-		local RightX = ClusterData[i].position[1] + clusterSpreadHalfSize
-		local BottomZ = ClusterData[i].position[3] + clusterSpreadHalfSize		
-		
-		-- Get base height and height range
-		local BaseHeight = ClusterData[i].position[2] + ClusterData[i].cloudHeight
-		local HeightOffset = ClusterData[i].cloudHeightRange	
-		
-		-- Choose weather cluster effects
-		local clusterWeatherEffects = WeatherEffects
-		local numEffects = table.getn(WeatherEffects) 
-		if ClusterData[i].forceType != "None" then
-			clusterWeatherEffects = MapWeatherList[MapStyle][ClusterData[i].forceType] 
-			LOG( 'Force Effect Type: ', ClusterData[i].forceType )			
-			numEffects = table.getn(clusterWeatherEffects) 
-		end
-		
-		-- Generate Clouds for our cluster
-		for j = 0, numCloudsPerCluster do
-			local cloud = Entity()
-			local x = util.GetRandomInt( LeftX, RightX )
-			local y = BaseHeight + util.GetRandomInt(-HeightOffset,HeightOffset)
-			local z = util.GetRandomInt( TopZ, BottomZ )
-			Warp( cloud, Vector(x,y,z) )
-			--LOG( 'Generating cloud at: ', x .. ' ' .. y .. ' ' .. z )	
-			
-			local EmitterGroupSeed = util.GetRandomInt(1,numEffects)
-			local numEmitters = table.getn(clusterWeatherEffects[EmitterGroupSeed])
-			local effects = clusterWeatherEffects[EmitterGroupSeed]
-			
-			for k, v in clusterWeatherEffects[EmitterGroupSeed] do
-				CreateEmitterAtBone(cloud,-2,-1,v):ScaleEmitter(util.GetRandomFloat( clusterEffectMaxScale, clusterEffectMinScale ))					
+	-- for each cluster...
+	for k, cluster in clusters do 
+
+		-- there is a chance it doesn't spawn at all
+		local spawn = util.GetRandomFloat( 0, 1 )
+		if spawn < cluster.spawnChance then 
+
+			-- determine the height of the emitters
+			local BaseHeight = cluster.position[2] + cluster.cloudHeight
+			local HeightOffset = cluster.cloudHeightRange	
+
+			-- determine rectangle to spawn the emitters in
+			local clusterSpreadHalfSize = cluster.clusterSpread * 0.5
+			local LeftX = cluster.position[1] - clusterSpreadHalfSize
+			local TopZ = cluster.position[3] - clusterSpreadHalfSize
+			local RightX = cluster.position[1] + clusterSpreadHalfSize
+			local BottomZ = cluster.position[3] + clusterSpreadHalfSize		
+
+			-- determine number of emitters
+			local numCloudsPerCluster = cluster.cloudCount
+			numCloudsPerCluster = numCloudsPerCluster + util.GetRandomInt(
+				cluster.cloudCountRange * -0.5, 
+				cluster.cloudCountRange * 0.5
+			)
+
+			-- determine individual particle scale
+			local clusterEffectMaxScale = cluster.emitterScale + cluster.emitterScaleRange
+			local clusterEffectMinScale = cluster.emitterScale - cluster.emitterScaleRange
+
+			-- spawn the individual emitters
+			for j = 0, numCloudsPerCluster do 
+				-- construct a dummy entity
+				local cloud = Entity()
+
+				-- move the entity 
+				local x = util.GetRandomInt( LeftX, RightX )
+				local y = BaseHeight + util.GetRandomInt(-HeightOffset,HeightOffset)
+				local z = util.GetRandomInt( TopZ, BottomZ )
+				Warp( cloud, Vector(x,y,z) )
+
+				-- spawn the weather effects
+				for k, effect in cluster.effects do
+
+					-- create the emitter
+					local entity = cloud 
+					local bone = -2 
+					local army = -1
+					local emitter = CreateEmitterAtBone(entity, bone, army, effect)
+
+					-- scale it accordingly
+					emitter:ScaleEmitter(util.GetRandomFloat( clusterEffectMaxScale, clusterEffectMinScale))	
+					
+					-- determine if it spawns without visibility
+					if cluster.visibleThroughFog then 
+						emitter:SetEmitterParam("EMITIFVISIBLE", 0)	
+					end
+				end
 			end
 		end
 	end
