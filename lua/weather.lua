@@ -45,8 +45,10 @@ function CreateWeatherThread()
     -- early opt out: map style is unknown
     local style = definition.MapStyle
     if not table.find(MapStyleList, style) then 
-        WARN('Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.')
-        WARN('A full list of available styles is: \r\n' .. repr(MapStyleList) )  
+        WARN(
+            'Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.',
+            'A full list of available styles is: \r\n' .. repr(MapStyleList) 
+        )
         return
     end
 
@@ -75,8 +77,10 @@ function CreateWeatherThread()
     for k, cluster in clusters do 
         if not (cluster.forceType == "None") then 
             if not MapWeatherList[style][cluster.forceType] then 
-                WARN('Intention to generate weather but a forced type \'' .. cluster.forceType .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
-                WARN('A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style]))  
+                WARN(
+                    'Intention to generate weather but a forced type \'' .. cluster.forceType .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.',
+                    'A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style])
+                )
             end
         end
     end
@@ -105,9 +109,7 @@ function GetWeatherMarkerData(mapScale)
         for k, marker in markers do
             if marker.type == 'Weather Generator' then
                 table.insert(generatorMarkers, marker)
-            end
-
-            if marker.type == 'Weather Definition' then 
+            elseif marker.type == 'Weather Definition' then 
                 table.insert(definitionMarkers, marker)
             end
         end
@@ -185,7 +187,7 @@ function GetRandomWeatherEffectType( definition )
     -- determine which marker has the number in its range
     local sum = 0
     for k, v in definition.WeatherTypes do
-        if (sum <= pick) and (pick <= (sum + v.Chance)) then 
+        if sum <= pick and pick <= sum + v.Chance then 
             return v.Type
         else
             sum = sum + v.Chance
