@@ -15,7 +15,7 @@ blacklist = {
     "Eject.scd",
     "gaz_ui",
     "lobby.nxt",
-    "faforever.nxt"    
+    "faforever.nxt"
 }
 whitelist =
 {
@@ -30,7 +30,7 @@ whitelist =
     "projectiles.nx2",
     "schook.nx2",
     "textures.nx2",
-    "units.nx2",    
+    "units.nx2",
     "murderparty.nxt",
     "labwars.nxt",
     "units.scd",
@@ -60,7 +60,7 @@ whitelist =
     "texturepack.nxt",
     "sc_music.scd"
 }
- 
+
 local function mount_dir(dir, mountpoint)
     table.insert(path, { dir = dir, mountpoint = mountpoint } )
 end
@@ -83,7 +83,7 @@ local function mount_contents(dir, mountpoint)
         end
     end
 end
- 
+
 local function mount_dir_with_whitelist(dir, glob, mountpoint)
     sorted = {}
     LOG('checking ' .. dir .. glob)
@@ -95,7 +95,7 @@ local function mount_dir_with_whitelist(dir, glob, mountpoint)
                     notsafe = notsafe and (string.find(mp, white, 1) == nil)
             end
             if notsafe then
-                    LOG('not safe ' .. dir .. entry)                                
+                    LOG('not safe ' .. dir .. entry)
             else
                     table.insert(sorted, dir .. entry)
             end
@@ -141,8 +141,6 @@ local function mount_map_dir(dir, glob, mountpoint)
         end
     end
 end
-mount_map_dir(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
-mount_map_dir(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
 -- Begin mod mounting section
 -- This section mounts sounds from the mods directory to allow mods to add custom sounds to the game
 function mount_mod_sounds(MODFOLDER)
@@ -162,16 +160,22 @@ function mount_mod_sounds(MODFOLDER)
         end
     end
 end
-mount_mod_sounds(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
-mount_mod_sounds(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
--- End mod mounting section
--- these are the classic supcom directories. They don't work with accents or other foreign characters in usernames
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
- 
--- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the uppder ones.
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
+
+load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+custom_vault_path = GetCommandLineArg('/init', false)
+if custom_vault_path
+	load_vault(custom_vault_path[1])
+end
+
+local function load_vault(vault_path)
+	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
+	mount_mod_sounds(vault_path .. '\\mods')
+
+	mount_contents(vault_path .. '\\mods', '/mods')
+	mount_contents(vault_path .. '\\maps', '/maps')
+end
+
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
  
