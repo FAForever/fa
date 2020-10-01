@@ -161,13 +161,6 @@ function mount_mod_sounds(MODFOLDER)
     end
 end
 
-load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
-load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
-custom_vault_path = GetCommandLineArg('/init', false)
-if custom_vault_path
-	load_vault(custom_vault_path[1])
-end
-
 local function load_vault(vault_path)
 	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
 	mount_mod_sounds(vault_path .. '\\mods')
@@ -175,6 +168,14 @@ local function load_vault(vault_path)
 	mount_contents(vault_path .. '\\mods', '/mods')
 	mount_contents(vault_path .. '\\maps', '/maps')
 end
+
+load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+if custom_vault_path != nil then
+	LOG('Loading custom vault path' .. custom_vault_path)
+	load_vault(custom_vault_path)
+end
+
 
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
