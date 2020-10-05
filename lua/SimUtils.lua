@@ -602,8 +602,8 @@ end
 
 function GiveResourcesToPlayer(data)
     SendChatToReplay(data)
-    -- Ignore observers and players trying to send resources to themselves
-    if data.From ~= -1 and data.From ~= data.To then
+    -- Ignore observers and players trying to send resources to themselves or to enemies
+    if data.From ~= -1 and data.From ~= data.To and IsAlly(data.From, data.To) then
         if not OkayToMessWithArmy(data.From) then
             return
         end
