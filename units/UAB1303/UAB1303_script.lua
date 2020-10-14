@@ -1,21 +1,19 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
-#**
-#**  Summary  :  Aeon T3 Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+--#**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
+--#**
+--#**  Summary  :  Aeon T3 Mass Fabricator
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
 UAB1303 = Class(AMassFabricationUnit) {
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        AMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
-        #B04 = parent, B03 = ball, B01/2 = rings
-        #CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
+    OnCreate = function(self)
+        AMassFabricationUnit.OnCreate(self)
         local num = self:GetRandomDir()
         self.RingManip1 = CreateRotator(self, 'B01', 'x', nil, 0, 15, 45)
         self.Trash:Add(self.RingManip1)

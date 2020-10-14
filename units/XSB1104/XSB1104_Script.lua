@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XSB1104/XSB1104_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Seraphim Mass Fabricator
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /data/units/XSB1104/XSB1104_script.lua
+--#**  Author(s):  Jessica St. Croix
+--#**
+--#**  Summary  :  Seraphim Mass Fabricator
+--#**
+--#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 
 local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
 
@@ -18,8 +18,8 @@ XSB1104 = Class(SMassFabricationUnit) {
         self.Trash:Add(self.Rotator)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        SMassFabricationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        SMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ActiveState)
     end,
 

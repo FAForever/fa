@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB1104/UEB1104_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  UEF Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--#****************************************************************************
+--#**
+--#**  File     :  /cdimage/units/UEB1104/UEB1104_script.lua
+--#**  Author(s):  Jessica St. Croix, David Tomandl
+--#**
+--#**  Summary  :  UEF Mass Fabricator
+--#**
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#****************************************************************************
 local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit
 
 UEB1104 = Class(TMassFabricationUnit) {
@@ -24,9 +24,12 @@ UEB1104 = Class(TMassFabricationUnit) {
 
     CreateState = State {
         Main = function(self)
-            self:HideBone('UEB1104', true)              #   This units default position is open,
-            self.SliderManip:SetGoal(0,-1,0)            #   so we have to hide the bone, close the unit,
-            self.SliderManip:SetSpeed(-1)               #   and then show the bone once its in its closed position.
+            --   This units default position is open,
+            --   so we have to hide the bone, close the unit,
+            --   and then show the bone once its in its closed position.
+            self:HideBone('UEB1104', true)              
+            self.SliderManip:SetGoal(0,-1,0)            
+            self.SliderManip:SetSpeed(-1)               
             WaitFor(self.SliderManip)
             self:ShowBone('UEB1104', true)
             self.Closed = true
@@ -36,11 +39,14 @@ UEB1104 = Class(TMassFabricationUnit) {
         end,
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        TMassFabricationUnit.OnStopBeingBuilt(self,builder,layer)
-        if self.Closed == true then                     #   Had enough time to go through the CreateState already.
-            ChangeState(self, self.ActiveState)         #   Most likely created with an engineer
-        else                                            #   else.... Created with F2
+    OnStopBeingBuilt = function(self, builder, layer)
+        TMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
+        --   Had enough time to go through the CreateState already.
+        --   Most likely created with an engineer
+        --   else.... Created with F2
+        if self.Closed == true then                     
+            ChangeState(self, self.ActiveState)         
+        else                                            
             self.GoToActive = true
             ChangeState(self, self.CreateState)
         end
@@ -50,12 +56,12 @@ UEB1104 = Class(TMassFabricationUnit) {
         Main = function(self)
             local myBlueprint = self:GetBlueprint()
 
-            # Play the "activate" sound
+            -- Play the "activate" sound
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)
             end
 
-            # Initiate the unit's ambient movement sound
+            -- Initiate the unit's ambient movement sound
             self:PlayUnitAmbientSound( 'ActiveLoop' )
 
             self.SliderManip:SetGoal(0,0,0)
@@ -63,7 +69,7 @@ UEB1104 = Class(TMassFabricationUnit) {
             WaitFor(self.SliderManip)
         end,
 
-        #   User deactivates unit.
+        --   User deactivates unit.
         OnConsumptionInActive = function(self)
             TMassFabricationUnit.OnConsumptionInActive(self)
             ChangeState(self, self.InactiveState)
@@ -79,7 +85,7 @@ UEB1104 = Class(TMassFabricationUnit) {
             WaitFor(self.SliderManip)
         end,
 
-        #   User activates unit.
+        --   User activates unit.
         OnConsumptionActive = function(self)
             TMassFabricationUnit.OnConsumptionActive(self)
             ChangeState(self, self.ActiveState)
