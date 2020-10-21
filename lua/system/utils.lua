@@ -405,7 +405,7 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
-    return table.getsize(t) == 0
+    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -623,12 +623,13 @@ function Sort(itemA, itemB)
 end
 
 -- Rounds a number to specified double precision
-function math.round(num, idp)
+function math.round(num,idp)
     if not idp then
         return math.floor(num+.5)
-    else
-        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     end
+
+    idp = 10^idp
+    return math.floor(num*idp+.5)/idp
 end
 
 --- Clamps numeric value to specified Min and Max range
