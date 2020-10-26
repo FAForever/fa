@@ -2504,7 +2504,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and gameInfo.scenarioInfo.hidePreviewMarkers then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and associatedMarker:IsEnabled() then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then

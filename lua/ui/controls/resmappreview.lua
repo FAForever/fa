@@ -214,7 +214,7 @@ ResourceMapPreview = Class(Group) {
             local slot = inSlot
 
             -- Create an ACUButton for each start position.
-            local marker = ACUButton(self.mapPreview, not self.buttonsDisabled)
+            local marker = ACUButton(self.mapPreview, not self.buttonsDisabled and not scenarioInfo.hidePreviewMarkers)
             local markerWidth = xOffset + ((pos[1] / mWidth) * self.size * xFactor) - (marker.Width() / 2)
             local markerHeight = yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2)
             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview, markerWidth, markerHeight)
