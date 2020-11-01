@@ -209,7 +209,8 @@ function CreateUI(over, exitBehavior)
     
     gameList = Group(panel)
     LayoutHelpers.AtLeftTopIn(gameList, panel, 30, 152)
-    LayoutHelpers.SetDimensions(gameList, panel.Width() - 90, 432)
+    gameList.Width:Set(panel.Width() - LayoutHelpers.ScaleNumber(90))
+    LayoutHelpers.SetHeight(gameList, 432)
     gameList.top = 0
     
     local gamesTitle = UIUtil.CreateText(panel, '<LOC GAMESEL_0002>Server List', 18, UIUtil.bodyFont)
