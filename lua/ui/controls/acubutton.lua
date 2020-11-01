@@ -20,15 +20,13 @@ local teamIcons = {
 ACUButton = Class(Group) {
     __init = function(self, parent, enabled)
         Group.__init(self, parent)
-        self.Height:Set(10)
-        self.Width:Set(8)
+        LayoutHelpers.SetDimensions(self, 8, 10)
 
         self.enabled = enabled
 
         -- Provides the solid-colour filling of the little ACU. Default transparent.
         local colourBmp = Bitmap(self)
-        colourBmp.Height:Set(10)
-        colourBmp.Width:Set(8)
+        LayoutHelpers.SetDimensions(colourBmp, 8, 10)
         colourBmp:SetSolidColor('00777777')
         LayoutHelpers.AtLeftTopIn(colourBmp, self)
 
