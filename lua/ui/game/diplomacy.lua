@@ -256,12 +256,12 @@ function BuildPlayerLines()
 
         entry.Height:Set(function()
                 if (isAlly or data.human) and not data.outOfGame then
-                    return 40
+                    return LayoutHelpers.ScaleNumber(40)
                 else
-                    return entry.factionIcon.Height() + 4
+                    return entry.factionIcon.Height() + LayoutHelpers.ScaleNumber(4)
                 end
             end)
-        entry.Width:Set(function() return parent.Width() - 20 end)
+        entry.Width:Set(function() return parent.Width() - LayoutHelpers.ScaleNumber(20) end)
 
         return entry
     end
@@ -331,10 +331,10 @@ function BuildPlayerLines()
         for index, info in allyControls do
             parent.Items[i] = CreateEntry(info, true)
             LayoutHelpers.Below(parent.Items[i], parent.Items[i-1], 12)
-            if table.getsize(allyControls) != index then
+            if table.getsize(allyControls) ~= index then
                 parent.Items[i].Seperator = Bitmap(parent.Items[i], UIUtil.UIFile('/game/options-diplomacy-panel/line-allies_bmp.dds'))
                 local curI = i
-                parent.Items[i].Seperator.Top:Set(function() return parent.Items[curI].Bottom() + 12 end)
+                LayoutHelpers.AnchorToBottom(parent.Items[i].Seperator, parent.Items[curI], 12)
                 LayoutHelpers.AtHorizontalCenterIn(parent.Items[i].Seperator, parent.Items[i], 2)
             end
             lastAllyControl = parent.Items[i]
@@ -342,13 +342,13 @@ function BuildPlayerLines()
         end
 
         parent.alliedBG = Bitmap(parent, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_t.dds'))
-        parent.alliedBG.Top:Set(function() return parent.Top() + 2 end)
+        LayoutHelpers.AtTopIn(parent.alliedBG, parent, 2)
         parent.alliedBG.Left:Set(parent.Left)
 
         parent.alliedBG.bottomBG = Bitmap(parent.alliedBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_b.dds'))
         parent.alliedBG.bottomBG.Depth:Set(parent.alliedBG.Depth)
         parent.alliedBG.bottomBG.Left:Set(parent.alliedBG.Left)
-        parent.alliedBG.bottomBG.Top:Set(function() return lastAllyControl.Bottom() + 5 end)
+        LayoutHelpers.AnchorToBottom(parent.alliedBG.bottomBG, lastAllyControl, 5)
 
         parent.alliedBG.middleBG = Bitmap(parent.alliedBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_m.dds'))
         parent.alliedBG.middleBG.Depth:Set(parent.alliedBG.Depth)
@@ -404,7 +404,7 @@ function BuildPlayerLines()
         parent.Items[i] = CreateEntry(info)
         LayoutHelpers.Below(parent.Items[i], parent.Items[i-1], 2)
         lastEnemyControl = parent.Items[i]
-        if table.getsize(enemyControls) != index then
+        if table.getsize(enemyControls) ~= index then
             parent.Items[i].Seperator = Bitmap(parent.Items[i], UIUtil.UIFile('/game/options-diplomacy-panel/line-enemies_bmp.dds'))
             parent.Items[i].Seperator.Top:Set(parent.Items[i].Bottom)
             LayoutHelpers.AtHorizontalCenterIn(parent.Items[i].Seperator, parent.Items[i], 2)
@@ -413,7 +413,7 @@ function BuildPlayerLines()
     end
 
     parent.enemyBG = Bitmap(parent, UIUtil.UIFile('/game/options-diplomacy-panel/panel-enemy_bmp_t.dds'))
-    parent.enemyBG.Top:Set(function() return enemyTitle.Top() - 8 end)
+    LayoutHelpers.AtTopIn(parent.enemyBG, enemyTitle, -8)
     parent.enemyBG.Left:Set(parent.Left)
     parent.enemyBG.bottomBG = Bitmap(parent.enemyBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-enemy_bmp_b.dds'))
     parent.enemyBG.bottomBG.Depth:Set(parent.enemyBG.Depth)
@@ -439,7 +439,7 @@ function BuildPlayerLines()
                     height = height + (item.Bottom() - parent.Items[index-1].Bottom())
                 end
             end
-            return height + 10
+            return height + LayoutHelpers.ScaleNumber(10)
         end)
 end
 
@@ -453,7 +453,7 @@ function CreateShareResourcesDialog(control)
         control.OrigHeight = control.Height()
 
         control.giveResourcesGroup = Group(control)
-        control.giveResourcesGroup.Height:Set(90)
+        LayoutHelpers.SetHeight(control.giveResourcesGroup, 90)
         control.giveResourcesGroup.Width:Set(control.Width)
         LayoutHelpers.AtBottomIn(control.giveResourcesGroup, control)
         LayoutHelpers.AtLeftIn(control.giveResourcesGroup, control)
@@ -479,9 +479,9 @@ function CreateShareResourcesDialog(control)
         local massStatus = StatusBar(control.giveResourcesGroup, 0, 100, false, false,
             UIUtil.UIFile('/game/resource-bars/mini-mass-bar-back_bmp.dds'),
             UIUtil.UIFile('/game/resource-bars/mini-mass-bar_bmp.dds'), false)
-        massStatus.Top:Set(function() return control.giveResourcesGroup.Top() + 10 end)
+        LayoutHelpers.AtTopIn(massStatus, control.giveResourcesGroup, 10)
         massStatus.Left:Set(control.giveResourcesGroup.Left)
-        massStatus.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
+        LayoutHelpers.AtRightIn(massStatus, control.giveResourcesGroup, 50)
 
         local massSlider = Slider(control.giveResourcesGroup, false, 0, 100,
             UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds'),
@@ -489,7 +489,7 @@ function CreateShareResourcesDialog(control)
             UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds'))
         LayoutHelpers.AtVerticalCenterIn(massSlider, massStatus)
         massSlider.Left:Set(control.giveResourcesGroup.Left)
-        massSlider.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
+        LayoutHelpers.AtRightIn(massSlider, control.giveResourcesGroup, 50)
         massSlider:SetValue(0)
 
         massInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
@@ -508,7 +508,7 @@ function CreateShareResourcesDialog(control)
             UIUtil.UIFile('/game/resource-bars/mini-energy-bar_bmp.dds'), false)
         LayoutHelpers.Below(energyStatus, massStatus, 20)
         energyStatus.Left:Set(control.giveResourcesGroup.Left)
-        energyStatus.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
+        LayoutHelpers.AtRightIn(energyStatus, control.giveResourcesGroup, 50)
 
         local energySlider = Slider(control.giveResourcesGroup, false, 0, 100,
             UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds'),
@@ -516,7 +516,7 @@ function CreateShareResourcesDialog(control)
             UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds'))
         LayoutHelpers.AtVerticalCenterIn(energySlider, energyStatus)
         energySlider.Left:Set(control.giveResourcesGroup.Left)
-        energySlider.Right:Set(function() return control.giveResourcesGroup.Right() - 50 end)
+        LayoutHelpers.AtRightIn(energySlider, control.giveResourcesGroup, 50)
         energySlider:SetValue(0)
 
         energyInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
