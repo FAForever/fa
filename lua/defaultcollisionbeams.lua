@@ -1,23 +1,23 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/defaultcollisionbeams.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Default definitions collision beams
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+------------------------------------------------------------
+--
+--  File     :  /lua/defaultcollisionbeams.lua
+--  Author(s):  Gordon Duclos
+--
+--  Summary  :  Default definitions collision beams
+--
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------
 
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
-#-----------------------------
-#   Base class that defines supreme commander specific defaults
-#-----------------------------
+-------------------------------
+--   Base class that defines supreme commander specific defaults
+-------------------------------
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
-    FxImpactLand = {},#EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = {},-- EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
@@ -26,9 +26,9 @@ SCCollisionBeam = Class(CollisionBeam) {
     FxImpactNone = {},
 }
 
-#-----------------------------
-#   Ginsu COLLISION BEAM
-#-----------------------------
+-------------------------------
+--   Ginsu COLLISION BEAM
+-------------------------------
 GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/riot_gun_beam_01_emit.bp',
               '/effects/emitters/riot_gun_beam_02_emit.bp',},
@@ -43,9 +43,9 @@ GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxImpactUnderWater = {},
 }
 
-#----------------------------------
-#   PARTICLE CANNON COLLISION BEAM
-#----------------------------------
+------------------------------------
+--   PARTICLE CANNON COLLISION BEAM
+------------------------------------
 ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {
 		'/effects/emitters/particle_cannon_beam_01_emit.bp',
@@ -58,18 +58,18 @@ ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
     FxBeamEndPointScale = 1,
 }
 
-#----------------------------------
-#   ZAPPER COLLISION BEAM
-#----------------------------------
+------------------------------------
+--   ZAPPER COLLISION BEAM
+------------------------------------
 ZapperCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/zapper_beam_01_emit.bp'},
     FxBeamEndPoint = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',
                        '/effects/emitters/sparks_07_emit.bp',},
 }
 
-#----------------------------------
-#   QUANTUM BEAM GENERATOR COLLISION BEAM
-#----------------------------------
+------------------------------------
+--   QUANTUM BEAM GENERATOR COLLISION BEAM
+------------------------------------
 QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
@@ -266,10 +266,9 @@ TractorClawCollisionBeam = Class(CollisionBeam) {
     FxBeamStartPoint = { EffectTemplate.ACollossusTractorBeamGlow01 },
 }
 
-#----------------------------------
-#   QUANTUM BEAM GENERATOR COLLISION BEAM
-#----------------------------------
-
+------------------------------------
+--   QUANTUM BEAM GENERATOR COLLISION BEAM
+------------------------------------
 ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -326,7 +325,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 			table.insert( self.BeamEffectsBag, fxBeam )
 			self.Trash:Add(fxBeam)
         end
-        #local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
+        -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
 
     end, 
 }
@@ -385,7 +384,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
 
 
-###This is for a ship and a point defense.
+-- This is for a ship and a point defense.
 UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -436,15 +435,14 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     end,
 }
 
-###This is for a ship and a point defense. (adjustment for ship muzzleflash)
+-- This is for a ship and a point defense. (adjustment for ship muzzleflash)
 UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCollisionBeam) {
 	FxBeamStartPoint = EffectTemplate.SUltraChromaticBeamGeneratorMuzzle02,
 }
 
-#----------------------------------
-#   HIRO LASER COLLISION BEAM
-#----------------------------------
-
+------------------------------------
+--   HIRO LASER COLLISION BEAM
+------------------------------------
 TDFHiroCollisionBeam = Class(CollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -496,31 +494,31 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
 }
 
 
-#----------------------------------
-#   ORBITAL DEATH LASER COLLISION BEAM
-#----------------------------------
+------------------------------------
+--   ORBITAL DEATH LASER COLLISION BEAM
+------------------------------------
 OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
         
     FxBeam = {'/effects/emitters/uef_orbital_death_laser_beam_01_emit.bp'},
     FxBeamEndPoint = {
-		'/effects/emitters/uef_orbital_death_laser_end_01_emit.bp',			# big glow
-		'/effects/emitters/uef_orbital_death_laser_end_02_emit.bp',			# random bright blueish dots
-		'/effects/emitters/uef_orbital_death_laser_end_03_emit.bp',			# darkening lines
-		'/effects/emitters/uef_orbital_death_laser_end_04_emit.bp',			# molecular, small details
-		'/effects/emitters/uef_orbital_death_laser_end_05_emit.bp',			# rings
-		'/effects/emitters/uef_orbital_death_laser_end_06_emit.bp',			# upward sparks
-		'/effects/emitters/uef_orbital_death_laser_end_07_emit.bp',			# outward line streaks
-		'/effects/emitters/uef_orbital_death_laser_end_08_emit.bp',			# center glow
-		'/effects/emitters/uef_orbital_death_laser_end_distort_emit.bp',	# screen distortion
+		'/effects/emitters/uef_orbital_death_laser_end_01_emit.bp',			-- big glow
+		'/effects/emitters/uef_orbital_death_laser_end_02_emit.bp',			-- random bright blueish dots
+		'/effects/emitters/uef_orbital_death_laser_end_03_emit.bp',			-- darkening lines
+		'/effects/emitters/uef_orbital_death_laser_end_04_emit.bp',			-- molecular, small details
+		'/effects/emitters/uef_orbital_death_laser_end_05_emit.bp',			-- rings
+		'/effects/emitters/uef_orbital_death_laser_end_06_emit.bp',			-- upward sparks
+		'/effects/emitters/uef_orbital_death_laser_end_07_emit.bp',			-- outward line streaks
+		'/effects/emitters/uef_orbital_death_laser_end_08_emit.bp',			-- center glow
+		'/effects/emitters/uef_orbital_death_laser_end_distort_emit.bp',	-- screen distortion
 	},
     FxBeamStartPoint = {
-		'/effects/emitters/uef_orbital_death_laser_muzzle_01_emit.bp',	# random bright blueish dots
-		'/effects/emitters/uef_orbital_death_laser_muzzle_02_emit.bp',	# molecular, small details
-		'/effects/emitters/uef_orbital_death_laser_muzzle_03_emit.bp',	# darkening lines
-		'/effects/emitters/uef_orbital_death_laser_muzzle_04_emit.bp',	# small downward sparks
-		'/effects/emitters/uef_orbital_death_laser_muzzle_05_emit.bp',	# big glow
+		'/effects/emitters/uef_orbital_death_laser_muzzle_01_emit.bp',	-- random bright blueish dots
+		'/effects/emitters/uef_orbital_death_laser_muzzle_02_emit.bp',	-- molecular, small details
+		'/effects/emitters/uef_orbital_death_laser_muzzle_03_emit.bp',	-- darkening lines
+		'/effects/emitters/uef_orbital_death_laser_muzzle_04_emit.bp',	-- small downward sparks
+		'/effects/emitters/uef_orbital_death_laser_muzzle_05_emit.bp',	-- big glow
     },
     
     SplatTexture = 'czar_mark01_albedo',
