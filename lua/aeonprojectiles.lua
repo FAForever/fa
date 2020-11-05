@@ -447,9 +447,26 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
     FxImpactUnderWater = {},
+    
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleCompositeEmitterProjectile.OnCreate(self)
+    end,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 150, 70, army)
+        end
+        
+        SingleCompositeEmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
 }
@@ -463,6 +480,7 @@ AMissileSerpentine02Projectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
     FxImpactUnderWater = {},
+    
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleCompositeEmitterProjectile.OnCreate(self)
@@ -479,6 +497,22 @@ AOblivionCannonProjectile = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.AOblivionCannonHit01,
     FxImpactLand = EffectTemplate.AOblivionCannonHit01,
     FxImpactWater = EffectTemplate.AOblivionCannonHit01,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+2, radius+2, 150, 50, army)
+        end
+        
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
@@ -489,6 +523,22 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
     FxImpactProp = EffectTemplate.AOblivionCannonHit02,
     FxImpactLand = EffectTemplate.AOblivionCannonHit02,
     FxImpactWater = EffectTemplate.AOblivionCannonHit02,
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+2, radius+2, 150, 50, army)
+        end
+        
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 AOblivionCannonProjectile03 = Class(EmitterProjectile) {
@@ -497,6 +547,22 @@ AOblivionCannonProjectile03 = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.AOblivionCannonHit03,
     FxImpactLand = EffectTemplate.AOblivionCannonHit03,
     FxImpactWater = EffectTemplate.AOblivionCannonHit03,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+1, radius+1, 150, 50, army)
+        end
+        
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 --------------------------------------------------------------------------
