@@ -46,7 +46,8 @@ Weapon = Class(moho.weapon_methods) {
             self.unit.Trash = TrashBag()
         end
         self:SetValidTargetsForCurrentLayer(self.unit:GetCurrentLayer())
-        if self:GetBlueprint().Turreted == true then
+        local bp = self:GetBlueprint()
+        if bp.Turreted == true then
             self:SetupTurret()
         end
         self:SetWeaponPriorities()
@@ -54,7 +55,6 @@ Weapon = Class(moho.weapon_methods) {
         self.DamageMod = 0
         self.DamageRadiusMod = 0
         self.NumTargets = 0
-        local bp = self:GetBlueprint()
         local initStore = bp.InitialProjectileStorage
         if initStore and initStore > 0 then
             if bp.MaxProjectileStorage and bp.MaxProjectileStorage < initStore then
@@ -144,22 +144,22 @@ Weapon = Class(moho.weapon_methods) {
         local turretpitchmin, turretpitchmax, turretpitchspeed
 
         -- SETUP MANIPULATORS AND SET TURRET YAW, PITCH AND SPEED
-        if self:GetBlueprint().TurretYaw and self:GetBlueprint().TurretYawRange then
+        if bp.TurretYaw and bp.TurretYawRange then
             turretyawmin, turretyawmax = self:GetTurretYawMinMax()
         else
             numbersexist = false
         end
-        if self:GetBlueprint().TurretYawSpeed then
+        if bp.TurretYawSpeed then
             turretyawspeed = self:GetTurretYawSpeed()
         else
             numbersexist = false
         end
-        if self:GetBlueprint().TurretPitch and self:GetBlueprint().TurretPitchRange then
+        if bp.TurretPitch and bp.TurretPitchRange then
             turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax()
         else
             numbersexist = false
         end
-        if self:GetBlueprint().TurretPitchSpeed then
+        if bp.TurretPitchSpeed then
             turretpitchspeed = self:GetTurretPitchSpeed()
         else
             numbersexist = false
@@ -173,7 +173,7 @@ Weapon = Class(moho.weapon_methods) {
                 self.AimLeft:SetFiringArc(turretyawmin/12, turretyawmax/12, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
         else
-            local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. self:GetBlueprint().Label .. ' UNIT: '.. self.unit.UnitId
+            local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: '.. self.unit.UnitId
             error(strg, 2)
         end
     end,
@@ -207,10 +207,9 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetTurretYawMinMax = function(self)
-        local halfrange = self:GetBlueprint().TurretYawRange
-        local yaw = self:GetBlueprint().TurretYaw
-        turretyawmin = yaw - halfrange
-        turretyawmax = yaw + halfrange
+        local bp = self:GetBlueprint()
+        local turretyawmin = bp.TurretYaw - bp.TurretYawRange
+        local turretyawmax = bp.TurretYaw + bp.TurretYawRange
         return turretyawmin, turretyawmax
     end,
 
@@ -219,10 +218,9 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetTurretPitchMinMax = function(self)
-        local halfrange = self:GetBlueprint().TurretPitchRange
-        local pitch = self:GetBlueprint().TurretPitch
-        turretpitchmin = pitch - halfrange
-        turretpitchmax = pitch + halfrange
+        local bp = self:GetBlueprint()
+        local turretpitchmin = bp.TurretPitch - bp.TurretPitchRange
+        local turretpitchmax = bp.TurretPitch + bp.TurretPitchRange
         return turretpitchmin, turretpitchmax
     end,
 
@@ -231,10 +229,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnFire = function(self)
-        local bp = self:GetBlueprint()
-        if bp.Audio.Fire then
-            self:PlaySound(bp.Audio.Fire)
-        end
+        self:PlayWeaponSound('Fire')
         self:DoOnFireBuffs()
     end,
 
@@ -307,14 +302,8 @@ Weapon = Class(moho.weapon_methods) {
         self.AmbientSounds[sound] = nil
     end,
 
-    OnEnableWeapon = function(self)
-
-    end,
-
     OnMotionHorzEventChange = function(self, new, old)
-
     end,
-
 
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self:GetBlueprint()
@@ -340,7 +329,6 @@ Weapon = Class(moho.weapon_methods) {
                 if not self.DisabledBuffs[v.BuffType] then
                     damageTable.Buffs[k] = v
                 end
-
             end
         end
 
