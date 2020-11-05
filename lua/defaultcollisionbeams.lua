@@ -70,7 +70,7 @@ ZapperCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
-QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
+QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
         
@@ -92,11 +92,11 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.5,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -115,11 +115,14 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 250, 250, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 200, 150, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -148,7 +151,7 @@ DisruptorBeamCollisionBeam = Class(SCCollisionBeam) {
     
 }
 
-MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
+MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -159,11 +162,11 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -182,11 +185,14 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -206,7 +212,7 @@ MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
 }
 
 
-PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
+PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -217,11 +223,11 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -240,11 +246,14 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -269,7 +278,7 @@ TractorClawCollisionBeam = Class(CollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
-ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
+ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit (big size though)
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -280,11 +289,11 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.1,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -303,11 +312,14 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -332,7 +344,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
 
 
-UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
+UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death energy ball
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -343,11 +355,11 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -366,11 +378,14 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -384,7 +399,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
 
 
--- This is for a ship and a point defense.
+-- This is for sera destro and sera T2 point defense.
 UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -396,11 +411,11 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -415,27 +430,30 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     ScorchThread = function(self)
         local army = self:GetArmy()
-        local size = 0.75 + (Random() * 0.75) 
+        local size = 1 + (Random() * 1) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 70, 50, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
                 
             WaitSeconds( self.ScorchSplatDropTime )
-            size = 1.2 + (Random() * 1.5)
+            size = 1 + (Random() * 1)
             CurrentPosition = self:GetPosition(1)
         end
     end,
 }
 
--- This is for a ship and a point defense. (adjustment for ship muzzleflash)
+-- This is for sera destro and sera T2 point defense. (adjustment for ship muzzleflash)
 UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCollisionBeam) {
 	FxBeamStartPoint = EffectTemplate.SUltraChromaticBeamGeneratorMuzzle02,
 }
@@ -443,7 +461,7 @@ UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCo
 ------------------------------------
 --   HIRO LASER COLLISION BEAM
 ------------------------------------
-TDFHiroCollisionBeam = Class(CollisionBeam) {
+TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -454,11 +472,11 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -473,15 +491,18 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
 
     ScorchThread = function(self)
         local army = self:GetArmy()
-        local size = 0.75 + (Random() * 0.75) 
+        local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 85, 70, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -497,7 +518,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
 ------------------------------------
 --   ORBITAL DEATH LASER COLLISION BEAM
 ------------------------------------
-OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
+OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
         
@@ -525,11 +546,11 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.5,
 
     OnImpact = function(self, impactType, targetEntity)
-        if impactType == 'Terrain' then
+        if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
                 self.Scorching = self:ForkThread( self.ScorchThread )   
             end
-        elseif not impactType == 'Unit' then
+        else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
@@ -548,11 +569,15 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 250, 15, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 250, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
