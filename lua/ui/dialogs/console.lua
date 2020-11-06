@@ -28,6 +28,19 @@ local consoleFontSize = 12
 local window = false
 local parent = false
 
+local windowTexture = {
+    bl = '/textures/ui/uef/game/options_brd/options_brd_ll.dds',
+    bm = '/textures/ui/uef/game/options_brd/options_brd_lm.dds',
+    borderColor = 'ff415055',
+    br = '/textures/ui/uef/game/options_brd/options_brd_lr.dds',
+    m = '/textures/ui/uef/game/options_brd/options_brd_m.dds',
+    ml = '/textures/ui/uef/game/options_brd/options_brd_vert_l.dds',
+    mr = '/textures/ui/uef/game/options_brd/options_brd_vert_r.dds',
+    tl = '/textures/ui/uef/game/options_brd/options_brd_ul.dds',
+    tm = '/textures/ui/uef/game/options_brd/options_brd_horz_um.dds',
+    tr = '/textures/ui/uef/game/options_brd/options_brd_ur.dds'
+}
+
 local function InsertCommand(text)
     table.insert(commandDeque, text)
     if table.getn(commandDeque) > maxCommandDequeSize then
@@ -43,6 +56,7 @@ function ConfigWindow(parent)
     window.Top:Set(function() return parent.Top() + 30 end)
     window.Right:Set(function() return parent.Left() + 230 end)
     window.Bottom:Set(function() return parent.Top() + 120 end)
+    window = Window(GetFrame(0), '<LOC console_0000>Console Config', nil, nil, nil, true, nil, 'console_window_config', nil, windowTexture)
     window.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     
     local client = window:GetClientGroup()
@@ -75,6 +89,7 @@ function CreateDialog()
 
     local location = {Top = 5, Left = 5, Bottom = 500, Right = 300}
     parent = Window(mainFrame, '<LOC _Console>Console', nil, nil, true, false, false, 'console_window', location)
+    parent = Window(mainFrame, '<LOC _Console>Console', nil, nil, true, false, false, 'console_window', location, windowTexture)
     parent.Depth:Set(UIUtil.consoleDepth)
     parent:SetMinimumResize(200, 170)
     local edit = Edit(parent:GetClientGroup())
