@@ -233,7 +233,6 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
-        local bp = self:GetBlueprint()
         if not self.Rotator then
             self.Rotator = CreateRotator(self, 'Pod', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)
