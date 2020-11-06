@@ -82,6 +82,7 @@ function ScaleEmittersParam(Emitters, param, minRange, maxRange)
 end
 
 function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
+    unitBeingBuilt.BuildingCube = true
     local bp = unitBeingBuilt:GetBlueprint()
     local mul = 1.15
     local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
@@ -148,6 +149,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
         lComplete = cComplete
         cComplete = unitBeingBuilt:GetFractionComplete()
     end
+    unitBeingBuilt.BuildingCube = nil
 end
 
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
