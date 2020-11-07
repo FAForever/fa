@@ -1,9 +1,9 @@
-#
-# Terran Land-Based Cruise Missile
-#
+--
+-- Terran Land-Based Cruise Missile : UEL0111 (UEF T2 MML)
+--
+
 local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local SingleBeamProjectile = import('/lua/sim/defaultprojectiles.lua').SingleBeamProjectile
 
 TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
 
@@ -47,22 +47,22 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
         	self:SetTurnRate(8)
         	self.Distance = self:GetDistanceToTarget()
         end
-        #Get the nuke as close to 90 deg as possible
+        -- Get the nuke as close to 90 deg as possible
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
-						# Increase check intervals
+						-- Increase check intervals
 						self:SetTurnRate(12)
 						WaitSeconds(1.5)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 25 then
-						# Further increase check intervals
+						-- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 10 then
-						# Further increase check intervals            
+						-- Further increase check intervals            
             self:SetTurnRate(100)   
             KillThread(self.MoveThread)         
         end
@@ -74,10 +74,22 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-        
+    
     OnImpact = function(self, targetType, targetEntity)
-        local army = self:GetArmy()
-        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2, radius * 2, 70, 20, army)
+        end
+        
+        TMissileCruiseProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 TypeClass = TIFMissileCruise03

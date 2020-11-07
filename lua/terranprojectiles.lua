@@ -432,10 +432,6 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
     FxImpactProp = EffectTemplate.TMissileHit01,
     FxImpactUnderWater = {},
 
-    OnImpact = function(self, targetType, targetEntity)
-        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-    end,
-
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for k, v in EffectTable do
@@ -460,6 +456,19 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'nuke_scorch_003_albedo', '', 'Albedo', radius * 2, radius * 2, 70, 50, army)
+        end
+        
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
@@ -490,6 +499,23 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
     FxImpactLand = EffectTemplate.TMissileHit01,
     FxImpactProp = EffectTemplate.TMissileHit01,
     FxImpactUnderWater = {},
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'nuke_scorch_003_albedo', '', 'Albedo', radius * 2, radius * 2, 70, 50, army)
+        end
+        
+        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 
     OnExitWater = function(self)
         EmitterProjectile.OnExitWater(self)
