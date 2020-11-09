@@ -442,9 +442,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             self:WaitForAndDestroyManips()
 
             local bp = self:GetBlueprint()
-            if not bp.RackBones then
-                error('Error on rackbones ' .. self.unit.UnitId)
-            end
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
                     for mk, mv in v.MuzzleBones do
