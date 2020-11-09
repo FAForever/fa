@@ -628,7 +628,7 @@ function math.round(num,idp)
         return math.floor(num+.5)
     end
 
-    idp = 10^idp
+    idp = math.pow(10,idp)
     return math.floor(num*idp+.5)/idp
 end
 
