@@ -304,15 +304,7 @@ TShieldLandUnit = Class(ShieldLandUnit) {}
 --------------------------------------------------------------
 --  SHIELD STRUCTURES
 --------------------------------------------------------------
-TShieldStructureUnit = Class(ShieldStructureUnit) {
-    StartBeingBuiltEffects = function(self,builder,layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if builder and EntityCategoryContains(categories.MOBILE, builder) then
-            self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
-        end
-    end,
-}
+TShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 --------------------------------------------------------------
 --  STRUCTURES
