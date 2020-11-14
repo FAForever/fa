@@ -278,7 +278,7 @@ UnitBlueprint {
         BuildTime = 8400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
-        },
+        },	
         MaintenanceConsumptionPerSecondEnergy = 0,
         MaxBuildDistance = 10,
         NaturalProducer = true,
@@ -301,7 +301,7 @@ UnitBlueprint {
 			Name = '<LOC enhancements_0465>Acceleration Field',
 			Radius = 40,
 			Slot = 'Back',
-			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
+			UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE',
 		},
 		AccelerationFieldRemove = {
 			BuildCostEnergy = 1,
