@@ -14,13 +14,13 @@ UEFNukeEffectController01 = Class(NullShell) {
         local position = self:GetPosition()
 
         -- Create projectile that controls plume effects
-        local PlumeEffectYOffset = 3
+        local PlumeEffectYOffset = 0
         self:CreateProjectile('/effects/entities/UEFBillyNukeEffect02/UEFBillyNukeEffect02_proj.bp',0,PlumeEffectYOffset,0,0,0,1)
         
         -- Create full-screen glow flash
-        CreateLightParticle(self, -1, self.Army, 14, 2, 'glow_02', 'ramp_red_02')
+        CreateLightParticle(self, -1, self.Army, 20, 2, 'glow_02', 'ramp_red_02')
         WaitSeconds(0.25)
-        CreateLightParticle(self, -1, self.Army, 20, 5, 'glow_03', 'ramp_fire_06')
+        CreateLightParticle(self, -1, self.Army, 40, 10, 'glow_03', 'ramp_fire_06')
 
         -- Create initial fireball dome effect
         local FireballDomeYOffset = -5
