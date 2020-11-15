@@ -304,6 +304,22 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 
@@ -350,6 +366,33 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.TLaserHitUnit02,
     FxImpactLand = EffectTemplate.TLaserHitLand02,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            if radius > 0 then -- OC
+                local rotation2 = RandomFloat(0,2*math.pi)
+                
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
+                CreateDecal(pos, rotation2, 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
+            else
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+            end
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 --------------------------------------------------------------------------
@@ -757,6 +800,22 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
     PolyTrail = EffectTemplate.TIonizedPlasmaGatlingCannonPolyTrail,
     FxImpactProjectile = {},
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 3, 3, 100, 30, army)
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 
@@ -772,6 +831,23 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
     FxImpactUnderWater = {},
     FxTrails = EffectTemplate.THeavyPlasmaGatlingCannonFxTrails,
     PolyTrail = EffectTemplate.THeavyPlasmaGatlingCannonPolyTrail,
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 70, 30, army)
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 
