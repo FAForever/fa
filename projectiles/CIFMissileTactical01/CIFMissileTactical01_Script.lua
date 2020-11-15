@@ -1,8 +1,9 @@
-#
-# Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile,
-# lower and straighter trajectory. Splits into child projectile if it takes enough
-# damage.
-#
+--
+-- URL0111 : cybran MML
+-- Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile, lower and straighter trajectory. 
+-- Splits into child projectile if it takes enough damage.
+--
+
 local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
 
 CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
@@ -36,7 +37,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         	self.Distance = self:GetDistanceToTarget()
         end
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
@@ -70,7 +71,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local army = self:GetArmy()
         CreateLightParticle( self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11' ) 
-        #if I collide with terrain dont split
+        -- if I collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
@@ -84,9 +85,9 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
             local velocity = 10
             local ChildProjectileBP = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp'
             local angle = (2*math.pi) / self.NumChildMissiles
-            local spreadMul = 1  # Adjusts the width of the dispersal        
+            local spreadMul = 1  -- Adjusts the width of the dispersal        
 
-            # Launch projectiles at semi-random angles away from split location
+            -- Launch projectiles at semi-random angles away from split location
             for i = 0, (self.NumChildMissiles - 1) do
                 local xVec = vx + math.sin(i*angle) * spreadMul
                 local yVec = vy + math.cos(i*angle) * spreadMul
