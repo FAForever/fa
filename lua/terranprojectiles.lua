@@ -26,7 +26,6 @@ local util = import('utilities.lua')
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-
 TFragmentationGrenade= Class(EmitterProjectile) {
     FxImpactUnit = EffectTemplate.THeavyFragmentationGrenadeUnitHit,
     FxImpactLand = EffectTemplate.THeavyFragmentationGrenadeHit,
@@ -222,7 +221,6 @@ TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         if self.DamageData.DamageRadius > 0 then
             if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-                local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
                 local rotation = RandomFloat(0,2*math.pi)
                 local pos = self:GetPosition()
                 local radius = self.DamageData.DamageRadius
@@ -248,7 +246,6 @@ TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES03
     OnImpact = function(self, targetType, targetEntity)
         if self.DamageData.DamageRadius > 0 then
             if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-                local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
                 local rotation = RandomFloat(0,2*math.pi)
                 local pos = self:GetPosition()
                 local radius = self.DamageData.DamageRadius
@@ -276,7 +273,6 @@ TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- fatbo
     OnImpact = function(self, targetType, targetEntity)
         if self.DamageData.DamageRadius > 0 then
             if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-                local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
                 local rotation = RandomFloat(0,2*math.pi)
                 local pos = self:GetPosition()
                 local radius = self.DamageData.DamageRadius
@@ -307,7 +303,6 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local army = self.Army
@@ -369,7 +364,6 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
@@ -500,7 +494,6 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
@@ -545,7 +538,6 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
@@ -803,7 +795,6 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local army = self.Army
@@ -834,7 +825,6 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
