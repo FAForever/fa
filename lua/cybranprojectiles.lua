@@ -117,6 +117,22 @@ CDFProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CProtonCannonHit01,
     FxTrailOffset = 0,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 250, 50, army)
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 ---- XRL0403 experimental crab heavy proton cannon
@@ -146,7 +162,7 @@ CDFHvyProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+2, radius+2, 250, 70, army)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+2, radius+2, 400, 70, army)
         end
         
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
