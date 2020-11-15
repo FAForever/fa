@@ -1,6 +1,7 @@
 --
 -- Terran CDR Nuke
 --
+
 local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
 
 TIFMissileNukeCDR = Class(TIFMissileNuke) {
@@ -20,13 +21,15 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE, TargetEntity) then
+        if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_TWO, TargetEntity) then
             self:Destroy()
         else
+
             TIFMissileNuke.OnImpact(self, TargetType, TargetEntity)
         end
     end,
 
+    
     -- Tactical nuke has different flight path
     MovementThread = function(self)
         local target = self:GetTrackingTarget()
