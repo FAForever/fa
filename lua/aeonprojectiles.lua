@@ -25,6 +25,7 @@ local DefaultExplosion = import('defaultexplosions.lua')
 local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 --------------------------------------------------------------------------
 --  AEON ANTI-NUKE PROJECTILES
@@ -113,7 +114,6 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
@@ -455,7 +455,6 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
@@ -550,7 +549,6 @@ AOblivionCannonProjectile03 = Class(EmitterProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
