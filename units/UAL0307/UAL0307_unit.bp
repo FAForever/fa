@@ -56,7 +56,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDEFENSE',
         'DUMMYGSRWEAPON',
-        'DIESTOOCDEPLETINGSHIELD',
     },
     Defense = {
         AirThreatLevel = 0,

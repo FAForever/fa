@@ -7,7 +7,7 @@ UnitBlueprint {
         AutoLandTime = 1,
         BankFactor = 3,
         BankForward = false,
-        BreakOffDistance = 24,
+        BreakOffDistance = 32,
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
@@ -193,9 +193,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 2450,
-        BuildCostMass = 105,
-        BuildTime = 700,
+        BuildCostEnergy = 2050,
+        BuildCostMass = 90,
+        BuildTime = 500,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -227,6 +227,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        RadarRadius = 42,
         VisionRadius = 32,
     },
     Interface = {

@@ -164,9 +164,9 @@ UnitBlueprint {
         UniformScale = 0.07,
     },
     Economy = {
-        BuildCostEnergy = 420,
-        BuildCostMass = 40,
-        BuildTime = 145,
+        BuildCostEnergy = 580,
+        BuildCostMass = 50,
+        BuildTime = 200,
     },
     Footprint = {
         MaxSlope = 0.25,
