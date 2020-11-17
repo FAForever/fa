@@ -350,7 +350,7 @@ function SpreadAttack()
             --For each unit use its index to select which order from order queue should be that unit's first order, this evens out units between their first orders
             local indexorder = index
             --If there are more units than orders, skip back to start of order queue once last order in order queue is given to a unit and select orders from start of order queue for next unit
-            while (indexorder > endAction)==true do
+            while indexorder > endAction do
                 indexorder = indexorder - endAction
             end
             if indexorder ~= beginAction then
@@ -361,7 +361,7 @@ function SpreadAttack()
             for i = beginAction + 1,endAction do
                 local randomorder = math.random(beginAction + 1,endAction)
                 if randomorder ~= i then
-                    unitOrders[i],unitOrders[randomorder] = unitOrders[randomorder],unitOrders[i]
+                    unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
                 end
             end
 
