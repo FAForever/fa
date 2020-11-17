@@ -331,7 +331,7 @@ UnitBlueprint {
             TurretYawSpeed = 0,
             Turreted = false,
             WeaponCategory = 'Missile',
-            WeaponRepackTimeout = 32.5,
+            WeaponRepackTimeout = 20,
             WeaponUnpackAnimation = '/units/uab2305/uab2305_alaunchsequence.sca',
             WeaponUnpackAnimationRate = 10,
             WeaponUnpacks = true,
