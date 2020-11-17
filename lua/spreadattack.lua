@@ -347,26 +347,19 @@ function SpreadAttack()
                 break
             end
             
-            -- Rearrange the first few mixable orders (equal to the number of targets) so that the targets are uniformly distributed on the first pass.
-            -- For example, 3 units attacking 8 units (? denotes random target):
-            -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
-            -- Unit 2: 2, 5, 8, ?, ?, ?, ?, ?
-            -- Unit 3: 3, 6, ?, ?, ?, ?, ?, ?
-            local unitCount = table.getn(curSelection)
-            local numOrders = endAction - beginAction + 1
-            -- "and 1 or 0" is lua's ugly alternative to the ternary operator. Same as (...) ? 1 : 0
-            local stableTargetNum = math.floor(numOrders / unitCount) + ((math.mod(numOrders, unitCount) >= index) and 1 or 0)
-            for i = 0, stableTargetNum - 1 do
-                -- For if the targets outnumber the units targeting them.
-                local targetBlock = i * unitCount
-                unitOrders[i + beginAction],unitOrders[targetBlock + beginAction + index - 1]
-                        = unitOrders[targetBlock + beginAction + index - 1],unitOrders[i + beginAction]
+            --For each unit use its index to select which order from order queue should be that unit's first order, this evens out units between their first orders
+            local indexorder = index
+            --If there are more units than orders, skip back to start of order queue once last order in order queue is given to a unit and select orders from start of order queue for next unit
+            while (indexorder > endAction)==true do
+                indexorder = indexorder - endAction
             end
-            beginAction = beginAction + stableTargetNum
-
-            -- Randomize the remaining mixable orders.
-            for i = beginAction,endAction do
-                local randomorder = math.random(beginAction,endAction)
+            if indexorder ~= beginAction then
+                unitOrders[indexorder],unitOrders[beginAction] = unitOrders[beginAction],unitOrders[indexorder]
+            end
+			
+            -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
+            for i = beginAction + 1,endAction do
+                local randomorder = math.random(beginAction + 1,endAction)
                 if randomorder ~= i then
                     unitOrders[i],unitOrders[randomorder] = unitOrders[randomorder],unitOrders[i]
                 end
