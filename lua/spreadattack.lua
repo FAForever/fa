@@ -354,12 +354,12 @@ function SpreadAttack()
                 indexorder = indexorder - endAction
             end
             if indexorder ~= beginAction then
-                unitOrders[indexorder],unitOrders[beginAction] = unitOrders[beginAction],unitOrders[indexorder]
+                unitOrders[indexorder], unitOrders[beginAction] = unitOrders[beginAction], unitOrders[indexorder]
             end
 			
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
-            for i = beginAction + 1,endAction do
-                local randomorder = math.random(beginAction + 1,endAction)
+            for i = beginAction + 1, endAction do
+                local randomorder = math.random(beginAction + 1, endAction)
                 if randomorder ~= i then
                     unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
                 end
