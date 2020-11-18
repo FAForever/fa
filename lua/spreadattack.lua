@@ -112,7 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
-	ordercount = numOrders
+	ordercount = numOrders -- Going to need total number of orders to be able start counting backwards from last one
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -316,7 +316,7 @@ function SpreadAttack()
 		action2 = unitOrders[ordercount].CommandType
         while unitOrders[counter].CommandType == action2 do
             endAction = nil
-            -- Search for the first entry of a mixable order.
+            -- Search for the last entry of a mixable order.
             while endAction == nil and unitOrders[counter] ~= nil do
                 for _,v in ipairs(alwaysMix) do
                     if unitOrders[counter].CommandType == v then
@@ -334,7 +334,7 @@ function SpreadAttack()
             end
 
             beginAction = endAction
-            -- Search for the last entry of a mixable order in this series.
+            -- Search for the first entry of a mixable order in last group of them.
             while unitOrders[counter] ~= nil do
                 if unitOrders[counter].CommandType == action and (actionAlwaysMixed or unitOrders[counter].EntityId) then
                     beginAction = counter
