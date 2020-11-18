@@ -349,6 +349,10 @@ function SpreadAttack()
             
             --For each unit use its index to select which order from order queue should be that unit's first order, this evens out units between their first orders
             local indexorder = index
+			-- if this unit has previous non attack order queued before attack orders, add 1 to their index to fix problem when using spread attack on attack orders queued after a move order
+			if unitOrders[beginAction - 1] ~= nil then
+				indexorder = indexorder + 1
+			end
             --If there are more units than orders, skip back to start of order queue once last order in order queue is given to a unit and select orders from start of order queue for next unit
             while indexorder > endAction do
                 indexorder = indexorder - endAction
@@ -364,6 +368,12 @@ function SpreadAttack()
                     unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
                 end
             end
+			
+			if indexorder == 1 then -- If index of this unit is multiple of number of orders or is first unit (the units effected by incorrectly switched move and attack orders)
+				if unitOrders[beginAction - 1] ~= nil then -- If this unit has order before attack orders (to exclude units that only have attack orders and no previous move orders)
+					unitOrders[beginAction], unitOrders[beginAction - 1] = unitOrders[beginAction - 1], unitOrders[beginAction] -- switch incorrectly given first order (attack order) with move order
+				end
+			end
 
             -- Repeat this loop and search for more mixable order series.
         end
