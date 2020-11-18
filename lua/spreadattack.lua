@@ -112,6 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
+	ordercount = numOrders
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -309,41 +310,42 @@ function SpreadAttack()
         end
     
         -- Find all consecutive mixable orders, and only mix those.
-        local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,1,false
+        local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,ordercount,false
         local alwaysMix = {"Attack", "Nuke", "Tactical"}
 
-        while unitOrders[counter] ~= nil  do
-            beginAction = nil
+		action2 = unitOrders[ordercount].CommandType
+        while unitOrders[counter].CommandType == action2 do
+            endAction = nil
             -- Search for the first entry of a mixable order.
-            while beginAction == nil and unitOrders[counter] ~= nil do
+            while endAction == nil and unitOrders[counter] ~= nil do
                 for _,v in ipairs(alwaysMix) do
                     if unitOrders[counter].CommandType == v then
-                        beginAction = counter
+                        endAction = counter
                         action = unitOrders[counter].CommandType
                         actionAlwaysMixed = true
                         break
                     elseif unitOrders[counter].EntityId then
-                        beginAction = counter
+                        endAction = counter
                         action = unitOrders[counter].CommandType
                         actionAlwaysMixed = false
                     end
                 end
-                counter = counter + 1
+                counter = counter - 1
             end
 
-            endAction = beginAction
+            beginAction = endAction
             -- Search for the last entry of a mixable order in this series.
             while unitOrders[counter] ~= nil do
                 if unitOrders[counter].CommandType == action and (actionAlwaysMixed or unitOrders[counter].EntityId) then
-                    endAction = counter
-                    counter = counter + 1
+                    beginAction = counter
+                    counter = counter - 1
                 else
                     break
                 end
             end
             
             -- Skip if there was no mixable order found, or only one order (can't swap one command).
-            if beginAction == nil or endAction == beginAction then
+            if endAction == nil or beginAction == endAction then
                 break
             end
             
@@ -351,12 +353,14 @@ function SpreadAttack()
             local indexorder = beginAction + index
             -- If there are more units than orders, skip back to start of attack order queue once last order in order queue is given to a unit and select orders from start of order queue for next unit
             while indexorder > endAction do
-				indexorder = indexorder - endAction
+                indexorder = indexorder - endAction
 				indexorder = indexorder + beginAction - 1 -- + beginAction to not include all move orders queued prior to attack orders, -1 to not mess up first attack order given by player
             end
+
             if indexorder ~= beginAction then
                 unitOrders[indexorder], unitOrders[beginAction] = unitOrders[beginAction], unitOrders[indexorder]
             end
+			
 			
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
             for i = beginAction + 1, endAction do
