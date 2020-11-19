@@ -153,7 +153,11 @@ ResourceMapPreview = Class(Group) {
                         if v.Position then
                             local marker = self.wreckageIconPool:Get()
                             table.insert(wreckagemarkers, marker)
-                            marker:Show()
+                            if scenarioInfo.hidePreviewMarkers then
+                                marker:Hide()
+                            else
+                                marker:Show()
+                            end
 
                             -- Yes, these ones have a capital Position, but the others have a lowercase.
                             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
@@ -171,7 +175,11 @@ ResourceMapPreview = Class(Group) {
         local masses = {}
         for i = 1, table.getn(massmarkers) do
             masses[i] = self.massIconPool:Get()
-            masses[i]:Show()
+            if scenarioInfo.hidePreviewMarkers then
+                masses[i]:Hide()
+            else
+                masses[i]:Show()
+            end
 
             LayoutHelpers.AtLeftTopIn(masses[i], self.mapPreview,
                 xOffset + (massmarkers[i].position[1] / mWidth) * (self.size * xFactor)  - halfMassIconSize,
@@ -184,7 +192,11 @@ ResourceMapPreview = Class(Group) {
         local halfHydroIconSize = self.hydroIconSize / 2
         for i = 1, table.getn(hydromarkers) do
             hydros[i] = self.hydroIconPool:Get()
-            hydros[i]:Show()
+            if scenarioInfo.hidePreviewMarkers then
+                hydros[i]:Hide()
+            else
+                hydros[i]:Show()
+            end
 
             LayoutHelpers.AtLeftTopIn(hydros[i], self.mapPreview,
                 xOffset + (hydromarkers[i].position[1] / mWidth) * (self.size * xFactor)  - halfHydroIconSize,
@@ -203,7 +215,7 @@ ResourceMapPreview = Class(Group) {
             local slot = inSlot
 
             -- Create an ACUButton for each start position.
-            local marker = ACUButton(self.mapPreview, not self.buttonsDisabled)
+            local marker = ACUButton(self.mapPreview, not self.buttonsDisabled and not scenarioInfo.hidePreviewMarkers)
             local markerWidth = xOffset + ((pos[1] / mWidth) * self.size * xFactor) - (marker.Width() / 2)
             local markerHeight = yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2)
             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview, markerWidth, markerHeight)
@@ -214,6 +226,11 @@ ResourceMapPreview = Class(Group) {
             -- Create Labels above markers to show rating of player or AI names
             self.ratingLabel[slot] = UIUtil.CreateText(self.mapPreview, '', 10, 'Arial Gras', true)
             LayoutHelpers.CenteredAbove(self.ratingLabel[slot], marker, 5)
+
+            if scenarioInfo.hidePreviewMarkers then
+                marker:Hide()
+                self.ratingLabel[slot]:Hide()
+            end
 
             startPositions[slot] = marker
         end
