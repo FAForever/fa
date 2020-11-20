@@ -370,13 +370,13 @@ function SpreadAttack()
 				oposition = unitOrders[i].Position
 				curdis = VDist3Sq(position, oposition)
 				if curdis < closestorderdis then -- If this order is closer than previous order
-					if orderDistribution[i] < (table.getn(curSelection) / (endAction - beginAction + 1)) then -- If this order doesnt already have too many units as their first order
+					if orderDistribution[i - beginAction] < (table.getn(curSelection) / (endAction - beginAction + 1)) then -- If this order doesnt already have too many units as their first order
 						closestorderdis = curdis
 						closestorder = i
 					end
 				end
 			end
-			orderDistribution[closestorder] = orderDistribution[closestorder] + 1 -- Inform unit distribution table that another unit has this order as its first order
+			orderDistribution[closestorder - beginAction] = orderDistribution[closestorder - beginAction] + 1 -- Inform unit distribution table that another unit has this order as its first order
 			unitOrders[beginAction], unitOrders[closestorder] = unitOrders[closestorder], unitOrders[beginAction]
 			
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
