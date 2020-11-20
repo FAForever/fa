@@ -357,10 +357,12 @@ function SpreadAttack()
 			end
 			closestorderdis = 10000000000000000
 			closestorder = beginAction
+			closestorderover = beginAction
+			got_order = 0
 			
 			if created_distribution_table == 0 then -- Create distribution table once, this table tracks how many units each order has as its first order, to distribute them evenly
 				orderDistribution = {}
-				for i = 0, ordercount do
+				for i = 0, ordercount - beginAction do
 					orderDistribution[i] = 0
 				end
 				created_distribution_table = 1
@@ -370,14 +372,22 @@ function SpreadAttack()
 				oposition = unitOrders[i].Position
 				curdis = VDist3Sq(position, oposition)
 				if curdis < closestorderdis then -- If this order is closer than previous order
-					if orderDistribution[i - beginAction] < (table.getn(curSelection) / (endAction - beginAction + 1)) then -- If this order doesnt already have too many units as their first order
+					if orderDistribution[i - beginAction] < math.floor(table.getn(curSelection) / (endAction - beginAction + 1)) then -- If this order doesnt already have too many units as their first order (is not full)
 						closestorderdis = curdis
 						closestorder = i
+						got_order = 1
+					elseif orderDistribution[i - beginAction] < math.floor(table.getn(curSelection) / (endAction - beginAction + 1)) + 1 then -- If this order doesnt have overfill, save it as potential overfill order in case no order is received normally
+						closestorderover = i
 					end
 				end
 			end
-			orderDistribution[closestorder - beginAction] = orderDistribution[closestorder - beginAction] + 1 -- Inform unit distribution table that another unit has this order as its first order
-			unitOrders[beginAction], unitOrders[closestorder] = unitOrders[closestorder], unitOrders[beginAction]
+			if got_order == 1 then -- if order was received normally (at least one was not full), pick closest that was not full
+				orderDistribution[closestorder - beginAction] = orderDistribution[closestorder - beginAction] + 1 -- Inform unit distribution table that this order has another unit as its first order
+				unitOrders[beginAction], unitOrders[closestorder] = unitOrders[closestorder], unitOrders[beginAction]
+			else -- if order was not received (all orders were full), pick closest without overfill unit
+				orderDistribution[closestorderover - beginAction] = orderDistribution[closestorderover - beginAction] + 1 -- Inform unit distribution table that this order is overfilled
+				unitOrders[beginAction], unitOrders[closestorderover] = unitOrders[closestorderover], unitOrders[beginAction]
+			end
 			
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
             for i = beginAction + 1, endAction do
