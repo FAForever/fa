@@ -299,6 +299,8 @@ function SpreadAttack()
         return
     end
 
+	created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
+
     -- Switch the orders for each unit.
     for index,unit in ipairs(curSelection) do
         FixOrders(unit)
@@ -334,7 +336,7 @@ function SpreadAttack()
             end
 
             beginAction = endAction
-            -- Search for the first entry of a mixable order in last group of them.
+            -- Search for the first entry of a mixable order in this group of orders.
             while unitOrders[counter] ~= nil do
                 if unitOrders[counter].CommandType == action and (actionAlwaysMixed or unitOrders[counter].EntityId) then
                     beginAction = counter
@@ -348,19 +350,34 @@ function SpreadAttack()
             if endAction == nil or beginAction == endAction then
                 break
             end
-            
-            -- For each unit use its index to select which order from order queue should be that unit's first order, this evens out units between their first orders
-            local indexorder = beginAction + index
-            -- If there are more units than orders, skip back to start of attack order queue once last order in order queue is given to a unit and select orders from start of order queue for next unit
-            while indexorder > endAction do
-                indexorder = indexorder - endAction
-				indexorder = indexorder + beginAction - 1 -- + beginAction to not include all move orders queued prior to attack orders, -1 to not mess up first attack order given by player
-            end
-
-            if indexorder ~= beginAction then
-                unitOrders[indexorder], unitOrders[beginAction] = unitOrders[beginAction], unitOrders[indexorder]
-            end
 			
+			position = unit:GetPosition()
+			if unitOrders[beginAction - 1] ~= nil then -- If this unit has non attack order queued prior to attack orders, use that order's position to determine closest queued attack order instead
+				position = unitOrders[beginAction - 1].Position
+			end
+			closestorderdis = 10000000000000000
+			closestorder = beginAction
+			
+			if created_distribution_table == 0 then -- Create distribution table once, this table tracks how many units each order has as its first order, to distribute them evenly
+				orderDistribution = {}
+				for i = 0, ordercount do
+					orderDistribution[i] = 0
+				end
+				created_distribution_table = 1
+			end
+			
+			for i = beginAction, endAction do -- Find closest order that doesnt already have too many units as their first order
+				oposition = unitOrders[i].Position
+				curdis = VDist3Sq(position, oposition)
+				if curdis < closestorderdis then -- If this order is closer than previous order
+					if orderDistribution[i] < (table.getn(curSelection) / (endAction - beginAction + 1)) then -- If this order doesnt already have too many units as their first order
+						closestorderdis = curdis
+						closestorder = i
+					end
+				end
+			end
+			orderDistribution[closestorder] = orderDistribution[closestorder] + 1 -- Inform unit distribution table that another unit has this order as its first order
+			unitOrders[beginAction], unitOrders[closestorder] = unitOrders[closestorder], unitOrders[beginAction]
 			
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
             for i = beginAction + 1, endAction do
