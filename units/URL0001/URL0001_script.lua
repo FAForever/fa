@@ -287,13 +287,15 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetWeaponEnabledByLabel('MLG', false)
         elseif enh == 'NaniteTorpedoTube' then
             self:SetWeaponEnabledByLabel('Torpedo', true)
-            self:EnableUnitIntel('Enhancement', 'Sonar')
+			self:SetIntelRadius('Sonar', bpIntel.NewSonarRadius or 60)
+            --self:EnableUnitIntel('Enhancement', 'Sonar')
             if self:GetCurrentLayer() == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
             end
         elseif enh == 'NaniteTorpedoTubeRemove' then
             self:SetWeaponEnabledByLabel('Torpedo', false)
-            self:DisableUnitIntel('Enhancement', 'Sonar')
+			self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 0)
+            --self:DisableUnitIntel('Enhancement', 'Sonar')
             if self:GetCurrentLayer() == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
