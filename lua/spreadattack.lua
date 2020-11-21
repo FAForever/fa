@@ -368,20 +368,18 @@ function SpreadAttack()
 					for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
 						cunit = index
 						cunitdis = 1000000000000000000000000
-						found_unit = 0
 						
 						oposition = unitOrders[i].Position
 						for i2 = 1, table.getn(curSelection) do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
-							position = curSelection[i2]:GetPosition()
-							if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
-								position = curSelection[i2].unitOrders[beginAction - 1].Position
-							end
-							cdis = VDist3Sq(position, oposition)
-							if cdis < cunitdis then
-								if orderDistribution[i2] == -1 then -- if unit isnt taken already (doesnt have a first order yet)
-									cunitdis = cdis
-									cunit = i2
-									found_unit = 1
+							if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
+								position = curSelection[i2]:GetPosition()
+								if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
+									position = curSelection[i2].unitOrders[beginAction - 1].Position
+								end
+								cdis = VDist3Sq(position, oposition)
+								if cdis < cunitdis then
+										cunitdis = cdis
+										cunit = i2
 								end
 							end
 						end
