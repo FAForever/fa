@@ -121,7 +121,7 @@ function _OnBeat()
     controls.time:SetText(GetGameTime())
     local scoreData = import('/lua/ui/game/score.lua').currentScores
     if scoreData[GetFocusArmy()].general then
-        SetUnitText(scoreData[GetFocusArmy()].general.currentunits.count, scoreData[GetFocusArmy()].general.currentcap.count)
+        SetUnitText(scoreData[GetFocusArmy()].general.currentunits, scoreData[GetFocusArmy()].general.currentcap)
     end
 end
 
