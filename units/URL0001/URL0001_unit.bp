@@ -702,9 +702,9 @@ UnitBlueprint {
     Intel = {
         ActiveIntel = {
             Omni = true,
-            Sonar = true,
         },
         Cloak = true,
+        Sonar = true,
         FreeIntel = false,
         OmniRadius = 26,
         RadarStealth = true,
