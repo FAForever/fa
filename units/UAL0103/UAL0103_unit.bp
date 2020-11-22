@@ -271,7 +271,7 @@ UnitBlueprint {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
-                '(MOBILE TECH1 + COMMAND)',
+                '(MOBILE * TECH1 + COMMAND)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

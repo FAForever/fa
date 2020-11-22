@@ -1,57 +1,45 @@
 #****************************************************************************
 #**
-#**  File     :  /cdimage/units/ZEB9502/ZEB9502_script.lua
+#**  File     :  /cdimage/units/UEB0102/UEB0102_script.lua
 #**  Author(s):  John Comes, David Tomandl
 #**
-#**  Summary  :  UEF T2 Air Factory Script
+#**  Summary  :  UEF T1 Air Factory Script
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
-
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
-
-ZEB9502 = Class(TAirFactoryUnit) {
-
+UEB0102 = Class(TAirFactoryUnit) {
+    
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider1 then
-            self.ArmSlider1 = CreateSlider(self, 'Arm01')
-            self.Trash:Add(self.ArmSlider1)
+        #local unitBldg = self.UnitBeingBuilt
+        if not self.ArmSlider then
+            self.ArmSlider = CreateSlider(self, 'Arm01')
+            self.Trash:Add(self.ArmSlider)
         end
-        if not self.ArmSlider2 then
-            self.ArmSlider2 = CreateSlider(self, 'Arm02')
-            self.Trash:Add(self.ArmSlider2)
-        end
+        
     end,
 
     MovingArmsThread = function(self)
         TAirFactoryUnit.MovingArmsThread(self)
         while true do
-            if not self.ArmSlider1 then return end
-            if not self.ArmSlider2 then return end
-            self.ArmSlider1:SetGoal(0, -6, 0)
-            self.ArmSlider1:SetSpeed(20)
-            self.ArmSlider2:SetGoal(0, 6, 0)
-            self.ArmSlider2:SetSpeed(20)
-            WaitFor(self.ArmSlider2)
-            self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(20)
-            self.ArmSlider2:SetGoal(0, 0, 0)
-            self.ArmSlider2:SetSpeed(20)
-            WaitFor(self.ArmSlider2)
+            if not self.ArmSlider then return end
+            self.ArmSlider:SetGoal(0, 6, 0)
+            self.ArmSlider:SetSpeed(20)
+            WaitFor(self.ArmSlider)
+            self.ArmSlider:SetGoal(0, -6, 0)
+            WaitFor(self.ArmSlider)
         end
     end,
-
+    
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetGoal(0, 0, 0)
-        self.ArmSlider2:SetSpeed(40)
+        if not self.ArmSlider then return end
+        self.ArmSlider:SetGoal(0, 0, 0)
+        self.ArmSlider:SetSpeed(40)
     end,
+
 
 --Overwrite FinishBuildThread to speed up platform lowering rate
 
@@ -91,4 +79,4 @@ ZEB9502 = Class(TAirFactoryUnit) {
     end,
 }
 
-TypeClass = ZEB9502
+TypeClass = UEB0102
