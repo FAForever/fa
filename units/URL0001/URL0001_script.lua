@@ -286,13 +286,17 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
             self:SetWeaponEnabledByLabel('MLG', false)
         elseif enh == 'NaniteTorpedoTube' then
+            local bp = self:GetBlueprint().Enhancements[enh]
             self:SetWeaponEnabledByLabel('Torpedo', true)
+            self:SetIntelRadius('Sonar', bp.NewSonarVision or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
             if self:GetCurrentLayer() == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
             end
         elseif enh == 'NaniteTorpedoTubeRemove' then
+            local bpIntel = self:GetBlueprint().Intel
             self:SetWeaponEnabledByLabel('Torpedo', false)
+            self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
             self:DisableUnitIntel('Enhancement', 'Sonar')
             if self:GetCurrentLayer() == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
