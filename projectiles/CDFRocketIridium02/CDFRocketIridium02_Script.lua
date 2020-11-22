@@ -3,14 +3,12 @@
 --  File     :  /data/projectiles/CDFRocketIridium02/CDFRocketIridium02_script.lua
 --  Author(s):  Matt Vainio
 --
---  Summary  :  Cybran Iridium Rocket Tubes, DRL0204
+--  Summary  :  Cybran Iridium Rocket Tubes, DRL0204 : cyb T2 range bot (hoplite)
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 local CIridiumRocketProjectile = import('/lua/cybranprojectiles.lua').CIridiumRocketProjectile
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
-local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 
 CDFRocketIridium02 = Class(CIridiumRocketProjectile) {
     OnImpact = function(self, targetType, targetEntity)
@@ -28,7 +26,7 @@ CDFRocketIridium02 = Class(CIridiumRocketProjectile) {
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 100, 50, army)
         end
         
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+        CIridiumRocketProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 

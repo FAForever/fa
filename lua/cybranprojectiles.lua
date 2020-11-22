@@ -359,7 +359,7 @@ CDFTrackerProjectile = Class(SingleCompositeEmitterProjectile) {
 --------------------------------------------------------------------------
 --  DISINTEGRATOR LASER PROJECILE
 --------------------------------------------------------------------------
-CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) {
+CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & wailers
     PolyTrails = {
         '/effects/emitters/disintegrator_polytrail_04_emit.bp',
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
@@ -374,6 +374,23 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactLand = EffectTemplate.CDisintegratorHitLand01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 -- adjusments for URA0104 to tone down effect
@@ -396,7 +413,7 @@ CDisintegratorLaserProjectile02 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN ELECTRON BOLTER PROJECILES
 --------------------------------------------------------------------------
-CElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
+CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya
 
     PolyTrails = {
         '/effects/emitters/electron_bolter_trail_02_emit.bp',
@@ -409,9 +426,26 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactLand = EffectTemplate.CElectronBolterHitLand01,
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
-CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
+CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
 
     PolyTrails = {
         '/effects/emitters/electron_bolter_trail_01_emit.bp',
@@ -530,7 +564,7 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  IRIDIUM ROCKET PROJECTILES
 --------------------------------------------------------------------------
-CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) {
+CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) { -- T2 gs & SR & hoplite
     FxTrails = {},
     PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
@@ -551,11 +585,6 @@ CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) {
                 DamageArea(self, pos, 1, 1, 'Force', true)
             
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 250, 50, army)
-            else
-                DamageArea(self, pos, radius, 1, 'Force', true)
-                DamageArea(self, pos, radius, 1, 'Force', true)
-            
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 250, 50, army)
             end
         end
         
@@ -641,7 +670,7 @@ CHeavyLaserProjectile2 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN MOLECULAR CANNON PROJECTILE
 --------------------------------------------------------------------------
-CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) {
+CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     FxImpactTrajectoryAligned = false,
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     FxTrails = EffectTemplate.CMolecularCannon01,
@@ -650,6 +679,25 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.CMolecularRipperHit01,
     FxImpactProp = EffectTemplate.CMolecularRipperHit01,
     FxImpactLand = EffectTemplate.CMolecularRipperHit01,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            if radius == 0 then
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+            end
+        end
+
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 --------------------------------------------------------------------------
@@ -1025,7 +1073,7 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 --
 --------------------------------------------------------------------------
 
-CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) {
+CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
     PolyTrails = {
         '/effects/emitters/disintegrator_polytrail_02_emit.bp',
         '/effects/emitters/disintegrator_polytrail_03_emit.bp',
@@ -1040,6 +1088,23 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
     FxTrails = {},
     FxTrailOffset = 0,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1.5, 1.5, 70, 20, army)
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 
