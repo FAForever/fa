@@ -8,7 +8,6 @@
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
-local ADFChronoDampener = AWeapons.ADFChronoDampener
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -16,8 +15,7 @@ local Buff = import('/lua/sim/Buff.lua')
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
-        ChronoDampener = Class(ADFChronoDampener) {},
-		DeathWeapon = Class(SCUDeathWeapon) {},
+        DeathWeapon = Class(SCUDeathWeapon) {},
     },
 
     __init = function(self)
@@ -28,8 +26,7 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('ChronoDampener', false)
-		self:SetWeaponEnabledByLabel('RightReactonCannon', true)
+        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
@@ -41,7 +38,6 @@ UAL0301 = Class(CommandUnit) {
         self:SetCapturable(false)
         self:HideBone('Turbine', true)
         self:SetupBuildBones()
-		self:SetWeaponEnabledByLabel('ChronoDampener', false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
@@ -57,31 +53,7 @@ UAL0301 = Class(CommandUnit) {
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        -- ChronoDampener
-        elseif enh == 'ChronoDampener' then
-            self:SetWeaponEnabledByLabel('ChronoDampener', true)
-            if not Buffs['AeonSACUChronoDampener'] then
-				BuffBlueprint {
-					Name = 'AeonSACUChronoDampener',
-					DisplayName = 'AeonSACUChronoDampener',
-					BuffType = 'DamageStabilization',
-					Stacks = 'REPLACE',
-					Duration = -1,
-					Affects = {
-						MaxHealth = {
-							Add = bp.NewHealth,
-							Mult = 1.0,
-						},
-					},
-				}
-			end
-			Buff.ApplyBuff(self, 'AeonSACUChronoDampener')
-		elseif enh == 'ChronoDampenerRemove' then
-		    if Buff.HasBuff(self, 'AeonSACUChronoDampener') then
-				Buff.RemoveBuff(self, 'AeonSACUChronoDampener')
-			end
-			self:SetWeaponEnabledByLabel('ChronoDampener', false)
-		-- Shields
+        -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -110,8 +82,7 @@ UAL0301 = Class(CommandUnit) {
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         -- Engineering Focus Module
         elseif enh =='EngineeringFocusingModule' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
-			if not Buffs['AeonSCUBuildRate'] then
+            if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonSCUBuildRate',
                     DisplayName = 'AeonSCUBuildRate',
@@ -128,35 +99,48 @@ UAL0301 = Class(CommandUnit) {
             end
             Buff.ApplyBuff(self, 'AeonSCUBuildRate')
         elseif enh == 'EngineeringFocusingModuleRemove' then
-			self:RemoveCommandCap('RULEUCC_Sacrifice')
             if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
-        -- GunRange
-        elseif enh =='GunRange' then
+        -- SystemIntegrityCompensator
+        elseif enh == 'SystemIntegrityCompensator' then
+            local name = 'AeonSCURegenRate'
+            if not Buffs[name] then
+                BuffBlueprint {
+                    Name = name,
+                    DisplayName = name,
+                    BuffType = 'SCUREGENRATE',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        Regen = {
+                            Add =  bp.NewRegenRate - self:GetBlueprint().Defense.RegenRate,
+                            Mult = 1,
+                        },
+                    },
+                }
+            end
+            Buff.ApplyBuff(self, name)
+        elseif enh == 'SystemIntegrityCompensatorRemove' then
+            if Buff.HasBuff(self, 'AeonSCURegenRate') then
+                Buff.RemoveBuff(self, 'AeonSCURegenRate')
+            end
+        -- Sacrifice
+        elseif enh == 'Sacrifice' then
+            self:AddCommandCap('RULEUCC_Sacrifice')
+        elseif enh == 'SacrificeRemove' then
+            self:RemoveCommandCap('RULEUCC_Sacrifice')
+        -- StabilitySupressant
+        elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
-        elseif enh =='GunRangeRemove' then
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-		-- GunAoe
-        elseif enh =='GunAoe' then
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 0)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-        elseif enh =='GunAoeRemove' then
-            local bp = self:GetBlueprint().Enhancements['GunAoe']
-            if not bp then return end
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+        elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageRadiusMod(-bp.NewDamageRadiusMod)
-        -- GunRange
-        elseif enh =='GunDps' then
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.GunDamageMod)
-        elseif enh =='GunDpsRemove' then
-            local bp = self:GetBlueprint().Enhancements['GunDps']
-            if not bp then return end
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-bp.GunDamageMod)
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end
     end,
 
