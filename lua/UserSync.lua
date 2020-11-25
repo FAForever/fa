@@ -89,7 +89,7 @@ function OnSync()
         GpgNetSend('EnforceRating')
     end
 
-    if not table.empty(Sync.EnhanceMessage) then
+    if Sync.EnhanceMessage and not table.empty(Sync.EnhanceMessage) then
         for _, messageTable in Sync.EnhanceMessage do
             sendEnhancementMessage(messageTable)
         end
