@@ -83,7 +83,7 @@ end
 
 ---
 --  CreateUnitAtMouse
-function CreateUnitAtMouse()
+function CreateUnitAtMouse(string blueprintId, int ownerArmyIndex, float offsetMouseWorldPosX, float offsetMouseWorldPosZ, float rotation)
 end
 
 ---

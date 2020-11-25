@@ -9,9 +9,14 @@
 -- ****************************************************************************
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local DummyWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
 
 UAA0107 = Class(AirTransport) {
-    Weapons = {},
+
+    Weapons = {
+        GuidanceSystem = Class(DummyWeapon) {},
+    },
+
 }
 
 TypeClass = UAA0107

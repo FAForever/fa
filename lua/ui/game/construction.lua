@@ -1060,6 +1060,7 @@ function StratIconReplacement(control)
 
         if iconConversion and DiskGetFileInfo('/textures/ui/icons_strategic/' .. iconConversion .. '.dds') then
             control.StratIcon:SetTexture('/textures/ui/icons_strategic/' .. iconConversion .. '.dds')
+            LayoutHelpers.SetDimensions(control.StratIcon, control.StratIcon.BitmapWidth(), control.StratIcon.BitmapHeight())
             LayoutHelpers.AtTopIn(control.StratIcon, control.Icon, 1)
             LayoutHelpers.AtRightIn(control.StratIcon, control.Icon, 1)
             LayoutHelpers.ResetBottom(control.StratIcon)
