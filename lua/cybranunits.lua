@@ -306,7 +306,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
             pos[1], pos[2], pos[3],
             0, 0, 0
         )
-        ForkThread(function()
+        self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)
                 self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)

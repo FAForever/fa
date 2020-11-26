@@ -109,6 +109,22 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactProp = EffectTemplate.ABombHit01,
     FxImpactLand = EffectTemplate.ABombHit01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+1, radius+1, 150, 30, army)
+        end
+        
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 #------------------------------------------------------------------------
@@ -601,13 +617,15 @@ AQuarkBombProjectile = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle(self, -1, self.Army, 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
 
-        if targetType == 'Terrain' or targetType == 'Prop' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+
             DefaultExplosion.CreateScorchMarkSplat(self, 3)
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
-            DamageRing(self, pos, 0.1, self.DamageData.DamageRadius, 10, 'Fire', false, false)
-            DamageArea(self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true)
-            DamageArea(self, pos, self.DamageData.DamageRadius - 1, 1, 'Force', true)
+            DamageRing(self, pos, 0.1, radius, 10, 'Fire', false, false)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
         end
 
         EmitterProjectile.OnImpact(self, targetType, targetEntity)

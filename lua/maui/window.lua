@@ -72,19 +72,19 @@ styles = {}
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, 'window')
-        
+
         self:DisableHitTest()
-        
+
         self._resizeGroup = Group(parent, 'window resize group')
         LayoutHelpers.FillParent(self._resizeGroup, self)
         self._resizeGroup.Depth:Set(function() return self.Depth() + 100 end)
         self._resizeGroup:DisableHitTest()
         self._pref = prefID
-        
+
         self._windowGroup = Group(self, 'window texture group')
         LayoutHelpers.FillParent(self._windowGroup, self)
         self._windowGroup:DisableHitTest()
-        
+
         self.tl = Bitmap(self._resizeGroup)
         self.tr = Bitmap(self._resizeGroup)
         self.bl = Bitmap(self._resizeGroup)
@@ -93,7 +93,7 @@ Window = Class(Group) {
         self.bm = Bitmap(self._resizeGroup)
         self.ml = Bitmap(self._resizeGroup)
         self.mr = Bitmap(self._resizeGroup)
-        
+
         self._borderSize = 5
         self._cornerSize = 8
         self._sizeLock = false
@@ -101,9 +101,9 @@ Window = Class(Group) {
         self._lockSize = lockSize or false
         self._xMin = 0
         self._yMin = 0
-        
+
         --Set alpha of resize controls to 0 so that they still get resize events, but are not seen
-        
+
         self.tl:SetAlpha(0)
         self.tr:SetAlpha(0)
         self.bl:SetAlpha(0)
@@ -112,47 +112,47 @@ Window = Class(Group) {
         self.bm:SetAlpha(0)
         self.ml:SetAlpha(0)
         self.mr:SetAlpha(0)
-        
+
         self.tl.Height:Set(self._cornerSize)
         self.tl.Width:Set(self._cornerSize)
         self.tl.Top:Set(self.Top)
         self.tl.Left:Set(self.Left)
-        
+
         self.tr.Height:Set(self._cornerSize)
         self.tr.Width:Set(self._cornerSize)
         self.tr.Top:Set(self.Top)
         self.tr.Right:Set(self.Right)
-        
+
         self.bl.Height:Set(self._cornerSize)
         self.bl.Width:Set(self._cornerSize)
         self.bl.Bottom:Set(self.Bottom)
         self.bl.Left:Set(self.Left)
-        
+
         self.br.Height:Set(self._cornerSize)
         self.br.Width:Set(self._cornerSize)
         self.br.Bottom:Set(self.Bottom)
         self.br.Right:Set(self.Right)
-        
+
         self.tm.Height:Set(self._borderSize)
         self.tm.Left:Set(self.tl.Right)
         self.tm.Right:Set(self.tr.Left)
         self.tm.Top:Set(self.tl.Top)
-        
+
         self.bm.Height:Set(self._borderSize)
         self.bm.Left:Set(self.bl.Right)
         self.bm.Right:Set(self.br.Left)
         self.bm.Top:Set(self.bl.Top)
-        
+
         self.ml.Width:Set(self._borderSize)
         self.ml.Left:Set(self.tl.Left)
         self.ml.Top:Set(self.tl.Bottom)
         self.ml.Bottom:Set(self.bl.Top)
-        
+
         self.mr.Width:Set(self._borderSize)
         self.mr.Right:Set(self.tr.Right)
         self.mr.Top:Set(self.tr.Bottom)
         self.mr.Bottom:Set(self.br.Top)
-        
+
         local texturekey = 'notitle'
         if textureTable then
             texturekey = prefID
@@ -160,7 +160,7 @@ Window = Class(Group) {
         elseif title then
             texturekey = 'title'
         end
-        
+
         self.tl:SetSolidColor(styles.backgrounds[texturekey].borderColor)
         self.tr:SetSolidColor(styles.backgrounds[texturekey].borderColor)
         self.bl:SetSolidColor(styles.backgrounds[texturekey].borderColor)
@@ -169,7 +169,7 @@ Window = Class(Group) {
         self.bm:SetSolidColor(styles.backgrounds[texturekey].borderColor)
         self.ml:SetSolidColor(styles.backgrounds[texturekey].borderColor)
         self.mr:SetSolidColor(styles.backgrounds[texturekey].borderColor)
-        
+
         self.window_tl = Bitmap(self._windowGroup, styles.backgrounds[texturekey].tl)
         self.window_tr = Bitmap(self._windowGroup, styles.backgrounds[texturekey].tr)
         self.window_tm = Bitmap(self._windowGroup, styles.backgrounds[texturekey].tm)
@@ -179,52 +179,52 @@ Window = Class(Group) {
         self.window_bl = Bitmap(self._windowGroup, styles.backgrounds[texturekey].bl)
         self.window_bm = Bitmap(self._windowGroup, styles.backgrounds[texturekey].bm)
         self.window_br = Bitmap(self._windowGroup, styles.backgrounds[texturekey].br)
-        
+
         self.window_tl.Top:Set(self.Top)
         self.window_tl.Left:Set(self.Left)
-        
+
         self.window_tr.Top:Set(self.Top)
         self.window_tr.Right:Set(self.Right)
-        
+
         self.window_bl.Bottom:Set(self.Bottom)
         self.window_bl.Left:Set(self.Left)
-        
+
         self.window_br.Bottom:Set(self.Bottom)
         self.window_br.Right:Set(self.Right)
-        
+
         self.window_tm.Left:Set(self.window_tl.Right)
         self.window_tm.Right:Set(self.window_tr.Left)
         self.window_tm.Top:Set(self.window_tl.Top)
-        
+
         self.window_bm.Left:Set(self.window_bl.Right)
         self.window_bm.Right:Set(self.window_br.Left)
         self.window_bm.Top:Set(self.window_bl.Top)
-        
+
         self.window_ml.Left:Set(self.window_tl.Left)
         self.window_ml.Top:Set(self.window_tl.Bottom)
         self.window_ml.Bottom:Set(self.window_bl.Top)
-        
+
         self.window_mr.Right:Set(self.window_tr.Right)
         self.window_mr.Top:Set(self.window_tr.Bottom)
         self.window_mr.Bottom:Set(self.window_br.Top)
-        
+
         self.window_m.Top:Set(self.window_tm.Bottom)
         self.window_m.Left:Set(self.window_ml.Right)
         self.window_m.Right:Set(self.window_mr.Left)
         self.window_m.Bottom:Set(self.window_bm.Top)
-        
+
         self.TitleGroup = Group(self, 'window title group')
         self.TitleGroup.Top:Set(self.tm.Top)
         self.TitleGroup.Left:Set(self.tl.Left)
         self.TitleGroup.Right:Set(self.tr.Right)
         self.TitleGroup.Height:Set(30)
         self.TitleGroup.Depth:Set(function() return self._windowGroup.Depth() + 2 end)
-        
+
         if icon then
             self._titleIcon = Bitmap(self.TitleGroup, icon)
             LayoutHelpers.AtLeftTopIn(self._titleIcon, self.TitleGroup, 2, 2)
         end
-        
+
         self._title = Text(self.TitleGroup)
         if title then
             self._title:SetFont(styles.title.font, styles.title.size)
@@ -237,17 +237,17 @@ Window = Class(Group) {
         else
             LayoutHelpers.AtLeftTopIn(self._title, self.TitleGroup, 20, 7)
         end
-        
-        self._closeBtn = Button(self.TitleGroup, 
-            styles.closeButton.up, 
-            styles.closeButton.down, 
-            styles.closeButton.over, 
+
+        self._closeBtn = Button(self.TitleGroup,
+            styles.closeButton.up,
+            styles.closeButton.down,
+            styles.closeButton.over,
             styles.closeButton.dis)
         LayoutHelpers.AtRightTopIn(self._closeBtn, self.TitleGroup, 10, 5)
         self._closeBtn.OnClick = function(control)
             self:OnClose(control)
         end
-        
+
         if pin then
             self._pinBtn = Checkbox(self.TitleGroup,
                 styles.pinButton.up,
@@ -261,7 +261,7 @@ Window = Class(Group) {
                 self:OnPinCheck(checked)
             end
         end
-        
+
         if config then
             self._configBtn = Button(self.TitleGroup,
                 styles.configButton.up,
@@ -277,7 +277,7 @@ Window = Class(Group) {
                 self:OnConfigClick()
             end
         end
-        
+
         self.ClientGroup = Group(self, 'window client group')
         self.ClientGroup.Top:Set(self.TitleGroup.Bottom)
         self.ClientGroup.Left:Set(self.ml.Right)
@@ -286,7 +286,7 @@ Window = Class(Group) {
         self.ClientGroup.Right:Set(self.mr.Left)
         self.ClientGroup.Bottom:Set(self.bm.Top)
         self.ClientGroup.Depth:Set(function() return self.window_m.Depth() + 1 end)
-        
+
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()
             local x_max = true
@@ -309,7 +309,7 @@ Window = Class(Group) {
                     xControl:Set(newX)
                 end
                 if yControl then
-                    local newY 
+                    local newY
                     if y_max then
                         newY = math.min(math.max(y, self.Top() + self._yMin), parent.Bottom())
                         newY = math.max(newY, self.Top() + self.window_bm.Height() + self.window_tm.Height())
@@ -338,7 +338,7 @@ Window = Class(Group) {
             end
             PostDragger(self:GetRootFrame(), event.KeyCode, drag)
         end
-                
+
         self.RolloverHandler = function(control, event, xControl, yControl, cursor, controlID)
             if self._lockSize then return end
             if not self._sizeLock then
@@ -353,7 +353,7 @@ Window = Class(Group) {
                 end
             end
         end
-        
+
         self.br.HandleEvent = function(control, event)
             self.RolloverHandler(control, event, self.Right, self.Bottom, 'NW_SE', 'br')
         end
@@ -378,7 +378,7 @@ Window = Class(Group) {
         self.ml.HandleEvent = function(control, event)
             self.RolloverHandler(control, event, self.Left, nil, 'W_E', 'ml')
         end
-        
+
         self.TitleGroup.HandleEvent = function(control, event)
             if not self._sizeLock then
                 if event.Type == 'ButtonPress' then
@@ -417,7 +417,7 @@ Window = Class(Group) {
                 end
             end
         end
-        
+
         self.HandleEvent = function(control, event)
             if event.Type == 'WheelRotation' then
                 self:OnMouseWheel(event.WheelRotation)
@@ -427,13 +427,13 @@ Window = Class(Group) {
             control._resizeGroup:SetHidden(hidden)
             control:OnHideWindow(control, hidden)
         end
-        
+
         local OldHeightOnDirty = parent.Height.OnDirty
         local OldWidthOnDirty = parent.Width.OnDirty
         parent.Height.OnDirty = function(var)
             if self.Bottom() > parent.Bottom() then
                 local Height = math.min(self.Height(), parent.Height())
-                self.Bottom:Set(parent.Bottom)
+                self.Bottom:Set(parent.Bottom())
                 self.Top:Set(self.Bottom() - Height)
             end
             if OldHeightOnDirty then
@@ -444,7 +444,7 @@ Window = Class(Group) {
         parent.Width.OnDirty = function(var)
             if self.Right() > parent.Right() then
                 local Width = math.min(self.Width(), parent.Width())
-                self.Right:Set(parent.Right)
+                self.Right:Set(parent.Right())
                 self.Left:Set(self.Right() - Width)
             end
             if OldWidthOnDirty then
@@ -452,7 +452,7 @@ Window = Class(Group) {
             end
             self:SaveWindowLocation()
         end
-        
+
         local location = Prefs.GetFromCurrentProfile(prefID)
         if location then
             local oldHeight = location.bottom - location.top
@@ -482,13 +482,13 @@ Window = Class(Group) {
             end
         end
     end,
-    
+
     SaveWindowLocation = function(self)
         if self._pref then
             Prefs.SetToCurrentProfile(self._pref, {top = self.Top(), left = self.Left(), right = self.Right(), bottom = self.Bottom()})
         end
     end,
-    
+
     ApplyWindowTextures = function(self, textures)
         self.window_tl:SetTexture(textures.tl)
         self.window_tr:SetTexture(textures.tr)
@@ -500,32 +500,32 @@ Window = Class(Group) {
         self.window_bm:SetTexture(textures.bm)
         self.window_br:SetTexture(textures.br)
     end,
-    
+
     GetClientGroup = function(self)
         return self.ClientGroup
     end,
-    
+
     SetSizeLock = function(control, locked)
         self._lockSize(locked)
     end,
-    
+
     SetPositionLock = function(control, locked)
         self._lockPosition(locked)
     end,
-    
+
     SetMinimumResize = function(control, xDimension, yDimension)
         control._xMin = LayoutHelpers.ScaleNumber(xDimension) or 0
         control._yMin = LayoutHelpers.ScaleNumber(yDimension) or 0
     end,
-    
+
     SetWindowAlpha = function(control, alpha)
         control._windowGroup:SetAlpha(alpha, true)
     end,
-    
+
     SetTitle = function(control,text)
         control._title:SetText(LOC(text))
     end,
-    
+
     IsPinned = function(control)
         if control._pinBtn then
             return control._pinBtn:IsChecked()
@@ -533,7 +533,7 @@ Window = Class(Group) {
             return false
         end
     end,
-        
+
     OnDestroy = function(control)
         control._resizeGroup:Destroy()
     end,
@@ -541,15 +541,15 @@ Window = Class(Group) {
     -- The following are functions that can be overloaded
     OnResize = function(control, x, y, firstFrame) end,
     OnResizeSet = function(control) end,
-    
+
     OnMove = function(control, x, y, firstFrame) end,
     OnMoveSet = function(control) end,
-    
+
     OnPinCheck = function(control, checked) end,
     OnConfigClick = function(control) end,
-    
+
     OnMouseWheel = function(control, rotation) end,
-    
+
     OnClose = function(control) end,
     OnHideWindow = function(control, hidden) end,
 }

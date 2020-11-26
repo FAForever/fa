@@ -121,6 +121,15 @@ UnitBlueprint {
             {
                 Animation = '/units/url0402/url0402_A005.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = 0.25,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 2.25,
+                    SizeX = 2.8,
+                    SizeY = 2.8,
+                    SizeZ = 4,
+                },
             },
         },
         AnimationWalk = '/units/url0402/url0402_a001.sca',

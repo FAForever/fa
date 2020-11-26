@@ -8122,7 +8122,7 @@ xss0303_help="Flugzeugträger"
 xss0303_name="Iavish"
 xss0304_desc="U-Boot-Jäger"
 xss0304_help="U-Boot-Jäger"
-xss0304_name="112233"
+xss0304_name="Yathsou"
 
 loadingtip_0000="Kurzhinweis"
 loadingtip_0001="Mindestens ein Energiespeicher und 5000 Energie sind erforderlich um die Überladung Funktion der Kommandoeinheit zu nutzen"
