@@ -559,7 +559,7 @@ StructureUnit = Class(Unit) {
                 return
             end
         end
-        self:ForkThread(EffectUtil.CreateAdjacencyBeams, adjacentUnit, self.AdjacencyBeamsBag)
+        EffectUtil.CreateAdjacencyBeams(self, adjacentUnit, self.AdjacencyBeamsBag)
     end,
 
     DestroyAdjacentEffects = function(self, adjacentUnit)
