@@ -53,7 +53,6 @@ gamePatches = {
             '       - Air scout',
             '           - Power Cost: 420 → 580',
             '           - Build Time: 145 → 200',
-                
             '- Air',
             '   - Tech 1 Air',
             '       - T1 bomber',
@@ -104,7 +103,7 @@ gamePatches = {
             '   - T3 Air Crash Damage',
             '       - The crash damage of T3 air units has been increased and made more consistent.',
             '   - Fixed the vision effects of Lobos and Seraphim air scouts',
-                        
+            '',
             '**Contributors**',
             '- keyser',
             '- speed2',
