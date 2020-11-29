@@ -118,6 +118,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'OVERLAYANTIAIR',
         'CANNOTUSEAIRSTAGING',
+        'SNIPEMODE',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1.5,

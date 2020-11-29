@@ -95,6 +95,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYDEFENSE',
         'OVERLAYANTINAVY',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.29,
     Defense = {
@@ -563,7 +564,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

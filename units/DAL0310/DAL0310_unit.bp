@@ -50,6 +50,8 @@ UnitBlueprint {
         'HOVER',
         'TANK',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
+        'ANTISHIELD',
     },
     CollisionOffsetZ = 0.1,
     Defense = {
@@ -274,10 +276,10 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.75,
-            TranscendentPriorities = {'SHIELD'},
+            TranscendentPriorities = {'SHIELD', 'PERSONALSHIELD'},
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

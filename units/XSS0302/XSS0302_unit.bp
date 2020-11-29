@@ -75,6 +75,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYDEFENSE',
         'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,

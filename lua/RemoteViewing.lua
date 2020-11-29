@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  File that creates in units ability to create Remote Entities
 --**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
@@ -29,10 +29,6 @@ function RemoteViewing(SuperClass)
         OnKilled = function(self, instigator, type, overkillRatio)
             SuperClass.OnKilled(self, instigator, type, overkillRatio)
             if self.RemoteViewingData.Satellite then
-                self.RemoteViewingData.Satellite:DisableIntel('Omni')
-                self.RemoteViewingData.Satellite:DisableIntel('Radar')
-                self.RemoteViewingData.Satellite:DisableIntel('Vision')
-                self.RemoteViewingData.Satellite:DisableIntel('WaterVision')
                 self.RemoteViewingData.Satellite:Destroy()
             end
             self:SetMaintenanceConsumptionInactive()

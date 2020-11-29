@@ -282,6 +282,8 @@ UnitBlueprint {
             RateOfFire = 0.208,
             TargetCheckInterval = 0.4,
             TargetPriorities = {
+                'ANTIAIR',
+                'GROUNDATTACK',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',

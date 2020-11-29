@@ -430,11 +430,11 @@ OverchargeProjectile = Class() {
     -- y = 3000e^(0.000095(x+15500))-10090
     -- https://www.desmos.com/calculator/yyetmwyf0d
     DamageAsEnergy = function(self, damage)
-        return (3000 * math.exp(0.000095 * (damage + 15500))) - 10090
+        return damage * 4
     end,
 
     EnergyAsDamage = function(self, energy)
-        return (math.log((energy + 10090) / 3000) / 0.000095) - 15500
+        return energy / 4
     end,
     
     UnitsDetection = function(self, targetType, targetEntity)
