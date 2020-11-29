@@ -91,7 +91,7 @@ gamePatches = {
             '       - Damage vs buildings and vs commanders is unchanged from the previous system.',
             '   - Target Priorities',
             '       - Many units had their target priorities updated to enabled them to function more effectively. Find all the details here: https://github.com/FAForever/fa/pull/3072',
-            '   - Nuke Missile Health,'
+            '   - Nuke Missile Health',
             '       - Experimental Nuclear Missile',
             '       - Health: 60 → 60000',
             '       - Nuclear Missile',
