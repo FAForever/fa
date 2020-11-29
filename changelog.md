@@ -3329,7 +3329,7 @@ Patch 3646 (August 11, 2015)
 Patch 3644.1 (August 5, 2015)
 ==========================
 ### Enhancements
-- "More unit info mod" integrated and improved
+- "More unit info" mod integrated and improved
 - Incompatible mods and old maps are now blacklisted
 
 
