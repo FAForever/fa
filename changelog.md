@@ -134,7 +134,7 @@ Patch 3715 (12 September, 2020)
 ### Gameplay
 - Added an alternative hotkey layout using cycle when building unit in factory
 - Added a hotkey to access factory template (unit queue template in factory)
-- Allowed to bind action to the chevron key
+- Allowed to bind action to the "chevron" key
 - Improved AI
 - Prevented reclaim from cancelling death animation when the unit is killed by a shot (doesn\'t apply to volatile structure)
 - Added experimental armor to air/navy/structure experimental
@@ -503,7 +503,7 @@ Patch 3710 (26 January, 2020)
 - Allowed transition for 3rd person camera
 - Improved AI pathfinding and expansion base template
 - Allowed SCU to have their own strategic icons
-- Fixed select land unit on screen selecting factories
+- Fixed "select land unit on screen" selecting factories
 - Allowed dead players to see the whole map only after the team lost
 - Fixed factorie's construction beam still working when they are paused
 - Added an option in lobby for optimal mirrored balance
@@ -673,7 +673,7 @@ Patch 3705 (5 July, 2019)
 - Fixed a bug that gave you free resources by pausing a factory
 - Fixed loading AI mod templates being loaded without mods being enabled
 - Fixed unfinished unit transfer in fullshare games
-- Remove Assist command from factory during upgrade
+- Remove "Assist" command from factory during upgrade
 - Fixed free shield assist bug
 - Enable transport rates to be set vs blueprint
 - Added Exit button to the endscreen
@@ -1075,7 +1075,7 @@ Patch 3697 (17 August, 2018)
 - Fixed official maps being hidden at the wrong time by the filter
 - Added chat name colors
 - Lobby refactor
-- Allow more No Rush timer
+- Allow more "No Rush" timer
 
 ### UI
 - Fixed shielded air units having their shield and fuel UI bars collide
@@ -1098,7 +1098,7 @@ Patch 3697 (17 August, 2018)
 - Fixed sera T3 static arty shots landing too short
 - Fixed UEF Battlecruiser leaving no mass behind
 - Fixed being able to shield transport and having a personal shield of 0 hp
-- Fixed a crash with Game object have been destroyed
+- Fixed a crash with "Game object have been destroyed"
 - Fixed OC draining more e than available
 - Fixed omen and exodus not retargeting as soon as possible
 - Fixed T3 static arty having issue shooting at targets on higher ground
@@ -1528,7 +1528,7 @@ Patch 3692 (1st December, 2017)
 - Fixed veterancy UI not showing for non-default screen layouts
 - Fixed Bulwark dummy shield range ring being the wrong size
 - Allowed mod icon support for ACU upgrades
-- Refined some UI tips. Engineers now display Engineering Suite only, with Reclaims and Repairs being saved for special case units like the Harbinger
+- Refined some UI tips. Engineers now display "Engineering Suite" only, with "Reclaims" and "Repairs" being saved for special case units like the Harbinger
 
 ### Lobby
 - Changed background faction images to widescreen versions
@@ -1645,7 +1645,7 @@ Patch 3688 (24th September 2017)
 Patch 3686 (13th August 2017)
 ============================
 ### Lobby
-- Changed Hide Obsolete filter in map selection to be enabled by default
+- Changed "Hide Obsolete" filter in map selection to be enabled by default
 - Hide maps if a newer version is available locally
 - Fixed the title change option locking if you enter an empty string
 - Fixed lobby chat not behaving as expected when multi-line messages are entered
@@ -1731,7 +1731,7 @@ Patch 3686 (13th August 2017)
 - Added an option to disable hotkey labels
 - Fixed factory templates not displaying icons for mod units
 - Fixed missing UI elements in replays or when the Use Factional UI Skin option is disabled
-- Removed Quick Tip prefix from the tips which show on the loading screen
+- Removed "Quick Tip" prefix from the tips which show on the loading screen
 - Added T3 MAA to the hotkey description
 
 ### Other
@@ -1747,7 +1747,7 @@ Patch 3686 (13th August 2017)
 - Fixed kill objectives not working as intended in COOP
 - Fixed Torpedo Boat ID being incorrect from an AI perspective, causing them not to work properly
 - Added additional AI Naval platoon templates
-- Removed the hyphen from Air Superiority Fighter unit type to make it the same across all factions
+- Removed the hyphen from "Air Superiority Fighter" unit type to make it the same across all factions
 
 ### Contributors
 - CookieNoob
@@ -2476,7 +2476,7 @@ Patch 3664 (December 21st, 2016)
 - New feature: Ability to click on the game title to update it, both in the lobby, and in the client's Find Games tab
 - New feature: Closed slot - Spawn Mex. This option is used for the adaptive maps, letting a slot be turned on for mexes but not a player spawn
 - Improved lobby setting persistence interaction with maps that introduce their own options
-- Corrected to observers tooltip occurring twice
+- Corrected "to observers" tooltip occurring twice
 - Display mean rating in the rating tooltip, rather than minimum. Also use player name in that tooltip.
 - Fixed closed spots showing an empty box for newly joined players, breaking the lobby
 - Renamed 'Random' spawn option to 'Random - Unbalanced' for the sake of clarity
@@ -2636,7 +2636,7 @@ Patch 3660 (October 24th, 2016)
 - Fixed Cheat and Build multipliers for AIs showing 1.0 - 1.9 two times
 - Fixed rating labels being shown on the minimap when teams are not set to 'Fixed'
 - Made it clearer that there's a search filter in the map selection
-- Added new unit share conditions for interesting new gameplay. Full Share and Share Until Death have been joined by Traitors, which gifts all your units to the player who killed you (Very interesting for FFA games), Defectors, which is the opposite of Full Share, gifting your units to the highest scoring enemy, and Civilian Desertion, which gifts your units to a neutral civilian AI, if there is one.
+- Added new unit share conditions for interesting new gameplay. "Full Share" and "Share Until Death" have been joined by "Traitors", which gifts all your units to the player who killed you (Very interesting for FFA games), "Defectors", which is the opposite of Full Share, gifting your units to the highest scoring enemy, and "Civilian Desertion", which gifts your units to a neutral civilian AI, if there is one.
 - Improved the tooltip when hovering over your score in the lobby. It will now show a more detailed explanation including your rating deviation
 - Fixed the position of the load button in Skirmish mode when launching offline
 - Fixed 'Odd vs Even' autoteam button for random faction being the same as the 'Top vs Bottom'
@@ -2685,7 +2685,7 @@ Patch 3660 (October 24th, 2016)
 
 ### UI
 - Fixed UEF Engineering station strategic icon not matching the tech level
-- Added missing strategic build icons used in Bigger mode
+- Added missing strategic build icons used in "Bigger" mode
 - Fixed displayed abilities on several units
 - Fixed unit descriptions on support factories displaying for the wrong ones
 - Fixed game quality displaying a corrupted string
@@ -2739,7 +2739,7 @@ Patch 3658 (August 29th, 2016)
 - Fixed map preview highlights not going away when you exit the player switch drop-down menu in certain ways
 - The colour of your rating text now changes colour, getting darker with higher deviation. This should make identifying smurf accounts easier.
 - Added new spawn options: Fixed, Random, Optimal Balance, Flexible Balance
-- Added message Player kicked by host to chat
+- Added message "Player kicked by host" to chat
 
 ### Bugs
 - Fixed death animations for Cybran T1 mobile artillery and Seraphim T3 mobile artillery
@@ -3084,7 +3084,7 @@ Patch 3652 (May 2, 2016)
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
-- Aeon ACU upgrade Chrono Dampener won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
+- Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
 - Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
 - Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
 - Fixed Cybran T3 MAA hitbox/bones making lots of units miss
@@ -3297,7 +3297,7 @@ HTML-version of this balance oriented changelog available at: http://content.faf
         - Mass cost: 480 → 1200
         - Energy drain: 250 → 400
 - Energy/Mass overflow
-    - The bug that caused resources to disappear when they got shared to several teammates and one of them had full storage does not exist and is a FAF urban legend. If a teammate has full storage, the resources get properly shared to a different teammate instead. It is not needed to use any mods to prevent resources from getting lost or to inform others about this bug.
+    - The bug that caused resources to disappear when they got shared to several teammates and one of them had full storage does not exist and is a FAF urban legend. If a teammate has full storage, the resources get properly shared to a different teammate instead. It is not needed to use any mods to prevent resources from getting lost or to inform others about this "bug".
     - No change required
 
 
@@ -3329,7 +3329,7 @@ Patch 3646 (August 11, 2015)
 Patch 3644.1 (August 5, 2015)
 ==========================
 ### Enhancements
-- More unit info mod integrated and improved
+- "More unit info mod" integrated and improved
 - Incompatible mods and old maps are now blacklisted
 
 
@@ -3443,7 +3443,7 @@ Patch 3641 (July 12, 2015)
 - Cybran Engineers now display a build beam to clearly show what they're tasked to
 - Cybran factories now have red build beams
 - Number of Cybran build bots scale with buildpower of the engineer, to a maximum of 10
-- Ping values under Connectivity (F11) now update during game stop/stall
+- Ping values under "Connectivity" (F11) now update during game stop/stall
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
   Super-Game-Enders
 - ASF effects tweaked for performance (less effects on low fidelity)
@@ -3466,7 +3466,7 @@ Patch 3641 (July 12, 2015)
 - Now possible to pause units to make them pause execution of queued up orders
 - Debug window: Searching for units now supports unit name and substrings
 - Cybran engineering build bots no longer display the heads-up consumption overlay
-- Commander under attack now plays for shielded ACUs
+- "Commander under attack" now plays for shielded ACUs
 - 34 new taunts
 - Added a button to unbind key mappings
 - Drop shadow for chat messages
@@ -3643,7 +3643,7 @@ Patch 3636 (Dec 12, 2014)
 -  Attempt to fix Seraphim T1 Mobile AA's aim
 -  Improved autobalance with random spawns in lobby
 -  SMD can be paused
--  New No Walls Unit Restriction
+-  New "No Walls" Unit Restriction
 -  Improved the Unit Restrictions menu descriptions, including localization
 -  Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 -  Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
