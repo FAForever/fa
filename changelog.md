@@ -1,3 +1,7 @@
+Hotfix 3719 (2 December, 2020)
+============================
+- Reverted previous change breaking Sorian AI
+
 Patch 3718 (29 November, 2020)
 ============================
 - Land
@@ -99,7 +103,11 @@ Patch 3718 (29 November, 2020)
     - T3 Air Crash Damage
         - The crash damage of T3 air units has been increased and made more consistent.
     - Fixed the vision effects of Lobos and Seraphim air scouts
-            
+    
+- Game Patch
+    - hide ressources on game preview for generated hidden maps
+    - allow AI to build assist factories
+    
 ### Contributors
 - keyser
 - speed2
@@ -107,6 +115,8 @@ Patch 3718 (29 November, 2020)
 - Petricpwnz
 - Kazbek
 - KionX
+- Sheikah
+- Azraeel
 
 Hotfix 3717 (13 September, 2020)
 ============================

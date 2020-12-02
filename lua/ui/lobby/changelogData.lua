@@ -1,5 +1,12 @@
-last_version = 3718
+last_version = 3719
 gamePatches = {
+    {
+        version = 3719,
+        name = 'Hotfix 3719',
+        description = {
+            '- Reverted previous change breaking Sorian AI',
+        },
+    },
     {
         version = 3718,
         name = 'Game Version 3718',
@@ -104,6 +111,10 @@ gamePatches = {
             '       - The crash damage of T3 air units has been increased and made more consistent.',
             '   - Fixed the vision effects of Lobos and Seraphim air scouts',
             '',
+            '- Game Patch',
+            '   - hide ressources on game preview for generated hidden maps',
+            '   - allow AI to build assist factories',
+            '',
             '**Contributors**',
             '- keyser',
             '- speed2',
@@ -111,6 +122,8 @@ gamePatches = {
             '- Petricpwnz',
             '- Kazbek',
             '- KionX',
+            '- Sheikah',
+            '- Azraeel',
         },
     },
     {
