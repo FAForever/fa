@@ -16,8 +16,6 @@ BaseBuilderTemplate {
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
         'SorianEmergencyUpgradeBuilders',
-        'SorianSupportFactoryUpgrades',
-        'SorianSupportFactoryUpgradesNAVY',
         'SorianMassFabPause',
 
         # Engineer Builders
