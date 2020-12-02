@@ -1,0 +1,14 @@
+name: Build
+on: [push]
+env:
+  LUAC: luac5.2
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install lua
+        run: "sudo apt-get install lua5.2"
+      - name: Run lua tests
+        run: "bash ./run_lua_tests.sh"
