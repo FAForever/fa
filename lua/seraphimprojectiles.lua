@@ -196,7 +196,7 @@ SShriekerAutoCannon = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  SERAPHIM AIRE-AU BOLTER
 --------------------------------------------------------------------------
-SAireauBolter = Class(MultiPolyTrailProjectile) {
+SAireauBolter = Class(MultiPolyTrailProjectile) { -- T2 bot (Ilshavoh) and T3 tank (Othuum)
     FxImpactLand = EffectTemplate.SAireauBolterHit,
     FxImpactNone = EffectTemplate.SAireauBolterHit,
     FxImpactProp = EffectTemplate.SAireauBolterHit,
@@ -204,12 +204,30 @@ SAireauBolter = Class(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.SAireauBolterProjectileFxTrails,
     PolyTrailOffset = {0,0,0},
     PolyTrails = EffectTemplate.SAireauBolterProjectilePolyTrails,
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            DamageArea(self, pos, 0.5, 1, 'Force', true)
+            DamageArea(self, pos, 0.5, 1, 'Force', true)
+        
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.75, 0.75, 120, 50, army)
+
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 --------------------------------------------------------------------------
 --  SERAPHIM TAU CANNON
 --------------------------------------------------------------------------
-STauCannon = Class(MultiPolyTrailProjectile) {
+STauCannon = Class(MultiPolyTrailProjectile) { -- sera T2 hover tank and T3 tank (othuum)
     FxImpactLand = EffectTemplate.STauCannonHit,
     FxImpactNone = EffectTemplate.STauCannonHit,
     FxImpactProp = EffectTemplate.STauCannonHit,
@@ -217,6 +235,30 @@ STauCannon = Class(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.STauCannonProjectileTrails,
     PolyTrailOffset = {0,0},
     PolyTrails = EffectTemplate.STauCannonProjectilePolyTrails,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            if radius == 0 then
+                DamageArea(self, pos, 1, 1, 'Force', true)
+                DamageArea(self, pos, 1, 1, 'Force', true)
+            
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1.5, 1.5, 120, 50, army)
+            else
+                DamageArea(self, pos, radius+0.3, 1, 'Force', true)
+                DamageArea(self, pos, radius+0.3, 1, 'Force', true)
+            
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 150, 80, army)
+            end
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 ------------------------------------------------------------------------
