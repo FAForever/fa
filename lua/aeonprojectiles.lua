@@ -499,7 +499,6 @@ AOblivionCannonProjectile = Class(EmitterProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
@@ -525,7 +524,6 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
@@ -587,7 +585,6 @@ AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
