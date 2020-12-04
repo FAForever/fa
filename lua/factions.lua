@@ -179,7 +179,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/ual0105_icon.dds',
             T2 = '/icons/units/ual0208_icon.dds',
-            T2F = '/icons/units/sal0209_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/ual0309_icon.dds',
             SCU = '/icons/units/ual0301_icon.dds',
         },
@@ -232,7 +232,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/url0105_icon.dds',
             T2 = '/icons/units/url0208_icon.dds',
-            T2F = '/icons/units/srl0209_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/url0309_icon.dds',
             SCU = '/icons/units/url0301_icon.dds',
         },
@@ -285,7 +285,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/xsl0105_icon.dds',
             T2 = '/icons/units/xsl0208_icon.dds',
-            T2F = '/icons/units/ssl0219_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/xsl0309_icon.dds',
             SCU = '/icons/units/xsl0301_icon.dds',
         },
