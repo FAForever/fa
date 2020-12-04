@@ -817,7 +817,7 @@ SDFSniperShot = Class(MultiPolyTrailProjectile) {
 --  SERAPHIM EXPERIMENTAL PHASON BEAM PROJECTILE
 --------------------------------------------------------------------------
 
-SDFExperimentalPhasonProjectile = Class(EmitterProjectile) {
+SDFExperimentalPhasonProjectile = Class(EmitterProjectile) { -- ythotha
     FxImpactTrajectoryAligned = false,
     FxTrails = EffectTemplate.SDFExperimentalPhasonProjFXTrails01,
     FxImpactUnit = EffectTemplate.SDFExperimentalPhasonProjHitUnit,
@@ -826,13 +826,23 @@ SDFExperimentalPhasonProjectile = Class(EmitterProjectile) {
     FxImpactWater = EffectTemplate.SDFExperimentalPhasonProjHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+
+            DamageArea(self, pos, radius-1, 1, 'Force', true)
+            DamageArea(self, pos, radius-1, 1, 'Force', true)
+            
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 300, 80, army)
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 300, 80, army)
+        end
+        
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
-SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) {
+SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) { -- ythotha
     FxTrails = EffectTemplate.SDFSinnutheWeaponFXTrails01,
     FxImpactUnit = EffectTemplate.SDFSinnutheWeaponHitUnit,
     FxImpactProp = EffectTemplate.SDFSinnutheWeaponHit,
@@ -840,13 +850,23 @@ SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) {
     FxImpactWater = EffectTemplate.SDFSinnutheWeaponHit,
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+
+            DamageArea(self, pos, radius-1, 1, 'Force', true)
+            DamageArea(self, pos, radius-1, 1, 'Force', true)
+            
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 300, 80, army)
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 300, 80, army)
+        end
+        
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
-SDFAireauProjectile = Class(MultiPolyTrailProjectile) {
+SDFAireauProjectile = Class(MultiPolyTrailProjectile) { -- ythotha
     FxImpactNone = EffectTemplate.SDFAireauWeaponHit01,
     FxImpactUnit = EffectTemplate.SDFAireauWeaponHitUnit,
     FxImpactProp = EffectTemplate.SDFAireauWeaponHit01,
@@ -856,4 +876,19 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) {
 
     PolyTrails = EffectTemplate.SDFAireauWeaponPolytrails01,
     PolyTrailOffset = {0,0,0},
+
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+
+            DamageArea(self, pos, 1, 1, 'Force', true)
+            DamageArea(self, pos, 1, 1, 'Force', true)
+            
+            CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', 1, 1, 200, 50, army)
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
