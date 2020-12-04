@@ -77,7 +77,7 @@ SBaseTempProjectile = Class(EmitterProjectile) {
 --------------------------------------------------------------------------
 --  SERAPHIM CHRONATRON CANNONS
 --------------------------------------------------------------------------
-SChronatronCannon = Class(MultiPolyTrailProjectile) {
+SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SChronotronCannonLandHit,
     FxImpactNone = EffectTemplate.SChronotronCannonHit,
@@ -107,7 +107,7 @@ SChronatronCannon = Class(MultiPolyTrailProjectile) {
     end,
 }
 
-SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) {
+SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- ACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SChronotronCannonOverChargeLandHit,
     FxImpactNone = EffectTemplate.SChronotronCannonOverChargeLandHit,
@@ -135,7 +135,7 @@ SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) {
     end,
 }
 
-SLightChronatronCannon = Class(MultiPolyTrailProjectile) {
+SLightChronatronCannon = Class(MultiPolyTrailProjectile) { -- SACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SLightChronotronCannonLandHit,
     FxImpactNone = EffectTemplate.SLightChronotronCannonLandHit,
@@ -165,7 +165,7 @@ SLightChronatronCannon = Class(MultiPolyTrailProjectile) {
     end,
 }
 
-SLightChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) {
+SLightChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- SACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SLightChronotronCannonOverChargeHit,
     FxImpactNone = EffectTemplate.SLightChronotronCannonOverChargeHit,
@@ -346,7 +346,7 @@ SHeavyQuarnonCannon = Class(MultiPolyTrailProjectile) {
 ------------------------------------------------------------------------
 --  SERAPHIM LAANSE TACTICAL MISSILE
 --------------------------------------------------------------------------
-SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) {
+SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { -- ACU / SACU / TML /MML
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactUnderWater = {},
@@ -357,6 +357,23 @@ SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) {
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+    end,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local army = self.Army
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local radius = self.DamageData.DamageRadius
+            local pos = self:GetPosition()
+            
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 200, 90, army)
+        end
+
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
