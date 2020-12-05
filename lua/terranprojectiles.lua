@@ -292,7 +292,7 @@ TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- fatbo
 --------------------------------------------------------------------------
 --  TERRAN HEAVY PLASMA CANNON PROJECTILES
 --------------------------------------------------------------------------
-THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
+THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan, T3 gunship and T3 transport
     FxTrails = EffectTemplate.TPlasmaCannonHeavyMunition,
     RandomPolyTrails = 1,
     PolyTrailOffset = {0,0,0},
@@ -302,17 +302,6 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
-            local army = self.Army
-            
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
-        end
-        
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

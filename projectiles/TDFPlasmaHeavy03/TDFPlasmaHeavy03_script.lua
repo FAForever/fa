@@ -14,6 +14,22 @@ TDFPlasmaHeavy03 = Class(THeavyPlasmaCannonProjectile) {
 		end
 		THeavyPlasmaCannonProjectile.CreateImpactEffects( self, army, EffectTable, EffectScale )
 	end,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            DamageArea( self, pos, 1, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+        end
+        
+        THeavyPlasmaCannonProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 TypeClass = TDFPlasmaHeavy03
 
