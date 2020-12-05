@@ -222,7 +222,7 @@ SPhasicAutogun = Class(MultiPolyTrailProjectile) {
     PolyTrailOffset = {0,0},
 }
 
-SHeavyPhasicAutogun = Class(MultiPolyTrailProjectile) {
+SHeavyPhasicAutogun = Class(MultiPolyTrailProjectile) { -- T2 gunship and T2 transport
     FxImpactLand = EffectTemplate.HeavyPhasicAutoGunHit,
     FxImpactNone = EffectTemplate.HeavyPhasicAutoGunHit,
     FxImpactProp = EffectTemplate.HeavyPhasicAutoGunHitUnit,
@@ -234,10 +234,26 @@ SHeavyPhasicAutogun = Class(MultiPolyTrailProjectile) {
     PolyTrailOffset = {0,0},
 }
 
--- Adjustment for XSA0203 projectile speed.
+-- Adjustment for XSA0203 projectile speed. : T2 gunship
 SHeavyPhasicAutogun02 = Class(SHeavyPhasicAutogun) {
     PolyTrails = EffectTemplate.HeavyPhasicAutoGunProjectileTrail02,
     FxTrails = EffectTemplate.HeavyPhasicAutoGunProjectileTrailGlow02,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local army = self.Army
+            
+            DamageArea( self, pos, 0.7, 1, 'Force', true )
+            DamageArea( self, pos, 0.7, 1, 'Force', true )
+            
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.7, 0.7, 130, 15, army)
+        end
+        
+        SHeavyPhasicAutogun.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 --------------------------------------------------------------------------
