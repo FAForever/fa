@@ -1,6 +1,7 @@
-#
-# UEF Subcommander Heavy Plasma bolt
-#
+--
+-- UEF Subcommander Heavy Plasma bolt
+--
+
 local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavyPlasmaCannonProjectile
 
 TDFPlasmaHeavy03 = Class(THeavyPlasmaCannonProjectile) {
