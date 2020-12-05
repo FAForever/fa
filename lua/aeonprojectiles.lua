@@ -736,6 +736,43 @@ AReactonCannonProjectile = Class(EmitterProjectile) {
     FxImpactUnit = EffectTemplate.AReactonCannonHitUnit01,
     FxImpactProp = EffectTemplate.AReactonCannonHitUnit01,
     FxImpactLand = EffectTemplate.AReactonCannonHitLand01,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local army = self.Army
+            local radius = self.DamageData.DamageRadius
+            
+            if radius == 0 then
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                DamageArea( self, pos, 0.5, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+            else
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 100, 50, army)
+            end
+        
+        elseif targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local radius = self.DamageData.DamageRadius
+            
+            if radius ~= 0 then
+                local rotation = RandomFloat(0,2*math.pi)
+                local pos = self:GetPosition()
+                local army = self.Army
+                
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 100, 50, army)
+            end
+        end
+
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 AReactonCannonAOEProjectile = Class(EmitterProjectile) {
