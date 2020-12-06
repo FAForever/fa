@@ -25,7 +25,6 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local DefaultExplosion = import('defaultexplosions.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 --------------------------------------------------------------------------
 --  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
@@ -377,7 +376,6 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & waile
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
@@ -413,7 +411,7 @@ CDisintegratorLaserProjectile02 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN ELECTRON BOLTER PROJECILES
 --------------------------------------------------------------------------
-CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya
+CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, monkeylord & soul ripper
 
     PolyTrails = {
         '/effects/emitters/electron_bolter_trail_02_emit.bp',
@@ -429,16 +427,22 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya
 
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+            local radius = self.DamageData.DamageRadius
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
+            if radius > 0 then
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                DamageArea( self, pos, radius, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius, radius, 50, 15, army)
+            else
+                DamageArea( self, pos, 1, 1, 'Force', true )
+                DamageArea( self, pos, 1, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 1, 1, 50, 15, army)
+            end
         end
 
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
@@ -682,7 +686,6 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
@@ -692,7 +695,7 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
                 DamageArea( self, pos, 0.5, 1, 'Force', true )
                 DamageArea( self, pos, 0.5, 1, 'Force', true )
                 
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 100, 50, army)
             end
         end
 
@@ -836,6 +839,24 @@ CRocketProjectile = Class(SingleBeamProjectile) {
     FxImpactProp = EffectTemplate.CMissileHit01,
     FxImpactLand = EffectTemplate.CMissileHit01,
     FxImpactUnderWater = {},
+    
+    OnImpact = function(self, targetType, targetEntity)
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+            local army = self.Army
+            
+            if radius == 0 then
+                DamageArea( self, pos, 1, 1, 'Force', true )
+                DamageArea( self, pos, 1, 1, 'Force', true )
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+            end
+        end
+
+        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
+    end,
 }
 
 CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
@@ -1091,7 +1112,6 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
     
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius

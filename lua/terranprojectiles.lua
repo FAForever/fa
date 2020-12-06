@@ -271,11 +271,11 @@ TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- fatbo
     FxImpactLand = EffectTemplate.TLandGaussCannonHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-        if self.DamageData.DamageRadius > 0 then
+        local radius = self.DamageData.DamageRadius
+        if radius > 0 then
             if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
                 local rotation = RandomFloat(0,2*math.pi)
                 local pos = self:GetPosition()
-                local radius = self.DamageData.DamageRadius
                 local army = self.Army
                 
                 DamageArea( self, pos, radius, 1, 'Force', true )
