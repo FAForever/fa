@@ -311,30 +311,38 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan,
 --  UEF SMALL YIELD NUCLEAR BOMB
 --------------------------------
 TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
-    FxTrails = {},
-    FxImpactUnit = EffectTemplate.TSmallYieldNuclearBombHit01,
-    FxImpactProp = EffectTemplate.TSmallYieldNuclearBombHit01,
-    FxImpactLand = EffectTemplate.TSmallYieldNuclearBombHit01,
+    -- FxTrails = {},
+    -- FxImpactUnit = EffectTemplate.TSmallYieldNuclearBombHit01,
+    -- FxImpactProp = EffectTemplate.TSmallYieldNuclearBombHit01,
+    -- FxImpactLand = EffectTemplate.TSmallYieldNuclearBombHit01,
+    -- FxImpactUnderWater = {},
+
+    FxImpactTrajectoryAligned = false,
+    PolyTrail = '/effects/emitters/antimatter_polytrail_01_emit.bp',
+    PolyTrailOffset = 0,
+
+    -- Hit Effects
+    FxImpactUnit = EffectTemplate.TAntiMatterShellHit01,
+    FxImpactProp = EffectTemplate.TAntiMatterShellHit01,
+    FxImpactLand = EffectTemplate.TAntiMatterShellHit01,
+    FxLandHitScale = 1,
     FxImpactUnderWater = {},
 
-    OnImpact = function(self, TargetType, TargetEntity)
-        CreateLightParticle(self, -1, self.Army, 2.75, 4, 'sparkle_03', 'ramp_fire_03')
-        if TargetType == 'Terrain' then
-            CreateSplat(self:GetPosition(), 0, 'scorch_008_albedo', 6, 6, 250, 200, self.Army)
-
-            -- local blanketSides = 12
-            -- local blanketAngle = (2*math.pi) / blanketSides
-            -- local blanketStrength = 1
-            -- local blanketVelocity = 2.25
-
-            -- for i = 0, (blanketSides-1) do
-            --     local blanketX = math.sin(i*blanketAngle)
-            --     local blanketZ = math.cos(i*blanketAngle)
-            --     local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 0.5, blanketZ, blanketX, 0, blanketZ)
-            --         :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
-            -- end
+    OnImpact = function(self, targetType, targetEntity)
+        -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local army = self.Army
+            local rotation = RandomFloat(0,2*math.pi)
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+        
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            
+            CreateSplat(pos, rotation, 'scorch_008_albedo', radius*2, radius*2, 250, 200, army)
         end
-        EmitterProjectile.OnImpact(self, TargetType, TargetEntity)
+
+        EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
