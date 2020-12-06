@@ -448,7 +448,7 @@ Platoon = Class(moho.platoon_methods) {
                 nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                    IssueNuke({unit}, nukePos)
-                   WaitSeconds(10)
+                   WaitSeconds(12)
                    IssueClearCommands({unit})
                 end
                 WaitSeconds(1)
@@ -3785,7 +3785,7 @@ Platoon = Class(moho.platoon_methods) {
                 nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                     IssueNuke({unit}, nukePos)
-                    WaitSeconds(10)
+                    WaitSeconds(12)
                     IssueClearCommands({unit})
                 end
                 WaitSeconds(1)
