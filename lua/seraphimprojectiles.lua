@@ -310,7 +310,6 @@ SAireauBolter = Class(MultiPolyTrailProjectile) { -- T2 bot (Ilshavoh) and T3 ta
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             DamageArea(self, pos, 0.5, 1, 'Force', true)
@@ -916,7 +915,6 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) { -- ythotha
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
 
             DamageArea(self, pos, 1, 1, 'Force', true)

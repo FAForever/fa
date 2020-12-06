@@ -61,7 +61,7 @@ CDFBrackmanHackPegProjectile02 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN PROTON PROJECTILES
 --------------------------------------------------------------------------
-CIFProtonBombProjectile = Class(NullShell) {
+CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.CProtonBombHit01,
     FxImpactProp = EffectTemplate.CProtonBombHit01,
@@ -73,14 +73,17 @@ CIFProtonBombProjectile = Class(NullShell) {
         CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
 
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local rotation = RandomFloat(0.0,6.28)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
 
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
+            
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
             DamageRing(self, pos, 0.1, radius, 10, 'Fire', false, false)
-            CreateDecal(pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', 12, 12, 150, 200, army)
+            
+            CreateDecal(pos, rotation, 'scorch_011_albedo', '', 'Albedo', 12, 12, 300, 200, army)
         end
 
         local blanketSides = 12
@@ -95,7 +98,7 @@ CIFProtonBombProjectile = Class(NullShell) {
                 :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
 
-        EmitterProjectile.OnImpact(self, targetType, targetEntity)
+        NullShell.OnImpact(self, targetType, targetEntity)
     end,
 }
 
@@ -287,8 +290,8 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
             
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
-            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
             
+            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
         end
         
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
@@ -378,7 +381,6 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & waile
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             DamageArea( self, pos, 0.5, 1, 'Force', true )
@@ -685,13 +687,13 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     FxImpactLand = EffectTemplate.CMolecularRipperHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
             local army = self.Army
             
-            if radius == 0 then
+            if radius == 0 then -- to prevent OC from doing that decal
                 DamageArea( self, pos, 0.5, 1, 'Force', true )
                 DamageArea( self, pos, 0.5, 1, 'Force', true )
                 
@@ -1114,7 +1116,6 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             DamageArea( self, pos, 1, 1, 'Force', true )

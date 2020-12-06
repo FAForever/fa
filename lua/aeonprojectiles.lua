@@ -462,6 +462,7 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
             
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
+            
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 150, 70, army)
         end
         
@@ -526,6 +527,7 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
+            local rotation2 = RandomFloat(0,2*math.pi)
             local radius = self.DamageData.DamageRadius
             local pos = self:GetPosition()
             local army = self.Army
@@ -534,7 +536,7 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
             DamageArea(self, pos, radius, 1, 'Force', true)
             
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+4, radius+4, 250, 100, army)
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+4, radius+4, 250, 100, army)
+            CreateDecal(pos, rotation2, 'crater_radial01_albedo', '', 'Albedo', radius+4, radius+4, 250, 100, army)
         end
         
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
@@ -591,7 +593,6 @@ AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) { -- ACU
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
             local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             DamageArea( self, pos, 0.5, 1, 'Force', true )
@@ -705,8 +706,10 @@ AQuarkBombProjectile = Class(EmitterProjectile) {
             local radius = self.DamageData.DamageRadius
 
             DefaultExplosion.CreateScorchMarkSplat(self, 3)
+            
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
             DamageRing(self, pos, 0.1, radius, 10, 'Fire', false, false)
+            
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
         end
