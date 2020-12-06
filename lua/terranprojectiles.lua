@@ -310,7 +310,7 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan,
 --------------------------------
 --  UEF SMALL YIELD NUCLEAR BOMB
 --------------------------------
-TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
+TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bomber
     -- FxTrails = {},
     -- FxImpactUnit = EffectTemplate.TSmallYieldNuclearBombHit01,
     -- FxImpactProp = EffectTemplate.TSmallYieldNuclearBombHit01,
@@ -349,7 +349,7 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
 --------------------------------------------------------------------------
 --  TERRAN BOT LASER PROJECTILES
 --------------------------------------------------------------------------
-TLaserBotProjectile = Class(MultiPolyTrailProjectile) {
+TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
     PolyTrails = EffectTemplate.TLaserPolytrail01,
     PolyTrailOffset = {0,0,0},
     FxTrails = EffectTemplate.TLaserFxtrail01,
@@ -779,7 +779,7 @@ TGatlingPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  UEF IONIZED PLASMA GATLING CANNON PROJECTILE
 --------------------------------------------------------------------------
-TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
+TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     FxImpactWater = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
     FxImpactLand = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
     FxImpactNone = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
@@ -810,7 +810,7 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  UEF HEAVY PLASMA GATLING CANNON PROJECTILE
 --------------------------------------------------------------------------
-THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
+THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.THeavyPlasmaGatlingCannonHit,
     FxImpactProp = EffectTemplate.THeavyPlasmaGatlingCannonHit,

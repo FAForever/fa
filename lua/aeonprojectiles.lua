@@ -102,7 +102,7 @@ ABeamProjectile = Class(NullShell) {
 --------------------------------------------------------------------------
 --  AEON GRAVITON BOMB
 --------------------------------------------------------------------------
-AGravitonBombProjectile = Class(SinglePolyTrailProjectile) {
+AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { -- T1 bomber
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
 
@@ -687,7 +687,7 @@ AQuantumWarheadProjectile = Class(NukeProjectile, MultiCompositeEmitterProjectil
 --------------------------------------------------------------------------
 --  AEON QUARK BOMB
 --------------------------------------------------------------------------
-AQuarkBombProjectile = Class(EmitterProjectile) {
+AQuarkBombProjectile = Class(EmitterProjectile) { -- Strategic bomber
     FxTrails = EffectTemplate.AQuarkBomb01,
     FxTrailScale = 1,
 

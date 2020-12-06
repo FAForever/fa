@@ -832,7 +832,7 @@ CRailGunProjectile = Class(EmitterProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN ROCKET PROJECILES
 --------------------------------------------------------------------------
-CRocketProjectile = Class(SingleBeamProjectile) {
+CRocketProjectile = Class(SingleBeamProjectile) { -- wagner
     -- Emitter Values
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
 
