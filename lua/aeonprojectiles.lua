@@ -506,6 +506,7 @@ AOblivionCannonProjectile = Class(EmitterProjectile) {
             
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
+            
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+2, radius+2, 150, 50, army)
         end
         
@@ -531,7 +532,9 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
             
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+2, radius+2, 150, 50, army)
+            
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+4, radius+4, 250, 100, army)
+            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+4, radius+4, 250, 100, army)
         end
         
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
@@ -554,6 +557,7 @@ AOblivionCannonProjectile03 = Class(EmitterProjectile) {
             
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
+            
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+1, radius+1, 150, 50, army)
         end
         
