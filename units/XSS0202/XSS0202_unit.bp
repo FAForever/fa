@@ -61,6 +61,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
         'OVERLAYINDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.4,
     Defense = {
@@ -269,6 +270,10 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 2,
             TargetPriorities = {
+                'TECH3 STRUCTURE',
+                'TECH2 STRUCTURE',
+                'TECH1 STRUCTURE',
+                'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -336,9 +341,10 @@ UnitBlueprint {
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
+                'AIR MOBILE TECH2 BOMBER',
+                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',

@@ -109,6 +109,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'BOMBER',
         'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 6,
