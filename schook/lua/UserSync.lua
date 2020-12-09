@@ -1,3 +1,7 @@
+local utils = import('/lua/system/utils.lua')
+
+local hasSeenResult = false
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 local baseOnSync = OnSync
 OnSync = function()
@@ -84,23 +88,25 @@ OnSync = function()
 
     if not table.empty(Sync.Score) then
         import('/lua/ui/game/score.lua').currentScores = Sync.Score
-        if not Sync.FullScoreSync then
-            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
-        end
     end
 
-    if Sync.FullScoreSync then
-        if not table.empty(Sync.ScoreAccum) then
-            import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
-        end
+    if not table.empty(Sync.ScoreAccum) then
+        import('/lua/ui/dialogs/hotstats.lua').scoreData = Sync.ScoreAccum
     end
 
-    if not import("/lua/ui/dialogs/eschandler.lua").isExiting then
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
+
+    for _, gameResult in Sync.GameResult do
+        local armyIndex, result = unpack(gameResult)
+
+        # Only send defeat results if the player has not been defeated yet
+        if not hasSeenResult or not utils.StringStartsWith(result, "defeat") then
             LOG(string.format('Sending game result: %i %s', armyIndex, result))
             GpgNetSend('GameResult', armyIndex, result)
             import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
+
+            if armyIndex == GetFocusArmy() then
+                hasSeenResult = true
+            end
         end
     end
 

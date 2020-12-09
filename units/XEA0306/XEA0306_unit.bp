@@ -131,6 +131,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'CANNOTUSEAIRSTAGING',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -248,7 +249,7 @@ UnitBlueprint {
         Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = true,
+            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
@@ -877,9 +878,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 3,
+            DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

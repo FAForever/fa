@@ -108,7 +108,7 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'AIR',
-    'BOMBER',
+        'BOMBER',
         'HIGHALTAIR',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
@@ -125,7 +125,7 @@ UnitBlueprint {
     CollisionOffsetY = -1.5,
     Defense = {
         AirThreatLevel = 50,
-        ArmorType = 'Normal',
+        ArmorType = 'Experimental', 
         EconomyThreatLevel = 0,
         Health = 52000,
         MaxHealth = 52000,

@@ -47,7 +47,7 @@ Wreckage = Class(Prop) {
     -- this means we have to calculate the health from the reclaim values, instead of going the
     -- other way.
     Clone = function(self)
-        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim)
+        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim, self:GetCollisionExtents())
 
         -- Figure out the health this wreck had before it was deleted. We can't use any native
         -- functions like GetHealth(), so we use the latest known value
@@ -83,14 +83,40 @@ Wreckage = Class(Prop) {
 }
 
 --- Create a wreckage prop.
-function CreateWreckage(bp, position, orientation, mass, energy, time)
+function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
+    local wreck = bp.Wreckage
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
     prop:SetOrientation(orientation, true)
-
     prop:SetScale(bp.Display.UniformScale)
-    prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX * 0.5, bp.SizeY * 0.5, bp.SizeZ * 0.5)
+
+    -- take the default center (cx, cy, cz) and size (sx, sy, sz)
+    local cx, cy, cz, sx, sy, sz;
+    cx = bp.CollisionOffsetX
+    cy = bp.CollisionOffsetY
+    cz = bp.CollisionOffsetZ
+    sx = bp.SizeX
+    sy = bp.SizeY
+    sz = bp.SizeZ
+
+    -- if a death animation is played the wreck hitbox may need some changes
+    if deathHitBox then 
+        cx = deathHitBox.CollisionOffsetX or cx 
+        cy = deathHitBox.CollisionOffsetY or cy 
+        cz = deathHitBox.CollisionOffsetZ or cz 
+        sx = deathHitBox.SizeX or sx 
+        sy = deathHitBox.SizeY or sy 
+        sz = deathHitBox.SizeZ or sz 
+    end
+
+    -- adjust the size, these dimensions are in both directions based on the center
+    sx = sx * 0.5
+    sy = sy * 0.5
+    sz = sz * 0.5
+
+    -- create the collision box
+    prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
 
     prop:SetMaxHealth(bp.Defense.Health)
     prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))

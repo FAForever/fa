@@ -70,6 +70,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYDEFENSE',
         'OVERLAYINDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.375,
     Defense = {
@@ -349,6 +350,9 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 5,
             TargetPriorities = {
+                'TECH3 STRUCTURE',
+                'TECH2 STRUCTURE',
+                'TECH1 STRUCTURE',
                 'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

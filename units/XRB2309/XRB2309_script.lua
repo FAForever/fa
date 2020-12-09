@@ -142,7 +142,7 @@ XRB2309 = Class(CStructureUnit) {
     -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
         if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
-            ForkThread(callback)
+            self:ForkThread(callback)
         elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
             self.sinkProjectile.callback = callback
             return

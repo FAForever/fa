@@ -88,14 +88,41 @@ UnitBlueprint {
             {
                 Animation = '/units/xel0305/xel0305_adeath.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = 0.9,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = -0.25,
+                    SizeX = 1.3,
+                    SizeY = 1,
+                    SizeZ = 1.5,
+                },
             },
             {
                 Animation = '/units/xel0305/xel0305_adeath02.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = -0.40,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = -0.45,
+                    SizeX = 1.4,
+                    SizeY = 1,
+                    SizeZ = 1.4,
+                },  
             },
             {
                 Animation = '/units/xel0305/xel0305_adeath03.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = 0,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = -0.5,
+                    SizeX = 1.0,
+                    SizeY = 1,
+                    SizeZ = 2.0,
+                },
             },
         },
         AnimationWalk = '/units/xel0305/xel0305_awalk.sca',
@@ -278,8 +305,9 @@ UnitBlueprint {
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
+                'COMMAND',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

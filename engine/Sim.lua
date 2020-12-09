@@ -615,9 +615,9 @@ end
 -- @param tblUnits Table containing units.
 -- @param position Table with position {x, y, z}.
 -- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param number Unknown TODO.
+-- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
 -- @return Returns the issued command.
-function IssueFormAggressiveMove(tblUnits, position, formation, number)
+function IssueFormAggressiveMove(tblUnits, position, formation, degrees)
 end
 
 --- Orders group of units to attack the target unit.
@@ -625,18 +625,18 @@ end
 -- @param tblUnits Table containing units.
 -- @param target Unit to attack.
 -- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param number Unknown TODO.
+-- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
 -- @return Returns the issued command.
-function IssueFormAttack(tblUnits, target, formation, number)
+function IssueFormAttack(tblUnits, target, formation, degrees)
 end
 
 --- Oders group of units to move in formation to target position.
 -- @param tblUnits Table containing units.
 -- @param position Table with position {x, y, z}.
 -- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param number Unknown TODO.
+-- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
 -- @return Returns the issued command.
-function IssueFormMove(tblUnits, position, formation, number)
+function IssueFormMove(tblUnits, position, formation, degrees)
 end
 
 --- Oders group of units to patrol in formation on target position.
@@ -644,9 +644,9 @@ end
 -- @param tblUnits Table containing units.
 -- @param position Table with position {x, y, z}.
 -- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param number Unknown TODO.
+-- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
 -- @return Returns the issued command.
-function IssueFormPatrol(tblUnits, position, formation, number)
+function IssueFormPatrol(tblUnits, position, formation, degrees)
 end
 
 --- Orders group of unit to assist the target unit.

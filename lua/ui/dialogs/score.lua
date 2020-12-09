@@ -116,6 +116,14 @@ local tabs = {
     },
 }
 
+local prefix = {
+    Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
+    Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
+    UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
+    Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
+    NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}
+}
+
 -- determine which data to show based on current page, data type and column
 local function UpdateDisplay()
     -- show elapsed time
@@ -138,8 +146,23 @@ local function UpdateDisplay()
     for index, info in ipairs(curInfo) do
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
-        sortOrder[index].sortKey = curInfo.scoreData.current[index][curScoreKey][curSortCol][curType]
-                                   or curInfo.scoreData.current[index][curScoreKey][curSortCol]
+
+        local PlayerData = curInfo.scoreData.current[index]
+        PlayerData.general.mass = PlayerData.resources.massin.total
+        PlayerData.general.energy = PlayerData.resources.energyin.total
+        PlayerData.resources.massover = {}
+        PlayerData.resources.energyover = {}
+        PlayerData.resources.massover.total = PlayerData.resources.massout.excess
+        PlayerData.resources.energyover.total = PlayerData.resources.energyout.excess
+        PlayerData.resources.massover.rate = math.max(0, PlayerData.resources.massin.rate -
+            PlayerData.resources.massout.rate + PlayerData.resources.massin.reclaimRate +
+            PlayerData.resources.storage.storedMass - PlayerData.resources.storage.maxMass)
+        PlayerData.resources.energyover.rate = math.max(0, PlayerData.resources.energyin.rate -
+            PlayerData.resources.energyout.rate + PlayerData.resources.energyin.reclaimRate +
+            PlayerData.resources.storage.storedEnergy - PlayerData.resources.storage.maxEnergy)
+
+        sortOrder[index].sortKey = PlayerData[curScoreKey][curSortCol][curType]
+                                or PlayerData[curScoreKey][curSortCol]
     end
 
     table.sort(sortOrder, function(first, second)
@@ -215,7 +238,7 @@ function UpdateData()
     end
 
     -- set score data
-    curInfo.scoreData = import('/lua/ui/game/scoreaccum.lua').scoreData
+    curInfo.scoreData = hotstats.scoreData
 end
 
 function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
@@ -224,10 +247,18 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
         return
     end
     scoreScreenActive = true
-
     SessionEndGame()
     DisableWorldSounds()
     StopAllSounds()
+    ForkThread(function()
+        while not(hotstats.scoreData.interval and hotstats.scoreData.current and hotstats.scoreData.history) do
+            WaitSeconds(0.5)
+        end
+        CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
+    end)
+end
+
+function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
     UpdateData()
 
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
@@ -793,12 +824,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         elseif tabData.button == "campaign" then
             -- Set up campaign display
             local opData = operationVictoryTable.opData
-
-            local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
-                Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
-                UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
-                Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
-                NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
 
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)

@@ -109,6 +109,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYANTIAIR',
         'OVERLAYRADAR',
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {

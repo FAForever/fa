@@ -54,6 +54,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -266,8 +267,12 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SUBMERSIBLE',
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'MOBILE DIRECTFIRE',
+                'MOBILE ANTINAVY',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE - ANTIAIR)',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
