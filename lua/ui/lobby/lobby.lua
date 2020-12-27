@@ -5118,6 +5118,11 @@ end
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo.hidePreviewMarkers then
+        return
+    end
+
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
