@@ -20,6 +20,7 @@ function AnimatePingMesh(entity)
 end
 
 function SpawnPing(data)
+    if not OkayToMessWithArmy(data.Owner+1) then return end
     if not PingsRemaining[data.Owner] then
         PingsRemaining[data.Owner] = PingLimit
     end
