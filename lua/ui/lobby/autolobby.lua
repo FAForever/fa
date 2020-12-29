@@ -42,6 +42,7 @@ local gameInfo = {
         UnitCap = '1000',
         Ranked = true,
         PrebuiltUnits = 'Off',
+        Share = 'FullShare',
     },
     PlayerOptions = {},
     Observers = {},
@@ -68,6 +69,8 @@ local function MakeLocalPlayerInfo(name)
     end
 
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
+    result.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or false
+
     result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
     result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
     result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
@@ -112,18 +115,17 @@ end
 local function HostAddPlayer(senderId, playerInfo)
     playerInfo.OwnerID = senderId
 
-    local slot = 1
-    while gameInfo.PlayerOptions[slot] do
-        slot = slot + 1
+    local slot = playerInfo.StartSpot or 1
+    if not playerInfo.StartSpot then
+        while gameInfo.PlayerOptions[slot] do
+            slot = slot + 1
+        end
+        playerInfo.StartSpot = slot
     end
 
-    # figure out a reasonable default color
-    for colorIndex,colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            playerInfo.PlayerColor = colorIndex
-            break
-        end
-    end
+    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
+    -- TODO: Should colors be based on teams?
+    playerInfo.PlayerColor = slot
 
     gameInfo.PlayerOptions[slot] = playerInfo
 end
@@ -136,6 +138,8 @@ local function CheckForLaunch()
         GpgNetSend('PlayerOption', player.OwnerID, 'StartSpot', slot)
         GpgNetSend('PlayerOption', player.OwnerID, 'Army', slot)
         GpgNetSend('PlayerOption', player.OwnerID, 'Faction', player.Faction)
+        GpgNetSend('PlayerOption', player.OwnerID, 'Color', player.PlayerColor)
+
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
@@ -394,4 +398,3 @@ function DisconnectFromPeer(uid)
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
-

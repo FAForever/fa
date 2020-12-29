@@ -8139,6 +8139,489 @@ technique NomadsPhaseShield2_LowFidelity
     }
 }
 
+/////////////////////
+// TA Build Shader //
+/////////////////////
+
+// Original Shader by Armoured Fish, version 1.2 (10th Feb 2008)
+// Ported to Forged Alliance by Raevn
+
+//////////////////
+//STRUCTS
+//////////////////
+
+
+
+struct TABUILD_VERTEX
+{
+    float4 position : POSITION0;
+    float4 material : TEXCOORD0;
+    float4 positionLocal : TEXCOORD1;
+    float4 depth : TEXCOORD2;
+};
+
+
+/////////////////////
+//TA VERTEX SHADER //
+/////////////////////
+
+
+TABUILD_VERTEX TABuildVS(
+    float3 position : POSITION0,
+    float3 normal : NORMAL0,
+    float3 tangent : TANGENT0,
+    float3 binormal : BINORMAL0,
+    float4 texcoord0 : TEXCOORD0,
+    int boneIndex[4] : BLENDINDICES,
+    float3 row0 : TEXCOORD1,
+    float3 row1 : TEXCOORD2,
+    float3 row2 : TEXCOORD3,
+    float3 row3 : TEXCOORD4,
+    anim_t anim : TEXCOORD5,
+    float4 material : TEXCOORD6,
+    float4 color : COLOR0
+)
+{
+    TABUILD_VERTEX vertex = (TABUILD_VERTEX)0;
+    CompatSwizzle(color);
+
+    vertex.positionLocal = mul(transPalette[anim.y + boneIndex[0]].w, float4(position,1));
+
+    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
+    vertex.position = mul( float4(position,1), worldMatrix);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+    vertex.depth.xy = float2(vertex.position.y - terrainScale.y * surfaceElevation,material.x);
+
+
+    vertex.material = float4( time - material.x, material.yzw);
+    return vertex;
+}
+
+
+////////////////////
+//TA PIXEL SHADER //
+////////////////////
+
+float4 TABuildPS( TABUILD_VERTEX vertex ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+    float posY = vertex.positionLocal.y;
+
+    float percentComplete = vertex.material.y;
+		
+	//The following is a list of variables for tweaking the effect.
+	//startpercent is the % complete the unit will be before effect starts.
+	//speed is the fraction of the build time it would take to move from y=0 to y=1
+	//thickness is simply the width of the band or leading edge band in the y direction
+	//NOTE: the start and end percent vars don't seem terribly exact
+	//      remember, bands have an END or FINISH percent, not a start
+	//      it's only like that cause it's easiest to make something reach or leave 0 at a certain time
+	//      than the unit height which is I can't actually read through the pixel shader
+    	#define band1endpercent 0.05
+    	#define band1speed 45.0
+    	#define band1thickness 0.2
+
+    	#define band2endpercent 0.15
+    	#define band2speed 45.0
+    	#define band2thickness 0.2
+
+    	#define mainfillstartpercent 0.2
+    	#define mainfillspeed 45.0
+    	#define mainfillleadthickness 0.2
+
+   	 #define texturefillstartpercent 0.7
+   	 #define texturefillspeed 45.0
+   	 #define texturefillleadthickness 0.2
+
+   	 #define band3endpercent 0.95
+   	 #define band3speed 45.0
+   	 #define band3thickness 0.2
+
+	
+    //0 = transparent, 1 = sine green, 2 = cosine green, 3 = ignore (texture pass fills this in)
+    int shadingmethod = 0;
+    //This is where we determine what shading method to use on this pixel
+    //Order of overlays here is in highest to lowest priority
+
+    //third band pass
+    if (1 - (percentComplete - band3endpercent)*band3speed >= posY &&
+        posY + band3thickness >= (1 - (percentComplete - band3endpercent)*band3speed))
+            shadingmethod = 2;
+
+    //second band pass
+    else if (1 - (percentComplete - band2endpercent)*band2speed >= posY &&
+        posY + band2thickness >= (1 - (percentComplete - band2endpercent)*band2speed))
+            shadingmethod = 2;
+
+    //first band pass
+    else if (1 - (percentComplete - band1endpercent)*band1speed >= posY &&
+        posY + band1thickness >= (1 - (percentComplete - band1endpercent)*band1speed))
+            shadingmethod = 2;
+
+    //texture overlay
+    else if ((percentComplete - texturefillstartpercent)*texturefillspeed >= posY) {
+        //lead band
+        if (posY + texturefillleadthickness >= (percentComplete - texturefillstartpercent)*texturefillspeed)
+            shadingmethod = 2;
+        //rest of fill
+        else
+            shadingmethod = 3;
+    }
+
+    //main color overlay
+    else if ((percentComplete - mainfillstartpercent)*mainfillspeed >= posY) {
+        //lead band
+        if (posY + mainfillleadthickness >= (percentComplete - mainfillstartpercent)*mainfillspeed)
+            shadingmethod = 2;
+        //rest of fill
+        else
+            shadingmethod = 1;
+    }
+
+
+    //Now we actually compute pixel color
+    float4 color = float4(0,0,0,1);
+
+    //Shading methods very simple right now, however can be expanded upon
+    //for more complex effects at high fidelity.
+    //I tried to emulate the TA color movement but my attempts looked bad.
+    //Just pure green ended up looking better.
+
+    //0 = transparent, 1 = sine green, 2 = cosine green, 3 = ignore (texture pass fills this in)
+
+    if (shadingmethod == 3) {
+        discard;
+    }
+    else if (shadingmethod == 0)
+        color.a = 0;
+    else if (shadingmethod == 1) {
+        color.g = (0.5*sin(time))+0.5;
+    }
+    else if (shadingmethod == 2) {
+        color.g = (0.5*cos(time))+0.5;
+    }
+
+   return color;
+}
+float4 TABuildWiresPS( FLAT_VERTEX vertex) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+    //Same as shading method 2 in the solid shader.
+    return float4(0,(0.5*cos(time))+0.5,0,0);
+}
+
+
+
+// TABuild technique High Fidelity
+technique TABuild_HighFidelity
+<
+    string abstractTechnique = "TABuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    //NOTE: This all WOULD be just 2 passes, but 8 tex coords are already required for
+    //the unit shader and adding the 1 more that I require is beyond shader limits.
+    //This is a pain in the ass as combining them would fix a few things
+
+    //occlusion pass for hidden line style render
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_None )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Occlude )
+
+        VertexShader = compile vs_1_1 SilhouetteVS();
+        PixelShader = null;
+    }
+
+    //render the main shading
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+        FillMode = Solid;
+        DepthBias = -0.00001f;
+
+        VertexShader = compile vs_1_1 TABuildVS();
+        PixelShader = compile ps_2_a TABuildPS(); //Right now this is the only version
+    }
+    //render the flashing wireframe
+    pass P2
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = WireFrame;  //This pass cannot be last else nothing will set this back to solid
+        DepthBias = -0.00002f;
+
+        VertexShader = compile vs_1_1 FlatVS();
+        PixelShader = compile ps_2_a TABuildWiresPS(); //Right now this is the only version
+    }
+    //render the texture
+    pass P3
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = Solid;
+        DepthBias = 0.0f;
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+
+}
+
+// TABuild technique Medium Fidelity
+technique TABuild_MedFidelity
+<
+    string abstractTechnique = "TABuild";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    //NOTE: This all WOULD be just 2 passes, but 8 tex coords are already required for
+    //the unit shader and adding the 1 more that I require is beyond shader limits.
+    //This is a pain in the ass as combining them would fix a few things
+
+    //occlusion pass for hidden line style render
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Occlude )
+
+        VertexShader = compile vs_1_1 SilhouetteVS();
+        PixelShader = null;
+    }
+
+    //render the main shading
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+        FillMode = Solid;
+        DepthBias = -0.00001f;
+
+        VertexShader = compile vs_1_1 TABuildVS();
+        PixelShader = compile ps_2_0 TABuildPS(); //Right now this is the only version
+    }
+    //render the flashing wireframe
+    pass P2
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = WireFrame;  //This pass cannot be last else nothing will set this back to solid
+        DepthBias = -0.00002f;
+
+        VertexShader = compile vs_1_1 FlatVS();
+        PixelShader = compile ps_2_0 TABuildWiresPS(); //Right now this is the only version
+    }
+    //render the texture
+    pass P3
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = Solid;
+        DepthBias = 0.0f;
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+    }
+
+}
+
+
+// TABuild technique Low Fidelity
+technique TABuild_LowFidelity
+<
+    string abstractTechnique = "TABuild";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_POSTWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    //NOTE: This all WOULD be just 2 passes, but 8 tex coords are already required for
+    //the unit shader and adding the 1 more that I require is beyond shader limits.
+    //This is a pain in the ass as combining them would fix a few things
+
+    //occlusion pass for hidden line style render
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Occlude )
+
+        VertexShader = compile vs_1_1 SilhouetteVS();
+        PixelShader = null;
+    }
+
+    //render the main shading
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+        FillMode = Solid;
+        DepthBias = -0.00001f;
+
+        VertexShader = compile vs_1_1 TABuildVS();
+        PixelShader = compile ps_2_0 TABuildPS(); //Right now this is the only version
+    }
+    //render the flashing wireframe
+    pass P2
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = WireFrame;  //This pass cannot be last else nothing will set this back to solid
+        DepthBias = -0.00002f;
+
+        VertexShader = compile vs_1_1 FlatVS();
+        PixelShader = compile ps_2_0 TABuildWiresPS(); //Right now this is the only version
+    }
+    //render the texture
+    pass P3
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        FillMode = Solid;
+        DepthBias = 0.0f;
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+
+}
+
+/////////////////////
+// TA Cloak Shader //
+/////////////////////
+
+// Based off NormalMappedPS Shader with half alpha
+//
+// Original Shader by Armoured Fish
+// Adapted for FA by Raevn
+
+float4 TACloakPS( NORMALMAPPED_VERTEX vertex, 
+					   uniform bool maskAlbedo, 
+					   uniform bool glow, 
+					   uniform bool hiDefShadows,
+					   uniform bool alphaTestEnable, 
+					   uniform int alphaFunc, 
+					   uniform int alphaRef ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+		
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    
+    if ( maskAlbedo )
+    	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+
+	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+	float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+	float3 phongMultiplicative = float3( 2 * environment * specular.r);
+
+	float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+
+	float emissive = glowMultiplier * specular.b;
+	float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+
+//	float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+//#ifdef DIRECT3D10
+//	if( alphaTestEnable )
+//		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+//#endif
+	return float4( color.rgb, 0.5 );
+}
+
+
+technique TACloak_HighFidelity
+<
+    string abstractTechnique = "TACloak";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a TACloakPS(true,false,true, false,0,0 );
+    }
+}
+technique TACloak_MedFidelity
+<
+    string abstractTechnique = "TACloak";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 TACloakPS(true,false,false, false,0,0 );
+    }
+}
+technique TACloak_LowFidelity
+<
+    string abstractTechnique = "TACloak";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable_Less )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 TACloakPS(true,false,false, false,0,0 );
+    }
+}
+
+
+
 
 // Old build shader with scanline effect, pulsing glow,  noise
 // This might come in handy at some point if we want these in the new shader

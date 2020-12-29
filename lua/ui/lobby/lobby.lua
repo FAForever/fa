@@ -46,10 +46,23 @@ local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
-local aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
-AIKeys = {}
-AIStrings = {}
-AITooltips = {}
+local aitypes
+local AIKeys = {}
+local AIStrings = {}
+local AITooltips = {}
+
+function GetAITypes()
+    AIKeys = {}
+    AIStrings = {}
+    AITooltips = {}
+    aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
+    for _, aidata in aitypes do
+        table.insert(AIKeys, aidata.key)
+        table.insert(AIStrings, aidata.name)
+        table.insert(AITooltips, 'aitype_'..aidata.key)
+    end
+end
+GetAITypes()
 
 --This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
 -- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
@@ -371,11 +384,9 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
                     end
                 end
             end
-            for aiindex, aidata in aitypes do
-                table.insert(keys, aidata.key)
-                table.insert(strings, aidata.name)
-                table.insert(tooltips, 'aitype_'..aidata.key)
-            end
+            table.destructiveCat(keys, AIKeys)
+            table.destructiveCat(strings, AIStrings)
+            table.destructiveCat(tooltips, AITooltips)
         elseif key == 'move' then
             -- Generate the "move player to slot X" entries.
             for i = 1, numOpenSlots, 1 do
@@ -2014,6 +2025,42 @@ local function TryLaunch(skipNoObserversCheck)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
+        -- Load in the default map options if they are not set manually
+
+        -- Not all maps have options
+        if scenarioInfo.options then 
+      
+            -- If we don't validate them first then the people using the default 
+            -- as a value instead of the index of the value will mess us up
+            MapUtil.ValidateScenarioOptions(scenarioInfo.options)
+      
+            -- For every option, if it's not set yet then add its default value
+            for _, option in scenarioInfo.options do 
+                if not gameInfo.GameOptions[option.key] then 
+                    -- When the value data of the option is formatted as:
+                    -- values = {
+                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },		
+                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },	
+                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },	
+                    --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
+                    -- },	
+                    local keyVersion = option.values[option.default].key
+
+                    -- When the value data of the option is formatted as:
+                    -- values = {
+                    --     '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'
+                    -- }
+                    local valueVersion = option.values[option.default]
+
+                    -- Expect a key version, fall back on a value version
+                    gameInfo.GameOptions[option.key] = keyVersion or valueVersion
+
+                    -- Can be removed once this code leaves the develop branch
+                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
+                end
+            end
+        end
+
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
@@ -2033,7 +2080,7 @@ local function TryLaunch(skipNoObserversCheck)
         SetWindowedLobby(false)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
-        
+
         PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
         SetPreference('PreGameData',PreGameData)
         lobbyComm:LaunchGame(gameInfo)
@@ -2157,9 +2204,7 @@ local function UpdateGame()
         end
     end
 
-    if not singlePlayer then
-        refreshObserverList()
-    end
+    refreshObserverList()
 
     if isHost then
         HostUtils.RefreshButtonEnabledness()
@@ -2200,7 +2245,7 @@ local function UpdateGame()
     SetRuleTitleText(gameInfo.GameOptions.GameRules or "")
     SetGameTitleText(gameInfo.GameOptions.Title or LOC("<LOC lobui_0427>FAF Game Lobby"))
 
-    if not singlePlayer and isHost and GUI.autoTeams then
+    if isHost and GUI.autoTeams then
         GUI.autoTeams:SetState(gameInfo.GameOptions.AutoTeams,true)
         Tooltip.DestroyMouseoverDisplay()
     end
@@ -2307,18 +2352,10 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 
     if not ignoreRefresh then
         -- reload AI types in case we have enable or disable an AI mod.
-        aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
-        AIKeys = {}
-        AIStrings = {}
-        AITooltips = {}
-        for _, aidata in aitypes do
-          table.insert(AIKeys, aidata.key)
-          table.insert(AIStrings, aidata.name)
-          table.insert(AITooltips, 'aitype_'..aidata.key)
-        end
-        GUI.AIFillPanel:ClearItems()
-        GUI.AIFillPanel:AddItems(AIStrings)
-        GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
+        GetAITypes()
+        GUI.AIFillCombo:ClearItems()
+        GUI.AIFillCombo:AddItems(AIStrings)
+        GUI.AIFillCombo:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         UpdateGame()
     end
 end
@@ -2437,8 +2474,9 @@ function CreateSlotsUI(makeLabel)
     local teamLabel = makeLabel(LOC("<LOC lobui_0216>Team"), 14)
     labelGroup:AddChild(teamLabel)
 
+    labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0450>CPU"), 14))
+
     if not singlePlayer then
-        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0450>CPU"), 14))
         labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0451>Ping"), 14))
         labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0218>Ready"), 14))
     end
@@ -2466,7 +2504,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and associatedMarker:IsEnabled() then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
@@ -2603,7 +2641,6 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddControlTooltip(teamSelector, 'lob_team')
         teamSelector.OnEvent = defaultHandler
 
-        -- if not singlePlayer then
         -- CPU
         local barMax = 450
         local barMin = 0
@@ -2655,7 +2692,6 @@ function CreateSlotsUI(makeLabel)
             end
             SetPlayerOption(curRow, 'Ready', checked)
         end
-        -- end
 
         newSlot.HideControls = function()
             -- hide these to clear slot of visible data
@@ -2674,7 +2710,6 @@ function CreateSlotsUI(makeLabel)
         if singlePlayer then
             -- TODO: Use of groups may allow this to be simplified...
             readyBox:Hide()
-            CPUSpeedBar:Hide()
             pingStatus:Hide()
         end
 
@@ -2820,7 +2855,6 @@ function CreateUI(maxPlayers)
 
     -- Observer section
     GUI.observerPanel = Group(GUI.panel, "observerPanel")
-    UIUtil.SurroundWithBorder(GUI.observerPanel, '/scx_menu/lan-game-lobby/frame/')
 
     -- Scale the observer panel according to the buttons we are showing.
     local obsOffset
@@ -2830,36 +2864,36 @@ function CreateUI(maxPlayers)
         obsOffset = 620--545
     else
         obsHeight = 206
-        obsOffset = 503
+        obsOffset = 498
     end
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 512, obsOffset)
     LayoutHelpers.SetDimensions(GUI.observerPanel, 278, obsHeight)
+    UIUtil.SurroundWithBorder(GUI.observerPanel, '/scx_menu/lan-game-lobby/frame/')
 
     -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
-    UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 11, 459)
     LayoutHelpers.SetWidth(GUI.chatPanel, 478)
     LayoutHelpers.SetHeight(GUI.chatPanel, 245)
+    UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
 
     if isHost then
-        GUI.AIFillPanel = Combo.Combo(GUI.panel, 14, 12, false, nil)
-        LayoutHelpers.SetWidth(GUI.AIFillPanel, 278)
+        GUI.AIFillPanel = Group(GUI.panel)
         GUI.AIFillPanel.Left:Set(GUI.observerPanel.Left)
         GUI.AIFillPanel.Top:Set(GUI.chatPanel.Top)
-        if (AIKeys[1] or AIStrings[1] or AITooltips[1]) == nil then
-          for _, aidata in aitypes do
-            table.insert(AIKeys, aidata.key)
-            table.insert(AIStrings, aidata.name)
-            table.insert(AITooltips, 'aitype_'..aidata.key)
-          end
-        end
-        GUI.AIFillPanel:AddItems(AIStrings)
-        GUI.AIFillPanel:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
-        GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillPanel, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
+        LayoutHelpers.SetHeight(GUI.AIFillPanel, 60)
+        LayoutHelpers.SetWidth(GUI.AIFillPanel, 278)
+        UIUtil.SurroundWithBorder(GUI.AIFillPanel, '/scx_menu/lan-game-lobby/frame/')
+        GUI.AIFillCombo = Combo.Combo(GUI.AIFillPanel, 14, 12, false, nil)
+        LayoutHelpers.AtLeftTopIn(GUI.AIFillCombo, GUI.AIFillPanel)
+        GUI.AIFillCombo.Width:Set(GUI.AIFillPanel.Width)
+        GUI.AIFillCombo:AddItems(AIStrings)
+        GUI.AIFillCombo:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
+        Tooltip.AddComboTooltip(GUI.AIFillCombo, AITooltips)
+        GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillCombo, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
         LayoutHelpers.SetWidth(GUI.AIFillButton, 129)
         LayoutHelpers.SetHeight(GUI.AIFillButton, 30)
-        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillPanel, -10, 25)
+        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillCombo, -10, 25)
         GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
         GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width)
         GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height)
@@ -2869,26 +2903,29 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
         GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right)
         local tooltipText = {}
-        tooltipText['text'] = LOC('<LOC tooltipui0710>Teams Count')
-        tooltipText['body'] = LOC('<LOC tooltipui0711>On how many teams share players?')
+        tooltipText['text'] = '<LOC tooltipui0710>Teams Count'
+        tooltipText['body'] = '<LOC tooltipui0711>On how many teams share players?'
         Tooltip.AddControlTooltip(GUI.TeamCountSelector, tooltipText, 0)
         local ChangedSlots = {}
         GUI.AIFillButton.OnClick = function()
-          local AIKeyIndex, AIName = GUI.AIFillPanel:GetItem()
+          local AIKeyIndex, AIName = GUI.AIFillCombo:GetItem()
           if ChangedSlots[1] ~= nil then
             for i = 1, table.getn(ChangedSlots) do
               HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], ChangedSlots[i])
             end
-            GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
-            return
-          end
-          for Slot = 1, GetNumAvailStartSpots() do
-            if not (gameInfo.PlayerOptions[Slot] or gameInfo.ClosedSlots[Slot]) then
-              HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], Slot)
-              table.insert(ChangedSlots, Slot)
+          else
+            for Slot = 1, GetNumAvailStartSpots() do
+              if not (gameInfo.PlayerOptions[Slot] or gameInfo.ClosedSlots[Slot]) then
+                HostUtils.AddAI(AIName, AIKeys[AIKeyIndex], Slot)
+                table.insert(ChangedSlots, Slot)
+              end
             end
           end
-          GUI.TeamCountSelector.OnClick(nil,GUI.TeamCountSelector:GetItem(),nil)
+          if gameInfo.GameOptions.AutoTeams == 'none' then
+            GUI.TeamCountSelector.OnClick(nil, GUI.TeamCountSelector:GetItem(), nil)
+          else
+            AssignAutoTeams()
+          end
         end
         GUI.AIClearButton.OnClick = function()
           for i = 1, table.getn(ChangedSlots) do
@@ -2926,28 +2963,14 @@ function CreateUI(maxPlayers)
             end
           end
         end
-        local texturePath = '/scx_menu/lan-game-lobby/frame/'
-        GUI.AIFillPanelBorder = Border(GUI.panel,
-          UIUtil.SkinnableFile(texturePath .. 'topLeft.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'topRight.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'bottomLeft.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'bottomRight.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'left.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'right.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'top.dds'),
-          UIUtil.SkinnableFile(texturePath .. 'bottom.dds'))
-        GUI.AIFillPanelBorder:Surround(GUI.AIFillPanel, 62, 62)
-        LayoutHelpers.AtBottomIn(GUI.AIFillPanelBorder, GUI.AIFillPanel, 20)
     end
-
-
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
-    UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 813, 88)
     LayoutHelpers.SetDimensions(GUI.mapPanel, 198, 198)
     LayoutHelpers.DepthOverParent(GUI.mapPanel, GUI.panel, 2)
+    UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
 
     -- Map Preview Info Labels
     local tooltipText = {}
@@ -2961,10 +2984,10 @@ function CreateUI(maxPlayers)
     Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
-    UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
     LayoutHelpers.SetDimensions(GUI.optionsPanel, 198, 337)
     LayoutHelpers.DepthOverParent(GUI.optionsPanel, GUI.panel, 2)
+    UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
 
     ---------------------------------------------------------------------------
     -- set up map panel
@@ -3594,6 +3617,9 @@ function CreateUI(maxPlayers)
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -19)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
+    GUI.rerunBenchmark.OnClick = function(self, modifiers)
+        ForkThread(function() UpdateBenchmark(true) end)
+    end
 
     -- Observer List
     GUI.observerList = ItemList(GUI.observerPanel)
@@ -3628,17 +3654,6 @@ function CreateUI(maxPlayers)
     if singlePlayer then
         -- observers are always allowed in skirmish games.
         SetGameOption("AllowObservers", true)
-        -- Hide all the multiplayer-only UI elements (we still create them because then we get to
-        -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
-        -- nop, instead of needing to keep checking if UI controls actually exist...
-
-        GUI.closeEmptySlots:Hide()
-        GUI.becomeObserver:Hide()
-        GUI.autoTeams:Hide()
-        GUI.defaultOptions:Hide()
-        GUI.rerunBenchmark:Hide()
-        GUI.randMap:Hide()
-        GUI.observerPanel:Hide()
     end
 
     ---------------------------------------------------------------------------
@@ -3674,10 +3689,6 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-
-    if not singlePlayer then
-        CreateCPUMetricUI()
-    end
 end
 
 function setupChatEdit(chatPanel)
@@ -4430,7 +4441,9 @@ local MessageHandlers = {
             else
                 HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
             end
-            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            if HasCommandLineArg('/gpgnet') then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
         end
     },
 
@@ -4624,7 +4637,9 @@ local MessageHandlers = {
         Accept = IsFromHost,
         Handle = function(data)
             gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
-            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            if HasCommandLineArg('/gpgnet') then
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+            end
             SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.Slot])
             PossiblyAnnounceGameFull()
@@ -4914,9 +4929,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         )
 
         CreateUI(LobbyComm.maxPlayerSlots)
-        if not singlePlayer then
-            ForkThread(function() UpdateBenchmark() end)
-        end
+        ForkThread(function() UpdateBenchmark(false) end)
 
         if argv.isRehost then
             LoadPresetByName(LAST_GAME_PRESET_NAME);
@@ -4961,7 +4974,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
+                if HasCommandLineArg('/gpgnet') then
+                    PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
+                end
                 lobbyComm:BroadcastData(
                 {
                     Type = 'Peer_Really_Disconnected',
@@ -5192,27 +5207,7 @@ function Ping_AddControlTooltip(control, delay, slotNumber)
         end
         return LOC('<LOC lobui_0453>Only shows when > 500') .. '\n\n' .. LOC(ConnectionStatusInfo[conInfo])
     end
-    Lobby_AddControlTooltip(control,
-                            delay,
-                            slotNumber,
-                            pingText,
-                            pingBody)
-end
-
-function Lobby_AddControlTooltip(control, delay, slotNumber, displayText, displayBody)
-    if not control.oldHandleEvent then
-        control.oldHandleEvent = control.HandleEvent
-    end
-    control.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
-            local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text= displayText(),
-            body=displayBody()}, delay, true)
-        elseif event.Type == 'MouseExit' then
-            Tooltip.DestroyMouseoverDisplay()
-        end
-        return self.oldHandleEvent(self, event)
-    end
+    Tooltip.AddAutoUpdatedControlTooltip(control, pingText, pingBody, delay)
 end
 
 --CPU Status Bar Configuration
@@ -5281,12 +5276,6 @@ end
 --------------------------------------------------
 --  CPU GUI Functions
 --------------------------------------------------
-function CreateCPUMetricUI()
-    GUI.rerunBenchmark.OnClick = function(self, modifiers)
-            ForkThread(function() UpdateBenchmark(true) end)
-    end
-end
-
 function CPU_AddControlTooltip(control, delay, slotNumber)
     --This function creates the benchmark tooltip for a slot along with necessary mouseover function.
     --It is called during the UI creation.
@@ -5305,11 +5294,7 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     local CPUBody = function()
         return LOC('<LOC lobui_0322>0=Fastest, 450=Slowest')
     end
-    Lobby_AddControlTooltip(control,
-                            delay,
-                            slotNumber,
-                            CPUText,
-                            CPUBody)
+    Tooltip.AddAutoUpdatedControlTooltip(control, CPUText, CPUBody, delay)
 end
 
 --- Get the CPU benchmark score for the local machine.
@@ -5489,7 +5474,7 @@ function ShowRuleDialog()
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
-        end
+        end, gameInfo.GameOptions.GameRules
 )
 end
 

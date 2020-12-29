@@ -1,17 +1,310 @@
-Patch 3714 (20 April, 2020)
+Hotfix 3719 (2 December, 2020)
+============================
+- Reverted previous change breaking Sorian AI
+
+Patch 3718 (29 November, 2020)
 ============================
 - Land
-    - Sniper Bot
-        - Sprite Striker (aeon)
-            - Mass cost: 720 → 800
-            - Energy cost: 8000 → 8900
-            - Buildtime: 4000 → 4500
-            - Speed: 2.85 → 2.6
-        - Usha-Ah (seraphim)
-            - Mass cost: 800 → 880
-            - Energy cost: 8800 → 9700
-            - Buildtime: 4300 → 4900
-            - Speed: 2.5 → 2.4
+    - Tech 1 Land
+        - Aurora
+            - Mass Cost: 52 → 54
+            - Power Cost: 260 → 270
+            - Build Time: 260 → 270
+            - Health: 140 → 155
+            - Speed: 2.9 → 3
+            - RateOfFire: 0.66 → 0.6
+        - Mantis
+            - Mass Cost: 52 → 56
+            - Build Time: 260 → 265
+        - Flare
+            - Mass Cost: 35 → 42
+            - Power Cost: 140 → 165
+            - Build Time: 120 → 140
+            - Health: 70 → 115
+            - Speed: 4 → 3.8
+            - Damage: 7 → 9        
+        - Hunter
+            - Health: 65 → 90         
+        - Mech Marine
+            Mass Cost: 35 → 30
+            Power Cost: 120 → 100
+            Build Time: 120 → 100
+            Health: 75 → 60
+            Speed: 4 → 4.2
+            Turnrate: 45 → 50
+            TurretYawSpeed: 180 → 200
+        - Selen
+            Build Time: 80 → 90
+            Speed: 4 → 3.8
+            Range: 16 → 18
+            Turret SlavedToBody: True → False
+            TurretYawRange: 30 → 360
+            TurretYawSpeed: 180 → 120
+    - Tech 2 Land
+        - Mongoose
+            - MaxSpeed: 3.2 → 2.8
+        - Hoplite
+            - MaxSpeed: 3.6 → 3.3
+        - Asylum
+            - Energy maintenance: 35 → 45
+        - Parashield
+            - Energy maintenance: 60 → 80
+            - MaxSpeed: 4 → 3.5
+        - Air scout
+            - Power Cost: 420 → 580
+            - Build Time: 145 → 200
+            
+- Air
+    - Tech 1 Air
+        - T1 bomber
+            - Mass cost: 105 → 90
+            - Energy cost: 2450 → 2050
+            - Build time: 700 → 500
+            - BreakOffDistance: 24 → 32
+            - RadarRadius: 0 → 42
+        - Jester
+            - Mass cost: 200 → 170
+            - Energy cost: 5000 → 4250
+            - Build time: 1000 → 850
+            - Health: 525 → 350
+            - MaxSpeed: 12 → 9
+            - Damage: 16 → 15
+- Structures
+    - Flood XR
+        - Sonar Stealth: 90 → 70
+        - Radar Stealth: 45 → 70
+    - Yolona-Oss
+        - The Yolona-Oss has its animation reduced to increase the speed of its firing cycle. It also explodes like other strategic missile launchers when killed. 
+    - Death Weapon
+        - Inner Ring Damage: 20000
+        - Inner Ring Radius: 15
+        - Outer Ring Damage: 5000
+        - Outer Ring Radius: 20
+        - WeaponRepackTimeout: 32.5 → 20
+- Miscellaneous
+    - Overcharge
+        - Overcharge is changed from a variable system to a fixed damage per energy used. The ratio is 1:4 damage to energy drained and the minimum damage is 1250, maintaining the minimum energy required to Overcharge at 5k.
+        - The damage dealt by overcharge scales with the amount of energy drained from storage.
+        - Overcharge will use as much energy as is needed to kill the highest health unit hit
+        - The minimum damage is 1250 at a cost of 5k energy.
+        - The maximum damage is 15k at a cost of 60k energy.
+        - Overcharge will drain a maximum of 90% of stored energy.
+        - Damage vs buildings and vs commanders is unchanged from the previous system.
+    - Target Priorities
+        - Many units had their target priorities updated to enabled them to function more effectively. Find all the details here: https://github.com/FAForever/fa/pull/3072
+    - Experimental Nuclear Missile
+        - Health: 60 → 60000
+    - Nuclear Missile
+        - Health: 25 → 25000
+    - Anti-nuke missile
+        - Damage: 30 → 30000
+    - Air Factory Rolloff
+        - Air factory rolloff times have been equalised between factions.
+    - T3 Air Crash Damage
+        - The crash damage of T3 air units has been increased and made more consistent.
+    - Fixed the vision effects of Lobos and Seraphim air scouts
+    
+- Game Patch
+    - hide ressources on game preview for generated hidden maps
+    - allow AI to build assist factories
+    
+### Contributors
+- keyser
+- speed2
+- JaggedAppliance
+- Petricpwnz
+- Kazbek
+- KionX
+- Sheikah
+- Azraeel
+
+Hotfix 3717 (13 September, 2020)
+============================
+- Fixed coop not working
+- Fixed all games being unrated
+
+### Contributors
+- KionX
+- Askaholic
+
+Hotfix 3716 (12 September, 2020)
+============================
+- Fixed cybran arty explosion when hitting shields
+
+### Contributors
+- keyser
+
+Patch 3715 (12 September, 2020)
+============================
+### Lobby
+- Allowed single player lobby to get the features from the multiplayer lobby
+- Adapted autolobby for team matchmaker
+- Improved russian translation of the lobby
+
+### Gameplay
+- Added an alternative hotkey layout using cycle when building unit in factory
+- Added a hotkey to access factory template (unit queue template in factory)
+- Allowed to bind action to the "chevron" key
+- Improved AI
+- Prevented reclaim from cancelling death animation when the unit is killed by a shot (doesn\'t apply to volatile structure)
+- Added experimental armor to air/navy/structure experimental
+- Removed beetle armor
+
+### Bugs
+- Fixed bigger strat icons
+- Fixed the eye of Rhianne giving permanent vision underwater
+- Fixed explosion decals spawn when structure dies
+- Fixed chat and minimap repositionning when resizing the game
+- Fixed explosion killing trees
+- Fixed explosion decals spawn with arty/bomber projectiles
+- Fixed mermaid torpedo hitbox
+- Fixed game slowdown on long AI games
+- Fixed wrong game rating reward
+- Fixed lag watching replay at fast speed and improved ingame performances
+- Fixed wreckages\' hitbox positionning
+
+### Other
+- Improved unit description in game
+- Updated resource structure description
+- Improved usability of the cheat menu
+- Allowed cheat menu to spawn modded unit
+- Improved the loading tips
+- Moved faction data out of the functions
+- Added topological sorting for mods
+- Added shaders for the SCTA
+- Improved scripted army movement
+
+### Contributors
+- KionX
+- speed2
+- BlackYps
+- The-Balthazar
+- keyser
+- Uveso
+- Askaholic
+- AugSphere
+- FemtoZetta
+- Dragun123
+- ugandarowanda
+- Jip
+- Kazbek
+
+Patch 3714 (3 May, 2020)
+============================
+- Land
+    - Tech 1 Land
+        - Aurora 
+            - Parameter added: UseFiringSolutionInsteadOfAimBone = true
+    - Tech 2 Land
+        - Obsidian
+            - Damage: 480 → 360
+            - Rate of Fire: 0.25 → 0.333
+        - Pillar
+            - Range: 23 → 22
+        - Riptide
+            - Health: 1700 → 1800
+            - Mass cost: 360 → 320
+            - Power cost: 2000 → 1650
+            - Buildtime: 1600 → 1420
+        - Rhino 
+            - Mass cost: 297 → 290
+            - Buildtime: 1320 → 1300
+            - Range: 23 → 24
+            - Vision Radius: 20 → 22
+        - Blaze
+            - Health: 1050 → 1100
+            - Range: 23 → 24
+        - Ilshavoh
+            - Firing Tolerance: 1 → 3
+            - Turret yaw speed: 70 → 85
+            - Vision Radius: 20 → 24
+        - Yenzyne
+            - Health: 1300 → 1350
+            - Speed: 4.3 → 4
+            - Rate of Fire: 0.25 → 0.3
+        - Firebeetle
+            - Health: 500 → 350
+            - Mass cost: 250 → 190
+            - Power cost: 1500 → 1300
+            - Buildtime: 1000 → 700
+            - Damage: 1500 → 1100
+            - Firebeetle is now cloaked
+        - Tech 2 Engineer
+            - Build range: 5 → 6
+    - Tech 3 Land 
+        - Tanks/Bots
+            - Harbinger 
+                - Health: 3050 → 3600
+                - Range: 26 → 27
+                - Damage: 320 → 160
+                - Rate of Fire: 1 → 2
+                - Shield recharge time: 40 → 30
+            - Titan
+                - Health: 2550 → 2600
+                - Shield: 600 → 700
+                - Damage: 50 → 45
+                - Shield recharge time: 15 → 12
+                - Range: 22 → 24
+            - Loyalist
+                - Health: 3000 → 2500
+                - Stun duration: 1.4s → 1.5s
+                - Bolter damage: 14 → 28
+                - Bolter Range: 20 → 24
+                
+                - Charge Ability
+                    - Stun duration: 3s
+                    - Speed boost: x1.75
+                    - Seconds before charge begins: 4s
+                    - Seconds before exploding: 10s
+            - Percival
+                - Damage: 1690 → 1450
+                - Rate of Fire: 0.2 → 0.23
+                - Muzzle Velocity: 38 → 36
+            - Brick
+                - Muzzle Velocity: 42 → 38
+            - Othuum
+                - Health: 5000 → 4700
+                - Speed: 2.6 → 2.75
+                - SizeY: 0.45 → 0.65
+                - SizeZ: 2.0 → 2.3
+                - Bolters
+                    - Damage: 46 → 64
+                    - Muzzle Velocity: 40 → 30
+                    - Range: 21 → 20
+                - Cannon
+                    - Damage: 525 → 625
+                    - Damage Radius: 0 → 1.2
+        - Snipers
+            - Sprite Striker (Aeon)
+                - Mass cost: 720 → 800
+                - Energy cost: 8000 → 8900
+                - Buildtime: 4000 → 4500
+                - Speed: 2.85 → 2.6
+            - Usha-Ah (Seraphim)
+                - Mass cost: 800 → 880
+                - Energy cost: 8800 → 9700
+                - Buildtime: 4300 → 4900
+                - Speed: 2.5 → 2.4
+        - Mobile Artillery
+            - Serenity(Aeon)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+            - Trebuchet(Cybran)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+                - Damage Radius: 7 → 6
+            - Demolisher(UEF)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+            - Suthanus(Seraphim)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+                - Damage Radius: 6 → 5
+        - Tech 3 Engineer
+            - Build Range: 5 → 7
     - Experimentals
         - Galactic Colossus
             - Death weapon damage: 7500 → 8000
@@ -32,14 +325,21 @@ Patch 3714 (20 April, 2020)
     - Spy planes
         - Turn rate: 0.6 → 0.8
         - Max speed: 30 → 27
-    - swiftwind
+    - Swiftwind
         - Mass cost: 200 → 235
         - Energy cost: 6000 → 6750
         - Buildtime: 1600 → 1800
-    - ASF
-        - Max speed: 25 → 22
-        - Build time: 3000 → 4000
-    - Specter (aeon gunship)
+    - Notha
+        - BreakOffDistance: 1.5 → 5
+        - BreakOffTrigger: 10 → 15
+        - Rate of fire: 0.2 → 0.1
+    - Jester
+        - TurretPitchRange: 45 → 60
+    - Stinger
+        - TurretPitch: -40 → -20
+        - TurretPitchRange: 70 → 60
+        - TurretPitchSpeed: 90 → 360
+    - Specter (Aeon gunship)
         - Mass cost: 240 → 270
         - Energy cost: 4800 → 5400
         - Buildtime: 1600 → 1800
@@ -49,9 +349,10 @@ Patch 3714 (20 April, 2020)
         - Rate of fire: 1.25 → 0.208
         - Bullet speed: 40 → 25
         - Dps : 65 → 65
+    - ASF
+        - Max speed: 25 → 22
     - Experimentals
         - CZAR
-            - Max speed: 8 → 10
             - Health: 58 000 → 40 000
             - Personal shield: 0 → 30 000
             - Shield recharge time: 120
@@ -59,14 +360,40 @@ Patch 3714 (20 April, 2020)
             - Energy consumption: 0 → 500
             - SAM (anti-air):
                 - Range: 64 → 120
-                - Aoe: 0 → 2
+                - AoE: 0 → 2
                 - Bullet speed: 50 → 100
         - Ahwassa
+            - Speed: 20 → 18
             - Crash Aoe: 8 → 10
         - Soul ripper
             - Crash Damage: 5000 → 7000
             - Crash Aoe: 4 → 8
-
+            
+- Navy
+    - CI:18 Mermaid(Cybran stealth boat)
+        - Speed: 7 → 6
+        - Turn Rate: 60 → 55
+        - UniformScale: 0.08 → 0.12
+        - SizeX: 0.75 → 1.25
+        - SizeY: 0.8 → 1.3
+        - SizeZ: 2.7 → 3.6
+        
+- Structures
+    - T2 Air HQ
+        - Mass cost: 840 → 920
+        - Energy cost: 14400 → 18000
+        - Buildtime: 1800 → 2000
+    - Shou-esel(T2 Seraphim sonar)
+        - Speed: 1 → 2.5
+        - Speed while submerged: 0.5 → 1.5
+    - T3 Sonar
+        - Aeon
+            - Energy Maintenance: 250 → 500
+        - UEF
+            - Energy Maintenance: 250 → 500
+        - Cybran
+            - Energy Maintenance: 400 → 700
+            
 - Seraphim ACU
     - regen field
         - regen ceiling:
@@ -86,7 +413,7 @@ Patch 3714 (20 April, 2020)
         - Moved from back to RCH (right arm)
 
 - Misc
-    - Broken tree ressource modifier: 1.25 → 2
+    - Broken tree resource modifier: 1.25 → 2
     - Nuke missile kills non-experimental air units without explosion
     - Veterancy rework:
         - ACU veterancy from units:
@@ -107,16 +434,21 @@ Patch 3714 (20 April, 2020)
             - T2: 1.5
             - T3: 1.25
     - ACU won't survive an ACU explosion under 2500 hp by vetting anymore (veterancy is gained right after ACU explosion)
+    - A bomb from a strat bomber no longer collides with ASF. 
+    - All mobile shields and land scouts now stop at an appropriate range from enemy units when using an attack move.
 
 ### Contributors
 - Strogo
 - keyser
 - TurinTurambar
 - Petricpwnz
+- JaggedAppliance
+- Crotalus
+- wodzu93
 
 Patch 3713 (7 April, 2020)
 ============================
-- Fix a bug allowing to generate resources for free
+- Fixed a bug allowing to generate resources for free
 
 ### Contributors ###
 - speed2

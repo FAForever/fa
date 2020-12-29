@@ -266,6 +266,7 @@ Description = {
     ['xrb0304'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius. This upgrade increases build power and operational radius.",
 
     ['xrb2308'] = "<LOC Unit_Description_0325> Submerged torpedo launcher. Capable of destroying the largest of enemy vessels.",
+    ['xrb2309'] = "<LOC Unit_Description_0325> Submerged torpedo launcher. Capable of destroying the largest of enemy vessels.",
     ['xrb3301'] = "<LOC Unit_Description_0326> Offers complete line-of-sight within its operational area.",
     ['urb2304'] = "<LOC Unit_Description_0185> High-end anti-air tower. Designed to engage all levels of aircraft.",
     ['urb4302'] = "<LOC Unit_Description_0186> Strategic missile defense. Protection is limited to the structure's operational area.",

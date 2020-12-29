@@ -103,6 +103,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
+        'ASF',
     },
     Defense = {
         AirThreatLevel = 9,
@@ -185,7 +186,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 40000,
         BuildCostMass = 350,
-        BuildTime = 4000,
+        BuildTime = 3000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -343,7 +344,7 @@ UnitBlueprint {
         {
             Damage = 200,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

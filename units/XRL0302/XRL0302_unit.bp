@@ -70,7 +70,7 @@ UnitBlueprint {
     CollisionOffsetZ = 0.05,
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'FireBeetle',
+        ArmorType = 'Normal',
         EconomyThreatLevel = 0,
         Health = 350,
         MaxHealth = 350,
@@ -233,7 +233,7 @@ UnitBlueprint {
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

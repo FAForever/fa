@@ -8,6 +8,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local CommandMode = import('/lua/ui/game/commandmode.lua')
 local Construction = import('/lua/ui/game/construction.lua')
 local Templates = import('/lua/ui/game/build_templates.lua')
+local FactoryTemplates = import('/lua/ui/templates_factory.lua')
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -23,8 +24,12 @@ local cycleThread = false
 local cycleLastName
 local cycleLastMaxPos
 local cycleButtons = {}
+local oldSelection
 
 local modifiersKeys = {}
+local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+local oldHandleEvent = worldview.HandleEvent
+
 
 function initCycleButtons(values)
     local buttonH = 48
@@ -144,7 +149,7 @@ function getUnitKeyGroups()
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
-            elseif value == '_upgrade' or value == '_templates' then
+            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
                 table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
@@ -167,19 +172,156 @@ function init()
     CommandMode.AddEndBehavior(resetCycle)
 end
 
+-- UI for the cycle
+function hotbuildCyclePreview(maxPos, factoryFlag)
+    local options = Prefs.GetFromCurrentProfile('options')
+    if options.hotbuild_cycle_preview == 1 then
+        -- Highlight the active button
+        for i, button in cycleButtons do
+            if i == cyclePos then
+                button:SetAlpha(1, true)
+            else
+                button:SetAlpha(0.4, true)
+            end
+        end
+
+        cycleMap:Show()
+        -- Start the fading thread
+        if not factoryFlag or maxPos == 1 then
+            cycleThread = ForkThread(function()
+                local stayTime = options.hotbuild_cycle_reset_time / 2000.0
+                local fadeTime = stayTime
+                
+                WaitSeconds(stayTime)
+                if not cycleMap:IsHidden() then
+                    Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+                end
+                WaitSeconds(fadeTime)
+                cyclePos = 0
+            end)
+        end
+    else
+        cycleThread = ForkThread(function()
+            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
+            cyclePos = 0
+        end)
+    end
+end
+
+function cycleUnits(maxPos, name, effectiveIcons, selection, modifier)
+    -- Check if the selection/key has changed
+    if cycleLastName == name and cycleLastMaxPos == maxPos and oldSelection == selection[1] then
+        if modifier == 'Alt' then
+            cyclePos = cyclePos - 1
+            if cyclePos < 1 then
+                cyclePos = maxPos
+            end
+        else
+            cyclePos = cyclePos + 1
+            if cyclePos > maxPos then
+                cyclePos = 1
+            end
+        end
+    else
+        initCycleButtons(effectiveIcons)
+        cyclePos = 1
+        cycleLastName = name
+        cycleLastMaxPos = maxPos
+        oldSelection = selection[1]
+    end
+    return
+end
+
+-- look for template that can be built
+function availableTemplate(allTemplates,buildable)
+    local effectiveTemplates = {}
+    local effectiveIcons = {}
+    for templateIndex, template in allTemplates do
+        local valid = true
+        for _, entry in template.templateData do
+            if type(entry) == 'table' then
+                if entry.id then
+                    if not table.find(buildable, entry.id) then -- factory templates
+                        valid = false
+                        break
+                    end
+                else 
+                    if not table.find(buildable, entry[1]) then -- build templates
+                        valid = false
+                        break
+                    end
+                end
+            end
+        end
+        if valid then
+            template.templateID = templateIndex
+            table.insert(effectiveTemplates, template)
+            table.insert(effectiveIcons, template.icon)
+        end
+    end
+    return effectiveTemplates, effectiveIcons
+end
+
+function factoryHotkey(units, count)
+    CommandMode.StartCommandMode("build", {name = ''})
+    worldview.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if event.Modifiers.Left then
+                if type(units) == "string" then
+                    if IsKeyDown("Shift") then
+                        count = 5
+                    end
+                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", units, count)
+                    count = 1
+                    factoryHotkey(units, count)
+                else
+                    for _, unit in units do
+                        local v = unit.id
+                        local count = unit.count
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                    end
+                    StopCycleMap(self, event)
+                end
+            else
+                StopCycleMap(self, event)
+            end 
+        end
+    end
+end
+
+function StopCycleMap(self, event)
+    worldview.HandleEvent = oldHandleEvent(self, event)
+    cycleThread = ForkThread(function()
+        local options = Prefs.GetFromCurrentProfile('options')
+        local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+        Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
+    end)
+    CommandMode.EndCommandMode()
+end
+
+function hideCycleMap()
+    if (cycleThread) then
+        KillThread(cycleThread)
+    end
+
+    cycleMap:SetNeedsFrameUpdate(false)
+    cycleMap.OnFrame = function(self, elapsedTime) end
+    cycleMap:Hide()
+    cycleMap:SetAlpha(1, true)
+end
+
 -- The actual key action callback, called each time a 'Hotbuild' category action is activated
 function buildAction(name)
     local modifier = ""
     if IsKeyDown("Shift") then
         modifier = "Shift"
-    elseif IsKeyDown("Alt") then
+    elseif IsKeyDown("MENU") then -- IsKeyDown("Alt") doesn't work, engine error
         modifier = "Alt"
     end
-
     local selection = GetSelectedUnits()
     if selection then
-        -- If current selection is engineer or commander
-        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) > 0 then
+        -- If current selection is engineer or commander or megalith
+        if table.getsize(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) > 0 or table.getsize(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN, selection)) > 0 then
             buildActionBuilding(name, modifier)
         else -- Buildqueue or normal applying all the command
             buildActionUnit(name, modifier)
@@ -217,55 +359,58 @@ function buildActionBuilding(name, modifier)
     if maxPos == 0 then
         return
     end
+    
+    cycleUnits(maxPos, name, effectiveValues, selection, modifier)
 
-    -- Check if the selection/key has changed
-    if cycleLastName == name and cycleLastMaxPos == maxPos then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
-        end
-    else
-        initCycleButtons(effectiveValues)
-        cyclePos = 1
-        cycleLastName = name
-        cycleLastMaxPos = maxPos
-    end
-
-    if options.hotbuild_cycle_preview == 1 then
-        -- Highlight the active button
-        for i, button in cycleButtons do
-            if i == cyclePos then
-                button:SetAlpha(1, true)
-            else
-                button:SetAlpha(0.4, true)
-            end
-        end
-
-        cycleMap:Show()
-        -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
-    else
-        cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
-            cyclePos = 0
-        end)
-    end
+    hotbuildCyclePreview()
 
     local cmd = effectiveValues[cyclePos]
     ClearBuildTemplates()
     CommandMode.StartCommandMode("build", {name = cmd})
 end
 
+function buildActionFactoryTemplate(modifier)
+    local options = Prefs.GetFromCurrentProfile('options')
+    local factoryFlag = true
+
+    -- Reset everything that could be fading or running
+    hideCycleMap()
+
+    -- Find all avaiable templates
+    local allFactoryTemplates = FactoryTemplates.GetTemplates()
+
+    if (not allFactoryTemplates) or table.getsize(allFactoryTemplates) == 0 then
+        return
+    end
+
+    local selection = GetSelectedUnits()
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
+    local buildable = EntityCategoryGetUnitList(buildableCategories)
+
+    effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
+
+    local maxPos = table.getsize(effectiveTemplates)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, '_factory_templates', effectiveIcons, selection, modifier)
+    
+    hotbuildCyclePreview(maxPos, factoryFlag)
+    
+    local template = effectiveTemplates[cyclePos]
+    local selectedTemplate = template.templateData
+    
+    if maxPos == 1 then
+        for _, units in selectedTemplate do
+            local v = units.id
+            local count = units.count
+            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+        end
+    else
+        factoryHotkey(selectedTemplate)
+    end
+end
 
 -- Some of the work here is redundant when cycle_preview is disabled
 function buildActionTemplate(modifier)
@@ -284,7 +429,7 @@ function buildActionTemplate(modifier)
     end
 
     local selection = GetSelectedUnits()
-    local availableOrders,    availableToggles, buildableCategories = GetUnitCommandData(selection)
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
@@ -329,70 +474,17 @@ function buildActionTemplate(modifier)
             end
         end
     else
-        for templateIndex, template in allTemplates do
-            local valid = true
-            for _, entry in template.templateData do
-                if type(entry) == 'table' then
-                    if not table.find(buildableUnits, entry[1]) then
-                        valid = false
-                        break
-                    end
-                end
-            end
-            if valid then
-                template.templateID = templateIndex
-                table.insert(effectiveTemplates, template)
-                table.insert(effectiveIcons, template.icon)
-            end
-        end
+        effectiveTemplates, effectiveIcons = availableTemplate(allTemplates,buildableUnits)
     end
 
     local maxPos = table.getsize(effectiveTemplates)
     if maxPos == 0 then
         return
     end
+    
+    cycleUnits(maxPos, '_templates', effectiveIcons, selection, modifier)
 
-    -- Check if the selection/key has changed
-    if cycleLastName == '_templates' and cycleLastMaxPos == maxPos then
-        cyclePos = cyclePos + 1
-        if cyclePos > maxPos then
-            cyclePos = 1
-        end
-    else
-        initCycleButtons(effectiveIcons)
-        cyclePos = 1
-        cycleLastName = '_templates'
-        cycleLastMaxPos = maxPos
-    end
-
-    if options.hotbuild_cycle_preview == 1 then
-        -- Highlight the active button
-        for i, button in cycleButtons do
-            if i == cyclePos then
-                button:SetAlpha(1, true)
-            else
-                button:SetAlpha(0.4, true)
-            end
-        end
-
-        cycleMap:Show()
-        -- Start the fading thread
-        cycleThread = ForkThread(function()
-            local stayTime = options.hotbuild_cycle_reset_time / 2000.0
-            local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
-            WaitSeconds(stayTime)
-            if not cycleMap:IsHidden() then
-                Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
-            end
-            WaitSeconds(fadeTime)
-            cyclePos = 0
-        end)
-    else
-        cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
-            cyclePos = 0
-        end)
-    end
+    hotbuildCyclePreview()
 
     local template = effectiveTemplates[cyclePos]
     local cmd = template.templateData[3][1]
@@ -426,55 +518,57 @@ function buildActionTemplate(modifier)
     end
 end
 
-function hideCycleMap()
-    if (cycleThread) then
-        KillThread(cycleThread)
-    end
-
-    cycleMap:SetNeedsFrameUpdate(false)
-    cycleMap.OnFrame = function(self, elapsedTime) end
-    cycleMap:Hide()
-    cycleMap:SetAlpha(1, true)
-end
-
 function buildActionUnit(name, modifier)
     local values = unitkeygroups[name]
+    local factoryFlag = true
 
-    -- Try to delete old units except for the one currently in construction
-    if modifier == 'Alt' then
-        local currentCommandQueue = Construction.getCurrentCommandQueue()
-        if currentCommandQueue then
-            for index = table.getn(currentCommandQueue), 1, -1 do
-                local count = currentCommandQueue[index].count
-                if index == 1 then
-                    count = count - 1
-                end
-                DecreaseBuildCountInQueue(index, count)
-            end
-        end
+    if table.find(values, "_factory_templates") then
+        return buildActionFactoryTemplate(modifier)
     end
-
-    for i, v in values do
-        if v == '_upgrade' and buildActionUpgrade() then
+    
+    -- Reset everything that could be fading or running
+    hideCycleMap()
+    
+    for i, value in values do
+        if value == '_upgrade' and buildActionUpgrade() then
             return
         end
     end
+    
     local count = 1
     if modifier == 'Shift' then
         count = 5
     end
 
-    local selectedUnits = GetSelectedUnits()
-    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selectedUnits)
+    local selection = GetSelectedUnits()
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-
-    for i, v in values do
-        for ii, ba in buildable do
-            if v == ba then
-                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+    
+    local effectiveValues = {}
+    for _, value in values do
+        for i, buildableValue in buildable do
+            if value == buildableValue then
+                table.insert(effectiveValues, value)
             end
         end
     end
+    
+    local maxPos = table.getsize(effectiveValues)
+    if maxPos == 0 then
+        return
+    end
+    
+    cycleUnits(maxPos, name, effectiveValues, selection, modifier)
+    
+    hotbuildCyclePreview(maxPos, factoryFlag)
+    
+    local unit = effectiveValues[cyclePos]
+    
+    if maxPos == 1 then
+        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+    else
+        factoryHotkey(unit, count)
+    end 
 end
 
 -- Does not upgrade T1 facs that are currently upgrading to T2 to T3 when issued

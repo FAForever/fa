@@ -36,7 +36,7 @@ XRB2308 = Class(CStructureUnit) {
 
         
         if not self:IsIdleState() then --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
-            ForkThread(self.CreateNewHarmsWithDelay, self, armySelf, pos, spottedByArmy, fireState)
+            self:ForkThread(self.CreateNewHarmsWithDelay, armySelf, pos, spottedByArmy, fireState)
         else
             self:Destroy()
             
@@ -119,7 +119,7 @@ XRB2308 = Class(CStructureUnit) {
     -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
         if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
-            ForkThread(callback)
+            self:ForkThread(callback)
         elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
             self.sinkProjectile.callback = callback
             return

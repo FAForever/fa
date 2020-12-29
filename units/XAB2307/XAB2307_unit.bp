@@ -59,7 +59,7 @@ UnitBlueprint {
     CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
+        ArmorType = 'ExperimentalStructure',
         EconomyThreatLevel = 3048,
         Health = 10000,
         MaxHealth = 10000,
@@ -257,6 +257,16 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 5,
             TargetPriorities = {
+                'EXPERIMENTAL MASSFABRICATION',
+                '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
+                'TECH3 ANTIMISSILE',
+                'NUKE STRUCTURE',
+                'TECH3 STRUCTURE ARTILLERY',
+                'TECH3 ENERGYPRODUCTION',
+                'ORBITALSYSTEM',
+                'EXPERIMENTAL MOBILE',
+                'TECH3 STRUCTURE',
+                'TECH3 MOBILE',
                 'STRUCTURE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

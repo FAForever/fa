@@ -65,6 +65,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SORTSTRATEGIC',
         'SHOWATTACKRETICLE',
+        'VOLATILE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
     },
     Defense = {

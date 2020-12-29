@@ -84,6 +84,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
         'OVERLAYANTINAVY',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -361,9 +362,11 @@ UnitBlueprint {
             SlavedToBodyArcRange = 10,
             TargetCheckInterval = 0.4,
             TargetPriorities = {
+                'TECH2 LIGHTBOAT',
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'ANTINAVY',
                 'MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #------------------------------------------------------------------------
 #  TERRAN PROJECTILES SCRIPTS
@@ -23,6 +23,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
 local util = import('utilities.lua')
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 
 TFragmentationGrenade= Class(EmitterProjectile) {
@@ -94,23 +95,25 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/antimatter_polytrail_01_emit.bp',
     PolyTrailOffset = 0,
 
-    # Hit Effects
+    -- Hit Effects
     FxImpactUnit = EffectTemplate.TAntiMatterShellHit01,
     FxImpactProp = EffectTemplate.TAntiMatterShellHit01,
     FxImpactLand = EffectTemplate.TAntiMatterShellHit01,
     FxLandHitScale = 1,
     FxImpactUnderWater = {},
-    FxSplatScale = 8,
 
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 50, self.Army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 50, self.Army)
-            self:ShakeCamera(20, 1, 0, 1)
+        -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
+
+        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+            local pos = self:GetPosition()
+            local radius = self.DamageData.DamageRadius
+        
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            DamageArea(self, pos, radius, 1, 'Force', true)
+            
         end
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
@@ -118,29 +121,16 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
 TArtilleryAntiMatterProjectile02 = Class(TArtilleryAntiMatterProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_07_emit.bp',
 
-    # Hit Effects
+    -- Hit Effects
     FxImpactUnit = EffectTemplate.TAntiMatterShellHit02,
     FxImpactProp = EffectTemplate.TAntiMatterShellHit02,
     FxImpactLand = EffectTemplate.TAntiMatterShellHit02,
-
-    OnImpact = function(self, targetType, targetEntity)
-        #CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        if targetType == 'Terrain' then
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_001_normals', '', 'Alpha Normals', self.FxSplatScale, self.FxSplatScale, 150, 30, self.Army)
-            CreateDecal(self:GetPosition(), util.GetRandomFloat(0,2*math.pi), 'nuke_scorch_002_albedo', '', 'Albedo', self.FxSplatScale * 2, self.FxSplatScale * 2, 150, 30, self.Army)
-            self:ShakeCamera(20, 1, 0, 1)
-        end
-        local pos = self:GetPosition()
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        DamageArea(self, pos, self.DamageData.DamageRadius, 1, 'Force', true)
-        EmitterProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 TArtilleryAntiMatterSmallProjectile = Class(TArtilleryAntiMatterProjectile02) {
     FxLandHitScale = 0.5,
     FxUnitHitScale = 0.5,
-    FxSplatScale = 4,
+    FxSplatScale = 6,
 }
 
 #------------------------------------------------------------------------
@@ -411,7 +401,7 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale != 1 then
+            if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
         end

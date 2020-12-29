@@ -412,16 +412,6 @@ StructureUnit = Class(Unit) {
 
     end,
 
-    -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
-    -- will time out over the time spec'd or 300 seconds.
-    OnDestroy = function(self)
-        Unit.OnDestroy(self)
-        local orient = self.TarmacBag.Orientation
-        local currentBP = self.TarmacBag.CurrentBP
-        self:DestroyTarmac()
-        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
-    end,
-
     OnKilled = function(self, instigator, type, overkillRatio)
         local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
         if scus[1] then
@@ -432,6 +422,12 @@ StructureUnit = Class(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
+        -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
+        -- will time out over the time spec'd or 300 seconds.
+        local orient = self.TarmacBag.Orientation
+        local currentBP = self.TarmacBag.CurrentBP
+        self:DestroyTarmac()
+        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
     CheckRepairersForRebuild = function(self, wreckage)
@@ -830,6 +826,9 @@ FactoryUnit = Class(StructureUnit) {
         if not bp then return 0, px, py, pz end
 
         local vectorObj = self:GetRallyPoint()
+
+        if not vectorObj then return 0, px, py, pz end
+
         local bpKey = 1
         local distance, lowest = nil
         for k, v in bp do
@@ -2071,7 +2070,7 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
-                ForkThread(self.WaitForBuildAnimation, self, true)
+                self:ForkThread(self.WaitForBuildAnimation, true)
             end
         end
 
@@ -2081,7 +2080,7 @@ ConstructionUnit = Class(MobileUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
         end
     end,
 
@@ -2215,7 +2214,7 @@ CommandUnit = Class(WalkingLandUnit) {
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
             self:SetImmobile(true)
-            ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
         end
     end,
 
@@ -2321,16 +2320,17 @@ CommandUnit = Class(WalkingLandUnit) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
         
-        local bp = self:GetBlueprint().Economy
-        local energyCost, time
-        if bp then
-            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
-            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bp.TeleportTimeMod or 0.01)
-        end
-
+        local bp = self:GetBlueprint()
+        local bpEco = bp.Economy
         local teleDelay = bp.General.TeleportDelay
+        local energyCost, time
+
+        if bpEco then
+            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
+            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
+        end
 
         if teleDelay then
             energyCostMod = (time + teleDelay) / time
