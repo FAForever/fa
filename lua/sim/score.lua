@@ -44,6 +44,48 @@ function CalculateBrainScore(brain)
     return math.floor(resourceProduction + battleResults + (commanderKills * 5000))
 end
 
+local function ScoreResourcesThread()
+    while not victory.gameOver do
+        WaitSeconds(1)
+        for index, brain in ArmyBrains do
+            if ArmyIsCivilian(index) then continue end
+            if (ArmyScore[index].Defeated ~= nil) and (ArmyScore[index].Defeated < 0) then continue end
+            local Score = ArmyScore[index]
+            local CurTick = GetGameTick()
+            TicksSinceLastUpdate = (CurTick - Score.general.lastupdatetick)
+            Score.general.lastupdatetick = CurTick
+
+            local lastReclaimedMass = Score.resources.massin.reclaimed
+            Score.resources.massin.reclaimed = brain:GetArmyStat("Economy_Reclaimed_Mass", 0).Value
+            Score.resources.massin.reclaimRate = (Score.resources.massin.reclaimed - lastReclaimedMass) / TicksSinceLastUpdate
+            local lastTotalMass = Score.resources.massin.total
+            Score.resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0).Value
+            Score.resources.massin.rate = (Score.resources.massin.total - lastTotalMass) / TicksSinceLastUpdate - Score.resources.massin.reclaimRate
+            local lastConsumedMass = Score.resources.massout.total
+            Score.resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0).Value
+            Score.resources.massout.rate = (Score.resources.massout.total - lastConsumedMass) / TicksSinceLastUpdate
+            Score.resources.massout.excess = brain:GetArmyStat("Economy_AccumExcess_Mass", 0).Value
+
+            local lastReclaimedEnergy = Score.resources.energyin.reclaimed
+            Score.resources.energyin.reclaimed = brain:GetArmyStat("Economy_Reclaimed_Energy", 0).Value
+            Score.resources.energyin.reclaimRate = (Score.resources.energyin.reclaimed - lastReclaimedEnergy) / TicksSinceLastUpdate
+            local lastTotalEnergy = Score.resources.energyin.total
+            Score.resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0).Value
+            Score.resources.energyin.rate = (Score.resources.energyin.total - lastTotalEnergy) / TicksSinceLastUpdate - Score.resources.energyin.reclaimRate
+            local lastConsumedEnergy = Score.resources.energyout.total
+            Score.resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0).Value
+            Score.resources.energyout.rate = (Score.resources.energyout.total - lastConsumedEnergy) / TicksSinceLastUpdate
+            Score.resources.energyout.excess = brain:GetArmyStat("Economy_AccumExcess_Energy", 0).Value
+
+            Score.resources.storage.storedMass = brain:GetEconomyStored('MASS')
+            Score.resources.storage.storedEnergy = brain:GetEconomyStored('ENERGY')
+
+            Score.resources.storage.maxMass = brain:GetArmyStat("Economy_MaxStorage_Mass", 0).Value
+            Score.resources.storage.maxEnergy = brain:GetArmyStat("Economy_MaxStorage_Energy", 0).Value
+        end
+    end
+end
+
 local function ScoreHistoryThread()
     while not victory.gameOver do
         WaitSeconds(scoreData.interval)
@@ -70,7 +112,7 @@ local function ScoreThread()
             type = '',
             general = {
                 score = 0,
-                lastupdatetime = 0,
+                lastupdatetick = 0,
                 kills = {
                     count = 0,
                     mass = 0,
@@ -130,6 +172,8 @@ local function ScoreThread()
             }
         end
     end
+
+    ForkThread(ScoreResourcesThread)
     ForkThread(ScoreHistoryThread)
 
     local NextTime = 0
@@ -140,7 +184,7 @@ local function ScoreThread()
     local lastConsumedMass = 0
     local lastConsumedEnergy = 0
     local estimatedTicksSinceLastUpdate = 0
-    local simFrequency = 10
+
     while not victory.gameOver do
         local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
@@ -155,10 +199,8 @@ local function ScoreThread()
             if (Score.Defeated == nil) and brain:IsDefeated() then
                 Score.Defeated = CurTime + 15
             end
-            estimatedTicksSinceLastUpdate = (CurTime - Score.general.lastupdatetime) * simFrequency
             Score.type = brain.BrainType
             Score.general.score = CalculateBrainScore(brain)
-            Score.general.lastupdatetime = CurTime
 
             Score.general.currentunits = brain:GetArmyStat("UnitCap_Current", 0).Value
             Score.general.currentcap = brain:GetArmyStat("UnitCap_MaxCap", 0).Value
@@ -173,34 +215,6 @@ local function ScoreThread()
             Score.general.lost.count = brain:GetArmyStat("Units_Killed", 0).Value
             Score.general.lost.mass = brain:GetArmyStat("Units_MassValue_Lost", 0).Value
             Score.general.lost.energy = brain:GetArmyStat("Units_EnergyValue_Lost", 0).Value
-
-            lastReclaimedMass = Score.resources.massin.reclaimed
-            Score.resources.massin.reclaimed = brain:GetArmyStat("Economy_Reclaimed_Mass", 0).Value
-            Score.resources.massin.reclaimRate = (Score.resources.massin.reclaimed - lastReclaimedMass) / estimatedTicksSinceLastUpdate
-            lastTotalMass = Score.resources.massin.total
-            Score.resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0).Value
-            Score.resources.massin.rate = (Score.resources.massin.total - lastTotalMass) / estimatedTicksSinceLastUpdate - Score.resources.massin.reclaimRate
-            lastConsumedMass = Score.resources.massout.total
-            Score.resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0).Value
-            Score.resources.massout.rate = (Score.resources.massout.total - lastConsumedMass) / estimatedTicksSinceLastUpdate
-            Score.resources.massout.excess = brain:GetArmyStat("Economy_AccumExcess_Mass", 0).Value
-
-            lastReclaimedEnergy = Score.resources.energyin.reclaimed
-            Score.resources.energyin.reclaimed = brain:GetArmyStat("Economy_Reclaimed_Energy", 0).Value
-            Score.resources.energyin.reclaimRate = (Score.resources.energyin.reclaimed - lastReclaimedEnergy) / estimatedTicksSinceLastUpdate
-            lastTotalEnergy = Score.resources.energyin.total
-            Score.resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0).Value
-            Score.resources.energyin.rate = (Score.resources.energyin.total - lastTotalEnergy) / estimatedTicksSinceLastUpdate - Score.resources.energyin.reclaimRate
-            lastConsumedEnergy = Score.resources.energyout.total
-            Score.resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0).Value
-            Score.resources.energyout.rate = (Score.resources.energyout.total - lastConsumedEnergy) / estimatedTicksSinceLastUpdate
-            Score.resources.energyout.excess = brain:GetArmyStat("Economy_AccumExcess_Energy", 0).Value
-
-            Score.resources.storage.storedMass = brain:GetEconomyStored('MASS')
-            Score.resources.storage.storedEnergy = brain:GetEconomyStored('ENERGY')
-
-            Score.resources.storage.maxMass = brain:GetArmyStat("Economy_MaxStorage_Mass", 0).Value
-            Score.resources.storage.maxEnergy = brain:GetArmyStat("Economy_MaxStorage_Energy", 0).Value
 
             for unitId, stats in brain.UnitStats do
                 if Score.blueprints[unitId] == nil then
