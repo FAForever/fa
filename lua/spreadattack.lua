@@ -112,7 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
-	ordercount = numOrders -- Going to need total number of orders to be able start counting backwards from last one
+    ordercount = numOrders -- Going to need total number of orders to be able start counting backwards from last one
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -299,13 +299,13 @@ function SpreadAttack()
         return
     end
 
-	created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
+    created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
 
-	-- Switch the orders for each unit.
-	index = 0
-	while index < table.getn(curSelection) do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
-	index = index + 1
-	unit = curSelection[index]
+    -- Switch the orders for each unit.
+    index = 0
+    while index < table.getn(curSelection) do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
+    index = index + 1
+    unit = curSelection[index]
         FixOrders(unit)
         local unitOrders = ShadowOrders[unit:GetEntityId()]
 
@@ -318,7 +318,7 @@ function SpreadAttack()
         local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,ordercount,false
         local alwaysMix = {"Attack", "Nuke", "Tactical"}
 
-		action2 = unitOrders[ordercount].CommandType
+        local action2 = unitOrders[ordercount].CommandType
         while unitOrders[counter].CommandType == action2 do
             endAction = nil
             -- Search for the last entry of a mixable order.
@@ -353,51 +353,51 @@ function SpreadAttack()
             if endAction == nil or beginAction == endAction then
                 break
             end
-			
-			if created_distribution_table == 1 then -- Only take orders from order distribution table once they are there (after first loop thru units where last unit determines them)
-				unitOrders[beginAction], unitOrders[orderDistribution[index]] = unitOrders[orderDistribution[index]], unitOrders[beginAction]
-			end
-			
-			if created_distribution_table == 0 and index == table.getn(curSelection) then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
-				orderDistribution = {}
-				for i = 0, table.getn(curSelection) do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
-					orderDistribution[i] = -1
-				end
-				created_distribution_table = 1
-				for i0 = 0, math.floor((table.getn(curSelection) / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
-					for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
-						cunit = index
-						cunitdis = 1000000000000000000000000
-						
-						oposition = unitOrders[i].Position
-						for i2 = 1, table.getn(curSelection) do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
-							if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
-								position = curSelection[i2]:GetPosition()
-								if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
-									position = curSelection[i2].unitOrders[beginAction - 1].Position
-								end
-								cdis = VDist3Sq(position, oposition)
-								if cdis < cunitdis then
-										cunitdis = cdis
-										cunit = i2
-								end
-							end
-						end
-						orderDistribution[cunit] = i -- Save index of closest order to unit as variable in order distribution table at that unit's index in it
-					end
-				end
-				index = 0 -- Reset the loop once every unit has a first order in order distribution table, to give it to them in next loop, this part of code will not rerun
-			end
-			
+            
+            if created_distribution_table == 1 then -- Only take orders from order distribution table once they are there (after first loop thru units where last unit determines them)
+                unitOrders[beginAction], unitOrders[orderDistribution[index]] = unitOrders[orderDistribution[index]], unitOrders[beginAction]
+            end
+            
+            if created_distribution_table == 0 and index == table.getn(curSelection) then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
+                orderDistribution = {}
+                for i = 0, table.getn(curSelection) do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
+                    orderDistribution[i] = -1
+                end
+                created_distribution_table = 1
+                for i0 = 0, math.floor((table.getn(curSelection) / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
+                    for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
+                        cunit = index
+                        cunitdis = 1000000000000000000000000
+                        
+                        oposition = unitOrders[i].Position
+                        for i2 = 1, table.getn(curSelection) do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
+                            if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
+                                position = curSelection[i2]:GetPosition()
+                                if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
+                                    position = curSelection[i2].unitOrders[beginAction - 1].Position
+                                end
+                                cdis = VDist3Sq(position, oposition)
+                                if cdis < cunitdis then
+                                        cunitdis = cdis
+                                        cunit = i2
+                                end
+                            end
+                        end
+                        orderDistribution[cunit] = i -- Save index of closest order to unit as variable in order distribution table at that unit's index in it
+                    end
+                end
+                index = 0 -- Reset the loop once every unit has a first order in order distribution table, to give it to them in next loop, this part of code will not rerun
+            end
+            
             -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
-			if created_distribution_table == 1 then -- only randomize once first order is given
-				for i = beginAction + 1, endAction do
-					local randomorder = math.random(beginAction + 1, endAction)
-					if randomorder ~= i then
-						unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
-					end
-				end
-			end
+            if created_distribution_table == 1 then -- only randomize once first order is given
+                for i = beginAction + 1, endAction do
+                    local randomorder = math.random(beginAction + 1, endAction)
+                    if randomorder ~= i then
+                        unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
+                    end
+                end
+            end
 
             -- Repeat this loop and search for more mixable order series.
         end
@@ -485,4 +485,4 @@ function GiveOrders(Data)
         end
     end
 end -- function GiveOrders(Data)
-			
+            
