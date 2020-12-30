@@ -140,7 +140,7 @@ local function ScoreThread()
     local lastConsumedMass = 0
     local lastConsumedEnergy = 0
     local estimatedTicksSinceLastUpdate = 0
-    local simFrequency = GetSimTicksPerSecond()
+    local simFrequency = 10
     while not victory.gameOver do
         local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
@@ -155,7 +155,6 @@ local function ScoreThread()
             if (Score.Defeated == nil) and brain:IsDefeated() then
                 Score.Defeated = CurTime + 15
             end
-            simFrequency = GetSimTicksPerSecond()
             estimatedTicksSinceLastUpdate = (CurTime - Score.general.lastupdatetime) * simFrequency
             Score.type = brain.BrainType
             Score.general.score = CalculateBrainScore(brain)
