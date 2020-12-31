@@ -2501,10 +2501,12 @@ Unit = Class(moho.unit_methods) {
                 local pos = p.CachePosition
                 if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
                     local bp = unit:GetBlueprint()
-                    local MaxMassReclaim = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-                    local progress = (p.ReclaimLeft * p.MaxMassReclaim) / MaxMassReclaim * 0.5
-                    -- Set health according to how much is left of the wreck
-                    unit:SetHealth(self, unit:GetMaxHealth() * progress)
+                    local UnitMaxMassReclaim = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
+                    if UnitMaxMassReclaim and UnitMaxMassReclaim > 0 then
+                        local progress = (p.ReclaimLeft * p.MaxMassReclaim) / UnitMaxMassReclaim * 0.5
+                        -- Set health according to how much is left of the wreck
+                        unit:SetHealth(self, unit:GetMaxHealth() * progress)
+                    end
 
                     -- Clear up wreck after rebuild bonus applied if engine won't
                     if not unit.EngineIsDeletingWreck then
