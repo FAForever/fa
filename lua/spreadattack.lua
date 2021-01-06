@@ -302,6 +302,10 @@ function SpreadAttack()
     local created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
 
     -- Switch the orders for each unit.
+    local orderDistribution = {}
+    for i = 0, table.getn(curSelection) do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
+        orderDistribution[i] = -1
+    end
     local index = 0
     while index < table.getn(curSelection) do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
     index = index + 1
@@ -359,10 +363,6 @@ function SpreadAttack()
             end
             
             if created_distribution_table == 0 and index == table.getn(curSelection) then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
-                orderDistribution = {}
-                for i = 0, table.getn(curSelection) do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
-                    orderDistribution[i] = -1
-                end
                 created_distribution_table = 1
                 for i0 = 0, math.floor((table.getn(curSelection) / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
                     for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
