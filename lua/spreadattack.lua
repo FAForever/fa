@@ -112,7 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
-    ordercount = numOrders -- Going to need total number of orders to be able start counting backwards from last one
+    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -302,15 +302,20 @@ function SpreadAttack()
     local created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
 
     -- Switch the orders for each unit.
+	local ordercount = -1
+	local unitcount = table.getn(curSelection)
     local orderDistribution = {}
-    for i = 0, table.getn(curSelection) do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
-        orderDistribution[i] = -1
-    end
+        for i = 0, unitcount do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
+            orderDistribution[i] = -1
+        end
     local index = 0
-    while index < table.getn(curSelection) do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
-    index = index + 1
-    local unit = curSelection[index]
+    while index < unitcount do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
+        index = index + 1
+        local unit = curSelection[index]
         FixOrders(unit)
+        if ordercount == -1 then
+            ordercount = ordercountg
+        end
         local unitOrders = ShadowOrders[unit:GetEntityId()]
 
         -- Only mix orders if this unit has any orders to mix.
@@ -362,15 +367,15 @@ function SpreadAttack()
                 unitOrders[beginAction], unitOrders[orderDistribution[index]] = unitOrders[orderDistribution[index]], unitOrders[beginAction]
             end
             
-            if created_distribution_table == 0 and index == table.getn(curSelection) then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
+            if created_distribution_table == 0 and index == unitcount then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
                 created_distribution_table = 1
-                for i0 = 0, math.floor((table.getn(curSelection) / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
+                for i0 = 0, math.floor((unitcount / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
                     for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
                         local cunit = index
                         local cunitdis = 1000000000000000000000000
                         
                         local oposition = unitOrders[i].Position
-                        for i2 = 1, table.getn(curSelection) do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
+                        for i2 = 1, unitcount do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
                             if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
                                 local position = curSelection[i2]:GetPosition()
                                 if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
