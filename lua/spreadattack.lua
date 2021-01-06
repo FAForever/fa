@@ -299,13 +299,13 @@ function SpreadAttack()
         return
     end
 
-    created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
+    local created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
 
     -- Switch the orders for each unit.
-    index = 0
+    local index = 0
     while index < table.getn(curSelection) do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
     index = index + 1
-    unit = curSelection[index]
+    local unit = curSelection[index]
         FixOrders(unit)
         local unitOrders = ShadowOrders[unit:GetEntityId()]
 
@@ -366,17 +366,17 @@ function SpreadAttack()
                 created_distribution_table = 1
                 for i0 = 0, math.floor((table.getn(curSelection) / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
                     for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
-                        cunit = index
-                        cunitdis = 1000000000000000000000000
+                        local cunit = index
+                        local cunitdis = 1000000000000000000000000
                         
-                        oposition = unitOrders[i].Position
+                        local oposition = unitOrders[i].Position
                         for i2 = 1, table.getn(curSelection) do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
                             if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
-                                position = curSelection[i2]:GetPosition()
+                                local position = curSelection[i2]:GetPosition()
                                 if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
                                     position = curSelection[i2].unitOrders[beginAction - 1].Position
                                 end
-                                cdis = VDist3Sq(position, oposition)
+                                local cdis = VDist3Sq(position, oposition)
                                 if cdis < cunitdis then
                                         cunitdis = cdis
                                         cunit = i2
