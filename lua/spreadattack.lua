@@ -302,8 +302,8 @@ function SpreadAttack()
     local created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
 
     -- Switch the orders for each unit.
-	local ordercount = -1
-	local unitcount = table.getn(curSelection)
+    local ordercount = -1
+    local unitcount = table.getn(curSelection)
     local orderDistribution = {}
         for i = 0, unitcount do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
             orderDistribution[i] = -1
@@ -490,4 +490,3 @@ function GiveOrders(Data)
         end
     end
 end -- function GiveOrders(Data)
-            
