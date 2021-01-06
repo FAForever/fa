@@ -112,7 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
-    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
+
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -282,6 +282,7 @@ function FixOrders(unit)
         orderIndex = nextOrderIndex
         queueIndex = nextQueueIndex
     end
+	    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
 end
 
 
