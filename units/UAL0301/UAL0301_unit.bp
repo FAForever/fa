@@ -685,7 +685,7 @@ UnitBlueprint {
                 'ChronoDampener',
 				'EngineeringFocusingModule',
             },
-            HelpText = '<LOC ual0301_Support_help>Support Armored Command Unit. Enhanced during construction with the chrono damper enhancement and the engineering upgrade.',
+            HelpText = '<LOC ual0301_Support_help>Support Armored Command Unit. Enhanced during construction with the chrono dampener enhancement and the engineering upgrade.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_Support_name>SACU (Support preset)',
         },
