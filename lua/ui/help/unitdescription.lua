@@ -486,11 +486,11 @@ Description = {
     ['xsl0301'] = "<LOC Unit_Description_0433> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
     ['xsl0301-tmu'] = "<LOC Unit_Description_0434> Mounts a tactical cruise missile launcher onto the back of the SACU.",
     ['xsl0301-dss'] = "<LOC Unit_Description_0435> Increases the speed at which the SACU repairs itself. Also increases hit points.",
-    ['xsl0301-cba'] = "<LOC Unit_Description_0436> Increases the SCUs gun range.",
+    ['xsl0301-cba'] = "<LOC Unit_Description_0436> Increases the SACU's gun range.",
     ['xsl0301-efm'] = "<LOC Unit_Description_0437> Speeds up all engineering-related functions.",
     ['xsl0301-pqt'] = "<LOC Unit_Description_0439> Adds teleporter. Requires considerable Energy to activate.",
     ['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
-	['xsl0301-nrf'] = "<LOC Unit_Description_0466> Regen Aura.",
+	['xsl0301-nrf'] = "<LOC Unit_Description_0466> Adds a Restoration Aura.",
 
     -- SERAPHIM -- Support Commander Presets
     ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the gun upgrade enhancement.",
