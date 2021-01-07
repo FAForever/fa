@@ -112,6 +112,7 @@ function FixOrders(unit)
     end
     
     local numOrders = table.getn(unitOrders)
+
     
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
@@ -281,6 +282,7 @@ function FixOrders(unit)
         orderIndex = nextOrderIndex
         queueIndex = nextQueueIndex
     end
+    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
 end
 
 
@@ -298,9 +300,23 @@ function SpreadAttack()
         return
     end
 
+    local created_distribution_table = 0 -- need to create distribution table only once, but its only possible after FixOrders() runs once.
+
     -- Switch the orders for each unit.
-    for index,unit in ipairs(curSelection) do
+    local ordercount = -1
+    local unitcount = table.getn(curSelection)
+    local orderDistribution = {}
+        for i = 0, unitcount do -- Create order distribution table which keeps track of which unit has which first order (cell with index of unit contains that unit's first order or -1 until it has one)
+            orderDistribution[i] = -1
+        end
+    local index = 0
+    while index < unitcount do -- Need to be able to change iterator manually once loop is on last unit the first time, to reset it
+        index = index + 1
+        local unit = curSelection[index]
         FixOrders(unit)
+        if ordercount == -1 then
+            ordercount = ordercountg
+        end
         local unitOrders = ShadowOrders[unit:GetEntityId()]
 
         -- Only mix orders if this unit has any orders to mix.
@@ -309,66 +325,83 @@ function SpreadAttack()
         end
     
         -- Find all consecutive mixable orders, and only mix those.
-        local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,1,false
+        local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,ordercount,false
         local alwaysMix = {"Attack", "Nuke", "Tactical"}
 
-        while unitOrders[counter] ~= nil  do
-            beginAction = nil
-            -- Search for the first entry of a mixable order.
-            while beginAction == nil and unitOrders[counter] ~= nil do
+        local action2 = unitOrders[ordercount].CommandType
+        while unitOrders[counter].CommandType == action2 do
+            endAction = nil
+            -- Search for the last entry of a mixable order.
+            while endAction == nil and unitOrders[counter] ~= nil do
                 for _,v in ipairs(alwaysMix) do
                     if unitOrders[counter].CommandType == v then
-                        beginAction = counter
+                        endAction = counter
                         action = unitOrders[counter].CommandType
                         actionAlwaysMixed = true
                         break
                     elseif unitOrders[counter].EntityId then
-                        beginAction = counter
+                        endAction = counter
                         action = unitOrders[counter].CommandType
                         actionAlwaysMixed = false
                     end
                 end
-                counter = counter + 1
+                counter = counter - 1
             end
 
-            endAction = beginAction
-            -- Search for the last entry of a mixable order in this series.
+            beginAction = endAction
+            -- Search for the first entry of a mixable order in this group of orders.
             while unitOrders[counter] ~= nil do
                 if unitOrders[counter].CommandType == action and (actionAlwaysMixed or unitOrders[counter].EntityId) then
-                    endAction = counter
-                    counter = counter + 1
+                    beginAction = counter
+                    counter = counter - 1
                 else
                     break
                 end
             end
             
             -- Skip if there was no mixable order found, or only one order (can't swap one command).
-            if beginAction == nil or endAction == beginAction then
+            if endAction == nil or beginAction == endAction then
                 break
             end
             
-            -- Rearrange the first few mixable orders (equal to the number of targets) so that the targets are uniformly distributed on the first pass.
-            -- For example, 3 units attacking 8 units (? denotes random target):
-            -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
-            -- Unit 2: 2, 5, 8, ?, ?, ?, ?, ?
-            -- Unit 3: 3, 6, ?, ?, ?, ?, ?, ?
-            local unitCount = table.getn(curSelection)
-            local numOrders = endAction - beginAction + 1
-            -- "and 1 or 0" is lua's ugly alternative to the ternary operator. Same as (...) ? 1 : 0
-            local stableTargetNum = math.floor(numOrders / unitCount) + ((math.mod(numOrders, unitCount) >= index) and 1 or 0)
-            for i = 0, stableTargetNum - 1 do
-                -- For if the targets outnumber the units targeting them.
-                local targetBlock = i * unitCount
-                unitOrders[i + beginAction],unitOrders[targetBlock + beginAction + index - 1]
-                        = unitOrders[targetBlock + beginAction + index - 1],unitOrders[i + beginAction]
+            if created_distribution_table == 1 then -- Only take orders from order distribution table once they are there (after first loop thru units where last unit determines them)
+                unitOrders[beginAction], unitOrders[orderDistribution[index]] = unitOrders[orderDistribution[index]], unitOrders[beginAction]
             end
-            beginAction = beginAction + stableTargetNum
-
-            -- Randomize the remaining mixable orders.
-            for i = beginAction,endAction do
-                local randomorder = math.random(beginAction,endAction)
-                if randomorder ~= i then
-                    unitOrders[i],unitOrders[randomorder] = unitOrders[randomorder],unitOrders[i]
+            
+            if created_distribution_table == 0 and index == unitcount then -- Last unit determines first orders for all other units because units need to get their orders initialized in first loop
+                created_distribution_table = 1
+                for i0 = 0, math.floor((unitcount / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
+                    for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
+                        local cunit = index + 10000000
+                        local cunitdis = 1000000000000000000000000
+                        
+                        local oposition = unitOrders[i].Position
+                        for i2 = 1, unitcount do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
+                            if orderDistribution[i2] == -1 then -- Dont bother with units that are already taken, waste of cpu calculating distance
+                                local position = curSelection[i2]:GetPosition()
+                                if curSelection[i2].unitOrders[beginAction - 1] ~= nil then -- If this unit has a different order queued prior to attack orders, use that order's position to determine closest queued attack order instead
+                                    position = curSelection[i2].unitOrders[beginAction - 1].Position
+                                end
+                                local cdis = VDist3Sq(position, oposition)
+                                if cdis < cunitdis then
+                                        cunitdis = cdis
+                                        cunit = i2
+                                end
+                            end
+                        end
+                        orderDistribution[cunit] = i -- Save index of closest order to unit as variable in order distribution table at that unit's index in it
+                    end
+                end
+                index = 0 -- Reset the loop once every unit has a first order in order distribution table, to give it to them in next loop, this part of code will not rerun
+            end
+            
+            -- Randomize the remaining mixable orders. +1 is to not include the first order, which was already selected.
+            if created_distribution_table == 1 then -- only randomize once first order is given
+                for i = beginAction + 1, endAction do
+                    local randomorder = math.random(beginAction + 1, endAction)
+                    if randomorder ~= i then
+                        unitOrders[i], unitOrders[randomorder] = unitOrders[randomorder], unitOrders[i]
+                    end
                 end
             end
 
