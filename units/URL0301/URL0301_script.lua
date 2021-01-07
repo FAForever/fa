@@ -12,6 +12,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 
 URL0301 = Class(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
@@ -70,7 +71,7 @@ URL0301 = Class(CCommandUnit) {
     end,
 	
 	GetUnitsToBuff = function(self, bp)
-        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE')
         local brain = self:GetAIBrain()
         local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
         local units = {}
@@ -83,16 +84,18 @@ URL0301 = Class(CCommandUnit) {
 
         return units
     end,
-
-    SpeedBuffThread = function(self, type)
-        local bp = self:GetBlueprint().Enhancements[type]
-        local buff = 'CybranSACU' .. type
-
+	
+    SpeedBuffThread = function(self, enh)
+        local bp = self:GetBlueprint().Enhancements[enh]
+        local buff = 'CybranSACU' .. enh
+		
         while not self.Dead do
-            local units = self:GetUnitsToBuff(bp)
-            for _,unit in units do
-                Buff.ApplyBuff(unit, buff)
-                unit:RequestRefreshUI()
+            if self:GetResourceConsumed() == 1 then
+                local units = self:GetUnitsToBuff(bp)
+                for _,unit in units do
+                    Buff.ApplyBuff(unit, buff)
+                    unit:RequestRefreshUI()
+                end
             end
             WaitSeconds(5)
         end
@@ -108,15 +111,22 @@ URL0301 = Class(CCommandUnit) {
 			local buff
 			local type
 			
-			 buff = 'CybranSACU' .. enh
+		    buff = 'CybranSACU' .. enh
 			 
-			 if not Buffs[buff] then
+			if not Buffs[buff] then
 				local buff_bp = {
 					Name = buff,
 					DisplayName = buff,
 					BuffType = 'COMMANDERAURA_' .. enh,
 					Stacks = 'REPLACE',
 					Duration = 5,
+					--CreateAttachedEmitter( self, 'Torso', self:GetArmy(), '/effects/emitters/seraphim_expnuke_detonate_01_emit.bp' ):ScaleEmitter(0.3):OffsetEmitter(-1.5,0,0),
+                    --ShaderName = 'TMeshQuantumNuke',
+					--CreateAttachedEmitter(self, 'Torso', self:GetArmy(),'/effects/emitters/QuantumWarheadEffect01_proj.bp'),
+					Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
+					--Effects = {'/effects/emitters/cybran_soothsayer_ambient_01_emit.bp'},
+					--Effects:ScaleEmitter(0.3),
+					--Effects:OffsetEmitter(0,0,0),
 					Affects = {
 						MoveMult2 = {
 							Mult = bp.MoveMult,
@@ -126,21 +136,16 @@ URL0301 = Class(CCommandUnit) {
 				BuffBlueprint(buff_bp)
 			end
 			
-			if self.SpeedThreadHandle then
-				KillThread(self.SpeedThreadHandle)
-				self.SpeedThreadHandle = nil
-			end
-			
+			self:AddToggleCap('RULEUTC_CloakToggle')
+			self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
 			self.SpeedThreadHandle = self:ForkThread(self.SpeedBuffThread, enh)
 		elseif enh == 'AccelerationFieldRemove' then
-			if self.ShieldEffectsBag then
-				for k, v in self.ShieldEffectsBag do
-					v:Destroy()
-				end
-			self.ShieldEffectsBag = {}
-		end
+			self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:SetMaintenanceConsumptionInactive()
 			KillThread(self.SpeedThreadHandle)
 			self.SpeedThreadHandle = nil
+		
 		-- elseif enh == 'CloakingGenerator' then
             -- self.StealthEnh = false
             -- self.CloakEnh = true
@@ -191,6 +196,8 @@ URL0301 = Class(CCommandUnit) {
 		--Stealth Field
 		elseif enh == 'StealthField' then
 			self:AddToggleCap('RULEUTC_CloakToggle')
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
 			if self.IntelEffectsBag then
 				EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
 				self.IntelEffectsBag = nil
@@ -203,6 +210,7 @@ URL0301 = Class(CCommandUnit) {
 			self:EnableUnitIntel('Enhancement', 'RadarStealthField')
 			self:EnableUnitIntel('Enhancement', 'SonarStealthField')
 		elseif enh == 'StealthFieldRemove' then
+            self:SetMaintenanceConsumptionInactive()
 			self:RemoveToggleCap('RULEUTC_CloakToggle')
 			self:DisableUnitIntel('Enhancement', 'RadarStealth')
 			self:DisableUnitIntel('Enhancement', 'SonarStealth')
