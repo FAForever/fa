@@ -10,7 +10,6 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
 UEL0301 = Class(CommandUnit) {
@@ -25,12 +24,6 @@ UEL0301 = Class(CommandUnit) {
     },
 
     Weapons = {
-		Grenade = Class(TIFFragLauncherWeapon) {
-            OnCreate = function(self)
-                TIFFragLauncherWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-            end,
-        },
         RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
         DeathWeapon = Class(SCUDeathWeapon) {},
     },
@@ -40,7 +33,6 @@ UEL0301 = Class(CommandUnit) {
         self:SetCapturable(false)
         self:HideBone('Jetpack', true)
         self:HideBone('SAM', true)
-		self:GetWeaponByLabel('Grenade').NeedsUpgrade = true
         self:SetupBuildBones()
 		self.HasLeftPod = false
         self.HasRightPod = false
@@ -233,17 +225,17 @@ UEL0301 = Class(CommandUnit) {
         elseif enh =='AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-        --Granade Launcher
+        --Gun AoE
 		elseif enh =='HighExplosiveOrdnance' then
-			self:SetWeaponEnabledByLabel('Grenade', true)
-            local wep = self:GetWeaponByLabel('Grenade')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
+            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh =='HighExplosiveOrdnanceRemove' then
-            local wep = self:GetWeaponByLabel('Grenade')
-            wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
-			self:SetWeaponEnabledByLabel('Grenade', false)
-        end
-    end,
+            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+			wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+		end
+	end,
 
     OnIntelEnabled = function(self)
         CommandUnit.OnIntelEnabled(self)
