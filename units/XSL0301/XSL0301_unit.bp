@@ -642,7 +642,7 @@ UnitBlueprint {
 				'RegenAura',
 				'EngineeringThroughput',
 			},
-			HelpText = '<LOC xsl0301_Support_help>Support Armored Command Unit. Enhanced during construction with the Regen aura and engineering upgrade.',
+			HelpText = '<LOC xsl0301_Support_help>Support Armored Command Unit. Enhanced during construction with the restoration aura and engineering upgrade.',
 			SortCategory = 'SORTOTHER',
 			UnitName = '<LOC xsl0301_Support_name>SACU (Regen Aura Support preset)',
 		},
