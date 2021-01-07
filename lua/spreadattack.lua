@@ -282,7 +282,7 @@ function FixOrders(unit)
         orderIndex = nextOrderIndex
         queueIndex = nextQueueIndex
     end
-	    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
+    ordercountg = numOrders -- Going to need total number of orders to be able start counting backwards from last one
 end
 
 
