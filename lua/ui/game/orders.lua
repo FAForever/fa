@@ -1182,17 +1182,17 @@ local function CreateCommonOrders(availableOrders, init)
     end
 
     local units = {}
-    if currentSelection and table.getn(currentSelection) > 0 then
+    if currentSelection and not table.empty(currentSelection) then
         for _, unit in currentSelection do
             if not IsDestroyed(unit) then
                 table.insert(units, unit)
             end
         end
     end
-    if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
+    if units and not table.empty(units) and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
-            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
-                    or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
+            if (availOrder == 'RULEUCC_RetaliateToggle' and not table.empty(EntityCategoryFilterDown(categories.MOBILE, units)))
+                    or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) then
                 orderCheckboxMap['AttackMove']:Enable()
                 break
             end
@@ -1227,7 +1227,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     local assitingUnitList = {}
     local podUnits = {}
-    if table.getn(units) > 0 and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
+    if not table.empty(units) and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
         local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
         local Pods = EntityCategoryFilterDown(categories.POD, units)
         local assistingUnits = {}

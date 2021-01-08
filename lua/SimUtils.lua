@@ -46,7 +46,7 @@ end
 import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 function KillSharedUnits(owner)
-    if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
+    if sharedUnits[owner] and not table.empty(sharedUnits[owner]) then
         for index,unit in sharedUnits[owner] do
             if not unit.Dead and unit.oldowner == owner then
                 unit:Kill()
@@ -173,7 +173,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         if massKilled and massKilled > 0 then
             unit:CalculateVeterancyLevelAfterTransfer(massKilled, massKilledTrue)
         end
-        if enh and table.getn(enh) > 0 then
+        if enh and not table.empty(enh) then
             for k, v in enh do
                 unit:CreateEnhancement(v)
             end
@@ -232,7 +232,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         v:OnGiven(unit)
     end
 
-    if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
+    if not table.empty(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) then
         for _,aiBrain in {fromBrain, toBrain} do
             local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
             for _, victim in buildRestrictionVictims do

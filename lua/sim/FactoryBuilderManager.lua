@@ -372,7 +372,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                     table.insert(possibles, v[1])
                 end
             end
-            if table.getn(possibles) > 0 then
+            if not table.empty(possibles) then
                 rand = Random(1,table.getn(possibles))
                 local customUnitID = possibles[rand]
                 -- LOG('*AI DEBUG: Replaced with '..customUnitID)

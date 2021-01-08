@@ -295,7 +295,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local i = table.getn(sortedUnits)
             local needIcon = true
             while i > 0 do
-                if table.getn(sortedUnits[i]) > 0 then
+                if not table.empty(sortedUnits[i]) then
                     if needIcon then
                         -- Idle engineer icons
                         if Factions[currentFaction].IdleEngTextures[keyToIcon[i]] and UIUtil.UIFile(Factions[currentFaction].IdleEngTextures[keyToIcon[i]],true) then
@@ -325,7 +325,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local needIcon = true
             while i > 0 do
                 for curCat = 1, 3 do
-                    if table.getn(sortedFactories[curCat][i]) > 0 then
+                    if not table.empty(sortedFactories[curCat][i]) then
                         if needIcon then
                             -- Idle factory icons
                             if UIUtil.UIFile(Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i],true) then
@@ -344,7 +344,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             end
            if needIcon == true then
                local ExpFactories = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.allunits)
-               if table.getn(ExpFactories) > 0 then
+               if not table.empty(ExpFactories) then
                    local FactoryUnitId = ExpFactories[1]:GetUnitId()
                    if UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true) then
                        self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true))
@@ -599,7 +599,7 @@ function CreateIdleEngineerList(parent, units)
                 self.icons[i] = CreateUnitEntry(indexToIcon[i], units, Factions[currentFaction].IdleEngTextures[keyToIcon[index]])
                 self.icons[i].priority = i
             end
-            if table.getn(units) > 0 and not self.icons[i]:IsHidden() then
+            if not table.empty(units) and not self.icons[i]:IsHidden() then
                 self.icons[i].units = units
                 self.icons[i].count:SetText(table.getn(units))
                 self.icons[i].count:Show()
@@ -711,7 +711,7 @@ function CreateIdleFactoryList(parent, units)
         for type, icons in bg.icons do
             for index=1,3 do
                 local i = index
-                if table.getn(factories[type][i]) > 0 then
+                if not table.empty(factories[type][i]) then
                     bg.icons[type][i].units = factories[type][i]
                     bg.icons[type][i]:SetAlpha(1)
                     bg.icons[type][i].countBG:Show()
@@ -790,7 +790,7 @@ function AvatarUpdate()
         end
     end
 
-    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) > 0 then
+    if factories and not table.empty(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
         else

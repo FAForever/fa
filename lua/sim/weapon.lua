@@ -124,7 +124,7 @@ Weapon = Class(moho.weapon_methods) {
                 end
                 self.unit.Trash:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
-                if bp.RackSlavedToTurret and table.getn(bp.RackBones) > 0 then
+                if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)

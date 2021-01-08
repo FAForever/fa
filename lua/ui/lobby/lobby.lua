@@ -960,7 +960,7 @@ function SetSlotInfo(slotNum, playerInfo)
         local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
-        if table.getn(slotKeys) > 0 then
+        if not table.empty(slotKeys) then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
             Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1110,7 +1110,7 @@ function ClearSlotInfo(slotIndex)
     -- set the text appropriately
     slot.name:ClearItems()
     slot.name:SetTitleText(LOC(stateText))
-    if table.getn(slotKeys) > 0 then
+    if not table.empty(slotKeys) then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
         Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1227,7 +1227,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -1266,7 +1266,7 @@ local function autobalance_avg(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         local first_team = true
         for i, t in teams do
             local team = t['team']
@@ -1338,7 +1338,7 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)

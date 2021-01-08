@@ -399,7 +399,7 @@ function AirUnitRefitThread(unit, plan, data)
             if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM, unitPos, 400)
-                if table.getn(plats) > 0 then
+                if not table.empty(plats) then
                     local closest, distance
                     for _, v in plats do
                         if not v.Dead then
@@ -932,7 +932,7 @@ function FatBoyBehavior(self)
                     platoonUnits = platoon:GetPlatoonUnits()
                 end
 
-                if platoonUnits and table.getn(platoonUnits) > 0 then
+                if platoonUnits and not table.empty(platoonUnits) then
                     table.insert(goodList, platoon)
                 end
             end
@@ -1020,7 +1020,7 @@ function FatboyChildBehavior(self, parent, base)
     local targetUnit = false
 
     -- Find target loop
-    while aiBrain:PlatoonExists(self) and table.getn(self:GetPlatoonUnits()) > 0 do
+    while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) do
         targetUnit, base = WreckBase(self, base)
 
         local units = self:GetPlatoonUnits()
@@ -1037,7 +1037,7 @@ function FatboyChildBehavior(self, parent, base)
         end
 
         -- Walk to and kill target loop
-        while aiBrain:PlatoonExists(self) and table.getn(self:GetPlatoonUnits()) > 0 and not targetUnit.Dead do
+        while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) and not targetUnit.Dead do
             WaitSeconds(3)
         end
 
@@ -2074,7 +2074,7 @@ function AirUnitRefitThreadSorian(unit, plan, data)
             if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL, unitPos, 400)
-                if table.getn(plats) > 0 then
+                if not table.empty(plats) then
                     local closest, distance
                     for k, v in plats do
                         if not v.Dead then
@@ -2129,7 +2129,7 @@ function AirStagingThreadSorian(unit)
         end
 
         local cargo = unit:GetCargo()
-        if ready and numUnits == 0 and table.getn(cargo) > 0 then
+        if ready and numUnits == 0 and not table.empty(cargo) then
             local pos = unit:GetPosition()
             IssueClearCommands({unit})
             IssueTransportUnload({unit}, {pos[1] + 5, pos[2], pos[3] + 5})

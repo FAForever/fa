@@ -406,7 +406,7 @@ function CreateTabs(type)
         if templatesTab and templatesTab:IsChecked() then
             local numActive = 0
             for _, tab in controls.tabs do
-                if sortedOptions[tab.ID] and table.getn(sortedOptions[tab.ID]) > 0 then
+                if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
                     numActive = numActive + 1
                 end
             end
@@ -486,7 +486,7 @@ function CreateTabs(type)
     local defaultTab = false
     local numActive = 0
     for _, tab in controls.tabs do
-        if sortedOptions[tab.ID] and table.getn(sortedOptions[tab.ID]) > 0 then
+        if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
             numActive = numActive + 1
             if defaultTabOrder[tab.ID] then
@@ -2007,8 +2007,8 @@ function FormatData(unitData, type)
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
-            if table.getn(units) > 0 then
-                if table.getn(retData) > 0 then
+            if not table.empty(units) then
+                if not table.empty(retData) then
                     table.insert(retData, {type = 'spacer'})
                 end
 
@@ -2381,7 +2381,7 @@ function SetSecondaryDisplay(type)
             end
 
             previousModifiedCommandQueue = modifiedCommandQueue
-            if modifiedCommandQueue and table.getn(modifiedCommandQueue) > 0 then
+            if modifiedCommandQueue and not table.empty(modifiedCommandQueue) then
                 local index = 1
                 local newStack = nil
                 local lastStack = nil
@@ -2402,7 +2402,7 @@ function SetSecondaryDisplay(type)
                 end
             end
 
-            if table.getn(sortedOptions.selection) == 1 and table.getn(data) > 0 then
+            if table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
                 controls.secondaryProgress:SetNeedsFrameUpdate(true)
             else
                 controls.secondaryProgress:SetNeedsFrameUpdate(false)
@@ -2410,7 +2410,7 @@ function SetSecondaryDisplay(type)
             end
         elseif type == 'attached' then
             local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
-            if attachedUnits and table.getn(attachedUnits) > 0 then
+            if attachedUnits and not table.empty(attachedUnits) then
                 for _, v in attachedUnits do
                     table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
                 end
@@ -2439,7 +2439,7 @@ function CheckForOrderQueue(newSelection)
             ClearQueueGrid()
         end
         SetQueueState(false)
-    elseif table.getn(selection) > 0 then
+    elseif not table.empty(selection) then
         ClearCurrentFactoryForQueueDisplay()
         ClearQueueGrid()
         SetQueueState(false)
@@ -2549,7 +2549,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             sortedOptions.t1 = buildableUnits
         end
 
-        if table.getn(buildableUnits) > 0 then
+        if not table.empty(buildableUnits) then
             controls.constructionTab:Enable()
         else
             controls.constructionTab:Disable()

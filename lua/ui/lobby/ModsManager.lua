@@ -725,7 +725,7 @@ function ActivateMod(uid, isRecursing)
                 end
             end
             -- Prompt the user, and if they approve, turn off all conflicting mods.
-            if table.getn(activatedConflictingMods) > 0 then
+            if not table.empty(activatedConflictingMods) then
                 if isRecursing then
                     -- Just quietly get on and do it if it's a recursive call.
                     doEnable()

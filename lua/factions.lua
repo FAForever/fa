@@ -76,7 +76,7 @@ function GetSelectedMods(AllowedMods)
     if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
         -- Detect if we're in the main menu or loading the game
         mods = import('/lua/mods.lua').GetSelectedMods()
-    elseif rawget(_G, '__active_mods') and table.getn(__active_mods) > 0 then
+    elseif rawget(_G, '__active_mods') and not table.empty(__active_mods) then
         for k, mod in __active_mods do
             mods[mod.uid] = true
         end

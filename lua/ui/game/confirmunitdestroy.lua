@@ -12,7 +12,7 @@ local countdownThreads = {}
 
 function ConfirmUnitDestruction(instant)
     if import('/lua/ui/campaign/campaignmanager.lua').campaignMode
-    and table.getn(EntityCategoryFilterDown(categories.COMMAND, GetSelectedUnits())) > 0 then
+    and not table.empty(EntityCategoryFilterDown(categories.COMMAND, GetSelectedUnits())) then
         CreateAnnouncement('<LOC confirm_0001>You cannot self destruct during an operation!')
     else
         local units = GetSelectedUnits()

@@ -238,7 +238,7 @@ Unit = Class(moho.unit_methods) {
         self:SetCanBeKilled(true)
 
         local bpDeathAnim = bp.Display.AnimationDeath
-        if bpDeathAnim and table.getn(bpDeathAnim) > 0 then
+        if bpDeathAnim and not table.empty(bpDeathAnim) then
             self.PlayDeathAnimation = true
         end
 
@@ -2146,7 +2146,7 @@ Unit = Class(moho.unit_methods) {
         self:StartBeingBuiltEffects(builder, layer)
 
         local aiBrain = self:GetAIBrain()
-        if table.getn(aiBrain.UnitBuiltTriggerList) > 0 then
+        if not table.empty(aiBrain.UnitBuiltTriggerList) then
             for _, v in aiBrain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
                     self:ForkThread(self.UnitBuiltPercentageCallbackThread, v.Percent, v.Callback)

@@ -192,7 +192,7 @@ FilePicker = Class(Group) {
             self._filelistObjects = {}
 
             self._filelist.CreateOptionElements = function()
-                if table.getn(self._filelistObjects) > 0 then
+                if not table.empty(self._filelistObjects) then
                     for i, v in self._filelistObjects do
                         v:Destroy()
                     end
@@ -479,7 +479,7 @@ FilePicker = Class(Group) {
     end,
 
     SetTabConfiguration = function(self, configID)
-        if table.getn(self._tabs) > 0 then
+        if not table.empty(self._tabs) then
             for index, tab in self._tabs do
                 tab:Destroy()
             end

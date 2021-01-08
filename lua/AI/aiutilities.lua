@@ -669,7 +669,7 @@ function AIGetClosestMarkerLocation(aiBrain, markerType, startX, startZ, extraTy
     if extraTypes then
         for num, pType in extraTypes do
             local moreMarkers = AIGetMarkerLocations(aiBrain, pType)
-            if table.getn(moreMarkers) > 0 then
+            if not table.empty(moreMarkers) then
                 for _, v in moreMarkers do
                     table.insert(markerList, {Position = v.Position, Name = v.Name})
                 end
@@ -1238,7 +1238,7 @@ end
 
 function FindIdleGates(aiBrain)
     local gates = aiBrain:GetListOfUnits(categories.GATE, true)
-    if gates and table.getn(gates) > 0 then
+    if gates and not table.empty(gates) then
         local retGates = {}
         for _, v in gates do
             if not v:IsUnitState('Building') and not v:IsUnitState('TransportLoading') then
@@ -1358,7 +1358,7 @@ function GetTransports(platoon, units)
 
     local numTransports = 0
     local transSlotTable = {}
-    if table.getn(transports) > 0 then
+    if not table.empty(transports) then
         local sortedList = {}
         -- Sort distances
         for k = 1, table.getn(transports) do
@@ -1517,7 +1517,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local monitorUnits = {}
     for num, data in transportTable do
-        if table.getn(data.Units) > 0 then
+        if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
             for k, v in data.Units do table.insert(monitorUnits, v) end
@@ -1822,7 +1822,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     -- Check if enemy units are at location
     local checkUnits = aiBrain:GetUnitsAroundPoint( (categories.STRUCTURE + categories.MOBILE) - categories.AIR, pos, 10, 'Enemy')
     -- reclaim units near our building place.
-    if checkUnits and table.getn(checkUnits) > 0 then
+    if checkUnits and not table.empty(checkUnits) then
         for num, unit in checkUnits do
             if unit.Dead or unit:BeenDestroyed() then
                 continue
@@ -1844,7 +1844,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     end
     -- reclaim rocks etc or we can't build mexes or hydros
     local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
-    if Reclaimables and table.getn( Reclaimables ) > 0 then
+    if Reclaimables and not table.empty( Reclaimables ) then
         for k,v in Reclaimables do
             if v.MaxMassReclaim > 0 or v.MaxEnergyReclaim > 0 then
                 IssueReclaim({eng}, v)
@@ -1862,7 +1862,7 @@ function EngineerTryRepair(aiBrain, eng, whatToBuild, pos)
 
     local structureCat = ParseEntityCategory(whatToBuild)
     local checkUnits = aiBrain:GetUnitsAroundPoint(structureCat, pos, 1, 'Ally')
-    if checkUnits and table.getn(checkUnits) > 0 then
+    if checkUnits and not table.empty(checkUnits) then
         for num, unit in checkUnits do
             IssueRepair({eng}, unit)
         end
@@ -2156,7 +2156,7 @@ function EngineerTryRepairSorian(aiBrain, eng, whatToBuild, pos)
 
     local structureCat = ParseEntityCategory(whatToBuild)
     local checkUnits = aiBrain:GetUnitsAroundPoint(structureCat, pos, checkRange, 'Ally')
-    if checkUnits and table.getn(checkUnits) > 0 then
+    if checkUnits and not table.empty(checkUnits) then
         for num, unit in checkUnits do
             if unit:IsBeingBuilt() then
                 IssueRepair({eng}, unit)
@@ -2289,14 +2289,14 @@ function AIFindStartLocationNeedsEngineerSorian(aiBrain, locationType, radius, t
 
     local retPos, retName
     if eng then
-        if table.getn(validStartPos) > 0 then
+        if not table.empty(validStartPos) then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validStartPos)
         end
         if not retPos then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validPos)
         end
     else
-        if table.getn(validStartPos) > 0 then
+        if not table.empty(validStartPos) then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRings, tType, validStartPos)
         end
         if not retPos then
@@ -2835,7 +2835,7 @@ function UseTransportsGhetto(units, transports)
 
     local monitorUnits = {}
     for num, data in transportTable do
-        if table.getn(data.Units) > 0 then
+        if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
             for _, v in data.Units do table.insert(monitorUnits, v) end
