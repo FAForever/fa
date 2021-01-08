@@ -7,7 +7,7 @@
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
-local OCProjectiles = {}                                                                                            
+local OCProjectiles = {}
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -160,7 +160,7 @@ NukeProjectile = Class(NullShell) {
         end
         NullShell.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
 		local bp = self:GetBlueprint().Defense.MaxHealth
 			if bp then
@@ -339,7 +339,7 @@ OverchargeProjectile = Class() {
         --  Overcharge = {
         --      energyMult = _, -- What proportion of current storage are we allowed to spend?
         --      commandDamage = _, -- Takes effect in ACUUnit DoTakeDamage()
-        --      structureDamage = _, -- Takes effect in StructureUnit DoTakeDamage() & Shield  ApplyDamage()                                                                        
+        --      structureDamage = _, -- Takes effect in StructureUnit DoTakeDamage() & Shield  ApplyDamage()
         --      maxDamage = _,
         --      minDamage = _,
         --  },
@@ -363,15 +363,15 @@ OverchargeProjectile = Class() {
                 targetEntity = targetEntity.Owner
             end
 
-            
+
                 -- Get max energy available to drain according to how much we have
                 local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
                 local energyLimit = energyAvailable * data.energyMult
-                
+
                 if OCProjectiles[self.Army] > 1 then
                     energyLimit = energyLimit / OCProjectiles[self.Army]
                 end
-                
+
                 local energyLimitDamage = self:EnergyAsDamage(energyLimit)
 
                 -- Find max available damage
@@ -382,7 +382,7 @@ OverchargeProjectile = Class() {
                 local maxHP = self:UnitsDetection(targetType, targetEntity)
 
                 idealDamage = maxHP or data.minDamage
-                
+
                       -----SHIELDS------
                 if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
                     if EntityCategoryContains(categories.STRUCTURE, targetEntity) then
@@ -393,20 +393,20 @@ OverchargeProjectile = Class() {
 	                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
                     --good against group of mobile shields
                 end
-	        
+
                       ------ ACU -------
                 if EntityCategoryContains(categories.COMMAND, targetEntity) and not maxHP then -- no units around ACU - min.damage
-                    idealDamage = data.minDamage		
+                    idealDamage = data.minDamage
                 end
 
                 damage = math.min(damage, idealDamage)
                 damage = math.max(data.minDamage, damage)
-                
+
                 -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
                 if energyAvailable < 5000 then
                     damage = energyLimitDamage
                 end
-            
+
         end
 
         -- Turn the final damage into energy
@@ -436,12 +436,12 @@ OverchargeProjectile = Class() {
     EnergyAsDamage = function(self, energy)
         return energy / 4
     end,
-    
+
     UnitsDetection = function(self, targetType, targetEntity)
      -- looking for units around target which are in splash range
-        local launcher = self:GetLauncher() 
+        local launcher = self:GetLauncher()
         local maxHP = 0
-        
+
         for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do
                 if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
                     maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
@@ -449,7 +449,7 @@ OverchargeProjectile = Class() {
                     maxHP = unit:GetHealth()
                 end
         end
-               
+
         for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) or {} do
             -- Special for fatty's shield
             if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
@@ -461,7 +461,7 @@ OverchargeProjectile = Class() {
                 end
             end
         end
-        
+
         if EntityCategoryContains(categories.EXPERIMENTAL, targetEntity) and targetEntity:GetHealth() > maxHP then
             maxHP = targetEntity:GetHealth()
             --[[ we need this because if OC shell hitted top part of GC model its health won't be in our table
@@ -469,19 +469,19 @@ OverchargeProjectile = Class() {
             Shell is too far from actual target.pos(target pos is somewhere near land and shell is near GC's head)
             and getUnits returns nothing. Same to GetDistance. Distance between shell and GC pos > than math.min (x,z) size]]
         end
-        
+
         if maxHP ~= 0 then
-            return maxHP     
+            return maxHP
         end
     end,
-    
+
     OnCreate = function(self)
         self.Army = self:GetArmy()
 
         if not OCProjectiles[self.Army] then
             OCProjectiles[self.Army] = 0
         end
-        
+
         OCProjectiles[self.Army] = OCProjectiles[self.Army] + 1
     end,
 }

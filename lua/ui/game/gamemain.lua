@@ -514,9 +514,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local upgradesTo = nil
         local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then 
+            if type(potentialUpgrades) == "string" then
                 upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then 
+            elseif type(potentialUpgrades) == "table" then
                 local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
                 for _, v in potentialUpgrades do
                     if EntityCategoryContains(buildableCategories, v) then

@@ -6,14 +6,14 @@ function SetLayout()
     local controls = import('/lua/ui/game/multifunction.lua').controls
     local savedParent = import('/lua/ui/game/multifunction.lua').savedParent
     local econControl = import('/lua/ui/game/economy.lua').GUI.bg
-    
+
     controls.bg.panel:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/filter-ping-panel02_bmp.dds'))
     controls.bg.leftBrace:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
     controls.bg.leftGlow:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-energy-l_bmp.dds'))
     controls.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
     controls.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
     controls.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
-    
+
     controls.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'))
     controls.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'),
         UIUtil.UIFile('/game/tab-l-btn/tab-open_btn_up.dds'),
@@ -23,7 +23,7 @@ function SetLayout()
         UIUtil.UIFile('/game/tab-l-btn/tab-open_btn_dis.dds'))
     LayoutHelpers.AtLeftTopIn(controls.collapseArrow, GetFrame(0), -3, 97)
     controls.collapseArrow.Depth:Set(function() return controls.bg.Depth() + 10 end)
-    
+
     LayoutHelpers.Below(controls.bg, econControl, 5)
     if controls.collapseArrow:IsChecked() then
         LayoutHelpers.AtLeftIn(controls.bg, savedParent, -200)
@@ -32,7 +32,7 @@ function SetLayout()
     end
     controls.bg.Height:Set(controls.bg.panel.Height)
     controls.bg.Width:Set(controls.bg.panel.Width)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.bg.panel, controls.bg, 2)
     LayoutHelpers.AnchorToLeft(controls.bg.leftBrace, controls.bg, -11)
     LayoutHelpers.AtTopIn(controls.bg.leftBrace, controls.bg, 2)
@@ -46,8 +46,8 @@ function SetLayout()
     controls.bg.rightGlowMiddle.Top:Set(controls.bg.rightGlowTop.Bottom)
     controls.bg.rightGlowMiddle.Bottom:Set(function() return math.max(controls.bg.rightGlowTop.Bottom(), controls.bg.rightGlowBottom.Top()) end)
     controls.bg.rightGlowMiddle.Right:Set(function() return controls.bg.rightGlowTop.Right() end)
-    
-    
+
+
     for i, control in controls.overlayBtns do
         local index = i
         if index == 1 then
@@ -60,7 +60,7 @@ function SetLayout()
             LayoutHelpers.AtVerticalCenterIn(control.dropout, control, -1)
         end
     end
-    
+
     for i, control in controls.pingBtns do
         local index = i
         if index == 1 then
@@ -69,5 +69,5 @@ function SetLayout()
             LayoutHelpers.RightOf(control, controls.pingBtns[index-1], -7)
         end
     end
-    
+
 end

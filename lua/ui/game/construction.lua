@@ -1523,7 +1523,7 @@ function OnClickHandler(button, modifiers)
                 end
 
                 if not alreadyWarned and existingEnhancements[slot] ~= item.id then
-                    UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?", 
+                    UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
                         "<LOC _Yes>",
                         function()
                             OrderEnhancement(item, clean, true)

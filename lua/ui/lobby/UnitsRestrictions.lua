@@ -142,7 +142,7 @@ Expressions = {
     DIRECTFIRE_BASE_T2  = "(DIRECTFIRE * STRUCTURE * TECH2)",
     DIRECTFIRE_BASE_T1  = "(DIRECTFIRE * STRUCTURE * TECH1)",
 
-    SHIELD_AIR  = "(SHIELD * AIR)", 
+    SHIELD_AIR  = "(SHIELD * AIR)",
     SHIELD_NAVY = "(SHIELD * NAVAL)",
     SHIELD_LAND = "(SHIELD * LAND - TANK - BOT + uel0301_BubbleShield + uel0401)", -- excluding personal shields
     SHIELD_BASE = "(SHIELD * STRUCTURE)",
@@ -658,7 +658,7 @@ local function CreatePresets()
         "<LOC restricted_units_info_INTEL_LAND>Prevents land units that provide intelligence",
         "<LOC restricted_units_data_INTEL_LAND>No Mobile Intel",
         "/textures/ui/common/icons/presets/intel-land.dds")
-        
+
     -- TACTICAL MISSILES restrictions
     CreatePreset("TMLDEF",
         "<LOC restricted_units_info_TMLDEF>Prevents all structures that provide tactical missile defense (TMD) ability",

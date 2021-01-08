@@ -225,9 +225,9 @@ function OnCommandIssued(command)
         end
         --EQ:this is the only bit we add - a callback for shields so they can disable their pointers.
         local shieldCat = categories.MOBILE * categories.SHIELD
-        
+
         local mobShields = EntityCategoryFilterDown(shieldCat, command.Units)
-        
+
         if mobShields[1] then
             local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
             SimCallback(cb, true)

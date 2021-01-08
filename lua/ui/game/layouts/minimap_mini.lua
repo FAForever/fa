@@ -3,7 +3,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 function SetLayout()
     local controls = import('/lua/ui/game/minimap.lua').controls
-    
+
     local windowTextures = {
         tl = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
         tr = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
@@ -16,9 +16,9 @@ function SetLayout()
         br = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    
+
     controls.displayGroup:ApplyWindowTextures(windowTextures)
-    
+
     controls.miniMap.GlowTL:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_ul.dds'))
     controls.miniMap.GlowTR:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds'))
     controls.miniMap.GlowBR:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'))
@@ -27,33 +27,33 @@ function SetLayout()
     controls.miniMap.GlowR:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds'))
     controls.miniMap.GlowT:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds'))
     controls.miniMap.GlowB:SetTexture(UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds'))
-    
+
     controls.miniMap.DragTL:SetTexture(UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
     controls.miniMap.DragTR:SetTexture(UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
     controls.miniMap.DragBL:SetTexture(UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
     controls.miniMap.DragBR:SetTexture(UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
-    
+
     controls.miniMap.DragTL.textures = {up = UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'),
             down = UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_down.dds'),
             over = UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_over.dds')}
-            
+
     controls.miniMap.DragTR.textures = {up = UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'),
             down = UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_down.dds'),
             over = UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_over.dds')}
-            
+
     controls.miniMap.DragBL.textures = {up = UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'),
             down = UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_down.dds'),
             over = UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_over.dds')}
-            
+
     controls.miniMap.DragBR.textures = {up = UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'),
             down = UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_down.dds'),
             over = UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_over.dds')}
-    
+
     local clientGroup = controls.displayGroup:GetClientGroup()
     LayoutHelpers.AtLeftTopIn(controls.miniMap.GlowTL, clientGroup, 0, -4)
     controls.miniMap.GlowTL:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.GlowTL:DisableHitTest()
-    
+
     LayoutHelpers.AtRightTopIn(controls.miniMap.GlowTR, clientGroup, 0, -4)
     controls.miniMap.GlowTR:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.GlowTR:DisableHitTest()
@@ -83,23 +83,23 @@ function SetLayout()
     LayoutHelpers.AtBottomIn(controls.miniMap.GlowB, controls.miniMap.GlowBL, 1)
     controls.miniMap.GlowB:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.GlowB:DisableHitTest()
-    
+
     LayoutHelpers.AtLeftTopIn(controls.miniMap.DragTL, controls.displayGroup, -27, -10)
     controls.miniMap.DragTL:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.DragTL:DisableHitTest()
-    
+
     LayoutHelpers.AtRightTopIn(controls.miniMap.DragTR, controls.displayGroup, -22, -10)
     controls.miniMap.DragTR:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.DragTR:DisableHitTest()
-    
+
     LayoutHelpers.AtLeftBottomIn(controls.miniMap.DragBL, controls.displayGroup, -27, -8)
     controls.miniMap.DragBL:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.DragBL:DisableHitTest()
-    
+
     LayoutHelpers.AtRightBottomIn(controls.miniMap.DragBR, controls.displayGroup, -22, -8)
     controls.miniMap.DragBR:SetRenderPass(UIUtil.UIRP_PostGlow)
     controls.miniMap.DragBR:DisableHitTest()
-    
+
     controls.miniMap.DragTL.Depth:Set(function() return controls.displayGroup.Depth() + 2 end)
     controls.miniMap.DragTR.Depth:Set(controls.miniMap.DragTL.Depth)
     controls.miniMap.DragBL.Depth:Set(controls.miniMap.DragTL.Depth)

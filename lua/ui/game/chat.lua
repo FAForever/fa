@@ -825,7 +825,7 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
-    
+
     if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
         return
     end

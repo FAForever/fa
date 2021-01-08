@@ -226,7 +226,7 @@ function FactionIndex(aiBrain, ...)
         if faction == FactionIndex then
             return true
         end
-    end    
+    end
     return false
 end
 

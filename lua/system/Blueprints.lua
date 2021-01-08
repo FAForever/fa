@@ -670,11 +670,11 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
-    
+
     --load game preferences file
     PreGameData = false --this stops us from tripping the games global variable uninitialised detector, which is very finicky in this file.
     LoadCustomPreferences()
-    
+
     -- load blueprints from active map directory
     if PreGameData and PreGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
@@ -685,7 +685,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
             if taskNotifier then
                taskNotifier:Update(task, total, k)
             end
-            
+
             safecall(task .. ': ' .. file, doscript, file)
         end
     end

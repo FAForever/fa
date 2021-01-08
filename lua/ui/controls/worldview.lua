@@ -67,7 +67,7 @@ local function RadiusDecalFunction(filterFunc)
     local maxRadius = 0
     for _, w in weapons do
         if w.FixedSpreadRadius and w.FixedSpreadRadius > maxRadius then
-            maxRadius = w.FixedSpreadRadius    
+            maxRadius = w.FixedSpreadRadius
         elseif w.DamageRadius > maxRadius then
             maxRadius = w.DamageRadius
         end

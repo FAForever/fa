@@ -61,31 +61,31 @@ end
 
 local currentMovie = false
 function PlayMFDMovie(movie, text)
-    if not controls.movieBrackets then        
+    if not controls.movieBrackets then
         controls.movieBrackets = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/transmission/video-brackets.dds'))
         controls.movieBrackets.Height:Set(1)
         controls.movieBrackets.Width:Set(1)
         controls.movieBrackets.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
         controls.movieBrackets:SetNeedsFrameUpdate(true)
-        
+
         controls.movieBrackets.panel = Bitmap(controls.movieBrackets, UIUtil.SkinnableFile('/game/transmission/video-panel.dds'))
         LayoutHelpers.AtCenterIn(controls.movieBrackets.panel, controls.movieBrackets)
         controls.movieBrackets.panel:SetAlpha(0)
-        
+
         controls.movieBrackets.cover = Bitmap(controls.movieBrackets, UIUtil.UIFile(prefix[movie[4]].texture))
         LayoutHelpers.SetDimensions(controls.movieBrackets.cover, 190, 190)
         LayoutHelpers.DepthUnderParent(controls.movieBrackets.cover, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.cover, controls.movieBrackets.panel)
         controls.movieBrackets.cover:SetAlpha(0)
-        
+
         controls.movieBrackets.movie = Movie(controls.movieBrackets, movie[1])
         LayoutHelpers.SetDimensions(controls.movieBrackets.movie, 190, 190)
         LayoutHelpers.DepthUnderParent(controls.movieBrackets.movie, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.movie, controls.movieBrackets.panel)
         controls.movieBrackets.movie:SetAlpha(0)
-        
+
         controls.subtitles = CreateSubtitles(controls.movieBrackets, text[1])
-        
+
         controls.movieBrackets.movie.OnFinished = function(self)
             if (not controls.movieBrackets.movie:IsLoaded()) and (self.loadCheck == nil) then
                 ForkThread(
@@ -136,10 +136,10 @@ function PlayMFDMovie(movie, text)
                     controls.movieBrackets:Destroy()
                     controls.movieBrackets = false
                     local entryData = {
-                        movie = movie[1], 
-                        text = text, 
-                        soundbank = movie[2], 
-                        soundcue = movie[3], 
+                        movie = movie[1],
+                        text = text,
+                        soundbank = movie[2],
+                        soundcue = movie[3],
                         faction = movie[4],
                     }
                     import('/lua/ui/game/transmissionlog.lua').AddEntry(entryData)
@@ -147,7 +147,7 @@ function PlayMFDMovie(movie, text)
                 end
             end
         end
-        
+
         controls.movieBrackets.OnFrame = function(self, delta)
             if controls.movieBrackets._paused then
                 return
@@ -173,7 +173,7 @@ function PlayMFDMovie(movie, text)
                 controls.subtitles:Expand()
             end
         end
-        
+
         controls.movieBrackets.panel.OnFrame = function(self, delta)
             if controls.movieBrackets._paused then
                 return
@@ -191,7 +191,7 @@ function PlayMFDMovie(movie, text)
                 controls.movieBrackets.cover:SetAlpha(newAlpha)
             end
         end
-        
+
         controls.movieBrackets.Pause = function(self, state)
             PauseVoice("VO", state)
             self._paused = state
@@ -201,7 +201,7 @@ function PlayMFDMovie(movie, text)
                 self.movie:Play()
             end
         end
-        
+
         controls.movieBrackets:DisableHitTest(true)
         SetLayout()
     end
@@ -217,10 +217,10 @@ end
 
 function CreateSubtitles(parent, text)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
-    
+
     bg.text = {}
     bg.text[1] = UIUtil.CreateText(bg, '', 12, UIUtil.bodyFont)
-    
+
     bg.tl = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
     bg.tm = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
     bg.tr = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
@@ -229,7 +229,7 @@ function CreateSubtitles(parent, text)
     bg.bl = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
     bg.bm = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
     bg.br = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-    
+
     bg.tl.Bottom:Set(bg.Top)
     bg.tl.Right:Set(bg.Left)
     bg.tr.Bottom:Set(bg.Top)
@@ -250,11 +250,11 @@ function CreateSubtitles(parent, text)
     bg.mr.Left:Set(bg.Right)
     bg.mr.Top:Set(bg.Top)
     bg.mr.Bottom:Set(bg.Bottom)
-    
+
     local textWidth = LayoutHelpers.ScaleNumber(300)
-    local wrapped = WrapText(LOC(text), textWidth, 
+    local wrapped = WrapText(LOC(text), textWidth,
         function(curText) return bg.text[1]:GetStringAdvance(curText) end)
-        
+
     for index, line in wrapped do
         local i = index
         if not bg.text[i] then
@@ -263,14 +263,14 @@ function CreateSubtitles(parent, text)
         end
         bg.text[i]:SetText(line)
     end
-    
+
     bg.Top:Set(bg.text[1].Top)
     bg.Left:Set(bg.text[1].Left)
     bg.Width:Set(1)
     bg.Height:Set(function() return table.getsize(bg.text) * bg.text[1].Height() end)
-    
+
     bg:SetAlpha(0, true)
-    
+
     bg.Expand = function(control)
         control:SetAlpha(1, true)
         bg.text[1]:SetAlpha(0, true)
@@ -303,7 +303,7 @@ function CreateSubtitles(parent, text)
             self:SetAlpha(newAlpha, true)
         end
     end
-    
+
     bg.Contract = function(control)
         control.text[1]:SetNeedsFrameUpdate(true)
         control.OnFrame = function(self, delta)
@@ -335,7 +335,7 @@ function CreateSubtitles(parent, text)
             self:SetAlpha(newAlpha, true)
         end
     end
-    
+
     return bg
 end
 
@@ -434,7 +434,7 @@ function EndGameFMV(faction)
         --DisplaySubtitles(textArea, strings.captions)
         loading = false
     end
-    
+
     function DoExit(onFMVFinished)
         nis:Stop()
         loading = true
@@ -467,11 +467,11 @@ function EndGameFMV(faction)
         end
         nis.stage = nis.stage + 1
     end
-    
+
     nis.OnFinished = function(self)
         DoExit(true)
     end
-    
+
     nis.HandleEvent = function(self, event)
         if loading then
             return false

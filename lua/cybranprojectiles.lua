@@ -245,19 +245,19 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
         local radius = self.DamageData.DamageRadius
-        
+
         CreateLightParticle( self, -1, army, radius * 2, 12, 'glow_03', 'ramp_red_06' )
         CreateLightParticle( self, -1, army, radius * 2, 22, 'glow_03', 'ramp_antimatter_02' )
-    
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
-            
+
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageArea( self, pos, radius, 1, 'Force', true )
             DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
-            
+
         end
-        
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
@@ -500,7 +500,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.CCorsairMissileHit01,
     FxImpactLand = EffectTemplate.CCorsairMissileLandHit01,
     FxImpactUnderWater = {},
-    
+
     OnImpact = function(self, targetType, targetEntity)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -513,7 +513,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
             DamageArea(self, pos, radius, 1, 'Force', true)
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 150, 50, army)
         end
-        
+
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

@@ -257,7 +257,7 @@ local function AttackOrderInit(control, unitList)
     if not unitList[1] then
         return true
     end
-    
+
     --set up the icons that will be toggled on/off
     if not control.toggleModeIcon then
         control.toggleModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/toggle_red.dds'))
@@ -269,7 +269,7 @@ local function AttackOrderInit(control, unitList)
                 return true
             end
         end
-    end 
+    end
 
     if not control.mixedModeIcon then
         control.mixedModeIcon = Bitmap(control.toggleModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))

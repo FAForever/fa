@@ -1799,7 +1799,7 @@ Platoon = Class(moho.platoon_methods) {
             local guardedUnit
             if eng.UnitBeingAssist then
                 guardedUnit = eng.UnitBeingAssist
-            else 
+            else
                 guardedUnit = eng:GetGuardedUnit()
             end
             -- loop as long as we are not dead and not idle
@@ -1884,7 +1884,7 @@ Platoon = Class(moho.platoon_methods) {
             local guardedUnit
             if eng.UnitBeingAssist then
                 guardedUnit = eng.UnitBeingAssist
-            else 
+            else
                 guardedUnit = eng:GetGuardedUnit()
             end
             -- loop as long as we are not dead and not idle
@@ -1947,7 +1947,7 @@ Platoon = Class(moho.platoon_methods) {
                 local low = false
                 local bestUnit = false
                 for k,v in assistList do
-                    --DUNCAN - check unit is inside assist range 
+                    --DUNCAN - check unit is inside assist range
                     local unitPos = v:GetPosition()
                     local UnitAssist = v.UnitBeingBuilt or v.UnitBeingAssist or v
                     local NumAssist = table.getn(UnitAssist:GetGuards())
@@ -2707,7 +2707,7 @@ Platoon = Class(moho.platoon_methods) {
             WaitSeconds(7)
         end
     end,
-    
+
     -------------------------------------------------------
     --   Function: CarrierAI
     --   Args:
@@ -5180,7 +5180,7 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain.InterestList then
             aiBrain:BuildScoutLocationsSorian()
         end
-        
+
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
             scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
@@ -6557,7 +6557,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
     end,
-    
+
     --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
@@ -6576,7 +6576,7 @@ Platoon = Class(moho.platoon_methods) {
 
         if table.empty(path) then
             error("IssuePatrolAlongRoute: The path is empty.");
-            return { } 
+            return { }
         end
 
         -- keep track of all the commands we issued
@@ -6585,7 +6585,7 @@ Platoon = Class(moho.platoon_methods) {
         -- we have no formation, further computations are not required. We use this
         -- shortcut because calling IssueFormPatrol() with no formation causes them
         -- to not move at all.
-        if formation == 'NoFormation' then 
+        if formation == 'NoFormation' then
             local units = self:GetPlatoonUnits()
             for k, node in path do
                 local command = IssuePatrol(units, node)
@@ -6598,7 +6598,7 @@ Platoon = Class(moho.platoon_methods) {
         -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then 
+        if not path[1].x then
             local oldPath = path
             path = {}
             for k, node in oldPath do
@@ -6613,13 +6613,13 @@ Platoon = Class(moho.platoon_methods) {
 
         -- pre-compute the angles
         local angles = { }
-        for k = 1, count do 
-    
+        for k = 1, count do
+
             local curr = path[k - 1]
             local next = path[k]
-    
+
             -- if we're trying to look before the first node of the path, use the last node instead
-            if k - 1 < 1 then 
+            if k - 1 < 1 then
                 curr = path[count]
             end
 
@@ -6633,7 +6633,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path in formation
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do 
+        for k = 1, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormPatrol(units, point, formation, angle)
@@ -6642,7 +6642,7 @@ Platoon = Class(moho.platoon_methods) {
 
         return commands
     end,
-    
+
     --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     -- @param self The platoon itself.
     -- @param path A table of positions, preferably of type Vector. Converted otherwise.
@@ -6660,16 +6660,16 @@ Platoon = Class(moho.platoon_methods) {
 
         if table.empty(path) then
             error("IssueAggressiveMoveAlongRoute: The path is empty.");
-            return { } 
+            return { }
         end
 
         -- keep track of all the commands we issued
         local commands = { }
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormAggressiveMove() with no formation causes 
+        -- shortcut because calling IssueFormAggressiveMove() with no formation causes
         -- them to not move at all.
-        if formation == 'NoFormation' then 
+        if formation == 'NoFormation' then
             -- store the commands / orders
             local units = self:GetPlatoonUnits()
 
@@ -6684,7 +6684,7 @@ Platoon = Class(moho.platoon_methods) {
         -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then 
+        if not path[1].x then
             local oldPath = path
             path = {}
             for k, node in oldPath do
@@ -6699,13 +6699,13 @@ Platoon = Class(moho.platoon_methods) {
 
         -- pre-compute the angles
         local angles = { }
-        for k = 1, count do 
-    
+        for k = 1, count do
+
             local curr = path[k - 1]
             local next = path[k]
-    
+
             -- if we're trying to look before the first node of the path, use the platoons current position instead
-            if k - 1 < 1 then 
+            if k - 1 < 1 then
                 local pos = self:GetPlatoonPosition()
                 curr = Vector(pos[1], pos[2], pos[3])
             end
@@ -6720,7 +6720,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = fi1rst, count do 
+        for k = fi1rst, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormAggressiveMove(units, point, formation, angle)
@@ -6738,7 +6738,7 @@ Platoon = Class(moho.platoon_methods) {
     IssueMoveAlongRoute = function(self, path, formation)
         -- check for optional / default values
         local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
-        
+
         -- check if the parameters are correct
         if not path or not (type(path) == 'table') then
             error("IssueMoveAlongRoute: The path is not a table. For paths with only one node, use { node } as the path.")
@@ -6747,16 +6747,16 @@ Platoon = Class(moho.platoon_methods) {
 
         if table.empty(path) then
             error("IssueMoveAlongRoute: The path is empty.");
-            return { } 
+            return { }
         end
 
         -- keep track of all the commands we issued
         local commands = { }
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormMove() with no formation causes them 
+        -- shortcut because calling IssueFormMove() with no formation causes them
         -- to not move at all.
-        if formation == 'NoFormation' then 
+        if formation == 'NoFormation' then
             -- store the commands / orders
             local units = self:GetPlatoonUnits()
             for k, node in path do
@@ -6770,7 +6770,7 @@ Platoon = Class(moho.platoon_methods) {
         -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
         -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
         -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then 
+        if not path[1].x then
             local oldPath = path
             path = {}
             for k, node in oldPath do
@@ -6785,13 +6785,13 @@ Platoon = Class(moho.platoon_methods) {
 
         -- pre-compute the angles
         local angles = { }
-        for k = 1, count do 
-    
+        for k = 1, count do
+
             local curr = path[k - 1]
             local next = path[k]
-    
+
             -- if we're trying to look before the first node of the path, use the platoons current position instead
-            if k - 1 < 1 then 
+            if k - 1 < 1 then
                 local pos = self:GetPlatoonPosition()
                 curr = Vector(pos[1], pos[2], pos[3])
             end
@@ -6806,7 +6806,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do 
+        for k = 1, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormMove(units, point, formation, angle)
@@ -6815,5 +6815,5 @@ Platoon = Class(moho.platoon_methods) {
 
         return commands
     end,
-    
+
 }

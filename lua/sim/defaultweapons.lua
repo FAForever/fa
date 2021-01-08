@@ -34,7 +34,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
         self.WeaponUnpacks = bp.WeaponUnpacks
-        
+
         self.WeaponCanFire = true
         if bp.RackRecoilDistance ~= 0 then
             self.RecoilManipulators = {}
@@ -629,18 +629,18 @@ DefaultProjectileWeapon = Class(Weapon) {
                 if bp.MuzzleSalvoDelay == 0 then
                     numMuzzlesFiring = table.getn(rackInfo.MuzzleBones)
                 end
-                
+
                 if bp.FixedSpreadRadius then
                     local weaponPos = self.unit:GetPosition()
                     local targetPos = self:GetCurrentTargetPos()
                     local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
-                    
+
                     -- This formula was obtained empirically and somehow it works :)
                     local randomness = bp.FixedSpreadRadius / (distance^2 / 12)
 
-                    self:SetFiringRandomness(randomness) 
+                    self:SetFiringRandomness(randomness)
                 end
-                
+
                 local muzzleIndex = 1
                 for i = 1, numMuzzlesFiring do
                     if self.HaltFireOrdered then
@@ -912,7 +912,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             self.unit:IsUnitState('Enhancing') and not
             self.unit:IsUnitState('Upgrading')
     end,
-    
+
     StartEconomyDrain = function(self) -- OverchargeWeapon drains energy on impact
     end,
 
@@ -1040,7 +1040,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
                     while self.enabled and not self:CanOvercharge() do
                         WaitSeconds(0.1)
                     end
-                    
+
                     if self.enabled then
                         self:OnGotTarget()
                     end

@@ -578,7 +578,7 @@ EngineerManager = Class(BuilderManager) {
             manager:ForkEngineerTask(unit)
         end
     end,
-    
+
     UnitConstructionStarted = function(self, unit, unitBeingBuilt)
         if EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
             self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)

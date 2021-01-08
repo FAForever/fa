@@ -49,7 +49,7 @@ AFactoryUnit = Class(FactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
-   
+
     OnPaused = function(self)
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.unitBeingBuilt then
@@ -76,7 +76,7 @@ AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
-  
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
@@ -152,7 +152,7 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
-   
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
@@ -200,7 +200,7 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
-     
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
