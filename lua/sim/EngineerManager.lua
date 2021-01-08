@@ -436,7 +436,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.getn(v.EngineerBuildQueue) == 0 then
+            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
                 continue
             end
 
@@ -466,7 +466,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.getn(v.EngineerBuildQueue) == 0 then
+            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
                 continue
             end
             local buildName = v.EngineerBuildQueue[1][1]

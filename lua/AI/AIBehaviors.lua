@@ -312,7 +312,7 @@ function CommanderThread(cdr, platoon)
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
         and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
             elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
@@ -346,7 +346,7 @@ function CommanderThreadImproved(cdr, platoon)
         and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing")
         and not cdr:IsUnitState('BlockCommandQueue') then
             -- if we have nothing to build...
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 -- check if the we have still a platton assigned to the CDR
                 if cdr.PlatoonHandle then
                     local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
@@ -592,7 +592,7 @@ CommanderOverrideCheck = function(self)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 -- Look outside range.
 
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
-    if table.getn(commanders) == 0 or commanders[1].Dead then
+    if table.empty(commanders) or commanders[1].Dead then
         return false
     end
 
@@ -2032,7 +2032,7 @@ function CommanderThreadSorian(cdr, platoon)
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr.UnitBeingBuiltBehavior and not cdr:IsUnitState("Upgrading")
         and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100)
         and not cdr:IsUnitState('BlockCommandQueue') then
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
             elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
@@ -2290,7 +2290,7 @@ CommanderOverrideCheckSorian = function(self)
     local aiBrain = self:GetBrain()
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
 
-    if table.getn(commanders) == 0 or commanders[1].Dead or commanders[1]:GetCurrentLayer() == 'Seabed' then
+    if table.empty(commanders) or commanders[1].Dead or commanders[1]:GetCurrentLayer() == 'Seabed' then
         return false
     end
 

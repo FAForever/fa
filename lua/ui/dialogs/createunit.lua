@@ -331,7 +331,7 @@ do
     local killmodslist
     for i, filter in nameFilters do
         if filter.key == 'mod' then
-            if filter.choices and table.getn(filter.choices) == 0 then
+            if filter.choices and table.empty(filter.choices) then
                 killmodslist = i
             end
             break

@@ -56,7 +56,7 @@ function XZDistanceTwoVectorsSq(v1, v2)
 end
 
 function AICheckForWeakEnemyBase(aiBrain)
-    if aiBrain:GetCurrentEnemy() and table.getn(aiBrain.AirAttackPoints) == 0 then
+    if aiBrain:GetCurrentEnemy() and table.empty(aiBrain.AirAttackPoints) then
         local enemy = aiBrain:GetCurrentEnemy()
         local x,z = enemy:GetArmyStartPos()
         local enemyBaseThreat = aiBrain:GetThreatAtPosition({x,0,z}, 1, true, 'AntiAir', enemy:GetArmyIndex())
@@ -566,7 +566,7 @@ function CanRespondEffectively(aiBrain, location, platoon)
         return true
     end
     -- If no visible targets go anyway
-    if table.getn(targets) == 0 then
+    if table.empty(targets) then
         return true
     end
     return false

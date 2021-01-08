@@ -865,7 +865,7 @@ function ReceiveChatFromSim(sender, msg)
     end
     local tempText = WrapText({text = msg.text, name = name})
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    if table.getn(tempText) == 0 then
+    if table.empty(tempText) then
         tempText = {""}
     end
     local entry = {

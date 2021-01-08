@@ -166,7 +166,7 @@ function GetArmies(scenario)
         end
     end
 
-    if (retArmies == nil) or (table.getn(retArmies) == 0) then
+    if (retArmies == nil) or (table.empty(retArmies)) then
         WARN("No starting armies defined in " .. scenario.file)
     end
 

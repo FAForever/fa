@@ -1231,7 +1231,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
         local Pods = EntityCategoryFilterDown(categories.POD, units)
         local assistingUnits = {}
-        if table.getn(PodStagingPlatforms) == 0 and table.getn(Pods) == 1 then
+        if table.empty(PodStagingPlatforms) and table.getn(Pods) == 1 then
             assistingUnits[1] = Pods[1]:GetCreator()
             podUnits['DroneL'] = Pods[1]
             podUnits['DroneR'] = Pods[2]
@@ -1460,7 +1460,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     end
 
     controls.orderButtonGrid:EndBatch()
-    if table.getn(currentSelection) == 0 and controls.bg.Mini then
+    if table.empty(currentSelection) and controls.bg.Mini then
         controls.bg.Mini(true)
     elseif controls.bg.Mini then
         controls.bg.Mini(false)

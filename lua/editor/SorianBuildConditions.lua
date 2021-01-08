@@ -214,7 +214,7 @@ function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
     local testRings = rings or 0
 
     local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
-    if not ents or table.getn(ents) == 0 then
+    if not ents or table.empty(ents) then
         return false
     end
     for k,v in ents do

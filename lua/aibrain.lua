@@ -1739,7 +1739,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(gates, v.PrimaryFactories.Gate)
             end
 
-            if not v.RallyPoint or table.getn(v.RallyPoint) == 0 then
+            if not v.RallyPoint or table.empty(v.RallyPoint) then
                 self:PBMSetRallyPoint(airFactories, v, nil)
                 self:PBMSetRallyPoint(landFactories, v, nil)
                 self:PBMSetRallyPoint(seaFactories, v, nil)

@@ -2999,7 +2999,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 cmdQ = {1}
             -- if we have nothing to do, try finding something to do
-            elseif table.getn(cmdQ) == 0 then
+            elseif table.empty(cmdQ) then
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonNavalAttackVector(aiBrain, self)
                 stuckCount = 0
@@ -3165,7 +3165,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 cmdQ = {1}
             -- if we have nothing to do, try finding something to do
-            elseif table.getn(cmdQ) == 0 then
+            elseif table.empty(cmdQ) then
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonSquadAttackVector(aiBrain, self)
                 stuckCount = 0
@@ -3183,7 +3183,7 @@ Platoon = Class(moho.platoon_methods) {
 
             self.LastPosition = pos
 
-            if table.getn(cmdQ) == 0 then
+            if table.empty(cmdQ) then
                 -- if we have a low threat value, then go and defend an engineer or a base
                 if mySurfaceThreat < 4
                     and mySurfaceThreat > 0
@@ -3568,7 +3568,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         local aiBrain = eng.PlatoonHandle:GetBrain()
 
-        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.empty(eng.EngineerBuildQueue) then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist then
                     eng.PlatoonHandle:PlatoonDisband()
@@ -4837,13 +4837,13 @@ Platoon = Class(moho.platoon_methods) {
                 cmdQ = {1}
 --              quickReset = true
             -- if we have nothing to do, but still have a path (because of one of the above)
-            elseif table.getn(cmdQ) == 0 and oldPathSize > 0 then
+            elseif table.empty(cmdQ) and oldPathSize > 0 then
                 self.LastAttackDestination = nil
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonNavalAttackVectorSorian(aiBrain, self)
                 stuckCount = 0
             -- if we have nothing to do, try finding something to do
-            elseif table.getn(cmdQ) == 0 then
+            elseif table.empty(cmdQ) then
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonNavalAttackVectorSorian(aiBrain, self)
                 stuckCount = 0
@@ -5654,13 +5654,13 @@ Platoon = Class(moho.platoon_methods) {
                 cmdQ = {1}
 --              quickReset = true
             -- if we have nothing to do, but still have a path (because of one of the above)
-            elseif table.getn(cmdQ) == 0 and oldPathSize > 0 then
+            elseif table.empty(cmdQ) and oldPathSize > 0 then
                 self.LastAttackDestination = {}
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonSquadAttackVectorSorian(aiBrain, self, bAggro)
                 stuckCount = 0
             -- if we have nothing to do, try finding something to do
-            elseif table.getn(cmdQ) == 0 then
+            elseif table.empty(cmdQ) then
                 self:StopAttack()
                 cmdQ = AIAttackUtils.AIPlatoonSquadAttackVectorSorian(aiBrain, self, bAggro)
                 stuckCount = 0
@@ -5679,7 +5679,7 @@ Platoon = Class(moho.platoon_methods) {
 
             self.LastPosition = pos
 
---[[            if table.getn(cmdQ) == 0 then --and mySurfaceThreat < 4 then
+--[[            if table.empty(cmdQ) then --and mySurfaceThreat < 4 then
                 -- if we have a low threat value, then go and defend an engineer or a base
                 if mySurfaceThreat < platoonThreatTable[platoonTechLevel]
                     and mySurfaceThreat > 0 and not self.PlatoonData.NeverGuard
@@ -6362,7 +6362,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         local aiBrain = eng.PlatoonHandle:GetBrain()
 
-        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.empty(eng.EngineerBuildQueue) then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 --LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand " .. eng.Sync.id)
                 --if EntityCategoryContains(categories.COMMAND, eng) then
@@ -6424,7 +6424,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -- final check for if we should disband
-        if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not eng or eng.Dead or table.empty(eng.EngineerBuildQueue) then
             if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 --LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand " .. eng.Sync.id)
                 --if EntityCategoryContains(categories.COMMAND, eng) then

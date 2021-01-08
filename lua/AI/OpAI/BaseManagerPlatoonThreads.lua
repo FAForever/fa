@@ -176,7 +176,7 @@ function CanConditionalBuild(singleEngineerPlatoon)
     end
 
     -- Are there no conditional builds?
-    if table.getn(bManager.ConditionalBuildTable) == 0 then
+    if table.empty(bManager.ConditionalBuildTable) then
         return false
     end
 

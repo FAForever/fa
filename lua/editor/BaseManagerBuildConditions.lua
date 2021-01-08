@@ -336,7 +336,7 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
         return false
     end
     -- Return out if the list is empty or all buildings are finished
-    if table.getn(bManager.UnfinishedBuildings) == 0 then
+    if table.empty(bManager.UnfinishedBuildings) then
         return false
     else
         local allFinished = true
