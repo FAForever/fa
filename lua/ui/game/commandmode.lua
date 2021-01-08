@@ -214,7 +214,7 @@ function OnCommandIssued(command)
         local c = categories.STRUCTURE * categories.FACTORY
         if EntityCategoryContains(c, command.Blueprint) then
             local factories = EntityCategoryFilterDown(c, command.Units) or {}
-            if table.getsize(factories) > 0 then
+            if not table.empty(factories) then
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end

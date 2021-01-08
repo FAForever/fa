@@ -55,7 +55,7 @@ function LayoutGroups()
         end
         prevControl = control
     end
-    if controls.groups and table.getsize(controls.groups) > 0 then
+    if controls.groups and not table.empty(controls.groups) then
         controls.container.Bottom:Set(prevControl.Bottom)
         controls.container:Show()
         controls.collapseArrow:Show()

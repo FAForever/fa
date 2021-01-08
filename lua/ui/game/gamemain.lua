@@ -109,7 +109,7 @@ function OnFirstUpdate()
                     SelectUnits(avatars)
                     selected = GetSelectedUnits()
                 end
-            until table.getsize(selected) > 0 or GameTick() > 50
+            until not table.empty(selected) or GameTick() > 50
         end)
     end
 
@@ -554,7 +554,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local n = table.getn(newSelection)
 
         -- if something died in selection, restore command mode
-        if n > 0 and table.getsize(removed) > 0 and table.empty(added) then
+        if n > 0 and not table.empty(removed) and table.empty(added) then
             local CM = import('/lua/ui/game/commandmode.lua')
             local mode, data = unpack(CM.GetCommandMode())
 

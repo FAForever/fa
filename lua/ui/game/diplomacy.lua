@@ -120,7 +120,7 @@ end
 function BuildPlayerLines()
     local sessionOptions = SessionGetScenarioInfo().Options
 
-    if table.getsize(parent.Items) > 0 then
+    if not table.empty(parent.Items) then
         for i, _ in parent.Items do
             local index = i
             parent.Items[index]:Destroy()

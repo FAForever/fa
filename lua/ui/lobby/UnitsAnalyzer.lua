@@ -1203,7 +1203,7 @@ function GetBlueprints(activeMods, skipGameFiles, taskNotifier)
 
     blueprints.Loaded = false
     -- Load original FA blueprints only once
-    local loadedGameFiles = table.getsize(blueprints.Original) > 0
+    local loadedGameFiles = not table.empty(blueprints.Original)
     if loadedGameFiles then
          skipGameFiles = true
     end

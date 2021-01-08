@@ -258,7 +258,7 @@ function UpdateObjectiveItems(skipAnnounce)
             LayoutHelpers.AtBottomIn(group.timer, group, 3)
             LayoutHelpers.AtHorizontalCenterIn(group.timer, group)
             group.startTime = data.targets.Time
-        elseif table.getsize(data.targets) > 0 then
+        elseif not table.empty(data.targets) then
             local texture = false
             for _, v in data.targets do
                 if v.BlueprintId and DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..v.BlueprintId..'_icon.dds')) then
@@ -321,7 +321,7 @@ function UpdateObjectiveItems(skipAnnounce)
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
                 local targets = self.data.targets
                 local positions = self.data.unitPositions
-                if targets and table.getsize(targets) > 0 then
+                if targets and not table.empty(targets) then
                     local max = table.getn(targets)
                     local desiredTarget = math.mod(self.TargetFocus or 0, table.getn(targets)) + 1
 
@@ -339,7 +339,7 @@ function UpdateObjectiveItems(skipAnnounce)
                             self.TargetFocus = idx
                         end
                     end
-                elseif positions and table.getsize(positions) > 0 then
+                elseif positions and not table.empty(positions) then
                     local max = table.getsize(positions)
                     local desiredTarget = math.mod(self.TargetFocus or 0, table.getsize(positions)) + 1
 
@@ -705,7 +705,7 @@ function LayoutSquads()
     if not controls.squads then return end
     local prevControl = false
     local squadWidth = 10
-    if table.getsize(controls.squads) > 0 then
+    if not table.empty(controls.squads) then
         for _, item in controls.squads do
             if prevControl then
                 LayoutHelpers.RightOf(item, prevControl)
@@ -755,12 +755,12 @@ function ToggleObjectives(state)
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
-            if controls.objItems and table.getsize(controls.objItems) > 0 then
+            if controls.objItems and not table.empty(controls.objItems) then
                 controls.objectiveContainer:Show()
             else
                 controls.objectiveContainer:Hide()
             end
-            if controls.squads and table.getsize(controls.squads) > 0 then
+            if controls.squads and not table.empty(controls.squads) then
                 controls.squadContainer:Show()
             else
                 controls.squadContainer:Hide()
@@ -792,12 +792,12 @@ function ToggleObjectives(state)
         if state or controls.bg:IsHidden() then
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
-            if controls.objItems and table.getsize(controls.objItems) > 0 then
+            if controls.objItems and not table.empty(controls.objItems) then
                 controls.objectiveContainer:Show()
             else
                 controls.objectiveContainer:Hide()
             end
-            if controls.squads and table.getsize(controls.squads) > 0 then
+            if controls.squads and not table.empty(controls.squads) then
                 controls.squadContainer:Show()
             else
                 controls.squadContainer:Hide()
@@ -828,12 +828,12 @@ function Expand()
     end
     controls.bg:SetHidden(preContractState)
     if not preContractState then
-        if controls.objItems and table.getsize(controls.objItems) > 0 then
+        if controls.objItems and not table.empty(controls.objItems) then
             controls.objectiveContainer:Show()
         else
             controls.objectiveContainer:Hide()
         end
-        if controls.squads and table.getsize(controls.squads) > 0 then
+        if controls.squads and not table.empty(controls.squads) then
             controls.squadContainer:Show()
         else
             controls.squadContainer:Hide()

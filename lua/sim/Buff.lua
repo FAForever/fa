@@ -78,7 +78,7 @@ function ApplyBuff(unit, buffName, instigator)
         ubt[def.BuffType] = {}
     end
 
-    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and table.getsize(ubt[def.BuffType]) > 0 then
+    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and not table.empty(ubt[def.BuffType]) then
         return
     end
 

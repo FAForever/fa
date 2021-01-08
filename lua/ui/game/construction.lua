@@ -1670,7 +1670,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                         table.insert(entries, entry)
                     end
                 end
-                if table.getsize(entries) > 0 then
+                if not table.empty(entries) then
                     group.SubMenu = CreateSubMenu(group, entries, function(id)
                         templates.SendTemplate(theTemplate.templateID, id)
                         RefreshUI()
@@ -2228,7 +2228,7 @@ function FormatData(unitData, type)
     if type == 'templates' and allFactories then
         -- Replace Infinite queue with Create template
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
-        if table.getsize(currentCommandQueue) > 0 then
+        if not table.empty(currentCommandQueue) then
             controls.extraBtn1:Enable()
             controls.extraBtn1.OnClick = function(self, modifiers)
                 TemplatesFactory.CreateBuildTemplate(currentCommandQueue)
@@ -2483,7 +2483,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         ClearCurrentFactoryForQueueDisplay()
     end
 
-    if table.getsize(selection) > 0 then
+    if not table.empty(selection) then
         capturingKeys = false
         -- Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
@@ -2585,7 +2585,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         local templates = Templates.GetTemplates()
-        if allMobile and templates and table.getsize(templates) > 0 then
+        if allMobile and templates and not table.empty(templates) then
             sortedOptions.templates = {}
             for templateIndex, template in templates do
                 local valid = true
@@ -2635,7 +2635,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         import(UIUtil.GetLayoutFilename('construction')).OnSelection(true)
     end
 
-    if table.getsize(selection) > 0 then
+    if not table.empty(selection) then
         -- Repeated from original to access the local variables
         local allSameUnit = true
         local bpID = false
@@ -2663,7 +2663,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-            if allMobile and templates and table.getsize(templates) > 0 then
+            if allMobile and templates and not table.empty(templates) then
 
                 local unitFactionName = selection[1]:GetBlueprint().General.FactionName
                 local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]

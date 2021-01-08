@@ -1310,7 +1310,7 @@ local function autobalance_rr(players, teams)
         i = i + 1
     end
 
-    while table.getsize(players) > 0 do
+    while not table.empty(players) do
         for i, pick in team_picks do
             local slot = table.remove(teams[pick.team], 1)
             if not slot then continue end
@@ -3768,7 +3768,7 @@ function setupChatEdit(chatPanel)
         if AddUnicodeCharToEditText(self, keyCode) then
             return
         end
-        if commandQueue and table.getsize(commandQueue) > 0 then
+        if commandQueue and not table.empty(commandQueue) then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
