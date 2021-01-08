@@ -135,7 +135,7 @@ StructureUnit = Class(Unit) {
         local tarmac
         local bp = self:GetBlueprint().Display.Tarmacs
         if not specTarmac then
-            if bp and table.getn(bp) > 0 then
+            if bp and not table.empty(bp) then
                 local num = Random(1, table.getn(bp))
                 tarmac = bp[num]
             else
@@ -154,7 +154,7 @@ StructureUnit = Class(Unit) {
         -- I'm disabling this for now since there are so many things wrong with it
         local orient = orientation
         if not orientation then
-            if tarmac.Orientations and table.getn(tarmac.Orientations) > 0 then
+            if tarmac.Orientations and not table.empty(tarmac.Orientations) then
                 orient = tarmac.Orientations[Random(1, table.getn(tarmac.Orientations))]
                 orient = (0.01745 * orient)
             else

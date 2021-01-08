@@ -609,7 +609,7 @@ function BaseManagerAssistThread(platoon)
                     table.insert(factories, assistee)
                     AIUtils.AIEngineersAssistFactories(aiBrain, platoonUnits, factories)
                     assistingBool = true
-                elseif table.getn(assistee:GetGuards()) > 0 then
+                elseif not table.empty(assistee:GetGuards()) then
                     local factories = AIUtils.AIReturnAssistingFactories(assistee)
                     table.insert(factories, assistee)
                     AIUtils.AIEngineersAssistFactories(aiBrain, platoonUnits, factories)

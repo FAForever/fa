@@ -33,13 +33,13 @@ function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
             local time = GetSystemTimeSecondsOnlyForProfileUse()
 
             --Spawn bases
-            while table.getn(ScenarioInfo.LoadBalance.SpawnGroups) > 0 do
+            while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
                 local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
                 base:SpawnGroup(name, uncapturable, true)
             end
 
             --Spawn units
-            while table.getn(ScenarioInfo.LoadBalance.PlatoonGroups) > 0 do
+            while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
                 local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
                 CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
             end

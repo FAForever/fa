@@ -505,7 +505,7 @@ function GetTemplateReplacement(aiBrain, building, faction, buildingTmpl)
             end
         end
         -- If we found a possibility
-        if table.getn(possibles) > 0 then
+        if not table.empty(possibles) then
             rand = Random(1,table.getn(possibles))
             local customUnitID = possibles[rand]
             retTemplate = { { building, customUnitID, } }

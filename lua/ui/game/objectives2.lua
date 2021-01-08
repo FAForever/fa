@@ -451,7 +451,7 @@ function LayoutObjectiveItems()
             table.insert(sortedControls, item)
         end
     end
-    if table.getn(sortedControls) > 0 then
+    if not table.empty(sortedControls) then
         local prevControl = false
         local objectiveWidth = 0
         for _, item in sortedControls do

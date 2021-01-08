@@ -249,7 +249,7 @@ function ReclaimablesInArea(aiBrain, locType)
     --end
 
     local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
-    if ents and table.getn(ents) > 0 then
+    if ents and not table.empty(ents) then
         return true
     end
 

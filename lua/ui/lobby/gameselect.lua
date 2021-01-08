@@ -510,7 +510,7 @@ function CreateUI(over, exitBehavior)
         return bg
     end
 
-    if table.getn(gameListObjects) > 0 then
+    if not table.empty(gameListObjects) then
         for i, v in gameListObjects do
             v:Destroy()
         end

@@ -284,7 +284,7 @@ function BuildPlayerLines()
     end
 
     i = 1
-    if table.getn(allyControls) > 0 then
+    if not table.empty(allyControls) then
         parent.Items[i] = UIUtil.CreateText(parent, LOC('<LOC diplomacy_0002>Allies'), 18, UIUtil.bodyFont)
         parent.Items[i]:SetColor('ff00ff72')
         parent.Items[i]:SetDropShadow(true)

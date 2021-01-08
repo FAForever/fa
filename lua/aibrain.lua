@@ -500,7 +500,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function KillWalls()
                 -- Kill all walls while the ACU is blowing up
                 local tokill = self:GetListOfUnits(categories.WALL, false)
-                if tokill and table.getn(tokill) > 0 then
+                if tokill and not table.empty(tokill) then
                     for index, unit in tokill do
                         unit:Kill()
                     end
@@ -521,7 +521,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function TransferOwnershipOfBorrowedUnits(brains)
                 for index, brain in brains do
                     local units = brain:GetListOfUnits(categories.ALLUNITS, false)
-                    if units and table.getn(units) > 0 then
+                    if units and not table.empty(units) then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then
                                 unit.oldowner = nil
@@ -533,7 +533,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
             local function TransferUnitsToBrain(brains)
-                if table.getn(brains) > 0 then
+                if not table.empty(brains) then
                     if shareOption == 'FullShare' then
                         local indexes = {}
                         for _, brain in brains do
@@ -545,7 +545,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        if units and table.getn(units) > 0 then
+                        if units and not table.empty(units) then
                             TransferUnitsOwnership(units, brain.index)
                             WaitSeconds(1)
                         end
@@ -555,7 +555,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Sort the destiniation armies by score
             local function TransferUnitsToHighestBrain(brains)
-                if table.getn(brains) > 0 then
+                if not table.empty(brains) then
                     table.sort(brains, function(a, b) return a.score > b.score end)
                     TransferUnitsToBrain(brains)
                 end
@@ -565,7 +565,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function TransferUnitsToKiller()
                 local KillerIndex = 0
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                if units and table.getn(units) > 0 then
+                if units and not table.empty(units) then
                     if victoryOption == 'demoralization' then
                         KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
@@ -603,7 +603,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 local given = {}
                 for index, brain in brains do
                     local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                    if units and table.getn(units) > 0 then
+                    if units and not table.empty(units) then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then -- The unit was built by me
                                 table.insert(given, unit)
@@ -658,7 +658,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Kill all units left over
             local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if tokill and table.getn(tokill) > 0 then
+            if tokill and not table.empty(tokill) then
                 for index, unit in tokill do
                     unit:Kill()
                 end
@@ -671,7 +671,7 @@ AIBrain = Class(moho.aibrain_methods) {
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
             -- remove PlatoonHandle from all AI units before we kill / transfer the army
             local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if units and table.getn(units) > 0 then
+            if units and not table.empty(units) then
                 for _, unit in units do
                     if not unit.Dead then
                         if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
@@ -1701,7 +1701,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             local afac, lfac, sfac, gatefac
-            if table.getn(airFactories) > 0 then
+            if not table.empty(airFactories) then
                 if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
@@ -1711,7 +1711,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(airFactories, v.PrimaryFactories.Air)
             end
 
-            if table.getn(landFactories) > 0 then
+            if not table.empty(landFactories) then
                 if not v.PrimaryFactories.Land or v.PrimaryFactories.Land.Dead
                     or v.PrimaryFactories.Land:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(landFactories, v.PrimaryFactories.Land) then
@@ -1721,7 +1721,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(landFactories, v.PrimaryFactories.Land)
             end
 
-            if table.getn(seaFactories) > 0 then
+            if not table.empty(seaFactories) then
                 if not v.PrimaryFactories.Sea or v.PrimaryFactories.Sea.Dead
                     or v.PrimaryFactories.Sea:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(seaFactories, v.PrimaryFactories.Sea) then
@@ -1731,7 +1731,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(seaFactories, v.PrimaryFactories.Sea)
             end
 
-            if table.getn(gates) > 0 then
+            if not table.empty(gates) then
                 if not v.PrimaryFactories.Gate or v.PrimaryFactories.Gate.Dead then
                     gatefac = self:PBMGetPrimaryFactory(gates)
                     v.PrimaryFactories.Gate = gatefac
@@ -1761,7 +1761,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PBMSetRallyPoint = function(self, factories, location, rallyLoc, markerType)
-        if table.getn(factories) > 0 then
+        if not table.empty(factories) then
             local rally
             local position = factories[1]:GetPosition()
             for facNum, facData in factories do
@@ -2269,7 +2269,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- First go through the list of locations and see if we can build stuff there.
                 for k, v in self.PBM.Locations do
                     -- See if we have platoons to build in that type
-                    if table.getn(platoonList[typev]) > 0 then
+                    if not table.empty(platoonList[typev]) then
                         -- Sort the list of platoons via priority
                         if self.PBM.NeedSort[typev] then
                             self:PBMSortPlatoonsViaPriority(typev)
@@ -2285,7 +2285,7 @@ AIBrain = Class(moho.aibrain_methods) {
                                 numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
                                 if numBuildOrders == 0 then
                                     local guards = priFac:GetGuards()
-                                    if guards and table.getn(guards) > 0 then
+                                    if guards and not table.empty(guards) then
                                         for kg, vg in guards do
                                             numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                                             if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -2379,7 +2379,7 @@ AIBrain = Class(moho.aibrain_methods) {
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()
-                if guards and table.getn(guards) > 0 then
+                if guards and not table.empty(guards) then
                     for kg, vg in guards do
                         numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                         if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -2993,7 +2993,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     BaseMonitorCheck = function(self)
         local vecs = self:GetStructureVectors()
-        if table.getn(vecs) > 0 then
+        if not table.empty(vecs) then
             -- Find new points to monitor
             for k, v in vecs do
                 local found = false
@@ -3107,7 +3107,7 @@ AIBrain = Class(moho.aibrain_methods) {
                         -- Check for exact position?
                         if threat[3] > v[2] and v[4] and v[5] then
                             local nearUnits = self:GetUnitsAroundPoint(v[5], newPos, v[1], 'Enemy')
-                            if table.getn(nearUnits) > 0 then
+                            if not table.empty(nearUnits) then
                                 local unitPos = nearUnits[1]:GetPosition()
                                 if unitPos then
                                     newPos = {unitPos[1], 0, unitPos[3]}

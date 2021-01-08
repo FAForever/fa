@@ -499,7 +499,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
     local changed = false -- Prevent recursion
-    if newSelection and table.getn(newSelection) > 0 then
+    if newSelection and not table.empty(newSelection) then
         newSelection, changed = DeselectSelens(newSelection)
 
         if changed then
@@ -947,10 +947,10 @@ end
 SendChat = function()
     while true do
         if UnitData.Chat then
-            if table.getn(UnitData.Chat) > 0 then
+            if not table.empty(UnitData.Chat) then
                 for index, chat in UnitData.Chat do
                     local newChat = true
-                    if table.getn(oldData) > 0 then
+                    if not table.empty(oldData) then
                         for index, old in oldData do
                             if (old.oldTime + 3) < GetGameTimeSeconds() then
                                 oldData[index] = nil

@@ -1074,14 +1074,14 @@ Platoon = Class(moho.platoon_methods) {
             local targetData = false
 
             --For every scouts we send to all opponents, send one to scout a low pri area.
-            if aiBrain.IntelData.HiPriScouts < aiBrain.NumOpponents and table.getn(aiBrain.InterestList.HighPriority) > 0 then
+            if aiBrain.IntelData.HiPriScouts < aiBrain.NumOpponents and not table.empty(aiBrain.InterestList.HighPriority) then
                 targetData = aiBrain.InterestList.HighPriority[1]
                 aiBrain.IntelData.HiPriScouts = aiBrain.IntelData.HiPriScouts + 1
                 targetData.LastScouted = GetGameTimeSeconds()
 
                 aiBrain:SortScoutingAreas(aiBrain.InterestList.HighPriority)
 
-            elseif table.getn(aiBrain.InterestList.LowPriority) > 0 then
+            elseif not table.empty(aiBrain.InterestList.LowPriority) then
                 targetData = aiBrain.InterestList.LowPriority[1]
                 aiBrain.IntelData.HiPriScouts = 0
                 targetData.LastScouted = GetGameTimeSeconds()
@@ -1201,12 +1201,12 @@ Platoon = Class(moho.platoon_methods) {
                 targetArea = mustScoutArea.Position
 
             --2) Scout "unknown threat" areas with a threat higher than 25
-            elseif table.getn(unknownThreats) > 0 and unknownThreats[1][3] > 25 then
+            elseif not table.empty(unknownThreats) and unknownThreats[1][3] > 25 then
                 aiBrain:AddScoutArea({unknownThreats[1][1], 0, unknownThreats[1][2]})
 
             --3) Scout high priority locations
             elseif aiBrain.IntelData.AirHiPriScouts < aiBrain.NumOpponents and aiBrain.IntelData.AirLowPriScouts < 1
-            and table.getn(aiBrain.InterestList.HighPriority) > 0 then
+            and not table.empty(aiBrain.InterestList.HighPriority) then
                 aiBrain.IntelData.AirHiPriScouts = aiBrain.IntelData.AirHiPriScouts + 1
 
                 highPri = true
@@ -1218,7 +1218,7 @@ Platoon = Class(moho.platoon_methods) {
                 aiBrain:SortScoutingAreas(aiBrain.InterestList.HighPriority)
 
             --4) Every time we scout NumOpponents number of high priority locations, scout a low priority location
-            elseif aiBrain.IntelData.AirLowPriScouts < 1 and table.getn(aiBrain.InterestList.LowPriority) > 0 then
+            elseif aiBrain.IntelData.AirLowPriScouts < 1 and not table.empty(aiBrain.InterestList.LowPriority) then
                 aiBrain.IntelData.AirHiPriScouts = 0
                 aiBrain.IntelData.AirLowPriScouts = aiBrain.IntelData.AirLowPriScouts + 1
 
@@ -1942,7 +1942,7 @@ Platoon = Class(moho.platoon_methods) {
             -- Track all valid units in the assist list so we can load balance for builders
             local category = ParseEntityCategory(catString)
             local assistList = AIUtils.GetAssistees(aiBrain, assistData.AssistLocation, assistData.AssisteeType, category, assisteeCat)
-            if table.getn(assistList) > 0 then
+            if not table.empty(assistList) then
                 -- only have one unit in the list; assist it
                 local low = false
                 local bestUnit = false
@@ -2059,7 +2059,7 @@ Platoon = Class(moho.platoon_methods) {
                     table.insert(factories, assistee)
                     AIUtils.AIEngineersAssistFactories(aiBrain, platoonUnits, factories)
                     assistingBool = true
-                elseif table.getn(assistee:GetGuards()) > 0 then
+                elseif not table.empty(assistee:GetGuards()) then
                     local factories = AIUtils.AIReturnAssistingFactories(assistee)
                     table.insert(factories, assistee)
                     AIUtils.AIEngineersAssistFactories(aiBrain, platoonUnits, factories)
@@ -3100,7 +3100,7 @@ Platoon = Class(moho.platoon_methods) {
                     table.insert(strayTransports, v)
                 end
             end
-            if table.getn(strayTransports) > 0 then
+            if not table.empty(strayTransports) then
                 local dropPoint = pos
                 dropPoint[1] = dropPoint[1] + Random(-3, 3)
                 dropPoint[3] = dropPoint[3] + Random(-3, 3)
@@ -3114,7 +3114,7 @@ Platoon = Class(moho.platoon_methods) {
                         break
                     end
                 end
-                if table.getn(strayTransports) > 0 then
+                if not table.empty(strayTransports) then
                     local MAIN = aiBrain.BuilderManagers.MAIN
                     if MAIN then
                         dropPoint = MAIN.Position
@@ -3402,7 +3402,7 @@ Platoon = Class(moho.platoon_methods) {
     -- names units in platoon
     NameUnits = function(self)
         local units = self:GetPlatoonUnits()
-        if units and table.getn(units) > 0 then
+        if units and not table.empty(units) then
             for k, v in units do
                 local bp = v:GetBlueprint().Display
                 if bp.AINames then
@@ -3587,7 +3587,7 @@ Platoon = Class(moho.platoon_methods) {
         IssueClearCommands({eng})
         local commandDone = false
         local PlatoonPos
-        while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
+        while not eng.Dead and not commandDone and not table.empty(eng.EngineerBuildQueue)  do
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
             if GetTerrainHeight(buildLocation[1], buildLocation[3]) > GetSurfaceHeight(buildLocation[1], buildLocation[3]) then
@@ -4102,7 +4102,7 @@ Platoon = Class(moho.platoon_methods) {
         while aiBrain:PlatoonExists(self) do
             target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
             local newtarget = false
-            if aiBrain.AttackPoints and table.getn(aiBrain.AttackPoints) > 0 then
+            if aiBrain.AttackPoints and not table.empty(aiBrain.AttackPoints) then
                 newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
                 if newtarget then
                     target = newtarget
@@ -4193,7 +4193,7 @@ Platoon = Class(moho.platoon_methods) {
 
                     target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri, true)
                     local newtarget = false
-                    if aiBrain.AttackPoints and table.getn(aiBrain.AttackPoints) > 0 then
+                    if aiBrain.AttackPoints and not table.empty(aiBrain.AttackPoints) then
                         newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri, true)
                         if newtarget then
                             target = newtarget
@@ -4246,7 +4246,7 @@ Platoon = Class(moho.platoon_methods) {
                 if newtarget then
                     target = newtarget
                 end
-            elseif aiBrain.AirAttackPoints and table.getn(aiBrain.AirAttackPoints) > 0 then
+            elseif aiBrain.AirAttackPoints and not table.empty(aiBrain.AirAttackPoints) then
                 newtarget = AIUtils.AIFindAirAttackTargetInRangeSorian(aiBrain, self, 'Attack', atkPri, self.AirAttackPoints[1].Position)
                 if newtarget then
                     target = newtarget
@@ -5021,7 +5021,7 @@ Platoon = Class(moho.platoon_methods) {
 
             local assistList = AIUtils.GetAssisteesSorian(aiBrain, assistData.AssistLocation, assistData.AssisteeType, category, assisteeCat)
 
-            if table.getn(assistList) > 0 then
+            if not table.empty(assistList) then
                 -- only have one unit in the list; assist it
                 if table.getn(assistList) == 1
                 and (not assistData.AssistRange or SUtils.XZDistanceTwoVectorsSq(eng:GetPosition(), assistList[1]:GetPosition()) < assistData.AssistRange) then
@@ -5126,14 +5126,14 @@ Platoon = Class(moho.platoon_methods) {
             local targetData = false
 
             --For every scouts we send to all opponents, send one to scout a low pri area.
-            if aiBrain.IntelData.HiPriScouts < aiBrain.NumOpponents and table.getn(aiBrain.InterestList.HighPriority) > 0 then
+            if aiBrain.IntelData.HiPriScouts < aiBrain.NumOpponents and not table.empty(aiBrain.InterestList.HighPriority) then
                 targetData = aiBrain.InterestList.HighPriority[1]
                 aiBrain.IntelData.HiPriScouts = aiBrain.IntelData.HiPriScouts + 1
                 targetData.LastScouted = GetGameTimeSeconds()
 
                 aiBrain:SortScoutingAreas(aiBrain.InterestList.HighPriority)
 
-            elseif table.getn(aiBrain.InterestList.LowPriority) > 0 then
+            elseif not table.empty(aiBrain.InterestList.LowPriority) then
                 targetData = aiBrain.InterestList.LowPriority[1]
                 aiBrain.IntelData.HiPriScouts = 0
                 targetData.LastScouted = GetGameTimeSeconds()
@@ -5198,12 +5198,12 @@ Platoon = Class(moho.platoon_methods) {
                 targetArea = mustScoutArea.Position
 
             --2) Scout "unknown threat" areas with a threat higher than 25
-            elseif table.getn(unknownThreats) > 0 and unknownThreats[1][3] > 25 then
+            elseif not table.empty(unknownThreats) and unknownThreats[1][3] > 25 then
                 aiBrain:AddScoutArea({unknownThreats[1][1], 0, unknownThreats[1][2]})
 
             --3) Scout high priority locations
             elseif aiBrain.IntelData.AirHiPriScouts < aiBrain.NumOpponents and aiBrain.IntelData.AirLowPriScouts < 1
-            and table.getn(aiBrain.InterestList.HighPriority) > 0 then
+            and not table.empty(aiBrain.InterestList.HighPriority) then
                 aiBrain.IntelData.AirHiPriScouts = aiBrain.IntelData.AirHiPriScouts + 1
 
                 highPri = true
@@ -5215,7 +5215,7 @@ Platoon = Class(moho.platoon_methods) {
                 aiBrain:SortScoutingAreas(aiBrain.InterestList.HighPriority)
 
             --4) Every time we scout NumOpponents number of high priority locations, scout a low priority location
-            elseif aiBrain.IntelData.AirLowPriScouts < 1 and table.getn(aiBrain.InterestList.LowPriority) > 0 then
+            elseif aiBrain.IntelData.AirLowPriScouts < 1 and not table.empty(aiBrain.InterestList.LowPriority) then
                 aiBrain.IntelData.AirHiPriScouts = 0
                 aiBrain.IntelData.AirLowPriScouts = aiBrain.IntelData.AirLowPriScouts + 1
 
@@ -5264,7 +5264,7 @@ Platoon = Class(moho.platoon_methods) {
                 self:Stop()
                 badScouting = true
                 markers = AIUtils.AIGetMarkerLocations(aiBrain, 'Combat Zone')
-                if markers and table.getn(markers) > 0 then
+                if markers and not table.empty(markers) then
                     local ScoutPath = {}
                     local MarkerCount = table.getn(markers)
                     for i = 1, MarkerCount do
@@ -5423,7 +5423,7 @@ Platoon = Class(moho.platoon_methods) {
             elseif not movingToScout then
                 self:Stop()
                 local DefSpots = AIUtils.AIGetSortedDefensiveLocationsFromLast(aiBrain, 10)
-                if table.getn(DefSpots) > 0 then
+                if not table.empty(DefSpots) then
                     for k,v in DefSpots do
                         if SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) < (leashRange * leashRange) and (SUtils.XZDistanceTwoVectorsSq(v, eng.CDRHome) > SUtils.XZDistanceTwoVectorsSq(pos, eng.CDRHome) and initialMove) then
                             movingToScout = true
@@ -5569,7 +5569,7 @@ Platoon = Class(moho.platoon_methods) {
                     table.insert(strayTransports, v)
                 end
             end
-            if table.getn(strayTransports) > 0 then
+            if not table.empty(strayTransports) then
                 local dropPoint = pos
                 dropPoint[1] = dropPoint[1] + Random(-3, 3)
                 dropPoint[3] = dropPoint[3] + Random(-3, 3)
@@ -5583,7 +5583,7 @@ Platoon = Class(moho.platoon_methods) {
                         break
                     end
                 end
-                if table.getn(strayTransports) > 0 then
+                if not table.empty(strayTransports) then
                     local MAIN = aiBrain.BuilderManagers.MAIN
                     if MAIN then
                         dropPoint = MAIN.Position
@@ -5851,7 +5851,7 @@ Platoon = Class(moho.platoon_methods) {
                     movingToScout = true
                     self:Stop()
                     local MassSpots = AIUtils.AIGetSortedMassLocations(aiBrain, 10, nil, nil, nil, nil, self:GetPlatoonPosition())
-                    if table.getn(MassSpots) > 0 then
+                    if not table.empty(MassSpots) then
                         for k,v in MassSpots do
                             self:MoveToLocation(v, false)
                         end
@@ -6390,7 +6390,7 @@ Platoon = Class(moho.platoon_methods) {
         eng.ProcessBuildDone = false
         IssueClearCommands({eng})
         local commandDone = false
-        while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0 do
+        while not eng.Dead and not commandDone and not table.empty(eng.EngineerBuildQueue) do
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = BuildToNormalLocation(eng.EngineerBuildQueue[1][2])
             local buildRelative = eng.EngineerBuildQueue[1][3]
@@ -6547,7 +6547,7 @@ Platoon = Class(moho.platoon_methods) {
     NameUnitsSorian = function(self)
         local units = self:GetPlatoonUnits()
         local AINames = import('/lua/AI/sorianlang.lua').AINames
-        if units and table.getn(units) > 0 then
+        if units and not table.empty(units) then
             for k, v in units do
                 local ID = v.UnitId
                 if AINames[ID] then
