@@ -131,7 +131,7 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
     local markerList = AIGetMarkerLocations(aiBrain, 'Mass')
     local newList = {}
     for _, v in markerList do
-        -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.) 
+        -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.)
         if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
             -- mass marker is too close to border, skip it.
             continue
@@ -354,7 +354,7 @@ function GenerateAmphibiousMarkerList(markerList,markers,markerType)
     for k, v in markers do
         local marker = table.copy(v)
         if marker.type == markerType then
-            if marker.adjacentTo and marker.adjacentTo ~= '' then 
+            if marker.adjacentTo and marker.adjacentTo ~= '' then
                 -- transform adjacentTo to Amphibious marker names
                 local adjacentTo = ''
                 for i, node in STR_GetTokens(marker.adjacentTo or '', ' ') do
@@ -1830,7 +1830,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
             if not IsEnemy( aiBrain:GetArmyIndex(), unit:GetAIBrain():GetArmyIndex() ) then
                 continue
             end
-            if unit:IsCapturable() then 
+            if unit:IsCapturable() then
                 -- if we can capture the unit/building then do so
                 unit.CaptureInProgress = true
                 IssueCapture({eng}, unit)

@@ -24,7 +24,7 @@ function SpawnPing(data)
     if not PingsRemaining[data.Owner] then
         PingsRemaining[data.Owner] = PingLimit
     end
-    
+
     if PingsRemaining[data.Owner] > 0 then
         if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
             return

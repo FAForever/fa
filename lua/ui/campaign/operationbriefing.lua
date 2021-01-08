@@ -32,15 +32,15 @@ local backgrounds = false
 
 function CreateBackground(parent)
     local table = {}
-    
+
     table.top = Bitmap(parent, UIUtil.UIFile('/scx_menu/operation-briefing/border-console-top_bmp.dds'))
     LayoutHelpers.AtTopIn(table.top, parent)
     LayoutHelpers.AtHorizontalCenterIn(table.top, parent)
-    
+
     table.bottom = Bitmap(parent, UIUtil.UIFile('/scx_menu/operation-briefing/border-console-bot_bmp.dds'))
     LayoutHelpers.AtBottomIn(table.bottom, parent)
     LayoutHelpers.AtHorizontalCenterIn(table.bottom, parent)
-    
+
     return table
 end
 
@@ -49,21 +49,21 @@ function CreateUI(operationID, briefingData)
     LayoutHelpers.FillParent(parent, GetFrame(0))
     parent:DisableHitTest()
     local playing = false
-    
+
     local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
-    
+
     local currentBriefingText = {}
     local fmv_time = 0
     local fmv_playing = false
     Prefs.SetToCurrentProfile('Last_Op_Selected', {id = operationID})
-    
+
     local briefingGroup = Group(parent)
     briefingGroup.Depth:Set(function() return parent.Depth() + 5 end)
     LayoutHelpers.FillParent(briefingGroup, parent)
     briefingGroup:DisableHitTest()
-    
+
     backgrounds = CreateBackground(parent)
-    
+
     local backBtn = UIUtil.CreateButtonStd(briefingGroup, '/scx_menu/small-btn/small', "<LOC opbrief_0002>Back", 16, 2)
     LayoutHelpers.AtLeftIn(backBtn, backgrounds.bottom, 25)
     LayoutHelpers.AtBottomIn(backBtn, backgrounds.bottom, -4)
@@ -73,7 +73,7 @@ function CreateUI(operationID, briefingData)
     end
 
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() backBtn.OnClick() end)
-    
+
     local launchBtn = UIUtil.CreateButtonStd(briefingGroup, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC opbrief_0003>Launch", 20, 2)
     LayoutHelpers.AtRightIn(launchBtn, backgrounds.bottom, 20)
     LayoutHelpers.AtBottomIn(launchBtn, backgrounds.bottom, 2)
@@ -83,7 +83,7 @@ function CreateUI(operationID, briefingData)
         if scenario then
             local function TryLaunch()
                 local factionToIndex = import('/lua/factions.lua').FactionIndexMap
-                LaunchSinglePlayerSession(import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(scenario, difficulty, factionToIndex[faction], 
+                LaunchSinglePlayerSession(import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(scenario, difficulty, factionToIndex[faction],
                     {opKey = operationID, campaignID = faction, difficulty = difficulty}, false))
                 parent:Destroy()
                 MenuCommon.MenuCleanup()
@@ -100,7 +100,7 @@ function CreateUI(operationID, briefingData)
             mapErrorDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
         end
     end
-    
+
     local briefMovie = Movie(parent)
     briefMovie.Depth:Set(parent.Depth)
     briefMovie.Height:Set(parent.Height)
@@ -113,7 +113,7 @@ function CreateUI(operationID, briefingData)
                    Sound(briefingData.opMovies.briefing.bgsound[1]),
                    Sound(briefingData.opMovies.briefing.voice[1]))
     briefMovie:DisableHitTest()
-    
+
     local movieBG = Bitmap(parent, UIUtil.UIFile('/scx_menu/campaign-select/bg.dds'))
     movieBG.Height:Set(parent.Height)
     movieBG.Width:Set(function()
@@ -122,22 +122,22 @@ function CreateUI(operationID, briefingData)
     end)
     LayoutHelpers.AtCenterIn(movieBG, parent)
     movieBG.Depth:Set(function() return briefMovie.Depth() - 1 end)
-    
+
     local briefBG = Bitmap(briefingGroup, UIUtil.UIFile('/scx_menu/operation-briefing/text-panel_bmp.dds'))
-    
+
     local briefGlow = Bitmap(briefBG, UIUtil.UIFile('/scx_menu/operation-briefing/emiter-bar_bmp.dds'))
     LayoutHelpers.AnchorToTop(briefGlow, backgrounds.bottom, -5)
     LayoutHelpers.AtHorizontalCenterIn(briefGlow, backgrounds.bottom)
     briefGlow.Depth:Set(function() return briefingGroup.Depth() + 1 end)
-    
+
     briefBG.Depth:Set(function() return briefGlow.Depth() + 1 end)
     LayoutHelpers.AnchorToTop(briefBG, briefGlow, -50)
     LayoutHelpers.AtHorizontalCenterIn(briefBG, briefGlow)
-    
+
     local title = UIUtil.CreateText(briefingGroup, LOC(briefingData.long_name), 24)
     LayoutHelpers.AtTopIn(title, backgrounds.top, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, backgrounds.top)
-    
+
     local briefText = ItemList(briefBG)
     briefText:SetFont(UIUtil.bodyFont, 14)
     briefText:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor,  "00000000")
@@ -145,12 +145,12 @@ function CreateUI(operationID, briefingData)
     briefText.Width:Set(function() return briefBG.Width() - 60 end)
     briefText.Height:Set(function() return briefBG.Height() - 30 end)
     LayoutHelpers.AtLeftTopIn(briefText, briefBG, 15, 15)
-    
+
     UIUtil.CreateVertScrollbarFor(briefText)
-    
+
     local onStr = "<LOC op_briefing_0000>Hide Log"
     local offStr = "<LOC op_briefing_0001>Show Log"
-    
+
     local subtitleChk = Checkbox(briefingGroup,
         UIUtil.UIFile('/scx_menu/operation-briefing/subtitle_btn_off.dds'),
         UIUtil.UIFile('/scx_menu/operation-briefing/subtitle_btn_on.dds'),
@@ -160,11 +160,11 @@ function CreateUI(operationID, briefingData)
         UIUtil.UIFile('/scx_menu/operation-briefing/subtitle_btn_on.dds'),
         'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     LayoutHelpers.AtLeftTopIn(subtitleChk, backgrounds.bottom, 276, 16)
-        
+
     subtitleChk.label = UIUtil.CreateText(subtitleChk, LOC(onStr), 14, UIUtil.bodyFont)
     subtitleChk.label:DisableHitTest()
     LayoutHelpers.AtCenterIn(subtitleChk.label, subtitleChk)
-    
+
     subtitleChk.OnCheck = function(self, checked)
         if checked then
             self.label:SetText(LOC(onStr))
@@ -175,26 +175,26 @@ function CreateUI(operationID, briefingData)
         end
         Prefs.SetToCurrentProfile('briefing_log', checked)
     end
-    
+
     local showLog = Prefs.GetFromCurrentProfile('briefing_log')
     if showLog == nil then
         showLog = true
     end
-    
+
     subtitleChk:SetCheck(showLog)
-    
+
     local playpauseBtn = UIUtil.CreateButtonStd(briefingGroup, '/dialogs/movie-control/nav-pause', nil, nil, nil, nil, 'UI_Economy_Rollover', 'UI_Opt_Mini_Button_Click')
     LayoutHelpers.AtLeftTopIn(playpauseBtn, backgrounds.bottom, 345, 56)
     Tooltip.AddButtonTooltip(playpauseBtn, 'options_Pause')
-    
+
     local restartMovBtn = UIUtil.CreateButtonStd(briefingGroup, '/dialogs/movie-control/nav-back', nil, nil, nil, nil, 'UI_Economy_Rollover', 'UI_Opt_Mini_Button_Click')
     LayoutHelpers.LeftOf(restartMovBtn, playpauseBtn)
     Tooltip.AddButtonTooltip(restartMovBtn, 'campaignbriefing_restart')
-    
+
     local skipMovBtn = UIUtil.CreateButtonStd(briefingGroup, '/dialogs/movie-control/nav-end', nil, nil, nil, nil, 'UI_Economy_Rollover', 'UI_Opt_Mini_Button_Click')
     LayoutHelpers.RightOf(skipMovBtn, playpauseBtn)
     Tooltip.AddButtonTooltip(skipMovBtn, 'campaignbriefing_skip')
-    
+
     briefText.StreamInLines = function(self, startingline)
         self:SetNeedsFrameUpdate(true)
         self:DeleteAllItems()
@@ -221,9 +221,9 @@ function CreateUI(operationID, briefingData)
             end
         end
     end
-    
-    local statusBar = StatusBar(parent, 0, 100, false, false, 
-        UIUtil.UIFile('/scx_menu/operation-briefing/status-bar-back_bmp.dds'), 
+
+    local statusBar = StatusBar(parent, 0, 100, false, false,
+        UIUtil.UIFile('/scx_menu/operation-briefing/status-bar-back_bmp.dds'),
         UIUtil.UIFile('/scx_menu/operation-briefing/status-bar_bmp.dds'), false)
     LayoutHelpers.AtLeftIn(statusBar, backgrounds.bottom, 260)
     LayoutHelpers.AnchorToLeft(statusBar, statusBar, -200)
@@ -233,42 +233,42 @@ function CreateUI(operationID, briefingData)
         local perc = MATH_Lerp(fmv_time, 0, briefMovie:GetLength(), 0, 100)
         self:SetValue(perc)
     end
-    
+
     statusBar.border = {}
-    
+
     statusBar.border.t = Bitmap(statusBar)
     statusBar.border.t:SetSolidColor('aabadbdb')
     statusBar.border.t.Bottom:Set(statusBar.Top)
     statusBar.border.t.Left:Set(statusBar.Left)
     statusBar.border.t.Right:Set(statusBar.Right)
     statusBar.border.t.Height:Set(1)
-    
+
     statusBar.border.b = Bitmap(statusBar)
     statusBar.border.b:SetSolidColor('aabadbdb')
     statusBar.border.b.Top:Set(statusBar.Bottom)
     statusBar.border.b.Left:Set(statusBar.Left)
     statusBar.border.b.Right:Set(statusBar.Right)
     statusBar.border.b.Height:Set(1)
-    
+
     statusBar.border.l = Bitmap(statusBar)
     statusBar.border.l:SetSolidColor('aabadbdb')
     statusBar.border.l.Top:Set(statusBar.border.t.Top)
     statusBar.border.l.Bottom:Set(statusBar.border.b.Bottom)
     statusBar.border.l.Right:Set(statusBar.border.t.Left)
     statusBar.border.l.Width:Set(1)
-    
+
     statusBar.border.r = Bitmap(statusBar)
     statusBar.border.r:SetSolidColor('aabadbdb')
     statusBar.border.r.Top:Set(statusBar.border.t.Top)
     statusBar.border.r.Bottom:Set(statusBar.border.b.Bottom)
     statusBar.border.r.Left:Set(statusBar.border.t.Right)
     statusBar.border.r.Width:Set(1)
-    
+
     function loopOnLoaded(self)
         playing = true
         self:Play()
     end
-    
+
     function CreateLogThread()
         local thread = ForkThread(function()
             local nextCueTime = 0
@@ -297,7 +297,7 @@ function CreateUI(operationID, briefingData)
         end)
         return thread
     end
-    
+
     function briefOnLoaded(self)
         playing = true
         fmv_time = 0
@@ -312,7 +312,7 @@ function CreateUI(operationID, briefingData)
         currentBriefingText = {}
         streamThread = CreateLogThread()
     end
-    
+
     local factionData = {
         {name = '<LOC _UEF>', icon = '/dialogs/logo-btn/logo-uef', key = 'uef', color = 'ff00d7ff', tooltip = 'faction_select_uef', disabled = not CampaignManager.IsOperationSelectable('uef', operationID)},
         {name = '<LOC _Aeon>', icon = '/dialogs/logo-btn/logo-aeon', key = 'aeon', color = 'ffb5ff39', tooltip = 'faction_select_aeon', disabled = not CampaignManager.IsOperationSelectable('aeon', operationID)},
@@ -322,7 +322,7 @@ function CreateUI(operationID, briefingData)
         {name = '<LOC opbrief_0004>Easy', key = 1},
         {name = '<LOC opbrief_0005>Normal', key = 2},
         {name = '<LOC opbrief_0006>Hard', key = 3}}
-    
+
     local disablefaction = false
     local defaultFaction = Prefs.GetFromCurrentProfile('last_faction') or 'uef'
     if operationID == 'X1CA_001' then
@@ -339,16 +339,16 @@ function CreateUI(operationID, briefingData)
     end
     local difficultyOption = CreateOptionGroup(briefingGroup, "<LOC opbrief_0007>Difficulty:", itemArray, Prefs.GetFromCurrentProfile("campaign.difficulty") or 2)
     local factionOption = CreateOptionGroup(briefingGroup, "<LOC opbrief_0008>Faction:", factionData, defaultFaction, disablefaction)
-    
+
     difficulty = Prefs.GetFromCurrentProfile("campaign.difficulty") or 2
     faction = defaultFaction
-    
+
     difficultyOption.button.OnPopupChosen = OnDifficultyChosen
     factionOption.button.OnPopupChosen = OnFactionChosen
-    
+
     LayoutHelpers.AtLeftTopIn(difficultyOption, backgrounds.bottom, 535, 16)
     LayoutHelpers.AtLeftTopIn(factionOption, backgrounds.bottom, 535, 50)
-        
+
     playpauseBtn.OnClick = function(self)
         if fmv_playing then
             Tooltip.SetTooltipText(self, LOC('<LOC tooltipui0098>'))
@@ -377,7 +377,7 @@ function CreateUI(operationID, briefingData)
         end
         fmv_playing = not fmv_playing
     end
-    
+
     restartMovBtn.OnClick = function(self)
         if playing then
             playing = false
@@ -388,7 +388,7 @@ function CreateUI(operationID, briefingData)
             briefMovie.OnLoaded = briefOnLoaded
         end
     end
-    
+
     skipMovBtn.OnClick = function(self)
         fmv_playing = false
         briefMovie:Loop(true)
@@ -412,17 +412,17 @@ function CreateUI(operationID, briefingData)
             briefText:ScrollToBottom()
         end
     end
-    
+
     local textThread = false
-    
+
     briefMovie.OnLoaded = briefOnLoaded
-    
+
     briefMovie.OnFinished = function(self)
         self:Loop(true)
         self:Set('/movies/menu_background.sfd')
         self.OnLoaded = loopOnLoaded
     end
-    
+
     parent.OnDestroy = function(self)
         if textThread then KillThread(textThread) end
         StopSound(ambientSounds)
@@ -448,21 +448,21 @@ end
 function CreateOptionGroup(parent, label, optionData, default, disabled)
     local group = Group(parent)
     group.label = UIUtil.CreateText(group, LOC(label), 10, UIUtil.bodyFont)
-    
+
     group.button = Button(group, UIUtil.UIFile('/scx_menu/operation-briefing/popup_btn_up.dds'),
         UIUtil.UIFile('/scx_menu/operation-briefing/popup_btn_down.dds'),
         UIUtil.UIFile('/scx_menu/operation-briefing/popup_btn_over.dds'),
         UIUtil.UIFile('/scx_menu/operation-briefing/popup_btn_dis.dds'))
-        
+
     if disabled then
         group.button:Disable()
         group.label:SetColor('ff888888')
     else
         group.button.label = UIUtil.CreateText(group.button, '', 12, UIUtil.bodyFont)
         group.button.label:DisableHitTest()
-        
+
         LayoutHelpers.AtCenterIn(group.button.label, group.button)
-        
+
         group.button.data = optionData
         group.button.OnRolloverEvent = function(self, event)
             if event == 'enter' then
@@ -485,7 +485,7 @@ function CreateOptionGroup(parent, label, optionData, default, disabled)
             end
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_01'}))
         end
-        
+
         for i, v in optionData do
             if v.key == default then
                 group.button.label:SetText(LOC(v.name))
@@ -493,15 +493,15 @@ function CreateOptionGroup(parent, label, optionData, default, disabled)
             end
         end
     end
-    
+
     LayoutHelpers.AtLeftIn(group.label, group)
     LayoutHelpers.AtVerticalCenterIn(group.label, group)
-    
+
     LayoutHelpers.AtRightIn(group.button, group)
     LayoutHelpers.AtVerticalCenterIn(group.button, group)
-    
+
     LayoutHelpers.SetDimensions(group, 150, 30)
-    
+
     return group
 end
 
@@ -515,7 +515,7 @@ function CreatePopup(parent, data)
         local item = Bitmap(bg)
         item.text = UIUtil.CreateText(item, LOC(v.name), 14, UIUtil.bodyFont)
         item.text:DisableHitTest()
-        
+
         item.data = v
         item.HandleEvent = function(self, event)
             local eventHandled = false
@@ -533,7 +533,7 @@ function CreatePopup(parent, data)
             end
             return eventHandled
         end
-        
+
         if v.icon then
             local texture = v.icon..'_btn_up.dds'
             if v.disabled then
@@ -581,34 +581,34 @@ function CreatePopupBackground(parent)
     bg.bl = Bitmap(bg, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ll.dds'))
     bg.bm = Bitmap(bg, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
     bg.br = Bitmap(bg, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lr.dds'))
-    
+
     bg.tl.Bottom:Set(bg.Top)
     bg.tl.Right:Set(bg.Left)
-    
+
     bg.tr.Bottom:Set(bg.Top)
     bg.tr.Left:Set(bg.Right)
-    
+
     bg.bl.Top:Set(bg.Bottom)
     bg.bl.Right:Set(bg.Left)
-    
+
     bg.br.Top:Set(bg.Bottom)
     bg.br.Left:Set(bg.Right)
-    
+
     bg.tm.Left:Set(bg.Left)
     bg.tm.Right:Set(bg.Right)
     bg.tm.Bottom:Set(bg.Top)
-    
+
     bg.bm.Left:Set(bg.Left)
     bg.bm.Right:Set(bg.Right)
     bg.bm.Top:Set(bg.Bottom)
-    
+
     bg.l.Top:Set(bg.Top)
     bg.l.Bottom:Set(bg.Bottom)
     bg.l.Right:Set(bg.Left)
-    
+
     bg.r.Top:Set(bg.Top)
     bg.r.Bottom:Set(bg.Bottom)
     bg.r.Left:Set(bg.Right)
-    
+
     return bg
 end

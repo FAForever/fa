@@ -237,16 +237,16 @@ function CheckMapHasMarkers(scenario)
     doscript('/lua/dataInit.lua', saveData)
     doscript(scenario.save, saveData)
 
-    
-    local markers = saveData and 
-                    saveData.Scenario and 
+
+    local markers = saveData and
+                    saveData.Scenario and
                     saveData.Scenario.MasterChain and
                     saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
                     saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
- 
-    if not markers then 
-       WARN('Map '.. scenario.name..' has no markers') return false 
-    else 
+
+    if not markers then
+       WARN('Map '.. scenario.name..' has no markers') return false
+    else
        for marker, data in markers do
           if data.adjacentTo and string.find(data.adjacentTo, ' ') then
              return true

@@ -24,13 +24,13 @@ local factionCredits = {
     aeon = {fmv = 'Credits_Aeon', cue = 'X_FMV_Aeon_Credits', voice = 'SCX_Aeon_Credits_VO'},
 }
 
-    
+
 local creditsAvailable = {}
 local GUI = {}
 
 function CreateBackground(parent)
     local table = {}
-    
+
     table.bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/campaign-select/bg.dds'))
     table.bg.Depth:Set(function() return parent.Depth() - 1 end)
     LayoutHelpers.AtCenterIn(table.bg, parent)
@@ -39,7 +39,7 @@ function CreateBackground(parent)
         local ratio = table.bg.Height() / table.bg.BitmapHeight()
         return table.bg.BitmapWidth() * ratio
     end)
-    
+
     table.bgfmv = Movie(table.bg, '/movies/menu_background.sfd')
     table.bgfmv:Loop(true)
     table.bgfmv:Play()
@@ -49,12 +49,12 @@ function CreateBackground(parent)
     table.top.Depth:Set(parent.Depth)
     LayoutHelpers.AtTopIn(table.top, parent)
     LayoutHelpers.AtHorizontalCenterIn(table.top, parent)
-    
+
     table.bottom = Bitmap(parent, UIUtil.UIFile('/scx_menu/campaign-select/border-console-bot_bmp.dds'))
     table.bottom.Depth:Set(parent.Depth)
     LayoutHelpers.AtBottomIn(table.bottom, parent)
     LayoutHelpers.AtHorizontalCenterIn(table.bottom, parent)
-    
+
     return table
 end
 
@@ -67,14 +67,14 @@ function CreateUI()
     GUI.parent = Group(GetFrame(0))
     LayoutHelpers.FillParent(GUI.parent, GetFrame(0))
     GUI.parent:DisableHitTest()
-    
+
     local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
     GUI.parent.OnDestroy = function(self)
         StopSound(ambientSounds)
     end
-    
+
     GUI.backgrounds = CreateBackground(GUI.parent)
-    
+
     GUI.backBtn = UIUtil.CreateButtonStd(GUI.parent, '/scx_menu/small-btn/small', "<LOC sel_campaign_0012>Back", 16, 2)
     LayoutHelpers.AtLeftIn(GUI.backBtn, GUI.backgrounds.bottom, 25)
     LayoutHelpers.AtBottomIn(GUI.backBtn, GUI.backgrounds.bottom, -4)
@@ -82,17 +82,17 @@ function CreateUI()
         GUI.parent:Destroy()
         import('/lua/ui/menus/main.lua').CreateUI()
     end
-    
+
     GUI.title = UIUtil.CreateText(GUI.backgrounds.top, LOC('<LOC sel_campaign_0018>Select Operation'), 24)
     LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.backgrounds.top)
     LayoutHelpers.AtTopIn(GUI.title, GUI.backgrounds.top, 10)
-    
+
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.backBtn.OnClick() end)
-    
+
     GUI.selectBtn = UIUtil.CreateButtonStd(GUI.parent, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC sel_campaign_0013>Select", 20, 2)
     LayoutHelpers.AtRightIn(GUI.selectBtn, GUI.backgrounds.bottom, 20)
     LayoutHelpers.AtBottomIn(GUI.selectBtn, GUI.backgrounds.bottom, 2)
-    
+
     GUI.loadBtn = UIUtil.CreateButtonStd(GUI.parent, '/scx_menu/small-btn/small', "<LOC sel_campaign_0014>Load", 16, 2)
     LayoutHelpers.AtLeftIn(GUI.loadBtn, GUI.backgrounds.bottom, 232)
     LayoutHelpers.AtBottomIn(GUI.loadBtn, GUI.backgrounds.bottom, -4)
@@ -100,26 +100,26 @@ function CreateUI()
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI.parent, nil, 'CampaignSave')
     end
     Tooltip.AddButtonTooltip(GUI.loadBtn, 'campaignselect_load')
-    
+
     GUI.OpSelectionGroup = Bitmap(GUI.parent, UIUtil.UIFile('/scx_menu/campaign-select/panel-list_bmp.dds'))
     LayoutHelpers.AtHorizontalCenterIn(GUI.OpSelectionGroup, GUI.parent, 230)
     LayoutHelpers.AtVerticalCenterIn(GUI.OpSelectionGroup, GUI.parent, -10)
     GUI.OpSelectionGroup:DisableHitTest()
-    
+
     GUI.OpSelectionGroup.brackets = Brackets(GUI.OpSelectionGroup)
-    
+
     GUI.OpSelectionGroup.Items = {}
     GUI.OpSelectionGroup.SelectionIcons = {}
     local defaultControl = false
     local lastOp = Prefs.GetFromCurrentProfile('Last_Op_Selected')
-    
+
     local function CreateSelectionEntry(data)
         local item = Bitmap(GUI.OpSelectionGroup)
         LayoutHelpers.SetDimensions(item, 370, 34)
-        
+
         item.disabled = false
         item.checked = true
-        
+
         item.HandleEvent = function(self, event)
             if not self.disabled then
                 if event.Type == 'MouseEnter' then
@@ -139,7 +139,7 @@ function CreateUI()
                 end
             end
         end
-        
+
         item.SetCheck = function(self, checked)
             self.checked = checked
             if checked then
@@ -154,7 +154,7 @@ function CreateUI()
                 self.highlight:SetAlpha(0, true)
             end
         end
-        
+
         local buttons = {}
         if data.factionIcons then
             local disabled = {}
@@ -186,19 +186,19 @@ function CreateUI()
             LayoutHelpers.AtRightIn(buttons[1], item, 46)
             LayoutHelpers.AtTopIn(buttons[1], item, 6)
         end
-        
+
         local opTitle = UIUtil.CreateText(item, LOC(data.name), 16, UIUtil.bodyFont)
         LayoutHelpers.AtLeftIn(opTitle, item, 15)
         LayoutHelpers.AtVerticalCenterIn(opTitle, item)
         if data.enabled == false or item.disabled then
             opTitle:SetColor('ffaaaaaa')
         end
-        
+
         item.highlight = Bitmap(item, UIUtil.UIFile('/scx_menu/campaign-select/select_bmp.dds'))
         LayoutHelpers.AtLeftIn(item.highlight, item, -3)
         LayoutHelpers.AtVerticalCenterIn(item.highlight, opTitle)
         item.highlight.Depth:Set(item.Depth)
-        
+
         item.highlightBox = Bitmap(item.highlight)
         item.highlightBox:SetSolidColor('aa7d9d9d')
         LayoutHelpers.AtLeftIn(item.highlightBox, item, 2)
@@ -206,7 +206,7 @@ function CreateUI()
         LayoutHelpers.AtTopIn(item.highlightBox, item, 2)
         LayoutHelpers.AtBottomIn(item.highlightBox, item, 2)
         LayoutHelpers.DepthUnderParent(item.highlightBox, item)
-        
+
         item.highlightIconBox = Bitmap(item.highlight)
         item.highlightIconBox:SetSolidColor('aa7d9d9d')
         LayoutHelpers.AtLeftIn(item.highlightIconBox, item, 250)
@@ -214,7 +214,7 @@ function CreateUI()
         LayoutHelpers.AtTopIn(item.highlightIconBox, item, 2)
         LayoutHelpers.AtBottomIn(item.highlightIconBox, item, 2)
         LayoutHelpers.DepthUnderParent(item.highlightIconBox, item)
-        
+
         item.boxTop = Bitmap(item)
         item.boxTop:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtLeftIn(item.boxTop, item)
@@ -222,7 +222,7 @@ function CreateUI()
         LayoutHelpers.AnchorToTop(item.boxTop, item)
         LayoutHelpers.SetHeight(item.boxTop, 1)
         LayoutHelpers.DepthUnderParent(item.boxTop, item)
-        
+
         item.boxBottom = Bitmap(item)
         item.boxBottom:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtLeftIn(item.boxBottom, item)
@@ -230,7 +230,7 @@ function CreateUI()
         LayoutHelpers.AnchorToBottom(item.boxBottom, item)
         LayoutHelpers.SetHeight(item.boxBottom, 1)
         LayoutHelpers.DepthUnderParent(item.boxBottom, item)
-        
+
         item.boxLeft = Bitmap(item)
         item.boxLeft:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtTopIn(item.boxLeft, item.boxTop)
@@ -238,7 +238,7 @@ function CreateUI()
         LayoutHelpers.AnchorToLeft(item.boxLeft, item.boxTop)
         LayoutHelpers.SetWidth(item.boxLeft, 1)
         LayoutHelpers.DepthUnderParent(item.boxLeft, item)
-        
+
         item.boxRight = Bitmap(item)
         item.boxRight:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtTopIn(item.boxRight, item.boxTop)
@@ -246,7 +246,7 @@ function CreateUI()
         LayoutHelpers.AnchorToRight(item.boxRight, item.boxTop)
         LayoutHelpers.SetWidth(item.boxRight, 1)
         LayoutHelpers.DepthUnderParent(item.boxRight, item)
-        
+
         item.boxIconTop = Bitmap(item)
         item.boxIconTop:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtLeftIn(item.boxIconTop, item, 248)
@@ -254,7 +254,7 @@ function CreateUI()
         LayoutHelpers.AnchorToTop(item.boxIconTop, item)
         LayoutHelpers.SetHeight(item.boxIconTop, 1)
         LayoutHelpers.DepthUnderParent(item.boxIconTop, item)
-        
+
         item.boxIconBottom = Bitmap(item)
         item.boxIconBottom:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtLeftIn(item.boxIconBottom, item, 248)
@@ -262,7 +262,7 @@ function CreateUI()
         LayoutHelpers.AnchorToBottom(item.boxIconBottom, item)
         LayoutHelpers.SetHeight(item.boxIconBottom, 1)
         LayoutHelpers.DepthUnderParent(item.boxIconBottom, item)
-        
+
         item.boxIconLeft = Bitmap(item)
         item.boxIconLeft:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtTopIn(item.boxIconLeft, item.boxIconTop)
@@ -270,7 +270,7 @@ function CreateUI()
         LayoutHelpers.AnchorToLeft(item.boxIconLeft, item.boxIconBottom)
         LayoutHelpers.SetWidth(item.boxIconLeft, 1)
         LayoutHelpers.DepthUnderParent(item.boxIconLeft, item)
-        
+
         item.boxIconRight = Bitmap(item)
         item.boxIconRight:SetSolidColor('ff7d9d9d')
         LayoutHelpers.AtTopIn(item.boxIconRight, item.boxIconTop)
@@ -278,7 +278,7 @@ function CreateUI()
         LayoutHelpers.AnchorToRight(item.boxIconRight, item.boxIconBottom)
         LayoutHelpers.SetWidth(item.boxIconRight, 1)
         LayoutHelpers.DepthUnderParent(item.boxIconRight, item)
-        
+
         item:DisableHitTest(true)
         if data.enabled ~= nil then
             if data.enabled then
@@ -289,7 +289,7 @@ function CreateUI()
         else
             item:EnableHitTest()
         end
-        
+
         table.insert(GUI.OpSelectionGroup.Items, item)
         local index = table.getn(GUI.OpSelectionGroup.Items)
         GUI.OpSelectionGroup.SelectionIcons[index] = buttons
@@ -298,7 +298,7 @@ function CreateUI()
         else
             LayoutHelpers.Below(GUI.OpSelectionGroup.Items[index], GUI.OpSelectionGroup.Items[index-1], 9)
         end
-        
+
         if lastOp and lastOp.id == data.id then
             if not item.disabled then
                 defaultControl = item
@@ -307,9 +307,9 @@ function CreateUI()
             defaultControl = item
         end
     end
-    
+
     local campaignSequence = CampaignManager.GetCampaignSequence('uef')
-    
+
     CreateSelectionEntry({name = '<LOC sel_campaign_0000>Tutorial',
         factionIcons = true,
         uef = true,
@@ -317,7 +317,7 @@ function CreateUI()
         aeon = false,
         desc = '<LOC sel_campaign_0019>UEF Brigadier General Fletcher teaches you how to play Supreme Commander: Forged Alliance.',
         launchType = 'tutorial'})
-        
+
     CreateSelectionEntry({name = '<LOC sel_campaign_0002>Introduction Movie',
         launchType = 'movie',
         id = 'introfmv',
@@ -326,7 +326,7 @@ function CreateUI()
         voiceName = 'SCX_INTRO_VO',
         desc = '<LOC sel_campaign_0020>Chronicles the events leading up to the Forged Alliance campaign.',
         factionIcons = false})
-        
+
     CreateSelectionEntry({name = '<LOC sel_campaign_0004>Timeline Movie',
         launchType = 'movie',
         id = 'timelinefmv',
@@ -334,7 +334,7 @@ function CreateUI()
         cueName = 'X_Timeline',
         desc = '<LOC sel_campaign_0021>Detailed breakdown of the time between the end of the Infinite War and the start of Forged Alliance.',
         factionIcons = false})
-    
+
     for i, v in campaignSequence do
         local index = i
         local opData = import('/maps/'..v..'/'..v..'_operation.lua')
@@ -367,7 +367,7 @@ function CreateUI()
             cybran = cybranBtn}
         CreateSelectionEntry(itemData)
     end
-    
+
     local enableOutros = creditsAvailable.uef or creditsAvailable.aeon or creditsAvailable.cybran
     CreateSelectionEntry({name = '<LOC sel_campaign_0006>Conclusion Movie',
         launchType = 'movie',
@@ -378,7 +378,7 @@ function CreateUI()
         desc = '<LOC sel_campaign_0022>The ending of Forged Alliance.',
         factionIcons = false,
         enabled = enableOutros,})
-    
+
     CreateSelectionEntry({name = '<LOC sel_campaign_0008>Credits',
         launchType = 'movie',
         id = 'credits',
@@ -386,7 +386,7 @@ function CreateUI()
         factionIcons = false,
         fmvName = 'FMV_Credits',
         enabled = enableOutros})
-    
+
     CreateSelectionEntry({name = '<LOC sel_campaign_0010>Post-Credits Movie',
         launchType = 'movie',
         id = 'postoutrofmv',
@@ -396,17 +396,17 @@ function CreateUI()
         desc = '<LOC sel_campaign_0024>The End?',
         factionIcons = false,
         enabled = enableOutros,})
-    
+
     GUI.briefingBG = Bitmap(GUI.parent, UIUtil.UIFile('/scx_menu/campaign-select/panel_bmp.dds'))
     LayoutHelpers.AtHorizontalCenterIn(GUI.briefingBG, GUI.parent, -230)
     LayoutHelpers.AtVerticalCenterIn(GUI.briefingBG, GUI.parent)
-    
+
     GUI.briefingBG.brackets = Brackets(GUI.briefingBG)
-    
+
     GUI.selOpTitle = UIUtil.CreateText(GUI.parent, 'yaaaar', 20)
     LayoutHelpers.AtHorizontalCenterIn(GUI.selOpTitle, GUI.briefingBG)
     LayoutHelpers.AtTopIn(GUI.selOpTitle, GUI.briefingBG, 22)
-    
+
     GUI.selOpDescription = ItemList(GUI.parent)
     GUI.selOpDescription:SetFont(UIUtil.bodyFont, 14)
     GUI.selOpDescription:SetColors(UIUtil.fontColor, "00000000", "FF000000", "00000000", "FF000000")
@@ -415,63 +415,63 @@ function CreateUI()
     LayoutHelpers.AtLeftIn(GUI.selOpDescription, GUI.briefingBG, 20)
     LayoutHelpers.AtRightIn(GUI.selOpDescription, GUI.briefingBG, 50)
     LayoutHelpers.AtBottomIn(GUI.selOpDescription, GUI.briefingBG, 30)
-    
+
     GUI.selOpDescription.scroll = UIUtil.CreateVertScrollbarFor(GUI.selOpDescription)
     GUI.selOpDescription.scroll:Hide()
-    
-    if defaultControl then 
+
+    if defaultControl then
         defaultControl:SetCheck(true)
     end
 end
 
 function Brackets(parent)
     local brackets = {}
-    
+
     brackets.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-ul_bmp.dds'))
     brackets.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-ur_bmp.dds'))
     brackets.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-ll_bmp.dds'))
     brackets.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-lr_bmp.dds'))
-    
+
     brackets.tlG = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-glow-ul_bmp.dds'))
     brackets.trG = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-glow-ur_bmp.dds'))
     brackets.blG = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-glow-ll_bmp.dds'))
     brackets.brG = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brackets/bracket-glow-lr_bmp.dds'))
-    
+
     LayoutHelpers.AtLeftTopIn(brackets.tl, parent, -42, -30)
-    
+
     LayoutHelpers.AtRightTopIn(brackets.tr, parent, -40, -30)
-    
+
     LayoutHelpers.AtLeftIn(brackets.bl, parent, -42)
     LayoutHelpers.AtBottomIn(brackets.bl, parent, -30)
-    
+
     LayoutHelpers.AtRightIn(brackets.br, parent, -40)
     LayoutHelpers.AtBottomIn(brackets.br, parent, -30)
-    
+
     LayoutHelpers.AtCenterIn(brackets.tlG, brackets.tl)
     LayoutHelpers.AtCenterIn(brackets.trG, brackets.tr)
     LayoutHelpers.AtCenterIn(brackets.blG, brackets.bl)
     LayoutHelpers.AtCenterIn(brackets.brG, brackets.br)
-    
+
     brackets.tl.Depth:Set(function() return parent.Depth() + 5 end)
     brackets.tr.Depth:Set(function() return parent.Depth() + 5 end)
     brackets.bl.Depth:Set(function() return parent.Depth() + 5 end)
     brackets.br.Depth:Set(function() return parent.Depth() + 5 end)
-    
+
     brackets.tlG.Depth:Set(function() return brackets.tl.Depth() - 1 end)
     brackets.trG.Depth:Set(function() return brackets.tr.Depth() - 1 end)
     brackets.blG.Depth:Set(function() return brackets.bl.Depth() - 1 end)
     brackets.brG.Depth:Set(function() return brackets.br.Depth() - 1 end)
-    
+
     brackets.tl:DisableHitTest()
     brackets.tr:DisableHitTest()
     brackets.bl:DisableHitTest()
     brackets.br:DisableHitTest()
-    
+
     brackets.tlG:DisableHitTest()
     brackets.trG:DisableHitTest()
     brackets.blG:DisableHitTest()
     brackets.brG:DisableHitTest()
-    
+
     return brackets
 end
 
@@ -499,7 +499,7 @@ function SelectOperation(opData)
         GUI.selectBtn.label:SetText(LOC("<LOC sel_campaign_0015>Select"))
         GUI.selectBtn.OnClick = function(self)
             GUI.parent:Destroy()
-            import('/lua/ui/campaign/operationbriefing.lua').CreateUI(opData.id, opData.briefingData) 
+            import('/lua/ui/campaign/operationbriefing.lua').CreateUI(opData.id, opData.briefingData)
         end
         Tooltip.AddButtonTooltip(GUI.selectBtn, 'campaignselect_select')
     elseif opData.launchType == 'movie' then
@@ -520,9 +520,9 @@ function SelectOperation(opData)
                     opData.fmvName,
                     GetFrame(0),
                     function()
-                    	import('/lua/ui/campaign/selectcampaign.lua').CreateUI() 
-                    end, 
-                    opData.cueName, 
+                    	import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+                    end,
+                    opData.cueName,
                     opData.voiceName)
             end
         end
@@ -535,7 +535,7 @@ function SelectOperation(opData)
             Prefs.SetToCurrentProfile('LoadingFaction', 1)
             LaunchSinglePlayerSession(
                 import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(
-                    import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'), 
+                    import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
                     2, nil, nil, true
                 )
             )
@@ -548,14 +548,14 @@ function CreditsChooser()
     bg.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     bg:SetSolidColor('aa000000')
     LayoutHelpers.FillParent(bg, GUI.parent)
-    
+
     local panel = Bitmap(bg, UIUtil.UIFile('/scx_menu/game-select-faction-panel/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(panel, GUI.parent)
-    
+
     local title = UIUtil.CreateText(panel, LOC('<LOC sel_campaign_0025>Choose Your Faction'), 16)
     LayoutHelpers.AtHorizontalCenterIn(title, panel)
     LayoutHelpers.AtTopIn(title, panel, 30)
-    
+
     local lastBtn = false
     for i, v in factionData do
         local index = i
@@ -584,19 +584,19 @@ function CreditsChooser()
                 factionCredits[self.faction].fmv,
                 GetFrame(0),
                 function()
-                	import('/lua/ui/campaign/selectcampaign.lua').CreateUI() 
-                end, 
-                factionCredits[self.faction].cue, 
+                	import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+                end,
+                factionCredits[self.faction].cue,
                 factionCredits[self.faction].voice)
         end
         if not creditsAvailable[button.faction] then
             button:Disable()
         end
     end
-    
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() 
+
+    import('/lua/ui/uimain.lua').SetEscapeHandler(function()
         bg:Destroy()
-        import('/lua/ui/uimain.lua').SetEscapeHandler(function() 
+        import('/lua/ui/uimain.lua').SetEscapeHandler(function()
             GUI.parent:Destroy()
             import('/lua/ui/menus/main.lua').CreateUI()
         end)
@@ -651,7 +651,7 @@ function TimelineFMV(toOpSelect)
 
     local loading = true
     local subtitleThread = nil
-    
+
     nis.OnLoaded = function(self)
         GetCursor():Hide()
         nis:Play()
@@ -660,7 +660,7 @@ function TimelineFMV(toOpSelect)
         end
         loading = false
     end
-    
+
     function DoExit(onFMVFinished)
         nis:Stop()
         GetCursor():Show()
@@ -678,14 +678,14 @@ function TimelineFMV(toOpSelect)
             CreateUI()
         else
             local opData = import('/maps/X1CA_001/X1CA_001_operation.lua').operationData
-            import('/lua/ui/campaign/operationbriefing.lua').CreateUI('X1CA_001', opData) 
+            import('/lua/ui/campaign/operationbriefing.lua').CreateUI('X1CA_001', opData)
         end
     end
-    
+
     nis.OnFinished = function(self)
         DoExit(true)
     end
-    
+
     nis.HandleEvent = function(self, event)
         if loading then
             return false

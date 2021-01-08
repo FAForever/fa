@@ -361,7 +361,7 @@ end
 function GetShiftAction(actionName, category)
     local keyActions = GetKeyActions()
     local keyLookup = GetKeyLookup()
-     
+
     local name = 'shift_' .. actionName
     local action = keyActions[name]
     if action  and action.category == category then

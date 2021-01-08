@@ -187,7 +187,7 @@ gamePatches = {
             '- Improved the loading tips',
             '- Moved faction data out of the functions',
             '- Added topological sorting for mods',
-            '- Added shaders for the SCTA', 
+            '- Added shaders for the SCTA',
             '- Improved scripted army movement',
             '',
             '**Contributors**',
@@ -1120,7 +1120,7 @@ gamePatches = {
             '- c0_okieZ',
             '- Crotalus',
             '- Exotic_Retard',
-            '- PhilipJFry',      
+            '- PhilipJFry',
         },
     },
     {
@@ -1197,7 +1197,7 @@ gamePatches = {
             '- keyser',
             '- Uveso',
             '- FAETHER',
-            '- TheAdDad',      
+            '- TheAdDad',
             '- ChrisKitching',
             '- crotalus',
             '- dk0x',
@@ -1207,7 +1207,7 @@ gamePatches = {
         version = 3696,
         name = 'Game Version 3696',
         description = {
-        
+
             '**ACU**',
             '- Aeon ',
             '   - Personal Shield Generator',
@@ -1278,7 +1278,7 @@ gamePatches = {
             '   - Torpedo Weapon:',
             '       - Range: 32 → 28',
             '   - Target Priorities: Othuum now prioritises T3 over T2 over T1 instead of the reverse',
-            '- Percival',            
+            '- Percival',
             '   - Health: 9300 → 7200',
             '   - BuildTime: 6000 → 4800',
             '   - Speed: 2 → 2.1',
@@ -2496,7 +2496,7 @@ gamePatches = {
         description = {
             '- Reverted that last one for a bit to fix an idiot bug',
         }
-    },  
+    },
     {
         version = 3668,
         name = 'Game Version 3668',

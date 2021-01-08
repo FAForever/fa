@@ -40,10 +40,10 @@ function CreateUI(playerName, over, exitBehavior)
 
 	local exitButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Cancel>", 16, 2, 0, "UI_Back_MouseDown")
 	LayoutHelpers.AtRightIn(exitButton, panel, 38)
-	LayoutHelpers.AtBottomIn(exitButton, panel, 34)    
+	LayoutHelpers.AtBottomIn(exitButton, panel, 34)
 
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() exitButton.OnClick(exitButton) end)
-    
+
     local panelTitle = UIUtil.CreateText(panel, "<LOC _Create_LAN_Game>", 22)
     LayoutHelpers.AtHorizontalCenterIn(panelTitle, panel)
     LayoutHelpers.AtTopIn(panelTitle, panel, 50)
@@ -58,7 +58,7 @@ function CreateUI(playerName, over, exitBehavior)
 
     local gameNameLabel = UIUtil.CreateText(panel, "<LOC _Game_Name>", 14, UIUtil.bodyFont)
     LayoutHelpers.Above(gameNameLabel, gameNameEdit, 5)
-    
+
     local portEdit = CreateEditField(panel)
     portEdit.Width:Set(gameNameEdit.Width)
     LayoutHelpers.AtHorizontalCenterIn(portEdit, panel)
@@ -81,7 +81,7 @@ function CreateUI(playerName, over, exitBehavior)
         end
     end
     autoPort:SetCheck(true)
-    
+
     local autoPortLabel = UIUtil.CreateText(panel, "<LOC GAMECREATE_0003>Auto Port", 14, UIUtil.bodyFont)
     autoPortLabel.Right:Set(autoPort.Left)
     autoPortLabel.Bottom:Set(autoPort.Bottom)
@@ -110,7 +110,7 @@ function CreateUI(playerName, over, exitBehavior)
             return true
         end
     end
-    
+
     portEdit.OnEnterPressed = function(self, text)
         portEdit:AbandonFocus()
         return true
@@ -130,7 +130,7 @@ function CreateUI(playerName, over, exitBehavior)
         continueButton:OnClick()
         return true
     end
-    
+
     continueButton.OnClick = function(self)
         local gameName = gameNameEdit:GetText()
         if (not gameName) or (gameName == "") then
@@ -138,7 +138,7 @@ function CreateUI(playerName, over, exitBehavior)
             errorDialog = UIUtil.ShowInfoDialog(parent, "<LOC GAMECREATE_0000>Please choose a valid game name", "<LOC _OK>")
             return
         end
-        
+
         -- check game name for all spaces
         local gnBegin, gnEnd = string.find(gameName, "%s+")
         if gnBegin and (gnBegin == 1 and gnEnd == string.len(gameName)) then
@@ -154,7 +154,7 @@ function CreateUI(playerName, over, exitBehavior)
                 if errorDialog then errorDialog:Destroy() end
                 errorDialog = UIUtil.ShowInfoDialog(parent, LOCF('<LOC DIRCON_0003>Invalid port number: %s.  Must be an integer between 1 and 65535', portEdit:GetText()), "<LOC _OK>")
                 return
-            end        
+            end
         end
 
         if port ~= 0 then

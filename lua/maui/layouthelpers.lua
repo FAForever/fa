@@ -166,19 +166,19 @@ function FillParentPreserveAspectRatio(control, parent)
         end
         return ratio
     end
-    
-    control.Top:Set(function() return 
+
+    control.Top:Set(function() return
         math.floor(parent.Top() + ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Bottom:Set(function()
         return math.floor(parent.Bottom() - ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Left:Set(function()
         return math.floor(parent.Left() + ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Right:Set(function()
         return math.floor(parent.Right() - ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
 end
 
 --* these functions will place the control and resize in a specified location within the parent
@@ -441,7 +441,7 @@ function SetDimensions(control, width, height)
             return math.floor(width * pixelScaleFactor)
         end)
     end
-    
+
     if height then
         control.Height:Set(function()
             return math.floor(height * pixelScaleFactor)
@@ -476,7 +476,7 @@ function DepthUnderParent(control, parent, depth)
     control.Depth:Set(function() return parent.Depth() - depth end)
 end
 
--- Scale according to the globally set ratio 
+-- Scale according to the globally set ratio
 function Scale(control)
     SetDimensions(control, control.Width(), control.Height())
 end

@@ -556,7 +556,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    
+
     local slice = nil
 
     -- Create a pool mercury that slow draws into the build unit
@@ -601,7 +601,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
         slider:SetSpeed(-1)
         slider:SetGoal(0, -sy * 0.5, 0)
     end
-    
+
     if not builder:IsPaused() then
         local fraction = unitBeingBuilt:GetFractionComplete()
         local scale
@@ -1432,7 +1432,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
     end
-    
+
     if teleDelay then
         WaitTicks(teleDelay * 10)
     end

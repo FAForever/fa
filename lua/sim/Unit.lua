@@ -1115,7 +1115,7 @@ Unit = Class(moho.unit_methods) {
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-                
+
                 if not EntityCategoryContains(categories.VOLATILE, self) then
                     self:SetReclaimable(false)
                 end
@@ -1271,19 +1271,19 @@ Unit = Class(moho.unit_methods) {
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
-        
+
         massTrue = mass
-        
+
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
             if unit and not unit.Dead and unit.gainsVeterancy then
                 local proportion = data.damage / self.totalDamageTaken
-                
+
                 -- True value for "Mass killed"
                 local massKilledTrue = math.floor(massTrue * proportion)
                 unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
-                
+
                 if unit.Sync.VeteranLevel < 5 then
                     -- Find the proportion of yourself that each instigator killed
                     local massKilled = math.floor(mass * proportion)
@@ -1335,11 +1335,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
-        
+
         -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
         if self.Sync.myValue then
             local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
-            
+
             -- Bail if our veterancy hasn't increased
             if newVetLevel == self.Sync.VeteranLevel then return end
 
@@ -1351,15 +1351,15 @@ Unit = Class(moho.unit_methods) {
             else
                 return
             end
-        end    
+        end
 
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
-    
+
     CalculateVeterancyLevelAfterTransfer = function(self, massKilled, massKilledTrue)
         self.Sync.totalMassKilled = math.floor(massKilled)
         self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
-        
+
         if self.Sync.myValue then
             local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
@@ -1381,7 +1381,7 @@ Unit = Class(moho.unit_methods) {
                 self.Sync.VeteranLevel = 5
             end
         end
-        
+
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
@@ -1389,12 +1389,12 @@ Unit = Class(moho.unit_methods) {
     SetVeterancy = function(self, veteranLevel)
         if veteranLevel <= 0 or veteranLevel > 5 then return end
         if not self.gainsVeterancy then return end
-        
+
         if self.Sync.myValue then
             self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
         else
             self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel])
-        end    
+        end
     end,
 
     -- Set the veteran level to the level specified
@@ -1435,14 +1435,14 @@ Unit = Class(moho.unit_methods) {
                 SUBCOMMANDER = 4,
                 EXPERIMENTAL = 5,
             }
-            
+
             local techLevel = techLevels[self.techCategory] or 1
-            
+
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
                 techLevel = techLevel + 1
             end
-            
+
             -- Regen values by tech level and veterancy level
             local regenBuffs = {
                 {1,  2,  3,  4,  5}, -- T1
@@ -1451,7 +1451,7 @@ Unit = Class(moho.unit_methods) {
                 {9,  18, 27, 36, 45}, -- SACU
                 {25, 50, 75, 100,125}, -- Experimental
             }
-        
+
             BuffBlueprint {
                 Name = regenBuffName,
                 DisplayName = regenBuffName,
@@ -1465,7 +1465,7 @@ Unit = Class(moho.unit_methods) {
                 },
             }
         end
-        
+
         return {regenBuffName, healthBuffName}
     end,
 
@@ -1597,7 +1597,7 @@ Unit = Class(moho.unit_methods) {
             local animBlock = self:ChooseAnimBlock(bp)
 
             -- for determining wreckage offset after dying with an animation
-            if anim == 'AnimationDeath' then 
+            if anim == 'AnimationDeath' then
                 self.DeathHitBox = animBlock.HitBox
             end
 
@@ -2001,7 +2001,7 @@ Unit = Class(moho.unit_methods) {
             self:DestroyAllBuildEffects()
             self:DestroyAllTrashBags()
         end
-        
+
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
         end
@@ -2191,7 +2191,7 @@ Unit = Class(moho.unit_methods) {
             self.Sync.totalMassKilled = 0
             self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
-            
+
             -- Values can be setting up manually via bp.
             if bp.VeteranMass then
                 self.Sync.manualVeterancy = {
@@ -2213,7 +2213,7 @@ Unit = Class(moho.unit_methods) {
                     COMMAND = 2,
                 }
                 local defaultMult = techMultipliers[self.techCategory] or 2
-                
+
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
         end
@@ -2615,13 +2615,13 @@ Unit = Class(moho.unit_methods) {
 
         self:DoOnStartBuildCallbacks(built)
 
-        
+
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
             built.IsUpgrade = true
-            
+
             --Transfer flag
             self.TransferUpgradeProgress = true
             self.UpgradeBuildTime = bp.Economy.BuildTime

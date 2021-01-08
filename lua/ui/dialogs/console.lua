@@ -56,16 +56,16 @@ function ConfigWindow(parent)
     LayoutHelpers.AnchorToLeft(window, parent, -230)
     LayoutHelpers.AnchorToTop(window, parent, -120)
     window.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    
+
     local client = window:GetClientGroup()
     local defValue = Prefs.GetFromCurrentProfile('console_alpha') or 1
     defValue = defValue * 100
     local label = UIUtil.CreateText(client, LOCF("<LOC console_alpha>Alpha: %d%%", defValue), 14)
     LayoutHelpers.AtLeftTopIn(label, client, 5, 5)
-    
-    local slider = IntegerSlider(client, false, 
-            20, 100, 1, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
-            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+
+    local slider = IntegerSlider(client, false,
+            20, 100, 1, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
     LayoutHelpers.Below(slider, label)
     slider.OnValueSet = function(self, newValue)
@@ -107,7 +107,7 @@ function CreateDialog()
     consoleOutput:SetFont(consoleFontName, consoleFontSize)
 
     UIUtil.CreateVertScrollbarFor(consoleOutput)
-    
+
     parent.OnConfigClick = function(self)
         ConfigWindow(parent)
     end
@@ -150,11 +150,11 @@ function CreateDialog()
                 for i,v in matches do
                     conFuncsList:AddItem(v)
                 end
-                
+
                 if conFuncsList:NeedsScrollBar() then
                     UIUtil.CreateVertScrollbarFor(conFuncsList)
                 end
-                
+
                 conFuncsList:SetSelection(conFuncsList:GetItemCount() - 1)
                 conFuncsList:ScrollToBottom()
 

@@ -41,7 +41,7 @@ TranslatedOrder = {
 -- This function makes a shadow copy of the orders given to the units.
 -- Due to it's use, only a subset of the orders will be kept.
 function MakeShadowCopyOrders(command)
-    
+
     -- If the order has the Clear bit set, then all previously issued orders will be removed first,
     -- even if the specific order will not be handled below.
     -- This conveniently also handles the Stop order (= clear all orders).
@@ -55,7 +55,7 @@ function MakeShadowCopyOrders(command)
     if not TranslatedOrder[command.CommandType] then
         return
     end
-    
+
     local Order = {
         CommandType = TranslatedOrder[command.CommandType],
         Position = command.Target.Position,
@@ -64,7 +64,7 @@ function MakeShadowCopyOrders(command)
     if command.Target.Type == "Entity" then
         Order.EntityId = command.Target.EntityId
     end
-    
+
     -- Add this order to each individual unit.
     for _,unit in ipairs(command.Units) do
 
@@ -93,12 +93,12 @@ function FixOrders(unit)
     if not unit or unit:IsInCategory("FACTORY") then
         return
     end
-    
+
     local unitOrders = ShadowOrders[unit:GetEntityId()]
     if not unitOrders  or not unitOrders[1] then
         return
     end
-    
+
     local queue = unit:GetCommandQueue()
     local filteredQueue = {}
     for _,command in ipairs(queue) do
@@ -110,15 +110,15 @@ function FixOrders(unit)
             table.insert(filteredQueue, Order)
         end
     end
-    
+
     local numOrders = table.getn(unitOrders)
-    
+
     -- We can't trust the shadow orders if commands were added without getting a copy.
     if numOrders < table.getn(filteredQueue) then
         WARN("Spreadattack: Command queue is longer than the shadow order list.")
         return
     end
-    
+
     -- First check for entire blocks of orders that have been deleted.
     local orderIndex = 1
     local queueIndex = 1
@@ -130,17 +130,17 @@ function FixOrders(unit)
         while unitOrders[nextOrderIndex].CommandType == orderType do
             nextOrderIndex = nextOrderIndex + 1
         end
-        
+
         if orderType == lastBlockType then
             orderIndex = nextOrderIndex
             continue
         end
-        
+
         local nextQueueIndex = queueIndex
         while filteredQueue[nextQueueIndex].CommandType == orderType do
             nextQueueIndex = nextQueueIndex + 1
         end
-        
+
          if nextQueueIndex == queueIndex then
             -- Block not found.
             for i = nextOrderIndex - 1, orderIndex, -1 do
@@ -151,11 +151,11 @@ function FixOrders(unit)
         else
             lastBlockType = orderType
         end
-        
+
         orderIndex = nextOrderIndex
         queueIndex = nextQueueIndex
     end
-    
+
     -- Now fix the orders within each block of the same type.
     orderIndex = 1
     queueIndex = 1
@@ -169,16 +169,16 @@ function FixOrders(unit)
             end
             nextOrderIndex = nextOrderIndex + 1
         end
-        
+
         local nextQueueIndex = queueIndex
         while filteredQueue[nextQueueIndex].CommandType == orderType do
             nextQueueIndex = nextQueueIndex + 1
         end
-        
+
         -- Check if orders were removed from the queue and try to identify them.
         local numDeletedOrders = nextOrderIndex - orderIndex - (nextQueueIndex - queueIndex)
         if numDeletedOrders ~= 0 then
-        
+
             if numEntityTargets == 0 then
                 -- With only position targets it doesn't matter which orders we delete.
                 while numDeletedOrders > 0 do
@@ -236,7 +236,7 @@ function FixOrders(unit)
                     end
                     table.insert(Matches, {Match = match, Priority = priority})
                 end
-                
+
                 -- Delete unmatched commands by priority.
                 for priority = 1, 3, 1 do
                     if numDeletedOrders <= 0 then
@@ -255,7 +255,7 @@ function FixOrders(unit)
                         end
                     end
                 end
-                
+
                 -- Fix the positions of any moved orders.
                 local positionIndex = Matches[1].Match or queueIndex
                 for i = 0, nextOrderIndex - orderIndex - 1, 1 do
@@ -277,7 +277,7 @@ function FixOrders(unit)
                 end
             end
         end
-            
+
         orderIndex = nextOrderIndex
         queueIndex = nextQueueIndex
     end
@@ -307,7 +307,7 @@ function SpreadAttack()
         if not unitOrders or not unitOrders[1] then
             continue
         end
-    
+
         -- Find all consecutive mixable orders, and only mix those.
         local beginAction,endAction,action,counter,actionAlwaysMixed = nil,nil,nil,1,false
         local alwaysMix = {"Attack", "Nuke", "Tactical"}
@@ -341,12 +341,12 @@ function SpreadAttack()
                     break
                 end
             end
-            
+
             -- Skip if there was no mixable order found, or only one order (can't swap one command).
             if beginAction == nil or endAction == beginAction then
                 break
             end
-            
+
             -- Rearrange the first few mixable orders (equal to the number of targets) so that the targets are uniformly distributed on the first pass.
             -- For example, 3 units attacking 8 units (? denotes random target):
             -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
@@ -374,12 +374,12 @@ function SpreadAttack()
 
             -- Repeat this loop and search for more mixable order series.
         end
-    
+
         -- All targeted orders have been mixed, now it's time to reassign those orders.
         -- Since giving orders is a Sim-side command, use a SimCallback function.
         SimCallback( {
                 Func = "GiveOrders",
-                Args = { 
+                Args = {
                     unit_orders = unitOrders,
                     unit_id     = unit:GetEntityId(),
                     From = GetFocusArmy()
@@ -417,19 +417,19 @@ function GiveOrders(Data)
          --["Reclaim"]            = IssueReclaim,
         }
     end
-    
+
     if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
         local unit = GetEntityById(Data.unit_id)
         -- Skip units with no valid shadow orders.
         if not Data.unit_orders or not Data.unit_orders[1] then
             return
         end
-        
+
         if unit:GetBlueprint().CategoriesHash.BOMBER then
             for key, order in Data.unit_orders or {} do
                 if order.CommandType == "Move" then
                     local bomberPosition = unit:GetPosition()
-                    
+
                     --reject all move orders that are closer than 20
                     if VDist2(bomberPosition[1], bomberPosition[3], order.Position[1], order.Position[3]) < 20 then
                         table.remove (Data.unit_orders, key)
@@ -447,7 +447,7 @@ function GiveOrders(Data)
             if not Function then
                 continue
             end
-            
+
             local target = order.Position
             if order.EntityId then
                 target = GetEntityById(order.EntityId)

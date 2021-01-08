@@ -455,7 +455,7 @@ function CreateWreckage(unit, needToRotate)
         newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] + unitRotation[3] * rotation[1] - unitRotation[1] * rotation[3]
         newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] + unitRotation[1] * rotation[2] - unitRotation[2] * rotation[1]
         newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] - unitRotation[2] * rotation[2] - unitRotation[3] * rotation[3]
-        
+
         prop:SetOrientation(newOrientation, true)
     end
     unit:Destroy()
@@ -467,25 +467,25 @@ function AnimateDeathThread(unit, deathAnim)
     local animator = CreateAnimator(unit)
     animator:PlayAnim(animBlock.Animation)
     local rate = unit.rate or 1
-    
+
     if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
         rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
     end
-    
+
     animator:SetRate(rate)
     animator:SetAnimationTime(1000)
     unit.Trash:Add(animator)
-    
+
     if animator then
         WaitFor(animator)
     end
-    
+
     CreateWreckage(unit, false)
 end
 
 function CreateWreckageUnit(unit)
 	local bp = unit:GetBlueprint()
-	
+
 	local isStructure = bp.CategoriesHash.STRUCTURE
 	local isAir = bp.CategoriesHash.AIR
 	local isLand = bp.CategoriesHash.LAND
@@ -496,7 +496,7 @@ function CreateWreckageUnit(unit)
 	local unitPos = unit:GetPosition()
 	local deep = (GetSurfaceHeight(unitPos[1],unitPos[3]) - GetTerrainHeight(unitPos[1],unitPos[3]))
 	local deathAnim = bp.Display['AnimationDeath']
-	
+
 	-- If unit stay on land or deep<5 and have death animation, animate this
 	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and (layer == 'Land' or deep < 5)
 	-- We want to random rotate all naval and air units whats haven`t death animation

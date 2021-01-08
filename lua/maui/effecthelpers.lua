@@ -461,12 +461,12 @@ function Pulse(control, time, alphaBtm, alphaTop)
     local duration = (time or 1) / 2
     local minAlpha = alphaBtm or 0
     local maxAlpha = alphaTop or 1
-    
+
     local alphaNorm = maxAlpha - minAlpha
     local direction = 1
     local elapsedTime = 0
     local newAlpha = minAlpha
-    
+
     control:SetAlpha(newAlpha)
 
     control.OnFrame = function(self, frameTime)

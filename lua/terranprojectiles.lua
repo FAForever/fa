@@ -95,10 +95,10 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local pos = self:GetPosition()
             local radius = self.DamageData.DamageRadius
-        
+
             DamageArea(self, pos, radius, 1, 'Force', true)
             DamageArea(self, pos, radius, 1, 'Force', true)
-            
+
         end
 
         EmitterProjectile.OnImpact(self, targetType, targetEntity)

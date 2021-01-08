@@ -643,7 +643,7 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianACUAttack',
     BuildersType = 'EngineerBuilder',
-    Builder {    
+    Builder {
         BuilderName = 'Sorian CDR Attack',
         PlatoonTemplate = 'CommanderAttackSorian',
         Priority = 875,
@@ -683,7 +683,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {    
+    Builder {
         BuilderName = 'Sorian CDR T1 Power',
         PlatoonTemplate = 'CommanderBuilderSorian',
         Priority = 875,

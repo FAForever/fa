@@ -20,18 +20,18 @@ local function ParsePriorities()
 
     for _, id in idlist do
         local weapons = GetUnitBlueprintByName(id).Weapon
-        
+
         for weaponNum, weapon in weapons or {} do
             for line, priority in weapon.TargetPriorities or {} do
                 if not finalPriorities[priority] then
                     if string.find(priority, '%(') then
-                        finalPriorities[priority] = ParseEntityCategoryProperly(priority) 
+                        finalPriorities[priority] = ParseEntityCategoryProperly(priority)
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)
                     end
                 end
             end
-        end     
+        end
     end
     return finalPriorities
 end
@@ -340,7 +340,7 @@ Weapon = Class(moho.weapon_methods) {
         if not self.damageTableCache then self.damageTableCache = self:GetDamageTableInternal() end
         return self.damageTableCache
     end,
-    
+
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -383,11 +383,11 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetWeaponPriorities = function(self, priTable)
-    
+
         if not cachedPriorities then
             cachedPriorities = ParsePriorities()
-        end 
-        
+        end
+
         if not priTable then
             local bp = self:GetBlueprint().TargetPriorities
             if bp then
@@ -402,7 +402,7 @@ Weapon = Class(moho.weapon_methods) {
                         else
                             cachedPriorities[v] = ParseEntityCategory(v)
                             table.insert(priorityTable, cachedPriorities[v])
-                        end    
+                        end
                     end
                 end
                 self:SetTargetingPriorities(priorityTable)

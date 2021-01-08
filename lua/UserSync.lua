@@ -94,7 +94,7 @@ function OnSync()
             sendEnhancementMessage(messageTable)
         end
     end
-    
+
     if Sync.NewPlayableArea then
         SetPlayableArea(Sync.NewPlayableArea)
     end

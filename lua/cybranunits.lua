@@ -199,7 +199,7 @@ CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
-   
+
     StartBuildingEffects = function(self, unitBeingBuilt)
         local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
