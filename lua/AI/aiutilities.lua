@@ -318,7 +318,7 @@ function AIGetMarkerLocationsEx(aiBrain, markerType)
         markerList = GenerateMarkerList(markerList,markers,markerType)
         LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType)
         -- If we have no Amphibious Path Nodes, generate them from Land and Water Nodes
-        if markerType == 'Amphibious Path Node' and table.getn(markerList) <= 0 then
+        if markerType == 'Amphibious Path Node' and table.empty(markerList) then
             markerList = GenerateAmphibiousMarkerList(markerList,markers,'Land Path Node')
             markerList = GenerateAmphibiousMarkerList(markerList,markers,'Water Path Node')
             LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType..' (generated from Land/Water markers).')
