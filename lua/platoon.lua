@@ -3639,7 +3639,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -- final check for if we should disband
-        if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) <= 0 then
+        if not eng or eng.Dead or table.empty(eng.EngineerBuildQueue) then
             if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport then
                 eng.PlatoonHandle:PlatoonDisband()
             end
