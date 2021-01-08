@@ -226,7 +226,7 @@ StructureUnit = Class(Unit) {
 
     HasTarmac = function(self)
         if not self.TarmacBag then return false end
-        return table.getn(self.TarmacBag.Decals) ~= 0
+        return not table.empty(self.TarmacBag.Decals)
     end,
 
     OnMassStorageStateChange = function(self, state)

@@ -5069,7 +5069,7 @@ function SetGameOptions(options, ignoreRefresh)
         if key == 'RestrictedCategories' then
             local restrictionsEnabled = false
             if val ~= nil then
-                if table.getn(val) ~= 0 then
+                if not table.empty(val) then
                     restrictionsEnabled = true
                 end
             end

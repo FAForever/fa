@@ -1571,7 +1571,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         end
     end
 
-    if table.getn(transports) ~= 0 then
+    if not table.empty(transports) then
         -- If no location then we have loaded transports then return true
         if location then
             -- Adding Surface Height, so the transporter get not confused, because the target is under the map (reduces unload time)
