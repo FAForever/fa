@@ -705,7 +705,7 @@ Unit = Class(moho.unit_methods) {
     RemoveCaptor = function(self, captor)
         self.Captors[captor.EntityId] = nil
 
-        if table.getsize(self.Captors) == 0 then
+        if table.empty(self.Captors) then
             self:ResetCaptors()
         end
     end,

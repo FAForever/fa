@@ -113,13 +113,13 @@ function GetStartPositions(scenario)
                 break
             end
         end
-        if table.getsize(armyPositions) == 0 then
+        if table.empty(armyPositions) then
             WARN("Unable to find FFA configuration in " .. scenario.file)
         end
     end
 
     -- try old data if nothing added to army positions
-    if table.getsize(armyPositions) == 0 then
+    if table.empty(armyPositions) then
         -- figure out all the armies in this map
         -- make sure old data is there
         if scenario.Games then

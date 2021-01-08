@@ -379,7 +379,7 @@ function buildActionFactoryTemplate(modifier)
     -- Find all avaiable templates
     local allFactoryTemplates = FactoryTemplates.GetTemplates()
 
-    if (not allFactoryTemplates) or table.getsize(allFactoryTemplates) == 0 then
+    if (not allFactoryTemplates) or table.empty(allFactoryTemplates) then
         return
     end
 
@@ -424,7 +424,7 @@ function buildActionTemplate(modifier)
     local effectiveIcons = {}
     local allTemplates = Templates.GetTemplates()
 
-    if (not allTemplates) or table.getsize(allTemplates) == 0 then
+    if (not allTemplates) or table.empty(allTemplates) then
         return
     end
 

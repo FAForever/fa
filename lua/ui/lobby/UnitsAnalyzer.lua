@@ -977,7 +977,7 @@ function GetUnitsGroups(bps, faction)
     local DRONES = '(POD - UPGRADE)'
     local DEFENSES = '(ANTINAVY + DIRECTFIRE + ARTILLERY + ANTIAIR + MINE + ORBITALSYSTEM + SATELLITE + NUKE)'
 
-    if table.getsize(faction.Blueprints) == 0 then
+    if table.empty(faction.Blueprints) then
         faction.Blueprints = GetUnits(bps, faction.Name)
     end
     faction.Units = {}

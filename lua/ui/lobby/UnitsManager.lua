@@ -1048,7 +1048,7 @@ end
 -- @param sortReversed - optional boolean for sorting in revers of order specified in sortCategories
 function CompareUnitsOrder(a, b, sortCategories, sortReversed)
 
-    if table.getsize(sortCategories) == 0 then
+    if table.empty(sortCategories) then
         return 0
     end
 
@@ -1096,7 +1096,7 @@ function SortUnits(unitsByID, sortCategories, sortReversed)
        sortCategories = sortBy.TECH
     end
 
-    if table.getsize(unitsByID) == 0 then
+    if table.empty(unitsByID) then
         return unitsByID
     end
 
