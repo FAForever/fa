@@ -3542,7 +3542,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         eng.NotBuildingThread = nil
-        if not eng.Dead and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
+        if not eng.Dead and eng:IsIdleState() and not table.empty(eng.EngineerBuildQueue) and eng.PlatoonHandle then
             eng.PlatoonHandle.SetupEngineerCallbacks(eng)
             if not eng.ProcessBuild then
                 eng.ProcessBuild = eng:ForkThread(eng.PlatoonHandle.ProcessBuildCommand, true)
@@ -6335,7 +6335,7 @@ Platoon = Class(moho.platoon_methods) {
             --if eng.CDRHome then eng:PrintCommandQueue() end
         end
         eng.NotBuildingThread = nil
-        if not eng.Dead and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
+        if not eng.Dead and eng:IsIdleState() and not table.empty(eng.EngineerBuildQueue) and eng.PlatoonHandle then
             eng.PlatoonHandle.SetupEngineerCallbacksSorian(eng)
             if not eng.ProcessBuild then
                 eng.ProcessBuild = eng:ForkThread(eng.PlatoonHandle.ProcessBuildCommandSorian, true)
