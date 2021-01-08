@@ -18,7 +18,7 @@ end
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
-    if table.getn(NewFactionAiData) < 1 then
+    if table.empty(NewFactionAiData) then
         local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
     end
     if not offset then

@@ -73,7 +73,7 @@ BuffField = Class(Entity) {
         if not bp.Name or type(bp.Name) ~= 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
         if type(bp.Buffs) == 'string' then bp.Buffs = {bp.Buffs} end
-        if table.getn(bp.Buffs) < 1 then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
+        if table.empty(bp.Buffs) then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
 
         if not bp.Duration then
             WARN('BuffField: [..repr(bp.Name)..] Duration must be specified for a buff field buff.')

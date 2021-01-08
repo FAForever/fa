@@ -58,7 +58,7 @@ end
 
 function TransferUnitsOwnership(units, ToArmyIndex, captured)
     local toBrain = GetArmyBrain(ToArmyIndex)
-    if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
+    if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
         return
     end
     local fromBrain = GetArmyBrain(units[1].Army)
