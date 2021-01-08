@@ -1154,7 +1154,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
         for i = 1, numNodes do
             nodeList[i].entity:SetMesh(nodeMesh, false)
             nodeList[i].mesh = true
-            if emitterNodeEffects[i] ~= nil and table.getn(emitterNodeEffects[i]) ~= 0 then
+            if emitterNodeEffects[i] ~= nil and not table.empty(emitterNodeEffects[i]) then
                 for _, vEmit in emitterNodeEffects[i] do
                     emit = CreateAttachedEmitter(nodeList[i].entity, 0, unit.Army, vEmit)
                     info.Trash:Add(emit)

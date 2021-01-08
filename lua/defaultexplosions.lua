@@ -171,7 +171,7 @@ function _CreateScalableUnitExplosion(obj)
     EnvironmentalEffectTable = GetUnitEnvironmentalExplosionEffects(layer, scale)
 
     -- Merge resulting tables to final explosion emitter list
-    if table.getn(EnvironmentalEffectTable) ~= 0 then
+    if not table.empty(EnvironmentalEffectTable) then
         EffectTable = table.cat(BaseEffectTable, EnvironmentalEffectTable)
     else
         EffectTable = BaseEffectTable

@@ -315,7 +315,7 @@ function CommanderThread(cdr, platoon)
             if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -361,7 +361,7 @@ function CommanderThreadImproved(cdr, platoon)
                 -- assing the CDR to the armypool
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
             -- if we have a BuildQueue then continue building
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -1348,7 +1348,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     local maxBaseThreat = 0
     for _, base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if table.getn(threatTable) ~= 0 then
+        if not table.empty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -2035,7 +2035,7 @@ function CommanderThreadSorian(cdr, platoon)
             if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuildingSorian)
                 end
@@ -2346,7 +2346,7 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     local maxBaseThreat = 0
     for _, base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if table.getn(threatTable) ~= 0 then
+        if not table.empty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
