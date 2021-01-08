@@ -601,7 +601,7 @@ function CreateDialog(x, y)
     end
 
     local function spawnUnits(creationList, targetArmy, fast)
-        if table.getsize(creationList) <= 0 then return end
+        if table.empty(creationList) then return end
         local numUnits = tonumber(count:GetText())
         local vetLvl = tonumber(veterancyLevel:GetText())
         if fast then
