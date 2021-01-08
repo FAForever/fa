@@ -405,6 +405,7 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
+    if type(t) ~= 'table' then return true end
     return next(t) == nil
 end
 
