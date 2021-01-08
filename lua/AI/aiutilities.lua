@@ -1348,7 +1348,7 @@ function GetTransports(platoon, units)
     -- Determine distance of transports from platoon
     local transports = {}
     for _, unit in pool:GetPlatoonUnits() do
-        if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION - categories.uea0203, unit) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.getn(unit:GetCargo()) < 1 and unit:GetFractionComplete() == 1 then
+        if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION - categories.uea0203, unit) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.empty(unit:GetCargo()) and unit:GetFractionComplete() == 1 then
             local unitPos = unit:GetPosition()
             local curr = {Unit = unit, Distance = VDist2(unitPos[1], unitPos[3], location[1], location[3]),
                            Id = unit.UnitId}
@@ -1378,7 +1378,7 @@ function GetTransports(platoon, units)
 
         -- Take transports as needed
         for i = 1, table.getn(sortedList) do
-            if transportsNeeded and table.getn(sortedList[i].Unit:GetCargo()) < 1 and not sortedList[i].Unit:IsUnitState('TransportLoading') then
+            if transportsNeeded and table.empty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
                 aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
                 numTransports = numTransports + 1
@@ -1557,7 +1557,7 @@ function UseTransports(units, transports, location, transportPlatoon)
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
-        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.getn(unit:GetCargo()) < 1 then
+        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
             table.remove(transports, k)
         end
@@ -1565,7 +1565,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     -- If some transports have no units return to pool
     for k, t in transports do
-        if not t.Dead and table.getn(t:GetCargo()) < 1 then
+        if not t.Dead and table.empty(t:GetCargo()) then
             aiBrain:AssignUnitsToPlatoon('ArmyPool', {t}, 'Scout', 'None')
             table.remove(transports, k)
         end
@@ -2875,7 +2875,7 @@ function UseTransportsGhetto(units, transports)
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
-        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.getn(unit:GetCargo()) < 1 then
+        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
             table.remove(transports, k)
         end
@@ -2883,7 +2883,7 @@ function UseTransportsGhetto(units, transports)
 
     -- Return empty transports to base
     for k, v in transports do
-        if not v.Dead and EntityCategoryContains(categories.TRANSPORTATION, v) and table.getn(v:GetCargo()) < 1 then
+        if not v.Dead and EntityCategoryContains(categories.TRANSPORTATION, v) and table.empty(v:GetCargo()) then
             ReturnTransportsToPool({v}, true)
             table.remove(transports, k)
         end
