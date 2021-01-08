@@ -51,7 +51,7 @@ function RemoveUnitEnhancement(unit, enhancement)
 
     if not key then return end
     SimUnitEnhancements[id][key] = nil
-    if table.getsize(slots) == 0 then
+    if table.empty(slots) then
         SimUnitEnhancements[id] = nil
     end
     SyncUnitEnhancements()

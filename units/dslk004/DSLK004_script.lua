@@ -123,7 +123,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
-        if table.getn(self.FxBeam) ~= 0 then
+        if not table.empty(self.FxBeam) then
 
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
