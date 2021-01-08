@@ -249,7 +249,7 @@ function AISortMarkersFromLastPos(aiBrain, markerList, maxNumber, tMin, tMax, tR
     end
 
     -- Simple selection sort, this can be made faster later if we decide we need it.
-    if table.getsize(markerList) == 0 then return {} end
+    if table.empty(markerList) then return {} end
 
     local num = table.getsize(markerList)
     if maxNumber < num then
@@ -985,7 +985,7 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
         end
     end
 
-    if table.getsize(locList) == 0 then return {} end
+    if table.empty(locList) then return {} end
 
     -- Sort the locations from point to closest point, that way it  makes a nice patrol path
     local sortedList = {}
@@ -2022,7 +2022,7 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
     local lastX = location[1]
     local lastZ = location[3]
 
-    if table.getsize(locList) == 0 then return {} end
+    if table.empty(locList) then return {} end
 
     local num = table.getsize(locList)
     local startX, startZ = aiBrain:GetArmyStartPos()

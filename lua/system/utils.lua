@@ -472,7 +472,7 @@ function table.print(tbl, tblPrefix, printer)
         printer(tblPrefix .." table is nil")
         return
     end
-    if table.getsize(tbl) == 0 then
+    if table.empty(tbl) then
         printer(tblPrefix .." { }")
         return
     end

@@ -604,7 +604,7 @@ function PostModBlueprints(all_bps)
             if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
             if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
             -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if table.getsize(issues) == 0 then
+            if table.empty(issues) then
                 table.insert(preset_bps, table.deepcopy(bp))
             else
                 issues = table.concat(issues,', ')

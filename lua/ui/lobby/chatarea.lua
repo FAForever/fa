@@ -152,7 +152,7 @@ ChatArea = Class(Group){
     AppendText = function(self, str, style, useNewLine)
         -- make sure we always append text to an existing line
         local line = nil
-        if useNewLine or table.getsize(self.ChatLines) == 0 then
+        if useNewLine or table.empty(self.ChatLines) then
             line = self:CreateLine(style.fontSize + self.Style.lineSpacing)
         else
             line = self.lastLine  -- getting the last/current line
@@ -164,7 +164,7 @@ ChatArea = Class(Group){
         textField.style = style
         textField.useNewLine = useNewLine
         -- position text field at the start of current line or at the end
-        if useNewLine or table.getsize(line.TextFields) == 0 then
+        if useNewLine or table.empty(line.TextFields) then
             LayoutHelpers.AtLeftTopIn(textField, line, style.padding.left, 0)
         else
             LayoutHelpers.RightOf(textField, line.lastTextField, -5)

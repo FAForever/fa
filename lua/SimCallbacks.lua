@@ -54,7 +54,7 @@ end
 
 Callbacks.PersistFerry = function(data, units)
     local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
-    if table.getsize(transports) == 0 then return end
+    if table.empty(transports) then return end
     local start = data.route[1]
 
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')

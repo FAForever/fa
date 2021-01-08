@@ -170,7 +170,7 @@ function SetActiveOverlays()
         local info = comboData[i]
         SetOverlayFilter(info.filterName,categories,info.NormalColor,info.SelectColor,info.RolloverColor,info.Inner[1],info.Inner[2],info.Outer[1],info.Outer[2])
     end
-    if table.getsize(tempFilters) == 0 then
+    if table.empty(tempFilters) then
         buttonState = false
         GetButton('military'):Disable()
     else

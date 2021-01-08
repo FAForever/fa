@@ -803,7 +803,7 @@ local function CreatePresets()
 end
 --- Generates restriction presets or returns cached presets
 function GetPresetsData()
-    if table.getsize(presetsRestrictions) == 0 then
+    if table.empty(presetsRestrictions) then
         CreatePresets()
     end
     return presetsRestrictions
