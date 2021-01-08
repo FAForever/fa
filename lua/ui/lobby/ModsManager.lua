@@ -487,7 +487,7 @@ function UpdateMods(modsList)
                 mod.units[id] = bp
             end
         end
-        if table.getsize(mod.units) > 0 then
+        if not table.empty(mod.units) then
             mod.tags['UNITS'] = true
         end
     end
@@ -911,11 +911,11 @@ function CreateListElement(parent, mod, Pos)
 
     if mod.type == 'NO_DEPENDENCY' then
         local body = ''
-        if table.getsize(mod.requiresNames) > 0 then
+        if not table.empty(mod.requiresNames) then
             for k, v in mod.requiresNames do
                 body = v .. ',\n' .. body
             end
-        elseif table.getsize(mod.requires) > 0 then
+        elseif not table.empty(mod.requires) then
             for k, v in mod.requires do
                 body = v .. ',\n' .. body
             end

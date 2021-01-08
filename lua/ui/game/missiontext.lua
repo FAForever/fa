@@ -352,7 +352,7 @@ function ResumeTransmission()
 end
 
 function UpdateQueue()
-    if table.getsize(videoQueue) > 0 then
+    if not table.empty(videoQueue) then
         PlayMFDMovie({videoQueue[1][1], videoQueue[1][2], videoQueue[1][3], videoQueue[1][4]}, videoQueue[1][5])
         table.remove(videoQueue, 1)
     end

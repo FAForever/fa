@@ -764,7 +764,7 @@ function CreateDialog(x, y)
         filterSetCombo.itemArray = {}
         filterSetCombo.keyMap = {}
         local CurrentFilterSets = GetPreference('CreateUnitFilters')
-        if CurrentFilterSets and table.getsize(CurrentFilterSets) > 0 then
+        if CurrentFilterSets and not table.empty(CurrentFilterSets) then
             local index = 1
             local default = 1
             for filterName, filter in sortedpairs(CurrentFilterSets) do

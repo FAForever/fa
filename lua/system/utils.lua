@@ -294,7 +294,7 @@ end
 function table.getsize(t)
     -- handling nil table like empty tables so that no need to check
     -- for nil table and then size of table:
-    -- if t and table.getsize(t) > 0 then
+    -- if t and not table.empty(t) then
     -- do some thing
     -- end
     if type(t) ~= 'table' then return 0 end

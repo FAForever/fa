@@ -679,7 +679,7 @@ function CreateChatEdit()
             ChatPageUp(mod)
             return true
         elseif charcode == UIUtil.VK_UP then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.max(self.recallEntry-1, 1)
                 else
@@ -688,7 +688,7 @@ function CreateChatEdit()
                 RecallCommand(self.recallEntry)
             end
         elseif charcode == UIUtil.VK_DOWN then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.min(self.recallEntry+1, table.getsize(commandHistory))
                     RecallCommand(self.recallEntry)

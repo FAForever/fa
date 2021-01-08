@@ -681,7 +681,7 @@ Unit = Class(moho.unit_methods) {
         if not self.CaptureThread then
             self.CaptureThread = self:ForkThread(function()
                 local captors = self.Captors or {}
-                while table.getsize(captors) > 0 do
+                while not table.empty(captors) do
                     for _, c in captors do
                         self:CheckCaptor(c)
                     end
@@ -2600,7 +2600,7 @@ Unit = Class(moho.unit_methods) {
 
         if order == 'Repair' then
             self:OnStartRepair(built)
-        elseif self:GetHealth() < self:GetMaxHealth() and table.getsize(self:GetGuards()) > 0 then
+        elseif self:GetHealth() < self:GetMaxHealth() and not table.empty(self:GetGuards()) then
             -- Unit building something is damaged and has assisters, check their focus
             self:CheckAssistersFocus()
         end

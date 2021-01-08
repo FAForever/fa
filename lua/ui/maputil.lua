@@ -132,7 +132,7 @@ function GetStartPositions(scenario)
     end
 
     -- if we found armies, then get the positions
-    if table.getsize(armyPositions) > 0 then
+    if not table.empty(armyPositions) then
         for army, position in armyPositions do
             if saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army] then
                 pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position

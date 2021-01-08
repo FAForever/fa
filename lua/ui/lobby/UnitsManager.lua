@@ -326,7 +326,7 @@ function OnBlueprintsLoaded()
         for name, faction in factions do
             UnitsAnalyzer.GetUnitsGroups(faction.Blueprints, faction)
             for group, units in faction.Units do
-                if table.getsize(units) > 0 then
+                if not table.empty(units) then
                     cellMax = cellMax + 1
                 elseif group ~= 'CIVILIAN' then
                     WARN('UnitsManager detected '..name..' faction without any '..group..' units')

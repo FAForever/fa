@@ -825,7 +825,7 @@ function FormatData()
     local index = 1
     for _, key in ipairs(keys) do
         local category = key.key
-        if table.getsize(LineGroups[category].sources) > 0 then
+        if not table.empty(LineGroups[category].sources) then
             -- This is the first row
             lineData[index] = {
                 type = 'header',
