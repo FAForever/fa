@@ -198,7 +198,7 @@ function AISortMarkersFromStartPos(aiBrain, markerList, maxNumber, tMin, tMax, t
     end
 
     -- Simple selection sort, this can be made faster later if we decide we need it.
-    if table.getn(markerList) == 0 then return {} end
+    if table.empty(markerList) then return {} end
 
     local num = table.getsize(markerList)
     if maxNumber < num then
@@ -1315,7 +1315,7 @@ function GetTransports(platoon, units)
     end
 
     -- Check for empty platoon
-    if table.getn(units) == 0 then
+    if table.empty(units) then
         return 0
     end
 

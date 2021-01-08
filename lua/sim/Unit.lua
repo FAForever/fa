@@ -2252,7 +2252,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit
-        if table.getn(self.IdleEffectsBag) == 0 then
+        if table.empty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
         end
 
@@ -3430,7 +3430,7 @@ Unit = Class(moho.unit_methods) {
                 effects = self.GetTerrainTypeEffects(FxBlockType, FxBlockKey, pos, vTypeGroup.Type, TypeSuffix)
             end
 
-            if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
+            if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.empty(vTypeGroup.Bones))) then
                 WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
@@ -3470,7 +3470,7 @@ Unit = Class(moho.unit_methods) {
                 self:RemoveScroller()
             end
 
-            if not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0)) then
+            if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
                 if not self.Footfalls and bpTable.Footfall then
                     WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
                 end
@@ -3549,7 +3549,7 @@ Unit = Class(moho.unit_methods) {
             if self.BeamExhaustCruise  then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustIdle and table.getn(self.BeamExhaustEffectsBag) == 0 and bpTable.Idle ~= false then
+            if self.BeamExhaustIdle and table.empty(self.BeamExhaustEffectsBag) and bpTable.Idle ~= false then
                 self:CreateBeamExhaust(bpTable, self.BeamExhaustIdle)
             end
         elseif motionState == 'Cruise' then
@@ -3568,7 +3568,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
-        if not effectBones or (effectBones and table.getn(effectBones) == 0) then
+        if not effectBones or (effectBones and table.empty(effectBones)) then
             WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
@@ -3583,7 +3583,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
-        if not effectBones or (effectBones and table.getn(effectBones) == 0) then
+        if not effectBones or (effectBones and table.empty(effectBones)) then
             WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
@@ -3642,7 +3642,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateFootFallManipulators = function(self, footfall)
-        if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
+        if not footfall.Bones or (footfall.Bones and (table.empty(footfall.Bones))) then
             WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end

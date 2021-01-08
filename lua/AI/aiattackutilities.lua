@@ -254,7 +254,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
 
-    if table.getn(threatTable) == 0 then
+    if table.empty(threatTable) then
         return false
     end
 
