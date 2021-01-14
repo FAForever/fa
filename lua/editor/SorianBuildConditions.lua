@@ -245,7 +245,6 @@ function ClosestEnemyLessThan(aiBrain, distance)
             end
         end
         if closest and closest < distance * distance then
-            LOG('ClosestEnemyLessThan is true')
             return true
         end
     end
