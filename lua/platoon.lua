@@ -100,7 +100,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     StopAI = function(self)
-        if self.AIThread ~= nil then
+        if self.AIThread != nil then
             self.AIThread:Destroy()
         end
     end,
