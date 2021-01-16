@@ -2776,7 +2776,7 @@ Platoon = Class(moho.platoon_methods) {
             local oldPathSize = table.getn(self.LastAttackDestination)
 
             -- if we don't have an old path or our old destination and new destination are different
-            if attackPos and oldPathSize == 0 or attackPos[1] ~= self.LastAttackDestination[oldPathSize][1] or attackPos[3] ~= self.LastAttackDestination[oldPathSize][3] then
+            if attackPos and oldPathSize == 0 or attackPos[1] != self.LastAttackDestination[oldPathSize][1] or attackPos[3] != self.LastAttackDestination[oldPathSize][3] then
                 AIAttackUtils.GetMostRestrictiveLayer(self)
                 -- check if we can path to here safely... give a large threat weight to sort by threat first
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), attackPos, self.PlatoonData.NodeWeight or 10)
