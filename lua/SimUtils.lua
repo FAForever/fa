@@ -556,9 +556,16 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 end
 
 function GiveUnitsToPlayer(data, units)
+    local manualShare = ScenarioInfo.Options.ManualUnitShare
+    if manualShare == 'none' then return end
+
     if units then
         local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
+            if manualShare == 'no_builders' then
+                units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
+            end
+            
             TransferUnitsOwnership(units, data.To)
         end
     end

@@ -195,6 +195,10 @@ function BuildPlayerLines()
                 end
                 Tooltip.AddButtonTooltip(entry.giveUnitBtn, 'dip_give_units')
 
+                if sessionOptions.ManualUnitShare == 'none' then
+                    entry.giveUnitBtn:Disable()
+                end
+
                 entry.giveResourcesBtn = UIUtil.CreateButton(entry,
                     '/dialogs/toggle_btn/toggle-d_btn_up.dds',
                     '/dialogs/toggle_btn/toggle-d_btn_down.dds',
