@@ -375,9 +375,7 @@ GetAbilityDesc = {
         if bp.CategoriesHash.TECH3 then
             return text..'≈28'
         end
-        if bp.CategoriesHash.EXPERIMENTAL then
-            return text..'≈28'
-        end
+        return ''
     end,
     ability_airstaging = function(bp)
         return LOCF('<LOC uvd_RepairRate>', bp.Transport.RepairRate)..', '
