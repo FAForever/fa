@@ -366,16 +366,11 @@ GetAbilityDesc = {
     end,]]
     ability_transport = function(bp)
         local text = LOC('<LOC uvd_Capacity>')
-        if bp.CategoriesHash.TECH1 then
-            return text..'≈6'
-        end
-        if bp.CategoriesHash.TECH2 then
-            return text..'≈12'
-        end
-        if bp.CategoriesHash.TECH3 then
-            return text..'≈28'
-        end
-        return ''
+        return bp.Transport and bp.Transport.Class1Capacity and text..bp.Transport.Class1Capacity
+            or bp.CategoriesHash.TECH1 and text..'≈6'
+            or bp.CategoriesHash.TECH2 and text..'≈12'
+            or bp.CategoriesHash.TECH3 and text..'≈28'
+            or ''
     end,
     ability_airstaging = function(bp)
         return LOCF('<LOC uvd_RepairRate>', bp.Transport.RepairRate)..', '
