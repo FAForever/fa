@@ -273,6 +273,7 @@ UnitBlueprint {
         Class2AttachSize = 2,
         Class3AttachSize = 4,
         TransportClass = 10,
+        Class1Capacity = 10,
     },
     UseOOBTestZoom = 200,
     Veteran = {
