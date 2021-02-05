@@ -690,11 +690,11 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
     local radius = 0
     local offset = 0
     if factionIndex == 1 then
-        radius = 750 + offset
+        radius = 825 + offset
     elseif factionIndex == 2 then
-        radius = 900 + offset
+        radius = 825 + offset
     elseif factionIndex == 3 then
-        radius = 700 + offset
+        radius = 825 + offset
     elseif factionIndex == 4 then
         radius = 825 + offset
     end
