@@ -382,10 +382,11 @@ OverchargeProjectile = Class() {
                 local maxHP = self:UnitsDetection(targetType, targetEntity)
 
                 idealDamage = maxHP or data.minDamage
-                
+                targetCats = targetEntity:GetBlueprint().CategoriesHash
+
                       -----SHIELDS------
                 if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
-                    if EntityCategoryContains(categories.STRUCTURE, targetEntity) then
+                    if targetCats.STRUCTURE then
                         idealDamage = data.minDamage
                     else
                         idealDamage = targetEntity.MyShield:GetMaxHealth()
@@ -393,9 +394,9 @@ OverchargeProjectile = Class() {
 	                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
                     --good against group of mobile shields
                 end
-	        
+
                       ------ ACU -------
-                if EntityCategoryContains(categories.COMMAND, targetEntity) and not maxHP then -- no units around ACU - min.damage
+                if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
                     idealDamage = data.minDamage		
                 end
 
@@ -423,12 +424,18 @@ OverchargeProjectile = Class() {
                 RemoveEconomyEvent(launcher, launcher.EconDrain)
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
+                -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
+                if targetCats.DIESTOOCDEPLETINGSHIELD and not targetEntity.MyShield:IsUp() then
+                    targetEntity:Kill(launcher, 'Overcharge', 2)
+                    launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
+                end
             end)
         end
     end,
 
-    -- y = 3000e^(0.000095(x+15500))-10090
-    -- https://www.desmos.com/calculator/yyetmwyf0d
+    -- y = 3000e^(0.000095(x+15500))-10090 = old values
+    -- y = 4x = new values
+    -- https://www.desmos.com/calculator/ap0kazbdp0
     DamageAsEnergy = function(self, damage)
         return damage * 4
     end,
