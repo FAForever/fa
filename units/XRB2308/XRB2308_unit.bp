@@ -265,8 +265,8 @@ UnitBlueprint {
             RateOfFire = 0.25,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
-                'LIGHTBOAT TECH2', -- cooper
                 'SUBMERSIBLE',
+                'LIGHTBOAT TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'MOBILE ANTINAVY',

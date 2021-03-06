@@ -872,11 +872,7 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'MOBILE BOMB',
-                'MOBILE EXPERIMENTAL',
-                'MOBILE TECH3',
-                'MOBILE TECH2',
-                'MOBILE TECH1',
+                'MOBILE',
                 'COMMAND',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
@@ -962,7 +958,6 @@ UnitBlueprint {
             TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
-                'MOBILE BOMB',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
@@ -1049,7 +1044,6 @@ UnitBlueprint {
             TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
-                'MOBILE BOMB',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
@@ -1184,7 +1178,6 @@ UnitBlueprint {
             TargetPriorities = {
                 'COMMAND',
                 'MOBILE EXPERIMENTAL',
-                'MOBILE BOMB',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
