@@ -408,8 +408,9 @@ function CAiBrain:PlatoonExists(platoon)
 end
 
 --- Remove an army stats trigger.
--- TODO.
-function CAiBrain:RemoveArmyStatsTrigger()
+-- @param statName String, army's stat, example: "Economy_Ratio_Mass".
+-- @param triggerName String, unique name of the trigger.
+function CAiBrain:RemoveArmyStatsTrigger(statName, triggerName)
 end
 
 --- Sets army's stat to value.
