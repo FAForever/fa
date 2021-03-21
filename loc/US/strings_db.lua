@@ -1748,7 +1748,7 @@ Unit_Description_s204="Constructs Tech 3 Naval units. Buildable for a much cheap
 -- AEON -- Armored Commander Unit/Upgrades
 Unit_Description_0305="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
 Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health"
-Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High energy consumption."
+Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius."
 Unit_Description_0158="Massively increases main cannon range."
 Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range."
 Unit_Description_0160="Replaces the Tech 2 engineering Suite. Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health"
