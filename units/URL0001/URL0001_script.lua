@@ -288,7 +288,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'NaniteTorpedoTube' then
             local bp = self:GetBlueprint().Enhancements[enh]
             self:SetWeaponEnabledByLabel('Torpedo', true)
-            self:SetIntelRadius('Sonar', bp.NewSonarVision or 60)
+            self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
             if self:GetCurrentLayer() == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
