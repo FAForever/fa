@@ -5228,20 +5228,15 @@ local BenchTime
 --  CPU Benchmarking Functions
 --------------------------------------------------
 function CPUBenchmark()
+    -- Uveso: Actual we are checking more or less RAM speed not CPU speed
     --This function gives the CPU some busy work to do.
     --CPU score is determined by how quickly the work is completed.
     local totalTime = 0
     local lastTime
     local currTime
     local countTime = 0
-    --Make everything a local variable
-    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
-    local h
-    local i
-    local j
-    local k
-    local l
-    local m
+    local TABLE1 = 'ABC123.-/'
+    local TABLE2 = {}
     for h = 1, 48, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
@@ -5250,21 +5245,7 @@ function CPUBenchmark()
 
         lastTime = GetSystemTimeSeconds()
         for i = 1.0, 25.0, 0.0008 do
-            --This instruction set should cover most LUA operators
-            j = i + i   --Addition
-            k = i * i   --Multiplication
-            l = k / j   --Division
-            m = j - i   --Subtraction
-            j = i ^ 4   --Power
-            l = -i      --Negation
-            m = {'One', 'Two', 'Three'} --Create Table
-            table.insert(m, 'Four')     --Insert Table Value
-            table.remove(m, 1)          --Remove Table Value
-            l = table.getn(m)           --Get Table Length
-            k = i < j   --Less Than
-            k = i == j  --Equality
-            k = i <= j  --Less Than or Equal to
-            k = not k
+            TABLE2[tostring(i)] = TABLE1
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
