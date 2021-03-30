@@ -5228,24 +5228,45 @@ local BenchTime
 --  CPU Benchmarking Functions
 --------------------------------------------------
 function CPUBenchmark()
-    -- Uveso: Actual we are checking more or less RAM speed not CPU speed
     --This function gives the CPU some busy work to do.
     --CPU score is determined by how quickly the work is completed.
     local totalTime = 0
     local lastTime
     local currTime
     local countTime = 0
-    local TABLE1 = 'ABC123.-/'
-    local TABLE2 = {}
-    for h = 1, 48, 1 do
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local TableInsert = table.insert
+    local TableRemove = table.remove
+    local h
+    local i
+    local j
+    local k
+    local l
+    local m
+    local n = {}
+    for h = 1, 24, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
             return
         end
 
         lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 25.0, 0.0008 do
-            TABLE2[tostring(i)] = TABLE1
+        for i = 1.0, 30.4, 0.0008 do
+           --This instruction set should cover most LUA operators
+            j = i + i   --Addition
+            k = i * i   --Multiplication
+            l = k / j   --Division
+            m = j - i   --Subtraction
+            j = i ^ 4   --Power
+            l = -i      --Negation
+            m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
+            TableInsert(m, '1234567890')     --Insert Table Value
+            k = i < j   --Less Than
+            k = i == j  --Equality
+            k = i <= j  --Less Than or Equal to
+            k = not k
+            n[tostring(i)] = m
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
@@ -5253,7 +5274,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            WaitSeconds(0)
+            coroutine.yield(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)
