@@ -42,5 +42,5 @@ Tips = {
     "<LOC loadingtip_0040>Stealth only hides units from radar, cloak only from vision",
     "<LOC loadingtip_0041>Veterancy is based on the mass value of the killed unit and how much damage a unit dealt to it",
     "<LOC loadingtip_0042>To kill with a single overcharge, you need 1 energy storage for T1 units, up to 2 for T2, and up to 6 for T3",
-    "<LOC loadingtip_0043>To see stealthed underwater units you need water vision or omni",
+    "<LOC loadingtip_0043>To see stealthed underwater units you need water vision or omni"
 }
