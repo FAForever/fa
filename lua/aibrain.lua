@@ -1233,58 +1233,11 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
-
-            -- Table to track consumption
-            MassConsumption = {
-                Resources = {Units = {}, Drain = 0, },
-                Units = {Units = {}, Drain = 0, },
-                Defenses = {Units = {}, Drain = 0, },
-                Upgrades = {Units = {}, Drain = 0, },
-                Engineers = {Units = {}, Drain = 0, },
-                TotalDrain = 0,
-            },
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
         }
         self.NumBases = self.NumBases + 1
-    end,
-
-    AddConsumption = function(self, locationType, consumptionType, unit, unitBeingBuilt)
-        local consumptionData = self.BuilderManagers[locationType].MassConsumption
-        local bp = unitBeingBuilt:GetBlueprint()
-        local consumptionDrain = (unit:GetBuildRate() / bp.Economy.BuildTime) * bp.Economy.BuildCostMass
-
-        consumptionData[consumptionType].Drain = consumptionData[consumptionType].Drain + consumptionDrain
-        consumptionData.TotalDrain = consumptionData.TotalDrain + consumptionDrain
-
-        unit.ConsumptionData = {
-            ConsumptionType = consumptionType,
-            ConsumptionDrain = consumptionDrain,
-        }
-        table.insert(consumptionData[consumptionType].Units, unit)
-    end,
-
-    RemoveConsumption = function(self, locationType, unit)
-        local consumptionData = self.BuilderManagers[locationType].MassConsumption
-        local consumptionType = unit.ConsumptionData.ConsumptionType
-        if not consumptionType then
-            return
-        end
-
-        if not consumptionData[consumptionType] then
-            WARN('*AI WARNING: Invalid consumptionType - ' .. consumptionType)
-            return
-        end
-
-        for k, v in consumptionData[consumptionType].Units do
-            if v == unit then
-                consumptionData.TotalDrain = consumptionData.TotalDrain - unit.ConsumptionData.ConsumptionDrain
-                consumptionData[consumptionType].Drain = consumptionData[consumptionType].Drain - unit.ConsumptionData.ConsumptionDrain
-                consumptionData[consumptionType].Units[k] = nil
-                break
-            end
-        end
     end,
 
     GetEngineerManagerUnitsBeingBuilt = function(self, category)

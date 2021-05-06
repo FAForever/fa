@@ -327,14 +327,6 @@ EngineerManager = Class(BuilderManager) {
                         end
                         import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(unitConstructionFinished, unit, categories.ALLUNITS)
 
-                        local unitConstructionStarted = function(unit, unitBeingBuilt)
-                                                    local aiBrain = unit:GetAIBrain()
-                                                    local engManager = aiBrain.BuilderManagers[unit.BuilderManagerData.LocationType].EngineerManager
-                                                    if engManager then
-                                                        engManager:UnitConstructionStarted(unit, unitBeingBuilt)
-                                                    end
-                        end
-                        import('/lua/ScenarioTriggers.lua').CreateStartBuildTrigger(unitConstructionStarted, unit, categories.ALLUNITS)
                     end
                 end
 
@@ -547,8 +539,6 @@ EngineerManager = Class(BuilderManager) {
                 break
             end
         end
-
-        self.Brain:RemoveConsumption(self.LocationType, unit)
     end,
 
     ReassignUnit = function(self, unit)
@@ -579,28 +569,6 @@ EngineerManager = Class(BuilderManager) {
         end
     end,
 
-    UnitConstructionStarted = function(self, unit, unitBeingBuilt)
-        if EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
-        elseif EntityCategoryContains(categories.EXPERIMENTAL + categories.MOBILE, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Units', unitBeingBuilt)
-        elseif EntityCategoryContains(categories.MASSEXTRACTION + categories.MASSFABRICATION + categories.ENERGYPRODUCTION, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Resources', unitBeingBuilt)
-        elseif EntityCategoryContains(categories.DEFENSE, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Defenses', unitBeingBuilt)
-        elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Engineers', unitBeingBuilt)
-        elseif EntityCategoryContains(categories.STRUCTURE, unitBeingBuilt) then
-            self:AddConsumption(unit, 'Upgrades', unitBeingBuilt)
-        else
-            WARN('*AI DEBUG: Unknown consumption type for UnitId - ' .. unitBeingBuilt.UnitId)
-        end
-    end,
-
-    AddConsumption = function(self, unit, consumptionType, unitBeingBuilt)
-        self.Brain:AddConsumption(self.LocationType, consumptionType, unit, unitBeingBuilt)
-    end,
-
     UnitConstructionFinished = function(self, unit, finishedUnit)
         if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
@@ -620,7 +588,6 @@ EngineerManager = Class(BuilderManager) {
                 end
             end
         end
-        self.Brain:RemoveConsumption(self.LocationType, unit)
     end,
 
     AssignTimeout = function(self, builderName)
