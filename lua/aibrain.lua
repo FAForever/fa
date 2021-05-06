@@ -2781,14 +2781,15 @@ AIBrain = Class(moho.aibrain_methods) {
         local found = false
         for k, v in self.BaseMonitor.PlatoonDistressTable do
             -- If already calling for help, don't add another distress call
-            if v.Platoon == platoon then
-                continue
+            if table.equal(v.Platoon, platoon) then
+                found = true
+                break
             end
-
+        end
+        if not found then
             -- Add platoon to list desiring aid
             table.insert(self.BaseMonitor.PlatoonDistressTable, {Platoon = platoon, Threat = threat})
         end
-
         -- Create the distress call if it doesn't exist
         if not self.BaseMonitor.PlatoonDistressThread then
             self.BaseMonitor.PlatoonDistressThread = self:ForkThread(self.BaseMonitorPlatoonDistressThread)
