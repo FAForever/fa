@@ -44,111 +44,13 @@ XSL0301 = Class(CommandUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
-	
-	GetUnitsToBuff = function(self, bp)
-        local unitCat = ParseEntityCategory(bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
-        local brain = self:GetAIBrain()
-        local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
-        local units = {}
 
-        for _, u in all do
-            if not u.Dead and not u:IsBeingBuilt() then
-                table.insert(units, u)
-            end
-        end
-
-        return units
-    end,
-
-    RegenFieldBuffThread = function(self, type)
-        local bp = self:GetBlueprint().Enhancements[type]
-        local buff = 'SeraphimSACU' .. type
-
-        while not self.Dead do
-            local units = self:GetUnitsToBuff(bp)
-            for _,unit in units do
-                Buff.ApplyBuff(unit, buff)
-                unit:RequestRefreshUI()
-            end
-            WaitSeconds(5)
-        end
-    end,
-	
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        -- Regenerative Aura
-		    if enh == 'RegenAura' then
-            local buff
-            local type
-
-            buff = 'SeraphimSACU' .. enh
-
-            if not Buffs[buff] then
-                local buff_bp = {
-                    Name = buff,
-                    DisplayName = buff,
-                    BuffType = 'COMMANDERAURA_' .. enh,
-                    --Stacks = 'REPLACE',
-                    Duration = 5,
-                    Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
-                    Affects = {
-                        Regen = {
-                            Add = 0,
-							Floor = bp.RegenFloor,
-                            Mult = bp.RegenPerSecond,
-                            BPCeilings = {
-								TECH1 = bp.RegenCeilingT1,
-								TECH2 = bp.RegenCeilingT2,
-								TECH3 = bp.RegenCeilingT3,
-								EXPERIMENTAL = bp.RegenCeilingT4,
-								SUBCOMMANDER = bp.RegenCeilingSCU,
-							},
-                        },
-                    },
-                }
-                BuffBlueprint(buff_bp)
-            end
-
-            --buff2 = buff .. 'SelfBuff'
-
-            --if not Buffs[buff2] then   -- AURA SELF BUFF
-             --   BuffBlueprint {
-             --       Name = buff2,
-            --        DisplayName = buff2,
-            --        BuffType = 'COMMANDERAURAFORSELF',
-            --        Stacks = 'REPLACE',
-             --       Duration = -1,
-            --    }
-            --end
-
-            --Buff.ApplyBuff(self, buff2)
-            --table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
-            --if self.RegenFieldThreadHandle then
-            --    KillThread(self.RegenFieldThreadHandle)
-            --    self.RegenFieldThreadHandle = nil
-            --end
-
-            self.RegenFieldThreadHandle = self:ForkThread(self.RegenFieldBuffThread, enh)
-        elseif enh == 'RegenAuraRemove' then
-            if self.ShieldEffectsBag then
-                for k, v in self.ShieldEffectsBag do
-                    v:Destroy()
-                end
-                self.ShieldEffectsBag = {}
-            end
-
-            KillThread(self.RegenFieldThreadHandle)
-            self.RegenFieldThreadHandle = nil
-            for _, b in {'SeraphimACURegenAura', 'SeraphimACUAdvancedRegenAura'} do
-                if Buff.HasBuff(self, b .. 'SelfBuff') then
-                    Buff.RemoveBuff(self, b .. 'SelfBuff')
-                end
-            end
-
-		-- Teleporter
-        elseif enh == 'Teleporter' then
+        -- Teleporter
+        if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
@@ -161,6 +63,16 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
+        -- Shields
+        elseif enh == 'Shield' then
+            self:AddToggleCap('RULEUTC_ShieldToggle')
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+            self:CreateShield(bp)
+        elseif enh == 'ShieldRemove' then
+            self:DestroyShield()
+            self:SetMaintenanceConsumptionInactive()
+            self:RemoveToggleCap('RULEUTC_ShieldToggle')
         -- Overcharge
         elseif enh == 'Overcharge' then
             self:AddCommandCap('RULEUCC_Overcharge')
@@ -224,14 +136,19 @@ XSL0301 = Class(CommandUnit) {
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
         -- Enhanced Sensor Systems
-        elseif enh == 'GunUpgrade' then
+        elseif enh == 'EnhancedSensors' then
+            self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
+            self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local wep = self:GetWeaponByLabel('OverCharge')
             wep:ChangeMaxRadius(35)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(35)
-        elseif enh == 'GunUpgradeRemove' then
+        elseif enh == 'EnhancedSensorsRemove' then
+            local bpIntel = self:GetBlueprint().Intel
+            self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
+            self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local wep = self:GetWeaponByLabel('OverCharge')

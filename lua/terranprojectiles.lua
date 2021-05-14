@@ -37,19 +37,6 @@ TFragmentationGrenade= Class(EmitterProjectile) {
     #PolyTrail= EffectTemplate.THeavyFragmentationGrenadePolyTrail,
 }
 
-TFragmentationGrenade2= Class(EmitterProjectile) {
-	FxTrails= EffectTemplate.THeavyFragmentationGrenadeFxTrails,
-    #PolyTrail= EffectTemplate.THeavyFragmentationGrenadePolyTrail,
-
-    # Hit Effects
-    FxImpactUnit = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
-    FxImpactProp = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
-    FxImpactLand = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
-    FxImpactWater = EffectTemplate.TNapalmHvyCarpetBombHitWater01,
-    FxImpactUnderWater = {},
-    PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
-}
-
 TIFMissileNuke = Class(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     FxImpactUnit = {},

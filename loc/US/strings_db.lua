@@ -7,7 +7,10 @@
 --Aeon
 ual0301_Engineer_desc="SACU (Engineer Preset)"
 ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator."
-ual0301_Engineer_name="SACU (Engineer Preset)"
+ual0301_Engineer_name=""
+ual0301_NanoCombat_desc="SACU (Nano Combatant Preset)"
+ual0301_NanoCombat_help="Enhanced during construction with the Reacton Refractor and Nano-Repair System."
+ual0301_NanoCombat_name=""
 ual0301_Rambo_desc="SACU (Rambo Preset)"
 ual0301_Rambo_help="Enhanced during construction with the Heavy Personal Shield and Reacton Refractor."
 ual0301_Rambo_name=""
@@ -65,7 +68,10 @@ url0301_RAS_help="Enhanced during construction with a Resource Allocation System
 url0301_RAS_name=""
 
 --Seraphim
-xsl0301_Combat_desc="Support Armoured Command Unit (Combatant Preset)"
+xsl0301_AdvancedCombat_desc="SACU (Advanced Combatant Preset)"
+xsl0301_AdvancedCombat_help="Enhanced during construction with the Enhanced Sensor System, Nano-Repair System and Overcharge."
+xsl0301_AdvancedCombat_name=""
+xsl0301_Combat_desc="SACU (Combatant Preset)"
 xsl0301_Combat_help="Enhanced during construction with the Enhanced Sensor System."
 xsl0301_Combat_name=""
 xsl0301_Engineer_desc="SACU (Engineer Preset)"
@@ -76,10 +82,10 @@ xsl0301_Missile_help="Enhanced during construction with the Tactical Missile Lau
 xsl0301_Missile_name=""
 xsl0301_NanoCombat_desc="SACU (Nano Combatant Preset)"
 xsl0301_NanoCombat_help="Enhanced during construction with the Enhanced Sensor System and Nano-Repair System."
-xsl0301_NanoCombat_name="SACU (Nano Combatant Preset)"
-xsl0301_Rambo_desc="Support Armoured Command Unit (Rambo Preset)"
-xsl0301_Rambo_help="Enhanced during construction with the Enhanced Sensor System, Nano-Repair System and Overcharge."
-xsl0301_Rambo_name="SACU (Rambo Preset)"
+xsl0301_NanoCombat_name=""
+xsl0301_Rambo_desc="SACU (Rambo Preset)"
+xsl0301_Rambo_help="Enhanced during construction with the Personal Shield Generator, Nano-Repair System and Overcharge."
+xsl0301_Rambo_name=""
 
 A02_M01_OBJ_010_113="(%s%%/%s%%)"
 Abasi="Abasi"
