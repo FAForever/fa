@@ -26,25 +26,22 @@ Description = {
 
     -- UEF -- Support Commander Units/Upgrades
     ['uel0301'] = "<LOC Unit_Description_0016> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer. ",
-    ['uel0301-led'] = "<LOC Unit_Description_0017> Engineering Drone acts as a secondary Engineer. Assists the SACU where applicable.",
-	['uel0301-red'] = "<LOC Unit_Description_0017> Engineering Drone acts as a secondary Engineer. Assists the SACU where applicable.",
+    ['uel0301-ed'] = "<LOC Unit_Description_0017> Engineering Drone acts as a secondary Engineer. Assists the SACU where applicable.",
     ['uel0301-psg'] = "<LOC Unit_Description_0018> Creates a protective shield around the SACU. Requires Energy to run.",
     ['uel0301-sgf'] = "<LOC Unit_Description_0019> Expands the radius of the SACU's personal shield. Requires Energy to run.",
     ['uel0301-rj'] = "<LOC Unit_Description_0020>Radar Jammer creates false radar images. Countered by Omni sensors.",
     ['uel0301-isb'] = "<LOC Unit_Description_0021> Increases SACU's resource generation.",
     ['uel0301-sre'] = "<LOC Unit_Description_0022>Greatly expands the range of the standard on-board SACU sensor systems.",
     ['uel0301-acu'] = "<LOC Unit_Description_0023>Rapidly cools any weapon mounted onto the SACU. Increases rate of fire.",
-    ['uel0301-heo'] = "<LOC Unit_Description_0024>Equips the standard SACU with a napalm granade launcher damage.",
+    ['uel0301-heo'] = "<LOC Unit_Description_0024>Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
     -- UEF -- Support Commander Presets
     ['uel0301_BubbleShield'] = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
-    ['uel0301_Combat'] = "<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with personal shield and gun speed upgrade.",
-    ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with 2 engineering drone enhancements.",
+    ['uel0301_Combat'] = "<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
+    ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
     ['uel0301_IntelJammer'] = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",
-    ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, gun speed and granade launcher enhancements.",
+    ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
     ['uel0301_RAS'] = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
-	['uel0301_Support'] = "<LOC uel0301_Support_help>Support Armored Command Unit. Enhanced during construction with a bubble shield, jamming and 2 drones.",
-	['uel0301_BasicCombat'] = "<LOC uel0301_Support_help>Support Armored Command Unit. Enhanced during construction with the AdvancedCoolingUpgrade.",
 
     -- UEF -- Land Units
     ['uel0101'] = "<LOC Unit_Description_0025>Fast, lightly armored reconnaissance vehicle. Armed with a machine gun and a state-of-the-art sensor suite.",
