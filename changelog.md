@@ -38,10 +38,12 @@ Patch 3720 (14 May, 2021)
          - Subs target other subs before coopers
     - Overcharge
         - Overcharge kills mobile land shield generators if it depletes its shield on impact (only a single one, overspilled ones live). Veterancy counted, no reclaim left.
-
+    - Artillery damage
+        - Fixed T2 aeon artillery dealing double damage and zthuee & lobo dealing 10 more damage per shot
 ### Contributors
 - Petricpwnz
 - Tagada
+- keyser
 
 Hotfix 3719 (2 December, 2020)
 ============================
