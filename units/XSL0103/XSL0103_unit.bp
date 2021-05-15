@@ -286,7 +286,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_HighArc',
             CollideFriendly = false,
-            Damage = 45,
+            Damage = 43, --there is 2 more damage per shell added afterward
             DamageFriendly = false,
             DamageRadius = 1.5,
             DamageType = 'Normal',

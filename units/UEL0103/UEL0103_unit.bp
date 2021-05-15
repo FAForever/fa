@@ -214,7 +214,7 @@ UnitBlueprint {
             CameraLifetime = 5,
             CameraVisionRadius = 5,
             CollideFriendly = false,
-            Damage = 100,
+            Damage = 98, --there is 2 more damage per shell added afterward
             DamageFriendly = false,
             DamageRadius = 1,
             DamageType = 'Normal',

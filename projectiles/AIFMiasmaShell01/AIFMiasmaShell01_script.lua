@@ -36,7 +36,6 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
             DamageArea( self, pos, radius, 1, 'Force', true )
         end
         
-        AMiasmaProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
 }

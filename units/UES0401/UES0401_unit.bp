@@ -437,8 +437,8 @@ UnitBlueprint {
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'TECH2 LIGHTBOAT',
                 'SUBMERSIBLE',
+                'TECH2 LIGHTBOAT',
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'ANTINAVY',

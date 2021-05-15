@@ -1,3 +1,50 @@
+Patch 3720 (14 May, 2021)
+============================
+- Land
+    - Tech 1 Land
+        - Mantis
+            - Icon changed from a LAB icon to that of a T1 tank
+        - Sky Slammer
+            - Increase of projectile velocity and projectile lifetime vs air units
+        - Selen
+            - Range: 18 → 19
+            - TurretYawSpeed 120: → 130
+- Air
+    - Tech 1 Air
+        - Jester
+            - Speed: 9 → 10
+            - MuzzleVelocity: 40 → 55
+            - DamageRadius: 0 → 0.15
+        - T1 Bombers
+            - Radar radius: 42 → 44
+- Navy
+    - Tech 1 Navy
+        - Shard
+            - Damage: 7 → 6
+            - MuzzleVelocity: 45 → 60
+- Structures
+    - Mexes
+        - T1 Mexes
+            - BuildPower: 13 → 10
+        - T2 Mexes
+            - BuildPower: 20.58 → 15
+            - BuildTime: 1171 → 900
+        - T3 Mexes
+            - BuildTime: 3944 → 2875
+- Miscellaneous
+    - Unit Target Priorities
+         - Revert ACUs to previous targeting behavior of having no preference between various units
+         - Cruisers now target navy before structures again
+         - Subs target other subs before coopers
+    - Overcharge
+        - Overcharge kills mobile land shield generators if it depletes its shield on impact (only a single one, overspilled ones live). Veterancy counted, no reclaim left.
+    - Artillery damage
+        - Fixed T2 aeon artillery dealing double damage and zthuee & lobo dealing 10 more damage per shot
+### Contributors
+- Petricpwnz
+- Tagada
+- keyser
+
 Hotfix 3719 (2 December, 2020)
 ============================
 - Reverted previous change breaking Sorian AI
