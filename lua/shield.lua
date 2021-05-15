@@ -178,7 +178,8 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        if dmgType == 'Overcharge' and instigator.EntityId then
+        -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
+        if dmgType == 'Overcharge' and instigator.UnitId then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2
