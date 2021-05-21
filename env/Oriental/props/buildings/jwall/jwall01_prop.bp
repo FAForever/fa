@@ -1,0 +1,52 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+		'WALL',
+    },
+    Defense = {
+        Health = 4000,
+        MaxHealth = 4000,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'jwall01_albedo.dds',
+					NormalsName = 'jwall01_normalsts.dds',
+	  	    		ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 200,
+                    
+                },
+				{
+
+                    AlbedoName = 'jwall01_albedo.dds',
+					NormalsName = 'jwall01_normalsts.dds',
+	  	    		ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 3000,
+                    
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 100,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Japanese Wall',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2.1,
+    SizeY = 1,
+    SizeZ = 2.1,
+	CollisionOffsetX = .2,
+}
