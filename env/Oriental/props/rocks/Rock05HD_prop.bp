@@ -1,0 +1,37 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'rock05HD_albedo.dds',
+                    LODCutoff = 150,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 5,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Very Small Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
+}

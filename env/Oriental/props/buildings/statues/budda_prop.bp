@@ -1,0 +1,50 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 2000,
+        MaxHealth = 2000,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'white_rough_plaster_albedo.dds',
+					NormalsName = 'white_rough_plaster_normalsts.dds',
+	  	    		ShaderName = 'VertexNormal',
+                    LODCutoff = 200,
+                    
+                },
+				{
+
+                    AlbedoName = 'white_rough_plaster_albedo.dds',
+					NormalsName = 'white_rough_plaster_normalsts.dds',
+	  	    		ShaderName = 'VertexNormal',
+                    LODCutoff = 3000,
+                    
+                },
+            },
+        },
+        UniformScale = 0.07,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 100,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Budda statue',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 1.5,
+    SizeY = 2,
+    SizeZ = 1,
+}
