@@ -103,13 +103,16 @@ ACUButton = Class(Group) {
 
         self.indicator = indicator
 
+        local textOverlay = Text(self)
+        textOverlay:SetFont(UIUtil.bodyFont, 20)
+        LayoutHelpers.AtCenterIn(textOverlay, self)
+        self.textOverlay = textOverlay
+
         self.OnHide = function(self, hidden)
             self.markerOverlay:SetHidden(hidden)
             self.marker:SetHidden(hidden)
             self.teamIndicator:SetHidden(hidden)
-            if self.textOverlay then
-                self.textOverlay:SetHidden(hidden)
-            end
+            self.textOverlay:SetHidden(hidden)
             return true
         end
     end,
@@ -186,20 +189,13 @@ ACUButton = Class(Group) {
     end,
 
     draw = function(self, color, text)
-        local textOverlay = Text(self)
-        textOverlay:SetFont(UIUtil.bodyFont, 20)
-        textOverlay:SetColor(color)
-        textOverlay:SetText(text)
-        LayoutHelpers.AtCenterIn(textOverlay, self)
-
-        self.textOverlay = textOverlay
+        self.textOverlay:SetColor(color)
+        self.textOverlay:SetText(text)
     end,
 
     RemoveTextOverlay = function(self)
-        if self.textOverlay then
-            self.textOverlay:Destroy()
-            self.textOverlay = nil
-        end
+        self.textOverlay:SetColor('00000000')
+        self.textOverlay:SetText('')
     end,
 
     -- Override for events...
