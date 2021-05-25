@@ -237,7 +237,7 @@ UnitBlueprint {
                 },
             },
             CollideFriendly = false,
-            Damage = 230, # 195
+            Damage = 228, # 195 --add 2 more damage with DamageArea in projectile_script.lua
             DamageFriendly = false,
             DamageRadius = 2,
             DamageType = 'Normal',
