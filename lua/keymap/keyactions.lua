@@ -425,6 +425,10 @@ keyActions = {
         category = 'selection', order =65,},
     ['lock_zoom'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").lockZoom()',
         category = 'camera', order = 666,},
+    ['dock'] = {action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(true)',
+        category = 'orders', order = 35,},
+    ['shift_dock'] = {action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
+        category = 'orders', order = 35,},
 
     -- HOTBUILD
     ['builders'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Builders")',
