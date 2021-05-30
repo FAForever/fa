@@ -20,42 +20,42 @@ PropBlueprint {
         'RECLAIMABLE',
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 100,
+        MaxHealth = 100,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'oak1_brown1_albedo.dds',
-                    LODCutoff = 30,
+                    AlbedoName = 'fallmix1oak1_albedo.dds',
+                    LODCutoff = 60,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },
                 {
-                    AlbedoName = 'oak1_brown1_albedo.dds',
-                    LODCutoff = 200,
+                    AlbedoName = 'fallmix1oak1_albedo.dds',
+                    LODCutoff = 300,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
                 {
-                    AlbedoName = 'oak1_brown1_LOD2_albedo.dds',
-                    LODCutoff = 750,
+                    AlbedoName = 'fallmix1oak1_LOD2_albedo.dds',
+                    LODCutoff = 820,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
             },
         },
-        UniformScale = 0.06,
+        UniformScale = 0.12,
     },
     Economy = {
-        ReclaimEnergyMax = 8,
-        ReclaimMassMax = 0.8,
-        ReclaimTime = 5,
+        ReclaimEnergyMax = 24,
+        ReclaimMassMax = 2.4,
+        ReclaimTime = 15,
     },
     Interface = {
-        HelpText = 'Tree - Decidous ',
+        HelpText = 'Large Tree - Decidous ',
     },
     Physics = {
         BlockPath = false,
