@@ -154,11 +154,11 @@ function GetMidPoint(v1, v2)
 end
 
 function GetRandomFloat(nmin, nmax)
-    return (Random() * (nmax - nmin) + nmin)
+    return Random() * (nmax - nmin) + nmin
 end
 
 function GetRandomInt(nmin, nmax)
-    return math.floor(Random() * (nmax - nmin + 1) + nmin)
+    return Random(nmin, nmax)
 end
 
 function GetRandomOffset(sx, sy, sz, scalar)
@@ -176,9 +176,9 @@ function GetRandomOffset2(sx, sy, sz, scalar)
     sx = sx * scalar
     sy = sy * scalar
     sz = sz * scalar
-    local x = Random(-1.0, 1.0) * sx - (sx * 0.5)
-    local y = Random(-1.0, 1.0) * sy
-    local z = Random(-1.0, 1.0) * sz - (sz * 0.5)
+    local x = (Random() * 2 - 1) * sx - (sx * 0.5)
+    local y = (Random() * 2 - 1) * sy
+    local z = (Random() * 2 - 1) * sz - (sz * 0.5)
 
     return x, y, z
 end
