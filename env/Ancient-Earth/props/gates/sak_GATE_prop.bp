@@ -35,6 +35,6 @@ PropBlueprint {
         BlockPath = false,
     },
     SizeX = 1.0,
-    SizeY = 4.0,
-    SizeZ = 4.0,
+    SizeY = 6.0,
+    SizeZ = 6.0,
 }

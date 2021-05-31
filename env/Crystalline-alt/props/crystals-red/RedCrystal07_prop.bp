@@ -34,7 +34,7 @@ PropBlueprint {
     Physics = {
         BlockPath = true,
     },
-    SizeX = 8,
-    SizeY = 5,
-    SizeZ = 12,
+    SizeX = 2,
+    SizeY = 2.25,
+    SizeZ = 3,
 }
