@@ -28,19 +28,19 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'fallmix1oak1_albedo.dds',
+                    AlbedoName = 'fallmix1oak1_s3_albedo.dds',
                     LODCutoff = 30,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'UndulatingNormalMappedAlpha',
                 },
                 {
-                    AlbedoName = 'fallmix1oak1_albedo.dds',
+                    AlbedoName = 'fallmix1oak1_s3_albedo.dds',
                     LODCutoff = 200,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
                 },
                 {
-                    AlbedoName = 'fallmix1oak1_albedo.dds',
+                    AlbedoName = 'fallmix1oak1_s3_albedo.dds',
                     LODCutoff = 750,
                     NormalsName = 'oak1_normalsTS.dds',
                     ShaderName = 'TMeshAlpha',
