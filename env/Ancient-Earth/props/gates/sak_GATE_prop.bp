@@ -25,9 +25,6 @@ PropBlueprint {
         ReclaimMassMax = 80,
         ReclaimTime = 6,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'A Torii Gate',
     },
