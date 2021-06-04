@@ -5287,10 +5287,8 @@ function CPUBenchmark()
     local currTime
     local countTime = 0
     --Make everything a local variable
-    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
-    local countTime = 0
-    --Make everything a local variable
-    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmar
+  
     local TableInsert = table.insert
     local TableRemove = table.remove
     local h
