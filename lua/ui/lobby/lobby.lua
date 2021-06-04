@@ -1233,7 +1233,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while table.getn(players) > 0 do
+    while not table.empty(players)  do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -1316,7 +1316,7 @@ local function autobalance_rr(players, teams)
         i = i + 1
     end
 
-    while table.getsize(players) > 0 do
+    while not table.empty(players) do
         for i, pick in team_picks do
             local slot = table.remove(teams[pick.team], 1)
             if not slot then continue end
@@ -3821,7 +3821,7 @@ function setupChatEdit(chatPanel)
             elseif keyCode == UIUtil.VK_DOWN then
                     GUI.EmojiSelector:Highlight(false)
             end
-        elseif commandQueue and table.getsize(commandQueue) > 0 then
+        elseif commandQueue and not table.empty(commandQueue) then
             if keyCode == UIUtil.VK_UP  then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
