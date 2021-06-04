@@ -45,11 +45,17 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+
+local Emojis =  import('/lua/ui/lobby/emojis.lua')
+local Packages =  Emojis.Packages
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
+
+local lineHeight = 30
+
 
 function GetAITypes()
     AIKeys = {}
@@ -960,7 +966,7 @@ function SetSlotInfo(slotNum, playerInfo)
         local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
-        if not table.empty(slotKeys) then
+        if table.getn(slotKeys) > 0 then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
             Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1110,7 +1116,7 @@ function ClearSlotInfo(slotIndex)
     -- set the text appropriately
     slot.name:ClearItems()
     slot.name:SetTitleText(LOC(stateText))
-    if not table.empty(slotKeys) then
+    if table.getn(slotKeys) > 0 then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
         Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1227,7 +1233,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while not table.empty(players) do
+    while table.getn(players) > 0 do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -1266,7 +1272,7 @@ local function autobalance_avg(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
     end
 
-    while not table.empty(players) do
+    while table.getn(players) > 0 do
         local first_team = true
         for i, t in teams do
             local team = t['team']
@@ -1310,7 +1316,7 @@ local function autobalance_rr(players, teams)
         i = i + 1
     end
 
-    while not table.empty(players) do
+    while table.getsize(players) > 0 do
         for i, pick in team_picks do
             local slot = table.remove(teams[pick.team], 1)
             if not slot then continue end
@@ -1338,7 +1344,7 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while not table.empty(players) do
+    while table.getn(players) > 0 do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
@@ -2028,22 +2034,22 @@ local function TryLaunch(skipNoObserversCheck)
         -- Load in the default map options if they are not set manually
 
         -- Not all maps have options
-        if scenarioInfo.options then
-
-            -- If we don't validate them first then the people using the default
+        if scenarioInfo.options then 
+      
+            -- If we don't validate them first then the people using the default 
             -- as a value instead of the index of the value will mess us up
             MapUtil.ValidateScenarioOptions(scenarioInfo.options)
-
+      
             -- For every option, if it's not set yet then add its default value
-            for _, option in scenarioInfo.options do
-                if not gameInfo.GameOptions[option.key] then
+            for _, option in scenarioInfo.options do 
+                if not gameInfo.GameOptions[option.key] then 
                     -- When the value data of the option is formatted as:
                     -- values = {
-                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },
-                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },
-                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },
+                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },		
+                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },	
+                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },	
                     --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
-                    -- },
+                    -- },	
                     local keyVersion = option.values[option.default].key
 
                     -- When the value data of the option is formatted as:
@@ -2504,7 +2510,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and associatedMarker:IsEnabled() then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
@@ -3674,11 +3680,12 @@ function CreateUI(maxPlayers)
                         ping = math.floor(ping)
                         GUI.slots[slot].pingStatus.PingActualValue = ping
                         GUI.slots[slot].pingStatus:SetValue(ping)
-                        if ping > 500 then
-                            GUI.slots[slot].pingStatus:Show()
-                        else
-                            GUI.slots[slot].pingStatus:Hide()
-                        end
+                        -- if ping > 500 then
+                        --     GUI.slots[slot].pingStatus:Show()
+                        -- else
+                        --     GUI.slots[slot].pingStatus:Hide()
+                        -- end
+                        GUI.slots[slot].pingStatus:Show()
                         -- Set the ping bar to a colour representing the status of our connection.
                         GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
                     else
@@ -3706,11 +3713,35 @@ function setupChatEdit(chatPanel)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
-        if charcode == UIUtil.VK_TAB then
-            return true
+        -- 58 is ':' code
+        if charcode == 58  then
+            if GUI.EmojiSelector  then
+                GUI.EmojiSelector:Destroy()
+                GUI.EmojiSelector = nil
+            else
+                CreateEmojiSelector()
+                GUI.EmojiSelector.BeginPos = self:GetCaretPosition() + 1
+            end
         end
+        --
 
         local charLim = self:GetMaxChars()
+        if charcode ==  UIUtil.VK_TAB then--tab code
+            if table.empty(GUI.EmojiSelector.FoundEmojis) then return true end
+            local text =        self:GetText() 
+            local CaretPos =    self:GetCaretPosition()
+            
+            local emojiname =  GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].pack..'/'.. GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].emoji
+
+            self:SetText(string.sub(text, 1, GUI.EmojiSelector.BeginPos)..emojiname..':'..string.sub(text,CaretPos + 1, string.len(text)))
+            self:SetCaretPosition(string.len(emojiname) + GUI.EmojiSelector.BeginPos + 1)
+            GUI.EmojiSelector:Destroy()
+            GUI.EmojiSelector = nil
+            
+            return true
+        end
+       
+
         if STR_Utf8Len(self:GetText()) >= charLim then
             local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
             PlaySound(sound)
@@ -3727,6 +3758,10 @@ function setupChatEdit(chatPanel)
     local commandQueueIndex = 0
     local commandQueue = {}
     GUI.chatEdit.OnEnterPressed = function(self, text)
+        if GUI.EmojiSelector then
+            GUI.EmojiSelector:Destroy()
+            GUI.EmojiSelector = nil
+        end
         if text:gsub("%s+", "") == '' then  -- If the text, trimmed of all space, is equal to ''
             return
         end
@@ -3745,6 +3780,18 @@ function setupChatEdit(chatPanel)
             commandFunc(params)
         else
             PublicChat(text)
+        end
+    end
+
+    GUI.chatEdit.OnTextChanged = function(self, newText, oldText)
+        if   GUI.EmojiSelector and GUI.EmojiSelector.BeginPos then
+            if  GUI.EmojiSelector.BeginPos > self:GetCaretPosition() then
+                GUI.EmojiSelector:Destroy()
+                GUI.EmojiSelector = nil
+                return
+            end
+            local EmojiText = string.sub(newText, GUI.EmojiSelector.BeginPos +1, self:GetCaretPosition())
+            UpdateEmojiSelector(EmojiText)
         end
     end
 
@@ -3768,14 +3815,20 @@ function setupChatEdit(chatPanel)
         if AddUnicodeCharToEditText(self, keyCode) then
             return
         end
-        if commandQueue and not table.empty(commandQueue) then
-            if keyCode == 38 then
+        if GUI.EmojiSelector then
+            if keyCode == UIUtil.VK_UP  then
+                    GUI.EmojiSelector:Highlight(true)
+            elseif keyCode == UIUtil.VK_DOWN then
+                    GUI.EmojiSelector:Highlight(false)
+            end
+        elseif commandQueue and table.getsize(commandQueue) > 0 then
+            if keyCode == UIUtil.VK_UP  then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
                     self:SetText(commandQueue[commandQueueIndex])
                 end
             end
-            if keyCode == 40 then
+            if keyCode == UIUtil.VK_DOWN then
                 if commandQueueIndex ~= 1 then
                     if commandQueue[commandQueueIndex - 1] then
                         commandQueueIndex = commandQueueIndex - 1
@@ -5069,7 +5122,7 @@ function SetGameOptions(options, ignoreRefresh)
         if key == 'RestrictedCategories' then
             local restrictionsEnabled = false
             if val ~= nil then
-                if not table.empty(val) then
+                if table.getn(val) ~= 0 then
                     restrictionsEnabled = true
                 end
             end
@@ -5118,11 +5171,6 @@ end
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
-    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    if scenarioInfo.hidePreviewMarkers then
-        return
-    end
-
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
@@ -5236,37 +5284,35 @@ function CPUBenchmark()
     local countTime = 0
     --Make everything a local variable
     --This is necessary because we don't want LUA searching through the globals as part of the benchmark
-    local TableInsert = table.insert
-    local TableRemove = table.remove
     local h
     local i
     local j
     local k
     local l
     local m
-    local n = {}
-    for h = 1, 24, 1 do
+    for h = 1, 48, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
             return
         end
 
         lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 30.4, 0.0008 do
-           --This instruction set should cover most LUA operators
+        for i = 1.0, 25.0, 0.0008 do
+            --This instruction set should cover most LUA operators
             j = i + i   --Addition
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
             j = i ^ 4   --Power
             l = -i      --Negation
-            m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
-            TableInsert(m, '1234567890')     --Insert Table Value
+            m = {'One', 'Two', 'Three'} --Create Table
+            table.insert(m, 'Four')     --Insert Table Value
+            table.remove(m, 1)          --Remove Table Value
+            l = table.getn(m)           --Get Table Length
             k = i < j   --Less Than
             k = i == j  --Equality
             k = i <= j  --Less Than or Equal to
             k = not k
-            n[tostring(i)] = m
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
@@ -5274,7 +5320,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            coroutine.yield(1)
+            WaitSeconds(0)
         end
     end
     BenchTime = math.ceil(totalTime * 100)
@@ -6766,3 +6812,173 @@ function InitHostUtils()
         end
     }
 end
+
+
+
+function CreateEmojiSelector()
+    GUI.EmojiSelector = Bitmap(GUI.chatPanel)
+    GUI.EmojiSelector:SetSolidColor('ff000000')
+    
+    LayoutHelpers.Above(GUI.EmojiSelector, GUI.chatEdit, 2)
+    LayoutHelpers.AtLeftIn(GUI.EmojiSelector, GUI.chatPanel)
+    LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatPanel)
+    LayoutHelpers.AtRightIn(GUI.EmojiSelector,GUI.chatPanel)
+    --GUI.EmojiSelector:DisableHitTest()
+    LayoutHelpers.DepthOverParent(GUI.EmojiSelector,GUI.chatPanel,100)
+    --GUI.EmojiSelector.Depth:Set(function() return GUI.chatContainer.Depth() + 100 end)
+    GUI.EmojiSelector.curIndex = 1
+    GUI.EmojiSelector.MaxSize = 0
+    GUI.EmojiSelector.selectionIndex = 1
+    GUI.EmojiSelector.Highlight = function (self,up)
+        
+        self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff000000')
+        if up == true then
+            if self.selectionIndex ~= table.getn(self.FoundEmojis) then
+                if self.selectionIndex - self.curIndex == self.MaxSize - 1  then
+                    self.curIndex = self.curIndex + 1
+                    UpdateEmojiSelector()
+                end
+                self.selectionIndex = self.selectionIndex + 1
+            end
+        elseif up == false then
+            if self.selectionIndex > 1 then
+                if self.selectionIndex == self.curIndex then
+                    self.curIndex = self.curIndex - 1
+                    UpdateEmojiSelector()
+                end
+                self.selectionIndex = self.selectionIndex - 1
+            end   
+        end
+        self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff202020')
+    end
+    GUI.EmojiSelector.HandleEvent = function(self,event)
+        if event.WheelRotation ~= 0 then
+            if event.WheelRotation > 0 then
+                if GUI.EmojiSelector.MaxSize + GUI.EmojiSelector.curIndex <= table.getn(self.FoundEmojis) then
+                    GUI.EmojiSelector.curIndex = GUI.EmojiSelector.curIndex + 1
+                    GUI.EmojiSelector.selectionIndex = GUI.EmojiSelector.curIndex
+                    UpdateEmojiSelector()
+                end
+            else
+                if GUI.EmojiSelector.curIndex ~= 1 then
+                    GUI.EmojiSelector.curIndex = GUI.EmojiSelector.curIndex - 1
+                    GUI.EmojiSelector.selectionIndex = GUI.EmojiSelector.curIndex
+                    UpdateEmojiSelector()
+                end
+            end
+        end
+    end   
+end
+
+
+
+
+
+function UpdateEmojiSelector(emojiText)
+    if GUI.EmojiSelector == nil then return end
+    if emojiText then
+        GUI.EmojiSelector.curIndex = 1
+        GUI.EmojiSelector.emojiText = emojiText
+        GUI.EmojiSelector.FoundEmojis = Emojis.processInput(emojiText)
+        GUI.EmojiSelector.selectionIndex = 1   
+    end
+    local FoundEmojis = GUI.EmojiSelector.FoundEmojis
+    if GUI.EmojiSelector.emojiLines then
+        GUI.EmojiSelector.emojiLines:Destroy()
+    end
+    GUI.EmojiSelector.emojiLines = Group(GUI.EmojiSelector)
+    LayoutHelpers.FillParentFixedBorder(GUI.EmojiSelector.emojiLines, GUI.EmojiSelector)
+    GUI.EmojiSelector.emojiLines.lines = {}
+    LayoutHelpers.DepthOverParent(GUI.EmojiSelector.emojiLines,GUI.EmojiSelector,10)
+    if not table.empty(FoundEmojis) then
+        local index = GUI.EmojiSelector.curIndex
+        while index <= table.getn(FoundEmojis) do
+            local emojiname = FoundEmojis[index].pack .. '/' .. FoundEmojis[index].emoji
+            local path = UIUtil.UIFile(Emojis.emojis_textures .. emojiname .. '.dds')
+            GUI.EmojiSelector.emojiLines.lines[index] = Group(GUI.EmojiSelector.emojiLines)
+            local emojiLine = GUI.EmojiSelector.emojiLines.lines[index]
+            
+            emojiLine.HandleEvent = function(self, event)
+                if event.Type == 'ButtonPress' then
+                    local text =        GUI.chatEdit:GetText() 
+                    local CaretPos =    GUI.chatEdit:GetCaretPosition()
+                    
+                    --LOG(GUI.EmojiSelector.emojiText)
+                    local newtext = string.sub(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..string.sub(text,CaretPos + 1, string.len(text))
+                    local oldtext = GUI.EmojiSelector.emojiText or ''
+                    GUI.EmojiSelector:Destroy()
+                    GUI.EmojiSelector = nil
+                    GUI.chatEdit:SetText(newtext)
+                    GUI.chatEdit:SetCaretPosition(CaretPos + string.len(self.emoji) - 1 - string.len(oldtext))
+                    GUI.chatEdit:AcquireFocus()
+                    
+                elseif event.Type == 'MouseEnter' then
+                    for _,line in GUI.EmojiSelector.emojiLines.lines do
+                        line.bg:SetSolidColor('ff000000') 
+                    end
+                    self.bg:SetSolidColor('ff202020')
+                elseif event.Type == 'MouseExit' then
+                    self.bg:SetSolidColor('ff000000')
+                    GUI.EmojiSelector:Highlight()
+                    --GUI.EmojiSelector.emojiLines.lines[GUI.EmojiSelector.curIndex].bg:SetSolidColor('ff202020')
+                end
+            end
+            
+            LayoutHelpers.DepthOverParent(emojiLine,GUI.EmojiSelector.emojiLines)
+            
+            if index == GUI.EmojiSelector.curIndex then
+                LayoutHelpers.AtLeftBottomIn(emojiLine, GUI.EmojiSelector,2,2)
+            else
+                LayoutHelpers.Above(emojiLine, GUI.EmojiSelector.emojiLines.lines[index - 1], 2)
+            end
+            LayoutHelpers.SetHeight(emojiLine,lineHeight)
+            LayoutHelpers.AtRightIn(emojiLine,GUI.EmojiSelector.emojiLines,2)
+            
+
+            emojiLine.bg = Bitmap(emojiLine)
+            emojiLine.bg:DisableHitTest()
+            LayoutHelpers.FillParent( emojiLine.bg ,emojiLine)
+            emojiLine.bg:SetSolidColor('ff000000')
+    
+
+            emojiLine.icon = Bitmap(emojiLine,path)
+            emojiLine.icon:DisableHitTest()
+       
+            emojiLine.icon.Height:Set(emojiLine.Height)
+            emojiLine.icon.Width:Set(emojiLine.Height)
+            LayoutHelpers.AtLeftTopIn(emojiLine.icon, emojiLine)
+
+            emojiLine.text = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
+            emojiLine.text:DisableHitTest()
+            --emojiLine.text:SetDropShadow(true)
+            LayoutHelpers.RightOf(emojiLine.text, emojiLine.icon, 2)
+            emojiLine.text:SetText(':'..FoundEmojis[index].emoji ..':')
+
+            emojiLine.emoji =':'.. emojiname..':'
+
+            emojiLine.pack = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
+            emojiLine.pack:DisableHitTest()
+            --emojiLine.pack:SetDropShadow(true)
+            LayoutHelpers.AtRightIn(emojiLine.pack,GUI.EmojiSelector.emojiLines, 5)
+            LayoutHelpers.AtTopIn(emojiLine.pack,emojiLine )
+            emojiLine.pack:SetText(FoundEmojis[index].pack)
+            emojiLine.pack:SetColor('FF808080')
+            index = index + 1
+            if  emojiLine:Top() - GUI.chatPanel.Top() < lineHeight then
+                LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatPanel)
+                GUI.EmojiSelector.MaxSize = index - GUI.EmojiSelector.curIndex
+                if emojiText then GUI.EmojiSelector:Highlight() end
+                
+                return
+            end
+        end
+        GUI.EmojiSelector.Top:Set(function()return GUI.EmojiSelector.emojiLines.lines[index - 1].Top() - 2 end)
+        GUI.EmojiSelector.MaxSize = index - GUI.EmojiSelector.curIndex
+        if emojiText then GUI.EmojiSelector:Highlight() end
+    else
+        GUI.EmojiSelector.Top:Set(GUI.EmojiSelector.Bottom)
+    end
+    
+end
+
+
