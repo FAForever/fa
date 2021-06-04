@@ -966,7 +966,7 @@ function SetSlotInfo(slotNum, playerInfo)
         local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
-        if table.getn(slotKeys) > 0 then
+        if not table.empty(slotKeys) then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
             Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1116,7 +1116,7 @@ function ClearSlotInfo(slotIndex)
     -- set the text appropriately
     slot.name:ClearItems()
     slot.name:SetTitleText(LOC(stateText))
-    if table.getn(slotKeys) > 0 then
+    if not table.empty(slotKeys) then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
         Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1272,7 +1272,7 @@ local function autobalance_avg(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         local first_team = true
         for i, t in teams do
             local team = t['team']
@@ -1344,7 +1344,7 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
@@ -2510,7 +2510,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and associatedMarker:IsEnabled() then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
@@ -3680,11 +3680,11 @@ function CreateUI(maxPlayers)
                         ping = math.floor(ping)
                         GUI.slots[slot].pingStatus.PingActualValue = ping
                         GUI.slots[slot].pingStatus:SetValue(ping)
-                        -- if ping > 500 then
-                        --     GUI.slots[slot].pingStatus:Show()
-                        -- else
-                        --     GUI.slots[slot].pingStatus:Hide()
-                        -- end
+                        if ping > 500 then
+                            GUI.slots[slot].pingStatus:Show()
+                        else
+                            GUI.slots[slot].pingStatus:Hide()
+                        end
                         GUI.slots[slot].pingStatus:Show()
                         -- Set the ping bar to a colour representing the status of our connection.
                         GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
@@ -5122,7 +5122,7 @@ function SetGameOptions(options, ignoreRefresh)
         if key == 'RestrictedCategories' then
             local restrictionsEnabled = false
             if val ~= nil then
-                if table.getn(val) ~= 0 then
+                if not table.empty(val) then
                     restrictionsEnabled = true
                 end
             end
@@ -5171,6 +5171,10 @@ end
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo.hidePreviewMarkers then
+        return
+    end
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
@@ -5284,35 +5288,40 @@ function CPUBenchmark()
     local countTime = 0
     --Make everything a local variable
     --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local countTime = 0
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local TableInsert = table.insert
+    local TableRemove = table.remove
     local h
     local i
     local j
     local k
     local l
     local m
-    for h = 1, 48, 1 do
+    local n = {}
+    for h = 1, 24, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
             return
         end
 
         lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 25.0, 0.0008 do
-            --This instruction set should cover most LUA operators
+        for i = 1.0, 30.4, 0.0008 do
+           --This instruction set should cover most LUA operators
             j = i + i   --Addition
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
             j = i ^ 4   --Power
             l = -i      --Negation
-            m = {'One', 'Two', 'Three'} --Create Table
-            table.insert(m, 'Four')     --Insert Table Value
-            table.remove(m, 1)          --Remove Table Value
-            l = table.getn(m)           --Get Table Length
+            m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
+            TableInsert(m, '1234567890')     --Insert Table Value
             k = i < j   --Less Than
             k = i == j  --Equality
             k = i <= j  --Less Than or Equal to
             k = not k
+            n[tostring(i)] = m
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
@@ -5320,7 +5329,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            WaitSeconds(0)
+            coroutine.yield(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)
