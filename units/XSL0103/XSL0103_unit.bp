@@ -266,6 +266,9 @@ UnitBlueprint {
     SizeZ = 0.6,
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
+    Transport = {
+        TransportClass = 2,
+    },
     Veteran = {
         Level1 = 3,
         Level2 = 6,
