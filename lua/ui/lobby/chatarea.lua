@@ -133,7 +133,7 @@ ChatArea = Class(Group){
             messageText = ''
         end
         local contents = self:WrapContents({
-                                                text = Emojis.CheckEmojis(messageText,true),
+                                                text = Emojis.CheckEmojis(messageText,Prefs.GetFromCurrentProfile("ChatLobbyEmojis")),
                                                 style = messageStyle
                                             },
                                             {

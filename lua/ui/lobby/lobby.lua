@@ -48,6 +48,8 @@ local Changelog = import('/lua/ui/lobby/changelog.lua')
 
 local Emojis =  import('/lua/ui/lobby/emojis.lua')
 local Packages =  Emojis.Packages
+local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
+local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -5687,7 +5689,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 300)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -5725,7 +5727,7 @@ function ShowLobbyOptionsDialog()
     -- label for displaying chat font size
     local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
     local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 162)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 180)
 
     -- slider for changing chat font size
     local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 20,
@@ -5733,7 +5735,7 @@ function ShowLobbyOptionsDialog()
         UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
         UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
         UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-        LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 182)
+        LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 200)
     slider_Chat_SizeFont:SetValue(currentFontSize)
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
@@ -5798,12 +5800,32 @@ function ShowLobbyOptionsDialog()
         end
     end
 
+    local cbox_ChatEmojis = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "Emojis in lobby")
+    LayoutHelpers.AtRightTopIn(cbox_ChatEmojis, dialogContent, 20, 146)
+    cbox_ChatEmojis.OnCheck = function(self, checked)
+        if checked then
+            Prefs.SetToCurrentProfile('ChatLobbyEmojis', true)
+        else
+            Prefs.SetToCurrentProfile('ChatLobbyEmojis', false)
+        end
+        GUI.chatDisplay:ReflowLines()
+    end
+
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 10)
 
     QuitButton.OnClick = function(self)
+        dialog:Hide()
+    end
+
+    local PMButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Emojis")
+    LayoutHelpers.CenteredLeftOf(PMButton, QuitButton, 20)
+    LayoutHelpers.AtBottomIn(PMButton, dialogContent, 10)
+
+    PMButton.OnClick = function(self)
+        CreatePackageManagerWindow()
         dialog:Hide()
     end
     --
@@ -5822,6 +5844,194 @@ function ShowLobbyOptionsDialog()
 
     local chatPlayerColor = Prefs.GetFromCurrentProfile('ChatPlayerColor')
     cbox_ChatPlayerColor:SetCheck(chatPlayerColor == true or chatPlayerColor == nil, true)
+
+    local ChatLobbyEmojis = Prefs.GetFromCurrentProfile('ChatLobbyEmojis')
+    cbox_ChatEmojis:SetCheck(ChatLobbyEmojis == true or ChatLobbyEmojis == nil, true)
+end
+
+
+function CreatePackageManagerWindow()
+   
+    GUI.PackageManager = Group(GetFrame(0))
+    LayoutHelpers.SetDimensions(GUI.PackageManager,500,500)
+    LayoutHelpers.AtCenterIn(GUI.PackageManager, GetFrame(0))
+
+    GUI.PackageManager.popup = Popup(GetFrame(0),GUI.PackageManager)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager,GUI.PackageManager.popup, 10)
+
+    GUI.PackageManager.TopLine = 1
+    GUI.PackageManager.SizeLine = table.getsize(Packages)
+
+    GUI.PackageManager.Title = UIUtil.CreateText(GUI.PackageManager, 'Package Manager', 16, UIUtil.titleFont,true)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.PackageManager.Title,GUI.PackageManager)
+    LayoutHelpers.AtTopIn(GUI.PackageManager.Title,GUI.PackageManager,5)
+
+    GUI.PackageManager.scroll = UIUtil.CreateLobbyVertScrollbar(GUI.PackageManager, -20,10,25) -- scroller
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.scroll , GUI.PackageManager, 10)
+
+    GUI.PackageManager.QuitButton = UIUtil.CreateButtonWithDropshadow(GUI.PackageManager, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
+    LayoutHelpers.AtHorizontalCenterIn(GUI.PackageManager.QuitButton, GUI.PackageManager, 0)
+    LayoutHelpers.AtBottomIn(GUI.PackageManager.QuitButton, GUI.PackageManager, 5)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.QuitButton , GUI.PackageManager, 50)
+
+    GUI.PackageManager.QuitButton.OnClick = function(self)
+        GUI.PackageManager.popup:Destroy()
+        GUI.PackageManager = nil
+    end
+
+    -- called when the scrollbar for the control requires data to size itself
+    -- GetScrollValues must return 4 values in this order:
+    -- rangeMin, rangeMax, visibleMin, visibleMax
+    -- aixs can be "Vert" or "Horz"
+    GUI.PackageManager.GetScrollValues = function(self, axis)
+        --LOG( 1 ..' '.. self.SizeLine..' '..self.TopLine.. ' '.. math.min(self.TopLine + self.numLines, self.SizeLine))
+        return 1, self.SizeLine ,self.TopLine , math.min(self.TopLine + self.numLines, self.SizeLine)
+    end
+
+    -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    GUI.PackageManager.ScrollLines = function(self, axis, delta)
+        -- LOG(delta)
+        -- LOG(self.TopLine)
+        self:ScrollSetTop(axis, self.TopLine + delta)
+    end
+
+    -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    GUI.PackageManager.ScrollPages = function(self, axis, delta)
+        self:ScrollSetTop(axis, self.TopLine + math.floor(delta) * self.numLines )
+    end
+
+    -- called when the scrollbar wants to set a new visible top line
+    GUI.PackageManager.ScrollSetTop = function(self, axis, top)
+        --top = math.floor(top)
+        if top == self.TopLine then return end
+        self.TopLine = math.max(math.min(self.SizeLine - self.numLines + 1, top), 1)
+        self:CalcVisible()
+    end
+
+    GUI.PackageManager.ScrollToBottom = function(self)
+        GUI.chatContainer:ScrollSetTop(nil, self.numLines)
+    end
+
+    -- determines what controls should be visible or not
+    GUI.PackageManager.CalcVisible = function(self)
+        local packIndex = 1
+        local lineIndex = 1
+        local dorender = false
+        for id,pack in Packages do
+            if packIndex == self.TopLine then  dorender = true end
+            if dorender then
+                self.LineGroup.Lines[lineIndex]:render(pack.info,id)
+                if self.numLines == lineIndex then return end
+                lineIndex = lineIndex + 1
+            end
+            packIndex = packIndex + 1
+        end
+        for ind = lineIndex, self.numLines do self.LineGroup.Lines[ind]:render() end
+    end
+    
+      -- called to determine if the control is scrollable on a particular access. Must return true or false.
+    GUI.PackageManager.IsScrollable = function(self, axis)
+        return true
+    end
+    
+    --scrlling
+    GUI.PackageManager.HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            if event.WheelRotation > 0 then
+                self:ScrollLines(nil, -1)
+            else
+                self:ScrollLines(nil, 1)
+            end
+            return true
+        end
+        return false
+    end
+
+    GUI.PackageManager.LineGroup = Group(GUI.PackageManager) --group that contains PM data lines
+    LayoutHelpers.AtLeftIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 5)
+    LayoutHelpers.LeftOf(GUI.PackageManager.LineGroup, GUI.PackageManager.scroll, 5)
+    LayoutHelpers.AtTopIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 25)
+    LayoutHelpers.AtBottomIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 5)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.LineGroup,GUI.PackageManager,10)
+    GUI.PackageManager.LineGroup.Lines = {}
+
+    local function CreatePackageManagerLines()
+        local function CreatePackageManagerLine()
+            local line = Group(GUI.PackageManager.LineGroup)
+            LayoutHelpers.DepthOverParent(line,GUI.PackageManager.LineGroup,1)
+            line.bg = CheckBox(line,
+                        UIUtil.SkinnableFile('/MODS/blank.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/double.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            LayoutHelpers.SetDimensions(line,80,80)
+            LayoutHelpers.FillParent(line.bg, line)
+            LayoutHelpers.DepthOverParent(line.bg,line,1)
+            line.bg:Disable()
+    
+    
+            line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
+            line.name:SetColor('FFE9ECE9')
+            line.name:DisableHitTest()
+            LayoutHelpers.AtLeftTopIn(line.name, line, 5, 5)
+    
+            line.author = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
+            line.author:DisableHitTest()
+            line.author:SetColor('FFE9ECE9')
+            LayoutHelpers.Below(line.author, line.name,5)
+    
+            line.desc = MultiLineText(line, UIUtil.bodyFont, 12, 'FFA2A5A2')
+            line.desc:SetDropShadow(true)
+            line.desc:DisableHitTest()
+            LayoutHelpers.Below(line.desc, line.author,5)
+            line.desc.Width:Set(line.Width() - 10)
+
+            line.render = function(self, data, id)
+                if data then
+                    self.bg.id = id    
+                    self.name:SetText(data.name)
+                    self.author:SetText(data.author)
+                    self.desc:SetText(data.description)
+                    self.bg:Enable()
+                    self.bg:SetCheck(data.isEnabled,true)
+                else
+                    self.name:SetText('')
+                    self.author:SetText('')
+                    self.desc:Clear()
+                    self.bg:Disable()
+                end
+                
+            end
+        
+            line.bg.OnCheck = function(self, checked)
+                LOG('set '..repr(checked)..' on '..repr(self.id))
+                Emojis.UpdatePacks(self.id, checked)
+                GUI.chatDisplay:ReflowLines()
+            end
+            return line
+        end
+
+        local index = 1
+        GUI.PackageManager.LineGroup.Lines[index]  = CreatePackageManagerLine()
+        local parent = GUI.PackageManager.LineGroup.Lines[index] 
+        LayoutHelpers.AtLeftTopIn( parent,GUI.PackageManager.LineGroup,5,5)
+        LayoutHelpers.AtRightIn(parent,GUI.PackageManager.LineGroup,5)
+        while GUI.PackageManager.LineGroup.Bottom() -  parent.Bottom() > 85 do
+            index = index + 1 
+            GUI.PackageManager.LineGroup.Lines[index] = CreatePackageManagerLine()
+            LayoutHelpers.Below(GUI.PackageManager.LineGroup.Lines[index] ,parent ,5)
+            LayoutHelpers.AtRightIn(GUI.PackageManager.LineGroup.Lines[index],parent)
+            parent = GUI.PackageManager.LineGroup.Lines[index] 
+        end
+        GUI.PackageManager.numLines = index
+    end
+    CreatePackageManagerLines()
+    GUI.PackageManager:CalcVisible()
+    
+
 end
 
 -- Load and return the current list of presets from persistent storage.

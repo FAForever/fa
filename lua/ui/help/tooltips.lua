@@ -2105,4 +2105,14 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
+    chat_emojis = 
+    {
+        title = "Emojis",
+        description = "Toggles emojis display in game chat",
+    },
+    package_manager = 
+    {
+        title = "Emojis Package Manager",
+        description = "Click here to configure packages",
+    },
 }
