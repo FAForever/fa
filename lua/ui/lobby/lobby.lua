@@ -7040,9 +7040,7 @@ function CreateEmojiSelector()
     LayoutHelpers.AtLeftIn(GUI.EmojiSelector, GUI.chatPanel)
     LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatPanel)
     LayoutHelpers.AtRightIn(GUI.EmojiSelector,GUI.chatPanel)
-    --GUI.EmojiSelector:DisableHitTest()
     LayoutHelpers.DepthOverParent(GUI.EmojiSelector,GUI.chatPanel,100)
-    --GUI.EmojiSelector.Depth:Set(function() return GUI.chatContainer.Depth() + 100 end)
     GUI.EmojiSelector.curIndex = 1
     GUI.EmojiSelector.MaxSize = 0
     GUI.EmojiSelector.selectionIndex = 1
@@ -7120,7 +7118,6 @@ function UpdateEmojiSelector(emojiText)
                     local text =        GUI.chatEdit:GetText() 
                     local CaretPos =    GUI.chatEdit:GetCaretPosition()
                     
-                    --LOG(GUI.EmojiSelector.emojiText)
                     local newtext = string.sub(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..string.sub(text,CaretPos + 1, string.len(text))
                     local oldtext = GUI.EmojiSelector.emojiText or ''
                     GUI.EmojiSelector:Destroy()
@@ -7137,7 +7134,6 @@ function UpdateEmojiSelector(emojiText)
                 elseif event.Type == 'MouseExit' then
                     self.bg:SetSolidColor('ff000000')
                     GUI.EmojiSelector:Highlight()
-                    --GUI.EmojiSelector.emojiLines.lines[GUI.EmojiSelector.curIndex].bg:SetSolidColor('ff202020')
                 end
             end
             
@@ -7167,7 +7163,6 @@ function UpdateEmojiSelector(emojiText)
 
             emojiLine.text = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
             emojiLine.text:DisableHitTest()
-            --emojiLine.text:SetDropShadow(true)
             LayoutHelpers.RightOf(emojiLine.text, emojiLine.icon, 2)
             emojiLine.text:SetText(':'..FoundEmojis[index].emoji ..':')
 
@@ -7175,7 +7170,6 @@ function UpdateEmojiSelector(emojiText)
 
             emojiLine.pack = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
             emojiLine.pack:DisableHitTest()
-            --emojiLine.pack:SetDropShadow(true)
             LayoutHelpers.AtRightIn(emojiLine.pack,GUI.EmojiSelector.emojiLines, 5)
             LayoutHelpers.AtTopIn(emojiLine.pack,emojiLine )
             emojiLine.pack:SetText(FoundEmojis[index].pack)

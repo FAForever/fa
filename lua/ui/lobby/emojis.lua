@@ -11,6 +11,7 @@ function UpdatePacks(id, state)
 end
 
 function ScanPackages()
+    Packages = {}
     local data = DiskFindFiles(emojis_textures,'*\.dds')
     for _,pathdata in data do
         local SepPath = {}

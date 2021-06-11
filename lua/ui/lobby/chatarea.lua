@@ -118,7 +118,6 @@ ChatArea = Class(Group){
             entry.authorStyle = authorStyle
             entry.messageText = messageText
             entry.messageStyle = messageStyle
-            --entry.contents = contents
             table.insert(self.ChatHistory, entry)
         end
 
@@ -375,7 +374,6 @@ ChatArea = Class(Group){
                                                             end
                                                         end,
                                                     GetStringAdvance)
-                    --LOG(repr(fittedText))
                     local fitTextNum = table.getn(fittedText)
                     table.insert(result_line, {text = fittedText[1]})
                     table.insert(result_lines, result_line)
