@@ -16,6 +16,8 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Movie = import('/lua/maui/movie.lua').Movie
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local Lobby = import('/lua/ui/lobby/lobby.lua')
+local AutoLobby = import('/lua/ui/lobby/autolobby.lua')
 
 local controls = import('/lua/ui/controls.lua').Get()
 
@@ -293,6 +295,8 @@ local function LoadDialog(parent)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
 
+    ForkThread(CreateTeamsPlayersTexts, movie, color, parent)
+
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
         tipControl:SetColor(color)
@@ -318,6 +322,79 @@ local function LoadDialog(parent)
     HideGameUI('off')
 
     return movie
+end
+
+
+function CreateTeamsPlayersTexts(movie, color, parent)
+	local gameInfo = AutoLobby.GetGameInfo()
+	
+	if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
+		gameInfo = Lobby.GetGameInfo() or {}
+	end
+
+	if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
+		return
+	end
+	local players = gameInfo.PlayerOptions
+
+	local teams = {}
+	for k, player in players do
+		if not teams[player.Team] then
+			teams[player.Team] = true
+		end
+	end
+	local isFFA = IsFFA(teams, players)
+	local topicCreating = true
+	local countTeams = table.getsize(teams)
+	local nT = 0
+	local teamText
+
+	for team, t in teams do
+		if topicCreating then
+			teamText = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
+			teamText:SetColor(color)
+			teamText:SetText('Team '..nT+1)
+			teamText:SetDropShadow(true)
+		end
+		if countTeams == 1 or isFFA then
+			
+			if gameInfo.Victory ~= "sandbox" then
+				teamText:SetText('FFA')
+			end
+			topicCreating = false
+			LayoutHelpers.CenteredAbove(teamText, parent , -100)
+		elseif countTeams == 2 then
+			LayoutHelpers.AtLeftTopIn(teamText, parent, parent.Width()/countTeams * nT + parent.Width()/4, 50)
+		else
+			LayoutHelpers.AtLeftTopIn(teamText, parent, parent.Width()/countTeams * nT + 100, 50)
+		end
+
+		local n = 0
+		for k, player in players do
+			if player.Team == team or isFFA then
+				local playerText = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
+				playerText:SetColor(color)
+				playerText:SetDropShadow(true)
+				local textPlayer = player.PlayerName
+				if player.PlayerClan and player.PlayerClan ~= "" then
+					textPlayer ="["..player.PlayerClan.."] " .. textPlayer
+				end
+				if player.PL and player.PL > 0 then
+					textPlayer = textPlayer .. " ["..player.PL.."]"
+				end
+ 				playerText:SetText(textPlayer)
+				LayoutHelpers.CenteredBelow(playerText, teamText, 25 + 25 * n)
+				n = n + 1
+			end
+		end
+		
+		nT = nT + 1
+		
+	end
+end
+
+function IsFFA(teams, players)
+	return table.getsize(teams) == table.getsize(players)
 end
 
 function CreateWldUIProvider()
