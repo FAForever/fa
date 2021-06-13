@@ -4683,7 +4683,7 @@ local MessageHandlers = {
             local info = data.GameInfo
             info.GameMods = Mods.GetGameMods(info.GameMods)
             SetWindowedLobby(false)
-
+            gameInfo = data.GameInfo
             -- Evil hack to correct the skin for randomfaction players before launch.
             for index, player in info.PlayerOptions do
                 -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
