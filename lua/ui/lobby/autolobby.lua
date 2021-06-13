@@ -49,6 +49,9 @@ local gameInfo = {
     GameMods = {},
 }
 
+function GetGameInfo()
+    return gameInfo
+end
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
