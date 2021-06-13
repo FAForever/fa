@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYINDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -260,7 +261,12 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
+                'ANTISHIELD',
+                'SNIPER',
+                '(ARTILLERY - TECH1)',
+                'SHIELD',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'STRUCTURE DEFENSE ANTIMISSILE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',

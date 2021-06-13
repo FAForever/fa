@@ -255,9 +255,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            Damage = 100,
+            Damage = 150,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

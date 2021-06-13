@@ -50,6 +50,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -215,10 +216,10 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            BeamCollisionDelay = 0,				#0.3
-            BeamLifetime = 1,					#0.9
+            BeamCollisionDelay = 0,				-- 0.3
+            BeamLifetime = 1,					-- 0.9
             CollideFriendly = false,
-            Damage = 55,					#220
+            Damage = 55,					-- 220
             DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
@@ -245,7 +246,7 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = -1,
-            RackReloadTimeout = 0,				#10
+            RackReloadTimeout = 0,				-- 10
             RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = false,
             RackSalvoReloadTime = 0,
@@ -253,10 +254,21 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.25,
-            TargetCheckInterval = 0.1,				#1
+            TargetCheckInterval = 0.1,				-- 1
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'EXPERIMENTAL',
+                'SNIPER',
+                'ANTISHIELD',
+                'MOBILE TECH3 ARTILLERY',
+                'MOBILE TECH2 SILO',
+                'STRUCTURE SHIELD',
+                'STRUCTURE TECH3 DEFENSE DIRECTFIRE',
+                '(STRUCTURE * TECH2 * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1 ARTILLERY',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
+                'COMMAND',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -272,7 +284,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 60,
             Turreted = true,
-        UseFiringSolutionInsteadOfAimBone = true,		#Added
+            UseFiringSolutionInsteadOfAimBone = true,		-- Added
             WeaponCategory = 'Direct Fire',
             WeaponUnpacks = false,
         },
