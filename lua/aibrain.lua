@@ -2920,7 +2920,7 @@ AIBrain = Class(moho.aibrain_methods) {
             for k, v in self.BaseMonitor.PlatoonDistressTable do
                 if self:PlatoonExists(v.Platoon) then
                     local platPos = v.Platoon:GetPlatoonPosition()
-                    local tempDist = Utilities.XZDistanceTwoVectors(platPos)
+                    local tempDist = Utilities.XZDistanceTwoVectors(position, platPos)
 
                     -- Platoon too far away to help
                     if tempDist > radius then
@@ -2928,7 +2928,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
 
                     -- Area not scary enough
-                    if v.Threat < theshold then
+                    if v.Threat < threshold then
                         continue
                     end
 
