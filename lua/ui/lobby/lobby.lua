@@ -3735,7 +3735,7 @@ function setupChatEdit(chatPanel)
             
             local emojiname =  GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].pack..'/'.. GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].emoji
 
-            self:SetText(string.sub(text, 1, GUI.EmojiSelector.BeginPos)..emojiname..':'..string.sub(text,CaretPos + 1, string.len(text)))
+            self:SetText(STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos)..emojiname..':'..STR_Utf8SubString(text,CaretPos + 1, string.len(text)))
             self:SetCaretPosition(string.len(emojiname) + GUI.EmojiSelector.BeginPos + 1)
             GUI.EmojiSelector:Destroy()
             GUI.EmojiSelector = nil
@@ -3792,7 +3792,10 @@ function setupChatEdit(chatPanel)
                 GUI.EmojiSelector = nil
                 return
             end
-            local EmojiText = string.sub(newText, GUI.EmojiSelector.BeginPos +1, self:GetCaretPosition())
+            local EmojiText = ''
+            if GUI.EmojiSelector.BeginPos < self:GetCaretPosition() then
+                EmojiText = STR_Utf8SubString(newText, GUI.EmojiSelector.BeginPos + 1, self:GetCaretPosition() - GUI.EmojiSelector.BeginPos)
+            end
             UpdateEmojiSelector(EmojiText)
         end
     end
@@ -7118,7 +7121,7 @@ function UpdateEmojiSelector(emojiText)
                     local text =        GUI.chatEdit:GetText() 
                     local CaretPos =    GUI.chatEdit:GetCaretPosition()
                     
-                    local newtext = string.sub(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..string.sub(text,CaretPos + 1, string.len(text))
+                    local newtext = STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..STR_Utf8SubString(text,CaretPos + 1, string.len(text))
                     local oldtext = GUI.EmojiSelector.emojiText or ''
                     GUI.EmojiSelector:Destroy()
                     GUI.EmojiSelector = nil
