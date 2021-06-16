@@ -91,34 +91,32 @@ SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
     PolyTrailOffset = {0,0,0},
 
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+        
+        if radius == 0 then
+            DamageArea( self, pos, 0.5, 1, 'Force', false )
+            DamageArea( self, pos, 0.5, 1, 'Force', false )
+        else
+            DamageArea( self, pos, radius, 1, 'Force', false )
+            DamageArea( self, pos, radius, 1, 'Force', false )
+        end
+        
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             if radius == 0 then
-                DamageArea( self, pos, 0.5, 1, 'Force', true )
-                DamageArea( self, pos, 0.5, 1, 'Force', true )
-                
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
             else
-                DamageArea( self, pos, radius, 1, 'Force', true )
-                DamageArea( self, pos, radius, 1, 'Force', true )
-                
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 120, 70, army)
             end
-        
-        elseif targetType == 'Unit' then
+        elseif targetType == 'Unit' then --works well for small unit, but doesn't look good when shooting at exp
             local radius = self.DamageData.DamageRadius
             
             if radius ~= 0 then
                 local rotation = RandomFloat(0,2*math.pi)
-                local pos = self:GetPosition()
                 local army = self.Army
-                
-                DamageArea( self, pos, radius, 1, 'Force', true )
-                DamageArea( self, pos, radius, 1, 'Force', true )
                 
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 120, 70, army)
             end
@@ -139,14 +137,15 @@ SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- ACU
     PolyTrailOffset = {0,0,0},
 
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+
+        DamageArea( self, pos, radius, 1, 'Force', true )
+        DamageArea( self, pos, radius, 1, 'Force', true )
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
-            
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            
+                        
             CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
             CreateDecal(pos, RandomFloat(0,2*math.pi), 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
         end
@@ -407,17 +406,16 @@ SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { -- ACU / SACU / TML 
     end,
     
     OnImpact = function(self, targetType, targetEntity)
+        local radius = self.DamageData.DamageRadius
+        local pos = self:GetPosition()
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local army = self.Army
             local rotation = RandomFloat(0,2*math.pi)
-            local radius = self.DamageData.DamageRadius
-            local pos = self:GetPosition()
-            
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            
+                        
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 200, 90, army)
         end
+        DamageArea(self, pos, radius, 1, 'Force', true)
+        DamageArea(self, pos, radius, 1, 'Force', true)
 
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,

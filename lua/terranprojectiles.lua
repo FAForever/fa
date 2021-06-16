@@ -360,24 +360,27 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
     FxImpactUnderWater = {},
     
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+
+        if radius > 0 then -- OC
+            DamageArea( self, pos, radius, 1, 'Force', true )
+            DamageArea( self, pos, radius, 1, 'Force', true )
+        else
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+            DamageArea( self, pos, 0.5, 1, 'Force', true )
+        end
+        
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
             local army = self.Army
             
             if radius > 0 then -- OC
                 local rotation2 = RandomFloat(0,2*math.pi)
                 
-                DamageArea( self, pos, radius, 1, 'Force', true )
-                DamageArea( self, pos, radius, 1, 'Force', true )
-                
                 CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
                 CreateDecal(pos, rotation2, 'crater_radial01_albedo', '', 'Albedo', radius * 2, radius * 2, 150, 40, army)
             else
-                DamageArea( self, pos, 0.5, 1, 'Force', true )
-                DamageArea( self, pos, 0.5, 1, 'Force', true )
-                
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
             end
         end

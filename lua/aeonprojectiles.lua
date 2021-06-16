@@ -590,13 +590,14 @@ AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     FxImpactLand = EffectTemplate.AQuantumDisruptorHit01,
     
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+
+        DamageArea( self, pos, 0.5, 1, 'Force', true )
+        DamageArea( self, pos, 0.5, 1, 'Force', true )
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
             local army = self.Army
-            
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
             
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
         end
