@@ -426,7 +426,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if targetCats.DIESTOOCDEPLETINGSHIELD and not targetEntity.MyShield:IsUp() then
+                if  EntityCategoryContains(categories.DIESTOOCDEPLETINGSHIELD, targetEntity) and not targetEntity.MyShield:IsUp() then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
