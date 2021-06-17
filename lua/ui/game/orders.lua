@@ -310,6 +310,10 @@ local function DockOrderBehavior(self, modifiers)
     self:SetCheck(false)
 end
 
+function Dock(clear)
+    IssueDockCommand(clear)
+end
+
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))

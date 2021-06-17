@@ -4430,6 +4430,7 @@ key_desc_0401="build static AA + air staging + mobile AA & flaks + air fighters 
 key_desc_0402="build torpedo defenses + torpedo bombers + submarines & torpedo boat"
 key_desc_0403="build static artilleries + mobile artilleries"
 key_desc_0404="build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers"
+key_desc_0405="Dock"
 
 keymap_category_0000="UI"
 keymap_category_0004="Selection"
