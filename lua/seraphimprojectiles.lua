@@ -97,24 +97,18 @@ SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
         if radius == 0 then
             DamageArea( self, pos, 0.5, 1, 'Force', false )
             DamageArea( self, pos, 0.5, 1, 'Force', false )
+            
+            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
+                local rotation = RandomFloat(0,2*math.pi)
+                local army = self.Army
+                
+                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
+            end
         else
             DamageArea( self, pos, radius, 1, 'Force', false )
             DamageArea( self, pos, radius, 1, 'Force', false )
-        end
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
             
-            if radius == 0 then
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
-            else
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 120, 70, army)
-            end
-        elseif targetType == 'Unit' then --works well for small unit, but doesn't look good when shooting at exp
-            local radius = self.DamageData.DamageRadius
-            
-            if radius ~= 0 then
+            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
                 local rotation = RandomFloat(0,2*math.pi)
                 local army = self.Army
                 
