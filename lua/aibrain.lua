@@ -2828,7 +2828,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local found = false
         for k, v in self.BaseMonitor.PlatoonDistressTable do
             -- If already calling for help, don't add another distress call
-            if table.equal(v.Platoon, platoon) then
+            if v.Platoon == platoon then
                 found = true
                 break
             end
