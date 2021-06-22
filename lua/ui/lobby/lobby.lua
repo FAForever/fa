@@ -3023,7 +3023,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
     GUI.curatedmapsButton.OnClick = function()
-        OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+        OpenURL('http://forum.faforever.com/topic/347')
     end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
