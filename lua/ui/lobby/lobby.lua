@@ -2036,15 +2036,15 @@ local function TryLaunch(skipNoObserversCheck)
         -- Load in the default map options if they are not set manually
 
         -- Not all maps have options
-        if scenarioInfo.options then 
+        if scenarioInfo.options then
 
             -- If we don't validate them first then the people using the default 
             -- as a value instead of the index of the value will mess us up
             MapUtil.ValidateScenarioOptions(scenarioInfo.options)
 
             -- For every option, if it's not set yet then add its default value
-            for _, option in scenarioInfo.options do 
-                if not gameInfo.GameOptions[option.key] then 
+            for _, option in scenarioInfo.options do
+                if not gameInfo.GameOptions[option.key] then
                     -- When the value data of the option is formatted as:
                     -- values = {
                     --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },

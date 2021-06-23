@@ -184,8 +184,7 @@ function CreateChatBackground()
     return bg
 end
 
-
-function CreateChatLines()    
+function CreateChatLines()
     local function CreateChatLine()
         local line = Group(GUI.chatContainer)
 

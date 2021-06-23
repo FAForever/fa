@@ -31,8 +31,8 @@ ChatArea = Class(Group){
         -- The chat history is indexed by the order in which they were added - so older messages are first
         self.ChatHistory = {} -- for example:
         -- ChatHistory = {
-        --   { authorName = "Mike", messageText = "Hi Dave, How are you?" }, 
-        --   { authorName = "Dave", messageText = "I'm fine, how are you?" },  
+        --   { authorName = "Mike", messageText = "Hi Dave, How are you?" },
+        --   { authorName = "Dave", messageText = "I'm fine, how are you?" },
         --}
 
         -- specifies whether or not to save new messages in chat history
@@ -216,13 +216,11 @@ ChatArea = Class(Group){
                 end
             end
         end
-        -- creating a table that will store all text fields that belong to this line
-        
 
         -- layout the new line based on its index
         if line.index == 1 then
            LayoutHelpers.AtLeftTopIn(line, self, 0, self.Style.padding.top)
-        else 
+        else
            -- putting the line below previous line
            line.previous = self.ChatLines[line.index - 1]
            line.Left:Set(function() return self.Left() end)
@@ -277,7 +275,7 @@ ChatArea = Class(Group){
         -- temporary deactivate Chat history while re-creating chat lines
         self.ChatHistoryActive = false
         for _, chat in self.ChatHistory or {} do
-            self:PostMessage(chat.messageText, chat.authorName, 
+            self:PostMessage(chat.messageText, chat.authorName,
                                chat.messageStyle, chat.authorStyle)
         end
         self.ChatHistoryActive = true
@@ -323,7 +321,7 @@ ChatArea = Class(Group){
         dummy:Destroy()
         return width
     end,
-    
+
     --- destroys safely all current chat lines and chat history
     OnDestroy = function(self)
         self:ClearLines()
