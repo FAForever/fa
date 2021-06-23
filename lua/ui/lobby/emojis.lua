@@ -5,7 +5,7 @@ Packages = {} -- emojis' packages data
 
 function UpdatePacks(id, state)
     Packages[id].info.isEnabled = state
-    local packsStates = Prefs.GetFromCurrentProfile('emojipacks') 
+    local packsStates = Prefs.GetFromCurrentProfile('emojipacks')
     packsStates[id] = state
     Prefs.SetToCurrentProfile("emojipacks", packsStates)
 end
@@ -48,9 +48,9 @@ function ScanPackages()
     Prefs.SetToCurrentProfile("emojipacks", packsStates)
 end
 
-do
-    ScanPackages()
-end
+
+ScanPackages()
+
 
 function  isInEmojis(str)
     str = string.lower(str)

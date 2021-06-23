@@ -1235,7 +1235,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while not table.empty(players)  do
+    while not table.empty(players) do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -2037,21 +2037,21 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- Not all maps have options
         if scenarioInfo.options then 
-      
+
             -- If we don't validate them first then the people using the default 
             -- as a value instead of the index of the value will mess us up
             MapUtil.ValidateScenarioOptions(scenarioInfo.options)
-      
+
             -- For every option, if it's not set yet then add its default value
             for _, option in scenarioInfo.options do 
                 if not gameInfo.GameOptions[option.key] then 
                     -- When the value data of the option is formatted as:
                     -- values = {
-                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },		
-                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },	
-                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },	
+                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },
+                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },
+                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },
                     --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
-                    -- },	
+                    -- },
                     local keyVersion = option.values[option.default].key
 
                     -- When the value data of the option is formatted as:
@@ -3687,7 +3687,6 @@ function CreateUI(maxPlayers)
                         else
                             GUI.slots[slot].pingStatus:Hide()
                         end
-                        GUI.slots[slot].pingStatus:Show()
                         -- Set the ping bar to a colour representing the status of our connection.
                         GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
                     else
