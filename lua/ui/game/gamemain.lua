@@ -295,8 +295,10 @@ local function LoadDialog(parent)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
 
-    ForkThread(CreateAdditionalInformationInLoading, movie, color, parent)
-
+    if Prefs.GetOption('loading_more_information') then
+        ForkThread(CreateAdditionalInformationInLoading, movie, color, parent)
+    end
+	
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
         tipControl:SetColor(color)
