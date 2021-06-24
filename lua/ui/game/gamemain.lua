@@ -295,7 +295,7 @@ local function LoadDialog(parent)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
 
-    ForkThread(CreateTeamsPlayersTexts, movie, color, parent)
+    ForkThread(CreateAdditionalInformationInLoading, movie, color, parent)
 
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
@@ -324,8 +324,25 @@ local function LoadDialog(parent)
     return movie
 end
 
+local InfoDialog = Class(Group) {
+    __init = function(self, GUI, content)
+        Group.__init(self, GUI)
+        self.content = content
+        content:SetParent(self)
+        LayoutHelpers.AtLeftTopIn(content, self)
 
-function CreateTeamsPlayersTexts(movie, color, parent)
+        self.Width:Set(content.Width())
+        self.Height:Set(content.Height())
+
+        local background = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
+
+        LayoutHelpers.FillParentFixedBorder(background, content, 64)
+
+        LayoutHelpers.DepthUnderParent(background, content)
+    end
+}
+
+function CreateAdditionalInformationInLoading(movie, color, parent)
 	local gameInfo = AutoLobby.GetGameInfo()
 	
 	if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
@@ -335,66 +352,97 @@ function CreateTeamsPlayersTexts(movie, color, parent)
 	if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
 		return
 	end
-	local players = gameInfo.PlayerOptions
+
+	CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
+end
+
+function CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
+	local allPlayers = gameInfo.PlayerOptions
+	
+	local maxLenPlayerName = -1
 
 	local teams = {}
-	for k, player in players do
-		if not teams[player.Team] then
-			teams[player.Team] = true
+	for k, player in allPlayers do
+		local team = player.Team
+		if not teams[team] then
+			teams[team] = {players = {}, games = 0, ratings = 0, dialog = nil}
 		end
+		maxLenPlayerName = math.max(maxLenPlayerName, string.len(player.PlayerName))
+		teams[team].games = teams[team].games + player.NG
+		teams[team].ratings = teams[team].ratings + player.PL
+		table.insert(teams[team].players, player)
 	end
-	local isFFA = IsFFA(teams, players)
+	
+	local isFFA = IsFFA(teams, allPlayers)
 	local topicCreating = true
 	local countTeams = table.getsize(teams)
-	local nT = 0
+	local nT = 1
 	local teamText
-
+	local lastTeam
+	
+	local dialogContent
+    local infoDialog
+	local heightDialogs = 5
+	local width = (maxLenPlayerName + 30) * 7
+	
 	for team, t in teams do
+		local players = table.sorted(t.players, sort_by("PL"))
+		
 		if topicCreating then
-			teamText = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
-			teamText:SetColor(color)
-			teamText:SetText('Team '..nT+1)
-			teamText:SetDropShadow(true)
-		end
-		if countTeams == 1 or isFFA then
+			local height = (table.getsize(players) + 1) * 22
+			dialogContent = Group(parent)
+			LayoutHelpers.SetDimensions(dialogContent, width, height)
 			
-			if gameInfo.Victory ~= "sandbox" then
+			infoDialog = InfoDialog(parent, dialogContent)
+			if lastTeam then
+				LayoutHelpers.Below(infoDialog, lastTeam.dialog, 10)
+			else
+				LayoutHelpers.AtLeftTopIn(infoDialog, parent, 5, 5)
+			end
+			teamText = UIUtil.CreateText(infoDialog, '', 15, UIUtil.bodyFont)
+			teamText:SetColor(color)
+			teamText:SetText(LOC('<LOC lobui_0096>Team')..' '..nT..' ('..t.ratings..'/'..t.games..')')
+			teamText:SetDropShadow(true)
+			
+			t.dialog = dialogContent
+			lastTeam = t
+			
+			LayoutHelpers.AtLeftTopIn(teamText, infoDialog, 5, 5)
+		end
+		
+		if isFFA and topicCreating then
+			if gameInfo.Victory ~= "sandbox" and countTeams == 1 then
+				teamText:SetText(LOC('<LOC lobui_0128>Sandbox'))
+			else 
 				teamText:SetText('FFA')
 			end
 			topicCreating = false
-			LayoutHelpers.CenteredAbove(teamText, parent , -100)
-		elseif countTeams == 2 then
-			LayoutHelpers.AtLeftTopIn(teamText, parent, parent.Width()/countTeams * nT + parent.Width()/4, 50)
-		else
-			LayoutHelpers.AtLeftTopIn(teamText, parent, parent.Width()/countTeams * nT + 100, 50)
+			LayoutHelpers.SetDimensions(dialogContent, width, (table.getsize(allPlayers) + 1) * 22)
 		end
-
-		local n = 0
+		
+		local n = 1
 		for k, player in players do
-			if player.Team == team or isFFA then
-				local playerText = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
-				playerText:SetColor(color)
-				playerText:SetDropShadow(true)
-				local textPlayer = player.PlayerName
-				if player.PlayerClan and player.PlayerClan ~= "" then
-					textPlayer ="["..player.PlayerClan.."] " .. textPlayer
-				end
-				if player.PL and player.PL > 0 then
-					textPlayer = textPlayer .. " ["..player.PL.."]"
-				end
- 				playerText:SetText(textPlayer)
-				LayoutHelpers.CenteredBelow(playerText, teamText, 25 + 25 * n)
-				n = n + 1
+			local playerText = UIUtil.CreateText(infoDialog, '', 15, UIUtil.bodyFont)
+			local playerColor = gameColors.PlayerColors[player.PlayerColor]
+			playerText:SetColor(playerColor)
+			playerText:SetDropShadow(true)
+			local textPlayer = player.PlayerName
+			if player.PlayerClan and player.PlayerClan ~= "" then
+				textPlayer ="["..player.PlayerClan.."] " .. textPlayer
 			end
+			if player.PL > 0 then
+				textPlayer = textPlayer .. " ["..player.PL.."]"
+			end
+ 			playerText:SetText(textPlayer)
+			LayoutHelpers.AtLeftTopIn(playerText, teamText, 50, n * 20)
+			n = n + 1
 		end
-		
 		nT = nT + 1
-		
 	end
 end
 
 function IsFFA(teams, players)
-	return table.getsize(teams) == table.getsize(players)
+	return table.getsize(teams) == table.getsize(players) or table.getsize(players) == 1 or table.getsize(teams) == 1
 end
 
 function CreateWldUIProvider()
