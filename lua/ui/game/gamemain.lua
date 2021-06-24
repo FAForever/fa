@@ -326,6 +326,21 @@ local function LoadDialog(parent)
     return movie
 end
 
+function CreateAdditionalInformationInLoading(movie, color, parent)
+	local gameInfo = AutoLobby.GetGameInfo()
+	
+	if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
+		gameInfo = Lobby.GetGameInfo() or {}
+	end
+
+	if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
+		return
+	end
+
+	CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
+	CreateViewMap(gameInfo, parent)
+end
+
 local InfoDialog = Class(Group) {
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
@@ -344,18 +359,33 @@ local InfoDialog = Class(Group) {
     end
 }
 
-function CreateAdditionalInformationInLoading(movie, color, parent)
-	local gameInfo = AutoLobby.GetGameInfo()
+function CreateViewMap(gameInfo, parent)
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo.hidePreviewMarkers then
+        return
+    end
+
+    local MAP_PREVIEW_SIZE = parent.Width() / 3.5
+    local HYDROCARBON_ICON_SIZE = 10
+    local MASS_ICON_SIZE = 8
+
+    local dialogContent = Group(parent)
+    LayoutHelpers.SetDimensions(dialogContent, MAP_PREVIEW_SIZE + 5, MAP_PREVIEW_SIZE + 5)
+
+    local mapDialog = InfoDialog(parent, dialogContent)
+
+    local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE, true)
+    dialogContent.mapPreview = mapPreview
+    LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
+
+    mapPreview:SetScenario(scenarioInfo, true)
+	LayoutHelpers.AtRightTopIn(mapDialog, parent, 5, 5)
 	
-	if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
-		gameInfo = Lobby.GetGameInfo() or {}
+    local notFixed = gameInfo.GameOptions['TeamSpawn'] ~= 'fixed'
+	
+	for k, player in gameInfo.PlayerOptions do
+		mapPreview:UpdatePlayer(k, player, notFixed)
 	end
-
-	if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
-		return
-	end
-
-	CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
 end
 
 function CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
