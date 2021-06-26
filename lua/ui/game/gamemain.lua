@@ -18,6 +18,9 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local Lobby = import('/lua/ui/lobby/lobby.lua')
 local AutoLobby = import('/lua/ui/lobby/autolobby.lua')
+local gameColors = import('/lua/gameColors.lua').GameColors
+local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
+local MapUtil = import('/lua/ui/maputil.lua')													   
 
 local controls = import('/lua/ui/controls.lua').Get()
 
