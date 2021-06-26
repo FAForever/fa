@@ -267,6 +267,18 @@ options = {
                         {text = "<LOC _On>", key = true},
                     },
                 },
+            },
+            {
+                title = "<LOC OPTIONS_0285>Automatic extractor selection",
+                key = 'automex',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = false},
+                        {text = "<LOC _On>", key = true},
+                    },
+                },
             }
         },
     },

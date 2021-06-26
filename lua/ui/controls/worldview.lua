@@ -179,40 +179,42 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.zoomed = true
         end
         if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or AutoBuild) then
-            local Units = GetSelectedUnits()
-            if Units and not GetRolloverInfo() then
-                local BuildType = false
-                local MWP = GetMouseWorldPos()
-                local Deposits = GetDepositsAroundPoint(MWP.x, MWP.z, 0.8, 0)
-                if not table.empty(Deposits) then
-                    if Deposits[1].Type == 1 then
-                        BuildType = categories.MASSEXTRACTION
-                    else
-                        BuildType = categories.HYDROCARBON
-                    end
-                end
-                if BuildType then
-                    local _, _, BuildableCategories = GetUnitCommandData(Units)
-                    BuildableCategories = BuildableCategories * BuildType
-                    local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
-                    for _, Tech in Techs do
-                        if not EntityCategoryEmpty(BuildableCategories * Tech) then
-                            BuildableCategories = BuildableCategories * Tech
-                            break
+            local options = Prefs.GetFromCurrentProfile('options')
+            if options['automex'] then
+                local Units = GetSelectedUnits()
+                if Units and not GetRolloverInfo() then
+                    local BuildType = false
+                    local MWP = GetMouseWorldPos()
+                    local Deposits = GetDepositsAroundPoint(MWP.x, MWP.z, 0.8, 0)
+                    if not table.empty(Deposits) then
+                        if Deposits[1].Type == 1 then
+                            BuildType = categories.MASSEXTRACTION
+                        else
+                            BuildType = categories.HYDROCARBON
                         end
                     end
-                    local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
-                    if BuildBP then
-                        CommandMode.StartCommandMode('build', { name = BuildBP }, true)
-                        AutoBuild = true
+                    if BuildType then
+                        local _, _, BuildableCategories = GetUnitCommandData(Units)
+                        BuildableCategories = BuildableCategories * BuildType
+                        local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
+                        for _, Tech in Techs do
+                            if not EntityCategoryEmpty(BuildableCategories * Tech) then
+                                BuildableCategories = BuildableCategories * Tech
+                                break
+                            end
+                        end
+                        local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
+                        if BuildBP then
+                            CommandMode.StartCommandMode('build', { name = BuildBP }, true)
+                            AutoBuild = true
+                        end
+                    else
+                        CommandMode.EndCommandMode(true)
+                        AutoBuild = false
                     end
-                else
-                    CommandMode.EndCommandMode(true)
-                    AutoBuild = false
                 end
             end
         end
-
         return false
     end,
 
