@@ -215,7 +215,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_HighArc',
             CollideFriendly = false,
-            Damage = 198, --add 2 more damage with DamageArea in projectile_script.lua
+            Damage = 200,
             DamageFriendly = false,
             DamageRadius = 0.5,
             DamageType = 'Normal',

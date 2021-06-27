@@ -213,7 +213,7 @@ UnitBlueprint {
             CameraLifetime = 5,
             CameraVisionRadius = 5,
             CollideFriendly = false,
-            Damage = 98, --add 2 more damage with DamageArea in projectile_script.lua
+            Damage = 100,
             DamageFriendly = false,
             DamageRadius = 1,
             DamageType = 'Normal',
