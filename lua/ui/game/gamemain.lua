@@ -20,7 +20,7 @@ local Lobby = import('/lua/ui/lobby/lobby.lua')
 local AutoLobby = import('/lua/ui/lobby/autolobby.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
-local MapUtil = import('/lua/ui/maputil.lua')													   
+local MapUtil = import('/lua/ui/maputil.lua')
 
 local controls = import('/lua/ui/controls.lua').Get()
 
@@ -297,11 +297,11 @@ local function LoadDialog(parent)
     textControl:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
     import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
-
+    
     if Prefs.GetOption('loading_more_information') then
         ForkThread(CreateAdditionalInformationInLoading, movie, color, parent)
     end
-	
+    
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
         tipControl:SetColor(color)
@@ -330,18 +330,18 @@ local function LoadDialog(parent)
 end
 
 function CreateAdditionalInformationInLoading(movie, color, parent)
-	local gameInfo = AutoLobby.GetGameInfo()
-	
-	if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
-		gameInfo = Lobby.GetGameInfo() or {}
-	end
+    local gameInfo = AutoLobby.GetGameInfo()
+    
+    if not gameInfo or table.empty(gameInfo.PlayerOptions)  then
+        gameInfo = Lobby.GetGameInfo() or {}
+    end
 
-	if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
-		return
-	end
+    if not gameInfo or table.empty(gameInfo) or table.empty(gameInfo.PlayerOptions) then 
+        return
+    end
 
-	CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
-	CreateViewMap(gameInfo, parent)
+    CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
+    CreateAdditionalInformationAboutMap(gameInfo, parent, color)
 end
 
 local InfoDialog = Class(Group) {
@@ -362,7 +362,7 @@ local InfoDialog = Class(Group) {
     end
 }
 
-function CreateViewMap(gameInfo, parent)
+function CreateAdditionalInformationAboutMap(gameInfo, parent, color)
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     if scenarioInfo.hidePreviewMarkers then
         return
@@ -372,112 +372,134 @@ function CreateViewMap(gameInfo, parent)
     local HYDROCARBON_ICON_SIZE = 10
     local MASS_ICON_SIZE = 8
 
-    local dialogContent = Group(parent)
-    LayoutHelpers.SetDimensions(dialogContent, MAP_PREVIEW_SIZE + 5, MAP_PREVIEW_SIZE + 5)
+    local mainDialog = Group(parent)
+    LayoutHelpers.SetDimensions(mainDialog, MAP_PREVIEW_SIZE + 5, MAP_PREVIEW_SIZE + 5)
 
-    local mapDialog = InfoDialog(parent, dialogContent)
+    local mapDialog = InfoDialog(parent, mainDialog)
+    local mapPreview = ResourceMapPreview(mainDialog, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE, true)
 
-    local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE, true)
-    dialogContent.mapPreview = mapPreview
-    LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
+    LayoutHelpers.AtCenterIn(mapPreview, mainDialog)
 
     mapPreview:SetScenario(scenarioInfo, true)
-	LayoutHelpers.AtRightTopIn(mapDialog, parent, 5, 5)
-	
+    LayoutHelpers.AtRightTopIn(mapDialog, parent, 5, 5)
+    
     local notFixed = gameInfo.GameOptions['TeamSpawn'] ~= 'fixed'
-	
-	for k, player in gameInfo.PlayerOptions do
-		mapPreview:UpdatePlayer(k, player, notFixed)
-	end
+    
+    for k, player in gameInfo.PlayerOptions do
+        mapPreview:UpdatePlayer(k, player, notFixed)
+    end
+
+    local secondaryDialog = Group(parent)
+    LayoutHelpers.SetDimensions(secondaryDialog, MAP_PREVIEW_SIZE + 5, 70)
+    
+    local infoMapDialog = InfoDialog(parent, secondaryDialog)
+    LayoutHelpers.Below(infoMapDialog, mainDialog, 10)
+        
+    local mapNameText = MakeText(infoMapDialog, scenarioInfo.name, color, 18)
+    LayoutHelpers.AtCenterIn(mapNameText, infoMapDialog, infoMapDialog.Height() / -4)
+    
+    local TTips_sizeX = scenarioInfo.size[1] / 51.2
+    local TTips_sizeY = scenarioInfo.size[2] / 51.2
+    
+    local mapSizeLabelText = LOC("<LOC lobui_0761>Map Size")..' : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
+    local mapSizeText = MakeText(infoMapDialog, mapSizeLabelText, color, 18)
+    LayoutHelpers.CenteredBelow(mapSizeText, mapNameText, 10)
+    LayoutHelpers.AtBottomIn(secondaryDialog, mapSizeText, -10)
 end
 
 function CreateTeamsPlayersTexts(gameInfo, movie, color, parent)
-	local allPlayers = gameInfo.PlayerOptions
-	
-	local maxLenPlayerName = -1
+    local allPlayers = gameInfo.PlayerOptions
+    
+    local maxLenPlayerName = -1
 
-	local teams = {}
-	for k, player in allPlayers do
-		local team = player.Team
-		if not teams[team] then
-			teams[team] = {players = {}, games = 0, ratings = 0, dialog = nil}
-		end
-		maxLenPlayerName = math.max(maxLenPlayerName, string.len(player.PlayerName))
-		teams[team].games = teams[team].games + player.NG
-		teams[team].ratings = teams[team].ratings + player.PL
-		table.insert(teams[team].players, player)
-	end
-	
-	local isFFA = IsFFA(teams, allPlayers)
-	local topicCreating = true
-	local countTeams = table.getsize(teams)
-	local nT = 1
-	local teamText
-	local lastTeam
-	
-	local dialogContent
+    local teams = {}
+    for k, player in allPlayers do
+        local team = player.Team
+        if not teams[team] then
+            teams[team] = {players = {}, games = 0, ratings = 0, dialog = nil}
+        end
+        maxLenPlayerName = math.max(maxLenPlayerName, string.len(player.PlayerName))
+        teams[team].games = teams[team].games + player.NG
+        teams[team].ratings = teams[team].ratings + player.PL
+        table.insert(teams[team].players, player)
+    end
+    
+    local isFFA = IsFFA(teams, allPlayers)
+    local topicCreating = true
+    local countTeams = table.getsize(teams)
+    local nT = 1
+    local teamText
+    local lastTeam
+    
+    local mainDialog
     local infoDialog
-	local heightDialogs = 5
-	local width = (maxLenPlayerName + 30) * 7
-	
-	for team, t in teams do
-		local players = table.sorted(t.players, sort_by("PL"))
-		
-		if topicCreating then
-			local height = (table.getsize(players) + 1) * 22
-			dialogContent = Group(parent)
-			LayoutHelpers.SetDimensions(dialogContent, width, height)
-			
-			infoDialog = InfoDialog(parent, dialogContent)
-			if lastTeam then
-				LayoutHelpers.Below(infoDialog, lastTeam.dialog, 10)
-			else
-				LayoutHelpers.AtLeftTopIn(infoDialog, parent, 5, 5)
-			end
-			teamText = UIUtil.CreateText(infoDialog, '', 15, UIUtil.bodyFont)
-			teamText:SetColor(color)
-			teamText:SetText(LOC('<LOC lobui_0096>Team')..' '..nT..' ('..t.ratings..'/'..t.games..')')
-			teamText:SetDropShadow(true)
-			
-			t.dialog = dialogContent
-			lastTeam = t
-			
-			LayoutHelpers.AtLeftTopIn(teamText, infoDialog, 5, 5)
-		end
-		
-		if isFFA and topicCreating then
-			if gameInfo.Victory ~= "sandbox" and countTeams == 1 then
-				teamText:SetText(LOC('<LOC lobui_0128>Sandbox'))
-			else 
-				teamText:SetText('FFA')
-			end
-			topicCreating = false
-			LayoutHelpers.SetDimensions(dialogContent, width, (table.getsize(allPlayers) + 1) * 22)
-		end
-		
-		local n = 1
-		for k, player in players do
-			local playerText = UIUtil.CreateText(infoDialog, '', 15, UIUtil.bodyFont)
-			local playerColor = gameColors.PlayerColors[player.PlayerColor]
-			playerText:SetColor(playerColor)
-			playerText:SetDropShadow(true)
-			local textPlayer = player.PlayerName
-			if player.PlayerClan and player.PlayerClan ~= "" then
-				textPlayer ="["..player.PlayerClan.."] " .. textPlayer
-			end
-			if player.PL > 0 then
-				textPlayer = textPlayer .. " ["..player.PL.."]"
-			end
- 			playerText:SetText(textPlayer)
-			LayoutHelpers.AtLeftTopIn(playerText, teamText, 50, n * 20)
-			n = n + 1
-		end
-		nT = nT + 1
-	end
+    local width = (maxLenPlayerName + 30) * 7
+    
+    for team, t in teams do
+        local players = table.sorted(t.players, sort_by("PL"))
+        
+        if topicCreating then
+            mainDialog = Group(parent)
+            LayoutHelpers.SetDimensions(mainDialog, width, 100)
+            
+            infoDialog = InfoDialog(parent, mainDialog)
+            if lastTeam then
+                LayoutHelpers.Below(infoDialog, lastTeam.dialog, 10)
+            else
+                LayoutHelpers.AtLeftTopIn(infoDialog, parent, 5, 5)
+            end
+            local textLabel = LOC('<LOC lobui_0096>Team')..' '..nT..' ('..t.ratings..'/'..t.games..')'
+            teamText = MakeText(infoDialog, textLabel, color, 18)
+
+            t.dialog = mainDialog
+            lastTeam = t
+            
+            LayoutHelpers.AtLeftTopIn(teamText, infoDialog, 5, 5)
+        end
+        
+        if isFFA and topicCreating then
+            if gameInfo.GameOptions.Victory == "sandbox" and countTeams == 1 then
+                teamText:SetText(LOC('<LOC lobui_0128>Sandbox'))
+            else 
+                teamText:SetText('FFA')
+            end
+            topicCreating = false
+        end
+        
+        local n = 1
+        local playerText
+        for k, player in players do
+            local playerColor = gameColors.PlayerColors[player.PlayerColor]
+            local textPlayer = player.PlayerName
+            
+            if player.PlayerClan ~= "" then
+                textPlayer ="["..player.PlayerClan.."] " .. textPlayer
+            end
+            playerText = MakeText(infoDialog, textPlayer, playerColor, 17)
+            LayoutHelpers.AtLeftTopIn(playerText, teamText, 50, 5 + n * 23)
+            
+            if player.PL > 0 then
+                local playerRatingText = MakeText(infoDialog, player.PL, playerColor, 17)
+                LayoutHelpers.CenteredLeftOf(playerRatingText, playerText, 10)
+            end
+            n = n + 1
+        end
+        
+        LayoutHelpers.AtBottomIn(mainDialog, playerText, -15)
+        
+        nT = nT + 1
+    end
 end
 
 function IsFFA(teams, players)
-	return table.getsize(teams) == table.getsize(players) or table.getsize(players) == 1 or table.getsize(teams) == 1
+    return table.getsize(teams) == table.getsize(players) or table.getsize(players) == 1 or table.getsize(teams) == 1
+end
+
+function MakeText(parent, text, color, size, dropshadow)
+    dropshadow = dropshadow or true
+    local textUI = UIUtil.CreateText(parent, text, size, UIUtil.bodyFont, dropshadow)
+    textUI:SetColor(color)
+    return textUI
 end
 
 function CreateWldUIProvider()
@@ -674,9 +696,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local upgradesTo = nil
         local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then
+            if type(potentialUpgrades) == "string" then 
                 upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then
+            elseif type(potentialUpgrades) == "table" then 
                 local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
                 for _, v in potentialUpgrades do
                     if EntityCategoryContains(buildableCategories, v) then

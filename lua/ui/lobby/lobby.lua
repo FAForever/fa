@@ -240,7 +240,7 @@ local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetF
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
 
 function GetGameInfo()
-	return gameInfo
+    return gameInfo
 end
 
 function SetWindowedLobby(windowed)
@@ -3021,14 +3021,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-	-- curated Maps
-	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    -- curated Maps
+    GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+    Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+    LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-	GUI.curatedmapsButton.OnClick = function()
-		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
-	end
+    GUI.curatedmapsButton.OnClick = function()
+        OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
