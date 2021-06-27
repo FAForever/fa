@@ -833,7 +833,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 98, --add 2 more damage with DamageArea in projectile_script.lua
+            Damage = 100,
             DamageType = 'Normal',
             DisplayName = 'Molecular Ripper Cannon',
             FireTargetLayerCapsTable = {
