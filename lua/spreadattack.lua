@@ -373,7 +373,7 @@ function SpreadAttack()
                 for i0 = 0, math.floor((unitcount / (endAction - beginAction + 1))) do -- Repeat to give all units a first order
                     for i = beginAction, endAction do -- For all orders find closest unit to them that doesnt have a first order yet, running it like this forces even distribution
                         local cunit = index + 10000000
-                        local cunitdis = 1000000000000000000000000
+                        local cunitdis = 67094528
                         
                         local oposition = unitOrders[i].Position
                         for i2 = 1, unitcount do -- Run thru all the units looking for closest unit to current order that isnt already taken (has a first order already)
