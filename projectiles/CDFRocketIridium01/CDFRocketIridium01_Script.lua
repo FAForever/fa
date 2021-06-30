@@ -6,22 +6,30 @@ local CIridiumRocketProjectile = import('/lua/cybranprojectiles.lua').CIridiumRo
 
 CDFRocketIridium01 = Class(CIridiumRocketProjectile) {
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        
+        if radius > 0 then
+            DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
+            DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
+        else
+            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
+            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
+        end
+        
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local radius = self.DamageData.DamageRadius
             local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
             local army = self.Army
             
             if radius > 0 then
-                DamageArea(self, pos, radius-1, 1, 'Force', true)
-                DamageArea(self, pos, radius-1, 1, 'Force', true)
                 DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', true )
                 
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius-0.5, radius-0.5, 100, 50, army)
             else
-                DamageArea(self, pos, 1, 1, 'Force', true)
-                DamageArea(self, pos, 1, 1, 'Force', true)
                 DamageRing( self, pos, 1, 5/4, 1, 'Fire', true )
                 
                 CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 100, 50, army)

@@ -115,14 +115,16 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 200, 150, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -185,14 +187,16 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 200, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -246,14 +250,16 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 200, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -312,14 +318,16 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -378,14 +386,16 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 250, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -434,14 +444,16 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 70, 50, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -495,14 +507,16 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
-                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 85, 70, army )
+                CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 70, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -569,14 +583,16 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 250, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
-                DamageArea(self, CurrentPosition, size, 1, 'Force', true)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
+                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
             else
                 skipCount = skipCount + self.ScorchSplatDropTime

@@ -12,15 +12,19 @@ local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavy
 
 TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile) {
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
+        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
+
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
             local army = self.Army
-            
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            DamageArea( self, pos, 0.5, 1, 'Force', true )
-            
+
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
         end
         

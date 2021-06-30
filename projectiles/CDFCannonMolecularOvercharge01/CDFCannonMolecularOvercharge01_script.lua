@@ -16,9 +16,12 @@ CDFCannonMolecular01 = Class(CMolecularCannonProjectile, OverchargeProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-
-        DamageArea( self, pos, radius, 1, 'Force', true )
-        DamageArea( self, pos, radius, 1, 'Force', true )
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

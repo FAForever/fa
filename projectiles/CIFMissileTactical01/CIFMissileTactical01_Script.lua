@@ -70,21 +70,25 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
+        local radius = self.DamageData.DamageRadius
+        local pos = self:GetPosition()
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
         CreateLightParticle( self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11' )
+            
+        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0,2*math.pi)
-            local radius = self.DamageData.DamageRadius
-            local pos = self:GetPosition()
             
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            DamageArea(self, pos, radius, 1, 'Force', true)
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 100, 50, army)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 150, 30, army)
         end
         
-        -- if I collide with terrain dont split
+        -- if it collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
