@@ -102,9 +102,9 @@ function strcmp(str1,str2)
         strlen = string.len(str1)
     end
     for ch = 1,strlen do
-        if string.byte(str1,ch) > string.byte(str2,ch) then 
+        if string.byte(str1,ch) > string.byte(str2,ch) then
             return true
-        elseif string.byte(str1,ch) < string.byte(str2,ch) then 
+        elseif string.byte(str1,ch) < string.byte(str2,ch) then
             return false
         end
     end
@@ -118,7 +118,7 @@ end
 function processInput(emojiText)
     local FoundEmojis = {}
     local isInserted = false
-    local ind 
+    local ind
     for id, pack in Packages do
         if not pack.info.isEnabled then
             continue

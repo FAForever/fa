@@ -250,7 +250,7 @@ function CreateChatLines()
             end
             if id == 1 then
                 self.name.chatID = entry.armyID
-                if self.name.chatID == GetFocusArmy() then 
+                if self.name.chatID == GetFocusArmy() then
                     self.name:Disable()
                 else
                     self.name:Enable()
@@ -277,14 +277,14 @@ function CreateChatLines()
                         parent.child = UIUtil.CreateText(parent, '', ChatOptions.font_size, "Arial",true)
                         LayoutHelpers.DepthOverParent(parent.child,self,10)
                         LayoutHelpers.RightOf(parent.child, parent,2)
-                        
+
                         parent.child:DisableHitTest()
                         parent.child:SetColor(chatColors[ChatOptions[entry.tokey]])
                         LayoutHelpers.AtVerticalCenterIn(parent.child, self.teamColor)
                         parent.child:SetText(content.text)
                         parent.child:SetClipToWidth()
                         parent = parent.child
-                    else    
+                    else
                         self.contents = UIUtil.CreateText(self, '', ChatOptions.font_size, "Arial",true)
                         LayoutHelpers.DepthOverParent(self.contents,self,10)
                         LayoutHelpers.RightOf(self.contents, self.name,2)
@@ -298,7 +298,7 @@ function CreateChatLines()
 
                 elseif content.emoji then--EMOJIS
                     if parent then
-                       
+
                         parent.child = Bitmap(parent,UIUtil.UIFile(Emojis.emojis_textures .. content.emoji .. '.dds'))
                         LayoutHelpers.DepthOverParent(parent.child,self.name,0)
                         LayoutHelpers.CenteredRightOf(parent.child, parent,2)
@@ -306,7 +306,7 @@ function CreateChatLines()
                         parent.child.Width:Set(self.Height)
 
                         parent = parent.child
-                       
+
                     else
                         self.contents = Bitmap(self,UIUtil.UIFile(Emojis.emojis_textures .. content.emoji .. '.dds'))
                         LayoutHelpers.DepthOverParent(self.contents,self.name,0)
@@ -320,7 +320,7 @@ function CreateChatLines()
         end
         return line
     end
-    
+
     if GUI.chatContainer then
         local curEntries = table.getsize(GUI.chatLines)
         local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 2))
@@ -486,7 +486,7 @@ function SetupChatScroll()
             end
             if chatHistory[curEntry] then
                 local Index = index
-                
+
                 line:renderChatLine(chatHistory[curEntry], curTop)
                 line.EntryID = curEntry
                 if GUI.bg:IsHidden() then
@@ -777,16 +777,16 @@ function CreateChatEdit()
         local charLim = self:GetMaxChars()
         if charcode == 9 then--tab code
             if table.empty(GUI.EmojiSelector.FoundEmojis) then return true end
-            local text =        self:GetText() 
+            local text =        self:GetText()
             local CaretPos =    self:GetCaretPosition()
-            
+
             local emojiname =  GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].pack..'/'.. GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].emoji
 
             self:SetText(STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos)..emojiname..':'..STR_Utf8SubString(text,CaretPos + 1, string.len(text)))
             self:SetCaretPosition(string.len(emojiname) + GUI.EmojiSelector.BeginPos + 1)
             GUI.EmojiSelector:Destroy()
             GUI.EmojiSelector = nil
-            
+
             return true
         end
         GUI.bg.curTime = 0
@@ -909,7 +909,7 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
-    
+
     if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
         return
     end
@@ -950,7 +950,7 @@ function ReceiveChatFromSim(sender, msg)
     local tempText = WrapContents({contents = Emojis.CheckEmojis(msg.text,ChatOptions.chat_emojis),name = name})
     --LOG(repr(tempText))
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    
+
     local entry = {
         name = name,
         tokey = tokey,
@@ -1277,7 +1277,7 @@ function RewrapLog()
     local tempSize = 0
     for i, v in chatHistory do
         v.wrappedtext = WrapContents({contents = Emojis.CheckEmojis(v.text,ChatOptions.chat_emojis),name = v.name})
-        
+
         --v.wrappedtext = WrapText(v)
         tempSize = tempSize + table.getsize(v.wrappedtext)
     end
@@ -1374,8 +1374,8 @@ function CreatePackageManagerWindow()
         self:CalcVisible()
     end
 
-  
-    
+
+
 
     GUI.PackageManager.ScrollToBottom = function(self)
         GUI.chatContainer:ScrollSetTop(nil, self.numLines)
@@ -1397,12 +1397,12 @@ function CreatePackageManagerWindow()
         end
         for ind = lineIndex, self.numLines do self.LineGroup.Lines[ind]:render() end
     end
-    
+
       -- called to determine if the control is scrollable on a particular access. Must return true or false.
     GUI.PackageManager.IsScrollable = function(self, axis)
         return true
     end
-    
+
     --scrlling
     GUI.PackageManager.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
@@ -1426,7 +1426,7 @@ function CreatePackageManagerWindow()
 
 
 
-    
+
 
     local function CreatePackageManagerLines()
         local function CreatePackageManagerLine()
@@ -1444,33 +1444,33 @@ function CreatePackageManagerWindow()
             LayoutHelpers.FillParent(line.bg, line)
             LayoutHelpers.DepthOverParent(line.bg,line,1)
             line.bg:Disable()
-    
-    
+
+
             line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
-            line.name:SetColor('FFE9ECE9') 
+            line.name:SetColor('FFE9ECE9')
             line.name:DisableHitTest()
             LayoutHelpers.AtLeftTopIn(line.name, line, 5, 5)
-    
+
             line.author = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
             line.author:DisableHitTest()
-            line.author:SetColor('FFE9ECE9') 
+            line.author:SetColor('FFE9ECE9')
             LayoutHelpers.Below(line.author, line.name,5)
-    
+
             line.desc = MultiLineText(line, UIUtil.bodyFont, 12, 'FFA2A5A2')
             line.desc:SetDropShadow(true)
             line.desc:DisableHitTest()
             LayoutHelpers.Below(line.desc, line.author,5)
             line.desc.Width:Set(line.Width() - 10)
-           
+
             --data:
             -- name --package name
             -- description -- its description
             -- author -- its author
             -- isEnabled -- is pack active
-    
+
             line.render = function(self, data, id)
                 if data then
-                    self.bg.id = id    
+                    self.bg.id = id
                     self.name:SetText(data.name)
                     self.author:SetText(data.author)
                     self.desc:SetText(data.description)
@@ -1487,26 +1487,26 @@ function CreatePackageManagerWindow()
                 LOG('set '..repr(checked)..' on '..repr(self.id))
                 Emojis.UpdatePacks(self.id, checked)
             end
-    
+
             return line
         end
         local index = 1
         GUI.PackageManager.LineGroup.Lines[index]  = CreatePackageManagerLine()
-        local parent = GUI.PackageManager.LineGroup.Lines[index] 
+        local parent = GUI.PackageManager.LineGroup.Lines[index]
         LayoutHelpers.AtLeftTopIn( parent,GUI.PackageManager.LineGroup,5,5)
         LayoutHelpers.AtRightIn(parent,GUI.PackageManager.LineGroup,5)
         while GUI.PackageManager.LineGroup.Bottom() -  parent.Bottom() > 85 do
-            index = index + 1 
+            index = index + 1
             GUI.PackageManager.LineGroup.Lines[index] = CreatePackageManagerLine()
             LayoutHelpers.Below(GUI.PackageManager.LineGroup.Lines[index] ,parent ,5)
             LayoutHelpers.AtRightIn(GUI.PackageManager.LineGroup.Lines[index],parent)
-            parent = GUI.PackageManager.LineGroup.Lines[index] 
+            parent = GUI.PackageManager.LineGroup.Lines[index]
         end
         GUI.PackageManager.numLines = index
     end
     CreatePackageManagerLines()
     GUI.PackageManager:CalcVisible()
- 
+
 
 end
 
@@ -1584,7 +1584,7 @@ function CreateConfigWindow()
     LayoutHelpers.AtHorizontalCenterIn(GUI.config, GetFrame(0))
     --LayoutHelpers.AtCenterIn(GUI.config, GetFrame(0))
     LayoutHelpers.ResetRight(GUI.config)
-   
+
 
     GUI.config.DragTL = Bitmap(GUI.config, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
     GUI.config.DragTR = Bitmap(GUI.config, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
@@ -1846,7 +1846,7 @@ function CloseChatConfig()
 end
 
 function WrapContents(data)
-    return FitContentsInLine(data.contents,GUI.chatLines[1].Height(), 
+    return FitContentsInLine(data.contents,GUI.chatLines[1].Height(),
     function(line)
         local firstLine = GUI.chatLines[1]
         if line == 1 then
@@ -1854,7 +1854,7 @@ function WrapContents(data)
         else
             return firstLine.Right() - (firstLine.name.Left() + 4)
         end
-    end, 
+    end,
     function(text)
         return GUI.chatLines[1].name:GetStringAdvance(text)
     end)
@@ -1873,7 +1873,7 @@ function FitContentsInLine(contents, lineHeight, lineWidth, GetStringAdvance)
             if CurShift + textWidth + 2 < lineWidth(lineIndex) then
                 table.insert(result_line, content)
                 CurShift = CurShift + textWidth + 2
-                continue 
+                continue
             else
                 local fittedText = import('/lua/maui/text.lua').WrapText(content.text,
                                                     function(line)
@@ -1928,7 +1928,7 @@ function CreateEmojiSelector()
     GUI.EmojiSelector.MaxSize = 0
     GUI.EmojiSelector.selectionIndex = 1
     GUI.EmojiSelector.Highlight = function (self,up)
-        
+
         self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff000000')
         if up == true then
             if self.selectionIndex ~= table.getn(self.FoundEmojis) then
@@ -1945,7 +1945,7 @@ function CreateEmojiSelector()
                     UpdateEmojiSelector()
                 end
                 self.selectionIndex = self.selectionIndex - 1
-            end   
+            end
         end
         self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff202020')
     end
@@ -1969,7 +1969,7 @@ function CreateEmojiSelector()
 
         end
     end
-   
+
 end
 
 
@@ -1979,7 +1979,7 @@ function UpdateEmojiSelector(emojiText)
         GUI.EmojiSelector.curIndex = 1
         GUI.EmojiSelector.emojiText = emojiText
         GUI.EmojiSelector.FoundEmojis = Emojis.processInput(emojiText)
-        GUI.EmojiSelector.selectionIndex = 1   
+        GUI.EmojiSelector.selectionIndex = 1
     end
     local FoundEmojis = GUI.EmojiSelector.FoundEmojis
     if GUI.EmojiSelector.emojiLines then
@@ -1989,7 +1989,7 @@ function UpdateEmojiSelector(emojiText)
     LayoutHelpers.FillParentFixedBorder(GUI.EmojiSelector.emojiLines, GUI.EmojiSelector)
     GUI.EmojiSelector.emojiLines.lines = {}
     LayoutHelpers.DepthOverParent(GUI.EmojiSelector.emojiLines,GUI.EmojiSelector,10)
-   
+
     if not table.empty(FoundEmojis) then
         local index = GUI.EmojiSelector.curIndex
         while index <= table.getn(FoundEmojis) do
@@ -1997,12 +1997,12 @@ function UpdateEmojiSelector(emojiText)
             local path = UIUtil.UIFile(Emojis.emojis_textures .. emojiname .. '.dds')
             GUI.EmojiSelector.emojiLines.lines[index] = Group(GUI.EmojiSelector.emojiLines)
             local emojiLine = GUI.EmojiSelector.emojiLines.lines[index]
-            
+
             emojiLine.HandleEvent = function(self, event)
                 if event.Type == 'ButtonPress' then
-                    local text =        GUI.chatEdit.edit:GetText() 
+                    local text =        GUI.chatEdit.edit:GetText()
                     local CaretPos =    GUI.chatEdit.edit:GetCaretPosition()
-                    
+
                     local newtext = STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..STR_Utf8SubString(text,CaretPos + 1, string.len(text))
                     local oldtext = GUI.EmojiSelector.emojiText or ''
                     GUI.EmojiSelector:Destroy()
@@ -2010,10 +2010,10 @@ function UpdateEmojiSelector(emojiText)
                     GUI.chatEdit.edit:SetText(newtext)
                     GUI.chatEdit.edit:SetCaretPosition(CaretPos + string.len(self.emoji) - 1 - string.len(oldtext))
                     GUI.chatEdit.edit:AcquireFocus()
-                    
+
                 elseif event.Type == 'MouseEnter' then
                     for _,line in GUI.EmojiSelector.emojiLines.lines do
-                        line.bg:SetSolidColor('ff000000') 
+                        line.bg:SetSolidColor('ff000000')
                     end
                     self.bg:SetSolidColor('ff202020')
                 elseif event.Type == 'MouseExit' then
@@ -2021,16 +2021,16 @@ function UpdateEmojiSelector(emojiText)
                     GUI.EmojiSelector:Highlight()
                 end
             end
-            
-            LayoutHelpers.DepthOverParent(emojiLine,GUI.EmojiSelector.emojiLines)
-            
 
-           
-            
+            LayoutHelpers.DepthOverParent(emojiLine,GUI.EmojiSelector.emojiLines)
+
+
+
+
             LayoutHelpers.SetDimensions(emojiLine,lineHeight,lineHeight)
-            
-            
-            
+
+
+
             if index == GUI.EmojiSelector.curIndex then
                 LayoutHelpers.AtLeftBottomIn(emojiLine, GUI.EmojiSelector,2,2)
             else
@@ -2042,11 +2042,11 @@ function UpdateEmojiSelector(emojiText)
             emojiLine.bg:DisableHitTest()
             LayoutHelpers.FillParent( emojiLine.bg ,emojiLine)
             emojiLine.bg:SetSolidColor('ff000000')
-          
+
 
             emojiLine.icon = Bitmap(emojiLine,path)
             emojiLine.icon:DisableHitTest()
-           
+
             emojiLine.icon.Height:Set(emojiLine.Height)
             emojiLine.icon.Width:Set(emojiLine.Height)
             LayoutHelpers.AtLeftTopIn(emojiLine.icon, emojiLine)
@@ -2069,7 +2069,7 @@ function UpdateEmojiSelector(emojiText)
                 LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatContainer)
                 GUI.EmojiSelector.MaxSize = index - GUI.EmojiSelector.curIndex
                 if emojiText then GUI.EmojiSelector:Highlight() end
-                
+
                 return
             end
         end
@@ -2079,6 +2079,6 @@ function UpdateEmojiSelector(emojiText)
     else
         GUI.EmojiSelector.Top:Set(GUI.EmojiSelector.Bottom)
     end
-    
+
 end
 

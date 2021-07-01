@@ -119,7 +119,7 @@ ChatArea = Class(Group){
             table.insert(self.ChatHistory, entry)
         end
 
-        
+
 
         if authorName == nil then
             authorName = ''
@@ -139,9 +139,9 @@ ChatArea = Class(Group){
                                             },
                                             self.Width() - self.Style.padding.left - self.Style.padding.right)
         -- If no author provided, we're simply going to skip it. Else we're going to style it
-        
-        
-        
+
+
+
 
         -- group wrapped text in to lines and text fields
         for i = 1, table.getn(contents) do
@@ -150,24 +150,24 @@ ChatArea = Class(Group){
             else
                 self:CreateLine(contents[i],messageStyle)
             end
-        end 
+        end
     end,
 
-    
-    
+
+
     --- create a new line and arranges its layout position based on line's index
     CreateLine = function(self,contents,messageStyle,authorName,authorStyle)
-    
+
         local line = Group(self)
         local lineSpacing = self.Style.lineSpacing/2
         line.Height:Set(messageStyle.fontSize + self.Style.lineSpacing)
         line.Width:Set(self.Width)
         line:DisableHitTest()
         line.index = table.getsize(self.ChatLines) + 1
-        
+
         line.name = UIUtil.CreateText(line, '', messageStyle.fontSize, messageStyle.fontFamily)
         LayoutHelpers.AtLeftTopIn(line.name, line)
-        
+
         line.name:DisableHitTest()
         if authorName then
             line.name:SetText(authorName)
@@ -186,7 +186,7 @@ ChatArea = Class(Group){
                     parent.child:SetColor(messageStyle.fontColor)
                     parent.child:SetClipToWidth()
                     parent = parent.child
-                else    
+                else
                     line.contents = UIUtil.CreateText(line, content.text, messageStyle.fontSize, messageStyle.fontFamily)
                     LayoutHelpers.RightOf(line.contents, line.name)
                     LayoutHelpers.AtVerticalCenterIn(line.contents, line.name,lineSpacing)
@@ -198,14 +198,14 @@ ChatArea = Class(Group){
 
             elseif content.emoji then--EMOJIES
                 if parent then
-                   
+
                     parent.child = Bitmap(parent,UIUtil.UIFile(Emojis.emojis_textures .. content.emoji .. '.dds'))
                     LayoutHelpers.RightOf(parent.child, parent,2)
                     LayoutHelpers.AtVerticalCenterIn(parent.child, parent,lineSpacing)
                     parent.child.Height:Set(line.Height)
                     parent.child.Width:Set(line.Height)
                     parent = parent.child
-                   
+
                 else
                     line.contents = Bitmap(line, UIUtil.UIFile(Emojis.emojis_textures .. content.emoji .. '.dds'))
                     LayoutHelpers.RightOf(line.contents, line.name)
@@ -289,7 +289,7 @@ ChatArea = Class(Group){
         local hasFontSize = type(fontSize) == 'number'
 
         if self.fontSize == fontSize and
-           self.fontFamily == fontFamily then 
+           self.fontFamily == fontFamily then
            return -- skip if the font did not changed
         else
             self.fontSize = fontSize
@@ -338,7 +338,7 @@ ChatArea = Class(Group){
                 else
                     return linewidth - 4
                 end
-            end, 
+            end,
             function(text)
                 return self:AdvanceFunction(text, contents.style)
             end)
