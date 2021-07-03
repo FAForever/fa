@@ -142,7 +142,7 @@ function GetNearestIdleLTMex()
         ConExecute('UI_SelectByCategory +nearest +idle +inview MASSEXTRACTION TECH' .. tech)
         tech = tech + 1
         local tempList = GetSelectedUnits()
-        if tempList ~= nil and table.getn(tempList) > 0 then
+        if tempList ~= nil and not table.empty(tempList) then
             break
         end
     end
@@ -290,7 +290,7 @@ function CycleIdleFactories()
     local i = 3
     while i > 0 do
         for curCat = 1, 3 do
-            if table.getn(sortedFactories[curCat][i]) > 0 then
+            if not table.empty(sortedFactories[curCat][i]) then
                 for _, unit in sortedFactories[curCat][i] do
                     table.insert(factoriesList, unit)
                 end

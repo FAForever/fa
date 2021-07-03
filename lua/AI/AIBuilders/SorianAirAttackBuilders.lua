@@ -1908,7 +1908,7 @@ BuilderGroup {
         #PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
         BuilderConditions = {
-                #{ SBC, 'LessThanGameTime', { 600 } },      
+                #{ SBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
                 #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE GROUNDATTACK' } },
                 { AirAttackCondition, { 'LocationType', 6 } },

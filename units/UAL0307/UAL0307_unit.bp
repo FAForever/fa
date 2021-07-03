@@ -56,6 +56,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDEFENSE',
         'DUMMYGSRWEAPON',
+        'DIESTOOCDEPLETINGSHIELD',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -164,7 +165,7 @@ UnitBlueprint {
         BuildCostEnergy = 1080,
         BuildCostMass = 220,
         BuildTime = 792,
-        MaintenanceConsumptionPerSecondEnergy = 35,
+        MaintenanceConsumptionPerSecondEnergy = 45,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,

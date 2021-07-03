@@ -177,7 +177,7 @@ UnitBlueprint {
             LAYER_Orbit = false,
             LAYER_Seabed = false,
             LAYER_Sub = false,
-            LAYER_Water = true,
+            LAYER_Water = false,
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.3,
@@ -299,6 +299,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'AIR MOBILE HIGHPRIAIR',
+                'AIR MOBILE EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',

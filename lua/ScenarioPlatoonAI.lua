@@ -645,12 +645,12 @@ function EngineersBuildPlatoon(platoon)
     end
 
     -- Have all engineers guard main engineer
-    if table.getn(engTable) > 0 then
+    if not table.empty(engTable) then
         if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
                 if not unit.Dead then
                     eng = table.remove(engTable, num)
-                    if table.getn(engTable) > 0 then
+                    if not table.empty(engTable) then
                         IssueGuard(engTable, eng)
                     end
                     break
@@ -726,7 +726,7 @@ function EngineersBuildPlatoon(platoon)
                 end
             end
             buildingPlatoon = false
-            if table.getn(plat:GetPlatoonUnits()) > 0 then
+            if not table.empty(plat:GetPlatoonUnits()) then
                 if buildingData.PlatoonData then
                     plat.PlatoonData = buildingData.PlatoonData
                 end
@@ -796,7 +796,7 @@ function CategoryHunterPlatoonAI(platoon)
         for i, enemy in enemies do
             for catNum, category in platoon.PlatoonData.CategoryList do
                 local unitList = enemy:GetListOfUnits(category, false, false)
-                if table.getn(unitList) > 0 then
+                if not table.empty(unitList) then
                     local distance = 100000
                     for _, v in unitList do
                         if not v.Dead then
@@ -979,12 +979,12 @@ function StartBaseEngineerThread(platoon)
     end
 
     -- Have all engineers guard main engineer
-    if table.getn(engTable) > 0 then
+    if not table.empty(engTable) then
         if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
                 if not unit.Dead then
                     eng = table.remove(engTable, num)
-                    if table.getn(engTable) > 0 then
+                    if not table.empty(engTable) then
                         IssueGuard(engTable, eng)
                     end
                     break
@@ -1423,11 +1423,11 @@ end
 -- Utility Function
 -- Resets main engineer and engTablef or StartBaseEngineer
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
-    if engTable and table.getn(engTable) > 0 then
+    if engTable and not table.empty(engTable) then
         for num, unit in engTable do
             if not unit.Dead then
                 eng = table.remove(engTable, num)
-                if table.getn(engTable) > 0 then
+                if not table.empty(engTable) then
                     IssueGuard(engTable, eng)
                 end
                 if unitBeingBuilt and not unitBeingBuilt.Dead then
@@ -1646,7 +1646,7 @@ function EngineersAssistFactories(platoon, locationType)
                 ReorganizeEngineers(platoon, engTable)
             end
             -- Any leftovers?
-            if table.getn(reassignEngPool) > 0 then
+            if not table.empty(reassignEngPool) then
                 EngAssist(platoon, reassignEngPool)
             end
 
@@ -1686,9 +1686,9 @@ function ReorganizeEngineers(platoon, engTable)
             end
         end
         -- If difference is greater than 1 across factories: reorganize
-        if (facHighNum - facLowNum) > 1 and facHighData ~= facLowData and table.getn(facHighData.Engineers) > 0 then
+        if (facHighNum - facLowNum) > 1 and facHighData ~= facLowData and not table.empty(facHighData.Engineers) then
             unbalanced = true
-            if table.getn(facHighData.Engineers) > 0 then
+            if not table.empty(facHighData.Engineers) then
                 for engNum, engData in facHighData.Engineers do
                     if not engData.Dead then
                         local moveEng = table.remove(facHighData.Engineers, engNum)
@@ -1866,7 +1866,7 @@ function GetLoadTransports(platoon)
     -- Old load transports
     local monitorUnits = {}
     for num, data in transportTable do
-        if table.getn(data.Units) > 0 then
+        if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
             for _, v in data.Units do table.insert(monitorUnits, v) end
@@ -2199,7 +2199,7 @@ function GetTransportsThread(platoon)
                         table.insert(transports, curr)
                     end
                 end
-                if table.getn(transports) > 0 then
+                if not table.empty(transports) then
                     local sortedList = {}
                     -- Sort distances
                     for k = 1, table.getn(transports) do

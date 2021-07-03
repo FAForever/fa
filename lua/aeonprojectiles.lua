@@ -5,7 +5,7 @@
 --
 --  Summary  : Aeon base projectile definitions
 --
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------
@@ -111,7 +111,7 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { -- T1 bomber
     FxImpactProp = EffectTemplate.ABombHit01,
     FxImpactLand = EffectTemplate.ABombHit01,
     FxImpactUnderWater = {},
-    
+
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
@@ -125,10 +125,10 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { -- T1 bomber
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
-            
+
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius+1, radius+1, 150, 30, army)
         end
-        
+
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

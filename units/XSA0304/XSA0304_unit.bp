@@ -107,6 +107,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
         'STRATEGICBOMBER',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 1.5,
@@ -347,7 +348,7 @@ UnitBlueprint {
         {
             Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

@@ -7898,6 +7898,7 @@ key_desc_0385="建造 T3 陆军工厂"
 key_desc_0386="建造 T3 空军工厂"
 key_desc_0387="建造 T3 海军船坞"
 key_desc_0388="切换通知自定义屏幕"
+key_desc_0405="回船塢加油及修理"
 
 loadingtip_0000="游戏提示"
 loadingtip_0001="发射ACU的超充能需要5000点能量"

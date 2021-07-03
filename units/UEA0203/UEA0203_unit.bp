@@ -113,6 +113,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -265,6 +266,7 @@ UnitBlueprint {
         AirClass = true,
         ClassGenericUpTo = 2,
         TransportClass = 1,
+        Class1Capacity = 1,
     },
     Veteran = {
         Level1 = 6,
@@ -323,6 +325,8 @@ UnitBlueprint {
             RateOfFire = 3,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
+                'ANTIAIR',
+                'GROUNDATTACK',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',

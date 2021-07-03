@@ -18,7 +18,7 @@ end
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
-    if table.getn(NewFactionAiData) < 1 then
+    if table.empty(NewFactionAiData) then
         local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
     end
     if not offset then
@@ -76,7 +76,7 @@ function GetSelectedMods(AllowedMods)
     if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
         -- Detect if we're in the main menu or loading the game
         mods = import('/lua/mods.lua').GetSelectedMods()
-    elseif rawget(_G, '__active_mods') and table.getn(__active_mods) > 0 then
+    elseif rawget(_G, '__active_mods') and not table.empty(__active_mods) then
         for k, mod in __active_mods do
             mods[mod.uid] = true
         end
@@ -179,6 +179,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/ual0105_icon.dds',
             T2 = '/icons/units/ual0208_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/ual0309_icon.dds',
             SCU = '/icons/units/ual0301_icon.dds',
         },
@@ -231,6 +232,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/url0105_icon.dds',
             T2 = '/icons/units/url0208_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/url0309_icon.dds',
             SCU = '/icons/units/url0301_icon.dds',
         },
@@ -283,6 +285,7 @@ function OrgFactions()
         IdleEngTextures = {
             T1 = '/icons/units/xsl0105_icon.dds',
             T2 = '/icons/units/xsl0208_icon.dds',
+            T2F = '/icons/units/xel0209_icon.dds',
             T3 = '/icons/units/xsl0309_icon.dds',
             SCU = '/icons/units/xsl0301_icon.dds',
         },

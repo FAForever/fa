@@ -34,13 +34,13 @@ Tips = {
     "<LOC loadingtip_0032>Use T1 Mobile Artillery to kill T1 Point Defenses",
     "<LOC loadingtip_0033>Power Generators adjacent to Static Artilleries will increase their rate of fire",
     "<LOC loadingtip_0034>Engineers are more efficient for build power than Engineering Stations",
-    "<LOC loadingtip_0035>Overcharge can deal up to 15,000 damage to a unit, requiring around 49k energy capacity",
+    "<LOC loadingtip_0035>Dealing maximum damage with overcharge (15,000), costs 60k energy and requires at least 67k energy in your storage",
     "<LOC loadingtip_0036>The Salem can not shoot backwards",
     "<LOC loadingtip_0037>Toggle the Salem's ability to let it also move on land",
     "<LOC loadingtip_0038>Only build a Salvation after you have built a Paragon",
     "<LOC loadingtip_0039>Your Engineers on Patrol or Attack-Move order will stop reclaiming when your storage is nearly full",
     "<LOC loadingtip_0040>Stealth only hides units from radar, cloak only from vision",
     "<LOC loadingtip_0041>Veterancy is based on the mass value of the killed unit and how much damage a unit dealt to it",
-    "<LOC loadingtip_0042>To kill with a single overcharge, you need 1 energy storage for T1 units, up to 2 for T2, and up to 4 for T3",
-    "<LOC loadingtip_0043>To see stealthed underwater units you need water vision or omni",
+    "<LOC loadingtip_0042>To kill with a single overcharge, you need 1 energy storage for T1 units, up to 2 for T2, and up to 6 for T3",
+    "<LOC loadingtip_0043>To see stealthed underwater units you need water vision or omni"
 }

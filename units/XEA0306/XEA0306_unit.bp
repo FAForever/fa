@@ -131,6 +131,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'CANNOTUSEAIRSTAGING',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -317,6 +318,7 @@ UnitBlueprint {
         Class2AttachSize = 2,
         Class3AttachSize = 4,
         TransportClass = 10,
+        Class1Capacity = 28,
     },
     UseOOBTestZoom = 200,
     Veteran = {
@@ -877,9 +879,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 3,
+            DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

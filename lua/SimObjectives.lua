@@ -1704,7 +1704,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
     if Target.Category then
         local bps = EntityCategoryGetUnitList(Target.Category)
-        if table.getn(bps) > 0 then
+        if not table.empty(bps) then
             table.insert(userTargets, {Type = 'Blueprint', BlueprintId = bps[1]})
         end
     end

@@ -548,7 +548,7 @@ BuilderGroup {
             }
         }
     },
-    Builder {    
+    Builder {
         BuilderName = 'CDR T1 Power',
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 875,

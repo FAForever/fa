@@ -121,12 +121,11 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 --------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom  ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        -- Different effect if we have building cube
+        if unitBeingBuilt.BuildingCube then
+            EffectUtil.CreateUEFBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         else
-            CreateUEFBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -304,15 +303,7 @@ TShieldLandUnit = Class(ShieldLandUnit) {}
 --------------------------------------------------------------
 --  SHIELD STRUCTURES
 --------------------------------------------------------------
-TShieldStructureUnit = Class(ShieldStructureUnit) {
-    StartBeingBuiltEffects = function(self,builder,layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if builder and EntityCategoryContains(categories.MOBILE, builder) then
-            self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
-        end
-    end,
-}
+TShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 --------------------------------------------------------------
 --  STRUCTURES

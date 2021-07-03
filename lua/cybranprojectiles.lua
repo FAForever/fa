@@ -308,7 +308,7 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
             DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', FriendlyFire )
             self.DamageData.DamageAmount = self.DamageData.DamageAmount - 1
         end
-        
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
@@ -649,7 +649,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.CCorsairMissileHit01,
     FxImpactLand = EffectTemplate.CCorsairMissileLandHit01,
     FxImpactUnderWater = {},
-    
+
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
@@ -666,7 +666,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
             
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 150, 50, army)
         end
-        
+
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

@@ -812,7 +812,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
-                { MIBC, 'LessThanGameTime', { 600 } },      
+                { MIBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -841,7 +841,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
-                { MIBC, 'GreaterThanGameTime', { 600 } },      
+                { MIBC, 'GreaterThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -918,7 +918,7 @@ BuilderGroup {
         Priority =  0, #DUNCAN - was 1000
         BuilderConditions = {
                 #{ UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 350, -1000, 0, 2, 'StructuresNotMex' } },
-                { MIBC, 'GreaterThanGameTime', { 720 } },  
+                { MIBC, 'GreaterThanGameTime', { 720 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {

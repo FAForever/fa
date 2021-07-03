@@ -108,7 +108,7 @@ function createEnhancementOverlay(args)
     overlay.pos = args.pos
     overlay.eta = args.eta
     overlay.lastUpdate = GetGameTimeSeconds()
-    
+
     if customMessagesDisabled then
         overlay.name = defaultMessages[overlay.category][overlay.source]
     else

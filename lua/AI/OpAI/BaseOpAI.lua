@@ -57,7 +57,7 @@ OpAI = Class {
         end,
 
         FindChildren = function(self, force)
-            if self.ChildrenHandles and table.getn(self.ChildrenHandles) > 0 and not force then
+            if self.ChildrenHandles and not table.empty(self.ChildrenHandles) and not force then
                 return true
             end
             self.ChildrenHandles = {}

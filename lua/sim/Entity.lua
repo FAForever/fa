@@ -20,8 +20,8 @@ Entity = Class(moho.entity_methods) {
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
     end,
-    
+
     OnDestroy = function(self)
-        
+
     end,
 }

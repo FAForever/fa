@@ -32,7 +32,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     end
 
     local mydata = bomb_data[id]
-    
+
     if not target.pos or mydata.usestore then
         if mydata then
             -- use same acceleration as last bomb
@@ -44,7 +44,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
                 bomb_data[id] = nil
             end
         end
-        
+
         return acc
     end
 

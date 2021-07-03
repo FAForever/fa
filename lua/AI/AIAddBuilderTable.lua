@@ -11,7 +11,7 @@ function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
     end
-    
+
     --SPEW('*AI DEBUG: AddGlobalBaseTemplate(): Loading Base Template '..repr(baseBuilderName))
     for k,v in BaseBuilderTemplates[baseBuilderName].Builders do
         AddGlobalBuilderGroup(aiBrain, locationType, v)

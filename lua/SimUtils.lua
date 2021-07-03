@@ -46,7 +46,7 @@ end
 import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 function KillSharedUnits(owner)
-    if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
+    if sharedUnits[owner] and not table.empty(sharedUnits[owner]) then
         for index,unit in sharedUnits[owner] do
             if not unit.Dead and unit.oldowner == owner then
                 unit:Kill()
@@ -58,23 +58,23 @@ end
 
 function TransferUnitsOwnership(units, ToArmyIndex, captured)
     local toBrain = GetArmyBrain(ToArmyIndex)
-    if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
+    if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
         return
     end
     local fromBrain = GetArmyBrain(units[1].Army)
     local shareUpgrades
-    
-    if ScenarioInfo.Options.Share == 'FullShare' then 
+
+    if ScenarioInfo.Options.Share == 'FullShare' then
         shareUpgrades = true
     end
-    
+
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
-    
+
     local newUnits = {}
     local upUnits = {}
     local pauseKennels = {}
     local upgradeKennels = {}
-    
+
     for k,v in units do
         local owner = v.Army
         -- Only allow units not attached to be given. This is because units will give all of it's children over
@@ -125,21 +125,21 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
                 end
             end
         end
-        
+
         if bp.CategoriesHash.ENGINEERSTATION and bp.CategoriesHash.UEF then
             --We have to kill drones which are idling inside Kennel at the moment of transfer
             --otherwise additional dummy drone will appear after transfer
             for _,drone in unit:GetCargo() do
                 drone:Destroy()
-            end    
+            end
         end
-        
+
         if unit.TransferUpgradeProgress and shareUpgrades then
             local progress = unit:GetWorkProgress()
             local upgradeBuildTime = unit.UpgradeBuildTime
-            
+
             defaultBuildRate = unit:GetBuildRate()
-                
+
             if progress > 0.05 then --5%. EcoManager & auto-paused mexes etc.
                 --What build rate do we need to reach required % in 1 tick?
                 upgradeBuildRate = upgradeBuildTime * progress * 10
@@ -173,7 +173,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         if massKilled and massKilled > 0 then
             unit:CalculateVeterancyLevelAfterTransfer(massKilled, massKilledTrue)
         end
-        if enh and table.getn(enh) > 0 then
+        if enh and not table.empty(enh) then
             for k, v in enh do
                 unit:CreateEnhancement(v)
             end
@@ -201,10 +201,10 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         end
         if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
             if not upgradeBuildRate or not shareUpgrades then
-                if bp.CategoriesHash.UEF then 
+                if bp.CategoriesHash.UEF then
                     --use special thread for UEF Kennels.
                     --Give them 1 tick to spawn their drones and then pause both station and drone.
-                    table.insert(pauseKennels, unit)   
+                    table.insert(pauseKennels, unit)
                 else --pause cybran hives immediately
                     unit:SetPaused(true)
                 end
@@ -212,18 +212,18 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
                 unit.UpgradesTo = upgradesTo
                 unit.DefaultBuildRate = defaultBuildRate
                 unit.UpgradeBuildRate = upgradeBuildRate
-                
+
                 table.insert(upgradeKennels, unit)
-                
+
                 exclude = true
             end
         end
-        
+
         if upgradeBuildRate and not exclude then
             unit.UpgradesTo = upgradesTo
             unit.DefaultBuildRate = defaultBuildRate
             unit.UpgradeBuildRate = upgradeBuildRate
-            
+
             table.insert(upUnits, unit)
         end
 
@@ -232,7 +232,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         v:OnGiven(unit)
     end
 
-    if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
+    if not table.empty(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) then
         for _,aiBrain in {fromBrain, toBrain} do
             local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
             for _, victim in buildRestrictionVictims do
@@ -240,34 +240,34 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
             end
         end
     end
-    
+
     if not captured then
         if upUnits[1] then
             ForkThread(UpgradeTransferredUnits, upUnits)
         end
-        
+
         if pauseKennels[1] then
             ForkThread(PauseTransferredKennels, pauseKennels)
         end
-        
+
         if upgradeKennels[1] then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
         end
     end
-    
+
     return newUnits
 end
 
 function PauseTransferredKennels(pauseKennels)
     WaitTicks(1) -- spawn drones
-    
+
     for _, unit in pauseKennels do
         unit:SetPaused(true)
-        
+
         for _, pod in unit.PodData or {} do --pause drones
             if pod.PodHandle then
                 pod.PodHandle:SetPaused(true)
-            end    
+            end
         end
     end
 end
@@ -276,59 +276,59 @@ function UpgradeTransferredUnits(units)
     for _, unit in units do
         IssueUpgrade({unit}, unit.UpgradesTo)
     end
-    
+
     WaitTicks(3) --mex needs at least 3 ticks after IssueUpgrade()
-    
+
     for _, unit in units do
         if not unit:BeenDestroyed() then
             unit:SetBuildRate(unit.UpgradeBuildRate)
             unit:SetConsumptionPerSecondMass(0)
             unit:SetConsumptionPerSecondEnergy(0)
-        end    
+        end
     end
 
     WaitTicks(1)
-    
+
     for _, unit in units do
         if not unit:BeenDestroyed() then
             unit:SetBuildRate(unit.DefaultBuildRate)
             unit:SetPaused(true) --SetPaused() updates ConsumptionPerSecond values
-        end    
+        end
     end
 end
 
 function UpgradeTransferredKennels(upgradeKennels)
     WaitTicks(1) --spawn drones
 
-    for _, unit in upgradeKennels do  
+    for _, unit in upgradeKennels do
         if not unit:BeenDestroyed() then
             for _, pod in unit.PodData or {} do --pause Kennels drones
                 if pod.PodHandle then
                     pod.PodHandle:SetPaused(true)
-                end    
+                end
             end
-            
+
             IssueUpgrade({unit}, unit.UpgradesTo)
         end
     end
-    
+
     WaitTicks(3)
-    
+
     for _, unit in upgradeKennels do
         if not unit:BeenDestroyed() then
             unit:SetBuildRate(unit.UpgradeBuildRate)
             unit:SetConsumptionPerSecondMass(0)
             unit:SetConsumptionPerSecondEnergy(0)
-        end    
+        end
     end
 
     WaitTicks(1)
-    
+
     for _, unit in upgradeKennels do
         if not unit:BeenDestroyed() then
             unit:SetBuildRate(unit.DefaultBuildRate)
             unit:SetPaused(true) --SetPaused() updates ConsumptionPerSecond values
-        end    
+        end
     end
 end
 
@@ -340,42 +340,42 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     local modifiedWrecks = {}
     local modifiedUnits = {}
     local createWreckIfTransferFailed = {}
-    
+
     for _, unit in EntityCategoryFilterDown(categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, units) do
-        --This transfer is pretty complex, so we do it only for really important units (EXPs and t3 arty). 
+        --This transfer is pretty complex, so we do it only for really important units (EXPs and t3 arty).
         if unit:IsBeingBuilt() then
             unfinishedUnits[unit.EntityId] = unit
             noUnits = nil --have to store units using entityID and not table.insert
         end
     end
-    
+
     if noUnits or not armies[1] then
         return
     end
-     
+
     for key, army in armies do
         if key == 1 then --this is our first try and first army
             local builders = {}
-            
+
             for ID, unit in unfinishedUnits do
                 local bp = unit:GetBlueprint()
                 local bplueprintID = bp.BlueprintId
                 local buildTime = bp.Economy.BuildTime
                 local health = unit:GetHealth()
                 local pos = unit:GetPosition()
-                local progress = unit:GetFractionComplete()     
-                
+                local progress = unit:GetFractionComplete()
+
                 --create invisible drone which belongs to allied army. BuildRange = 10000
                 local builder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0)
                 table.insert(builders, builder)
-                
+
                 builder.UnitHealth = health
                 builder.UnitPos = pos
                 builder.UnitID = ID
                 builder.UnitBplueprintID = bplueprintID
                 builder.BuildRate = progress * buildTime * 10 --buildRate to reach required progress in 1 tick
                 builder.DefaultProgress = math.floor(progress * 1000) --save current progress for some later checks
-                
+
                 --Save all important data because default unit will be destroyed during our first try
                 failedToTransfer[ID] = {}
                 failedToTransferCounter = failedToTransferCounter + 1
@@ -386,39 +386,39 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                 failedToTransfer[ID].BuildRate = progress * buildTime * 10
                 failedToTransfer[ID].DefaultProgress = math.floor(progress * 1000)
                 failedToTransfer[ID].Orientation = unit:GetOrientation()
-                
-                
+
+
                 for _, reclaim in GetReclaimablesInRect(unit:GetSkirtRect()) do --wrecks can prevent drone from starting construction
-                    if reclaim.IsWreckage then 
+                    if reclaim.IsWreckage then
                         reclaim:SetCollisionShape('None') --so we set collision shape 'None'
                         table.insert(modifiedWrecks, reclaim) --and save wrecks to revert our changes later
                     end
-                end       
-               
+                end
+
                 for _,u in GetUnitsInRect(unit:GetSkirtRect()) do --same as for wrecks
                     u:SetCollisionShape('None')
                     table.insert(modifiedUnits, u)
-                end 
-                
-                if progress > 0.5 then --if transfer failed, we have to create wreck manually. progress should be more than 50%
-                    createWreckIfTransferFailed[ID] = true    
                 end
-                
+
+                if progress > 0.5 then --if transfer failed, we have to create wreck manually. progress should be more than 50%
+                    createWreckIfTransferFailed[ID] = true
+                end
+
                 unit:Destroy() --destroy unfinished unit
-                
-                IssueBuildMobile({builder}, pos, bplueprintID, {}) --Give command to our drone 
+
+                IssueBuildMobile({builder}, pos, bplueprintID, {}) --Give command to our drone
             end
 
             WaitTicks(3) --Wait some ticks (3 is minimum), IssueBuildMobile() is not instant
-            
+
             for _, builder in builders do
                 builder:SetBuildRate(builder.BuildRate) --Set crazy build rate and consumption = 0
                 builder:SetConsumptionPerSecondMass(0)
                 builder:SetConsumptionPerSecondEnergy(0)
             end
-            
+
             WaitTicks(1)
-            
+
             for _, builder in builders do
                 local newUnit = builder:GetFocusUnit()
                 local builderProgress = math.floor(builder:GetWorkProgress() * 1000)
@@ -426,29 +426,29 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                     --That's for cases when unit was damaged while being built
                     --For example: default unit had 100/10000 hp but 90% progress.
                     newUnit:SetHealth(newUnit, builder.UnitHealth)
-                    
+
                     failedToTransfer[builder.UnitID] = nil
                     createWreckIfTransferFailed[builder.UnitID] = nil
                     failedToTransferCounter = failedToTransferCounter - 1
-                end    
+                end
                 builder:Destroy()
             end
-            
+
         elseif failedToTransferCounter > 0 then --failed to transfer some units to first army, let's try others.
             --This is just slightly modified version of our first try, no comments here
             local builders = {}
-            
+
             for ID, data in failedToTransfer do
                 local bp = data.Bp
                 local bplueprintID = data.BplueprintID
                 local buildRate = data.BuildRate
                 local health = data.UnitHealth
                 local pos = data.UnitPos
-                local progress = data.DefaultProgress    
-                
-                local builder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0) 
+                local progress = data.DefaultProgress
+
+                local builder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0)
                 table.insert(builders, builder)
-                
+
                 builder.UnitHealth = health
                 builder.UnitPos = pos
                 builder.UnitID = ID
@@ -460,32 +460,32 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
             end
 
             WaitTicks(3)
-            
+
             for _, builder in builders do
                 builder:SetBuildRate(builder.BuildRate)
                 builder:SetConsumptionPerSecondMass(0)
                 builder:SetConsumptionPerSecondEnergy(0)
             end
-            
+
             WaitTicks(1)
-            
+
             for _, builder in builders do
                 local newUnit = builder:GetFocusUnit()
                 local builderProgress = math.floor(builder:GetWorkProgress() * 1000)
                 if newUnit and builderProgress == builder.DefaultProgress then
                     newUnit:SetHealth(newUnit, builder.UnitHealth)
-                    
+
                     failedToTransfer[builder.UnitID] = nil
                     createWreckIfTransferFailed[builder.UnitID] = nil
                     failedToTransferCounter = failedToTransferCounter - 1
-                end    
+                end
                 builder:Destroy()
             end
-        end   
+        end
     end
-    
+
     local createWreckage = import('/lua/wreckage.lua').CreateWreckage
-    
+
     for ID,_ in createWreckIfTransferFailed do --create 50% wreck. Copied from Unit:CreateWreckageProp()
         local data = failedToTransfer[ID]
         local bp = data.Bp
@@ -494,10 +494,10 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
         local mass = bp.Economy.BuildCostMass * 0.57 --0.57 to compensate some multipliers in CreateWreckage()
         local energy = 0
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
-        
-        local wreck = createWreckage(bp, pos, orientation, mass, energy, time)    
+
+        local wreck = createWreckage(bp, pos, orientation, mass, energy, time)
     end
-    
+
     for key, wreck in modifiedWrecks do --revert wrecks collision shape. Copied from Prop.lua SetPropCollision()
         local radius = wreck.CollisionRadius
         local sizex = wreck.CollisionSizeX
@@ -514,12 +514,12 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
             wreck:SetCollisionShape(shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end
-    
+
     for _, u in modifiedUnits do
         if not u:BeenDestroyed() then
             u:RevertCollisionShape()
-        end   
-    end    
+        end
+    end
 end
 
 function GiveUnitsToPlayer(data, units)
@@ -602,8 +602,8 @@ end
 
 function GiveResourcesToPlayer(data)
     SendChatToReplay(data)
-    -- Ignore observers and players trying to send resources to themselves
-    if data.From ~= -1 and data.From ~= data.To then
+    -- Ignore observers and players trying to send resources to themselves or to enemies
+    if data.From ~= -1 and data.From ~= data.To and IsAlly(data.From, data.To) then
         if not OkayToMessWithArmy(data.From) then
             return
         end

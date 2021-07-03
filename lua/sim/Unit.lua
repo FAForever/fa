@@ -238,7 +238,7 @@ Unit = Class(moho.unit_methods) {
         self:SetCanBeKilled(true)
 
         local bpDeathAnim = bp.Display.AnimationDeath
-        if bpDeathAnim and table.getn(bpDeathAnim) > 0 then
+        if bpDeathAnim and not table.empty(bpDeathAnim) then
             self.PlayDeathAnimation = true
         end
 
@@ -681,7 +681,7 @@ Unit = Class(moho.unit_methods) {
         if not self.CaptureThread then
             self.CaptureThread = self:ForkThread(function()
                 local captors = self.Captors or {}
-                while table.getsize(captors) > 0 do
+                while not table.empty(captors) do
                     for _, c in captors do
                         self:CheckCaptor(c)
                     end
@@ -705,7 +705,7 @@ Unit = Class(moho.unit_methods) {
     RemoveCaptor = function(self, captor)
         self.Captors[captor.EntityId] = nil
 
-        if table.getsize(self.Captors) == 0 then
+        if table.empty(self.Captors) then
             self:ResetCaptors()
         end
     end,
@@ -1115,7 +1115,7 @@ Unit = Class(moho.unit_methods) {
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-                
+
                 if not EntityCategoryContains(categories.VOLATILE, self) then
                     self:SetReclaimable(false)
                 end
@@ -1271,19 +1271,19 @@ Unit = Class(moho.unit_methods) {
         if suicide then
             mass = mass * (1 - self:GetHealth() / self:GetMaxHealth())
         end
-        
+
         massTrue = mass
-        
+
         for _, data in self.Instigators do
             local unit = data.unit
             -- Make sure the unit is something which can vet, and is not maxed
             if unit and not unit.Dead and unit.gainsVeterancy then
                 local proportion = data.damage / self.totalDamageTaken
-                
+
                 -- True value for "Mass killed"
                 local massKilledTrue = math.floor(massTrue * proportion)
                 unit.Sync.totalMassKilledTrue = math.floor(unit.Sync.totalMassKilledTrue + massKilledTrue)
-                
+
                 if unit.Sync.VeteranLevel < 5 then
                     -- Find the proportion of yourself that each instigator killed
                     local massKilled = math.floor(mass * proportion)
@@ -1335,11 +1335,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
-        
+
         -- Calculate veterancy level. By default killing your own mass value (Build cost mass * 2 by default) grants a level
         if self.Sync.myValue then
             local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
-            
+
             -- Bail if our veterancy hasn't increased
             if newVetLevel == self.Sync.VeteranLevel then return end
 
@@ -1351,15 +1351,15 @@ Unit = Class(moho.unit_methods) {
             else
                 return
             end
-        end    
+        end
 
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
-    
+
     CalculateVeterancyLevelAfterTransfer = function(self, massKilled, massKilledTrue)
         self.Sync.totalMassKilled = math.floor(massKilled)
         self.Sync.totalMassKilledTrue = math.floor(massKilledTrue)
-        
+
         if self.Sync.myValue then
             local newVetLevel = math.min(math.floor(self.Sync.totalMassKilled / self.Sync.myValue), 5)
 
@@ -1381,7 +1381,7 @@ Unit = Class(moho.unit_methods) {
                 self.Sync.VeteranLevel = 5
             end
         end
-        
+
         self:SetVeteranLevel(self.Sync.VeteranLevel)
     end,
 
@@ -1389,12 +1389,12 @@ Unit = Class(moho.unit_methods) {
     SetVeterancy = function(self, veteranLevel)
         if veteranLevel <= 0 or veteranLevel > 5 then return end
         if not self.gainsVeterancy then return end
-        
+
         if self.Sync.myValue then
             self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
         else
             self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel])
-        end    
+        end
     end,
 
     -- Set the veteran level to the level specified
@@ -1435,14 +1435,14 @@ Unit = Class(moho.unit_methods) {
                 SUBCOMMANDER = 4,
                 EXPERIMENTAL = 5,
             }
-            
+
             local techLevel = techLevels[self.techCategory] or 1
-            
+
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
                 techLevel = techLevel + 1
             end
-            
+
             -- Regen values by tech level and veterancy level
             local regenBuffs = {
                 {1,  2,  3,  4,  5}, -- T1
@@ -1451,7 +1451,7 @@ Unit = Class(moho.unit_methods) {
                 {9,  18, 27, 36, 45}, -- SACU
                 {25, 50, 75, 100,125}, -- Experimental
             }
-        
+
             BuffBlueprint {
                 Name = regenBuffName,
                 DisplayName = regenBuffName,
@@ -1465,7 +1465,7 @@ Unit = Class(moho.unit_methods) {
                 },
             }
         end
-        
+
         return {regenBuffName, healthBuffName}
     end,
 
@@ -1597,7 +1597,7 @@ Unit = Class(moho.unit_methods) {
             local animBlock = self:ChooseAnimBlock(bp)
 
             -- for determining wreckage offset after dying with an animation
-            if anim == 'AnimationDeath' then 
+            if anim == 'AnimationDeath' then
                 self.DeathHitBox = animBlock.HitBox
             end
 
@@ -2001,7 +2001,7 @@ Unit = Class(moho.unit_methods) {
             self:DestroyAllBuildEffects()
             self:DestroyAllTrashBags()
         end
-        
+
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
         end
@@ -2146,7 +2146,7 @@ Unit = Class(moho.unit_methods) {
         self:StartBeingBuiltEffects(builder, layer)
 
         local aiBrain = self:GetAIBrain()
-        if table.getn(aiBrain.UnitBuiltTriggerList) > 0 then
+        if not table.empty(aiBrain.UnitBuiltTriggerList) then
             for _, v in aiBrain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
                     self:ForkThread(self.UnitBuiltPercentageCallbackThread, v.Percent, v.Callback)
@@ -2191,7 +2191,7 @@ Unit = Class(moho.unit_methods) {
             self.Sync.totalMassKilled = 0
             self.Sync.totalMassKilledTrue = 0
             self.Sync.VeteranLevel = 0
-            
+
             -- Values can be setting up manually via bp.
             if bp.VeteranMass then
                 self.Sync.manualVeterancy = {
@@ -2213,7 +2213,7 @@ Unit = Class(moho.unit_methods) {
                     COMMAND = 2,
                 }
                 local defaultMult = techMultipliers[self.techCategory] or 2
-                
+
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
         end
@@ -2252,7 +2252,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit
-        if table.getn(self.IdleEffectsBag) == 0 then
+        if table.empty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
         end
 
@@ -2500,9 +2500,13 @@ Unit = Class(moho.unit_methods) {
             for _, p in props do
                 local pos = p.CachePosition
                 if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
-                    local progress = p:GetFractionComplete() * 0.5
-                    -- Set health according to how much is left of the wreck
-                    unit:SetHealth(self, unit:GetMaxHealth() * progress)
+                    local bp = unit:GetBlueprint()
+                    local UnitMaxMassReclaim = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
+                    if UnitMaxMassReclaim and UnitMaxMassReclaim > 0 then
+                        local progress = (p.ReclaimLeft * p.MaxMassReclaim) / UnitMaxMassReclaim * 0.5
+                        -- Set health according to how much is left of the wreck
+                        unit:SetHealth(self, unit:GetMaxHealth() * progress)
+                    end
 
                     -- Clear up wreck after rebuild bonus applied if engine won't
                     if not unit.EngineIsDeletingWreck then
@@ -2600,7 +2604,7 @@ Unit = Class(moho.unit_methods) {
 
         if order == 'Repair' then
             self:OnStartRepair(built)
-        elseif self:GetHealth() < self:GetMaxHealth() and table.getsize(self:GetGuards()) > 0 then
+        elseif self:GetHealth() < self:GetMaxHealth() and not table.empty(self:GetGuards()) then
             -- Unit building something is damaged and has assisters, check their focus
             self:CheckAssistersFocus()
         end
@@ -2615,13 +2619,13 @@ Unit = Class(moho.unit_methods) {
 
         self:DoOnStartBuildCallbacks(built)
 
-        
+
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
             built.IsUpgrade = true
-            
+
             --Transfer flag
             self.TransferUpgradeProgress = true
             self.UpgradeBuildTime = bp.Economy.BuildTime
@@ -3430,7 +3434,7 @@ Unit = Class(moho.unit_methods) {
                 effects = self.GetTerrainTypeEffects(FxBlockType, FxBlockKey, pos, vTypeGroup.Type, TypeSuffix)
             end
 
-            if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
+            if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.empty(vTypeGroup.Bones))) then
                 WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
@@ -3470,7 +3474,7 @@ Unit = Class(moho.unit_methods) {
                 self:RemoveScroller()
             end
 
-            if not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0)) then
+            if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
                 if not self.Footfalls and bpTable.Footfall then
                     WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
                 end
@@ -3549,7 +3553,7 @@ Unit = Class(moho.unit_methods) {
             if self.BeamExhaustCruise  then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustIdle and table.getn(self.BeamExhaustEffectsBag) == 0 and bpTable.Idle ~= false then
+            if self.BeamExhaustIdle and table.empty(self.BeamExhaustEffectsBag) and bpTable.Idle ~= false then
                 self:CreateBeamExhaust(bpTable, self.BeamExhaustIdle)
             end
         elseif motionState == 'Cruise' then
@@ -3568,7 +3572,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
-        if not effectBones or (effectBones and table.getn(effectBones) == 0) then
+        if not effectBones or (effectBones and table.empty(effectBones)) then
             WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
@@ -3583,7 +3587,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
-        if not effectBones or (effectBones and table.getn(effectBones) == 0) then
+        if not effectBones or (effectBones and table.empty(effectBones)) then
             WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
@@ -3642,7 +3646,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateFootFallManipulators = function(self, footfall)
-        if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
+        if not footfall.Bones or (footfall.Bones and (table.empty(footfall.Bones))) then
             WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end

@@ -37,7 +37,6 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
-        AMiasmaProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
 }

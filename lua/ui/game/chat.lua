@@ -679,7 +679,7 @@ function CreateChatEdit()
             ChatPageUp(mod)
             return true
         elseif charcode == UIUtil.VK_UP then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.max(self.recallEntry-1, 1)
                 else
@@ -688,7 +688,7 @@ function CreateChatEdit()
                 RecallCommand(self.recallEntry)
             end
         elseif charcode == UIUtil.VK_DOWN then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.min(self.recallEntry+1, table.getsize(commandHistory))
                     RecallCommand(self.recallEntry)
@@ -825,7 +825,7 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
-    
+
     if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
         return
     end
@@ -865,7 +865,7 @@ function ReceiveChatFromSim(sender, msg)
     end
     local tempText = WrapText({text = msg.text, name = name})
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    if table.getn(tempText) == 0 then
+    if table.empty(tempText) then
         tempText = {""}
     end
     local entry = {

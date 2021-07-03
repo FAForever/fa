@@ -33,7 +33,7 @@ end
 
 function InsertChar(str, chr, pos)
     -- if we insert char to start or end of text just glue chr and str
-    if pos == 0 then return chr .. str end 
+    if pos == 0 then return chr .. str end
     local strLen = STR_Utf8Len(str)
     if pos == strLen then return str .. chr end
     -- otherwise insert
@@ -44,7 +44,7 @@ end
 function AddUnicodeCharToEditText(edit, unicode)
     if unicode <= 0x7F then return false end
     local unicodeChar = UTF(unicode)
-    if unicodeChar ~= "" then 
+    if unicodeChar ~= "" then
         local text = edit:GetText()
         local charLim = edit:GetMaxChars()
         if STR_Utf8Len(text) >= charLim then

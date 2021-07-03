@@ -321,7 +321,7 @@ IsAbilityExist = {
         return bp.Intel.SonarStealthFieldRadius > 0
     end,
     ability_customizable = function(bp)
-        return table.getsize(bp.Enhancements) > 0
+        return not table.empty(bp.Enhancements)
     end,
     ability_notcap = function(bp)
         return bp.CategoriesHash.COMMAND or bp.CategoriesHash.SUBCOMMANDER or bp.BlueprintId == 'uaa0310'
@@ -366,15 +366,11 @@ GetAbilityDesc = {
     end,]]
     ability_transport = function(bp)
         local text = LOC('<LOC uvd_Capacity>')
-        if bp.CategoriesHash.TECH1 then
-            return text..'≈6'
-        end
-        if bp.CategoriesHash.TECH2 then
-            return text..'≈12'
-        end
-        if bp.CategoriesHash.TECH3 then
-            return text..'≈28'
-        end
+        return bp.Transport and bp.Transport.Class1Capacity and text..bp.Transport.Class1Capacity
+            or bp.CategoriesHash.TECH1 and text..'≈6'
+            or bp.CategoriesHash.TECH2 and text..'≈12'
+            or bp.CategoriesHash.TECH3 and text..'≈28'
+            or ''
     end,
     ability_airstaging = function(bp)
         return LOCF('<LOC uvd_RepairRate>', bp.Transport.RepairRate)..', '
@@ -459,7 +455,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 table.insert(lines, ability)
             end
         end
-        if table.getsize(lines) > 0 then
+        if not table.empty(lines) then
             table.insert(lines, '')
         end
         table.insert(blocks, {color = 'FF7FCFCF', lines = lines})
@@ -527,7 +523,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 table.insert(blocks, {color = 'FF7FCFCF', lines = lines})
             end
             --Weapons
-            if table.getsize(bp.Weapon) > 0 then
+            if not table.empty(bp.Weapon) then
                 local weapons = {upgrades = {normal = {}, death = {}},
                                     basic = {normal = {}, death = {}}}
                 for _, weapon in bp.Weapon do
@@ -548,7 +544,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     end
                 end
                 for k, v in weapons do
-                    if table.getsize(v.normal) > 0 or table.getsize(v.death) > 0 then
+                    if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
                     for name, weapon in v.normal do
@@ -626,7 +622,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
                         table.insert(lines, weaponDetails)
                     end
-                    if table.getsize(v.normal) > 0 or table.getsize(v.death) > 0 then
+                    if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(lines, '')
                     end
                     table.insert(blocks, {color = 'FFFF0000', lines = lines})

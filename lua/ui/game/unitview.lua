@@ -221,7 +221,7 @@ local statFuncs = {
             else
                 return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
             end
-        elseif info.userUnit and table.getn(GetAttachedUnitsList({info.userUnit})) > 0 then
+        elseif info.userUnit and not table.empty(GetAttachedUnitsList({info.userUnit})) then
             return string.format('%d', table.getn(GetAttachedUnitsList({info.userUnit}))), 'attached'
         else
             return false
@@ -534,7 +534,7 @@ function UpdateWindow(info)
                 end
             end
         end
-        if lines and (table.getn(lines) > 0) then
+        if lines and (not table.empty(lines)) then
             local i = 1
             local maxWidth = 0
             local index = table.getn(lines)

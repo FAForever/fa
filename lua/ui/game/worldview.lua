@@ -102,10 +102,10 @@ local function CreatePositionMarker(army, worldView)
             end
         end
     end
- 
+
 end
 
-function MarkStartPositions(startPositions) 
+function MarkStartPositions(startPositions)
     if not startPositions then return end
 
     local armyInfo = GetArmiesTable()
@@ -130,10 +130,10 @@ function MarkStartPositions(startPositions)
     end
 end
 
-function CreateMainWorldView(parent, mapGroup, mapGroupRight)    
-    if viewLeft then    
+function CreateMainWorldView(parent, mapGroup, mapGroupRight)
+    if viewLeft then
         viewLeft:Destroy()
-        viewLeft = false  
+        viewLeft = false
     end
     if viewRight then
         viewRight:Destroy()
@@ -151,12 +151,12 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
         viewLeft:GetsGlobalCameraCommands(true)
-        
+
         viewRight = import('/lua/ui/controls/worldview.lua').WorldView(mapGroupRight, 'WorldCamera2', 1, false) -- depth value should be below minimap
         viewRight:Register('WorldCamera2', nil, '<LOC map_view_0005>Split View Right', 2)
         viewRight:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewRight, mapGroupRight)
-        
+
         view = Group(viewLeft)
         view.Left:Set(viewLeft.Left)
         view.Top:Set(viewLeft.Top)
@@ -170,7 +170,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
         viewLeft:GetsGlobalCameraCommands(true)
-        
+
         view = Group(viewLeft)
         view:DisableHitTest()
         LayoutHelpers.FillParent(view, viewLeft)
@@ -194,14 +194,14 @@ function Expand()
         origRight = viewLeft.Right.compute
         origTop = viewLeft.Top.compute
         origBottom = viewLeft.Bottom.compute
-        
+
         local gameViewTemp = GetFrame(parentForFrame:GetRootFrame():GetTargetHead())
-        
+
         viewLeft.Top:Set(gameViewTemp.Top)
         viewLeft.Left:Set(gameViewTemp.Left)
         viewLeft.Right:Set(function() return (gameViewTemp.Left() - 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
         viewLeft.Bottom:Set(gameViewTemp.Bottom)
-        
+
         viewRight.Top:Set(gameViewTemp.Top)
         viewRight.Left:Set(function() return (gameViewTemp.Left() + 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
         viewRight.Right:Set(gameViewTemp.Right)
@@ -216,13 +216,13 @@ function Expand()
 end
 
 function Contract()
-    if viewRight then        
+    if viewRight then
         viewRight.Left:Set(origRightLeft)
         viewRight.Right:Set(origRightRight)
         viewRight.Top:Set(origRightTop)
         viewRight.Bottom:Set(origRightBottom)
     end
-    
+
     viewLeft.Left:Set(origLeft)
     viewLeft.Right:Set(origRight)
     viewLeft.Top:Set(origTop)
@@ -248,11 +248,11 @@ function LockInput()
         LayoutHelpers.FillParent(worldBlock, GetFrame(0))
         UIUtil.MakeInputModal(worldBlock)
     end
-    
+
     if viewLeft then
         viewLeft:LockInput()
     end
-    
+
     if viewRight then
         viewRight:LockInput()
     end
@@ -265,11 +265,11 @@ function UnlockInput()
     if viewLeft then
         viewLeft:UnlockInput()
     end
-    
+
     if viewRight then
         viewRight:UnlockInput()
     end
-    
+
     if not IsInputLocked() then
         if worldBlock then
             worldBlock:Destroy()
@@ -303,7 +303,7 @@ end
 function ToggleMainCartographicView()
     if viewLeft then
         viewLeft:SetCartographic(not viewLeft:IsCartographic())
-    end    
+    end
 end
 
 function RegisterWorldView(view)

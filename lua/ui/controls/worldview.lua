@@ -67,7 +67,7 @@ local function RadiusDecalFunction(filterFunc)
     local maxRadius = 0
     for _, w in weapons do
         if w.FixedSpreadRadius and w.FixedSpreadRadius > maxRadius then
-            maxRadius = w.FixedSpreadRadius    
+            maxRadius = w.FixedSpreadRadius
         elseif w.DamageRadius > maxRadius then
             maxRadius = w.DamageRadius
         end
@@ -200,12 +200,12 @@ WorldView = Class(moho.UIWorldView, Control) {
                 else
                     self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
                 end
-            elseif (not order or order == 'RULEUCC_Move') and IsKeyDown(18) and units and table.getn(units) > 0 then
+            elseif (not order or order == 'RULEUCC_Move') and IsKeyDown(18) and units and not table.empty(units) then
                 local availableOrders,_,_ = GetUnitCommandData(units)
                 for _, availOrder in availableOrders do
-                    if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
-                        or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0
-                        or table.getn(EntityCategoryFilterDown(categories.FACTORY, units)) > 0 then
+                    if (availOrder == 'RULEUCC_RetaliateToggle' and not table.empty(EntityCategoryFilterDown(categories.MOBILE, units)))
+                        or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units))
+                        or not table.empty(EntityCategoryFilterDown(categories.FACTORY, units)) then
 
                         self.Cursor = {UIUtil.GetCursor('ATTACK_MOVE')}
                         break

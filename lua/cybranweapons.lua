@@ -354,15 +354,16 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
+        local bp = self:GetBlueprint()
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
-        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1])
+        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.6)
         self.SphereEffectEntity:SetVizToAllies('Intel')
         self.SphereEffectEntity:SetVizToNeutrals('Intel')
         self.SphereEffectEntity:SetVizToEnemies('Intel')
 
-        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
+        local emit = CreateAttachedEmitter(self.unit, bp.RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
 
         self.unit.Trash:Add(self.SphereEffectEntity)
         self.unit.Trash:Add(emit)
