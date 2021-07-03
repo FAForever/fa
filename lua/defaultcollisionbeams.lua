@@ -124,7 +124,6 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -196,7 +195,6 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -259,7 +257,6 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -327,7 +324,6 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -395,7 +391,6 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -453,7 +448,6 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -516,7 +510,6 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
@@ -592,7 +585,6 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
                 skipCount = 1
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
                 DamageArea(self, CurrentPosition, size, 1, 'Force', FriendlyFire)
-                self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
             else
                 skipCount = skipCount + self.ScorchSplatDropTime
