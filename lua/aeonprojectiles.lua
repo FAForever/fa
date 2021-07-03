@@ -472,7 +472,7 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
             
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 300, 70, army)
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2, radius * 2, 300, 90, army)
         end
         
         SingleCompositeEmitterProjectile.OnImpact(self, targetType, targetEntity)
