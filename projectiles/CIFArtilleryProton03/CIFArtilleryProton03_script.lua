@@ -11,10 +11,17 @@ CIFArtilleryProton03 = Class(CArtilleryProtonProjectile) {
     FxUnitHitScale = 1.6,
     
     OnImpact = function(self, targetType, targetEntity)
+        local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly
+        
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local pos = self:GetPosition()
             local army = self.Army
-            local radius = self.DamageData.DamageRadius
             
             CreateDecal( pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', radius * 2, radius * 2, 250, 200, army )
         end

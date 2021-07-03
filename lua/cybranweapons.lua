@@ -406,9 +406,22 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
+        local army = self.unit.Army
+        
         for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit, -2, self.unit.Army, v)
+            CreateEmitterAtBone(self.unit, -2, army, v)
         end
+        
+        if not self.unit.transportDrop then
+            local pos = self.unit:GetPosition()
+            local rotation = math.random(0, 6.28)
+            
+            DamageArea( self.unit, pos, 6, 1, 'Force', true )
+            DamageArea( self.unit, pos, 6, 1, 'Force', true )
+            
+            CreateDecal( pos, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
+        end
+        
         KamikazeWeapon.OnFire(self)
     end,
 }

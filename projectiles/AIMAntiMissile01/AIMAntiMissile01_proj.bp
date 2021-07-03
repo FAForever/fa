@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTIMISSILE',
+        'TECH_TWO',
     },
     Defense = {
         Health = 1,

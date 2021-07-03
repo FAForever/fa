@@ -126,7 +126,7 @@ NukeProjectile = Class(NullShell) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
+        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.NukeExplosion then
