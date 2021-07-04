@@ -101,12 +101,14 @@ UEL0307 = Class(TShieldLandUnit) {
         --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while not self.PointerEnabled do
 
+            WaitSeconds(1)
+
             -- break if we're a gooner
-            if self:BeenDestroyed() then 
+            if IsDestroyed(self) then 
                 break 
             end
 
-            WaitSeconds(1)
+            -- if not gooner, check whether we need to enable our weapon to keep reasonable distance
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
                 self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
