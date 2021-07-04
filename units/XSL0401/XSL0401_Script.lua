@@ -98,13 +98,7 @@ XSL0401 = Class(SWalkingLandUnit) {
             WaitTicks(Random(1, 4))
         end
 
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if bp.Weapon[i].Label == 'CollossusDeath' then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
+
         WaitSeconds(3.5)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
@@ -131,8 +125,17 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
 
-        -- only spawn storm when the unit is finished building
+        -- only spawn storm and do damage when the unit is finished building
         if self:GetFractionComplete() == 1 then
+
+            local bp = self:GetBlueprint()
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'CollossusDeath' then
+                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
+            end
+
             self:SpawnElectroStorm()
         end
 
