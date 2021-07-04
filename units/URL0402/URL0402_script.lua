@@ -236,18 +236,22 @@ URL0402 = Class(CWalkingLandUnit) {
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
 
-        local bp = self:GetBlueprint()
-        local position = self:GetPosition()
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        for i, numWeapons in bp.Weapon do
-            if bp.Weapon[i].Label == 'SpiderDeath' then
-                position[3] = position[3]+3*math.cos(a)
-                position[1] = position[1]+3*math.sin(a)
-                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
+        -- only apply death damage when the unit is finished building
+        if self:GetFractionComplete() == 1 then 
+            local bp = self:GetBlueprint()
+            local position = self:GetPosition()
+            local qx, qy, qz, qw = unpack(self:GetOrientation())
+            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'SpiderDeath' then
+                    position[3] = position[3]+3*math.cos(a)
+                    position[1] = position[1]+3*math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
             end
         end
+
         DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Center_Turret', 2)

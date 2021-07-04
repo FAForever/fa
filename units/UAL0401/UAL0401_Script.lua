@@ -58,16 +58,19 @@ UAL0401 = Class(AWalkingLandUnit) {
             WaitFor(self.DeathAnimManip)
         end
 
-        local bp = self:GetBlueprint()
-        local position = self:GetPosition()
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        for i, numWeapons in bp.Weapon do
-            if bp.Weapon[i].Label == 'CollossusDeath' then
-                position[3] = position[3]+5*math.cos(a)
-                position[1] = position[1]+5*math.sin(a)
-                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
+        -- only apply death damage when the unit is finished building
+        if self:GetFractionComplete() == 1 then 
+            local bp = self:GetBlueprint()
+            local position = self:GetPosition()
+            local qx, qy, qz, qw = unpack(self:GetOrientation())
+            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'CollossusDeath' then
+                    position[3] = position[3]+5*math.cos(a)
+                    position[1] = position[1]+5*math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
             end
         end
 
