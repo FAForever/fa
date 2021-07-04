@@ -52,40 +52,70 @@ StructureUnit = Class(Unit) {
     end,
 
     RotateTowardsEnemy = function(self)
+
+        --- constructs a piece of data that we can compare
+        local function MakeTarget(location, distance, threat)
+            local data = { }
+            data.location = location
+            data.distance = distance
+            data.threat = threat
+            return data
+        end
+
+        -- retrieve information we may need
         local bp = self:GetBlueprint()
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
-        local x, y = GetMapSize()
-        local threats = {{pos = {x / 2, 0, y / 2}, dist = VDist2(pos[1], pos[3], x, y), threat = -1}}
+
+        -- determine default threat that aims at center of the map
+        local x, z = GetMapSize()
+        local target = MakeTarget({0.5 * x, 0, 0.5 * z}, -1, -1)
+
+        -- retrieve units of certain type
+        local radius = 2 * (bp.AI.GuardScanRadius or 50)
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE + categories.LAND + categories.NAVAL)
-        local units = brain:GetUnitsAroundPoint(cats, pos, 2 * (bp.AI.GuardScanRadius or 100), 'Enemy')
+        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+
+        -- for each unit found
+        local threats = { }
         for _, u in units do
+
+            -- find its blip
             local blip = u:GetBlip(self.Army)
             if blip then
-                local on_radar = blip:IsOnRadar(self.Army)
-                local seen = blip:IsSeenEver(self.Army)
 
-                if on_radar or seen then
-                    local epos = u:GetPosition()
-                    local threat = seen and (u:GetBlueprint().Defense.SurfaceThreatLevel or 0) or 1
+                -- check if we've got it on radar and whether it is identified by army in question
+                local radar = blip:IsOnRadar(self.Army)
+                local identified = blip:IsSeenEver(self.Army)
+                if radar or identified then
 
-                    table.insert(threats, {pos = epos, threat = threat, dist = VDist2(pos[1], pos[3], epos[1], epos[3])})
+                    -- if we've identified the blip then we can use the threat of the unit, otherwise default to 1.
+                    local threat = (identified and u:GetBlueprint().Defense.SurfaceThreatLevel) or 1
+
+                    -- if this is more of a threat than what we have, compute distance
+                    if threat >= target.threat then
+                        local epos = u:GetPosition()
+                        local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
+
+                        -- if threat is bigger, then we don't need to compare distance
+                        if threat > target.threat then 
+                            target = MakeTarget(epos, distance, threat)
+                        else 
+                            -- threat is equal, therefore compare distance - closer wins
+                            if distance < target.distance then 
+                                target = MakeTarget(epos, distance, threat)
+                            end
+                        end
+                    end
                 end
             end
         end
 
-        table.sort(threats, function(a, b)
-            if a.threat <= 0 and b.threat <= 0 then
-                return a.threat == b.threat and a.dist < b.dist or a.threat > b.threat
-            elseif a.threat <= 0 then return false
-            elseif b.threat <= 0 then return true
-            else return a.dist < b.dist end
-        end)
-
-        local t = threats[1]
-        local rad = math.atan2(t.pos[1]-pos[1], t.pos[3]-pos[3])
+        -- get direction vector, atanify it for angle
+        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
+        -- some buildings can only take 90 degree angles
         if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL), self) then
             degrees = math.floor((degrees + 45) / 90) * 90
         end
