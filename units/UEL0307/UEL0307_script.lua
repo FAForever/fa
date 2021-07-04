@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Mobile Shield Generator Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TShieldLandUnit = import('/lua/terranunits.lua').TShieldLandUnit
@@ -98,8 +98,14 @@ UEL0307 = Class(TShieldLandUnit) {
     end,
         
     PointerRestart = function(self)
-    --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
-        while self.PointerEnabled == false do
+        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
+        while not self.PointerEnabled do
+
+            -- break if we're a gooner
+            if self:BeenDestroyed() then 
+                break 
+            end
+
             WaitSeconds(1)
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
