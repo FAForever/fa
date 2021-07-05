@@ -236,8 +236,10 @@ URL0402 = Class(CWalkingLandUnit) {
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
 
-        -- only apply death damage when the unit is finished building
-        if self:GetFractionComplete() == 1 then 
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self:GetFractionComplete() > FractionThreshold then 
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())

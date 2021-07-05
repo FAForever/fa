@@ -180,8 +180,10 @@ XRL0403 = Class(CWalkingLandUnit) {
         WaitSeconds(0.4)
         self:CreateDeathExplosionDustRing()
         
-        -- only apply death damage when the unit is finished building
-        if self:GetFractionComplete() == 1 then 
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self:GetFractionComplete() > FractionThreshold then 
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())

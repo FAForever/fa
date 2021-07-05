@@ -125,9 +125,10 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
 
-        -- only spawn storm and do damage when the unit is finished building
-        if self:GetFractionComplete() == 1 then
-
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self:GetFractionComplete() > FractionThreshold then 
             local bp = self:GetBlueprint()
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
@@ -135,7 +136,12 @@ XSL0401 = Class(SWalkingLandUnit) {
                     break
                 end
             end
+        end
 
+
+
+        -- only spawn storm and do damage when the unit is finished building
+        if self:GetFractionComplete() == 1 then
             self:SpawnElectroStorm()
         end
 
