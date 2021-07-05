@@ -141,18 +141,29 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     --- Adds a HQ so that the engi mod knows we have it
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
     AddHQ = function (self, faction, layer, tech)
         LOG("Adding: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
     RemoveHQ = function (self, faction, layer, tech)
         LOG("Removing: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
     --- Manages the support factory restrictions of the engi mod
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
     SetHQSupportFactoryRestrictions = function (self, faction, layer)
         -- the pessimists we are, restrict everything!
         AddBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
@@ -171,11 +182,18 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     --- Counts all HQs of specific faction, layer and tech
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
     CountHQs = function (self, faction, layer, tech)
         return self.HQs[faction][layer][tech]
     end,
 
     --- Counts all HQs of faction and tech, regardless of layer
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
     CountHQsAllLayers = function (self, faction, tech)
         local count = self.HQs[faction]["LAND"][tech]
         count = count + self.HQs[faction]["AIR"][tech]
