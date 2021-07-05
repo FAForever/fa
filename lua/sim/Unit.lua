@@ -358,33 +358,30 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- Updates build restrictions of any unit passed, used for support factories
-    updateBuildRestrictions = function(self)
+    UpdateBuildRestrictions = function(self)
 
         -- retrieve info of factory
         local faction = self.factionCategory
         local layer = self.layerCategory
         local aiBrain = self:GetAIBrain()
 
-        -- phase 1: add build restrictions for all units
-
+        -- the pessimists we are, remove all the units!
         self:AddBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
 
-        -- phase 2: lift build restrictions when applicable
-
-        -- there is a specific T3 HQ - allow all t2 / t3 units of this type
+        -- if there is a specific T3 HQ - allow all t2 / t3 units of this type
         if aiBrain:CountHQs(faction, layer, "TECH3") > 0 then 
             self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
 
-        -- there is some T3 HQ - allow t2 / t3 engineers
+        -- if there is some T3 HQ - allow t2 / t3 engineers
         elseif aiBrain:CountHQsAllLayers(faction, "TECH3") > 0 then 
             self:RemoveBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE * categories.CONSTRUCTION)
         end 
 
-        -- there is a specific T2 HQ - allow all t2 units of this type
+        -- if there is a specific T2 HQ - allow all t2 units of this type
         if aiBrain:CountHQs(faction, layer, "TECH2") > 0 then 
             self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
 
-        -- there is some T2 HQ - allow t2 engineers
+        -- if there is some T2 HQ - allow t2 engineers
         elseif aiBrain:CountHQsAllLayers(faction, "TECH2") > 0 then 
             self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
         end

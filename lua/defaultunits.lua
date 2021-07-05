@@ -597,7 +597,6 @@ FactoryUnit = Class(StructureUnit) {
                 function(self, unitBeingBuilt)
                     if EntityCategoryContains(categories.RESEARCH, self) then
                         unitBeingBuilt.UpgradedHQFromTech = self.techCategory
-                        LOG("Upgrading from " .. tostring(self.techCategory))
                     end
                 end,
                 "OnStartBuild"
@@ -610,14 +609,21 @@ FactoryUnit = Class(StructureUnit) {
             self:AddUnitCallback(
                 function(self) 
                     local brain = ArmyBrains[self.Army]
-                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
 
-                    -- if we upgraded then remove the HQ we came from
+                    -- if we're an upgrade then remove the HQ we came from
                     if self.UpgradedHQFromTech then
                         brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
                     end
 
-                    LOG("OnStopBeingBuilt: " .. tostring(self.Army))
+                    -- update internal state
+                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
                 end, "OnStopBeingBuilt")
 
             -- is called when:
@@ -625,18 +631,34 @@ FactoryUnit = Class(StructureUnit) {
             self:AddUnitCallback(
                 function(self) 
                     local brain = ArmyBrains[self.Army]
+
+                    -- update internal state
                     brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    LOG("OnKilled: " .. tostring(self.Army)) 
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
                 end, "OnKilled")
 
             -- is called when:
             --  - unit is given (used for the old army)
-            --  - unit is captured
+            --  - unit is captured (used for the old army)
             self:AddUnitCallback(
                 function(self, newUnit) 
                     local brain = ArmyBrains[self.Army]
+
+                    -- update internal state
                     brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    LOG("OnGiven: " .. tostring(self.Army) .. " -> " .. tostring(newUnit.Army)) 
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
                 end, "OnGiven")
 
             -- is called when:
@@ -644,19 +666,21 @@ FactoryUnit = Class(StructureUnit) {
             self:AddUnitCallback(
                 function(self) 
                     local brain = ArmyBrains[self.Army]
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    LOG("OnReclaimed: " .. tostring(self.Army)) 
-                end, "OnReclaimed")
-        end
 
-        -- Engymod addition: If a normal factory is created, we should check for research stations
-        if EntityCategoryContains(categories.FACTORY, self) then
-           self:updateBuildRestrictions()
+                    -- update internal state
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
+                end, "OnReclaimed")
         end
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
     end,
@@ -673,16 +697,6 @@ FactoryUnit = Class(StructureUnit) {
 
     OnDestroy = function(self)
         StructureUnit.OnDestroy(self)
-
-        -- Figure out if we're a research station
-        if EntityCategoryContains(categories.RESEARCH, self) then
-            local aiBrain = self:GetAIBrain()
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY, false)
-
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
-        end
 
         self.DestroyUnitBeingBuilt(self)
     end,
@@ -719,14 +733,6 @@ FactoryUnit = Class(StructureUnit) {
         else
             self:CreateBlinkingLights('Red')
             self.BlinkingLightsState = 'Red'
-        end
-
-        -- If we're a HQ, update build restrictions for all factories
-        if EntityCategoryContains(categories.RESEARCH, self) then
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY, false)
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
         end
     end,
 
@@ -1494,13 +1500,11 @@ MobileUnit = Class(Unit) {
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh)
         Unit.CreateEnhancement(self, enh)
-        self:updateBuildRestrictions()
     end,
 
     -- Added for engymod. When created, units must re-check their build restrictions
     OnCreate = function(self)
         Unit.OnCreate(self)
-        self:updateBuildRestrictions()
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 

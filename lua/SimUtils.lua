@@ -232,14 +232,14 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         v:OnGiven(unit)
     end
 
-    if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
-        for _,aiBrain in {fromBrain, toBrain} do
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
-            for _, victim in buildRestrictionVictims do
-                victim:updateBuildRestrictions()
-            end
-        end
-    end
+    -- if table.getn(EntityCategoryFilterDown(categories.RESEARCH, newUnits)) > 0 then
+    --     for _,aiBrain in {fromBrain, toBrain} do
+    --         local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+    --         for _, victim in buildRestrictionVictims do
+    --             victim:UpdateBuildRestrictions()
+    --         end
+    --     end
+    -- end
     
     if not captured then
         if upUnits[1] then

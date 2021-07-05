@@ -144,18 +144,16 @@ AIBrain = Class(moho.aibrain_methods) {
     AddHQ = function (self, faction, layer, tech)
         LOG("Adding: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
-        self:SetHQSupperFactoryRestrictions(faction, layer)
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it
     RemoveHQ = function (self, faction, layer, tech)
         LOG("Removing: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
-        self:SetHQSupperFactoryRestrictions(faction, layer)
     end,
 
     --- Manages the support factory restrictions of the engi mod
-    SetHQSupperFactoryRestrictions = function (self, faction, layer)
+    SetHQSupportFactoryRestrictions = function (self, faction, layer)
         -- the pessimists we are, restrict everything!
         AddBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         AddBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)

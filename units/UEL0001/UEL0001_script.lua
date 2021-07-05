@@ -235,8 +235,6 @@ UEL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -246,8 +244,6 @@ UEL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -275,8 +271,6 @@ UEL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -285,8 +279,6 @@ UEL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='DamageStabilization' then
             if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {

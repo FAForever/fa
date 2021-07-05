@@ -198,7 +198,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-            self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -207,7 +206,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
             end
-            self:updateBuildRestrictions()
         -- T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -238,7 +236,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-            self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -247,7 +244,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            self:updateBuildRestrictions()
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
