@@ -6,7 +6,7 @@ local Prefs = import('/lua/user/prefs.lua')
 
 function CreateResourceGroup(parent, groupLabel)
     local group = Group(parent)
-    
+
     -- Group label
     group.Label = UIUtil.CreateText(group, groupLabel, 12, "Arial Bold")
     group.Label:SetColor("FFBEBEBE")
@@ -39,7 +39,7 @@ end
 --       <icon> 24
 function CreateStatGroup(parent, labelIcon)
     local group = Group(parent)
-    
+
     group.Label = Bitmap(group)
     group.Label:SetTexture(labelIcon)
 
@@ -52,7 +52,7 @@ end
 
 function CreateTextbox(parent, label, bigBG)
     local group = Group(parent)
-    
+
     if bigBG then
         group.TL = Bitmap(group)
         group.TM = Bitmap(group)
@@ -85,7 +85,7 @@ function CreateTextbox(parent, label, bigBG)
 
     group.Value = {}
     group.Value[1] = UIUtil.CreateText(group, "", 12, UIUtil.bodyFont)
-    
+
     return group
 end
 
@@ -93,30 +93,30 @@ function Create(parent)
     if not import('/lua/ui/game/unitviewDetail.lua').View then
         import('/lua/ui/game/unitviewDetail.lua').View = Group(parent)
     end
-    
+
     local View = import('/lua/ui/game/unitviewDetail.lua').View
-    
+
     if not View.BG then
         View.BG = Bitmap(View)
     end
     View.BG:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/unit-over-back_bmp.dds'))
     View.BG.Depth:Set(200)
-    
+
     if not View.Bracket then
         View.Bracket = Bitmap(View)
     end
     View.Bracket:DisableHitTest()
     View.Bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
-    
+
     -- Unit icon
     if false then
         View.UnitIcon = Bitmap(View)
     end
-    
+
     if not View.UnitImg then
         View.UnitImg = Bitmap(View.BG)
     end
-    
+
     -- Unit Description
     if not View.UnitShortDesc then
         View.UnitShortDesc = UIUtil.CreateText(View.BG, "", 10, UIUtil.bodyFont)
@@ -132,12 +132,12 @@ function Create(parent)
     if not View.UpkeepGroup then
         View.UpkeepGroup = CreateResourceGroup(View.BG, "<LOC uvd_0002>Yield")
     end
-    
+
     -- Health stat
     if not View.HealthStat then
         View.HealthStat = CreateStatGroup(View.BG, UIUtil.UIFile('/game/unit_view_icons/redcross.dds'))
     end
-    
+
     if not View.ShieldStat then
         View.ShieldStat = CreateStatGroup(View.BG, UIUtil.UIFile('/game/unit_view_icons/shield.dds'))
     end
@@ -145,12 +145,12 @@ function Create(parent)
     if not View.TimeStat then
         View.TimeStat = CreateStatGroup(View.BG, UIUtil.UIFile('/game/unit-over/icon-clock_bmp.dds'))
     end
-    
+
     if not View.TechLevel then
         View.TechLevel = UIUtil.CreateText(View.BG, '', 10, UIUtil.bodyFont)
     end
     View.TechLevel:SetColor("FFFF9E06")
-    
+
     if Prefs.GetOption('uvd_format') == 'full' then
         -- Description  "<LOC uvd_0003>Description"
         if not View.Description then
@@ -159,16 +159,16 @@ function Create(parent)
     else
         if View.Description then View.Description:Destroy() View.Description = false end
     end
-    
+
     View.BG:DisableHitTest(true)
 end
 
 function SetLayout()
     local mapGroup = import('/lua/ui/game/unitviewDetail.lua').MapView
     import('/lua/ui/game/unitviewDetail.lua').ViewState = Prefs.GetOption('uvd_format')
-    
+
     Create(mapGroup)
-    
+
     local control = import('/lua/ui/game/unitviewDetail.lua').View
 
     local OrderGroup = false
@@ -185,13 +185,13 @@ function SetLayout()
     end
     control.Width:Set(control.BG.Width)
     control.Height:Set(control.BG.Height)
-    
+
     -- Main window background
     LayoutHelpers.AtLeftTopIn(control.BG, control)
-    
+
     LayoutHelpers.AtLeftTopIn(control.Bracket, control.BG, -19, -2)
     control.Bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
-    
+
     if control.bracketMid then
         control.bracketMid:Destroy()
         control.bracketMid = false
@@ -200,14 +200,14 @@ function SetLayout()
         control.bracketMax:Destroy()
         control.bracketMax = false
     end
-    
+
     -- Unit Image
     LayoutHelpers.AtLeftTopIn(control.UnitImg, control.BG, 12, 36)
     LayoutHelpers.SetDimensions(control.UnitImg, 48, 46)
-    
+
     -- Tech Level Text
     LayoutHelpers.CenteredBelow(control.TechLevel, control.UnitImg)
-    
+
     -- Unit Description
     LayoutHelpers.AtLeftTopIn(control.UnitShortDesc, control.BG, 20, 13)
     control.UnitShortDesc:SetClipToWidth(true)
@@ -218,7 +218,7 @@ function SetLayout()
     LayoutHelpers.AtLeftIn(control.TimeStat, control.UnitImg, -2)
     control.TimeStat.Height:Set(control.TimeStat.Label.Height)
     LayoutStatGroup(control.TimeStat)
-    
+
     -- Build Resource Group
     LayoutHelpers.AtLeftTopIn(control.BuildCostGroup, control.BG, 70, 34)
     LayoutHelpers.SetWidth(control.BuildCostGroup, 115)
@@ -230,19 +230,19 @@ function SetLayout()
     LayoutHelpers.SetWidth(control.UpkeepGroup, 55)
     control.UpkeepGroup.Bottom:Set(control.BuildCostGroup.Bottom)
     LayoutResourceGroup(control.UpkeepGroup)
-    
+
     -- health stat
     LayoutHelpers.RightOf(control.HealthStat, control.UpkeepGroup)
     LayoutHelpers.AtTopIn(control.HealthStat, control.UpkeepGroup, 22)
     control.HealthStat.Height:Set(control.HealthStat.Label.Height)
     LayoutStatGroup(control.HealthStat)
-    
+
     -- shield stat
     LayoutHelpers.RightOf(control.ShieldStat, control.UpkeepGroup, -2)
     LayoutHelpers.AtTopIn(control.ShieldStat, control.UpkeepGroup, 42)
     control.ShieldStat.Height:Set(control.ShieldStat.Label.Height)
     LayoutStatGroup(control.ShieldStat)
-    
+
     if control.Description then
         -- Description
         LayoutHelpers.AnchorToRight(control.Description, control.BG, -2)
@@ -275,42 +275,42 @@ function LayoutStatGroup(group)
     group.Label.Top:Set(group.Top)
     LayoutHelpers.AnchorToRight(group.Value, group.Label, 4)
     LayoutHelpers.AtVerticalCenterIn(group.Value, group.Label)
-end    
+end
 
 function LayoutTextbox(group)
     group.TL.Top:Set(group.Top)
     group.TL.Left:Set(group.Left)
-    
+
     group.TR.Top:Set(group.Top)
     group.TR.Right:Set(group.Right)
-    
+
     group.BL.Bottom:Set(group.Bottom)
     group.BL.Left:Set(group.Left)
-    
+
     group.BR.Bottom:Set(group.Bottom)
     group.BR.Right:Set(group.Right)
-    
+
     LayoutHelpers.AtTopIn(group.TM, group, 4)
     group.TM.Left:Set(group.TL.Right)
     group.TM.Right:Set(group.TR.Left)
-    
+
     LayoutHelpers.AtBottomIn(group.BM, group, 4)
     group.BM.Left:Set(group.BL.Right)
     group.BM.Right:Set(group.BR.Left)
-    
+
     group.ML.Left:Set(group.Left)
     group.ML.Top:Set(group.TL.Bottom)
     group.ML.Bottom:Set(group.BL.Top)
-    
+
     group.MR.Right:Set(group.Right)
     group.MR.Top:Set(group.TR.Bottom)
     group.MR.Bottom:Set(group.BR.Top)
-    
+
     group.M.Left:Set(group.ML.Right)
     group.M.Right:Set(group.MR.Left)
     group.M.Top:Set(group.TM.Bottom)
     group.M.Bottom:Set(group.BM.Top)
-    
+
     group.TL.Depth:Set(function() return group.Depth() - 1 end)
     group.TM.Depth:Set(group.TL.Depth)
     group.TR.Depth:Set(group.TL.Depth)
@@ -320,7 +320,7 @@ function LayoutTextbox(group)
     group.BL.Depth:Set(group.TL.Depth)
     group.BM.Depth:Set(group.TL.Depth)
     group.BR.Depth:Set(group.TL.Depth)
-    
+
     LayoutHelpers.AtLeftTopIn(group.Value[1], group, 24, 14)
     LayoutHelpers.AtRightIn(group.Value[1], group, 15)
     group.Value[1].Width:Set(function() return group.Right() - group.Left() - 14 end)

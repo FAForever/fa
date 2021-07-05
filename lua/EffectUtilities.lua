@@ -82,6 +82,7 @@ function ScaleEmittersParam(Emitters, param, minRange, maxRange)
 end
 
 function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
+    unitBeingBuilt.BuildingCube = true
     local bp = unitBeingBuilt:GetBlueprint()
     local mul = 1.15
     local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
@@ -148,6 +149,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
         lComplete = cComplete
         cComplete = unitBeingBuilt:GetFractionComplete()
     end
+    unitBeingBuilt.BuildingCube = nil
 end
 
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
@@ -554,7 +556,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    
+
     local slice = nil
 
     -- Create a pool mercury that slow draws into the build unit
@@ -599,7 +601,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
         slider:SetSpeed(-1)
         slider:SetGoal(0, -sy * 0.5, 0)
     end
-    
+
     if not builder:IsPaused() then
         local fraction = unitBeingBuilt:GetFractionComplete()
         local scale
@@ -817,18 +819,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
         end
     end
 
-    -- The flash can now be seen only by the player owning the building, his allies or enemies who
-    -- have a visual of the building.
-    local unitsArmy = unitBeingBuilt.Army
-    local focusArmy = GetFocusArmy()
-    if focusArmy == -1 or IsAlly(unitsArmy, focusArmy) then
-        CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-    elseif IsEnemy(unitsArmy, focusArmy) then
-        local blip = unitBeingBuilt:GetBlip(focusArmy)
-        if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-        end
-    end
+    CreateLightParticleIntel(unitBeingBuilt, -1, unitBeingBuilt.Army, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
 
     WaitSeconds(0.5)
     BuildBaseEffect:Destroy()
@@ -1163,7 +1154,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
         for i = 1, numNodes do
             nodeList[i].entity:SetMesh(nodeMesh, false)
             nodeList[i].mesh = true
-            if emitterNodeEffects[i] ~= nil and table.getn(emitterNodeEffects[i]) ~= 0 then
+            if emitterNodeEffects[i] ~= nil and not table.empty(emitterNodeEffects[i]) then
                 for _, vEmit in emitterNodeEffects[i] do
                     emit = CreateAttachedEmitter(nodeList[i].entity, 0, unit.Army, vEmit)
                     info.Trash:Add(emit)
@@ -1441,7 +1432,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
     end
-    
+
     if teleDelay then
         WaitTicks(teleDelay * 10)
     end

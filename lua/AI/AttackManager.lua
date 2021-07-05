@@ -224,7 +224,7 @@ AttackManager = Class({
                         end
                     end
                 end
-                if table.getn(combineList) > 0 or v.UsePool then
+                if not table.empty(combineList) or v.UsePool then
                     local tempPlatoon
                     if self.Platoons[k].AIName then
                         tempPlatoon = self.brain:CombinePlatoons(combineList, v.AIName)

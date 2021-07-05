@@ -326,7 +326,7 @@ function OnBlueprintsLoaded()
         for name, faction in factions do
             UnitsAnalyzer.GetUnitsGroups(faction.Blueprints, faction)
             for group, units in faction.Units do
-                if table.getsize(units) > 0 then
+                if not table.empty(units) then
                     cellMax = cellMax + 1
                 elseif group ~= 'CIVILIAN' then
                     WARN('UnitsManager detected '..name..' faction without any '..group..' units')
@@ -1048,7 +1048,7 @@ end
 -- @param sortReversed - optional boolean for sorting in revers of order specified in sortCategories
 function CompareUnitsOrder(a, b, sortCategories, sortReversed)
 
-    if table.getsize(sortCategories) == 0 then
+    if table.empty(sortCategories) then
         return 0
     end
 
@@ -1096,7 +1096,7 @@ function SortUnits(unitsByID, sortCategories, sortReversed)
        sortCategories = sortBy.TECH
     end
 
-    if table.getsize(unitsByID) == 0 then
+    if table.empty(unitsByID) then
         return unitsByID
     end
 

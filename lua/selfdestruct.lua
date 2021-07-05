@@ -12,7 +12,7 @@ function ToggleSelfDestruct(data)
                 table.insert(unitEntities, unit)
             end
         end
-        if table.getsize(unitEntities) > 0 then
+        if not table.empty(unitEntities) then
             if data.noDelay then -- Kill these units instantly
                 for _, unit in unitEntities do
                     if unit:BeenDestroyed() or unit.Dead then return end

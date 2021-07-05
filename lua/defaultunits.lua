@@ -135,7 +135,7 @@ StructureUnit = Class(Unit) {
         local tarmac
         local bp = self:GetBlueprint().Display.Tarmacs
         if not specTarmac then
-            if bp and table.getn(bp) > 0 then
+            if bp and not table.empty(bp) then
                 local num = Random(1, table.getn(bp))
                 tarmac = bp[num]
             else
@@ -154,7 +154,7 @@ StructureUnit = Class(Unit) {
         -- I'm disabling this for now since there are so many things wrong with it
         local orient = orientation
         if not orientation then
-            if tarmac.Orientations and table.getn(tarmac.Orientations) > 0 then
+            if tarmac.Orientations and not table.empty(tarmac.Orientations) then
                 orient = tarmac.Orientations[Random(1, table.getn(tarmac.Orientations))]
                 orient = (0.01745 * orient)
             else
@@ -226,7 +226,7 @@ StructureUnit = Class(Unit) {
 
     HasTarmac = function(self)
         if not self.TarmacBag then return false end
-        return table.getn(self.TarmacBag.Decals) ~= 0
+        return not table.empty(self.TarmacBag.Decals)
     end,
 
     OnMassStorageStateChange = function(self, state)
@@ -559,7 +559,7 @@ StructureUnit = Class(Unit) {
                 return
             end
         end
-        self:ForkThread(EffectUtil.CreateAdjacencyBeams, adjacentUnit, self.AdjacencyBeamsBag)
+        EffectUtil.CreateAdjacencyBeams(self, adjacentUnit, self.AdjacencyBeamsBag)
     end,
 
     DestroyAdjacentEffects = function(self, adjacentUnit)
@@ -572,7 +572,7 @@ StructureUnit = Class(Unit) {
             end
         end
     end,
-    
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
 	    -- Handle incoming OC damage
         if damageType == 'Overcharge' then
@@ -791,7 +791,7 @@ FactoryUnit = Class(StructureUnit) {
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
         elseif unitBeingBuilt:GetBlueprint().CategoriesHash.RESEARCH then
-            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory 
+            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
@@ -1848,8 +1848,8 @@ AirUnit = Class(MobileUnit) {
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
-    
-    
+
+
     -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
     -- the only difference is the `elseif other.Nuke...` condition
     -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
@@ -2375,7 +2375,7 @@ CommandUnit = Class(WalkingLandUnit) {
             self:SetMesh(bp.Display.MeshBlueprint, true)
         end
     end,
-    
+
     -------------------------------------------------------------------------------------------
     -- TELEPORTING WITH DELAY
     -------------------------------------------------------------------------------------------
@@ -2384,7 +2384,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
-        
+
         local bp = self:GetBlueprint()
         local bpEco = bp.Economy
         local teleDelay = bp.General.TeleportDelay
@@ -2401,18 +2401,18 @@ CommandUnit = Class(WalkingLandUnit) {
             energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
             energyCost = energyCost * energyCostMod
-            
-            self.TeleportDestChargeBag = nil 
+
+            self.TeleportDestChargeBag = nil
             self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-            
+
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
+
             -- Create teleport charge effect + exit animation delay
             self:PlayTeleportChargeEffects(location, orientation, teleDelay)
             WaitFor(self.TeleportDrain)
-        else 
+        else
             self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-            
+
             -- Create teleport charge effect
             self:PlayTeleportChargeEffects(location, orientation)
             WaitFor(self.TeleportDrain)
@@ -2482,7 +2482,7 @@ ACUUnit = Class(CommandUnit) {
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
         self:SetImmobile(false)
-        
+
         CommandUnit.OnWorkFail(self, work)
     end,
 
@@ -2491,7 +2491,7 @@ ACUUnit = Class(CommandUnit) {
         ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
-    
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then

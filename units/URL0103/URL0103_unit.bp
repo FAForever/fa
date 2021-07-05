@@ -238,7 +238,7 @@ UnitBlueprint {
                 },
             },
             CollideFriendly = false,
-            Damage = 230, # 195
+            Damage = 230, -- 195
             DamageFriendly = false,
             DamageRadius = 2,
             DamageType = 'Normal',

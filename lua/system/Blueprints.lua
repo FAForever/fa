@@ -604,7 +604,7 @@ function PostModBlueprints(all_bps)
             if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
             if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
             -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if table.getsize(issues) == 0 then
+            if table.empty(issues) then
                 table.insert(preset_bps, table.deepcopy(bp))
             else
                 issues = table.concat(issues,', ')
@@ -670,11 +670,11 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     local stats = {}
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
-    
+
     --load game preferences file
     PreGameData = false --this stops us from tripping the games global variable uninitialised detector, which is very finicky in this file.
     LoadCustomPreferences()
-    
+
     -- load blueprints from active map directory
     if PreGameData and PreGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
@@ -685,7 +685,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
             if taskNotifier then
                taskNotifier:Update(task, total, k)
             end
-            
+
             safecall(task .. ': ' .. file, doscript, file)
         end
     end

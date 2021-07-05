@@ -101,13 +101,13 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sz = bp.SizeZ
 
     -- if a death animation is played the wreck hitbox may need some changes
-    if deathHitBox then 
-        cx = deathHitBox.CollisionOffsetX or cx 
-        cy = deathHitBox.CollisionOffsetY or cy 
-        cz = deathHitBox.CollisionOffsetZ or cz 
-        sx = deathHitBox.SizeX or sx 
-        sy = deathHitBox.SizeY or sy 
-        sz = deathHitBox.SizeZ or sz 
+    if deathHitBox then
+        cx = deathHitBox.CollisionOffsetX or cx
+        cy = deathHitBox.CollisionOffsetY or cy
+        cz = deathHitBox.CollisionOffsetZ or cz
+        sx = deathHitBox.SizeX or sx
+        sy = deathHitBox.SizeY or sy
+        sz = deathHitBox.SizeZ or sz
     end
 
     -- adjust the size, these dimensions are in both directions based on the center

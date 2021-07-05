@@ -157,7 +157,7 @@ function SetupSession()
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
-    if table.getsize(enhRestrictions) > 0 then
+    if not table.empty(enhRestrictions) then
         --table.print(enhRestrictions, 'enhRestrictions ')
         import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end

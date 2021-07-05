@@ -11,7 +11,7 @@ local optionsLogic = import('/lua/options/optionsLogic.lua')
 -- check if there are any profiles defined
 function ProfilesExist()
     local profiles = GetPreference("profile.profiles")
-    if (not profiles) or (table.getn(profiles) == 0) then
+    if (not profiles) or (table.empty(profiles)) then
         return false
     end
     return true

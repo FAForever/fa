@@ -78,13 +78,13 @@ Shield = Class(moho.shield_methods, Entity) {
         self.OffHealth = -1
 
         self.PassOverkillDamage = spec.PassOverkillDamage
-        
+
         local ownerCategories = self.Owner:GetBlueprint().CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
-        end    
+        end
 
         ChangeState(self, self.OnState)
     end,
@@ -178,14 +178,17 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        if dmgType == 'Overcharge' and instigator.EntityId then 
+        -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
+        -- when UnitId is false and EntityId is true, then we got overspill from a shield that was impacted
+        -- by the splat damage of an ACU overcharge weapon.
+        if dmgType == 'Overcharge' and instigator.UnitId then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2 
+                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
                 -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
             elseif self.CommandShield then --fixed damage for all ACU shields
-                amount = wep:GetBlueprint().Overcharge.commandDamage        
-            end	  
+                amount = wep:GetBlueprint().Overcharge.commandDamage
+            end
         end
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
@@ -224,7 +227,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
             self.Owner.Trash:Add(self.AssistersThread)
         end
-    
+
         WaitSeconds(self.RegenStartTime)
         while self:GetHealth() < self:GetMaxHealth() do
 
@@ -236,64 +239,64 @@ Shield = Class(moho.shield_methods, Entity) {
         end
         self.RegenThread = nil
     end,
-    
+
     --Fix "free" shield regen. Assist efficiency never drops, no matter what mass income you have
     --We have to compensate it in this thread.
     ValidateAssistersThread = function(self)
         local shieldBP = self.Owner:GetBlueprint().Defense.Shield
         local RegenPerBR = shieldBP.ShieldRegenRate / shieldBP.RegenAssistMult / 10 --amount of hp per 1 buildrate (for 1 tick). Weird formula
-        
+
         local previousTickTotalBR
         local previousTickAssisters
-        
+
         while self.RegenThread and not self.Owner.ActiveConsumption or self.OnStateCharging and self:GetHealth() ~= shieldBP.ShieldMaxHealth do
             if previousTickAssisters then
                 local realBuildRate = 0
-                
+
                 for key, unit in previousTickAssisters do
                     -- ActiveConsumption means unit is not on pause. Without this, rapid pausing/unpausing engies causes hp drops
                     if not unit.Dead and unit.ActiveConsumption then
                         realBuildRate = realBuildRate + (unit:GetResourceConsumed() * unit.AssistBuildRate)
                     else
                         realBuildRate = realBuildRate + unit.AssistBuildRate
-                    end    
+                    end
                 end
-                
+
                 if realBuildRate ~= previousTickTotalBR then
                     local health = (previousTickTotalBR - realBuildRate) * RegenPerBR --calculate "free" hp that should be subtracted
-                    
+
                     self:AdjustHealth(self.Owner, -health)
                 end
-                
+
                 previousTickAssisters = nil
                 previousTickTotalBR = nil
             end
-            
+
             local assisters = self.Owner:GetGuards()
 
             if assisters[1] then
                 local engineers = {}
                 local totalBR = 0
-                
+
                 for key, unit in assisters do
                     --only engies can have shield as FocusUnit, also checking for pause
                     if unit:GetFocusUnit() == self.Owner and unit.ActiveConsumption then
                         unit.AssistBuildRate = unit:GetBuildRate()
                         totalBR = totalBR + unit.AssistBuildRate
-                        
+
                         table.insert(engineers, unit)
                     end
                 end
-                
+
                 if engineers[1] then
                     previousTickAssisters = engineers
                     previousTickTotalBR = totalBR
-                end    
+                end
             end
 
             WaitTicks(1)
         end
-        
+
         self.AssistersThread = nil
     end,
 
@@ -431,23 +434,23 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.Owner:SetMaintenanceConsumptionActive()
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
                 ChangeState(self, self.DamageRechargeState)
-        
+
             -- If the shield was turned off; use the recharge time before turning back on
             elseif self.OffHealth >= 0 then
                 self.Owner:SetMaintenanceConsumptionActive()
                 self.OnStateCharging = true
-                
+
                 -- In this particular case (OnState + charging) shield can be assisted by engineers
                 -- It's unfixable without changing the state (and changing state causes even more issues)
                 -- so we have to launch assisters thread here too
                 if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
                     self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
-                    self.Owner.Trash:Add(self.AssistersThread)       
+                    self.Owner.Trash:Add(self.AssistersThread)
                 end
-                
+
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
                 self.OnStateCharging = nil
-                
+
                 -- If the shield has less than full health, allow the shield to begin regening
                 if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
@@ -516,7 +519,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
-            
+
             if self.DamageRecharge then
                 self.DamageRecharge = self.Owner:GetShieldRatio(self.Owner)
             end
@@ -549,10 +552,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 -- We must make the unit charge up before getting its shield back
                 self:ChargingUp(0, self.ShieldRechargeTime)
-            
+
                 -- Fully charged, get full health
                 self:SetHealth(self, self:GetMaxHealth())
-            
+
                 self.DamageRecharge = nil
                 ChangeState(self, self.OnState)
             else
@@ -562,9 +565,9 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.Owner:PlayUnitSound('ShieldOff')
 
                 self:ChargingUp(self.ShieldRechargeTime * self.DamageRecharge, self.ShieldRechargeTime)
-            
+
                 self:SetHealth(self, self:GetMaxHealth())
-            
+
                 self.DamageRecharge = nil
                 ChangeState(self, self.OnState)
             end
@@ -929,18 +932,18 @@ CzarShield = Class(PersonalShield) {
 
         ChangeState(self, self.OnState)
     end,
-    
-    
+
+
     CreateImpactEffect = function(self, vector)
         if not self or self.Owner.Dead then return end
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
         local pos = self:GetPosition()
-        
+
         -- Shield has non-standard form (ellipsoid) and no collision, so we need some magic to make impacts look good
         -- All impacts from above and below (>1 & <1) cause big pulses in the center of shield
-        -- Projectiles that come from same elevation (ASF etc.) cause small pulses on the edge of shield using 
+        -- Projectiles that come from same elevation (ASF etc.) cause small pulses on the edge of shield using
         -- standard effect from static shields
         if vector.y > 1 then
             Warp(ImpactMesh, {pos[1], pos[2] + 9.5, pos[3]})
@@ -950,13 +953,13 @@ CzarShield = Class(PersonalShield) {
             ImpactMesh:SetOrientation(OrientFromDir(Vector(0, -30, 0)), true)
         elseif vector.y < -1 then
             Warp(ImpactMesh, {pos[1], pos[2] - 9.5, pos[3]})
-            
+
             ImpactMesh:SetMesh(self.ImpactMeshBigBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(0, 30, 0)), true)
         else
             Warp(ImpactMesh, {pos[1], pos[2], pos[3]})
-            
+
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
@@ -969,21 +972,21 @@ CzarShield = Class(PersonalShield) {
         WaitSeconds(5)
         ImpactMesh:Destroy()
     end,
-    
+
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
         self:SetCollisionShape('None')
-        
+
         self:SetMesh(self.MeshBp)
         self:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
         self:SetDrawScale(self.Size)
     end,
-    
+
     OnDestroy = function(self)
         Shield.OnDestroy(self)
     end,
-    
+
     RemoveShield = function(self)
         Shield.RemoveShield(self)
         self:SetCollisionShape('None')

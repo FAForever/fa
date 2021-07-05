@@ -11,6 +11,7 @@ ProjectileBlueprint {
         'PROJECTILE',
         'NOSPLASHDAMAGE',
         'ANTIMISSILE',
+        'TECH_THREE',
     },
     Description = 'UEF Anti Nuclear Missile',
     Display = {

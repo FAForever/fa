@@ -960,7 +960,7 @@ function SetSlotInfo(slotNum, playerInfo)
         local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
-        if table.getn(slotKeys) > 0 then
+        if not table.empty(slotKeys) then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
             Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1110,7 +1110,7 @@ function ClearSlotInfo(slotIndex)
     -- set the text appropriately
     slot.name:ClearItems()
     slot.name:SetTitleText(LOC(stateText))
-    if table.getn(slotKeys) > 0 then
+    if not table.empty(slotKeys) then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
         Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1227,7 +1227,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -1266,7 +1266,7 @@ local function autobalance_avg(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         local first_team = true
         for i, t in teams do
             local team = t['team']
@@ -1310,7 +1310,7 @@ local function autobalance_rr(players, teams)
         i = i + 1
     end
 
-    while table.getsize(players) > 0 do
+    while not table.empty(players) do
         for i, pick in team_picks do
             local slot = table.remove(teams[pick.team], 1)
             if not slot then continue end
@@ -1338,7 +1338,7 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
@@ -2028,22 +2028,22 @@ local function TryLaunch(skipNoObserversCheck)
         -- Load in the default map options if they are not set manually
 
         -- Not all maps have options
-        if scenarioInfo.options then 
-      
-            -- If we don't validate them first then the people using the default 
+        if scenarioInfo.options then
+
+            -- If we don't validate them first then the people using the default
             -- as a value instead of the index of the value will mess us up
             MapUtil.ValidateScenarioOptions(scenarioInfo.options)
-      
+
             -- For every option, if it's not set yet then add its default value
-            for _, option in scenarioInfo.options do 
-                if not gameInfo.GameOptions[option.key] then 
+            for _, option in scenarioInfo.options do
+                if not gameInfo.GameOptions[option.key] then
                     -- When the value data of the option is formatted as:
                     -- values = {
-                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },		
-                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },	
-                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },	
+                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },
+                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },
+                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },
                     --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
-                    -- },	
+                    -- },
                     local keyVersion = option.values[option.default].key
 
                     -- When the value data of the option is formatted as:
@@ -2504,7 +2504,7 @@ function CreateSlotsUI(makeLabel)
 
             local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' and associatedMarker:IsEnabled() then
+                if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
                     associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
@@ -3768,7 +3768,7 @@ function setupChatEdit(chatPanel)
         if AddUnicodeCharToEditText(self, keyCode) then
             return
         end
-        if commandQueue and table.getsize(commandQueue) > 0 then
+        if commandQueue and not table.empty(commandQueue) then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
@@ -5069,7 +5069,7 @@ function SetGameOptions(options, ignoreRefresh)
         if key == 'RestrictedCategories' then
             local restrictionsEnabled = false
             if val ~= nil then
-                if table.getn(val) ~= 0 then
+                if not table.empty(val) then
                     restrictionsEnabled = true
                 end
             end
@@ -5118,6 +5118,11 @@ end
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo.hidePreviewMarkers then
+        return
+    end
+
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
@@ -5231,35 +5236,37 @@ function CPUBenchmark()
     local countTime = 0
     --Make everything a local variable
     --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local TableInsert = table.insert
+    local TableRemove = table.remove
     local h
     local i
     local j
     local k
     local l
     local m
-    for h = 1, 48, 1 do
+    local n = {}
+    for h = 1, 24, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
             return
         end
 
         lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 25.0, 0.0008 do
-            --This instruction set should cover most LUA operators
+        for i = 1.0, 30.4, 0.0008 do
+           --This instruction set should cover most LUA operators
             j = i + i   --Addition
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
             j = i ^ 4   --Power
             l = -i      --Negation
-            m = {'One', 'Two', 'Three'} --Create Table
-            table.insert(m, 'Four')     --Insert Table Value
-            table.remove(m, 1)          --Remove Table Value
-            l = table.getn(m)           --Get Table Length
+            m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
+            TableInsert(m, '1234567890')     --Insert Table Value
             k = i < j   --Less Than
             k = i == j  --Equality
             k = i <= j  --Less Than or Equal to
             k = not k
+            n[tostring(i)] = m
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
@@ -5267,7 +5274,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            WaitSeconds(0)
+            coroutine.yield(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)

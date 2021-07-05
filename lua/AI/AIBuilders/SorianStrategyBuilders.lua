@@ -45,7 +45,7 @@ function EconWatch(aiBrain)
     repeat
         for _,cat in cats do
             local units = aiBrain:GetListOfUnits(cat, false)
-            if table.getn(units) <= 0 then continue end
+            if table.empty(units) then continue end
             for k, unit in units do
                 if unit.Dead then continue end
                 local upgradeID
@@ -287,7 +287,7 @@ BuilderGroup {
                     return
                 end
                 airfacs = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * categories.FACTORY, {x,0,z}, 150)
-            until table.getn(airfacs) > 0
+            until not table.empty(airfacs)
             local ex, ey = aiBrain:GetCurrentEnemy():GetArmyStartPos()
             local Engies = {}
             local possEngies = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.ENGINEER * categories.TECH1, {x,0,z}, 200)
@@ -867,9 +867,9 @@ BuilderGroup {
             local enemies = 0
             local allies = 0
             for k,v in ArmyBrains do
-                if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                     enemies = enemies + 1
-                elseif not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                     allies = allies + 1
                 end
             end

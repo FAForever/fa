@@ -90,7 +90,7 @@ function GetAItypes()
             end
         end
     end
-    
+
     --Default GPG Cheating AIs
     table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive" })
     table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush" })

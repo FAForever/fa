@@ -151,7 +151,7 @@ function ResetUserKeyMapTo(newPreset)
     LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')
     Prefs.SetToCurrentProfile("UserKeyMapName", newPreset)
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    if table.getsize(oldKeyMap) > 0 then
+    if not table.empty(oldKeyMap) then
         LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
     end
      -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
@@ -361,7 +361,7 @@ end
 function GetShiftAction(actionName, category)
     local keyActions = GetKeyActions()
     local keyLookup = GetKeyLookup()
-     
+
     local name = 'shift_' .. actionName
     local action = keyActions[name]
     if action  and action.category == category then

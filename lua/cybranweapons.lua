@@ -354,15 +354,16 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
+        local bp = self:GetBlueprint()
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
-        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1])
+        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.6)
         self.SphereEffectEntity:SetVizToAllies('Intel')
         self.SphereEffectEntity:SetVizToNeutrals('Intel')
         self.SphereEffectEntity:SetVizToEnemies('Intel')
 
-        local emit = CreateAttachedEmitter(self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
+        local emit = CreateAttachedEmitter(self.unit, bp.RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
 
         self.unit.Trash:Add(self.SphereEffectEntity)
         self.unit.Trash:Add(emit)
@@ -405,9 +406,22 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
+        local army = self.unit.Army
+        
         for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit, -2, self.unit.Army, v)
+            CreateEmitterAtBone(self.unit, -2, army, v)
         end
+        
+        if not self.unit.transportDrop then
+            local pos = self.unit:GetPosition()
+            local rotation = math.random(0, 6.28)
+            
+            DamageArea( self.unit, pos, 6, 1, 'Force', true )
+            DamageArea( self.unit, pos, 6, 1, 'Force', true )
+            
+            CreateDecal( pos, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
+        end
+        
         KamikazeWeapon.OnFire(self)
     end,
 }

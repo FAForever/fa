@@ -294,7 +294,7 @@ end
 function table.getsize(t)
     -- handling nil table like empty tables so that no need to check
     -- for nil table and then size of table:
-    -- if t and table.getsize(t) > 0 then
+    -- if t and not table.empty(t) then
     -- do some thing
     -- end
     if type(t) ~= 'table' then return 0 end
@@ -405,7 +405,8 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
-    return table.getsize(t) == 0
+    if type(t) ~= 'table' then return true end
+    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -472,7 +473,7 @@ function table.print(tbl, tblPrefix, printer)
         printer(tblPrefix .." table is nil")
         return
     end
-    if table.getsize(tbl) == 0 then
+    if table.empty(tbl) then
         printer(tblPrefix .." { }")
         return
     end
@@ -623,12 +624,13 @@ function Sort(itemA, itemB)
 end
 
 -- Rounds a number to specified double precision
-function math.round(num, idp)
+function math.round(num,idp)
     if not idp then
         return math.floor(num+.5)
-    else
-        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     end
+
+    idp = math.pow(10,idp)
+    return math.floor(num*idp+.5)/idp
 end
 
 --- Clamps numeric value to specified Min and Max range

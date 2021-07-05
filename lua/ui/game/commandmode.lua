@@ -214,7 +214,7 @@ function OnCommandIssued(command)
         local c = categories.STRUCTURE * categories.FACTORY
         if EntityCategoryContains(c, command.Blueprint) then
             local factories = EntityCategoryFilterDown(c, command.Units) or {}
-            if table.getsize(factories) > 0 then
+            if not table.empty(factories) then
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end
@@ -225,9 +225,9 @@ function OnCommandIssued(command)
         end
         --EQ:this is the only bit we add - a callback for shields so they can disable their pointers.
         local shieldCat = categories.MOBILE * categories.SHIELD
-        
+
         local mobShields = EntityCategoryFilterDown(shieldCat, command.Units)
-        
+
         if mobShields[1] then
             local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
             SimCallback(cb, true)

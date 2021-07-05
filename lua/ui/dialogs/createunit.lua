@@ -331,7 +331,7 @@ do
     local killmodslist
     for i, filter in nameFilters do
         if filter.key == 'mod' then
-            if filter.choices and table.getn(filter.choices) == 0 then
+            if filter.choices and table.empty(filter.choices) then
                 killmodslist = i
             end
             break
@@ -601,7 +601,7 @@ function CreateDialog(x, y)
     end
 
     local function spawnUnits(creationList, targetArmy, fast)
-        if table.getsize(creationList) <= 0 then return end
+        if table.empty(creationList) then return end
         local numUnits = tonumber(count:GetText())
         local vetLvl = tonumber(veterancyLevel:GetText())
         if fast then
@@ -764,7 +764,7 @@ function CreateDialog(x, y)
         filterSetCombo.itemArray = {}
         filterSetCombo.keyMap = {}
         local CurrentFilterSets = GetPreference('CreateUnitFilters')
-        if CurrentFilterSets and table.getsize(CurrentFilterSets) > 0 then
+        if CurrentFilterSets and not table.empty(CurrentFilterSets) then
             local index = 1
             local default = 1
             for filterName, filter in sortedpairs(CurrentFilterSets) do

@@ -25,20 +25,20 @@ function CreateDialog(over, isLoad, exitBehavior)
 
     local panel = Bitmap(parent, UIUtil.UIFile('/scx_menu/replay/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(panel, parent)
-    
+
     panel.brackets = UIUtil.CreateDialogBrackets(panel, 43, 25, 43, 25)
-    
+
     panel.Depth:Set(GetFrame(over:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
 
     local worldCover = UIUtil.CreateWorldCover(panel)
-    
+
     local titleString
     if isLoad then
         titleString = "<LOC uireplay_0001>Replay"
     else
         titleString = "<LOC uireplay_0003>Save Replay"
     end
-    
+
     local dlgHead = UIUtil.CreateText(panel, titleString, 20, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(dlgHead, panel, 35)
     LayoutHelpers.AtHorizontalCenterIn(dlgHead, panel)
@@ -57,16 +57,16 @@ function CreateDialog(over, isLoad, exitBehavior)
     end
 
     function DoReplaySave(profile, base)
-        CopyCurrentReplay(profile, base)    
+        CopyCurrentReplay(profile, base)
     end
-    
+
     function DoReplayLaunch(filename)
         if LaunchReplaySession(filename) == true then
             SetFrontEndData('replay_filename', filename)
             parent:Destroy()
             MenuCommon.MenuCleanup()
         else
-            UIUtil.ShowInfoDialog(parent, LOCF("<LOC REPLAY_0000>Unable to launch replay: %s", Basename(filename, true)), "<LOC _Ok>")    
+            UIUtil.ShowInfoDialog(parent, LOCF("<LOC REPLAY_0000>Unable to launch replay: %s", Basename(filename, true)), "<LOC _Ok>")
         end
     end
 
@@ -81,10 +81,10 @@ function CreateDialog(over, isLoad, exitBehavior)
             if forbiddenSaveNames[string.lower(control:GetBaseName())] then
                 UIUtil.ShowInfoDialog(parent, LOCF("<LOC filepicker_0005>The file %s is protected and can not be overwritten.", control:GetBaseName()), "<LOC _Ok>")
             elseif GetSpecialFileInfo(fileInfo.profile, fileInfo.fname, fileInfo.type) then
-                UIUtil.QuickDialog(parent, "<LOC filepicker_0003>A file already exits with that name. Are you sure you want to overwrite it?", 
-                "<LOC _Yes>", function() ExecuteSave() end, 
-                "<LOC _No>", nil, 
-                nil, nil, 
+                UIUtil.QuickDialog(parent, "<LOC filepicker_0003>A file already exits with that name. Are you sure you want to overwrite it?",
+                "<LOC _Yes>", function() ExecuteSave() end,
+                "<LOC _No>", nil,
+                nil, nil,
                 true, {worldCover = false, enterButton = 1, escapeButton = 2})
             else
                 ExecuteSave()
@@ -107,14 +107,14 @@ function CreateDialog(over, isLoad, exitBehavior)
     local deleteButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0006>Delete", 14)
     deleteButton.OnClick = function(self, modifiers)
         if filePicker:GetBaseName() == '' then
-            UIUtil.QuickDialog(panel, "<LOC file_0002>You must select a file to delete first.", 
+            UIUtil.QuickDialog(panel, "<LOC file_0002>You must select a file to delete first.",
                 "<LOC _Ok>", nil,
                 nil, nil,
                 nil, nil,
-                true, 
+                true,
                 {worldCover = false, enterButton = 1, escapeButton = 1})
         else
-            UIUtil.QuickDialog(panel, "<LOC file_0000>Are you sure you want to move this file to the recycle bin?", 
+            UIUtil.QuickDialog(panel, "<LOC file_0000>Are you sure you want to move this file to the recycle bin?",
                 "<LOC _Yes>", function()
                     RemoveSpecialFile(filePicker:GetProfile(), filePicker:GetBaseName(), "Replay")
                     filePicker:SetFilename('')
@@ -122,16 +122,16 @@ function CreateDialog(over, isLoad, exitBehavior)
                 end,
                 "<LOC _No>", nil,
                 nil, nil,
-                true, 
+                true,
                 {worldCover = false, enterButton = 1, escapeButton = 2})
         end
     end
-    
+
     LayoutHelpers.AtLeftTopIn(deleteButton, panel, 15, 505)
-    
+
     LayoutHelpers.AtRightTopIn(cancelBtn, panel, 15, 505)
     LayoutHelpers.LeftOf(okBtn, cancelBtn, 0)
-    
+
     UIUtil.MakeInputModal(panel, function() okBtn.OnClick(okBtn) end, function() cancelBtn.OnClick(cancelBtn) end)
 
 end
