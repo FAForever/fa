@@ -5291,7 +5291,7 @@ function CPUBenchmark()
     local currTime
     local countTime = 0
     --Make everything a local variable
-    --This is necessary because we don't want LUA searching through the globals as part of the benchmar
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
 
     local TableInsert = table.insert
     local TableRemove = table.remove
@@ -5934,7 +5934,7 @@ function CreatePackageManagerWindow()
         return true
     end
 
-    --scrlling
+    --scrolling
     GUI.PackageManager.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             if event.WheelRotation > 0 then
@@ -6007,7 +6007,6 @@ function CreatePackageManagerWindow()
             end
 
             line.bg.OnCheck = function(self, checked)
-                LOG('set '..repr(checked)..' on '..repr(self.id))
                 Emojis.UpdatePacks(self.id, checked)
                 GUI.chatDisplay:ReflowLines()
             end
