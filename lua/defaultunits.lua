@@ -586,16 +586,76 @@ StructureUnit = Class(Unit) {
 -- FACTORY UNITS
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
+        StructureUnit.OnCreate(self)
+
+        -- keeps track of what HQs are available
+        if EntityCategoryContains(categories.RESEARCH, self) then
+
+            -- is called when:
+            -- - structure is being upgraded
+            self:AddUnitCallback(
+                function(self, unitBeingBuilt)
+                    if EntityCategoryContains(categories.RESEARCH, self) then
+                        unitBeingBuilt.UpgradedHQFromTech = self.techCategory
+                        LOG("Upgrading from " .. tostring(self.techCategory))
+                    end
+                end,
+                "OnStartBuild"
+            )
+
+            -- is called when:
+            --  - unit is built
+            --  - unit is captured (for the new army)
+            --  - unit is given (for the new army)
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
+
+                    -- if we upgraded then remove the HQ we came from
+                    if self.UpgradedHQFromTech then
+                        brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
+                    end
+
+                    LOG("OnStopBeingBuilt: " .. tostring(self.Army))
+                end, "OnStopBeingBuilt")
+
+            -- is called when:
+            --  - unit is killed
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    LOG("OnKilled: " .. tostring(self.Army)) 
+                end, "OnKilled")
+
+            -- is called when:
+            --  - unit is given (used for the old army)
+            --  - unit is captured
+            self:AddUnitCallback(
+                function(self, newUnit) 
+                    local brain = ArmyBrains[self.Army]
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    LOG("OnGiven: " .. tostring(self.Army) .. " -> " .. tostring(newUnit.Army)) 
+                end, "OnGiven")
+
+            -- is called when:
+            --  - unit is reclaimed
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    LOG("OnReclaimed: " .. tostring(self.Army)) 
+                end, "OnReclaimed")
+        end
+
         -- Engymod addition: If a normal factory is created, we should check for research stations
         if EntityCategoryContains(categories.FACTORY, self) then
            self:updateBuildRestrictions()
         end
 
-        StructureUnit.OnCreate(self)
-
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-
 
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
@@ -612,39 +672,42 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnDestroy = function(self)
+        StructureUnit.OnDestroy(self)
+
         -- Figure out if we're a research station
         if EntityCategoryContains(categories.RESEARCH, self) then
             local aiBrain = self:GetAIBrain()
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY, false)
 
             for id, unit in buildRestrictionVictims do
                 unit:updateBuildRestrictions()
             end
         end
 
-        StructureUnit.OnDestroy(self)
-
         self.DestroyUnitBeingBuilt(self)
     end,
 
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
+
         -- When factory is paused take some action
         if self:IsUnitState('Building') then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
-        StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
+        StructureUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
-        StructureUnit.OnUnpaused(self)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+
         local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         aiBrain:ESRegisterUnitEnergyStorage(self)
@@ -660,13 +723,11 @@ FactoryUnit = Class(StructureUnit) {
 
         -- If we're a HQ, update build restrictions for all factories
         if EntityCategoryContains(categories.RESEARCH, self) then
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY, false)
             for id, unit in buildRestrictionVictims do
                 unit:updateBuildRestrictions()
             end
         end
-
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
     end,
 
     ChangeBlinkingLights = function(self, state)
@@ -807,8 +868,8 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnFailedToBuild = function(self)
-        self.FactoryBuildFailed = true
         StructureUnit.OnFailedToBuild(self)
+        self.FactoryBuildFailed = true
         self:DestroyBuildRotator()
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
@@ -1349,10 +1410,10 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     DestroyIdleEffects = function(self)
+        StructureUnit.DestroyIdleEffects(self)
         if self.TimedSonarEffectsThread then
             self.TimedSonarEffectsThread:Destroy()
         end
-        StructureUnit.DestroyIdleEffects(self)
     end,
 
     OnIntelDisabled = function(self)
