@@ -209,3 +209,5 @@ protocols = {
     'daap',
     'im',
 }
+
+table.insert(path, 1, { dir = InitFileDir .. '\\..\\DevData', mountpoint = '/' })
