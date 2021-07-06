@@ -179,8 +179,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.zoomed = true
         end
         if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or AutoBuild) then
-            local options = Prefs.GetFromCurrentProfile('options')
-            if options['automex'] then
+            local option = Prefs.GetFromCurrentProfile('options')['automex']
+            if option ~= 'off' then
                 local Units = GetSelectedUnits()
                 if Units and not GetRolloverInfo() then
                     local BuildType = false
@@ -194,19 +194,27 @@ WorldView = Class(moho.UIWorldView, Control) {
                         end
                     end
                     if BuildType then
-                        local _, _, BuildableCategories = GetUnitCommandData(Units)
-                        BuildableCategories = BuildableCategories * BuildType
-                        local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
-                        for _, Tech in Techs do
-                            if not EntityCategoryEmpty(BuildableCategories * Tech) then
-                                BuildableCategories = BuildableCategories * Tech
-                                break
+                        if AutoBuild and CommandMode.GetCommandMode()[2].name ~= AutoBuild then
+                            AutoBuild = false
+                        else
+                            local _, _, BuildableCategories = GetUnitCommandData(Units)
+                            BuildableCategories = BuildableCategories * BuildType
+                            if option == 'onlyT1' then
+                                BuildableCategories = BuildableCategories * categories.TECH1
+                            else
+                                local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
+                                for _, Tech in Techs do
+                                    if not EntityCategoryEmpty(BuildableCategories * Tech) then
+                                        BuildableCategories = BuildableCategories * Tech
+                                        break
+                                    end
+                                end
                             end
-                        end
-                        local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
-                        if BuildBP then
-                            CommandMode.StartCommandMode('build', { name = BuildBP }, true)
-                            AutoBuild = true
+                            local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
+                            if BuildBP then
+                                CommandMode.StartCommandMode('build', { name = BuildBP })
+                                AutoBuild = BuildBP
+                            end
                         end
                     else
                         CommandMode.EndCommandMode(true)
